@@ -89,9 +89,8 @@ trait Topos {
     def restrict[S](equalizingArrow: ARROW[S, M]): ARROW[S, EQUALIZER_SOURCE[M, T]]
   }
 
-  trait IntegerPower[X] {
-    val power: DOT[Power[X]]
-    val projection: Seq[ARROW[Power[X], X]]
+  case class IntegerPower[X](_power: DOT[_], projection: Seq[ARROW[Power[X], X]]) {
+    def power = _power.asInstanceOf[DOT[Power[X]]]
   }
 
   class Power[X] // just a marker, for now - will have methods as part of the DSL?
@@ -128,25 +127,24 @@ trait Topos {
     (base A exponent).projection(index)
 
   def genericIntegerPower[X](base: DOT[X], exponent: Int) = exponent match {
-      case 0 => new IntegerPower[X] {
-        override val power = I.asInstanceOf[DOT[Power[X]]]
-        override val projection = Seq.empty
-      }
+      case 0 => IntegerPower[X](
+        I,
+        Seq.empty
+      )
 
-      case 1 => new IntegerPower[X] {
-        override val power = base.asInstanceOf[DOT[Power[X]]]
-        override val projection = Seq(base.identity.asInstanceOf[ARROW[Power[X], X]])
-      }
+      case 1 => IntegerPower[X](
+        base,
+        Seq(base.identity.asInstanceOf[ARROW[Power[X], X]])
+      )
 
-      case _ => new IntegerPower[X] {
+      case _ =>
           val xN_1 = base A (exponent - 1)
           val product = (xN_1.power) * base
-          override val power = product.product.asInstanceOf[DOT[Power[X]]]
-          override val projection =
-            xN_1.projection.map( p =>
-              p(product.leftProjection).asInstanceOf[ARROW[Power[X], X]]
-            ) :+ product.rightProjection.asInstanceOf[ARROW[Power[X], X]]
-      }
+          IntegerPower[X](
+            product.product,
+            (xN_1.projection.map(_(product.leftProjection)) :+ product.rightProjection).
+              asInstanceOf[Seq[ARROW[Power[X], X]]]
+          )
   }
 }
 
