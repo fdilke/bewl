@@ -61,8 +61,6 @@ object FiniteSets extends Topos {
       })
     }
 
-    // TODO: clean up unnecessary type paramaters?
-
     override def equals(other: Any): Boolean = other match {
       case that: FiniteSetsArrow[X, Y] =>
         source == that.source && target == that.target &&
@@ -87,8 +85,8 @@ object FiniteSets extends Topos {
     override val rightProjection = FiniteSetsArrow[(L, R), R](product, right, tupled { (x, y) => y})
 
     override def multiply[W](leftArrow: FiniteSetsArrow[W, L], rightArrow: FiniteSetsArrow[W, R]) =
-      FiniteSetsArrow(leftArrow.source, product, { x => (leftArrow.function(x), rightArrow.function(x))} )
-  } // TODO: ^ can make arrow act on X directly?
+      FiniteSetsArrow(leftArrow.source, product, x => (leftArrow.function(x), rightArrow.function(x)) )
+  }
 
   class FiniteSetsExponential[S, T](source: FiniteSetsDot[S], target: FiniteSetsDot[T])
     extends Exponential[S, T] {
@@ -97,7 +95,7 @@ object FiniteSets extends Topos {
     // we'll be comparing against things that aren't
     val theAllMaps: Traversable[S => T] = allMaps(source, target).
       map(FunctionWithEquality(source, _))
-    val exponentDot: FiniteSetsDot[S => T] = FiniteSetsDot[S => T](theAllMaps)
+    override val exponentDot: FiniteSetsDot[S => T] = FiniteSetsDot[S => T](theAllMaps)
 
     override val evaluation = new BiArrow[S => T, S, T](exponentDot, source,
       FiniteSetsArrow[(S => T, S), T](exponentDot x source, target, tupled {

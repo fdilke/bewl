@@ -37,7 +37,15 @@ trait Topos {
       (this.asInstanceOf[DOT[Any]],
         that.asInstanceOf[DOT[Any]])).asInstanceOf[EXPONENTIAL[S, X]]
 
-    final def ^[S](that: DOT[S]): DOT[S => X] = (this A that).evaluation.left
+    final def ^[S](that: DOT[S]): DOT[S => X] = (this A that).exponentDot
+
+    final def toPower(exponent: Int): IntegerPower[X] = genericIntegerPower(this.asInstanceOf[DOT[X]], exponent)
+
+    final def A[S](exponent: Int) = standardPowers(
+      this.asInstanceOf[DOT[Any]],
+      exponent).asInstanceOf[IntegerPower[X]]
+
+    final def ^(exponent: Int): DOT[Power[X]] = (this A exponent).power
   }
 
   trait Arrow[X, Y] {
@@ -64,8 +72,8 @@ trait Topos {
   }
 
   trait Exponential[S, T] {
+    val exponentDot: DOT[S => T]
     val evaluation: BiArrow[S => T, S, T]
-
     def transpose[W](multiArrow: BiArrow[W, S, T]): ARROW[W, S => T]
   }
 
@@ -81,12 +89,23 @@ trait Topos {
     def restrict[S](equalizingArrow: ARROW[S, M]): ARROW[S, EQUALIZER_SOURCE[M, T]]
   }
 
+  trait IntegerPower[X] {
+    val power: DOT[Power[X]]
+    def projection(n: Int): ARROW[Power[X], X]  // TODO: <= make "projections" an array
+  }
+
+  class Power[X] // just a marker, for now - will have methods as part of the DSL?
+
   private val standardProducts = new ResultStore[(DOT[Any], DOT[Any]), BIPRODUCT[Any, Any]](tupled {
     (x, y) => x multiply y
   })
 
   private val standardExponentials = new ResultStore[(DOT[Any], DOT[Any]), EXPONENTIAL[Any, Any]](tupled {
     (x, y) => x exponential y
+  })
+
+  private val standardPowers = new ResultStore[(DOT[Any], Int), IntegerPower[Any]](tupled {
+    (x, n) => x toPower n
   })
 
   // Helper methods for biproducts
@@ -101,8 +120,38 @@ trait Topos {
   // Helper methods for exponentials
   def evaluation[S, T](s: DOT[S], t: DOT[T]): BiArrow[S=>T, S, T] =
     (t A s).evaluation
-
   def transpose[S, T, W](s: DOT[S], t: DOT[T], multiArrow: BiArrow[W, S, T]): ARROW[W, S => T] =
     (t A s).transpose(multiArrow)
+
+  // Helper methods for integer powers
+  def projection[X](base: DOT[X], exponent: Int, index: Int): ARROW[Power[X], X] =
+    (base A exponent).projection(index)
+
+  def genericIntegerPower[X](base: DOT[X], exponent: Int) = exponent match {
+      case 0 => new IntegerPower[X]() {
+        override val power = I.asInstanceOf[DOT[Power[X]]]
+        override def projection(index: Int): ARROW[Power[X], X] = ???
+      }
+
+      case 1 => new IntegerPower[X]() {
+        override val power = base.asInstanceOf[DOT[Power[X]]]
+        override def projection(index: Int): ARROW[Power[X], X] = index match {
+            case 0 => base.identity.asInstanceOf[ARROW[Power[X], X]]
+            case _ => ???
+        }
+      }
+
+      case _ => new IntegerPower[X]() {
+          val xN_1 = base A (exponent - 1)
+          val product = (xN_1.power) * base
+          override val power = product.product.asInstanceOf[DOT[Power[X]]]
+          override def projection(index: Int): ARROW[Power[X], X] =
+            (if (index < (exponent - 1))
+              xN_1.projection(index)(product.leftProjection)
+            else
+              product.rightProjection
+            ).asInstanceOf[ARROW[Power[X], X]]
+      }
+  }
 }
 

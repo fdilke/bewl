@@ -4,8 +4,6 @@ import com.fdilke.bewl.fsets.FiniteSets.FiniteSetsUtilities.{arrow, dot}
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
-// TODO; purge ShouldMatchers
-
 class FiniteSetsArrowTest extends FunSpec {
   val aDot = dot("a", "b")
   val dotBig = dot("a", "b", "c")

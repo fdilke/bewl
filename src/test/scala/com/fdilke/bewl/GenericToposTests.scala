@@ -172,6 +172,21 @@ abstract class GenericToposTests[TOPOS <: Topos](
       restriction.target shouldBe bar
       monicBar2baz(restriction) shouldBe foo2ImageOfBar
     }
+
+    it("can construct powers") {
+      foo ^ 0 shouldBe I
+
+      foo ^ 1 shouldBe foo
+
+      val square = foo ^ 2
+
+      val twist: ARROW[Power[FOO], Power[FOO]] = (projection(foo, 2, 1) x projection(foo, 2, 0)).
+        asInstanceOf[ARROW[Power[FOO], Power[FOO]]]
+      twist.source shouldBe square
+      twist.target shouldBe square
+      twist should not be square.identity
+      twist(twist) shouldBe square.identity
+    }
   }
 }
 
