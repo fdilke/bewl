@@ -50,9 +50,9 @@ trait Topos {
       case 1 => IntegerPower[X](this, Seq(this.identity))
       case _ =>
         val xN_1 = this A (exponent - 1)
-        val product = (xN_1.power) * this.asInstanceOf[DOT[X]]
+        val product = this * xN_1.power
         IntegerPower[X](product.product,
-          xN_1.projection.map(_(product.leftProjection)) :+ product.rightProjection
+          product.leftProjection +: xN_1.projection.map(_(product.rightProjection))
         )
     }
   }

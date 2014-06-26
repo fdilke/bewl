@@ -159,9 +159,6 @@ abstract class GenericToposTests[TOPOS <: Topos](
       truth.source shouldBe I
       truth.target shouldBe omega
 
-      // given: monic bar -> baz
-      // and: foo -> baz whose image lies in the image of bar
-
       val char = monicBar2baz.chi
       char.arrow.source shouldBe baz
       char.arrow.target shouldBe omega
@@ -173,7 +170,7 @@ abstract class GenericToposTests[TOPOS <: Topos](
       monicBar2baz(restriction) shouldBe foo2ImageOfBar
     }
 
-    it("can construct powers") {
+    it("can construct integer powers") {
       foo ^ 0 shouldBe I
 
       foo ^ 1 shouldBe foo
@@ -186,6 +183,11 @@ abstract class GenericToposTests[TOPOS <: Topos](
       twist.target shouldBe square
       twist should not be square.identity
       twist(twist) shouldBe square.identity
+    }
+
+    it("has standardized integer powers") {
+      val foo3: DOT[Power[FOO]] = foo ^ 3
+      foo3 shouldBe (foo ^ 3)
     }
   }
 }
