@@ -39,13 +39,22 @@ trait Topos {
 
     final def ^[S](that: DOT[S]): DOT[S => X] = (this A that).exponentDot
 
-    final def toPower(exponent: Int): IntegerPower[X] = genericIntegerPower(this.asInstanceOf[DOT[X]], exponent)
-
     final def A[S](exponent: Int) = standardPowers(
       this.asInstanceOf[DOT[Any]],
       exponent).asInstanceOf[IntegerPower[X]]
 
     final def ^(exponent: Int): DOT[Power[X]] = (this A exponent).power
+
+    final def toPower(exponent: Int): IntegerPower[X] = exponent match {
+      case 0 => IntegerPower[X](I, Seq.empty)
+      case 1 => IntegerPower[X](this, Seq(this.identity))
+      case _ =>
+        val xN_1 = this A (exponent - 1)
+        val product = (xN_1.power) * this.asInstanceOf[DOT[X]]
+        IntegerPower[X](product.product,
+          xN_1.projection.map(_(product.leftProjection)) :+ product.rightProjection
+        )
+    }
   }
 
   trait Arrow[X, Y] {
@@ -89,8 +98,9 @@ trait Topos {
     def restrict[S](equalizingArrow: ARROW[S, M]): ARROW[S, EQUALIZER_SOURCE[M, T]]
   }
 
-  case class IntegerPower[X](_power: DOT[_], projection: Seq[ARROW[Power[X], X]]) {
+  case class IntegerPower[X](_power: Dot[_], _projection: Seq[ARROW[_, _]]) {
     def power = _power.asInstanceOf[DOT[Power[X]]]
+    def projection = _projection.asInstanceOf[Seq[ARROW[Power[X], X]]]
   }
 
   class Power[X] // just a marker, for now - will have methods as part of the DSL?
@@ -125,26 +135,5 @@ trait Topos {
   // Helper methods for integer powers
   def projection[X](base: DOT[X], exponent: Int, index: Int): ARROW[Power[X], X] =
     (base A exponent).projection(index)
-
-  def genericIntegerPower[X](base: DOT[X], exponent: Int) = exponent match {
-      case 0 => IntegerPower[X](
-        I,
-        Seq.empty
-      )
-
-      case 1 => IntegerPower[X](
-        base,
-        Seq(base.identity.asInstanceOf[ARROW[Power[X], X]])
-      )
-
-      case _ =>
-          val xN_1 = base A (exponent - 1)
-          val product = (xN_1.power) * base
-          IntegerPower[X](
-            product.product,
-            (xN_1.projection.map(_(product.leftProjection)) :+ product.rightProjection).
-              asInstanceOf[Seq[ARROW[Power[X], X]]]
-          )
-  }
 }
 
