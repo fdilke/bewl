@@ -1,5 +1,7 @@
 package com.fdilke.bewl
 
+import com.fdilke.bewl.algebra.AlgebraicStructure.Signature
+import com.fdilke.bewl.algebra.{Operator, Law}
 import com.fdilke.bewl.helper.ResultStore
 import Function.tupled
 
@@ -135,5 +137,11 @@ trait Topos {
   // Helper methods for integer powers
   def projection[X](base: DOT[X], exponent: Int, index: Int): ARROW[Power[X], X] =
     (base A exponent).projection(index)
+
+  case class AlgebraicArrow[X](val dot: DOT[X], val arrow: ARROW[Power[X], X])
+
+  class AlgebraicStructure[X](val carrier: DOT[X], val signature: Signature, val ops: Map[Operator, AlgebraicArrow[X]], val laws: Seq[Law]) {
+    def verify = {} // TODO: add proper verification
+  }
 }
 

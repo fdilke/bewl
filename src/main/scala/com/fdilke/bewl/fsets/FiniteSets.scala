@@ -138,7 +138,7 @@ object FiniteSets extends Topos {
     def arrow[S, T](source: FiniteSetsDot[S], target: FiniteSetsDot[T], map: (S, T)*) =
       FiniteSetsArrow[S, T](source, target, Map(map:_*))
 
-    def dot[T](elements: T*) = FiniteSetsDot(elements)
+    def set[T](elements: T*) = FiniteSetsDot(elements)
 
     def cartesian[A](factors: Seq[Seq[A]]): Traversable[Seq[A]] = factors match {
         case Nil => Traversable(Seq())

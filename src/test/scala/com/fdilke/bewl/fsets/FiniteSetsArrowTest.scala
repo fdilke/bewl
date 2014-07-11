@@ -1,27 +1,27 @@
 package com.fdilke.bewl.fsets
 
-import com.fdilke.bewl.fsets.FiniteSets.FiniteSetsUtilities.{arrow, dot}
+import com.fdilke.bewl.fsets.FiniteSets.FiniteSetsUtilities.{arrow, set}
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
 class FiniteSetsArrowTest extends FunSpec {
-  val aDot = dot("a", "b")
-  val dotBig = dot("a", "b", "c")
-  val dotSmall = dot("a")
-  val doodah = dot(1,2,3)
-  val dash = dot("X", "Y", "Z")
-  val dashBig = dot("X", "Y", "Z", "W")
-  val dot2dash = arrow(aDot, dash, "a"->"X", "b"->"Y")
-  val dot2dashBadValues = arrow(aDot, dash, "a"->"boojum", "b"->"heejum")
-  val dot2dash_2 = arrow(aDot, dash, "a"->"X", "b"->"Y")
+  val dot = set("a", "b")
+  val dotBig = set("a", "b", "c")
+  val dotSmall = set("a")
+  val doodah = set(1,2,3)
+  val dash = set("X", "Y", "Z")
+  val dashBig = set("X", "Y", "Z", "W")
+  val dot2dash = arrow(dot, dash, "a"->"X", "b"->"Y")
+  val dot2dashBadValues = arrow(dot, dash, "a"->"boojum", "b"->"heejum")
+  val dot2dash_2 = arrow(dot, dash, "a"->"X", "b"->"Y")
   val dotSmall2dash = arrow(dotSmall, dash, "a"->"X", "b"->"Y")
-  val dot2dashBig = arrow(aDot, dashBig, "a"->"X", "b"->"Y")
+  val dot2dashBig = arrow(dot, dashBig, "a"->"X", "b"->"Y")
   val dotBig2dash = arrow(dotBig, dash, "a"->"X", "b"->"Y")
-  val doodah2dot = arrow(doodah, aDot, 1->"a", 2->"b", 3->"a")
+  val doodah2dot = arrow(doodah, dot, 1->"a", 2->"b", 3->"a")
 
   describe("An arrow representing a morphism of finite sets") {
     it("should make accessible its source and target") {
-      dot2dash.source shouldBe aDot
+      dot2dash.source shouldBe dot
       dot2dash.target shouldBe dash
     }
 

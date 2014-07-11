@@ -1,6 +1,6 @@
 package com.fdilke.bewl.fsets
 
-import com.fdilke.bewl.fsets.FiniteSets.FiniteSetsUtilities.dot
+import com.fdilke.bewl.fsets.FiniteSets.FiniteSetsUtilities.set
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
@@ -9,8 +9,8 @@ import org.scalatest.Matchers._
 class FiniteSetsExponentialTest extends FunSpec {
   describe("The exponential") {
     describe("has the correct number of values, all distinct") {
-      val source = dot('a, 'b, 'c)
-      val target = dot(1, 2, 3, 4)
+      val source = set('a, 'b, 'c)
+      val target = set(1, 2, 3, 4)
       val expDot = target ^ source
       expDot.size shouldBe 64
     }

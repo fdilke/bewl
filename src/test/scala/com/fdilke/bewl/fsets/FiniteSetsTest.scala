@@ -2,7 +2,7 @@ package com.fdilke.bewl.fsets
 
 import com.fdilke.bewl.fsets.FiniteSets.FiniteSetsUtilities
 import com.fdilke.bewl.{GenericToposTests, ToposWithFixtures}
-import FiniteSetsUtilities.{dot,arrow}
+import FiniteSetsUtilities.{set,arrow}
 
 class FiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
   type TOPOS = FiniteSets.type
@@ -14,10 +14,10 @@ class FiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
   type BAR = String
   type BAZ = Int
 
-  override val foo: DOT[FOO] = dot[FOO](true, false)
-  override val bar = dot[BAR]("X", "Y")
+  override val foo: DOT[FOO] = set[FOO](true, false)
+  override val bar = set[BAR]("X", "Y")
   override val foo2bar = arrow[FOO, BAR](foo, bar, true -> "X", false -> "Y")
-  override val baz = dot[BAZ](1, 2, 3)
+  override val baz = set[BAZ](1, 2, 3)
   override val foo2ImageOfBar = arrow[FOO, BAZ](foo, baz, true -> 3, false -> 2)
 
   override val foobar2baz = FiniteSetsBiArrow[FOO, BAR, BAZ](
