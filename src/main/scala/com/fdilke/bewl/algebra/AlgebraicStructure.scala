@@ -1,12 +1,8 @@
 package com.fdilke.bewl.algebra
 
+import com.fdilke.bewl.Topos
+
 case class Operator(arity: Int)
-
-class Law
-
-object Law {
-  def commutative(op: Operator) = new Law
-}
 
 object Operator {
   def * = new Operator(2)

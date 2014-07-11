@@ -26,18 +26,18 @@ class AlgebraicStructureTests extends FunSpec {
     it("can be constructed from arrows obeying laws") {
 
       val dot = set(0, 1)
-      val product = AlgebraicArrow(dot, FiniteSetsArrow[(Int, Int), Int](
-        dot x dot, dot, Map(
+      val product = AlgebraicArrow(dot A 2, FiniteSetsArrow[Power[Int], Int](
+        dot ^ 2, dot, Map(
           (0, 0) -> 0, 
           (0, 1) -> 1, 
           (1, 0) -> 0, 
           (1, 1) -> 0
-        )).asInstanceOf[ARROW[Power[Int], Int]]) // TODO: do this more smoothly
+        )) // TODO: do this more smoothly
 
       Magma(dot, product).verify
 
       def invalidAlgebra = CommutativeMagma(dot, product)
-//      intercept[IllegalArgumentException] { invalidAlgebra.verify }
+      intercept[IllegalArgumentException] { invalidAlgebra.verify }
     }
   }
 }

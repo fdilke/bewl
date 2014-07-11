@@ -1,7 +1,7 @@
 package com.fdilke.bewl
 
 import com.fdilke.bewl.algebra.AlgebraicStructure.Signature
-import com.fdilke.bewl.algebra.{Operator, Law}
+import com.fdilke.bewl.algebra.{Operator}
 import com.fdilke.bewl.helper.ResultStore
 import Function.tupled
 
@@ -105,6 +105,12 @@ trait Topos {
     def projection = _projection.asInstanceOf[Seq[ARROW[Power[X], X]]]
   }
 
+  object IntegerPower {
+    def multiply[S, X](source: DOT[S], arrows: Seq[ARROW[S, X]]): ARROW[S, Power[X]] = {
+      ???
+    }
+  }
+
   class Power[X] // just a marker, for now - will have methods as part of the DSL?
 
   private val standardProducts = new ResultStore[(DOT[Any], DOT[Any]), BIPRODUCT[Any, Any]](tupled {
@@ -138,10 +144,44 @@ trait Topos {
   def projection[X](base: DOT[X], exponent: Int, index: Int): ARROW[Power[X], X] =
     (base A exponent).projection(index)
 
-  case class AlgebraicArrow[X](val dot: DOT[X], val arrow: ARROW[Power[X], X])
+  // Machinery for constructing and verifying algebraic structures with laws (varieties)
+  // TODO: is there a way for this stuff to exist outside Topos?
+
+  trait Law {
+    val arity: Int
+    def apply[S, X](variables: Seq[ARROW[S, X]], ops: Map[Operator, AlgebraicArrow[X]])
+  }
+
+  object Law {
+    def commutative(operator: Operator) = new Law {
+      val arity = 2
+      override def apply[S, X](root: DOT[S], variables: Seq[ARROW[S, X]], ops: Map[Operator, AlgebraicArrow[X]]) = {
+        ops.get(operator).map { op =>
+          val Seq(x, y) = variables
+          if (op(root, x, y) != op(root, y, x)) {
+            throw new IllegalArgumentException(s"Commutative law failed for operator $operator")
+          }
+        } orElse {
+          throw new IllegalArgumentException(s"Operator $operator not defined")
+        }
+      } // TODO: can make this less of a rat's breakfast, not have to pass in the root?
+    }
+  }
+
+  case class AlgebraicArrow[X](val power: IntegerPower[X], val arrow: ARROW[Power[X], X]) {
+    def apply[S](source: DOT[S], variables: ARROW[S, X]*): ARROW[S, X] = {
+      val hh: DOT[Power[X]] = power.power
+      val x: ARROW[S, Power[X]] = IntegerPower.multiply(source, variables)
+      val k: ARROW[S, X] = arrow(x)
+      k
+    } // TODO: tidy up
+  }
 
   class AlgebraicStructure[X](val carrier: DOT[X], val signature: Signature, val ops: Map[Operator, AlgebraicArrow[X]], val laws: Seq[Law]) {
-    def verify = {} // TODO: add proper verification
+    def verify = laws.map { law =>
+      def power = carrier A law.arity
+      law(power.power, power.projection, ops)
+    }
   }
 }
 

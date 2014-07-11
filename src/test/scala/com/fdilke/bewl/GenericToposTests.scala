@@ -185,6 +185,12 @@ abstract class GenericToposTests[TOPOS <: Topos](
       twist(twist) shouldBe square.identity
     }
 
+    it("can multiply arrows of the same type in the context of an integer powers") {
+      IntegerPower.multiply(foo) shouldBe foo.toI
+      IntegerPower.multiply(foo, foo2bar) shouldBe foo2bar
+      IntegerPower.multiply(foo, foo2bar, foo2baz) shouldBe (foo2bar x foo2baz)
+    }
+
     it("has standardized integer powers") {
       val foo3: DOT[Power[FOO]] = foo ^ 3
       foo3 shouldBe (foo ^ 3)
