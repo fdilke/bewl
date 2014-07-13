@@ -152,34 +152,39 @@ trait Topos {
 
   trait Law {
     val arity: Int
-    def apply[S, X](root: DOT[S], variables: Seq[ARROW[S, X]], ops: Map[Operator, AlgebraicArrow[X]])
+    def apply[X](carrier: DOT[X], ops: Map[Operator, AlgebraicArrow[X]])
   }
 
   object Law {
     def commutative(operator: Operator) = new Law {
       val arity = 2
-      override def apply[S, X](root: DOT[S], variables: Seq[ARROW[S, X]], ops: Map[Operator, AlgebraicArrow[X]]) = {
+      override def apply[X](carrier: DOT[X], ops: Map[Operator, AlgebraicArrow[X]]) = {
+        val power = carrier A arity
+        val variables = power.projection
         ops.get(operator).map { op =>
           val Seq(x, y) = variables
-          if (op(root, x, y) != op(root, y, x)) {
+          if (op(x, y) != op(y, x)) {
             throw new IllegalArgumentException(s"Commutative law failed for operator $operator")
           }
         } orElse {
           throw new IllegalArgumentException(s"Operator $operator not defined")
         }
-      } // TODO: can make this less of a rat's breakfast, not have to pass in the root?
+      } // TODO: more refactoring to do here
     }
   }
 
   case class AlgebraicArrow[X](val arrow: ARROW[Power[X], X]) {
-    def apply[S](source: DOT[S], variables: ARROW[S, X]*): ARROW[S, X] =
-      arrow(IntegerPower.multiply(source, variables:_*))
+    def apply(variables: ARROW[Power[X], X]*): ARROW[Power[X], X] =
+      arrow(IntegerPower.multiply(arrow.source, variables:_*))
   }
 
-  class AlgebraicStructure[X](val carrier: DOT[X], val signature: Signature, val ops: Map[Operator, AlgebraicArrow[X]], val laws: Seq[Law]) {
-    def verify = laws.map { law =>
-      def power = carrier A law.arity
-      law(power.power, power.projection, ops)
+  class AlgebraicStructure[X](
+    val carrier: DOT[X],
+    val signature: Signature,
+    val ops: Map[Operator, AlgebraicArrow[X]],
+    val laws: Seq[Law]) {
+
+    def verify = laws.map { _(carrier, ops)
     }
   }
 }
