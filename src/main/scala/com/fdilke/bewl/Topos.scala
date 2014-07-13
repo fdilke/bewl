@@ -106,9 +106,12 @@ trait Topos {
   }
 
   object IntegerPower {
-    def multiply[S, X](source: DOT[S], arrows: Seq[ARROW[S, X]]): ARROW[S, Power[X]] = {
-      ???
-    }
+    def multiply[S, X](source: DOT[S], arrows: ARROW[S, X]*): ARROW[S, Power[X]] =
+      (arrows size match {
+        case 0 => source.toI
+        case 1 => arrows(0)
+        case _ => arrows.head x multiply(source, arrows.tail: _*)
+      }).asInstanceOf[ARROW[S, Power[X]]]
   }
 
   class Power[X] // just a marker, for now - will have methods as part of the DSL?
@@ -149,7 +152,7 @@ trait Topos {
 
   trait Law {
     val arity: Int
-    def apply[S, X](variables: Seq[ARROW[S, X]], ops: Map[Operator, AlgebraicArrow[X]])
+    def apply[S, X](root: DOT[S], variables: Seq[ARROW[S, X]], ops: Map[Operator, AlgebraicArrow[X]])
   }
 
   object Law {
@@ -171,7 +174,7 @@ trait Topos {
   case class AlgebraicArrow[X](val power: IntegerPower[X], val arrow: ARROW[Power[X], X]) {
     def apply[S](source: DOT[S], variables: ARROW[S, X]*): ARROW[S, X] = {
       val hh: DOT[Power[X]] = power.power
-      val x: ARROW[S, Power[X]] = IntegerPower.multiply(source, variables)
+      val x: ARROW[S, Power[X]] = IntegerPower.multiply(source, variables:_*)
       val k: ARROW[S, X] = arrow(x)
       k
     } // TODO: tidy up

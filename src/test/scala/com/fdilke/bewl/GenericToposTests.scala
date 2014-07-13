@@ -188,7 +188,7 @@ abstract class GenericToposTests[TOPOS <: Topos](
     it("can multiply arrows of the same type in the context of an integer powers") {
       IntegerPower.multiply(foo) shouldBe foo.toI
       IntegerPower.multiply(foo, foo2bar) shouldBe foo2bar
-      IntegerPower.multiply(foo, foo2bar, foo2baz) shouldBe (foo2bar x foo2baz)
+      IntegerPower.multiply(foo, foo2bar, foo2bar) shouldBe (foo2bar x foo2bar)
     }
 
     it("has standardized integer powers") {

@@ -5,7 +5,7 @@ import com.fdilke.bewl.fsets.FiniteSets.FiniteSetsUtilities._
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
-class AlgebraicStructureTests extends FunSpec {
+class AlgebraicStructureTe§§sts extends FunSpec {
   import FiniteSets._
 
   def MagmaSignature = Set(Operator.*)
@@ -32,11 +32,11 @@ class AlgebraicStructureTests extends FunSpec {
           (0, 1) -> 1, 
           (1, 0) -> 0, 
           (1, 1) -> 0
-        )) // TODO: do this more smoothly
+        ))) // TODO: do this more smoothly
 
-      Magma(dot, product).verify
+      Magma[Int](dot, product).verify
 
-      def invalidAlgebra = CommutativeMagma(dot, product)
+      def invalidAlgebra = CommutativeMagma[Int](dot, product)
       intercept[IllegalArgumentException] { invalidAlgebra.verify }
     }
   }
