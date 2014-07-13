@@ -171,13 +171,9 @@ trait Topos {
     }
   }
 
-  case class AlgebraicArrow[X](val power: IntegerPower[X], val arrow: ARROW[Power[X], X]) {
-    def apply[S](source: DOT[S], variables: ARROW[S, X]*): ARROW[S, X] = {
-      val hh: DOT[Power[X]] = power.power
-      val x: ARROW[S, Power[X]] = IntegerPower.multiply(source, variables:_*)
-      val k: ARROW[S, X] = arrow(x)
-      k
-    } // TODO: tidy up
+  case class AlgebraicArrow[X](val arrow: ARROW[Power[X], X]) {
+    def apply[S](source: DOT[S], variables: ARROW[S, X]*): ARROW[S, X] =
+      arrow(IntegerPower.multiply(source, variables:_*))
   }
 
   class AlgebraicStructure[X](val carrier: DOT[X], val signature: Signature, val ops: Map[Operator, AlgebraicArrow[X]], val laws: Seq[Law]) {

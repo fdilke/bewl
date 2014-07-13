@@ -147,16 +147,21 @@ object FiniteSets extends Topos {
                 yield(h +: sequence)
       }
 
-      def allMaps[A, B](source: Traversable[A], target: Traversable[B]): Traversable[A=>B] =
-      new Traversable[A=>B] {
-        override def foreach[U](func: (A => B) => U): Unit =
-          if (source.isEmpty)
-            func(_ => ???)
-          else
-            for(f <- allMaps(source.tail, target);
-                choice <- target) {
-                func { x => if (x == source.head) choice else f(x) }
-              }
+    def allMaps[A, B](source: Traversable[A], target: Traversable[B]): Traversable[A=>B] =
+    new Traversable[A=>B] {
+      override def foreach[U](func: (A => B) => U): Unit =
+        if (source.isEmpty)
+          func(_ => ???)
+        else
+          for(f <- allMaps(source.tail, target);
+              choice <- target) {
+              func { x => if (x == source.head) choice else f(x) }
+            }
     }
+
+    def binaryOperator[X](dot: FiniteSetsDot[X], entries: ((X, X), X)*) =
+      AlgebraicArrow(FiniteSetsArrow[Power[X], X](
+        dot ^ 2, dot, Map(entries:_*)
+      ))
   }
 }

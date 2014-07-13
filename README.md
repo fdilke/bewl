@@ -7,6 +7,12 @@ This [animated video](http://www.youtube.com/watch/?v=nUwjGBHXKYs) attempts a ge
 I've implemented this in Java, Clojure and now Scala. Really it should be in Haskell but I am only partway through
 [Barely Remember you a Hask](http://learnyouahaskell.com)
 
+
+# Intended applications
+
+- Explore the topos of graphs. Bewl will let us talk about graphs as if they were sets
+- Explore parity in other topoi (as it's so poorly understood for sets)
+
 # Done so far
 
 - Created Topos API as a trait
@@ -20,11 +26,6 @@ I've implemented this in Java, Clojure and now Scala. Really it should be in Has
 - Formalize constructions like: automorphism group, endomorphism ring, group of invertible elements of a monoid
 - Extract the Heyting algebra structure of the subobject classifier
 - Construct coproducts and colimits
-
-# Intended applications
-
-- Explore the topos of graphs. Bewl will let us talk about graphs as if they were sets
-- Explore parity in other topoi (as it's so poorly understood for sets)
 
 # Questions
 

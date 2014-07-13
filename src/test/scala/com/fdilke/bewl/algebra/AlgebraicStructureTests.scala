@@ -5,7 +5,7 @@ import com.fdilke.bewl.fsets.FiniteSets.FiniteSetsUtilities._
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
-class AlgebraicStructureTe§§sts extends FunSpec {
+class AlgebraicStructureTests extends FunSpec {
   import FiniteSets._
 
   def MagmaSignature = Set(Operator.*)
@@ -24,15 +24,13 @@ class AlgebraicStructureTe§§sts extends FunSpec {
 
   describe("Algebraic structures") {
     it("can be constructed from arrows obeying laws") {
-
       val dot = set(0, 1)
-      val product = AlgebraicArrow(dot A 2, FiniteSetsArrow[Power[Int], Int](
-        dot ^ 2, dot, Map(
-          (0, 0) -> 0, 
+      val product = binaryOperator(dot,
+          (0, 0) -> 0,
           (0, 1) -> 1, 
           (1, 0) -> 0, 
           (1, 1) -> 0
-        ))) // TODO: do this more smoothly
+        )
 
       Magma[Int](dot, product).verify
 
