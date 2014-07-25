@@ -12,12 +12,12 @@ class AlgebraicStructureTests extends FunSpec {
   case class Magma[X](dot: DOT[X], product: AlgebraicOperator[X]) extends AlgebraicStructure[X] (
     carrier = dot,
     signature = MagmaSignature,
-    ops = Map(AbstractOperator.* -> product)
+    operatorMap = Map(AbstractOperator.* -> product)
   )
   case class CommutativeMagma[X](dot: DOT[X], product: AlgebraicOperator[X]) extends AlgebraicStructure[X] (
     carrier = dot,
     signature = MagmaSignature,
-    ops = Map(AbstractOperator.* -> product),
+    operatorMap = Map(AbstractOperator.* -> product),
     Law.commutative(AbstractOperator.*)
   )
 
@@ -35,7 +35,7 @@ class AlgebraicStructureTests extends FunSpec {
 
       def invalidAlgebra = CommutativeMagma[Int](dot, product)
       intercept[IllegalArgumentException] { invalidAlgebra.verify }.
-        getMessage shouldBe "Commutative law failed for operator *"
+        getMessage shouldBe "Commutative law for operator *"
     }
   }
 }

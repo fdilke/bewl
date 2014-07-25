@@ -150,41 +150,34 @@ trait Topos {
   // Machinery for constructing and verifying algebraic structures with laws (varieties)
   // TODO: is there a way for this stuff to exist outside Topos?
 
-  abstract class Law(
-    arity: Int,
+  class Law(
     abstractOperators: Seq[AbstractOperator],
-    failureMessage: String) {
+    numVariables: Int,
+    _equation: PartialFunction[(Seq[AlgebraicOperator[Nothing]], Seq[ARROW[Power[Nothing], Nothing]]), Boolean],
+    exceptionMessage: String
+  ) {
+
+    def equation[X]: PartialFunction[(Seq[AlgebraicOperator[X]], Seq[ARROW[Power[X], X]]), Boolean] =
+      _equation.asInstanceOf[PartialFunction[(Seq[AlgebraicOperator[X]], Seq[ARROW[Power[X], X]]), Boolean]]
 
     def verify[X](carrier: DOT[X], operatorMap: Map[AbstractOperator, AlgebraicOperator[X]]) = {
-      val power = carrier A arity
+      val power = carrier A numVariables
       val variables = power.projection
       val operators = abstractOperators map operatorMap
       val operatorsAndVariables = (operators, variables)
       if (!equation[X](operatorsAndVariables)) {
-        throw new IllegalArgumentException(failureMessage)
+        throw new IllegalArgumentException(exceptionMessage)
       }
-//      {
-//        throw new IllegalArgumentException(s"Operator $abstractOperator not defined")
-//      }
-// TODO: add a test case for when the operator is not defined
     }
-
-    def equation[X](operatorsAndVariables: (Seq[AlgebraicOperator[X]], Seq[ARROW[Power[X], X]])): Boolean
   }
-
+  
   object Law {
     def commutative(abstractOperator: AbstractOperator) =
-      new Law(2,
-        Seq(abstractOperator),
-        s"Commutative law failed for operator $abstractOperator"
-      ) {
-        def equation[X](operatorsAndVariables: (Seq[AlgebraicOperator[X]], Seq[ARROW[Power[X], X]])): Boolean =
-          operatorsAndVariables match {
-            case (Seq(op), Seq(x, y)) =>
-              op(x, y) == op(y, x)
-          }
-      }
-    // TODO: verify the message when commutativity fails
+      new Law(Seq(abstractOperator), 2,
+        { case (Seq(op), Seq(x, y)) =>
+          op(x, y) == op(y, x) },
+        s"Commutative law for operator $abstractOperator"
+      )
   }
 
   case class AlgebraicOperator[X](val arrow: ARROW[Power[X], X]) {
@@ -195,11 +188,10 @@ trait Topos {
   class AlgebraicStructure[X](
     val carrier: DOT[X],
     val signature: Signature,
-    val ops: Map[AbstractOperator, AlgebraicOperator[X]],
+    val operatorMap: Map[AbstractOperator, AlgebraicOperator[X]],
     val laws: Law*) {
 
-    def verify = laws.map { _.verify(carrier, ops)
-    }
+    def verify = laws.map { _.verify(carrier, operatorMap) }
   }
 }
 
