@@ -6,10 +6,15 @@ case class AbstractOperator(arity: Int, symbol: String) {
 
 object AbstractOperator {
   def * = new AbstractOperator(2, "*")
+  def _1 = new AbstractOperator(0, "1")
 }
 
 object AlgebraicStructure {
   type Signature = Set[AbstractOperator]
+
+  import AbstractOperator._
+
+  def MonoidSignature = Set(_1, *)
 }
 
 

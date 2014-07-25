@@ -37,5 +37,19 @@ class AlgebraicStructureTests extends FunSpec {
       intercept[IllegalArgumentException] { invalidAlgebra.verify }.
         getMessage shouldBe "Commutative law for operator *"
     }
+
+    it("are defined for monoids") {
+      def i = 'i
+      def x = 'x
+      def y = 'y
+      val dot = set(i, x, y)
+      val unit = nullaryOperator(dot, i)
+      val product = binaryOperator(dot,
+        (i, i) -> i,    (i, x) -> x,    (i, y) -> y,
+        (x, i) -> x,    (x, x) -> x,    (x, y) -> x,
+        (y, i) -> y,    (y, x) -> y,    (y, y) -> y
+      )
+      Monoid[Symbol](dot, unit, product).verify
+    }
   }
 }
