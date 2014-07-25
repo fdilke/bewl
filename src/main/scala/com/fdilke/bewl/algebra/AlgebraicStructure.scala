@@ -1,15 +1,13 @@
 package com.fdilke.bewl.algebra
 
-import com.fdilke.bewl.Topos
+case class AbstractOperator(arity: Int)
 
-case class Operator(arity: Int)
-
-object Operator {
-  def * = new Operator(2)
+object AbstractOperator {
+  def * = new AbstractOperator(2)
 }
 
 object AlgebraicStructure {
-  type Signature = Set[Operator]
+  type Signature = Set[AbstractOperator]
 }
 
 

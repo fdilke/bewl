@@ -160,7 +160,7 @@ object FiniteSets extends Topos {
     }
 
     def binaryOperator[X](dot: FiniteSetsDot[X], entries: ((X, X), X)*) =
-      AlgebraicArrow(FiniteSetsArrow[Power[X], X](
+      AlgebraicOperator(FiniteSetsArrow[Power[X], X](
         dot ^ 2, dot, Map(entries:_*)
       ))
   }

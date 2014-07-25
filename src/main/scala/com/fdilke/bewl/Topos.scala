@@ -1,7 +1,7 @@
 package com.fdilke.bewl
 
 import com.fdilke.bewl.algebra.AlgebraicStructure.Signature
-import com.fdilke.bewl.algebra.{Operator}
+import com.fdilke.bewl.algebra.{AbstractOperator}
 import com.fdilke.bewl.helper.ResultStore
 import Function.tupled
 
@@ -150,30 +150,44 @@ trait Topos {
   // Machinery for constructing and verifying algebraic structures with laws (varieties)
   // TODO: is there a way for this stuff to exist outside Topos?
 
-  trait Law {
-    val arity: Int
-    def apply[X](carrier: DOT[X], ops: Map[Operator, AlgebraicArrow[X]])
+  abstract class Law(
+    arity: Int,
+    abstractOperators: Seq[AbstractOperator],
+    failureMessage: String) {
+
+    def verify[X](carrier: DOT[X], operatorMap: Map[AbstractOperator, AlgebraicOperator[X]]) = {
+      val power = carrier A arity
+      val variables = power.projection
+      val operators = abstractOperators map operatorMap
+      val operatorsAndVariables = (operators, variables)
+      if (!equation[X](operatorsAndVariables)) {
+        throw new IllegalArgumentException(failureMessage)
+      }
+//      {
+//        throw new IllegalArgumentException(s"Operator $abstractOperator not defined")
+//      }
+// TODO: add a test case for when the operator is not defined
+    }
+
+    def equation[X](operatorsAndVariables: (Seq[AlgebraicOperator[X]], Seq[ARROW[Power[X], X]])): Boolean
   }
 
   object Law {
-    def commutative(operator: Operator) = new Law {
-      val arity = 2
-      override def apply[X](carrier: DOT[X], ops: Map[Operator, AlgebraicArrow[X]]) = {
-        val power = carrier A arity
-        val variables = power.projection
-        ops.get(operator).map { op =>
-          val Seq(x, y) = variables
-          if (op(x, y) != op(y, x)) {
-            throw new IllegalArgumentException(s"Commutative law failed for operator $operator")
+    def commutative(abstractOperator: AbstractOperator) =
+      new Law(2,
+        Seq(abstractOperator),
+        s"Commutative law failed for operator $abstractOperator"
+      ) {
+        def equation[X](operatorsAndVariables: (Seq[AlgebraicOperator[X]], Seq[ARROW[Power[X], X]])): Boolean =
+          operatorsAndVariables match {
+            case (Seq(op), Seq(x, y)) =>
+              op(x, y) == op(y, x)
           }
-        } orElse {
-          throw new IllegalArgumentException(s"Operator $operator not defined")
-        }
-      } // TODO: more refactoring to do here
-    }
+      }
+    // TODO: verify the message when commutativity fails
   }
 
-  case class AlgebraicArrow[X](val arrow: ARROW[Power[X], X]) {
+  case class AlgebraicOperator[X](val arrow: ARROW[Power[X], X]) {
     def apply(variables: ARROW[Power[X], X]*): ARROW[Power[X], X] =
       arrow(IntegerPower.multiply(arrow.source, variables:_*))
   }
@@ -181,10 +195,10 @@ trait Topos {
   class AlgebraicStructure[X](
     val carrier: DOT[X],
     val signature: Signature,
-    val ops: Map[Operator, AlgebraicArrow[X]],
+    val ops: Map[AbstractOperator, AlgebraicOperator[X]],
     val laws: Seq[Law]) {
 
-    def verify = laws.map { _(carrier, ops)
+    def verify = laws.map { _.verify(carrier, ops)
     }
   }
 }
