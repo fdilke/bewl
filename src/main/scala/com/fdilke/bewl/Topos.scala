@@ -196,7 +196,7 @@ trait Topos {
     val carrier: DOT[X],
     val signature: Signature,
     val ops: Map[AbstractOperator, AlgebraicOperator[X]],
-    val laws: Seq[Law]) {
+    val laws: Law*) {
 
     def verify = laws.map { _.verify(carrier, ops)
     }
