@@ -160,13 +160,13 @@ object FiniteSets extends Topos {
     }
 
     def nullaryOperator[X](dot: FiniteSetsDot[X], constant: X) =
-      AlgebraicOperator(FiniteSetsArrow[Power[X], X](
+      FiniteSetsArrow[Power[X], X](
         dot ^ 0, dot, Map(() -> constant)
-      ))
+      )
 
     def binaryOperator[X](dot: FiniteSetsDot[X], entries: ((X, X), X)*) =
-      AlgebraicOperator(FiniteSetsArrow[Power[X], X](
+      FiniteSetsArrow[Power[X], X](
         dot ^ 2, dot, Map(entries:_*)
-      ))
+      )
   }
 }

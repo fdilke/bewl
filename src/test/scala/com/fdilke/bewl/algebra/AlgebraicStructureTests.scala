@@ -9,12 +9,12 @@ class AlgebraicStructureTests extends FunSpec {
   import FiniteSets._
 
   def MagmaSignature = Set(AbstractOperator.*)
-  case class Magma[X](dot: DOT[X], product: AlgebraicOperator[X]) extends AlgebraicStructure[X] (
+  case class Magma[X](dot: DOT[X], product: Operator[X]) extends AlgebraicStructure[X] (
     carrier = dot,
     signature = MagmaSignature,
     operatorMap = Map(AbstractOperator.* -> product)
   )
-  case class CommutativeMagma[X](dot: DOT[X], product: AlgebraicOperator[X]) extends AlgebraicStructure[X] (
+  case class CommutativeMagma[X](dot: DOT[X], product: Operator[X]) extends AlgebraicStructure[X] (
     carrier = dot,
     signature = MagmaSignature,
     operatorMap = Map(AbstractOperator.* -> product),
@@ -39,9 +39,7 @@ class AlgebraicStructureTests extends FunSpec {
     }
 
     it("are defined for monoids") {
-      def i = 'i
-      def x = 'x
-      def y = 'y
+      val (i, x, y) = ('i, 'x, 'y)
       val dot = set(i, x, y)
       val unit = nullaryOperator(dot, i)
       val product = binaryOperator(dot,

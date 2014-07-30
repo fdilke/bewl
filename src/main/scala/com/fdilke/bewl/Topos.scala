@@ -20,6 +20,8 @@ trait Topos {
   val omega: DOT[OMEGA]
   val truth: ARROW[TERMINAL, OMEGA]
 
+  type Operator[X] = ARROW[Power[X], X]
+
   trait Dot[X] {
     def identity: ARROW[X, X]
 
@@ -102,7 +104,7 @@ trait Topos {
 
   case class IntegerPower[X](_power: Dot[_], _projection: Seq[ARROW[_, _]]) {
     def power = _power.asInstanceOf[DOT[Power[X]]]
-    def projection = _projection.asInstanceOf[Seq[ARROW[Power[X], X]]]
+    def projection = _projection.asInstanceOf[Seq[Operator[X]]]
   }
 
   object IntegerPower {
@@ -144,7 +146,7 @@ trait Topos {
     (t A s).transpose(multiArrow)
 
   // Helper methods for integer powers
-  def projection[X](base: DOT[X], exponent: Int, index: Int): ARROW[Power[X], X] =
+  def projection[X](base: DOT[X], exponent: Int, index: Int): Operator[X] =
     (base A exponent).projection(index)
 
   // Machinery for constructing and verifying algebraic structures with laws (varieties)
@@ -153,26 +155,18 @@ trait Topos {
   class Law(
     abstractOperators: Seq[AbstractOperator],
     numVariables: Int,
-    _equation: PartialFunction[(Seq[AlgebraicOperator[Nothing]], Seq[ARROW[Power[Nothing], Nothing]]), Boolean],
+    _equation: PartialFunction[(Seq[BoundAlgebraicOperator[Power[Nothing], Nothing]], Seq[Operator[Nothing]]), Boolean],
     exceptionMessage: String
   ) {
 
-    def equation[X]: PartialFunction[(Seq[AlgebraicOperator[X]], Seq[ARROW[Power[X], X]]), Boolean] =
-      _equation.asInstanceOf[PartialFunction[(Seq[AlgebraicOperator[X]], Seq[ARROW[Power[X], X]]), Boolean]]
+    def equation[X]: PartialFunction[(Seq[BoundAlgebraicOperator[Power[X], X]], Seq[Operator[X]]), Boolean] =
+      _equation.asInstanceOf[PartialFunction[(Seq[BoundAlgebraicOperator[Power[X], X]], Seq[Operator[X]]), Boolean]]
 
-    def verify[X](carrier: DOT[X], operatorMap: Map[AbstractOperator, AlgebraicOperator[X]]) = {
+    def verify[X](carrier: DOT[X], operatorMap: Map[AbstractOperator, Operator[X]]) = {
       val power = carrier A numVariables
       val variables = power.projection
       val operators = abstractOperators map { abstractOp =>
-        val op: AlgebraicOperator[X] = operatorMap(abstractOp)
-        if (abstractOp.arity == 0) {
-          val opArrow: ARROW[TERMINAL, X] = op.arrow.asInstanceOf[ARROW[TERMINAL, X]]
-          val powerToI: ARROW[Power[X], TERMINAL] = power.power.toI
-          val composite: ARROW[Power[X], X] = opArrow(powerToI)
-          AlgebraicOperator[X](composite) // TODO: have AlgebraicOperator smart enough to handle postcomposition
-        } else {
-          op
-        }
+        BoundAlgebraicOperator[Power[X], X](power.power, operatorMap(abstractOp))
       }
 
       val operatorsAndVariables = (operators, variables)
@@ -183,52 +177,50 @@ trait Topos {
   }
   
   object Law {
-    def commutative(abstractOperator: AbstractOperator) =
-      new Law(Seq(abstractOperator), 2,
-        { case (Seq(op), Seq(x, y)) =>
-          op(x, y) == op(y, x) },
-        s"Commutative law for operator $abstractOperator"
+    def commutative(aop: AbstractOperator) =
+      new Law(Seq(aop), 2, { case (Seq(op), Seq(x, y)) =>
+          op(x, y) == op(y, x)
+        }, s"Commutative law for operator $aop"
       )
-    def associative(abstractOperator: AbstractOperator) =
-      new Law(Seq(abstractOperator), 3,
+
+    def associative(aop: AbstractOperator) =
+      new Law(Seq(aop), 3,
         { case (Seq(op), Seq(x, y, z)) =>
           op(x, op(y, z)) == op(op(x, y), z) },
-        s"Associative law for operator $abstractOperator"
+        s"Associative law for operator $aop"
       )
-    def unit(abstractUnit: AbstractOperator, abstractOperator: AbstractOperator) =
-      new Law(Seq(abstractUnit, abstractOperator), 1,
+    def unit(abstractUnit: AbstractOperator, aop: AbstractOperator) =
+      new Law(Seq(abstractUnit, aop), 1,
         { case (Seq(unit, op), Seq(x)) =>
-          val kkk: AlgebraicOperator[Nothing] = unit
+          val kkk: BoundAlgebraicOperator[_, _] = unit
           val u = unit()
           val lll: ARROW[Power[Nothing], Nothing] = u
           println(s"UNIT LAW: u = $u")
           println(s"UNIT LAW: x = $x")
           println(s"UNIT LAW: op(u, x) = ${op(u, x)}")
           op(u, x) == x && op(x, u) == x },
-        s"Unit law for operator $abstractOperator with unit $abstractUnit"
+        s"Unit law for operator $aop with unit $abstractUnit"
       )
   }
 
-  case class AlgebraicOperator[X](val arrow: ARROW[Power[X], X]) { // TODO: fix up extra arg postmultiply: ARROW[_, Power[X]]
-    def apply(variables: ARROW[Power[X], X]*): ARROW[Power[X], X] =
-      arrow(IntegerPower.multiply(arrow.source, variables:_*))
+  case class BoundAlgebraicOperator[S, X](val source: DOT[S], arrow: Operator[X]) {
+    def apply(variables: ARROW[S, X]*): ARROW[S, X] =
+      arrow(IntegerPower.multiply(source, variables:_*))
   }
 
-  class AlgebraicStructure[X](
+  class AlgebraicStructure[X] (
     val carrier: DOT[X],
     val signature: Signature,
-    val operatorMap: Map[AbstractOperator, AlgebraicOperator[X]],
+    val operatorMap: Map[AbstractOperator, Operator[X]],
     val laws: Law*) {
-
     def verify = laws.map { _.verify(carrier, operatorMap) }
   }
 
-  case class Monoid[X](dot: DOT[X], unit: AlgebraicOperator[X], product: AlgebraicOperator[X]) extends AlgebraicStructure[X] (
+  case class Monoid[X](dot: DOT[X], unit: Operator[X], product: Operator[X]) extends AlgebraicStructure[X] (
     carrier = dot,
     signature = MonoidSignature,
     operatorMap = Map(AbstractOperator._1 -> unit, AbstractOperator.* -> product),
-    // Law.unit(AbstractOperator._1, AbstractOperator.*),
-    // TODO: fix nullary operator remapping so that this works!
+    Law.unit(AbstractOperator._1, AbstractOperator.*),
     Law.associative(AbstractOperator.*)
   )
 }
