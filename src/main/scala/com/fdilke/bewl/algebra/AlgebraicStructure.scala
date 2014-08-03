@@ -12,7 +12,7 @@ object AbstractOperator {
 object AlgebraicStructure {
   type Signature = Set[AbstractOperator]
 
-  import AbstractOperator._
+  import com.fdilke.bewl.algebra.AbstractOperator._
 
   def MonoidSignature = Set(_1, *)
 }

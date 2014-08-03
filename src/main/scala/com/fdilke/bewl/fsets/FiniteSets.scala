@@ -2,7 +2,8 @@ package com.fdilke.bewl.fsets
 
 import com.fdilke.bewl._
 import com.fdilke.bewl.fsets.FiniteSets.FiniteSetsUtilities.allMaps
-import Function.{tupled, const}
+
+import scala.Function.{const, tupled}
 
 object FiniteSets extends Topos {
   type DOT[X] = FiniteSetsDot[X]
