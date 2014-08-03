@@ -165,6 +165,11 @@ object FiniteSets extends Topos {
         dot ^ 0, dot, Map(() -> constant)
       )
 
+    def unaryOperator[X](dot: FiniteSetsDot[X], entries: (X, X)*) =
+      FiniteSetsArrow[Power[X], X](
+        dot ^ 1, dot, Map(entries:_*)
+      )
+
     def binaryOperator[X](dot: FiniteSetsDot[X], entries: ((X, X), X)*) =
       FiniteSetsArrow[Power[X], X](
         dot ^ 2, dot, Map(entries:_*)

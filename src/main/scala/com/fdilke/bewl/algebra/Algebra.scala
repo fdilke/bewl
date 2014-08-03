@@ -12,6 +12,7 @@ case class AbstractOperator(arity: Int, symbol: String) {
 object AbstractOperator {
   def * = new AbstractOperator(2, "*")
   def _1 = new AbstractOperator(0, "1")
+  def inversion = new AbstractOperator(1, "inv")
 }
 
 object AlgebraicStructure {
@@ -20,6 +21,7 @@ object AlgebraicStructure {
   import com.fdilke.bewl.algebra.AbstractOperator._
 
   def MonoidSignature = Set(_1, *)
+  def GroupSignature = Set(_1, *, inversion)
 }
 
 trait Algebra {
@@ -47,29 +49,6 @@ trait Algebra {
         throw new IllegalArgumentException(exceptionMessage)
       }
     }
-  }
-
-  object Law {
-    def commutative(aop: AbstractOperator) =
-      new Law(Seq(aop), 2, { case (Seq(op), Seq(x, y)) =>
-        op(x, y) == op(y, x)
-      }, s"Commutative law for operator $aop"
-      )
-
-    def associative(aop: AbstractOperator) =
-      new Law(Seq(aop), 3, { case (Seq(op), Seq(x, y, z)) =>
-        op(x, op(y, z)) == op(op(x, y), z)
-      },
-      s"Associative law for operator $aop"
-      )
-
-    def unit(abstractUnit: AbstractOperator, aop: AbstractOperator) =
-      new Law(Seq(abstractUnit, aop), 1, { case (Seq(unit, op), Seq(x)) =>
-        val u = unit()
-        op(u, x) == x && op(x, u) == x
-      },
-      s"Unit law for operator $aop with unit $abstractUnit"
-      )
   }
 
   case class BoundAlgebraicOperator[S, X](val source: DOT[S], arrow: Operator[X]) {
