@@ -1,20 +1,17 @@
 package com.fdilke.bewl.algebra
 
-case class AbstractOperator(arity: Int, symbol: String) {
-  override def toString = symbol
+import com.fdilke.bewl.BaseTopos
+import com.fdilke.bewl.algebra.AlgebraicStructure._
+
+trait AlgebraicStructures { topos: BaseTopos with Algebra =>
+  case class Monoid[X](dot: DOT[X], unit: Operator[X], product: Operator[X]) extends AlgebraicStructure[X] (
+    carrier = dot,
+    signature = MonoidSignature,
+    operatorMap = Map(AbstractOperator._1 -> unit, AbstractOperator.* -> product),
+    Law.unit(AbstractOperator._1, AbstractOperator.*),
+    Law.associative(AbstractOperator.*)
+  )
 }
 
-object AbstractOperator {
-  def * = new AbstractOperator(2, "*")
-  def _1 = new AbstractOperator(0, "1")
-}
-
-object AlgebraicStructure {
-  type Signature = Set[AbstractOperator]
-
-  import com.fdilke.bewl.algebra.AbstractOperator._
-
-  def MonoidSignature = Set(_1, *)
-}
 
 

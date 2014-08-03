@@ -1,11 +1,11 @@
 package com.fdilke.bewl
 
-import com.fdilke.bewl.algebra.Algebra
+import com.fdilke.bewl.algebra.{AlgebraicStructures, Algebra}
 import com.fdilke.bewl.helper.ResultStore
 
 import scala.Function.tupled
 
-trait Topos extends BaseTopos with Algebra
+trait Topos extends BaseTopos with Algebra with AlgebraicStructures
 
 trait BaseTopos {
   type DOT[P] <: Dot[P]

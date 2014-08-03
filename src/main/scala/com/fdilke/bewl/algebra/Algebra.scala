@@ -5,7 +5,25 @@ import com.fdilke.bewl.algebra.AlgebraicStructure._
 
 // Machinery for constructing and verifying algebraic structures with laws (varieties)
 
-trait Algebra { topos: BaseTopos =>
+case class AbstractOperator(arity: Int, symbol: String) {
+  override def toString = symbol
+}
+
+object AbstractOperator {
+  def * = new AbstractOperator(2, "*")
+  def _1 = new AbstractOperator(0, "1")
+}
+
+object AlgebraicStructure {
+  type Signature = Set[AbstractOperator]
+
+  import com.fdilke.bewl.algebra.AbstractOperator._
+
+  def MonoidSignature = Set(_1, *)
+}
+
+trait Algebra {
+  topos: BaseTopos =>
 
   class Law(
              abstractOperators: Seq[AbstractOperator],
@@ -39,40 +57,33 @@ trait Algebra { topos: BaseTopos =>
       )
 
     def associative(aop: AbstractOperator) =
-      new Law(Seq(aop), 3,
-      { case (Seq(op), Seq(x, y, z)) =>
-        op(x, op(y, z)) == op(op(x, y), z) },
-        s"Associative law for operator $aop"
+      new Law(Seq(aop), 3, { case (Seq(op), Seq(x, y, z)) =>
+        op(x, op(y, z)) == op(op(x, y), z)
+      },
+      s"Associative law for operator $aop"
       )
+
     def unit(abstractUnit: AbstractOperator, aop: AbstractOperator) =
-      new Law(Seq(abstractUnit, aop), 1,
-      { case (Seq(unit, op), Seq(x)) =>
+      new Law(Seq(abstractUnit, aop), 1, { case (Seq(unit, op), Seq(x)) =>
         val u = unit()
-        op(u, x) == x && op(x, u) == x },
-        s"Unit law for operator $aop with unit $abstractUnit"
+        op(u, x) == x && op(x, u) == x
+      },
+      s"Unit law for operator $aop with unit $abstractUnit"
       )
   }
 
   case class BoundAlgebraicOperator[S, X](val source: DOT[S], arrow: Operator[X]) {
     def apply(variables: ARROW[S, X]*): ARROW[S, X] =
-      arrow(IntegerPower.multiply(source, variables:_*))
+      arrow(IntegerPower.multiply(source, variables: _*))
   }
 
-  class AlgebraicStructure[X] (
-                                val carrier: DOT[X],
-                                val signature: Signature,
-                                val operatorMap: Map[AbstractOperator, Operator[X]],
-                                val laws: Law*) {
-    def verify = laws.map { _.verify(carrier, operatorMap) }
+  class AlgebraicStructure[X](
+                               val carrier: DOT[X],
+                               val signature: Signature,
+                               val operatorMap: Map[AbstractOperator, Operator[X]],
+                               val laws: Law*) {
+    def verify = laws.map {
+      _.verify(carrier, operatorMap)
+    }
   }
-
-  case class Monoid[X](dot: DOT[X], unit: Operator[X], product: Operator[X]) extends AlgebraicStructure[X] (
-    carrier = dot,
-    signature = MonoidSignature,
-    operatorMap = Map(AbstractOperator._1 -> unit, AbstractOperator.* -> product),
-    Law.unit(AbstractOperator._1, AbstractOperator.*),
-    Law.associative(AbstractOperator.*)
-  )
 }
-
-
