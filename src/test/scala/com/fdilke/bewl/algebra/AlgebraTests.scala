@@ -16,7 +16,7 @@ class AlgebraTests extends FunSpec {
     theory = Magmas
   )
   def CommutativeMagmas = new AlgebraicTheory(Seq(*),
-    Law.commutative(*)
+    commutative(*)
   )
   case class CommutativeMagma[X](dot: DOT[X], product: Operator[X]) extends AlgebraicStructure[X] (
     carrier = dot,
@@ -24,10 +24,17 @@ class AlgebraTests extends FunSpec {
     theory = CommutativeMagmas
   )
 
-  // TODO: make sure the signature is used somewhere
+  describe("Algebraic theories") {
+    it("must define all the operations used in their laws") {
+      intercept[IllegalArgumentException] {
+        new AlgebraicTheory(Seq(), commutative(*))
+      }.getMessage shouldBe "Law uses undefined operator *"
+    }
+    // Note it's OK to define operations but not make use of them in laws - e.g. magmas
+  }
 
   describe("Algebraic structures") {
-    it("can be constructed from arrows obeying laws") {
+    it("can be constructed from arrows obeying laws specified by a theory") {
       val dot = set(0, 1)
       val product = binaryOperator(dot,
         (0, 0) -> 0,

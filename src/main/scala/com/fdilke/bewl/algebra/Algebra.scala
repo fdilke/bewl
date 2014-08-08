@@ -23,12 +23,18 @@ object AbstractOperator {
 trait Algebra {
   topos: BaseTopos =>
 
-  class Law(
-             abstractOperators: Seq[AbstractOperator],
-             numVariables: Int,
-             _equation: PartialFunction[(Seq[BoundAlgebraicOperator[Power[Nothing], Nothing]], Seq[Operator[Nothing]]), Boolean],
-             exceptionMessage: String
-             ) {
+  class Law(abstractOperators: Seq[AbstractOperator],
+            numVariables: Int,
+            _equation: PartialFunction[(Seq[BoundAlgebraicOperator[Power[Nothing], Nothing]], Seq[Operator[Nothing]]), Boolean],
+            exceptionMessage: String
+            ) {
+
+    def checkCoveredBy(signature: Seq[AbstractOperator]) =
+      for (abstractOperator <- abstractOperators) {
+        if (!signature.contains(abstractOperator)) {
+          throw new IllegalArgumentException(s"Law uses undefined operator $abstractOperator")
+        }
+      }
 
     def equation[X]: PartialFunction[(Seq[BoundAlgebraicOperator[Power[X], X]], Seq[Operator[X]]), Boolean] =
       _equation.asInstanceOf[PartialFunction[(Seq[BoundAlgebraicOperator[Power[X], X]], Seq[Operator[X]]), Boolean]]
