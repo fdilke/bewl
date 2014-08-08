@@ -34,7 +34,7 @@ class AlgebraTests extends FunSpec {
       intercept[IllegalArgumentException] {
         invalidAlgebra.verify
       }.
-        getMessage shouldBe "Commutative law for operator *"
+        getMessage shouldBe "Commutative law for *"
     }
   }
 
@@ -63,7 +63,7 @@ class AlgebraTests extends FunSpec {
       intercept[IllegalArgumentException] {
         Monoid(dot, unit, product).verify
       }.
-        getMessage shouldBe "Left unit law for operator * with unit 1"
+        getMessage shouldBe "Left unit law for * with unit 1"
     }
 
     it("must have a right unit element") {
@@ -78,7 +78,7 @@ class AlgebraTests extends FunSpec {
       intercept[IllegalArgumentException] {
         Monoid(dot, unit, product).verify
       }.
-        getMessage shouldBe "Right unit law for operator * with unit 1"
+        getMessage shouldBe "Right unit law for * with unit 1"
     }
 
     it("must be associative") {
@@ -93,7 +93,7 @@ class AlgebraTests extends FunSpec {
       intercept[IllegalArgumentException] {
         Monoid(dot, unit, product).verify
       }.
-        getMessage shouldBe "Associative law for operator *"
+        getMessage shouldBe "Associative law for *"
     }
   }
 
@@ -128,7 +128,7 @@ class AlgebraTests extends FunSpec {
       intercept[IllegalArgumentException] {
         Group(dot, unit, product, inverse).verify
       }.
-        getMessage shouldBe "Left inverse law for operator * with inverse invert and unit 1"
+        getMessage shouldBe "Left inverse law for * with inverse invert and unit 1"
     }
   }
 
@@ -163,7 +163,7 @@ class AlgebraTests extends FunSpec {
       intercept[IllegalArgumentException] {
         AbelianGroup(dot, zero, sum, negate).verify
       }.
-        getMessage shouldBe "Left inverse law for operator + with inverse negate and unit 0"
+        getMessage shouldBe "Left inverse law for + with inverse negate and unit 0"
     }
 
     it("must be commutative") {
@@ -184,7 +184,7 @@ class AlgebraTests extends FunSpec {
       intercept[IllegalArgumentException] {
         AbelianGroup(dot, unit, product, inverse).verify
       }.
-        getMessage shouldBe "Commutative law for operator +"
+        getMessage shouldBe "Commutative law for +"
     }
   }
 
@@ -206,21 +206,20 @@ class AlgebraTests extends FunSpec {
     }
   }
 
-//  describe("Heyting algebras") {
-//    it("can be defined with an appropriate zero, addition and subtraction, and multiplication") {
-//      val dot = set(0 until 7 :_*)
-//      val zero = nullaryOperator(dot, 0)
-//      val one = nullaryOperator(dot, 1)
-//      val negate = unaryOperator(dot,
-//      { x:Int => (7-x) % 7 }
-//      )
-//
-//      val sum = binaryOperator(dot,
-//      { (x:Int, y:Int) => (x + y) % 7 })
-//      val product = binaryOperator(dot,
-//      { (x:Int, y:Int) => (x * y) % 7 })
-//
-//      Ring(dot, zero, one, sum, negate, product).verify
-//    }
-//  }
+  describe("Heyting algebras") {
+    it("can be defined with an appropriate 0,1,^,v,->") {
+      val dot = set(true, false)
+      val zero = nullaryOperator(dot, false)
+      val one = nullaryOperator(dot, true)
+
+      val meet = binaryOperator(dot,
+      { (x:Boolean, y:Boolean) => x & y })
+      val join = binaryOperator(dot,
+      { (x:Boolean, y:Boolean) => x | y })
+      val imply = binaryOperator(dot,
+      { (x:Boolean, y:Boolean) => if (x) y else true  })
+
+      Lattice(dot, zero, one, meet, join, imply).verify
+    }
+  }
 }

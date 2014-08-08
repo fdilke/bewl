@@ -15,6 +15,9 @@ object AbstractOperator {
   def _0 = new AbstractOperator(0, "0")
   def -- = new AbstractOperator(1, "negate")
   def invert = new AbstractOperator(1, "invert")
+  def ^ = new AbstractOperator(2, "^")
+  def v = new AbstractOperator(2, "v")
+  def > = new AbstractOperator(2, "imply")
 }
 
 trait Algebra {
