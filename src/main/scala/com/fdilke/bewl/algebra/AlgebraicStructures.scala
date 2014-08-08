@@ -3,6 +3,18 @@ package com.fdilke.bewl.algebra
 import com.fdilke.bewl.BaseTopos
 
 trait AlgebraicStructures { topos: BaseTopos with Algebra =>
+  class AlgebraicTheory(signature: Seq[AbstractOperator], laws: Law*) {
+    def verify[X](carrier: DOT[X], operatorMap: Map[AbstractOperator, Operator[X]]) = laws.map {
+      _.verify(carrier, operatorMap)
+    }
+  }
+
+  class AlgebraicStructure[X](val carrier: DOT[X],
+    val operatorMap: Map[AbstractOperator, Operator[X]],
+    val theory: AlgebraicTheory) {
+    def verify = theory.verify(carrier, operatorMap)
+  }
+
   object Law {
     def commutative(aop: AbstractOperator) =
       new Law(Seq(aop), 2, { case (Seq(op), Seq(x, y)) =>
@@ -69,17 +81,75 @@ trait AlgebraicStructures { topos: BaseTopos with Algebra =>
       },
       s"Absorptive law for $abstractOver over $abstractUnder"
       )
+
+    // TODO: belongs here?
+
+    object AlgebraicTheories {
+      import AbstractOperator._
+
+      def Monoids = new AlgebraicTheory(Seq(_1, *),
+        leftUnit(_1, *),
+        rightUnit(_1, *),
+        associative(*)
+      )
+
+      def Groups = new AlgebraicTheory(Seq(_1, *, invert),
+        leftUnit(_1, *),
+        rightUnit(_1, *),
+        associative(*),
+        leftInverse(_1, invert, *),
+        rightInverse(_1, invert, *)
+      )  // TODO extend from Monoids
+
+      def AbelianGroups = new AlgebraicTheory(Seq(_0, ++, --),
+        leftUnit(_0, ++),
+        rightUnit(_0, ++),
+        associative(++),
+        leftInverse(_0, --, ++),
+        rightInverse(_0, --, ++),
+        commutative(++)
+        // TODO extend from Groups with remapping of operations?
+      )  // TODO: Call them MultiplicativeGroup, AdditiveAbelianGroup?
+
+      def Rings = new AlgebraicTheory(Seq(_0, _1, ++, --, *),
+        leftUnit(_0, ++),
+        rightUnit(_0, ++),
+        associative(++),
+        leftInverse(_0, --, ++),
+        rightInverse(_0, --, ++),
+        commutative(++),
+        associative(*),
+        leftUnit(_1, *),
+        rightUnit(_1, *),
+        leftDistributive(*, ++),
+        rightDistributive(*, ++)
+      ) // TODO: extend from AbelianGroups
+
+      def Lattices = new AlgebraicTheory(Seq(_0, _1, v, ^),
+        leftUnit(_0, v),
+        rightUnit(_0, v),
+        commutative(v),
+        associative(v),
+
+        leftUnit(_1, ^),
+        rightUnit(_1, ^),
+        commutative(^),
+        associative(^),
+
+        absorptive(^, v),
+        absorptive(v, ^)
+      )
+    }
   }
 
   import Law._
   import AbstractOperator._
+  import AlgebraicTheories._
 
   case class Monoid[X](dot: DOT[X], unit: Operator[X], product: Operator[X]) extends AlgebraicStructure[X] (
     carrier = dot,
     operatorMap = Map(_1 -> unit, * -> product),
-    leftUnit(_1, *),
-    rightUnit(_1, *),
-    associative(*)
+    theory = Monoids
   )
 
   case class Group[X](dot: DOT[X],
@@ -90,11 +160,7 @@ trait AlgebraicStructures { topos: BaseTopos with Algebra =>
     operatorMap = Map(_1 -> unit,
                       * -> product,
                       invert -> inversion),
-    leftUnit(_1, *),
-    rightUnit(_1, *),
-    associative(*),
-    leftInverse(_1, invert, *),
-    rightInverse(_1, invert, *)
+    theory = Groups
   )
 
   case class AbelianGroup[X](dot: DOT[X],
@@ -105,12 +171,7 @@ trait AlgebraicStructures { topos: BaseTopos with Algebra =>
     operatorMap = Map(_0 -> zero,
                       ++ -> sum,
                       -- -> negate),
-    leftUnit(_0, ++),
-    rightUnit(_0, ++),
-    associative(++),
-    leftInverse(_0, --, ++),
-    rightInverse(_0, --, ++),
-    commutative(++)
+    theory = AbelianGroups
   )
 
   case class Ring[X](dot: DOT[X],
@@ -125,17 +186,7 @@ trait AlgebraicStructures { topos: BaseTopos with Algebra =>
                       ++ -> sum,
                       -- -> negate,
                       * -> product),
-    leftUnit(_0, ++),
-    rightUnit(_0, ++),
-    associative(++),
-    leftInverse(_0, --, ++),
-    rightInverse(_0, --, ++),
-    commutative(++),
-    associative(*),
-    leftUnit(_1, *),
-    rightUnit(_1, *),
-    leftDistributive(*, ++),
-    rightDistributive(*, ++)
+    theory = Rings
   )
 
   case class Lattice[X](dot: DOT[X],
@@ -151,18 +202,7 @@ trait AlgebraicStructures { topos: BaseTopos with Algebra =>
                       v -> join,
                       > -> implies     // TODO: lattice doesn't need 'implies'
     ),
-    leftUnit(_0, v),
-    rightUnit(_0, v),
-    commutative(v),
-    associative(v),
-
-    leftUnit(_1, ^),
-    rightUnit(_1, ^),
-    commutative(^),
-    associative(^),
-
-    absorptive(^, v),
-    absorptive(v, ^)
+    theory = Lattices
   )
 }
 

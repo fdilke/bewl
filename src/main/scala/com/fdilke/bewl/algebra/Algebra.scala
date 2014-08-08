@@ -52,12 +52,4 @@ trait Algebra {
       arrow(IntegerPower.multiply(source, variables: _*))
   }
 
-  class AlgebraicStructure[X](
-                               val carrier: DOT[X],
-                               val operatorMap: Map[AbstractOperator, Operator[X]],
-                               val laws: Law*) {
-    def verify = laws.map {
-      _.verify(carrier, operatorMap)
-    }
-  }
 }
