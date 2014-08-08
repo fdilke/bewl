@@ -2,7 +2,7 @@ package com.fdilke.bewl.fsets
 
 import com.fdilke.bewl._
 import com.fdilke.bewl.fsets.FiniteSets.FiniteSetsUtilities.allMaps
-
+import Function.tupled
 import scala.Function.{const, tupled}
 
 object FiniteSets extends Topos {
@@ -170,9 +170,15 @@ object FiniteSets extends Topos {
         dot ^ 1, dot, Map(entries:_*)
       )
 
+    def unaryOperator[X](dot: FiniteSetsDot[X], unaryFunc: X => X): FiniteSetsArrow[Power[X], X] =
+      unaryOperator(dot, dot.map { x => (x, unaryFunc(x)) }.toList: _*)
+
     def binaryOperator[X](dot: FiniteSetsDot[X], entries: ((X, X), X)*) =
       FiniteSetsArrow[Power[X], X](
         dot ^ 2, dot, Map(entries:_*)
       )
+
+    def binaryOperator[X](dot: FiniteSetsDot[X], binaryFunc: (X, X) => X): FiniteSetsArrow[Power[X], X] =
+      binaryOperator(dot, (dot x dot).map { case (x, y) => ((x, y), binaryFunc(x,y)) }.toList: _*)
   }
 }

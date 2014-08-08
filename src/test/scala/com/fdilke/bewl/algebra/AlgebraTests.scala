@@ -194,12 +194,13 @@ class AlgebraTests extends FunSpec {
       val zero = nullaryOperator(dot, 0)
       val one = nullaryOperator(dot, 1)
       val negate = unaryOperator(dot,
-        dot.map(x => (x, (7-x) % 7)).toList: _*
+        { x:Int => (7-x) % 7 }
       )
+
       val sum = binaryOperator(dot,
-        (dot x dot).map { case (x, y) => ((x, y),  (x + y) % 7)}.toList: _*)
+        { (x:Int, y:Int) => (x + y) % 7 })
       val product = binaryOperator(dot,
-        (dot x dot).map { case (x, y) => ((x, y),  (x * y) % 7)}.toList: _*)
+        { (x:Int, y:Int) => (x * y) % 7 })
 
       Ring(dot, zero, one, sum, negate, product).verify
     }
