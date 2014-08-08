@@ -1,7 +1,6 @@
 package com.fdilke.bewl.algebra
 
 import com.fdilke.bewl.BaseTopos
-import com.fdilke.bewl.algebra.AlgebraicStructure._
 
 // Machinery for constructing and verifying algebraic structures with laws (varieties)
 
@@ -16,15 +15,6 @@ object AbstractOperator {
   def _0 = new AbstractOperator(0, "0")
   def - = new AbstractOperator(1, "negate")
   def invert = new AbstractOperator(1, "invert")
-}
-
-object AlgebraicStructure {
-  type Signature = Set[AbstractOperator]
-
-  import com.fdilke.bewl.algebra.AbstractOperator._
-
-  def MonoidSignature = Set(_1, *)
-  def GroupSignature = Set(_1, *, invert)
 }
 
 trait Algebra {
@@ -61,7 +51,6 @@ trait Algebra {
 
   class AlgebraicStructure[X](
                                val carrier: DOT[X],
-                               val signature: Signature,
                                val operatorMap: Map[AbstractOperator, Operator[X]],
                                val laws: Law*) {
     def verify = laws.map {

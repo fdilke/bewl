@@ -8,15 +8,12 @@ import org.scalatest.Matchers._
 class AlgebraTests extends FunSpec {
   import FiniteSets._
 
-  def MagmaSignature = Set(AbstractOperator.*)
   case class Magma[X](dot: DOT[X], product: Operator[X]) extends AlgebraicStructure[X] (
     carrier = dot,
-    signature = MagmaSignature,
     operatorMap = Map(AbstractOperator.* -> product)
   )
   case class CommutativeMagma[X](dot: DOT[X], product: Operator[X]) extends AlgebraicStructure[X] (
     carrier = dot,
-    signature = MagmaSignature,
     operatorMap = Map(AbstractOperator.* -> product),
     Law.commutative(AbstractOperator.*)
   )

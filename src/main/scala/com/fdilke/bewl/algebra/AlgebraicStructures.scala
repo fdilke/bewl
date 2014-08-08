@@ -1,7 +1,6 @@
 package com.fdilke.bewl.algebra
 
 import com.fdilke.bewl.BaseTopos
-import com.fdilke.bewl.algebra.AlgebraicStructure._
 
 trait AlgebraicStructures { topos: BaseTopos with Algebra =>
   object Law {
@@ -69,7 +68,6 @@ trait AlgebraicStructures { topos: BaseTopos with Algebra =>
 
   case class Monoid[X](dot: DOT[X], unit: Operator[X], product: Operator[X]) extends AlgebraicStructure[X] (
     carrier = dot,
-    signature = MonoidSignature,
     operatorMap = Map(AbstractOperator._1 -> unit, AbstractOperator.* -> product),
     leftUnit(AbstractOperator._1, AbstractOperator.*),
     rightUnit(AbstractOperator._1, AbstractOperator.*),
@@ -81,7 +79,6 @@ trait AlgebraicStructures { topos: BaseTopos with Algebra =>
                       product: Operator[X],
                       inversion: Operator[X]) extends AlgebraicStructure[X] (
     carrier = dot,
-    signature = GroupSignature,
     operatorMap = Map(AbstractOperator._1 -> unit,
                       AbstractOperator.* -> product,
                       AbstractOperator.invert -> inversion),
@@ -97,7 +94,6 @@ trait AlgebraicStructures { topos: BaseTopos with Algebra =>
                       sum: Operator[X],
                       negate: Operator[X]) extends AlgebraicStructure[X] (
     carrier = dot,
-    signature = GroupSignature,
     operatorMap = Map(AbstractOperator._0 -> zero,
                       AbstractOperator.+ -> sum,
                       AbstractOperator.- -> negate),
@@ -116,7 +112,6 @@ trait AlgebraicStructures { topos: BaseTopos with Algebra =>
                      negate: Operator[X],
                      product: Operator[X]) extends AlgebraicStructure[X] (
     carrier = dot,
-    signature = GroupSignature,
     operatorMap = Map(AbstractOperator._0 -> zero,
                       AbstractOperator._1 -> one,
                       AbstractOperator.+ -> sum,
