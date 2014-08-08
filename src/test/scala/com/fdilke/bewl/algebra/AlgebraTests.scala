@@ -205,4 +205,22 @@ class AlgebraTests extends FunSpec {
       Ring(dot, zero, one, sum, negate, product).verify
     }
   }
+
+//  describe("Heyting algebras") {
+//    it("can be defined with an appropriate zero, addition and subtraction, and multiplication") {
+//      val dot = set(0 until 7 :_*)
+//      val zero = nullaryOperator(dot, 0)
+//      val one = nullaryOperator(dot, 1)
+//      val negate = unaryOperator(dot,
+//      { x:Int => (7-x) % 7 }
+//      )
+//
+//      val sum = binaryOperator(dot,
+//      { (x:Int, y:Int) => (x + y) % 7 })
+//      val product = binaryOperator(dot,
+//      { (x:Int, y:Int) => (x * y) % 7 })
+//
+//      Ring(dot, zero, one, sum, negate, product).verify
+//    }
+//  }
 }

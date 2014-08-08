@@ -65,13 +65,14 @@ trait AlgebraicStructures { topos: BaseTopos with Algebra =>
   }
 
   import Law._
+  import AbstractOperator._
 
   case class Monoid[X](dot: DOT[X], unit: Operator[X], product: Operator[X]) extends AlgebraicStructure[X] (
     carrier = dot,
-    operatorMap = Map(AbstractOperator._1 -> unit, AbstractOperator.* -> product),
-    leftUnit(AbstractOperator._1, AbstractOperator.*),
-    rightUnit(AbstractOperator._1, AbstractOperator.*),
-    associative(AbstractOperator.*)
+    operatorMap = Map(_1 -> unit, * -> product),
+    leftUnit(_1, *),
+    rightUnit(_1, *),
+    associative(*)
   )
 
   case class Group[X](dot: DOT[X],
@@ -79,14 +80,14 @@ trait AlgebraicStructures { topos: BaseTopos with Algebra =>
                       product: Operator[X],
                       inversion: Operator[X]) extends AlgebraicStructure[X] (
     carrier = dot,
-    operatorMap = Map(AbstractOperator._1 -> unit,
-                      AbstractOperator.* -> product,
-                      AbstractOperator.invert -> inversion),
-    leftUnit(AbstractOperator._1, AbstractOperator.*),
-    rightUnit(AbstractOperator._1, AbstractOperator.*),
-    associative(AbstractOperator.*),
-    leftInverse(AbstractOperator._1, AbstractOperator.invert, AbstractOperator.*),
-    rightInverse(AbstractOperator._1, AbstractOperator.invert, AbstractOperator.*)
+    operatorMap = Map(_1 -> unit,
+                      * -> product,
+                      invert -> inversion),
+    leftUnit(_1, *),
+    rightUnit(_1, *),
+    associative(*),
+    leftInverse(_1, invert, *),
+    rightInverse(_1, invert, *)
   )
 
   case class AbelianGroup[X](dot: DOT[X],
@@ -94,15 +95,15 @@ trait AlgebraicStructures { topos: BaseTopos with Algebra =>
                       sum: Operator[X],
                       negate: Operator[X]) extends AlgebraicStructure[X] (
     carrier = dot,
-    operatorMap = Map(AbstractOperator._0 -> zero,
-                      AbstractOperator.+ -> sum,
-                      AbstractOperator.- -> negate),
-    leftUnit(AbstractOperator._0, AbstractOperator.+),
-    rightUnit(AbstractOperator._0, AbstractOperator.+),
-    associative(AbstractOperator.+),
-    leftInverse(AbstractOperator._0, AbstractOperator.-, AbstractOperator.+),
-    rightInverse(AbstractOperator._0, AbstractOperator.-, AbstractOperator.+),
-    commutative(AbstractOperator.+)
+    operatorMap = Map(_0 -> zero,
+                      ++ -> sum,
+                      -- -> negate),
+    leftUnit(_0, ++),
+    rightUnit(_0, ++),
+    associative(++),
+    leftInverse(_0, --, ++),
+    rightInverse(_0, --, ++),
+    commutative(++)
   )
 
   case class Ring[X](dot: DOT[X],
@@ -112,22 +113,22 @@ trait AlgebraicStructures { topos: BaseTopos with Algebra =>
                      negate: Operator[X],
                      product: Operator[X]) extends AlgebraicStructure[X] (
     carrier = dot,
-    operatorMap = Map(AbstractOperator._0 -> zero,
-                      AbstractOperator._1 -> one,
-                      AbstractOperator.+ -> sum,
-                      AbstractOperator.- -> negate,
-                      AbstractOperator.* -> product),
-    leftUnit(AbstractOperator._0, AbstractOperator.+),
-    rightUnit(AbstractOperator._0, AbstractOperator.+),
-    associative(AbstractOperator.+),
-    leftInverse(AbstractOperator._0, AbstractOperator.-, AbstractOperator.+),
-    rightInverse(AbstractOperator._0, AbstractOperator.-, AbstractOperator.+),
-    commutative(AbstractOperator.+),
-    associative(AbstractOperator.*),
-    leftUnit(AbstractOperator._1, AbstractOperator.*),
-    rightUnit(AbstractOperator._1, AbstractOperator.*),
-    leftDistributive(AbstractOperator.*, AbstractOperator.+),
-    rightDistributive(AbstractOperator.*, AbstractOperator.+)
+    operatorMap = Map(_0 -> zero,
+                      _1 -> one,
+                      ++ -> sum,
+                      -- -> negate,
+                      * -> product),
+    leftUnit(_0, ++),
+    rightUnit(_0, ++),
+    associative(++),
+    leftInverse(_0, --, ++),
+    rightInverse(_0, --, ++),
+    commutative(++),
+    associative(*),
+    leftUnit(_1, *),
+    rightUnit(_1, *),
+    leftDistributive(*, ++),
+    rightDistributive(*, ++)
   )
 }
 

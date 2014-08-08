@@ -10,10 +10,10 @@ case class AbstractOperator(arity: Int, symbol: String) {
 
 object AbstractOperator {
   def * = new AbstractOperator(2, "*")
-  def + = new AbstractOperator(2, "+")
+  def ++ = new AbstractOperator(2, "+")
   def _1 = new AbstractOperator(0, "1")
   def _0 = new AbstractOperator(0, "0")
-  def - = new AbstractOperator(1, "negate")
+  def -- = new AbstractOperator(1, "negate")
   def invert = new AbstractOperator(1, "invert")
 }
 
