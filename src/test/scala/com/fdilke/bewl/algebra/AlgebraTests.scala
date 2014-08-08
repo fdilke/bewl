@@ -221,20 +221,35 @@ class AlgebraTests extends FunSpec {
     }
   }
 
-  describe("Heyting algebras") {
-    it("can be defined with an appropriate 0,1,^,v,->") {
-      val dot = set(true, false)
-      val zero = nullaryOperator(dot, false)
-      val one = nullaryOperator(dot, true)
+  describe("Lattices") {
+    it("can be defined with an appropriate 0,1,^,v") {
+      val dot = set(0 until 8 :_*)
+      val zero = nullaryOperator(dot, 0)
+      val one = nullaryOperator(dot, 7)
 
       val meet = binaryOperator(dot,
-      { (x:Boolean, y:Boolean) => x & y })
+      { (x:Int, y:Int) => x & y })
       val join = binaryOperator(dot,
-      { (x:Boolean, y:Boolean) => x | y })
-      val imply = binaryOperator(dot,
-      { (x:Boolean, y:Boolean) => if (x) y else true  })
+      { (x:Int, y:Int) => x | y })
 
-      Lattice(dot, zero, one, meet, join, imply).verify
+      Lattice(dot, zero, one, meet, join).verify
+    }
+  }
+
+  describe("Heyting algebras") {
+    it("can be defined with an appropriate 0,1,^,v,->") {
+      val dot = set(0 until 8 :_*)
+      val zero = nullaryOperator(dot, 0)
+      val one = nullaryOperator(dot, 7)
+
+      val meet = binaryOperator(dot,
+      { (x:Int, y:Int) => x & y })
+      val join = binaryOperator(dot,
+      { (x:Int, y:Int) => x | y })
+      val imply = binaryOperator(dot,
+      { (x:Int, y:Int) => (x ^ 7) | y  })
+
+      HeytingAlgebra(dot, zero, one, meet, join, imply).verify
     }
   }
 }

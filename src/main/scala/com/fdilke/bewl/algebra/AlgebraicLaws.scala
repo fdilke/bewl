@@ -70,4 +70,25 @@ trait AlgebraicLaws {
     },
     { case Seq(anopOver, anopUnder) => s"Absorptive law for $anopOver over $anopUnder" }
     )
+
+  def selfImplication(abstractTruth: AbstractOperator, abstractImply: AbstractOperator) =
+    new Law(Seq(abstractTruth, abstractImply), 1, { case (Seq(truth, imply), Seq(x)) =>
+      truth() == imply(x, x)
+    },
+    { case Seq(anopTruth, anopImplies) => s"Self implication law for $anopTruth and $anopImplies" }
+    )
+
+  def modusPonens(abstractAnd: AbstractOperator, abstractImply: AbstractOperator) =
+    new Law(Seq(abstractAnd, abstractImply), 2, { case (Seq(and, imply), Seq(x, y)) =>
+      and(x, imply(x, y)) == and(x, y)
+    },
+    { case Seq(anopAnd, anopImplies) => s"Modus ponens for $anopAnd and $anopImplies" }
+    )
+
+  def implicationSupersedes(abstractAnd: AbstractOperator, abstractImply: AbstractOperator) =
+    new Law(Seq(abstractAnd, abstractImply), 2, { case (Seq(and, imply), Seq(x, y)) =>
+      and(x, imply(y, x)) == x
+    },
+    { case Seq(anopAnd, anopImplies) => s"Implication supersedes for $anopAnd and $anopImplies" }
+    )
 }

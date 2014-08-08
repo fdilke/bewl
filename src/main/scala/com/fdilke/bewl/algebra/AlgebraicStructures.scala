@@ -81,6 +81,13 @@ trait AlgebraicStructures { topos: BaseTopos with Algebra with AlgebraicLaws =>
     absorptive(v, ^)
   )
 
+  def HeytingAlgebras = Lattices.extend(Seq(>),
+    selfImplication(_1, >),
+    modusPonens(^, >),
+    implicationSupersedes(^, >),
+    leftDistributive(>, ^)
+  )
+
   case class Monoid[X](dot: DOT[X], unit: Operator[X], product: Operator[X]) extends AlgebraicStructure[X] (
     carrier = dot,
     operatorMap = Map(_1 -> unit, * -> product),
@@ -128,6 +135,20 @@ trait AlgebraicStructures { topos: BaseTopos with Algebra with AlgebraicLaws =>
                      zero: Operator[X],
                      one: Operator[X],
                      meet: Operator[X],
+                     join: Operator[X]) extends AlgebraicStructure[X] (
+    carrier = dot,
+    operatorMap = Map(_0 -> zero,
+                      _1 -> one,
+                      ^ -> meet,
+                      v -> join
+    ),
+    theory = Lattices
+  )
+
+  case class HeytingAlgebra[X](dot: DOT[X],
+                     zero: Operator[X],
+                     one: Operator[X],
+                     meet: Operator[X],
                      join: Operator[X],
                      implies: Operator[X]) extends AlgebraicStructure[X] (
     carrier = dot,
@@ -135,9 +156,9 @@ trait AlgebraicStructures { topos: BaseTopos with Algebra with AlgebraicLaws =>
                       _1 -> one,
                       ^ -> meet,
                       v -> join,
-                      > -> implies     // TODO: lattice doesn't need 'implies'
+                      > -> implies
     ),
-    theory = Lattices
+    theory = HeytingAlgebras
   )
 }
 
