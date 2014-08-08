@@ -12,7 +12,7 @@ case class AbstractOperator(arity: Int, symbol: String) {
 object AbstractOperator {
   def * = new AbstractOperator(2, "*")
   def _1 = new AbstractOperator(0, "1")
-  def inversion = new AbstractOperator(1, "inv")
+  def invert = new AbstractOperator(1, "invert")
 }
 
 object AlgebraicStructure {
@@ -21,7 +21,7 @@ object AlgebraicStructure {
   import com.fdilke.bewl.algebra.AbstractOperator._
 
   def MonoidSignature = Set(_1, *)
-  def GroupSignature = Set(_1, *, inversion)
+  def GroupSignature = Set(_1, *, invert)
 }
 
 trait Algebra {

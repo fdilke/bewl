@@ -131,7 +131,7 @@ class AlgebraTests extends FunSpec {
       intercept[IllegalArgumentException] {
         Group[Symbol](dot, unit, product, inverse).verify
       }.
-        getMessage shouldBe "Left inverse law for operator * with inverse inv and unit 1"
+        getMessage shouldBe "Left inverse law for operator * with inverse invert and unit 1"
     }
   }
 }
