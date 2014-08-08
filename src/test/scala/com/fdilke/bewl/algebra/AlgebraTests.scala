@@ -31,9 +31,9 @@ class AlgebraTests extends FunSpec {
         (1, 1) -> 0
       )
 
-      Magma[Int](dot, product).verify
+      Magma(dot, product).verify
 
-      def invalidAlgebra = CommutativeMagma[Int](dot, product)
+      def invalidAlgebra = CommutativeMagma(dot, product)
       intercept[IllegalArgumentException] {
         invalidAlgebra.verify
       }.
@@ -51,7 +51,7 @@ class AlgebraTests extends FunSpec {
         (x, i) -> x, (x, x) -> x, (x, y) -> x,
         (y, i) -> y, (y, x) -> y, (y, y) -> y
       )
-      Monoid[Symbol](dot, unit, product).verify
+      Monoid(dot, unit, product).verify
     }
 
     it("must have a left unit element") {
@@ -64,7 +64,7 @@ class AlgebraTests extends FunSpec {
         (y, i) -> y, (y, x) -> y, (y, y) -> y
       )
       intercept[IllegalArgumentException] {
-        Monoid[Symbol](dot, unit, product).verify
+        Monoid(dot, unit, product).verify
       }.
         getMessage shouldBe "Left unit law for operator * with unit 1"
     }
@@ -79,7 +79,7 @@ class AlgebraTests extends FunSpec {
         (y, i) -> i, (y, x) -> x, (y, y) -> y
       )
       intercept[IllegalArgumentException] {
-        Monoid[Symbol](dot, unit, product).verify
+        Monoid(dot, unit, product).verify
       }.
         getMessage shouldBe "Right unit law for operator * with unit 1"
     }
@@ -94,7 +94,7 @@ class AlgebraTests extends FunSpec {
         (y, i) -> y, (y, x) -> x, (y, y) -> y
       )
       intercept[IllegalArgumentException] {
-        Monoid[Symbol](dot, unit, product).verify
+        Monoid(dot, unit, product).verify
       }.
         getMessage shouldBe "Associative law for operator *"
     }
@@ -113,7 +113,7 @@ class AlgebraTests extends FunSpec {
         (x, i) -> x, (x, x) -> y, (x, y) -> i,
         (y, i) -> y, (y, x) -> i, (y, y) -> x
       )
-      Group[Symbol](dot, unit, product, inverse).verify
+      Group(dot, unit, product, inverse).verify
     }
 
     it("must have inverses for every element") {
@@ -129,14 +129,14 @@ class AlgebraTests extends FunSpec {
         (y, i) -> y, (y, x) -> y, (y, y) -> y
       )
       intercept[IllegalArgumentException] {
-        Group[Symbol](dot, unit, product, inverse).verify
+        Group(dot, unit, product, inverse).verify
       }.
         getMessage shouldBe "Left inverse law for operator * with inverse invert and unit 1"
     }
   }
 
   describe("Abelian groups") {
-    it("can be defined with an appropriate zero, addition and inverse") {
+    it("can be defined with an appropriate zero, addition and subtraction") {
       val (o, x, y) = ('o, 'x, 'y)
       val dot = set(o, x, y)
       val zero = nullaryOperator(dot, o)
@@ -148,7 +148,7 @@ class AlgebraTests extends FunSpec {
         (x, o) -> x, (x, x) -> y, (x, y) -> o,
         (y, o) -> y, (y, x) -> o, (y, y) -> x
       )
-      AbelianGroup[Symbol](dot, zero, sum, inverse).verify
+      AbelianGroup(dot, zero, sum, inverse).verify
     }
 
     it("must have inverses for every element") {
@@ -164,7 +164,7 @@ class AlgebraTests extends FunSpec {
         (y, o) -> y, (y, x) -> y, (y, y) -> y
       )
       intercept[IllegalArgumentException] {
-        AbelianGroup[Symbol](dot, zero, sum, negate).verify
+        AbelianGroup(dot, zero, sum, negate).verify
       }.
         getMessage shouldBe "Left inverse law for operator + with inverse negate and unit 0"
     }
@@ -185,9 +185,26 @@ class AlgebraTests extends FunSpec {
         (s, i) -> s, (s, x) -> y, (s, y) -> z, (s, z) -> x, (s, r) -> i, (s, s) -> r
       )
       intercept[IllegalArgumentException] {
-        AbelianGroup[Symbol](dot, unit, product, inverse).verify
+        AbelianGroup(dot, unit, product, inverse).verify
       }.
         getMessage shouldBe "Commutative law for operator +"
+    }
+  }
+
+  describe("Rings") {
+    it("can be defined with an appropriate zero, addition and subtraction, and multiplication") {
+      val dot = set(0 until 7 :_*)
+      val zero = nullaryOperator(dot, 0)
+      val one = nullaryOperator(dot, 1)
+      val negate = unaryOperator(dot,
+        dot.map(x => (x, (7-x) % 7)).toList: _*
+      )
+      val sum = binaryOperator(dot,
+        (dot x dot).map { case (x, y) => ((x, y),  (x + y) % 7)}.toList: _*)
+      val product = binaryOperator(dot,
+        (dot x dot).map { case (x, y) => ((x, y),  (x * y) % 7)}.toList: _*)
+
+      Ring(dot, zero, one, sum, negate, product).verify
     }
   }
 }

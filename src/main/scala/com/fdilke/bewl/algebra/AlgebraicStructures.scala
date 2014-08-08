@@ -49,6 +49,20 @@ trait AlgebraicStructures { topos: BaseTopos with Algebra =>
       },
       s"Right inverse law for operator $aop with inverse $abstractInverse and unit $abstractUnit"
       )
+
+    def leftDistributive(abstractProduct: AbstractOperator, abstractSum: AbstractOperator) =
+      new Law(Seq(abstractProduct, abstractSum), 3, { case (Seq(prd, sum), Seq(x, y, z)) =>
+        prd(x, sum(y, z)) == sum(prd(x, y), prd(x, z))
+      },
+      s"Left distributive law for operator $abstractProduct over $abstractSum"
+      )
+
+    def rightDistributive(abstractProduct: AbstractOperator, abstractSum: AbstractOperator) =
+      new Law(Seq(abstractProduct, abstractSum), 3, { case (Seq(prd, sum), Seq(x, y, z)) =>
+        prd(sum(x, y), z) == sum(prd(x, z), prd(y, z))
+      },
+      s"Right distributive law for operator $abstractProduct over $abstractSum"
+      )
   }
 
   import Law._
@@ -89,10 +103,36 @@ trait AlgebraicStructures { topos: BaseTopos with Algebra =>
                       AbstractOperator.- -> negate),
     leftUnit(AbstractOperator._0, AbstractOperator.+),
     rightUnit(AbstractOperator._0, AbstractOperator.+),
-    commutative(AbstractOperator.+),
     associative(AbstractOperator.+),
     leftInverse(AbstractOperator._0, AbstractOperator.-, AbstractOperator.+),
-    rightInverse(AbstractOperator._0, AbstractOperator.-, AbstractOperator.+)
+    rightInverse(AbstractOperator._0, AbstractOperator.-, AbstractOperator.+),
+    commutative(AbstractOperator.+)
+  )
+
+  case class Ring[X](dot: DOT[X],
+                     zero: Operator[X],
+                     one: Operator[X],
+                     sum: Operator[X],
+                     negate: Operator[X],
+                     product: Operator[X]) extends AlgebraicStructure[X] (
+    carrier = dot,
+    signature = GroupSignature,
+    operatorMap = Map(AbstractOperator._0 -> zero,
+                      AbstractOperator._1 -> one,
+                      AbstractOperator.+ -> sum,
+                      AbstractOperator.- -> negate,
+                      AbstractOperator.* -> product),
+    leftUnit(AbstractOperator._0, AbstractOperator.+),
+    rightUnit(AbstractOperator._0, AbstractOperator.+),
+    associative(AbstractOperator.+),
+    leftInverse(AbstractOperator._0, AbstractOperator.-, AbstractOperator.+),
+    rightInverse(AbstractOperator._0, AbstractOperator.-, AbstractOperator.+),
+    commutative(AbstractOperator.+),
+    associative(AbstractOperator.*),
+    leftUnit(AbstractOperator._1, AbstractOperator.*),
+    rightUnit(AbstractOperator._1, AbstractOperator.*),
+    leftDistributive(AbstractOperator.*, AbstractOperator.+),
+    rightDistributive(AbstractOperator.*, AbstractOperator.+)
   )
 }
 

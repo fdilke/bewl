@@ -4,6 +4,9 @@
 # IDEA specific
 .idea/
 
+# security specific
+keys/
+
 # sbt specific
 sbt
 .cache/
