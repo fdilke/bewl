@@ -160,7 +160,7 @@ class AlgebraTests extends FunSpec {
         (x, o) -> x, (x, x) -> y, (x, y) -> o,
         (y, o) -> y, (y, x) -> o, (y, y) -> x
       )
-      AbelianGroup(dot, zero, sum, inverse).verify
+      AdditiveAbelianGroup(dot, zero, sum, inverse).verify
     }
 
     it("must have inverses for every element") {
@@ -176,7 +176,7 @@ class AlgebraTests extends FunSpec {
         (y, o) -> y, (y, x) -> y, (y, y) -> y
       )
       intercept[IllegalArgumentException] {
-        AbelianGroup(dot, zero, sum, negate).verify
+        AdditiveAbelianGroup(dot, zero, sum, negate).verify
       }.
         getMessage shouldBe "Left inverse law for + with inverse negate and unit 0"
     }
@@ -197,7 +197,7 @@ class AlgebraTests extends FunSpec {
         (s, i) -> s, (s, x) -> y, (s, y) -> z, (s, z) -> x, (s, r) -> i, (s, s) -> r
       )
       intercept[IllegalArgumentException] {
-        AbelianGroup(dot, unit, product, inverse).verify
+        AdditiveAbelianGroup(dot, unit, product, inverse).verify
       }.
         getMessage shouldBe "Commutative law for +"
     }

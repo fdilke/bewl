@@ -26,8 +26,15 @@ trait Algebra {
   class Law(abstractOperators: Seq[AbstractOperator],
             numVariables: Int,
             _equation: PartialFunction[(Seq[BoundAlgebraicOperator[Power[Nothing], Nothing]], Seq[Operator[Nothing]]), Boolean],
-            exceptionMessage: String
+            exceptionMessageGenerator: PartialFunction[Seq[AbstractOperator], String]
             ) {
+
+    def remap(mappings: Map[AbstractOperator, AbstractOperator]) = new Law(
+      abstractOperators.map { aop =>
+        mappings.get(aop).getOrElse(aop)
+      },
+      numVariables, _equation, exceptionMessageGenerator
+    )
 
     def checkCoveredBy(signature: Seq[AbstractOperator]) =
       for (abstractOperator <- abstractOperators) {
@@ -48,7 +55,7 @@ trait Algebra {
 
       val operatorsAndVariables = (operators, variables)
       if (!equation[X](operatorsAndVariables)) {
-        throw new IllegalArgumentException(exceptionMessage)
+        throw new IllegalArgumentException(exceptionMessageGenerator(abstractOperators))
       }
     }
   }
