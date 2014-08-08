@@ -77,6 +77,23 @@ trait AlgebraicStructures { topos: BaseTopos with Algebra =>
     leftInverse(AbstractOperator._1, AbstractOperator.invert, AbstractOperator.*),
     rightInverse(AbstractOperator._1, AbstractOperator.invert, AbstractOperator.*)
   )
+
+  case class AbelianGroup[X](dot: DOT[X],
+                      zero: Operator[X],
+                      sum: Operator[X],
+                      negate: Operator[X]) extends AlgebraicStructure[X] (
+    carrier = dot,
+    signature = GroupSignature,
+    operatorMap = Map(AbstractOperator._0 -> zero,
+                      AbstractOperator.+ -> sum,
+                      AbstractOperator.- -> negate),
+    leftUnit(AbstractOperator._0, AbstractOperator.+),
+    rightUnit(AbstractOperator._0, AbstractOperator.+),
+    commutative(AbstractOperator.+),
+    associative(AbstractOperator.+),
+    leftInverse(AbstractOperator._0, AbstractOperator.-, AbstractOperator.+),
+    rightInverse(AbstractOperator._0, AbstractOperator.-, AbstractOperator.+)
+  )
 }
 
 

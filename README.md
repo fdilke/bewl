@@ -18,6 +18,8 @@ I've implemented this in Java, Clojure and now Scala. Really it should be in Has
 - Created Topos API as a trait
 - Implemented FiniteSets as a topos
 - Added 'generic topos tests' which use fixtures for the given topos
+- Can define algebraic laws and structures. Only 'monotyped' laws as yet - can't define monoid and ring actions 
+
 
 # To do
 

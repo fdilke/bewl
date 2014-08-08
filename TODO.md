@@ -1,9 +1,12 @@
 # To do
 
-- Tidy definitions of laws. 
 - Define group, ring, etc
+- can 'isCommutative' be a method on Group, Ring? Requires some refactoring of law verification?
 - Broaden definition of algebraic structures to include models and parameterized operations
 - Formalize constructions like: automorphism group, endomorphism ring, group of invertible elements of a monoid
+- can have one type of structure extending another, as we did in Clojure? e.g. ring extends abelian group?
+- check arities of operators in a law?
+- add tests based on these: we can verify that Aut(2) is commutative but Aut(3) isn't
 - Extract the Heyting algebra structure of the subobject classifier
 - Construct coproducts and colimits (how does McLarty do this?)
 
