@@ -1,11 +1,11 @@
 package com.fdilke.bewl
 
-import com.fdilke.bewl.algebra.{AlgebraicLaws, AlgebraicStructures, Algebra}
+import com.fdilke.bewl.algebra.{TruthObject, AlgebraicLaws, AlgebraicStructures, Algebra}
 import com.fdilke.bewl.helper.ResultStore
 
 import scala.Function.tupled
 
-trait Topos extends BaseTopos with Algebra with AlgebraicLaws with AlgebraicStructures
+trait Topos extends BaseTopos with Algebra with AlgebraicLaws with AlgebraicStructures with TruthObject
 
 trait BaseTopos {
   type DOT[P] <: Dot[P]
@@ -69,7 +69,7 @@ trait BaseTopos {
 
     def apply[W](arrow: ARROW[W, X]): ARROW[W, Y]
 
-    final def x[Z](that: ARROW[X, Z]) = (this.target * that.target).
+    final def x[Z](that: ARROW[X, Z]): ARROW[X, (Y, Z)] = (this.target * that.target).
       multiply(this.asInstanceOf[ARROW[X, Y]], that)
 
     def ?=(that: ARROW[X, Y]): EQUALIZER[X, Y]

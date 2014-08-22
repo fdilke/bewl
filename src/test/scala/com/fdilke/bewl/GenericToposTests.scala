@@ -155,7 +155,7 @@ abstract class GenericToposTests[TOPOS <: Topos](
       e(q) shouldBe r
     }
 
-    it("has a subobject classifier") {
+    it("has a truth object (subobject classifier)") {
       truth.source shouldBe I
       truth.target shouldBe omega
 
@@ -194,6 +194,11 @@ abstract class GenericToposTests[TOPOS <: Topos](
     it("has standardized integer powers") {
       val foo3: DOT[Power[FOO]] = foo ^ 3
       foo3 shouldBe (foo ^ 3)
+    }
+
+    ignore("has a Heyting algebra structure for the truth object") {
+      omegaHeyting.isInstanceOf[HeytingAlgebra[OMEGA]] shouldBe true
+//      omegaHeyting.verify
     }
   }
 }
