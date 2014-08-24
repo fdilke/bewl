@@ -5,9 +5,7 @@ import com.fdilke.bewl.fsets.FiniteSets.FiniteSetsUtilities._
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
-// User: Felix Date: 30/07/2014 Time: 19:59
-
-class BoundAlgebraicOperatorTests  extends FunSpec {
+class BindingTests  extends FunSpec {
   import FiniteSets._
 
   describe("Algebraic operators") {
@@ -43,6 +41,18 @@ class BoundAlgebraicOperatorTests  extends FunSpec {
       boundProductOp(u, a) shouldBe a
       boundProductOp(a, b) should not be (boundProductOp(b, a))
       boundProductOp(boundProductOp(a, b), c) shouldBe boundProductOp(a, boundProductOp(b, c))
+    }
+  }
+
+  describe("The name of an arrow") {
+    it("is calculated correctly for sets, at least") {
+      val foo = set(1, 2, 3)
+      val bar = set('a, 'b, 'c, 'd)
+      val foo2bar = arrow(foo, bar, 1 -> 'a, 2 -> 'c, 3 -> 'a)
+      val name = foo2bar.name
+      name.source shouldBe I
+      name.target shouldBe bar ^ foo
+      Seq(1,2,3).map(name.function(())) shouldBe Seq('a, 'c, 'a)
     }
   }
 }

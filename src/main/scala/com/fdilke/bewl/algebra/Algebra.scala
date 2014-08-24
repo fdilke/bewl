@@ -43,6 +43,7 @@ trait Algebra {
         }
       }
 
+    // TODO: can just assign from _equation with appropriate type hints?
     def equation[X]: PartialFunction[(Seq[BoundAlgebraicOperator[Power[X], X]], Seq[Operator[X]]), Boolean] =
       _equation.asInstanceOf[PartialFunction[(Seq[BoundAlgebraicOperator[Power[X], X]], Seq[Operator[X]]), Boolean]]
 

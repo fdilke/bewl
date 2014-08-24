@@ -76,6 +76,8 @@ trait BaseTopos {
 
     val chi: Characteristic[X, Y]
 
+    def name = transpose(source, target, BiArrow(I, source, this((I * source).rightProjection)))
+
     def sanityTest: Unit
   }
 

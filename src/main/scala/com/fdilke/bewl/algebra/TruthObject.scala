@@ -15,33 +15,39 @@ trait TruthObject { topos: BaseTopos with Algebra with AlgebraicLaws with Algebr
 
   case class MixedProduct[P](product: DOT[P], projection: Seq[ARROW[P, _]])
 
+//  object Weasel {
+//    def unapply[X](seqx: Seq[DOT[X]])
+//  }
+
   object MixedProduct {
     def of(components: Seq[DOT[_]]): MixedProduct[_] =
       components match {
         case Seq() => MixedProduct[TERMINAL](I, Seq.empty)
         case Seq(x: DOT[_]) => MixedProduct(x, Seq(x.identity))
         case _ =>
-          val head = components.head
-          val tail = components.tail
-          val tailProduct = MixedProduct.of(tail)
-          val product = head * tailProduct.product
-          MixedProduct(product.product,
-            product.leftProjection +: tailProduct.projection.map(_(product.rightProjection))
-          )
+          computeMixedProduct(components.head, MixedProduct.of(components.tail))
       }
-  }
 
-  def name[X, Y](arrow: ARROW[X, Y]) =
-    transpose(arrow.source, arrow.target, arrow((I * arrow.source).rightProjection))
+    private def computeMixedProduct[H, T](head: DOT[H], tailProduct: MixedProduct[T]) = {
+      val biproduct: BIPRODUCT[H, T] = head * tailProduct.product
+
+      MixedProduct(biproduct.product,
+        biproduct.leftProjection +: tailProduct.projection.map(_(biproduct.rightProjection))
+      )
+    }
+  }
 
   def forAll[X](dot: DOT[X]): ARROW[X => OMEGA, OMEGA] = {
-    name(truth(dot.toI)).chi.arrow
+    truth(dot.toI).name.chi.arrow
   }
 
-  def bind[S](domains: DOT[_]*)(ops: Operator[_]*)(f: (Seq[BoundAlgebraicOperator[S, _]], Seq[ARROW[S, _]]) => ARROW[S,_]) = {
-    val product = MixedProduct.of(domains)
-    val boundOps = ops map { op => BoundAlgebraicOperator(product.product, op) }
-    f((boundOps, product.projection))
+  def bind(domains: DOT[_]*)(ops: Operator[_]*)(f: (Seq[BoundAlgebraicOperator[_, _]], Seq[ARROW[_, _]]) => ARROW[_,_]) = {
+    def doBind[P](product: MixedProduct[P]) = {
+      val boundOps: Seq[BoundAlgebraicOperator[P, _]] = ops map { op => BoundAlgebraicOperator(product.product, op)}
+      f(boundOps, product.projection)
+    }
+
+    doBind(MixedProduct.of(domains))
   }
 
   def quantifyA[S](freeVariables: DOT[_]*)(boundVariables: DOT[_]*)(ops: Operator[_]*)(f: (Seq[BoundAlgebraicOperator[S, _]], Seq[ARROW[S, _]]) => ARROW[S,_]) = {
@@ -86,5 +92,5 @@ trait TruthObject { topos: BaseTopos with Algebra with AlgebraicLaws with Algebr
       implies)
   }
 */
-def omegaHeyting = null
+  def omegaHeyting = null
 }
