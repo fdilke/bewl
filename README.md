@@ -22,6 +22,7 @@ I've implemented this in Java, Clojure and now Scala. Really it should be in Has
 - Separated BaseTopos from its extra layers (Algebra, AlgebraicStructures) which are now traits
 - Structure definitions for monoid, group, abelian group, ring with their respective algebraic laws
 - Can extend and remap algebraic structures, e.g. ring extends abelian group remaps group with an extra law
+- Universal and existential quantifiers
 
 # To do
 
