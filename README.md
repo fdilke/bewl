@@ -29,6 +29,7 @@ I've implemented this in Java, Clojure and now Scala. Really it should be in Has
 - Formalize constructions like: automorphism group, endomorphism ring, group of invertible elements of a monoid
 - Extract the Heyting algebra structure of the subobject classifier
 - Construct coproducts and colimits
+- Add bindings: the type arguments have their own methods e.g. product has left, right
 
 # Questions
 

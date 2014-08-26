@@ -42,8 +42,12 @@ abstract class ToposFixtureSanityTests[T <: Topos](fixtures: ToposWithFixtures) 
   import fixtures._
 
   describe(s"The fixtures for ${fixtures.topos.getClass.getSimpleName}") {
-    it("include distinct objects") {
-      Set(foo, bar, baz) should have size 3
+    it("include distinct sane objects") {
+      val objects = Set(foo, bar, baz)
+
+      objects should have size 3
+      
+      objects map { _.sanityTest }
     }
 
     it("include sane arrows whose sources and targets match their names") {

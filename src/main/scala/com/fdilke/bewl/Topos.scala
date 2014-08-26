@@ -1,7 +1,7 @@
 package com.fdilke.bewl
 
 import com.fdilke.bewl.algebra.{TruthObject, AlgebraicLaws, AlgebraicStructures, Algebra}
-import com.fdilke.bewl.helper.ResultStore
+import com.fdilke.bewl.helper.{StrictRef, ResultStore}
 
 import scala.Function.tupled
 
@@ -31,22 +31,23 @@ trait BaseTopos {
 
     def multiply[Y](that: DOT[Y]): BIPRODUCT[X, Y]
 
-    final def *[Y](that: DOT[Y]) = standardProducts(
-      (this.asInstanceOf[DOT[Any]],
-        that.asInstanceOf[DOT[Any]])).asInstanceOf[BIPRODUCT[X, Y]]
+    final def *[Y](that: DOT[Y]) =
+      standardProducts(
+        (StrictRef(this.asInstanceOf[DOT[Any]]),
+         StrictRef(that.asInstanceOf[DOT[Any]]))).asInstanceOf[BIPRODUCT[X, Y]]
 
     final def x[Y](that: DOT[Y]) = (this * that).product
 
     def exponential[S](that: DOT[S]): EXPONENTIAL[S, X]
 
     final def A[S](that: DOT[S]) = standardExponentials(
-      (this.asInstanceOf[DOT[Any]],
-        that.asInstanceOf[DOT[Any]])).asInstanceOf[EXPONENTIAL[S, X]]
+      (StrictRef(this.asInstanceOf[DOT[Any]]),
+       StrictRef(that.asInstanceOf[DOT[Any]]))).asInstanceOf[EXPONENTIAL[S, X]]
 
     final def ^[S](that: DOT[S]): DOT[S => X] = (this A that).exponentDot
 
-    final def A[S](exponent: Int) = standardPowers(
-      this.asInstanceOf[DOT[Any]],
+    final def A(exponent: Int) = standardPowers(
+      StrictRef(this.asInstanceOf[DOT[Any]]),
       exponent).asInstanceOf[IntegerPower[X]]
 
     final def ^(exponent: Int): DOT[Power[X]] = (this A exponent).power
@@ -61,6 +62,8 @@ trait BaseTopos {
           product.leftProjection +: xN_1.projection.map(_(product.rightProjection))
         )
     }
+
+    def sanityTest: Unit
   }
 
   trait Arrow[X, Y] {
@@ -97,7 +100,10 @@ trait BaseTopos {
     def transpose[W](multiArrow: BiArrow[W, S, T]): ARROW[W, S => T]
   }
 
-  case class BiArrow[L, R, T](left: DOT[L], right: DOT[R], arrow: ARROW[(L, R), T])
+  case class BiArrow[L, R, T](left: DOT[L], right: DOT[R], arrow: ARROW[(L, R), T]) {
+    def apply[S](leftArrow: ARROW[S, L], rightArrow: ARROW[S, R]): ARROW[S, T] =
+      arrow(leftArrow x rightArrow)
+  }
 
   abstract class Characteristic[X, Y] {
     val arrow: ARROW[Y, OMEGA]
@@ -131,16 +137,18 @@ trait BaseTopos {
 
   // just a marker, for now - will have methods as part of the DSL?
 
-  private val standardProducts = new ResultStore[(DOT[Any], DOT[Any]), BIPRODUCT[Any, Any]](tupled {
-    (x, y) => x multiply y
+  private val standardProducts = new ResultStore[(StrictRef[DOT[Any]], StrictRef[DOT[Any]]),
+    BIPRODUCT[Any, Any]](tupled {
+    (x, y) => x.wrappedValue multiply y.wrappedValue
   })
 
-  private val standardExponentials = new ResultStore[(DOT[Any], DOT[Any]), EXPONENTIAL[Any, Any]](tupled {
-    (x, y) => x exponential y
+  private val standardExponentials = new ResultStore[(StrictRef[DOT[Any]], StrictRef[DOT[Any]]),
+    EXPONENTIAL[Any, Any]](tupled {
+    (x, y) => x.wrappedValue exponential y.wrappedValue
   })
 
-  private val standardPowers = new ResultStore[(DOT[Any], Int), IntegerPower[Any]](tupled {
-    (x, n) => x toPower n
+  private val standardPowers = new ResultStore[(StrictRef[DOT[Any]], Int), IntegerPower[Any]](tupled {
+    (x, n) => x.wrappedValue toPower n
   })
 
   // Helper methods for biproducts

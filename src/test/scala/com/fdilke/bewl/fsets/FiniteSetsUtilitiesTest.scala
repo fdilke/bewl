@@ -35,5 +35,17 @@ class FiniteSetsUtilitiesTest extends FunSpec {
         Map(1->"a", 2->"c"), Map(1->"b", 2->"c"), Map(1->"c", 2->"c")
       )
     }
+
+    it("gives sensible results even when the source is empty") {
+      allMaps(Seq(), Seq(0)) should have ('size (1))
+    }
+
+    it("gives sensible results even when the target is empty") {
+      allMaps(Seq(0), Seq()) shouldBe 'empty
+    }
+
+    it("gives sensible results even when both source and target are empty") {
+      allMaps(Seq(), Seq()) should have ('size (1))
+    }
   }
 }
