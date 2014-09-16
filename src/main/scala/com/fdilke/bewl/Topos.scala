@@ -5,7 +5,8 @@ import com.fdilke.bewl.helper.{StrictRef, ResultStore}
 
 import scala.Function.tupled
 
-trait Topos extends BaseTopos with Algebra with AlgebraicLaws with AlgebraicStructures with TruthObject
+trait Topos extends BaseTopos with Algebra with AlgebraicLaws with
+  AlgebraicStructures with TruthObject with StrongBinding
 
 trait BaseTopos {
   type DOT[P] <: Dot[P]

@@ -202,9 +202,22 @@ abstract class GenericToposTests[TOPOS <: Topos](
 
     ignore("has a Heyting algebra structure for the truth object") {
       omegaHeyting.isInstanceOf[HeytingAlgebra[OMEGA]] shouldBe true
-//      omegaHeyting.verify
+      //      omegaHeyting.verify
     }
   }
-}
 
+  describe(s"The topos ${topos.getClass.getSimpleName}, with strong binding") {
+
+    def foo0 = wrap(foo)
+    def bar0 = wrap(bar)
+    def foo2bar0 = wrap(foo2bar)
+
+    it("has identity arrows which can be composed") {
+      foo2bar0(foo0.identity) shouldBe foo2bar0
+      bar0.identity(foo2bar0) shouldBe foo2bar0
+    }
+
+    // TODO: get equivalents of all the other generic tests working
+  }
+}
 
