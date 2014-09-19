@@ -39,4 +39,58 @@ characteristic functions, etc.
 - It should also now be possible to deal with products in a (more) type-safe way, opening up the
 possibility of 'parametric arities'. Probably every wrapped product arrow should include an array of type tags.
 
+# Getting to Strong Binding
 
+How to evolve the existing code to get there?
+
+- First require FiniteSets[] to take a type parameter that is an element.
+- Under the covers this will be completely disregarded, we are still manipulating ordinary objects.
+
+conflict is: a topos object may in fact be parameterized by X, but we want to represent it by Y - in a type safe manner!
+could say: a dot is fundamentally a Traversable[Any], and an Arrow a Function[Any, Any] on a specified domain,
+so we throw away type safety at this level. But why should we have to?
+
+Want to have: type safe dots for X, Y and functions X -> Y
+wrapped in: type safe dots A, B, functions A -> B
+Perhaps:
+    FiniteSetsDot[X, Y] extends Dot[Y]
+We are concreting over the type system, and expecting to do it type safely.
+    
+Trying to do too many things at once?
+- formally have all types be an Element 
+- experiment with new notation for products/exponents
+- lift up the successful 'binding' mechanisms in Java
+
+Start with 1, even if this means junking the existing rather weak type safety in FiniteSets.    
+But: isn't it still useful to know what the concreted-over layer in the experimental StrongBinding
+would look like?
+
+We did have: a 'product diagram' = a dot with 2 projections, and a multiply operation.
+Now: we have a 'product dot' whose type parameter encodes the projections, 
+and a multiply operation on arrows.
+If we can do this at all, we can do it as a layer over an existing topos.
+For now, ignore the inefficiency of this. Eventually 'drive' the design down so that it's
+built into the lower layer. And this would be a good point to re-TDD FiniteSets. So:
+
+1. Build an inelegant layer on top of Topos, using the new elements etc. Get the API right.
+2. Integrate this into a new FiniteSets, now that we know what the API ought to look like. 
+In fact:
+2a. Push DOT, ARROW down into FiniteSets, rewriting everything else in terms of Star/Quiver
+2b. Get rid of DOT, ARROW
+
+So: The product object is going to be a new Star with the 'real' product inside it.
+Is every Star just this? Can retool WrappedStar.
+Becoming clearer: the 'right' way to do FiniteSets is to treat the elements as Object, and
+just get the types right, with the type-safety not helping at all with the mechanics.
+
+Continuing with StrongBinding: If I can get the products right, this will show the way to
+everything else.
+Want to make a Quiver[S, T] interchangeable with a T because: T is just a wrapper for an arrow.
+For this to work: when constructing composite types like Product and Exponent,
+    the 'host' Star[T] has to know how to make a T out of an arrow S->T,
+    because it's just a question of defining the right operations.
+    Algebras ought to work like this too.
+Aim for: it'll be *inherent* that if A is an X-algebra, A^B is automatically one too.
+    
+So... We have 'VanillaStarWrapper' for ordinary dots, and then ProductStarWrapper, AlgebraStarWrapper, etc
+    for 'rich' dots with additional operations.

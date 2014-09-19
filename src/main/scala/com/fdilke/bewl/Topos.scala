@@ -134,9 +134,7 @@ trait BaseTopos {
       }).asInstanceOf[ARROW[S, Power[X]]]
   }
 
-  class Power[X]
-
-  // just a marker, for now - will have methods as part of the DSL?
+  class Power[X] // just a marker, for now - will have methods as part of the DSL?
 
   private val standardProducts = new ResultStore[(StrictRef[DOT[Any]], StrictRef[DOT[Any]]),
     BIPRODUCT[Any, Any]](tupled {

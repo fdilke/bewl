@@ -208,13 +208,43 @@ abstract class GenericToposTests[TOPOS <: Topos](
 
   describe(s"The topos ${topos.getClass.getSimpleName}, with strong binding") {
 
-    def foo0 = wrap(foo)
-    def bar0 = wrap(bar)
-    def foo2bar0 = wrap(foo2bar)
+    type FOO0 = WrappedType[FOO]
+    type BAR0 = WrappedType[BAR]
+    type BAZ0 = WrappedType[BAZ]
+    def foo0 = wrapDot[FOO](foo)
+    def bar0 = wrapDot[BAR](bar)
+    def baz0 = wrapDot[BAZ](baz)
+    def foo2bar0 = wrapArrow[FOO, BAR, FOO0, BAR0](foo2bar)
+    def foo2baz0 = wrapArrow[FOO, BAZ, FOO0, BAZ0](foo2baz)
+
+    it("wraps dots and arrows with relatively sane equality semantics") {
+      wrapDot[FOO](foo) shouldBe wrapDot[FOO](foo)
+      (wrapDot[FOO](foo) eq wrapDot[FOO](foo)) shouldBe true
+
+      wrapArrow[FOO, BAR, FOO0, BAR0](foo2bar) shouldBe wrapArrow[FOO, BAR, FOO0, BAR0](foo2bar)
+      (wrapArrow[FOO, BAR, FOO0, BAR0](foo2bar) eq wrapArrow[FOO, BAR, FOO0, BAR0](foo2bar)) shouldBe false
+    }
 
     it("has identity arrows which can be composed") {
       foo2bar0(foo0.identity) shouldBe foo2bar0
       bar0.identity(foo2bar0) shouldBe foo2bar0
+    }
+
+    ignore("can construct biproduct diagrams") {
+      val barXbaz0 = bar0 x baz0
+
+      val productArrow = foo2bar0 x foo2baz0
+
+      productArrow.source shouldBe foo0
+      productArrow.target shouldBe barXbaz0
+
+      productArrow.sanityTest
+
+      leftProjection(bar0, baz0).sanityTest
+      rightProjection(bar0, baz0).sanityTest
+
+      leftProjection(bar0, baz0)(productArrow) shouldBe foo2bar
+      rightProjection(bar0, baz0)(productArrow) shouldBe foo2baz
     }
 
     // TODO: get equivalents of all the other generic tests working
