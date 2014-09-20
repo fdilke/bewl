@@ -29,7 +29,7 @@ trait StrongBinding { topos : BaseTopos =>
     def x[U <: Element[U]](that: Quiver[S, U]): Quiver[S, T x U]
 
     def sanityTest
-    def getArrow: ARROW[_, _]
+    def getArrow: ARROW[Any, Any]
   }
 
   trait x[T <: Element[T], U <: Element[U]] extends Element[T x U] {
@@ -40,15 +40,19 @@ trait StrongBinding { topos : BaseTopos =>
   trait WrappedType[X] extends Element[WrappedType[X]] {}
 
   private abstract class StarWrapper[X, A <: Element[A]](dot: DOT[X]) extends Star[A] {
-    override lazy val identity = wrapArrow[X, X, A, A](dot.identity)
+    override lazy val identity = new QuiverWrapper[X, X, A, A](this, this, dot.identity)
     override def x[T <: Element[T]](that: Star[T]): Star[A x T] =
       standardProductStar((
         StrictRef(this.asInstanceOf[Star[WrappedType[Any]]]),
         StrictRef(that.asInstanceOf[Star[WrappedType[Any]]])
       )).asInstanceOf[Star[A x T]]
     override def map[U <: Element[U]](f: A => U): Quiver[A, U] = {
+      println("Applying map... 1")
       val a: A = identity.asElement
+      println("Applying map... 2")
+      println(s"Applying map... a is: $a")
       val u: U = f(a)
+      println("Applying map... 3")
       u.asArrowFrom(this)       // TODO compactify
     }
 
@@ -60,43 +64,63 @@ trait StrongBinding { topos : BaseTopos =>
   }
 
   private class VanillaStar[X](dot: DOT[X]) extends StarWrapper[X, WrappedType[X]](dot) {
-    override def asElement[Z <: Element[Z]](quiver: Quiver[Z, WrappedType[X]]) = new WrappedType[X] {
-        override def asArrowFrom[S <: Element[S]](star: Star[S]): Quiver[S, WrappedType[X]] =
-          if (star.getDot == dot) {
-            quiver.asInstanceOf[Quiver[S, WrappedType[X]]]
-          } else {
-            throw new IllegalArgumentException("Cannot rebase arrow") // Possible exception here if star is Terminal
-          }
-      }
-  }
-
-  private class ProductStar[L <: Element[L], R <: Element[R]](left: Star[L], right: Star[R]) extends StarWrapper[(Any, Any), WrappedType[L x R]](left.getDot x right.getDot) {
-    override def asElement[Z <: Element[Z]](quiver: Quiver[Z, WrappedType[L x R]]) = new WrappedType[L x R] { // TODO Factor out this class: it's reusable!
-      override def asArrowFrom[S <: Element[S]](star: Star[S]): Quiver[S, WrappedType[L x R]] =
-        if (star.getDot == getDot) {
-          quiver.asInstanceOf[Quiver[S, WrappedType[L x R]]]
-        } else {
+    override def asElement[Z <: Element[Z]](quiver: Quiver[Z, WrappedType[X]]) = new WrappedType[X] { // TODO Factor out this class: it's reusable...?
+      override def asArrowFrom[S <: Element[S]](star: Star[S]): Quiver[S, WrappedType[X]] =
+        if (star.getDot == dot)
+          quiver.asInstanceOf[Quiver[S, WrappedType[X]]]
+        else
           throw new IllegalArgumentException("Cannot rebase arrow") // Possible exception here if star is Terminal
-        }
     }
   }
 
-  private class QuiverWrapper[X, Y, A <: Element[A], B <: Element[B]](private val arrow: ARROW[X, Y]) extends Quiver[A, B] {
+  private class ProductStar[L <: Element[L], R <: Element[R]](l: Star[L], r: Star[R]) extends StarWrapper[(Any, Any), L x R](l.getDot x r.getDot) {
+    override def asElement[Z <: Element[Z]](quiver: Quiver[Z, L x R]) = new x[L, R] {
+      override def asArrowFrom[S <: Element[S]](star: Star[S]): Quiver[S, L x R] =
+        if (star.getDot == getDot)
+          quiver.asInstanceOf[Quiver[S, L x R]]
+        else
+          throw new IllegalArgumentException("Cannot rebase arrow") // Possible exception here if star is Terminal
+
+      override lazy val left: L =
+        new QuiverWrapper(
+          quiver.source,
+          l,
+          leftProjection(l.getDot, r.getDot).asInstanceOf[ARROW[Any, Any]](quiver.getArrow)
+        ).asElement
+      override lazy val right: R =
+        new QuiverWrapper(
+          quiver.source,
+          r,
+          rightProjection(l.getDot, r.getDot).asInstanceOf[ARROW[Any, Any]](quiver.getArrow)
+        ).asElement
+
+    }
+  }
+
+  private class QuiverWrapper[X, Y, A <: Element[A], B <: Element[B]](
+      val source: Star[A],
+      val target: Star[B],
+      arrow: ARROW[X, Y]
+  ) extends Quiver[A, B] {
     override def apply[R <: Element[R]](quiver: Quiver[R, A]): Quiver[R, B] =
       wrapArrow[Any, Y, R, B](arrow(quiver.getArrow.asInstanceOf[ARROW[Any, X]]))
 
     override def x[C <: Element[C]](that: Quiver[A, C]): Quiver[A, B x C] =
-      wrapArrow[X, (Y, Any), A, B x C](arrow x that.getArrow.asInstanceOf[ARROW[X, Any]])
-    override lazy val source = wrapDot(arrow.source).asInstanceOf[Star[A]]
-    override lazy val target = wrapDot(arrow.target).asInstanceOf[Star[B]]
+      new QuiverWrapper[X, (Y, Any), A, B x C](
+        source,
+        target x that.target,
+        arrow x that.getArrow.asInstanceOf[ARROW[X, Any]]
+      )
+
+//      wrapArrow[X, (Y, Any), A, B x C](arrow x that.getArrow.asInstanceOf[ARROW[X, Any]])
 
     override def asElement : B = target.asElement(this)
 
-    override def getArrow: ARROW[_, _] = arrow.asInstanceOf[ARROW[_, _]]
+    override def getArrow = arrow.asInstanceOf[ARROW[Any, Any]]
     override def sanityTest = arrow.sanityTest
     override def equals(other: Any): Boolean = other match {
       case that: QuiverWrapper[X, Y, A, B] =>
-        arrow == that.arrow
+        arrow == that.getArrow
       case _ => false
     }
   }
@@ -116,11 +140,20 @@ trait StrongBinding { topos : BaseTopos =>
     ).asInstanceOf[Star[WrappedType[X]]]
 
   def wrapArrow[X, Y, A <: Element[A], B <: Element[B]](arrow: ARROW[X, Y]) : Quiver[A, B] =
-    new QuiverWrapper[X, Y, A, B](arrow)
+    new QuiverWrapper[X, Y, A, B](
+      wrapDot(arrow.source).asInstanceOf[Star[A]],
+      wrapDot(arrow.target).asInstanceOf[Star[B]],
+      arrow)
 
-  def leftProjection[A <: Element[A], B <: Element[B]](left: Star[A], right: Star[B]) =
-    for(x <- left x right)
-      yield x.left
+  def leftProjection[A <: Element[A], B <: Element[B]](left: Star[A], right: Star[B]) = {
+    println(s"left x right is: ${left x right}")
+    for (x <- left x right)
+      yield {
+        println(s"x is: $x")
+        println(s"x.left is: ${x.left}")
+        x.left
+      }
+  }
 
   def rightProjection[A <: Element[A], B <: Element[B]](left: Star[A], right: Star[B]) =
     for(x <- left x right)

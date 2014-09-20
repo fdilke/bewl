@@ -94,3 +94,8 @@ Aim for: it'll be *inherent* that if A is an X-algebra, A^B is automatically one
     
 So... We have 'VanillaStarWrapper' for ordinary dots, and then ProductStarWrapper, AlgebraStarWrapper, etc
     for 'rich' dots with additional operations.
+This is working reasonably well, except:
+    there can be different stars with the same underlying dot, e.g. if it's X x Y.
+Should the 'semantics of =' for stars reflect this? Recall, we want stars and dots to eventually
+    be the same thing.
+    
