@@ -3,33 +3,13 @@ package com.fdilke.bewl
 import com.fdilke.bewl.helper.{StrictRef, ResultStore}
 
 import scala.Function._
+import scala.collection.mutable
 
 trait StrongBinding { topos : BaseTopos =>
 
   trait Element[T <: Element[T]] {
-    def asArrowFrom[S <: Element[S]](star: Star[S]): Quiver[S, T]
-  }
-
-  trait Star[T <: Element[T]] {
-    val identity: Quiver[T, T]
-
-    def x[U <: Element[U]](that: Star[U]): Star[T x U]
-    def map[U <: Element[U]](f: T => U): Quiver[T, U]
-    def asElement[Z <: Element[Z]](quiver: Quiver[Z, T]) : T
-
-    def getDot: DOT[Any]
-  }
-  trait Quiver[S <: Element[S], T <: Element[T]] {
-    val source: Star[S]
-    val target: Star[T]
-
-    def asElement : T
-
-    def apply[R <: Element[R]](quiver: Quiver[R, S]): Quiver[R, T]
-    def x[U <: Element[U]](that: Quiver[S, U]): Quiver[S, T x U]
-
-    def sanityTest
-    def getArrow: ARROW[Any, Any]
+    val arrow: ARROW[Any, Any]
+    val element: T
   }
 
   trait x[T <: Element[T], U <: Element[U]] extends Element[T x U] {
@@ -37,128 +17,283 @@ trait StrongBinding { topos : BaseTopos =>
     val right: U
   }
 
-  trait WrappedType[X] extends Element[WrappedType[X]] {}
+  trait Star[T <: Element[T]] {
+    val identity = Quiver[T, T](this, this, x => x)
 
-  private abstract class StarWrapper[X, A <: Element[A]](dot: DOT[X]) extends Star[A] {
-    override lazy val identity = new QuiverWrapper[X, X, A, A](this, this, dot.identity)
-    override def x[T <: Element[T]](that: Star[T]): Star[A x T] =
+    def x[U <: Element[U]](that: Star[U]): Star[T x U] =
       standardProductStar((
-        StrictRef(this.asInstanceOf[Star[WrappedType[Any]]]),
-        StrictRef(that.asInstanceOf[Star[WrappedType[Any]]])
-      )).asInstanceOf[Star[A x T]]
-    override def map[U <: Element[U]](f: A => U): Quiver[A, U] = {
-      println("Applying map... 1")
-      val a: A = identity.asElement
-      println("Applying map... 2")
-      println(s"Applying map... a is: $a")
-      val u: U = f(a)
-      println("Applying map... 3")
-      u.asArrowFrom(this)       // TODO compactify
-    }
+        StrictRef(this.asInstanceOf[Star[WrappedArrow[Any]]]),
+        StrictRef(that.asInstanceOf[Star[WrappedArrow[Any]]])
+        )).asInstanceOf[ProductStar[T, U]]
 
-    override def getDot: DOT[Any] = dot.asInstanceOf[DOT[Any]]
-    override def equals(other: Any): Boolean = other match {
-      case that: StarWrapper[X, A] => this eq that
-      case _ => false
-    }
+    val getDot: DOT[Any]
+    def asElement(arrow: ARROW[Any, Any]) : T
   }
 
-  private class VanillaStar[X](dot: DOT[X]) extends StarWrapper[X, WrappedType[X]](dot) {
-    override def asElement[Z <: Element[Z]](quiver: Quiver[Z, WrappedType[X]]) = new WrappedType[X] { // TODO Factor out this class: it's reusable...?
-      override def asArrowFrom[S <: Element[S]](star: Star[S]): Quiver[S, WrappedType[X]] =
-        if (star.getDot == dot)
-          quiver.asInstanceOf[Quiver[S, WrappedType[X]]]
-        else
-          throw new IllegalArgumentException("Cannot rebase arrow") // Possible exception here if star is Terminal
-    }
-  }
+  case class Quiver[S <: Element[S], T <: Element[T]](
+     source: Star[S],
+     target: Star[T],
+     function: S => T
+    ) {
+    def o[R <: Element[R]](that: Quiver[R, S]) =
+      Quiver(that.source, target, function compose that.function)
 
-  private class ProductStar[L <: Element[L], R <: Element[R]](l: Star[L], r: Star[R]) extends StarWrapper[(Any, Any), L x R](l.getDot x r.getDot) {
-    override def asElement[Z <: Element[Z]](quiver: Quiver[Z, L x R]) = new x[L, R] {
-      override def asArrowFrom[S <: Element[S]](star: Star[S]): Quiver[S, L x R] =
-        if (star.getDot == getDot)
-          quiver.asInstanceOf[Quiver[S, L x R]]
-        else
-          throw new IllegalArgumentException("Cannot rebase arrow") // Possible exception here if star is Terminal
-
-      override lazy val left: L =
-        new QuiverWrapper(
-          quiver.source,
-          l,
-          leftProjection(l.getDot, r.getDot).asInstanceOf[ARROW[Any, Any]](quiver.getArrow)
-        ).asElement
-      override lazy val right: R =
-        new QuiverWrapper(
-          quiver.source,
-          r,
-          rightProjection(l.getDot, r.getDot).asInstanceOf[ARROW[Any, Any]](quiver.getArrow)
-        ).asElement
-
-    }
-  }
-
-  private class QuiverWrapper[X, Y, A <: Element[A], B <: Element[B]](
-      val source: Star[A],
-      val target: Star[B],
-      arrow: ARROW[X, Y]
-  ) extends Quiver[A, B] {
-    override def apply[R <: Element[R]](quiver: Quiver[R, A]): Quiver[R, B] =
-      wrapArrow[Any, Y, R, B](arrow(quiver.getArrow.asInstanceOf[ARROW[Any, X]]))
-
-    override def x[C <: Element[C]](that: Quiver[A, C]): Quiver[A, B x C] =
-      new QuiverWrapper[X, (Y, Any), A, B x C](
+    def x[U <: Element[U]](that: Quiver[S, U]) = {
+      val product = target x that.target
+      Quiver[S, T x U](
         source,
-        target x that.target,
-        arrow x that.getArrow.asInstanceOf[ARROW[X, Any]]
-      )
+        product,
+        arrowAsFunction(product, arrow x that.arrow))
+    }
 
-//      wrapArrow[X, (Y, Any), A, B x C](arrow x that.getArrow.asInstanceOf[ARROW[X, Any]])
-
-    override def asElement : B = target.asElement(this)
-
-    override def getArrow = arrow.asInstanceOf[ARROW[Any, Any]]
-    override def sanityTest = arrow.sanityTest
     override def equals(other: Any): Boolean = other match {
-      case that: QuiverWrapper[X, Y, A, B] =>
-        arrow == that.getArrow
+      case that: Quiver[S, T] => arrow == that.arrow
       case _ => false
+    }
+
+    private lazy val arrow: ARROW[Any, Any] =
+      function(source.asElement(source.getDot.identity)).arrow
+
+    def sanityTest = arrow.sanityTest
+  }
+
+  case class WrappedArrow[X](val arrow: ARROW[Any, Any]) extends Element[WrappedArrow[X]] {
+    override val element: WrappedArrow[X] = this
+  }
+
+  class WrappedDot[X](dot: DOT[X]) extends Star[WrappedArrow[X]] {
+    override val getDot: DOT[Any] = dot.asInstanceOf[DOT[Any]]
+
+    override def asElement(arrow: ARROW[Any, Any]) =
+      WrappedArrow(arrow)
+  }
+
+  class ProductStar[L <: Element[L], R <: Element[R]](
+    l: Star[L], r: Star[R]
+  ) extends Star[L x R] {
+    override val getDot = (l.getDot x r.getDot).asInstanceOf[DOT[Any]]
+
+    override def asElement(anArrow: ARROW[Any, Any]) = new x[L, R] { self: x[L, R] =>
+      override val left: L = l.asElement(
+        leftProjection(l.getDot, r.getDot).asInstanceOf[ARROW[Any, Any]](anArrow))
+      override val right: R = r.asElement(
+        rightProjection(l.getDot, r.getDot).asInstanceOf[ARROW[Any, Any]](anArrow))
+      override val arrow: ARROW[Any, Any] = anArrow
+      override val element: x[L, R] = self
     }
   }
 
-  private val standardVanillaStar = new ResultStore[StrictRef[DOT[Any]], Star[WrappedType[Any]]]({
-    x => new VanillaStar(x.wrappedValue)
+  private val standardWrappedDot = new ResultStore[StrictRef[DOT[Any]], Star[WrappedArrow[Any]]] (
+    x => new WrappedDot(x.wrappedValue)
+  )
+
+  private val standardProductStar = new ResultStore[(
+    StrictRef[Star[WrappedArrow[Any]]], StrictRef[Star[WrappedArrow[Any]]]
+  ),ProductStar[WrappedArrow[Any], WrappedArrow[Any]]](tupled {
+    (x, y) => new ProductStar(x.wrappedValue, y.wrappedValue)
   })
 
-  private val standardProductStar = new ResultStore[(StrictRef[Star[WrappedType[Any]]], StrictRef[Star[WrappedType[Any]]]),
-    ProductStar[WrappedType[Any], WrappedType[Any]]](tupled {
-    (x, y) => new ProductStar(x.wrappedValue, y.wrappedValue).asInstanceOf[ProductStar[WrappedType[Any], WrappedType[Any]]]
-  })
-
-  def wrapDot[X](dot: DOT[X]) : Star[WrappedType[X]] =
-    standardVanillaStar(
+  def wrapDot[X](dot: DOT[X]) =
+    standardWrappedDot(
       StrictRef(dot.asInstanceOf[DOT[Any]])
-    ).asInstanceOf[Star[WrappedType[X]]]
+    ).asInstanceOf[Star[WrappedArrow[X]]]
 
-  def wrapArrow[X, Y, A <: Element[A], B <: Element[B]](arrow: ARROW[X, Y]) : Quiver[A, B] =
-    new QuiverWrapper[X, Y, A, B](
-      wrapDot(arrow.source).asInstanceOf[Star[A]],
-      wrapDot(arrow.target).asInstanceOf[Star[B]],
-      arrow)
+  def arrowAsFunction[X, Y, S <: Element[S], T <: Element[T]](
+    target: Star[T], arrow: ARROW[X, Y]
+  ): S => T =
+    (s : S) =>
+      target.asElement(arrow.asInstanceOf[ARROW[Any, Any]](s.arrow))
 
-  def leftProjection[A <: Element[A], B <: Element[B]](left: Star[A], right: Star[B]) = {
-    println(s"left x right is: ${left x right}")
-    for (x <- left x right)
-      yield {
-        println(s"x is: $x")
-        println(s"x.left is: ${x.left}")
-        x.left
-      }
+  def wrapArrow[X, Y](arrow: ARROW[X, Y]) = {
+    val source = wrapDot(arrow.source)
+    val target = wrapDot(arrow.target)
+    Quiver(source, target,
+      arrowAsFunction[X, Y, WrappedArrow[X], WrappedArrow[Y]](target, arrow)
+    )
   }
+
+  def leftProjection[A <: Element[A], B <: Element[B]](left: Star[A], right: Star[B]) =
+    Quiver[A x B, A](left x right, left, _.left)
 
   def rightProjection[A <: Element[A], B <: Element[B]](left: Star[A], right: Star[B]) =
-    for(x <- left x right)
-      yield x.right
+    Quiver[A x B, B](left x right, right, _.right)
 
-  // TODO: make sure any unnecessary slack in asElement(...)=>asElement(...) is unwound
-  // TODO: are ResultStores used correctly here?
+
+  /*
+    trait Element[T <: Element[T]] {
+      val arrow: ARROW[Any, Any]
+      val target: Star[T]
+      val element: T
+    }
+
+    trait x[T <: Element[T], U <: Element[U]] extends Element[T x U] {
+      val left: T
+      val right: U
+    }
+
+    trait Star[T <: Element[T]] {
+      val identity: Quiver[T, T]
+
+      def x[U <: Element[U]](that: Star[U]): Star[T x U]
+      def map[U <: Element[U]](f: T => U): Quiver[T, U]
+      def asQuiver[U <: Element[U]](element: U): Quiver[T, U] =
+        Quiver[T, U](this, element.target,
+          t => ???, // Quiver[T, U](this, element.target, ),
+          element)
+        // TODO: make this a method on element?
+
+      def getDot: DOT[Any]
+    }
+
+    class WrappedType[X](val arrow: ARROW[Any, Any]) extends Element[WrappedType[X]] {
+      val target: Star[WrappedType[X]] = wrapDot[X](arrow.target.asInstanceOf[DOT[X]])
+      val element: WrappedType[X] = this
+    }
+
+    object WrappedType { // needed?
+      def identity[X](dot: DOT[X]) = new WrappedType[X](dot.identity.asInstanceOf[ARROW[Any, Any]])
+    }
+
+    private abstract class StarWrapper[X, A <: Element[A]](dot: DOT[X], calcIdentityElement: () => A) extends Star[A] {
+      override lazy val identity = Quiver[A, A](this, this, a => a, calcIdentityElement())
+      override def x[T <: Element[T]](that: Star[T]): Star[A x T] =
+        standardProductStar((
+          StrictRef(this.asInstanceOf[Star[WrappedType[Any]]]),
+          StrictRef(that.asInstanceOf[Star[WrappedType[Any]]])
+        )).asInstanceOf[Star[A x T]]
+      override def map[U <: Element[U]](f: A => U): Quiver[A, U] = {
+        println("Applying map... 1")
+        val a: A = identity.element
+        println("Applying map... 2")
+        println(s"Applying map... a is: $a :=> ${a.arrow}")
+        val u: U = f(a)
+        println(s"Applying map... 3. u = $u :=> ${u.arrow}")
+        println(s"Applying map... 4. rebasing from: ${this.getDot}")
+        asQuiver(u)
+        // TODO compactify
+      }
+
+      override def getDot: DOT[Any] = dot.asInstanceOf[DOT[Any]]
+      override def equals(other: Any): Boolean = other match {
+        case that: StarWrapper[X, A] => this eq that
+        case _ => false
+      }
+    }
+
+    private class VanillaStar[X](dot: DOT[X]) extends
+      StarWrapper[X, WrappedType[X]](dot, () => WrappedType.identity(dot)) {
+
+      if (dot.isInstanceOf[mutable.WrappedArray[_]])
+        throw new IllegalArgumentException("whaaat?")
+      else
+        println(s"Perfectly sensible: ${dot.getClass} ::== $dot")
+    }
+
+    def productIdentity[L <: Element[L], R <: Element[R]](
+      l: Star[L], r: Star[R]
+    ): L x R = ??? // sensible?
+
+    private class ProductStar[L <: Element[L], R <: Element[R]](l: Star[L], r: Star[R])
+      extends StarWrapper[(Any, Any), L x R](l.getDot x r.getDot, () => productIdentity(l, r)) {
+  //      override lazy val left: L =
+  //        new QuiverWrapper(
+  //          quiver.source,
+  //          l,
+  //          leftProjection(l.getDot, r.getDot).asInstanceOf[ARROW[Any, Any]](quiver.getArrow)
+  //        ).element
+  //      override lazy val right: R =
+  //        new QuiverWrapper(
+  //          quiver.source,
+  //          r,
+  //          rightProjection(l.getDot, r.getDot).asInstanceOf[ARROW[Any, Any]](quiver.getArrow)
+  //        ).element
+    }
+
+    case class Quiver[S <: Element[S], T <: Element[T]](
+        source: Star[S],
+        target: Star[T],
+        function: S => T,
+        element: T
+    ) extends Element[T] {
+      val arrow = element.arrow // TODO can this redirection be avoided?
+      def apply[R <: Element[R]](quiver: Quiver[R, S]) =
+        Quiver[R, T](
+          quiver.source,
+          target,
+          function compose quiver.function, // r => function(quiver.function(r)),
+          function(quiver.element)
+        )
+
+      def x[U <: Element[U]](that: Quiver[S, U]): Quiver[S, T x U] = {
+        val product = target x that.target
+        val productArrow = element.arrow x that.element.arrow
+        Quiver[S, T x U](
+          source,
+          product,
+          s => ???,
+          new x[T, U] {
+            override val left: T = Quiver.this.element
+            override val right: U = that.element
+            override val target: Star[x[T, U]] = product
+            override val arrow: ARROW[Any, Any] = productArrow.asInstanceOf[ARROW[Any, Any]]
+            override val element: x[T, U] = this
+          }
+        )
+      }
+
+      def sanityTest = arrow.sanityTest
+      override def equals(other: Any): Boolean = other match {
+        case that: Quiver[S, T] =>
+          element.arrow == that.element.arrow
+        case _ => false
+      }
+    }
+
+    private val standardVanillaStar = new ResultStore[StrictRef[DOT[Any]], Star[WrappedType[Any]]]({
+      x => new VanillaStar(x.wrappedValue)
+    })
+
+    private val standardProductStar = new ResultStore[(StrictRef[Star[WrappedType[Any]]], StrictRef[Star[WrappedType[Any]]]),
+      ProductStar[WrappedType[Any], WrappedType[Any]]](tupled {
+      (x, y) => new ProductStar(x.wrappedValue, y.wrappedValue)
+    })
+
+    def wrapDot[X](dot: DOT[X]) : Star[WrappedType[X]] =
+  //  if (true) throw new IllegalArgumentException("xxx!")
+  //  else
+      standardVanillaStar(
+        StrictRef(dot.asInstanceOf[DOT[Any]])
+      ).asInstanceOf[Star[WrappedType[X]]]
+
+    def wrapArrow[X, Y](arrow: ARROW[X, Y]) : Quiver[WrappedType[X], WrappedType[Y]] =
+        Quiver[WrappedType[X], WrappedType[Y]] (
+          wrapDot(arrow.source),
+          wrapDot(arrow.target),
+          a => wrapArrow[Any, Y](arrow.asInstanceOf[ARROW[Any, Y]](a.element.arrow)).element,
+          new WrappedType[Y](arrow.asInstanceOf[ARROW[Any, Any]])
+        )
+
+  //  def wrapArrow[X, Y, A <: Element[A], B <: Element[B]](arrow: ARROW[X, Y]) : Quiver[A, B] =
+  //    new QuiverWrapper[X, Y, A, B](
+  //      wrapDot(arrow.source).asInstanceOf[Star[A]],
+  //      wrapDot(arrow.target).asInstanceOf[Star[B]],
+  //      arrow)
+
+    def leftProjection[A <: Element[A], B <: Element[B]](left: Star[A], right: Star[B]) = {
+      println(s"left x right is: ${left x right}")
+      for (x <- left x right)
+        yield {
+          println(s"x is: $x")
+          println(s"x.left is: ${x.left}")
+          x.left
+        }
+    }
+
+    def rightProjection[A <: Element[A], B <: Element[B]](left: Star[A], right: Star[B]) =
+      for(x <- left x right)
+        yield x.right
+
+    // TODO: make sure any unnecessary slack in asElement(...)=>asElement(...) is unwound
+    // TODO: are ResultStores used correctly here?
+  */
 }

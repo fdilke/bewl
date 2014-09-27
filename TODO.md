@@ -98,4 +98,24 @@ This is working reasonably well, except:
     there can be different stars with the same underlying dot, e.g. if it's X x Y.
 Should the 'semantics of =' for stars reflect this? Recall, we want stars and dots to eventually
     be the same thing.
+refactoring and refactoring: such a mess. Can a Quiver actually *be* an Element? And then they can share target?
+    
+The Strong Binding Manifesto:
+Elements wrap arrows
+Quivers wrap functions.
+Stara wrap Dots and can:
+    map an arrow into an element
+Quivers wrap functions A => B (A,B elements) and also:    
+    remember their source and target
+    can test equality        
+
+We do NOT need to regard a quiver as an element... do we?
+Also a quiver sort of wraps an arrow, should we save this? Lazily?
+
+Note for the map notation for(x <- atar) to work, an element has to know its target...
+actually it won't work even then, so let's give up on the notation.
+How could it be rescued? In map() on a star, we make the identity arrow into an element,
+    then invoke the function on it, then take the target of that... Seems unnecessary calc.
+    So we COULD rescue the notation. Or is it better to keep it for operators?
+    The functional notation is kind of better anyway.
     
