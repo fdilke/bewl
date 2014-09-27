@@ -9,9 +9,6 @@
 # Questions
 
 - Can there be a Scala equivalent to the Clojure 'deflaw' to make it easier to specify algebraic laws?
-- Is there a way for the algebraic structure code to be taken outside the Topos trait?
-- (potential answer:) Can we have an 'implicit topos'? Will that work when several are in play?
-- Can there be a Scala equivalent to the Clojure 'deflaw' to make it easier to specify algebraic laws?
 - How to add 'parameterized operations' without doing even more violence to the type system? Shapeless?
 - Can generalize IntegerPower and make it type safe?
 
@@ -43,79 +40,48 @@ possibility of 'parametric arities'. Probably every wrapped product arrow should
 
 How to evolve the existing code to get there?
 
-- First require FiniteSets[] to take a type parameter that is an element.
-- Under the covers this will be completely disregarded, we are still manipulating ordinary objects.
+- Concrete over the type system, type safely. Stars and quivers replace dots and arrows. Do products.
+- Rewrite exponentials, subobject classifier, etc in stars and quivers. 
+- Build stars/quivers into the API for a topos. 
+Instead pf 'product diagram' = a dot with 2 projections, and a multiply operation:
+we have a 'product dot' whose type parameter encodes the projections, and a "x" operation on arrows.
+At this point DOT, ARROW dissolve as implementation details somewhere in FiniteSets.
 
-conflict is: a topos object may in fact be parameterized by X, but we want to represent it by Y - in a type safe manner!
-could say: a dot is fundamentally a Traversable[Any], and an Arrow a Function[Any, Any] on a specified domain,
-so we throw away type safety at this level. But why should we have to?
-
-Want to have: type safe dots for X, Y and functions X -> Y
-wrapped in: type safe dots A, B, functions A -> B
-Perhaps:
-    FiniteSetsDot[X, Y] extends Dot[Y]
-We are concreting over the type system, and expecting to do it type safely.
-    
-Trying to do too many things at once?
-- formally have all types be an Element 
-- experiment with new notation for products/exponents
-- lift up the successful 'binding' mechanisms in Java
-
-Start with 1, even if this means junking the existing rather weak type safety in FiniteSets.    
-But: isn't it still useful to know what the concreted-over layer in the experimental StrongBinding
-would look like?
-
-We did have: a 'product diagram' = a dot with 2 projections, and a multiply operation.
-Now: we have a 'product dot' whose type parameter encodes the projections, 
-and a multiply operation on arrows.
-If we can do this at all, we can do it as a layer over an existing topos.
-For now, ignore the inefficiency of this. Eventually 'drive' the design down so that it's
-built into the lower layer. And this would be a good point to re-TDD FiniteSets. So:
-
-1. Build an inelegant layer on top of Topos, using the new elements etc. Get the API right.
-2. Integrate this into a new FiniteSets, now that we know what the API ought to look like. 
-In fact:
-2a. Push DOT, ARROW down into FiniteSets, rewriting everything else in terms of Star/Quiver
-2b. Get rid of DOT, ARROW
-
-So: The product object is going to be a new Star with the 'real' product inside it.
-Is every Star just this? Can retool WrappedStar.
-Becoming clearer: the 'right' way to do FiniteSets is to treat the elements as Object, and
-just get the types right, with the type-safety not helping at all with the mechanics.
-
-Continuing with StrongBinding: If I can get the products right, this will show the way to
-everything else.
-Want to make a Quiver[S, T] interchangeable with a T because: T is just a wrapper for an arrow.
-For this to work: when constructing composite types like Product and Exponent,
-    the 'host' Star[T] has to know how to make a T out of an arrow S->T,
-    because it's just a question of defining the right operations.
-    Algebras ought to work like this too.
+Algebras ought to extend the API of a Star.
 Aim for: it'll be *inherent* that if A is an X-algebra, A^B is automatically one too.
-    
-So... We have 'VanillaStarWrapper' for ordinary dots, and then ProductStarWrapper, AlgebraStarWrapper, etc
-    for 'rich' dots with additional operations.
-This is working reasonably well, except:
-    there can be different stars with the same underlying dot, e.g. if it's X x Y.
-Should the 'semantics of =' for stars reflect this? Recall, we want stars and dots to eventually
-    be the same thing.
-refactoring and refactoring: such a mess. Can a Quiver actually *be* an Element? And then they can share target?
-    
-The Strong Binding Manifesto:
+        
+# The Strong Binding Manifesto
+
 Elements wrap arrows
 Quivers wrap functions.
-Stara wrap Dots and can:
+Stars wrap Dots and can:
     map an arrow into an element
 Quivers wrap functions A => B (A,B elements) and also:    
     remember their source and target
     can test equality        
 
-We do NOT need to regard a quiver as an element... do we?
-Also a quiver sort of wraps an arrow, should we save this? Lazily?
+Abandoned the idea of regarding a quiver as an element. (Translation is possible.)
 
-Note for the map notation for(x <- atar) to work, an element has to know its target...
-actually it won't work even then, so let's give up on the notation.
-How could it be rescued? In map() on a star, we make the identity arrow into an element,
+Abandoned the map notation for(x <- atar) because an element would have to know its target...
+Could be rescued. In map() on a star, we make the identity arrow into an element,
     then invoke the function on it, then take the target of that... Seems unnecessary calc.
-    So we COULD rescue the notation. Or is it better to keep it for operators?
-    The functional notation is kind of better anyway.
+The functional notation is kind of better anyway.
+May resuscitate this idea for operators.
     
+Implementation:
+Quivers have a lazily calculated arrow inside them.    
+Their equality semantics work by calculating this.    
+
+Eventually:
+There will be an 'abstract star' API as for dots, and we'll rewrite sets in terms of this.
+
+Possibly:
+There'll be an 'old style topos API' and an adapter for making its dots and arrows
+look like stars and quivers. Then we can keep all that machinery (product diagrams, etc)
+and still write a 'new' FiniteSets in terms of dots and arrows:
+OldFiniteSets extends OldTopos
+ToposWrapper(OldTopos) extends NewTopos
+NewFiniteSets extends NewTopos
+...and consider whether to keep the old machinery when this is done.
+Might be useful for upcoming topoi like 'M-actions', "H-sets'. 
+
