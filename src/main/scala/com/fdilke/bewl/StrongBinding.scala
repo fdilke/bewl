@@ -7,19 +7,19 @@ import scala.collection.mutable
 
 trait StrongBinding { topos : BaseTopos =>
 
-  trait Element[T <: Element[T]] { // TODO don't need generics!
+  trait Element {
     val arrow: ARROW[Any, Any]
   }
 
-  trait x[T <: Element[T], U <: Element[U]] extends Element[T x U] {
+  trait x[T <: Element, U <: Element] extends Element {
     val left: T
     val right: U
   }
 
-  trait Star[T <: Element[T]] {
+  trait Star[T <: Element] {
     val identity = Quiver[T, T](this, this, x => x)
 
-    def x[U <: Element[U]](that: Star[U]): Star[T x U] =
+    def x[U <: Element](that: Star[U]): Star[T x U] =
       standardProductStar((
         StrictRef(this.asInstanceOf[Star[WrappedArrow[Any]]]),
         StrictRef(that.asInstanceOf[Star[WrappedArrow[Any]]])
@@ -29,15 +29,15 @@ trait StrongBinding { topos : BaseTopos =>
     def asElement(arrow: ARROW[Any, Any]) : T
   }
 
-  case class Quiver[S <: Element[S], T <: Element[T]](
+  case class Quiver[S <: Element, T <: Element](
      source: Star[S],
      target: Star[T],
      function: S => T
     ) {
-    def o[R <: Element[R]](that: Quiver[R, S]) =
+    def o[R <: Element](that: Quiver[R, S]) =
       Quiver(that.source, target, function compose that.function)
 
-    def x[U <: Element[U]](that: Quiver[S, U]) = {
+    def x[U <: Element](that: Quiver[S, U]) = {
       val product = target x that.target
       Quiver[S, T x U](
         source,
@@ -56,7 +56,7 @@ trait StrongBinding { topos : BaseTopos =>
     def sanityTest = arrow.sanityTest
   }
 
-  case class WrappedArrow[X](val arrow: ARROW[Any, Any]) extends Element[WrappedArrow[X]]
+  case class WrappedArrow[X](val arrow: ARROW[Any, Any]) extends Element
 
   class WrappedDot[X](dot: DOT[X]) extends Star[WrappedArrow[X]] {
     override val getDot: DOT[Any] = dot.asInstanceOf[DOT[Any]]
@@ -65,7 +65,7 @@ trait StrongBinding { topos : BaseTopos =>
       WrappedArrow(arrow)
   }
 
-  class ProductStar[L <: Element[L], R <: Element[R]](
+  class ProductStar[L <: Element, R <: Element](
     l: Star[L], r: Star[R]
   ) extends Star[L x R] {
     override val getDot = (l.getDot x r.getDot).asInstanceOf[DOT[Any]]
@@ -94,7 +94,7 @@ trait StrongBinding { topos : BaseTopos =>
       StrictRef(dot.asInstanceOf[DOT[Any]])
     ).asInstanceOf[Star[WrappedArrow[X]]]
 
-  def arrowAsFunction[X, Y, S <: Element[S], T <: Element[T]](
+  def arrowAsFunction[X, Y, S <: Element, T <: Element](
     target: Star[T], arrow: ARROW[X, Y]
   ): S => T =
     (s : S) =>
@@ -108,9 +108,9 @@ trait StrongBinding { topos : BaseTopos =>
     )
   }
 
-  def leftProjection[A <: Element[A], B <: Element[B]](left: Star[A], right: Star[B]) =
+  def leftProjection[A <: Element, B <: Element](left: Star[A], right: Star[B]) =
     Quiver[A x B, A](left x right, left, _.left)
 
-  def rightProjection[A <: Element[A], B <: Element[B]](left: Star[A], right: Star[B]) =
+  def rightProjection[A <: Element, B <: Element](left: Star[A], right: Star[B]) =
     Quiver[A x B, B](left x right, right, _.right)
 }
