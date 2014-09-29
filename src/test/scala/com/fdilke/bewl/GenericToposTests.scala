@@ -1,10 +1,11 @@
 package com.fdilke.bewl
 
+import com.fdilke.bewl.diagrammatic.DiagrammaticTopos
 import org.scalatest.Matchers._
 import org.scalatest._
 
 abstract class ToposWithFixtures {
-  type TOPOS <: Topos
+  type TOPOS <: DiagrammaticTopos
   val topos : TOPOS
 
   type FOO
@@ -38,7 +39,7 @@ abstract class ToposWithFixtures {
   final lazy val foo2baz = foo2ImageOfBar // a convenient alias
 }
 
-abstract class ToposFixtureSanityTests[T <: Topos](fixtures: ToposWithFixtures) extends FunSpec {
+abstract class ToposFixtureSanityTests[T <: DiagrammaticTopos](fixtures: ToposWithFixtures) extends FunSpec {
   import fixtures._
 
   describe(s"The fixtures for ${fixtures.topos.getClass.getSimpleName}") {
@@ -72,7 +73,7 @@ abstract class ToposFixtureSanityTests[T <: Topos](fixtures: ToposWithFixtures) 
   }
 }
 
-abstract class GenericToposTests[TOPOS <: Topos](
+abstract class GenericToposTests[TOPOS <: DiagrammaticTopos](
     fixtures: ToposWithFixtures
   ) extends ToposFixtureSanityTests(fixtures) {
 

@@ -1,11 +1,12 @@
 package com.fdilke.bewl
 
+import com.fdilke.bewl.diagrammatic.BaseDiagrammaticTopos
 import com.fdilke.bewl.helper.{StrictRef, ResultStore}
 
 import scala.Function._
 import scala.collection.mutable
 
-trait StrongBinding { topos : BaseTopos =>
+trait StrongBinding { topos : BaseDiagrammaticTopos =>
 
   trait Element {
     val arrow: ARROW[Any, Any]

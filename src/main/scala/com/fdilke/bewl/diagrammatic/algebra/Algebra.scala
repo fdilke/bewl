@@ -1,6 +1,6 @@
-package com.fdilke.bewl.algebra
+package com.fdilke.bewl.diagrammatic.algebra
 
-import com.fdilke.bewl.BaseTopos
+import com.fdilke.bewl.diagrammatic.BaseDiagrammaticTopos
 
 // Machinery for constructing and verifying algebraic structures with laws (varieties)
 
@@ -21,7 +21,7 @@ object AbstractOperator {
 }
 
 trait Algebra {
-  topos: BaseTopos =>
+  topos: BaseDiagrammaticTopos =>
 
   class Law(abstractOperators: Seq[AbstractOperator],
             numVariables: Int,

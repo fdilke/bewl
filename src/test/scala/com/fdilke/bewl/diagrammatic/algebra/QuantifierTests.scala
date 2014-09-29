@@ -1,4 +1,4 @@
-package com.fdilke.bewl.algebra
+package com.fdilke.bewl.diagrammatic.algebra
 
 import com.fdilke.bewl.fsets.FiniteSets.FiniteSetsUtilities._
 import com.fdilke.bewl.fsets.FiniteSets._

@@ -1,9 +1,9 @@
-package com.fdilke.bewl.algebra
+package com.fdilke.bewl.diagrammatic.algebra
 
-import com.fdilke.bewl.BaseTopos
 import AbstractOperator._
+import com.fdilke.bewl.diagrammatic.BaseDiagrammaticTopos
 
-trait AlgebraicStructures { topos: BaseTopos with Algebra with AlgebraicLaws =>
+trait AlgebraicStructures { topos: BaseDiagrammaticTopos with Algebra with AlgebraicLaws =>
   class AlgebraicTheory(signature: Seq[AbstractOperator], laws: Law*) {
 
     // Make sure all the operators used in the laws are defined

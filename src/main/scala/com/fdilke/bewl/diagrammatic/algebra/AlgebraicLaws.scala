@@ -1,9 +1,9 @@
-package com.fdilke.bewl.algebra
+package com.fdilke.bewl.diagrammatic.algebra
 
-import com.fdilke.bewl.BaseTopos
+import com.fdilke.bewl.diagrammatic.BaseDiagrammaticTopos
 
 trait AlgebraicLaws {
-  topos: BaseTopos with Algebra =>
+  topos: BaseDiagrammaticTopos with Algebra =>
 
   def commutative(aop: AbstractOperator) =
     new Law(Seq(aop), 2, { case (Seq(op), Seq(x, y)) =>

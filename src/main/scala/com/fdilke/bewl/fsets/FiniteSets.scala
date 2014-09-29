@@ -1,10 +1,11 @@
 package com.fdilke.bewl.fsets
 
 import com.fdilke.bewl._
+import com.fdilke.bewl.diagrammatic.DiagrammaticTopos
 import com.fdilke.bewl.fsets.FiniteSets.FiniteSetsUtilities.allMaps
 import scala.Function.{const, tupled}
 
-object FiniteSets extends Topos {
+object FiniteSets extends DiagrammaticTopos {
   type DOT[X] = FiniteSetsDot[X]
   type ARROW[S, T] = FiniteSetsArrow[S, T]
   type BIPRODUCT[L, R] = FiniteSetsBiproduct[L, R]

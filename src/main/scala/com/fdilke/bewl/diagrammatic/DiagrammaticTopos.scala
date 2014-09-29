@@ -1,14 +1,15 @@
-package com.fdilke.bewl
+package com.fdilke.bewl.diagrammatic
 
-import com.fdilke.bewl.algebra.{TruthObject, AlgebraicLaws, AlgebraicStructures, Algebra}
-import com.fdilke.bewl.helper.{StrictRef, ResultStore}
+import com.fdilke.bewl.StrongBinding
+import com.fdilke.bewl.diagrammatic.algebra.{Algebra, AlgebraicLaws, AlgebraicStructures, TruthObject}
+import com.fdilke.bewl.helper.{ResultStore, StrictRef}
 
 import scala.Function.tupled
 
-trait Topos extends BaseTopos with Algebra with AlgebraicLaws with
+trait DiagrammaticTopos extends BaseDiagrammaticTopos with Algebra with AlgebraicLaws with
   AlgebraicStructures with TruthObject with StrongBinding
 
-trait BaseTopos {
+trait BaseDiagrammaticTopos {
   type DOT[P] <: Dot[P]
   type ARROW[P, Q] <: Arrow[P, Q]
   type BIPRODUCT[P, Q] <: Biproduct[P, Q]
