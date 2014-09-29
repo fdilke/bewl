@@ -1,10 +1,9 @@
 package com.fdilke.bewl.fsets
 
-import com.fdilke.bewl.fsets.FiniteSets.FiniteSetsUtilities
-import com.fdilke.bewl.{GenericToposTests, ToposWithFixtures}
-import FiniteSetsUtilities.{set,arrow}
+import com.fdilke.bewl.diagrammatic.{DiagrammaticToposWithFixtures, GenericDiagrammaticToposTests}
+import com.fdilke.bewl.fsets.FiniteSets.FiniteSetsUtilities.{arrow, set}
 
-class FiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
+class FiniteSetsTest extends GenericDiagrammaticToposTests(new DiagrammaticToposWithFixtures {
   type TOPOS = FiniteSets.type
   val topos = FiniteSets
 

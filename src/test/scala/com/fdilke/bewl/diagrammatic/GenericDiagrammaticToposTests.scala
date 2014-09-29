@@ -1,10 +1,9 @@
-package com.fdilke.bewl
+package com.fdilke.bewl.diagrammatic
 
-import com.fdilke.bewl.diagrammatic.DiagrammaticTopos
 import org.scalatest.Matchers._
 import org.scalatest._
 
-abstract class ToposWithFixtures {
+abstract class DiagrammaticToposWithFixtures {
   type TOPOS <: DiagrammaticTopos
   val topos : TOPOS
 
@@ -39,7 +38,7 @@ abstract class ToposWithFixtures {
   final lazy val foo2baz = foo2ImageOfBar // a convenient alias
 }
 
-abstract class ToposFixtureSanityTests[T <: DiagrammaticTopos](fixtures: ToposWithFixtures) extends FunSpec {
+abstract class DiagrammaticToposFixtureSanityTests[T <: DiagrammaticTopos](fixtures: DiagrammaticToposWithFixtures) extends FunSpec {
   import fixtures._
 
   describe(s"The fixtures for ${fixtures.topos.getClass.getSimpleName}") {
@@ -73,9 +72,9 @@ abstract class ToposFixtureSanityTests[T <: DiagrammaticTopos](fixtures: ToposWi
   }
 }
 
-abstract class GenericToposTests[TOPOS <: DiagrammaticTopos](
-    fixtures: ToposWithFixtures
-  ) extends ToposFixtureSanityTests(fixtures) {
+abstract class GenericDiagrammaticToposTests[TOPOS <: DiagrammaticTopos](
+    fixtures: DiagrammaticToposWithFixtures
+  ) extends DiagrammaticToposFixtureSanityTests(fixtures) {
 
   import fixtures._
   import fixtures.topos._
@@ -209,9 +208,6 @@ abstract class GenericToposTests[TOPOS <: DiagrammaticTopos](
 
   describe(s"The topos ${topos.getClass.getSimpleName}, with strong binding") {
 
-//    type FOO0 = WrappedType[FOO]
-//    type BAR0 = WrappedType[BAR]
-//    type BAZ0 = WrappedType[BAZ]
     def foo0 = wrapDot(foo)
     def bar0 = wrapDot(bar)
     def baz0 = wrapDot(baz)

@@ -1,8 +1,8 @@
 package com.fdilke.bewl.diagrammatic
 
-import com.fdilke.bewl.StrongBinding
 import com.fdilke.bewl.diagrammatic.algebra.{Algebra, AlgebraicLaws, AlgebraicStructures, TruthObject}
 import com.fdilke.bewl.helper.{ResultStore, StrictRef}
+import com.fdilke.bewl.topos.StrongBinding
 
 import scala.Function.tupled
 

@@ -1,10 +1,9 @@
-package com.fdilke.bewl
+package com.fdilke.bewl.topos
 
 import com.fdilke.bewl.diagrammatic.BaseDiagrammaticTopos
-import com.fdilke.bewl.helper.{StrictRef, ResultStore}
+import com.fdilke.bewl.helper.{ResultStore, StrictRef}
 
 import scala.Function._
-import scala.collection.mutable
 
 trait StrongBinding { topos : BaseDiagrammaticTopos =>
 
