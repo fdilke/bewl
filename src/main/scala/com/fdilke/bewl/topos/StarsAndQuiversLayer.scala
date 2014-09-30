@@ -5,69 +5,77 @@ import com.fdilke.bewl.helper.{ResultStore, StrictRef}
 
 import scala.Function._
 
-trait StrongBinding { topos : BaseDiagrammaticTopos =>
+trait StarsAndQuiversLayer extends Topos { topos : BaseDiagrammaticTopos =>
+
+  import topos._
+
+  type ELEMENT = Element
+  type STAR[S <: ELEMENT] = AdapterStar[S]
+  type QUIVER[S <: ELEMENT, T <: ELEMENT] = AdapterQuiver[S, T]
 
   trait Element {
     val arrow: ARROW[Any, Any]
   }
 
-  trait x[T <: Element, U <: Element] extends Element {
+  trait x[T <: ELEMENT, U <: ELEMENT] extends xI[T, U] with ELEMENT {
     val left: T
     val right: U
   }
 
-  trait Star[T <: Element] {
-    val identity = Quiver[T, T](this, this, x => x)
+  trait AdapterStar[T <: Element] extends Star[T] {
+    override val identity = AdapterQuiver[T, T](this, this, x => x)
 
-    def x[U <: Element](that: Star[U]): Star[T x U] =
+    override def x[U <: Element](that: STAR[U]): STAR[T x U] =
       standardProductStar((
-        StrictRef(this.asInstanceOf[Star[WrappedArrow[Any]]]),
-        StrictRef(that.asInstanceOf[Star[WrappedArrow[Any]]])
+        StrictRef(this.asInstanceOf[STAR[WrappedArrow[Any]]]),
+        StrictRef(that.asInstanceOf[STAR[WrappedArrow[Any]]])
         )).asInstanceOf[ProductStar[T, U]]
+
+    override def sanityTest = getDot.sanityTest
 
     val getDot: DOT[Any]
     def asElement(arrow: ARROW[Any, Any]) : T
   }
 
-  case class Quiver[S <: Element, T <: Element](
-     source: Star[S],
-     target: Star[T],
+  case class AdapterQuiver[S <: Element, T <: Element] (
+     source: STAR[S],
+     target: STAR[T],
      function: S => T
-    ) {
-    def o[R <: Element](that: Quiver[R, S]) =
-      Quiver(that.source, target, function compose that.function)
+    ) extends Quiver[S, T]  {
+    override def o[R <: ELEMENT](that: QUIVER[R, S]) =
+      AdapterQuiver(that.source, target, function compose that.function)
 
-    def x[U <: Element](that: Quiver[S, U]) = {
+    override def x[U <: ELEMENT](that: QUIVER[S, U]) = {
       val product = target x that.target
-      Quiver[S, T x U](
+      AdapterQuiver[S, T x U](
         source,
         product,
         arrowAsFunction(product, arrow x that.arrow))
     }
 
     override def equals(other: Any): Boolean = other match {
-      case that: Quiver[S, T] => arrow == that.arrow
+      case that: QUIVER[S, T] => arrow == that.arrow
       case _ => false
     }
 
+    override def sanityTest = arrow.sanityTest
+
     private lazy val arrow: ARROW[Any, Any] =
       function(source.asElement(source.getDot.identity)).arrow
-
-    def sanityTest = arrow.sanityTest
   }
 
-  case class WrappedArrow[X](val arrow: ARROW[Any, Any]) extends Element
+  case class WrappedArrow[X](val arrow: ARROW[Any, Any]) extends ELEMENT
 
-  class WrappedDot[X](dot: DOT[X]) extends Star[WrappedArrow[X]] {
-    override val getDot: DOT[Any] = dot.asInstanceOf[DOT[Any]]
+  class WrappedDot[X](innerDot: DOT[X]) extends STAR[WrappedArrow[X]] {
+    override val getDot: DOT[Any] = innerDot.asInstanceOf[DOT[Any]]  // TODO rename to dot
 
     override def asElement(arrow: ARROW[Any, Any]) =
       WrappedArrow(arrow)
   }
 
-  class ProductStar[L <: Element, R <: Element](
-    l: Star[L], r: Star[R]
-  ) extends Star[L x R] {
+  class ProductStar[L <: ELEMENT, R <: ELEMENT](
+    l: STAR[L], r: STAR[R]
+  ) extends STAR[L x R] {
     override val getDot = (l.getDot x r.getDot).asInstanceOf[DOT[Any]]
 
     override def asElement(anArrow: ARROW[Any, Any]) = new x[L, R] { self: x[L, R] =>
@@ -84,7 +92,7 @@ trait StrongBinding { topos : BaseDiagrammaticTopos =>
   )
 
   private val standardProductStar = new ResultStore[(
-    StrictRef[Star[WrappedArrow[Any]]], StrictRef[Star[WrappedArrow[Any]]]
+    StrictRef[STAR[WrappedArrow[Any]]], StrictRef[STAR[WrappedArrow[Any]]]
   ),ProductStar[WrappedArrow[Any], WrappedArrow[Any]]](tupled {
     (x, y) => new ProductStar(x.wrappedValue, y.wrappedValue)
   })
@@ -92,25 +100,22 @@ trait StrongBinding { topos : BaseDiagrammaticTopos =>
   def wrapDot[X](dot: DOT[X]) =
     standardWrappedDot(
       StrictRef(dot.asInstanceOf[DOT[Any]])
-    ).asInstanceOf[Star[WrappedArrow[X]]]
+    ).asInstanceOf[STAR[WrappedArrow[X]]]
 
   def arrowAsFunction[X, Y, S <: Element, T <: Element](
-    target: Star[T], arrow: ARROW[X, Y]
+    target: STAR[T], arrow: ARROW[X, Y]
   ): S => T =
     (s : S) =>
       target.asElement(arrow.asInstanceOf[ARROW[Any, Any]](s.arrow))
 
-  def wrapArrow[X, Y](arrow: ARROW[X, Y]) = {
+  def wrapArrow[X, Y](arrow: ARROW[X, Y]): QUIVER[WrappedArrow[X], WrappedArrow[Y]] = {
     val source = wrapDot(arrow.source)
     val target = wrapDot(arrow.target)
-    Quiver(source, target,
+    AdapterQuiver(source, target,
       arrowAsFunction[X, Y, WrappedArrow[X], WrappedArrow[Y]](target, arrow)
     )
   }
 
-  def leftProjection[A <: Element, B <: Element](left: Star[A], right: Star[B]) =
-    Quiver[A x B, A](left x right, left, _.left)
-
-  def rightProjection[A <: Element, B <: Element](left: Star[A], right: Star[B]) =
-    Quiver[A x B, B](left x right, right, _.right)
+  override def bind[S <: ELEMENT, T <: ELEMENT](source: STAR[S], target: STAR[T], f: S => T) =
+    AdapterQuiver[S, T](source, target, f)
 }

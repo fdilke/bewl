@@ -1,36 +1,47 @@
 package com.fdilke.bewl.fsets
 
-import com.fdilke.bewl.diagrammatic.{DiagrammaticToposWithFixtures, GenericDiagrammaticToposTests}
-import com.fdilke.bewl.fsets.FiniteSets.FiniteSetsUtilities.{arrow, set}
+import com.fdilke.bewl.fsets.FiniteSets.{FiniteSetsArrow, FiniteSetsDot}
+import com.fdilke.bewl.topos.StarsAndQuiversLayer
+import com.fdilke.bewl.topos.{GenericToposTests, ToposWithFixtures}
 
-class FiniteSetsTest extends GenericDiagrammaticToposTests(new DiagrammaticToposWithFixtures {
+class FiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
   type TOPOS = FiniteSets.type
   val topos = FiniteSets
 
   import topos._
 
-  type FOO = Boolean
-  type BAR = String
-  type BAZ = Int
+  type FOO = WrappedArrow[Boolean]
+  type BAR = WrappedArrow[String]
+  type BAZ = WrappedArrow[Int]
 
-  override val foo: DOT[FOO] = set[FOO](true, false)
-  override val bar = set[BAR]("X", "Y")
-  override val foo2bar = arrow[FOO, BAR](foo, bar, true -> "X", false -> "Y")
-  override val baz = set[BAZ](1, 2, 3)
-  override val foo2ImageOfBar = arrow[FOO, BAZ](foo, baz, true -> 3, false -> 2)
+  def star[T](elements: T*) = wrapDot(FiniteSetsDot(elements))
 
-  override val foobar2baz = FiniteSetsBiArrow[FOO, BAR, BAZ](
-    foo, bar, baz, (true, "X") -> 2, (false, "X") -> 3, (true, "Y") -> 1, (false, "Y") -> 2
-  )
+  def quiver[S, T](source: STAR[WrappedArrow[S]], target: STAR[WrappedArrow[T]], map: (S, T)*):
+    QUIVER[WrappedArrow[S], WrappedArrow[T]] =
+    wrapArrow[S, T](FiniteSetsArrow(
+      source.getDot.asInstanceOf[DOT[S]],
+      target.getDot.asInstanceOf[DOT[T]],
+      Map(map:_*)
+    ))
 
-  override val monicBar2baz = arrow[BAR, BAZ](
+  override val foo = star(true, false)
+  override val bar = star("X", "Y")
+  override val foo2bar = quiver(foo, bar, true -> "X", false -> "Y")
+  override val baz = star(1, 2, 3)
+  override val foo2ImageOfBar = quiver(foo, baz, true -> 3, false -> 2)
+
+//  override val foobar2baz = FiniteSetsBiArrow[FOO, BAR, BAZ](
+//    foo, bar, baz, (true, "X") -> 2, (false, "X") -> 3, (true, "Y") -> 1, (false, "Y") -> 2
+//  )
+
+  override val monicBar2baz = quiver(
     bar, baz, "X" -> 2, "Y" -> 3
   )
 
-  override val equalizerSituation = new EqualizerSituation[FOO, BAR, BAZ](
-    foo2bar,
-    arrow[BAR, BAZ](bar, baz, "X" -> 1, "Y" -> 2, "Z" -> 3),
-    arrow[BAR, BAZ](bar, baz, "X" -> 1, "Y" -> 2, "Z" -> 1)
-  )
+//  override val equalizerSituation = new EqualizerSituation[FOO, BAR, BAZ](
+//    foo2bar,
+//    arrow[BAR, BAZ](bar, baz, "X" -> 1, "Y" -> 2, "Z" -> 3),
+//    arrow[BAR, BAZ](bar, baz, "X" -> 1, "Y" -> 2, "Z" -> 1)
+//  )
 })
 

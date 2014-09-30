@@ -2,12 +2,11 @@ package com.fdilke.bewl.diagrammatic
 
 import com.fdilke.bewl.diagrammatic.algebra.{Algebra, AlgebraicLaws, AlgebraicStructures, TruthObject}
 import com.fdilke.bewl.helper.{ResultStore, StrictRef}
-import com.fdilke.bewl.topos.StrongBinding
 
 import scala.Function.tupled
 
 trait DiagrammaticTopos extends BaseDiagrammaticTopos with Algebra with AlgebraicLaws with
-  AlgebraicStructures with TruthObject with StrongBinding
+  AlgebraicStructures with TruthObject
 
 trait BaseDiagrammaticTopos {
   type DOT[P] <: Dot[P]

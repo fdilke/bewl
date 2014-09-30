@@ -3,6 +3,40 @@ package com.fdilke.bewl.diagrammatic
 import org.scalatest.Matchers._
 import org.scalatest._
 
+abstract class DiagrammaticToposFixtureSanityTests[T <: DiagrammaticTopos](fixtures: DiagrammaticToposWithFixtures) extends FunSpec {
+  import fixtures._
+
+  describe(s"The fixtures for ${fixtures.topos.getClass.getSimpleName}") {
+    it("include distinct sane objects") {
+      val objects = Set(foo, bar, baz)
+
+      objects should have size 3
+
+      objects map { _.sanityTest }
+    }
+
+    it("include sane arrows whose sources and targets match their names") {
+      foo2bar.source shouldBe foo
+      foo2bar.target shouldBe bar
+      foo2bar.sanityTest
+
+      foo2baz.source shouldBe foo
+      foo2baz.target shouldBe baz
+      foo2baz.sanityTest
+
+      foobar2baz.arrow.source shouldBe (foo x bar)
+      foobar2baz.arrow.target shouldBe baz
+      foobar2baz.arrow.sanityTest
+
+      monicBar2baz.source shouldBe bar
+      monicBar2baz.target shouldBe baz
+      monicBar2baz.sanityTest
+
+      equalizerSituation.sanityTest
+    }
+  }
+}
+
 abstract class DiagrammaticToposWithFixtures {
   type TOPOS <: DiagrammaticTopos
   val topos : TOPOS
@@ -36,40 +70,6 @@ abstract class DiagrammaticToposWithFixtures {
   }
 
   final lazy val foo2baz = foo2ImageOfBar // a convenient alias
-}
-
-abstract class DiagrammaticToposFixtureSanityTests[T <: DiagrammaticTopos](fixtures: DiagrammaticToposWithFixtures) extends FunSpec {
-  import fixtures._
-
-  describe(s"The fixtures for ${fixtures.topos.getClass.getSimpleName}") {
-    it("include distinct sane objects") {
-      val objects = Set(foo, bar, baz)
-
-      objects should have size 3
-      
-      objects map { _.sanityTest }
-    }
-
-    it("include sane arrows whose sources and targets match their names") {
-      foo2bar.source shouldBe foo
-      foo2bar.target shouldBe bar
-      foo2bar.sanityTest
-
-      foo2baz.source shouldBe foo
-      foo2baz.target shouldBe baz
-      foo2baz.sanityTest
-
-      foobar2baz.arrow.source shouldBe (foo x bar)
-      foobar2baz.arrow.target shouldBe baz
-      foobar2baz.arrow.sanityTest
-
-      monicBar2baz.source shouldBe bar
-      monicBar2baz.target shouldBe baz
-      monicBar2baz.sanityTest
-
-      equalizerSituation.sanityTest
-    }
-  }
 }
 
 abstract class GenericDiagrammaticToposTests[TOPOS <: DiagrammaticTopos](
@@ -205,46 +205,4 @@ abstract class GenericDiagrammaticToposTests[TOPOS <: DiagrammaticTopos](
       //      omegaHeyting.verify
     }
   }
-
-  describe(s"The topos ${topos.getClass.getSimpleName}, with strong binding") {
-
-    def foo0 = wrapDot(foo)
-    def bar0 = wrapDot(bar)
-    def baz0 = wrapDot(baz)
-    def foo2bar0 = wrapArrow[FOO, BAR](foo2bar)
-    def foo2baz0 = wrapArrow[FOO, BAZ](foo2baz)
-
-    it("wraps dots and arrows with relatively sane equality semantics") {
-      wrapDot[FOO](foo) shouldBe wrapDot[FOO](foo)
-      (wrapDot[FOO](foo) eq wrapDot[FOO](foo)) shouldBe true
-
-      wrapArrow[FOO, BAR](foo2bar) shouldBe wrapArrow[FOO, BAR](foo2bar)
-      (wrapArrow[FOO, BAR](foo2bar) eq wrapArrow[FOO, BAR](foo2bar)) shouldBe false
-    }
-
-    it("has identity arrows which can be composed") {
-      foo2bar0 o foo0.identity shouldBe foo2bar0
-      bar0.identity o foo2bar0 shouldBe foo2bar0
-    }
-
-    it("can construct biproduct diagrams") {
-      val barXbaz0 = bar0 x baz0
-
-      val productArrow = foo2bar0 x foo2baz0
-
-      productArrow.source shouldBe foo0
-      productArrow.target shouldBe barXbaz0
-
-      productArrow.sanityTest
-
-      leftProjection(bar0, baz0).sanityTest
-      rightProjection(bar0, baz0).sanityTest
-
-      leftProjection(bar0, baz0) o productArrow shouldBe foo2bar0
-      rightProjection(bar0, baz0) o productArrow shouldBe foo2baz0
-    }
-
-    // TODO: get equivalents of all the other generic tests working
-  }
 }
-

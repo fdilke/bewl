@@ -3,9 +3,10 @@ package com.fdilke.bewl.fsets
 import com.fdilke.bewl._
 import com.fdilke.bewl.diagrammatic.DiagrammaticTopos
 import com.fdilke.bewl.fsets.FiniteSets.FiniteSetsUtilities.allMaps
+import com.fdilke.bewl.topos.StarsAndQuiversLayer
 import scala.Function.{const, tupled}
 
-object FiniteSets extends DiagrammaticTopos {
+object FiniteSets extends DiagrammaticTopos with StarsAndQuiversLayer {
   type DOT[X] = FiniteSetsDot[X]
   type ARROW[S, T] = FiniteSetsArrow[S, T]
   type BIPRODUCT[L, R] = FiniteSetsBiproduct[L, R]
@@ -140,11 +141,11 @@ object FiniteSets extends DiagrammaticTopos {
         FiniteSetsArrow[(L, R), T](left x right, target, Map(map:_*)))
   }
 
-  object FiniteSetsUtilities {
+  object FiniteSetsUtilities { // TODO: could be separate?
+    def set[T](elements: T*) = FiniteSetsDot(elements)
+
     def arrow[S, T](source: FiniteSetsDot[S], target: FiniteSetsDot[T], map: (S, T)*) =
       FiniteSetsArrow[S, T](source, target, Map(map:_*))
-
-    def set[T](elements: T*) = FiniteSetsDot(elements)
 
     def cartesian[A](factors: Seq[Seq[A]]): Traversable[Seq[A]] = factors match {
         case Nil => Traversable(Seq())
