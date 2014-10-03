@@ -94,28 +94,23 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
 
   type DOTWRAPPER[S] = WrappedArrow[S]
 
-  override def makeStar[S](dot: BASE#DOT[S]) =
+  override def star[S](dot: BASE#DOT[S]) =
     standardWrappedDot(
       StrictRef(dot.asInstanceOf[DOT[Any]])
     ).asInstanceOf[STAR[WrappedArrow[S]]]
 
-  override def makeQuiver[S, T](arrow: BASE#ARROW[S, T]) : QUIVER[DOTWRAPPER[S], DOTWRAPPER[T]] = {
-    val source = makeStar(arrow.source)
-    val target = makeStar(arrow.target)
+  override def quiver[S, T](arrow: BASE#ARROW[S, T]) : QUIVER[DOTWRAPPER[S], DOTWRAPPER[T]] = {
+    val source = star(arrow.source)
+    val target = star(arrow.target)
     AdapterQuiver(source, target,
       arrowAsFunction[S, T, WrappedArrow[S], WrappedArrow[T]](target, arrow.asInstanceOf[ARROW[S, T]])
     )
   }
 
-  // TODO; make this an override
-  def cleverQuiver[S, T](source: STAR[WrappedArrow[S]], target: STAR[WrappedArrow[T]], f: S => T) =
-    makeQuiver(cleverArrow(source, target, f))
-
-  // TODO: hide this horror unless we need to show it
-  override def cleverArrow[S, T](source: STAR[WrappedArrow[S]], target: STAR[WrappedArrow[T]], f: S => T) =
-    buildArrow[S, T](
+  override def cleverQuiver[S, T](source: STAR[WrappedArrow[S]], target: STAR[WrappedArrow[T]], f: S => T) =
+    quiver(buildArrow[S, T](
       source.getDot.asInstanceOf[DOT[S]],
       target.getDot.asInstanceOf[DOT[T]],
       f
-    ).asInstanceOf[BASE#ARROW[DOTWRAPPER[S], DOTWRAPPER[T]]]
+    ).asInstanceOf[BASE#ARROW[DOTWRAPPER[S], DOTWRAPPER[T]]]).asInstanceOf[QUIVER[DOTWRAPPER[S], DOTWRAPPER[T]]]
 }

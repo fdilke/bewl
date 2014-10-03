@@ -45,10 +45,9 @@ trait Wrappings[
 ] { topos: Topos =>
   type DOTWRAPPER[T] <: ELEMENT
 
-  def makeStar[T](input: DOTINPUT[T]) : STAR[DOTWRAPPER[T]]
-  def makeQuiver[S, T](connector: CONNECTOR[S, T]) : QUIVER[DOTWRAPPER[S], DOTWRAPPER[T]]
-  // TODO: rename to star, quiver
+  def star[T](input: DOTINPUT[T]) : STAR[DOTWRAPPER[T]]
+  def quiver[S, T](connector: CONNECTOR[S, T]) : QUIVER[DOTWRAPPER[S], DOTWRAPPER[T]]
 
   // TODO: get rid of this abomination by introducing a map operation on DOTWRAPPER?
-  def cleverArrow[S, T](source: STAR[DOTWRAPPER[S]], target: STAR[DOTWRAPPER[T]], f: S => T): CONNECTOR[DOTWRAPPER[S], DOTWRAPPER[T]]
+  def cleverQuiver[S, T](source: STAR[DOTWRAPPER[S]], target: STAR[DOTWRAPPER[T]], f: S => T): QUIVER[DOTWRAPPER[S], DOTWRAPPER[T]]
 }
