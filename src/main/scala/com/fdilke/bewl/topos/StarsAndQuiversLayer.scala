@@ -5,7 +5,7 @@ import com.fdilke.bewl.helper.{ResultStore, StrictRef}
 
 import scala.Function._
 
-trait StarsAndQuiversLayer[BASE <: BaseDiagrammaticTopos] extends Topos with Wrappings { topos : BASE =>
+trait StarsAndQuiversLayer[BASE <: BaseDiagrammaticTopos] extends Topos with Wrappings[BASE#DOT, BASE#ARROW] { topos : BASE =>
 
   type ELEMENT = Element
   type STAR[S <: ELEMENT] = AdapterStar[S]
@@ -106,20 +106,18 @@ trait StarsAndQuiversLayer[BASE <: BaseDiagrammaticTopos] extends Topos with Wra
 
   // wrappings
 
-  type DOTINPUT[S] = DOT[S]
-  type CONNECTOR[S, T] = ARROW[S, T]
   type DOTWRAPPER[S] = WrappedArrow[S]
 
-  override def makeStar[S](dot: DOTINPUT[S]) =
+  override def makeStar[S](dot: BASE#DOT[S]) =
     standardWrappedDot(
       StrictRef(dot.asInstanceOf[DOT[Any]])
     ).asInstanceOf[STAR[WrappedArrow[S]]]
 
-  override def makeQuiver[S, T](arrow: CONNECTOR[S, T]) : QUIVER[DOTWRAPPER[S], DOTWRAPPER[T]] = {
+  override def makeQuiver[S, T](arrow: BASE#ARROW[S, T]) : QUIVER[DOTWRAPPER[S], DOTWRAPPER[T]] = {
     val source = makeStar(arrow.source)
     val target = makeStar(arrow.target)
     AdapterQuiver(source, target,
-      arrowAsFunction[S, T, WrappedArrow[S], WrappedArrow[T]](target, arrow)
+      arrowAsFunction[S, T, WrappedArrow[S], WrappedArrow[T]](target, arrow.asInstanceOf[ARROW[S, T]])
     )
   }
 }

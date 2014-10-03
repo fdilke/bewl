@@ -39,9 +39,10 @@ trait Topos {
     bind[A x B, B](left x right, right, _.right)
 }
 
-trait Wrappings { topos: Topos =>
-  type DOTINPUT[T]
-  type CONNECTOR[S, T]
+trait Wrappings[
+  DOTINPUT[T],
+  CONNECTOR[S, T]
+] { topos: Topos =>
   type DOTWRAPPER[T] <: ELEMENT
 
   def makeStar[T](input: DOTINPUT[T]) : STAR[DOTWRAPPER[T]]
