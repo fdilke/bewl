@@ -1,6 +1,8 @@
 package com.fdilke.bewl.fsets
 
-class FiniteSetsTest /* extends GenericToposTests(new ToposWithFixtures {
+import com.fdilke.bewl.topos.{GenericToposTests, ToposWithFixtures}
+
+class FiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
   type TOPOS = FiniteSets.type
   val topos = FiniteSets
 
@@ -10,15 +12,11 @@ class FiniteSetsTest /* extends GenericToposTests(new ToposWithFixtures {
   type BAR = WrappedArrow[String]
   type BAZ = WrappedArrow[Int]
 
-  def star[T](elements: T*) = wrapDot(FiniteSetsDot(elements))
+  def star[T](elements: T*) = makeStar(DiagrammaticFiniteSets.FiniteSetsDot(elements))
 
   def quiver[S, T](source: STAR[WrappedArrow[S]], target: STAR[WrappedArrow[T]], map: (S, T)*):
   QUIVER[WrappedArrow[S], WrappedArrow[T]] =
-    wrapArrow[S, T](FiniteSetsArrow(
-      source.getDot.asInstanceOf[DOT[S]],
-      target.getDot.asInstanceOf[DOT[T]],
-      Map(map:_*)
-    ))
+    makeQuiver[S, T](cleverQuiver(source, target, map :_*))
 
   override val foo = star(true, false)
   override val bar = star("X", "Y")
@@ -42,4 +40,3 @@ class FiniteSetsTest /* extends GenericToposTests(new ToposWithFixtures {
 })
 
 
-*/

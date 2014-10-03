@@ -1,6 +1,7 @@
 package com.fdilke.bewl.topos
 
 import com.fdilke.bewl.diagrammatic.BaseDiagrammaticTopos
+import com.fdilke.bewl.fsets.DiagrammaticFiniteSets
 import com.fdilke.bewl.helper.{ResultStore, StrictRef}
 
 import scala.Function._
@@ -106,4 +107,14 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
       arrowAsFunction[S, T, WrappedArrow[S], WrappedArrow[T]](target, arrow.asInstanceOf[ARROW[S, T]])
     )
   }
+
+  // TODO: get rid of this abomination
+
+  def cleverQuiver[S, T](source: STAR[WrappedArrow[S]], target: STAR[WrappedArrow[T]], map: (S, T)*) =
+    DiagrammaticFiniteSets.FiniteSetsArrow(
+      source.getDot.asInstanceOf[DiagrammaticFiniteSets.DOT[S]],
+      target.getDot.asInstanceOf[DiagrammaticFiniteSets.DOT[T]],
+      Map(map:_*)
+    )
+
 }

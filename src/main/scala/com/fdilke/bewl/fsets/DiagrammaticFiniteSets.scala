@@ -1,27 +1,12 @@
 package com.fdilke.bewl.fsets
 
-import com.fdilke.bewl._
 import com.fdilke.bewl.diagrammatic.DiagrammaticTopos
 import com.fdilke.bewl.fsets.DiagrammaticFiniteSets.FiniteSetsUtilities.allMaps
-import com.fdilke.bewl.topos.{StarsAndQuiversAdapter, StarsAndQuiversLayer}
+import com.fdilke.bewl.topos.StarsAndQuiversAdapter
+
 import scala.Function.{const, tupled}
 
-object DiagrammaticFiniteSets extends DiagrammaticFiniteSetsBase
-
-class DiagrammaticFiniteSetsBase extends DiagrammaticTopos with StarsAndQuiversLayer[DiagrammaticFiniteSetsBase] {
-  type DOT[X] = FiniteSetsDot[X]
-  type ARROW[S, T] = FiniteSetsArrow[S, T]
-  type BIPRODUCT[L, R] = FiniteSetsBiproduct[L, R]
-  type EXPONENTIAL[S, T] = FiniteSetsExponential[S, T]
-  type EQUALIZER[M, T] = FiniteSetsEqualizer[M, T]
-  type EQUALIZER_SOURCE[M, T] = M
-  type TERMINAL = Unit
-  type OMEGA = Boolean
-
-  override val I = FiniteSetsDot[Unit](Traversable(()))
-  override val omega = FiniteSetsDot[Boolean](Traversable(true, false))
-  override val truth = FiniteSetsArrow[Unit, Boolean](I, omega, const (true) _)
-
+object DiagrammaticFiniteSets extends DiagrammaticTopos {
   case class FiniteSetsDot[X](elements: Traversable[X]) extends Dot[X] with Traversable[X] {
     override def toString = elements.toString
 
@@ -41,10 +26,10 @@ class DiagrammaticFiniteSetsBase extends DiagrammaticTopos with StarsAndQuiversL
   }
 
   case class FiniteSetsArrow[X, Y](
-    source: FiniteSetsDot[X],
-    target: FiniteSetsDot[Y],
-    function: X => Y
-  ) extends Arrow[X, Y] {
+                                    source: FiniteSetsDot[X],
+                                    target: FiniteSetsDot[Y],
+                                    function: X => Y
+                                    ) extends Arrow[X, Y] {
     override def toString = s"""FiniteSetsArrow(${source}, ${target},
       |${Map(source.map(x => (x, function(x))).toList: _*)})""".stripMargin
 
@@ -66,7 +51,7 @@ class DiagrammaticFiniteSetsBase extends DiagrammaticTopos with StarsAndQuiversL
         arrow.source, source, (w: W) => {
           val y = arrow.function(w)
           source.find(function(_) == y).getOrElse(???)
-      })
+        })
     }
 
     override def equals(other: Any): Boolean = other match {
@@ -118,11 +103,11 @@ class DiagrammaticFiniteSetsBase extends DiagrammaticTopos with StarsAndQuiversL
 
   class FiniteSetsEqualizer[M, T](arrow: FiniteSetsArrow[M, T], arrow2: FiniteSetsArrow[M, T])
     extends Equalizer[M, T] {
-      import arrow._
+    import arrow._
 
-      override val equalizerSource = FiniteSetsDot[EQUALIZER_SOURCE[M, T]](
-        source.filter(s => arrow.function(s) == arrow2.function(s))
-      )
+    override val equalizerSource = FiniteSetsDot[EQUALIZER_SOURCE[M, T]](
+      source.filter(s => arrow.function(s) == arrow2.function(s))
+    )
 
     override val equalizer = FiniteSetsArrow[EQUALIZER_SOURCE[M, T], M](
       equalizerSource, source, identity
@@ -137,23 +122,23 @@ class DiagrammaticFiniteSetsBase extends DiagrammaticTopos with StarsAndQuiversL
     def apply[L, R, T](left: FiniteSetsDot[L],
                        right: FiniteSetsDot[R],
                        target: FiniteSetsDot[T],
-              map: ((L, R), T)*) : BiArrow[L, R, T] =
+                       map: ((L, R), T)*) : BiArrow[L, R, T] =
       BiArrow[L, R, T](left, right,
         FiniteSetsArrow[(L, R), T](left x right, target, Map(map:_*)))
   }
 
   object FiniteSetsUtilities { // TODO: could be separate?
-    def set[T](elements: T*) = FiniteSetsDot(elements)
+  def set[T](elements: T*) = FiniteSetsDot(elements)
 
     def arrow[S, T](source: FiniteSetsDot[S], target: FiniteSetsDot[T], map: (S, T)*) =
       FiniteSetsArrow[S, T](source, target, Map(map:_*))
 
     def cartesian[A](factors: Seq[Seq[A]]): Traversable[Seq[A]] = factors match {
-        case Nil => Traversable(Seq())
-        case head :: tail =>
-          for (h <- head; sequence <- cartesian[A](tail))
-                yield(h +: sequence)
-      }
+      case Nil => Traversable(Seq())
+      case head :: tail =>
+        for (h <- head; sequence <- cartesian[A](tail))
+        yield(h +: sequence)
+    }
 
     def allMaps[A, B](source: Traversable[A], target: Traversable[B]): Traversable[A=>B] =
       new Traversable[A => B] {
@@ -188,6 +173,19 @@ class DiagrammaticFiniteSetsBase extends DiagrammaticTopos with StarsAndQuiversL
     def binaryOperator[X](dot: FiniteSetsDot[X], binaryFunc: (X, X) => X): FiniteSetsArrow[Power[X], X] =
       binaryOperator(dot, (dot x dot).map { case (x, y) => ((x, y), binaryFunc(x,y)) }.toList: _*)
   }
+
+  type DOT[X] = FiniteSetsDot[X]
+  type ARROW[S, T] = FiniteSetsArrow[S, T]
+  type BIPRODUCT[L, R] = FiniteSetsBiproduct[L, R]
+  type EXPONENTIAL[S, T] = FiniteSetsExponential[S, T]
+  type EQUALIZER[M, T] = FiniteSetsEqualizer[M, T]
+  type EQUALIZER_SOURCE[M, T] = M
+  type TERMINAL = Unit
+  type OMEGA = Boolean
+
+  override val I = FiniteSetsDot[Unit](Traversable(()))
+  override val omega = FiniteSetsDot[Boolean](Traversable(true, false))
+  override val truth = FiniteSetsArrow[Unit, Boolean](I, omega, const (true) _)
 }
 
 object FiniteSets extends StarsAndQuiversAdapter(DiagrammaticFiniteSets)
