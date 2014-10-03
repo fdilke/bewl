@@ -6,7 +6,9 @@ import com.fdilke.bewl.fsets.DiagrammaticFiniteSets.FiniteSetsUtilities.allMaps
 import com.fdilke.bewl.topos.{StarsAndQuiversAdapter, StarsAndQuiversLayer}
 import scala.Function.{const, tupled}
 
-object DiagrammaticFiniteSets extends DiagrammaticTopos with StarsAndQuiversLayer {
+object DiagrammaticFiniteSets extends DiagrammaticFiniteSetsBase
+
+class DiagrammaticFiniteSetsBase extends DiagrammaticTopos with StarsAndQuiversLayer[DiagrammaticFiniteSetsBase] {
   type DOT[X] = FiniteSetsDot[X]
   type ARROW[S, T] = FiniteSetsArrow[S, T]
   type BIPRODUCT[L, R] = FiniteSetsBiproduct[L, R]
@@ -31,12 +33,11 @@ object DiagrammaticFiniteSets extends DiagrammaticTopos with StarsAndQuiversLaye
 
     override def exponential[Y](that: FiniteSetsDot[Y]) = new FiniteSetsExponential[Y, X](that, this)
 
-    override def toI = FiniteSetsArrow[X, TERMINAL](this, DiagrammaticFiniteSets.I, const () _)
+    override def toI = FiniteSetsArrow[X, TERMINAL](this, I, const () _)
 
-    override def sanityTest {
+    override def sanityTest =
       for (x <- elements ; y <- elements)
         x == y
-    }
   }
 
   case class FiniteSetsArrow[X, Y](

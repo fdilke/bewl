@@ -5,7 +5,7 @@ import com.fdilke.bewl.helper.{ResultStore, StrictRef}
 
 import scala.Function._
 
-trait StarsAndQuiversLayer extends Topos with Wrappings { topos : BaseDiagrammaticTopos =>
+trait StarsAndQuiversLayer[BASE <: BaseDiagrammaticTopos] extends Topos with Wrappings { topos : BASE =>
 
   type ELEMENT = Element
   type STAR[S <: ELEMENT] = AdapterStar[S]
