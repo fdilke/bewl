@@ -28,6 +28,7 @@ trait Topos {
   }
 
   def bind[S <: ELEMENT, T <: ELEMENT](source: STAR[S], target: STAR[T], f: S => T) : QUIVER[S, T]
+  // TODO rename as a proper operator: ":>()()" ?
 
   // TODO extras - separate into a trait?
 
@@ -36,4 +37,15 @@ trait Topos {
 
   def rightProjection[A <: ELEMENT, B <: ELEMENT](left: STAR[A], right: STAR[B]) =
     bind[A x B, B](left x right, right, _.right)
+}
+
+trait Wrappings { topos: Topos =>
+  type DOTINPUT[T]
+  type CONNECTOR[S, T]
+  type DOTWRAPPER[T] <: ELEMENT
+
+  def makeStar[T](input: DOTINPUT[T]) : STAR[DOTWRAPPER[T]]
+  def makeQuiver[S, T](connector: CONNECTOR[S, T]) : QUIVER[DOTWRAPPER[S], DOTWRAPPER[T]]
+
+  // TODO: rename to star, quiver
 }

@@ -12,11 +12,11 @@ class DiagrammaticFiniteSetsWithLayerTest extends GenericToposTests(new ToposWit
   type BAR = WrappedArrow[String]
   type BAZ = WrappedArrow[Int]
 
-  def star[T](elements: T*) = wrapDot(FiniteSetsDot(elements))
+  def star[T](elements: T*) = makeStar(FiniteSetsDot(elements))
 
   def quiver[S, T](source: STAR[WrappedArrow[S]], target: STAR[WrappedArrow[T]], map: (S, T)*):
     QUIVER[WrappedArrow[S], WrappedArrow[T]] =
-    wrapArrow[S, T](FiniteSetsArrow(
+    makeQuiver[S, T](FiniteSetsArrow(
       source.getDot.asInstanceOf[DOT[S]],
       target.getDot.asInstanceOf[DOT[T]],
       Map(map:_*)
