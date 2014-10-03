@@ -1,6 +1,6 @@
 package com.fdilke.bewl.fsets
 
-import com.fdilke.bewl.fsets.FiniteSets.FiniteSetsUtilities.{arrow, set}
+import com.fdilke.bewl.fsets.DiagrammaticFiniteSets.FiniteSetsUtilities.{arrow, set}
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 

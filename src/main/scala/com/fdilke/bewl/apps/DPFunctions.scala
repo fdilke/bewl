@@ -1,6 +1,6 @@
 package com.fdilke.bewl.apps
 
-import com.fdilke.bewl.fsets.FiniteSets.FiniteSetsDot
+import com.fdilke.bewl.fsets.DiagrammaticFiniteSets.FiniteSetsDot
 
 // Originally for finding 'difference-preserving binary operators'.
 // It doesn't find any up to n=3.

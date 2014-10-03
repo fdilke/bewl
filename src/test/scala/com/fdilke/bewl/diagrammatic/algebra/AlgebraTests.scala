@@ -1,12 +1,12 @@
 package com.fdilke.bewl.diagrammatic.algebra
 
-import com.fdilke.bewl.fsets.FiniteSets
-import com.fdilke.bewl.fsets.FiniteSets.FiniteSetsUtilities._
+import com.fdilke.bewl.fsets.DiagrammaticFiniteSets
+import com.fdilke.bewl.fsets.DiagrammaticFiniteSets.FiniteSetsUtilities._
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
 class AlgebraTests extends FunSpec {
-  import FiniteSets._
+  import DiagrammaticFiniteSets._
   import AbstractOperator._
 
   def Magmas = new AlgebraicTheory(Seq(*))

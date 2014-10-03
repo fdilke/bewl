@@ -1,12 +1,12 @@
 package com.fdilke.bewl.diagrammatic.algebra
 
-import com.fdilke.bewl.fsets.FiniteSets
-import com.fdilke.bewl.fsets.FiniteSets.FiniteSetsUtilities._
+import com.fdilke.bewl.fsets.DiagrammaticFiniteSets
+import com.fdilke.bewl.fsets.DiagrammaticFiniteSets.FiniteSetsUtilities._
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
 class BindingTests  extends FunSpec {
-  import FiniteSets._
+  import DiagrammaticFiniteSets._
 
   describe("Algebraic operators") {
     it("can wrap arrows, be bound to sources, verify algebraic laws") {
@@ -29,7 +29,7 @@ class BindingTests  extends FunSpec {
 
       // 2. Bind them to a power of the carrier as source
 
-      val source: DOT[FiniteSets.Power[Symbol]] = dot ^ 3
+      val source: DOT[DiagrammaticFiniteSets.Power[Symbol]] = dot ^ 3
       val boundUnitOp = BoundAlgebraicOperator(source, unitOp)
       val boundProductOp = BoundAlgebraicOperator(source, productOp)
 
