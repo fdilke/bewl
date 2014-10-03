@@ -50,6 +50,10 @@ abstract class ToposWithFixtures {
 
   import topos._
 
+  def makeSampleStar(): STAR[_ <: ELEMENT]
+
+  def makeSampleQuiver(): QUIVER[_ <: ELEMENT, _ <: ELEMENT]
+
   val foo : STAR[FOO]
   val bar : STAR[BAR]
   val baz : STAR[BAZ]
@@ -86,6 +90,14 @@ abstract class GenericToposTests[TOPOS <: Topos](
   import fixtures.topos._
 
   describe(s"The topos ${topos.getClass.getSimpleName}") {
+
+    it("wraps dots and arrows with relatively sane equality semantics") {
+      makeSampleStar() shouldBe makeSampleStar()
+      (makeSampleStar() eq makeSampleStar()) shouldBe true
+
+      makeSampleQuiver() shouldBe makeSampleQuiver()
+      (makeSampleQuiver() eq makeSampleQuiver()) shouldBe false
+    }
 
     it("has identity arrows which can be composed") {
       foo2bar o foo.identity shouldBe foo2bar

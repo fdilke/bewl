@@ -2,6 +2,7 @@ package com.fdilke.bewl.fsets
 
 import com.fdilke.bewl.diagrammatic.DiagrammaticTopos
 import com.fdilke.bewl.fsets.DiagrammaticFiniteSets.FiniteSetsUtilities.allMaps
+import com.fdilke.bewl.helper.FunctionWithEquality
 import com.fdilke.bewl.topos.StarsAndQuiversAdapter
 
 import scala.Function.{const, tupled}

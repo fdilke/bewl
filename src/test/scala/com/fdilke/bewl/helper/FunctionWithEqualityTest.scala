@@ -1,7 +1,7 @@
-package com.fdilke.bewl.fsets
+package com.fdilke.bewl.helper
 
-import org.scalatest.{Matchers, FunSpec}
-import Matchers._
+import org.scalatest.Matchers._
+import org.scalatest.{FunSpec, Matchers}
 
 // User: Felix Date: 07/06/2014 Time: 10:56
 

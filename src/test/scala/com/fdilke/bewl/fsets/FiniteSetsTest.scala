@@ -31,11 +31,19 @@ class FiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
     bar, baz, "X" -> 2, "Y" -> 3
   )
 
+  private val sampleDotSource = DiagrammaticFiniteSets.FiniteSetsDot(Seq(1, 2))
+  private val sampleDotTarget = DiagrammaticFiniteSets.FiniteSetsDot(Seq(true, false))
+
+  override def makeSampleStar() = star(sampleDotSource)
+
+  override def makeSampleQuiver() = makeQuiver(star(sampleDotSource), star(sampleDotTarget), 1 -> true, 2 -> false)
+
   //  override val equalizerSituation = new EqualizerSituation[FOO, BAR, BAZ](
   //    foo2bar,
   //    arrow[BAR, BAZ](bar, baz, "X" -> 1, "Y" -> 2, "Z" -> 3),
   //    arrow[BAR, BAZ](bar, baz, "X" -> 1, "Y" -> 2, "Z" -> 1)
   //  )
 })
+
 
 
