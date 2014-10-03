@@ -186,6 +186,9 @@ object DiagrammaticFiniteSets extends DiagrammaticTopos {
   override val I = FiniteSetsDot[Unit](Traversable(()))
   override val omega = FiniteSetsDot[Boolean](Traversable(true, false))
   override val truth = FiniteSetsArrow[Unit, Boolean](I, omega, const (true) _)
+
+  override def buildArrow[S, T](source: FiniteSetsDot[S], target: FiniteSetsDot[T], f: S => T) =
+    FiniteSetsArrow(source, target, f)
 }
 
 object FiniteSets extends StarsAndQuiversAdapter(DiagrammaticFiniteSets)

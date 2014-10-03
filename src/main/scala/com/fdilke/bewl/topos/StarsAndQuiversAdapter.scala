@@ -1,7 +1,6 @@
 package com.fdilke.bewl.topos
 
 import com.fdilke.bewl.diagrammatic.BaseDiagrammaticTopos
-import com.fdilke.bewl.fsets.DiagrammaticFiniteSets
 import com.fdilke.bewl.helper.{ResultStore, StrictRef}
 
 import scala.Function._
@@ -108,13 +107,15 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
     )
   }
 
-  // TODO: get rid of this abomination
+  // TODO; make this an override
+  def cleverQuiver[S, T](source: STAR[WrappedArrow[S]], target: STAR[WrappedArrow[T]], f: S => T) =
+    makeQuiver(cleverArrow(source, target, f))
 
-  def cleverQuiver[S, T](source: STAR[WrappedArrow[S]], target: STAR[WrappedArrow[T]], map: (S, T)*) =
-    DiagrammaticFiniteSets.FiniteSetsArrow(
-      source.getDot.asInstanceOf[DiagrammaticFiniteSets.DOT[S]],
-      target.getDot.asInstanceOf[DiagrammaticFiniteSets.DOT[T]],
-      Map(map:_*)
-    )
-
+  // TODO: hide this horror unless we need to show it
+  override def cleverArrow[S, T](source: STAR[WrappedArrow[S]], target: STAR[WrappedArrow[T]], f: S => T) =
+    buildArrow[S, T](
+      source.getDot.asInstanceOf[DOT[S]],
+      target.getDot.asInstanceOf[DOT[T]],
+      f
+    ).asInstanceOf[BASE#ARROW[DOTWRAPPER[S], DOTWRAPPER[T]]]
 }

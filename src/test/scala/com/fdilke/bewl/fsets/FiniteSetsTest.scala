@@ -14,9 +14,8 @@ class FiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
 
   def star[T](elements: T*) = makeStar(DiagrammaticFiniteSets.FiniteSetsDot(elements))
 
-  def quiver[S, T](source: STAR[WrappedArrow[S]], target: STAR[WrappedArrow[T]], map: (S, T)*):
-  QUIVER[WrappedArrow[S], WrappedArrow[T]] =
-    makeQuiver[S, T](cleverQuiver(source, target, map :_*))
+  def quiver[S, T](source: STAR[WrappedArrow[S]], target: STAR[WrappedArrow[T]], map: (S, T)*) =
+    cleverQuiver(source, target, Map(map :_*)).asInstanceOf[QUIVER[WrappedArrow[S], WrappedArrow[T]]]
 
   override val foo = star(true, false)
   override val bar = star("X", "Y")
