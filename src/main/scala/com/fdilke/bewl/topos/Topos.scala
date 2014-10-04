@@ -16,6 +16,8 @@ trait Topos {
     val identity: QUIVER[S, S]
     def x[T <: ELEMENT](that: STAR[T]): STAR[S x T]
     def sanityTest
+
+    def :>[T <: ELEMENT](target: STAR[T])(f: S => T) : QUIVER[S, T]
   }
 
   trait Quiver[S <: ELEMENT, T <: ELEMENT] {
@@ -27,16 +29,13 @@ trait Topos {
     def sanityTest
   }
 
-  def bind[S <: ELEMENT, T <: ELEMENT](source: STAR[S], target: STAR[T], f: S => T) : QUIVER[S, T]
-  // TODO rename as a proper operator: ":>()()" ?
-
   // TODO extras - separate into a trait?
 
   def leftProjection[A <: ELEMENT, B <: ELEMENT](left: STAR[A], right: STAR[B]) =
-    bind[A x B, A](left x right, left, _.left)
+    (left x right).:>(left) { x => x.left }
 
   def rightProjection[A <: ELEMENT, B <: ELEMENT](left: STAR[A], right: STAR[B]) =
-    bind[A x B, B](left x right, right, _.right)
+    (left x right).:> (right) { x => x.right }
 }
 
 trait Wrappings[

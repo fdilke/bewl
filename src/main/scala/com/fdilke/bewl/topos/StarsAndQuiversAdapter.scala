@@ -27,6 +27,10 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
         StrictRef(that.asInstanceOf[STAR[WrappedArrow[Any]]])
         )).asInstanceOf[ProductStar[T, U]]
     override def sanityTest = getDot.sanityTest
+
+    override def :>[U <: ELEMENT](target: STAR[U])(f: T => U) =
+      AdapterQuiver[T, U](this, target, f)
+
     protected[StarsAndQuiversAdapter] val getDot: DOT[Any]
     def asElement(arrow: ARROW[Any, Any]) : T
   }
@@ -86,9 +90,6 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
                                                          ): S => T =
     (s : S) =>
       target.asElement(arrow.asInstanceOf[ARROW[Any, Any]](s.arrow))
-
-  override def bind[S <: ELEMENT, T <: ELEMENT](source: STAR[S], target: STAR[T], f: S => T) =
-    AdapterQuiver[S, T](source, target, f)
 
   // wrappings
 
