@@ -121,6 +121,16 @@ abstract class GenericToposTests[TOPOS <: Topos](
       rightProjection(bar, baz) o productArrow shouldBe foo2baz
     }
 
+    it("has a terminator") {
+      val fooToI = foo.toI
+      fooToI.source shouldBe foo
+      fooToI.target shouldBe topos.I
+      fooToI.sanityTest
+
+      bar.toI o foo2bar shouldBe fooToI
+    }
+
+
     // TODO: get equivalents of all the other generic tests working
   }
 }

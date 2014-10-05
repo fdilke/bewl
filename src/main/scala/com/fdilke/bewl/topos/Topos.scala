@@ -12,8 +12,12 @@ trait Topos {
     val right: U
   }
 
+  type UNIT <: ELEMENT
+  val I : STAR[UNIT]
+
   trait Star[S <: ELEMENT] {
     val identity: QUIVER[S, S]
+    val toI: QUIVER[S, UNIT]
     def x[T <: ELEMENT](that: STAR[T]): STAR[S x T]
     def sanityTest
 
