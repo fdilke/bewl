@@ -130,6 +130,22 @@ abstract class GenericToposTests[TOPOS <: Topos](
       bar.toI o foo2bar shouldBe fooToI
     }
 
+    it("has standardized products") {
+      val product: STAR[FOO x BAR] = foo x bar
+      product shouldBe (foo x bar)
+    }
+
+    it("can chain products") {
+      val barXfooXbaz = bar x foo x baz
+      val productArrow = foo2bar x foo.identity x foo2baz
+      productArrow.source shouldBe foo
+      productArrow.target shouldBe barXfooXbaz
+      productArrow.sanityTest
+
+      leftProjection(bar, foo, baz) o productArrow shouldBe foo2bar
+      midProjection(bar, foo, baz) o productArrow shouldBe foo.identity
+      rightProjection(bar, foo, baz) o productArrow shouldBe foo2baz
+    }
 
     // TODO: get equivalents of all the other generic tests working
   }

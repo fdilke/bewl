@@ -35,11 +35,29 @@ trait Topos {
 
   // TODO extras - separate into a trait?
 
-  def leftProjection[A <: ELEMENT, B <: ELEMENT](left: STAR[A], right: STAR[B]) =
+  // Helper methods for biproducts: Compactify?
+
+  def leftProjection[A <: ELEMENT, B <: ELEMENT](left: STAR[A], right: STAR[B]) : QUIVER[A x B, A] =
     (left x right)(left) { _.left }
 
-  def rightProjection[A <: ELEMENT, B <: ELEMENT](left: STAR[A], right: STAR[B]) =
+  def rightProjection[A <: ELEMENT, B <: ELEMENT](left: STAR[A], right: STAR[B]) : QUIVER[A x B, B] =
     (left x right)(right) { _.right }
+
+  // Helper methods for triproducts (this could obviously be extended). Note, are these used outside tests?
+  def leftProjection[X <: ELEMENT, Y <: ELEMENT, Z <: ELEMENT](
+    x: STAR[X], y: STAR[Y], z: STAR[Z]
+  ) : QUIVER[X x Y x Z, X] =
+    leftProjection(x, y) o leftProjection(x x y, z)
+
+  def midProjection[X <: ELEMENT, Y <: ELEMENT, Z <: ELEMENT](
+   x: STAR[X], y: STAR[Y], z: STAR[Z]
+  ) : QUIVER[X x Y x Z, Y] =
+    rightProjection(x, y) o leftProjection(x x y, z)
+
+  def rightProjection[X <: ELEMENT, Y <: ELEMENT, Z <: ELEMENT](
+   x: STAR[X], y: STAR[Y], z: STAR[Z]
+  ) : QUIVER[X x Y x Z, Z] =
+    rightProjection(x x y, z)
 }
 
 trait Wrappings[
