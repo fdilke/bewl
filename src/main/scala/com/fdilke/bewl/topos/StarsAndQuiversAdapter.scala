@@ -28,7 +28,7 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
         )).asInstanceOf[ProductStar[T, U]]
     override def sanityTest = getDot.sanityTest
 
-    override def :>[U <: ELEMENT](target: STAR[U])(f: T => U) =
+    override def apply[U <: ELEMENT](target: STAR[U])(f: T => U) =
       AdapterQuiver[T, U](this, target, f)
 
     protected[StarsAndQuiversAdapter] val getDot: DOT[Any]

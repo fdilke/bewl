@@ -17,7 +17,7 @@ trait Topos {
     def x[T <: ELEMENT](that: STAR[T]): STAR[S x T]
     def sanityTest
 
-    def :>[T <: ELEMENT](target: STAR[T])(f: S => T) : QUIVER[S, T]
+    def apply[T <: ELEMENT](target: STAR[T])(f: S => T) : QUIVER[S, T]
   }
 
   trait Quiver[S <: ELEMENT, T <: ELEMENT] {
@@ -32,10 +32,10 @@ trait Topos {
   // TODO extras - separate into a trait?
 
   def leftProjection[A <: ELEMENT, B <: ELEMENT](left: STAR[A], right: STAR[B]) =
-    (left x right).:>(left) { x => x.left }
+    (left x right)(left) { _.left }
 
   def rightProjection[A <: ELEMENT, B <: ELEMENT](left: STAR[A], right: STAR[B]) =
-    (left x right).:> (right) { x => x.right }
+    (left x right)(right) { _.right }
 }
 
 trait Wrappings[
