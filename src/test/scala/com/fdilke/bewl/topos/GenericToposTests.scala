@@ -32,7 +32,7 @@ abstract class ToposFixtureSanityTests[T <: Topos](fixtures: ToposWithFixtures) 
       monicBar2baz.target shouldBe baz
       monicBar2baz.sanityTest
 
-//      equalizerSituation.sanityTest
+      equalizerSituation.sanityTest
     }
   }
 }
@@ -63,7 +63,7 @@ abstract class ToposWithFixtures {
 //  val foobar2baz : BiArrow[FOO, BAR, BAZ]
   val monicBar2baz: QUIVER[BAR, BAZ]
 
-//  val equalizerSituation: EqualizerSituation[FOO, BAR, BAZ]
+  val equalizerSituation: EqualizerSituation[FOO, BAR, BAZ]
 
   case class EqualizerSituation[S <: ELEMENT, M <: ELEMENT, T <: ELEMENT](
     r: QUIVER[S, M],
@@ -146,6 +146,17 @@ abstract class GenericToposTests[TOPOS <: Topos](
       midProjection(bar, foo, baz) o productArrow shouldBe foo.identity
       rightProjection(bar, foo, baz) o productArrow shouldBe foo2baz
     }
+
+    it("has equalizers") {
+      import equalizerSituation._
+      val equalizer = s ?= t
+      val e = equalizer.inclusion
+
+      (s o e) shouldBe (t o e)
+      val q = equalizer.restrict(r)
+      (e o q) shouldBe r
+    }
+
 
     // TODO: get equivalents of all the other generic tests working
   }

@@ -38,11 +38,11 @@ class FiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
 
   override def makeSampleQuiver() = makeQuiver(star(sampleDotSource), star(sampleDotTarget), 1 -> true, 2 -> false)
 
-  //  override val equalizerSituation = new EqualizerSituation[FOO, BAR, BAZ](
-  //    foo2bar,
-  //    arrow[BAR, BAZ](bar, baz, "X" -> 1, "Y" -> 2, "Z" -> 3),
-  //    arrow[BAR, BAZ](bar, baz, "X" -> 1, "Y" -> 2, "Z" -> 1)
-  //  )
+    override val equalizerSituation = new EqualizerSituation[FOO, BAR, BAZ](
+      foo2bar,
+      makeQuiver(bar, baz, "X" -> 1, "Y" -> 2, "Z" -> 3),
+      makeQuiver(bar, baz, "X" -> 1, "Y" -> 2, "Z" -> 1)
+    )
 })
 
 
