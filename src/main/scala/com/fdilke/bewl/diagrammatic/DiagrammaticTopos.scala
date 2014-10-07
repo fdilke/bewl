@@ -13,7 +13,6 @@ trait BaseDiagrammaticTopos {
   type ARROW[P, Q] <: Arrow[P, Q]
   type BIPRODUCT[P, Q] <: Biproduct[P, Q]
   type EXPONENTIAL[P, Q] <: Exponential[P, Q]
-  type EQUALIZER[M, T] <: Equalizer[M]
 
   type EQUALIZER_SOURCE[M]
   type TERMINAL
@@ -76,7 +75,7 @@ trait BaseDiagrammaticTopos {
     final def x[Z](that: ARROW[X, Z]): ARROW[X, (Y, Z)] = (this.target * that.target).
       multiply(this.asInstanceOf[ARROW[X, Y]], that)
 
-    def ?=(that: ARROW[X, Y]): EQUALIZER[X, Y]
+    def ?=(that: ARROW[X, Y]): Equalizer[X]
 
     val chi: Characteristic[X, Y]
 

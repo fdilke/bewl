@@ -151,7 +151,7 @@ abstract class GenericDiagrammaticToposTests[TOPOS <: DiagrammaticTopos](
 
     it("has equalizers") {
       import equalizerSituation._
-      val diagram: EQUALIZER[BAR, BAZ] = s ?= t
+      val diagram: topos.Equalizer[BAR] = s ?= t
       val e: ARROW[EQUALIZER_SOURCE[BAR], BAR] = diagram.equalizer
 
       s(e) shouldBe t(e)

@@ -41,8 +41,22 @@ object DiagrammaticFiniteSets extends DiagrammaticTopos {
         throw new IllegalArgumentException("Target does not match source")
       }
 
-    override def ?=(that: FiniteSetsArrow[X, Y]): EQUALIZER[X, Y] =
-      new FiniteSetsEqualizer(this, that)
+    override def ?=(that: FiniteSetsArrow[X, Y]) =
+      new Equalizer[X] {
+
+      override val equalizerSource = FiniteSetsDot[EQUALIZER_SOURCE[X]](
+        source.filter(s => function(s) == that.function(s))
+      )
+
+      override val equalizer = FiniteSetsArrow[EQUALIZER_SOURCE[X], X](
+        equalizerSource, source, identity
+      )
+
+      override def restrict[S](equalizingArrow: FiniteSetsArrow[S, X]) = FiniteSetsArrow[S, X](
+        equalizingArrow.source, equalizerSource, equalizingArrow.function
+      )
+    }
+
 
     override lazy val chi = new Characteristic[X, Y] {
       val arrow = FiniteSetsArrow[Y, Boolean](target, omega,
@@ -100,23 +114,6 @@ object DiagrammaticFiniteSets extends DiagrammaticTopos {
       FiniteSetsArrow[W, S => T](multiArrow.left, exponentDot,
         (w: W) => FunctionWithEquality[S, T](multiArrow.right, { s => multiArrow.arrow.function((w, s)) })
       )
-  }
-
-  class FiniteSetsEqualizer[M, T](arrow: FiniteSetsArrow[M, T], arrow2: FiniteSetsArrow[M, T])
-    extends Equalizer[M] {
-    import arrow._
-
-    override val equalizerSource = FiniteSetsDot[EQUALIZER_SOURCE[M]](
-      source.filter(s => arrow.function(s) == arrow2.function(s))
-    )
-
-    override val equalizer = FiniteSetsArrow[EQUALIZER_SOURCE[M], M](
-      equalizerSource, source, identity
-    )
-
-    override def restrict[S](equalizingArrow: FiniteSetsArrow[S, M]) = FiniteSetsArrow[S, M](
-      equalizingArrow.source, equalizerSource, equalizingArrow.function
-    )
   }
 
   object FiniteSetsBiArrow {
@@ -179,7 +176,6 @@ object DiagrammaticFiniteSets extends DiagrammaticTopos {
   type ARROW[S, T] = FiniteSetsArrow[S, T]
   type BIPRODUCT[L, R] = FiniteSetsBiproduct[L, R]
   type EXPONENTIAL[S, T] = FiniteSetsExponential[S, T]
-  type EQUALIZER[M, T] = FiniteSetsEqualizer[M, T]
   type EQUALIZER_SOURCE[M] = M
   type TERMINAL = Unit
   type OMEGA = Boolean
