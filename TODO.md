@@ -49,6 +49,11 @@ At this point DOT, ARROW dissolve as implementation details somewhere in FiniteS
 
 Algebras ought to extend the API of a Star.
 Aim for: it'll be *inherent* that if A is an X-algebra, A^B is automatically one too.
+
+# This is totally how I should implement algebraic operations:
+
+use scala.Dynamic
+http://stackoverflow.com/questions/15799811/how-does-type-dynamic-work-and-how-to-use-it/15799812#15799812        
         
 # The Strong Binding Manifesto
 

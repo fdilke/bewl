@@ -17,11 +17,6 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
     protected[StarsAndQuiversAdapter] val arrow: ARROW[Any, Any]
   }
 
-//  trait x[T <: ELEMENT, U <: ELEMENT] extends xI[T, U] with ELEMENT {
-//    val left: T
-//    val right: U
-//  }
-
   type UNIT = WrappedArrow[Unit]
   lazy val I : STAR[UNIT] = star(topos.I).asInstanceOf[AdapterStar[UNIT]]
 
@@ -104,7 +99,7 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
     l: STAR[L], r: STAR[R]
   ) = new AdapterStar[L x R] {
     override val getDot = (l.getDot x r.getDot).asInstanceOf[DOT[Any]]
-    override def asElement(anArrow: ARROW[Any, Any]) = new xI[L, R] with Element { // self: x[L, R] =>
+    override def asElement(anArrow: ARROW[Any, Any]) = new xI[L, R] with Element {
       override val left: L = l.asElement(
         topos.leftProjection(l.getDot, r.getDot).asInstanceOf[ARROW[Any, Any]](anArrow))
       override val right: R = r.asElement(

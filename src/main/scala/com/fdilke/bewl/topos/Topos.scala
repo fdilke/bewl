@@ -5,12 +5,11 @@ trait Topos {
   type STAR[S <: ELEMENT] <: Star[S]
   type QUIVER[S <: ELEMENT, T <: ELEMENT] <: Quiver[S, T]
 
-  type x[T <: ELEMENT, U <: ELEMENT] = xI[T, U] with ELEMENT
-
-  trait xI[T <: ELEMENT, U <: ELEMENT] {
+  trait xI[T <: ELEMENT, U <: ELEMENT] { self: ELEMENT =>
     val left: T
     val right: U
   }
+  type x[T <: ELEMENT, U <: ELEMENT] = xI[T, U] with ELEMENT
 
   trait EqualizingStar[S <: ELEMENT] { star: STAR[EqualizingElement[S] with ELEMENT] =>
     val equalizerTarget: STAR[S]
