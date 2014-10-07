@@ -17,10 +17,10 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
     protected[StarsAndQuiversAdapter] val arrow: ARROW[Any, Any]
   }
 
-  trait x[T <: ELEMENT, U <: ELEMENT] extends xI[T, U] with ELEMENT {
-    val left: T
-    val right: U
-  }
+//  trait x[T <: ELEMENT, U <: ELEMENT] extends xI[T, U] with ELEMENT {
+//    val left: T
+//    val right: U
+//  }
 
   type UNIT = WrappedArrow[Unit]
   lazy val I : STAR[UNIT] = star(topos.I).asInstanceOf[AdapterStar[UNIT]]
@@ -30,11 +30,11 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
       quiver(getDot.toI).asInstanceOf[QUIVER[T, UNIT]]
 
     override val identity = AdapterQuiver[T, T](this, this, x => x)
-    override def x[U <: Element](that: STAR[U]): STAR[T x U] =
+    override def x[U <: Element](that: STAR[U]) =
       standardProductStar((
         StrictRef(this.asInstanceOf[STAR[WrappedArrow[Any]]]),
         StrictRef(that.asInstanceOf[STAR[WrappedArrow[Any]]])
-        )).asInstanceOf[ProductStar[T, U]]
+        )).asInstanceOf[STAR[T x U]]
     override def sanityTest = getDot.sanityTest
 
     override def apply[U <: ELEMENT](target: STAR[U])(f: T => U) =
@@ -100,11 +100,11 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
       new WrappedArrow(arrow)
   }
 
-  private class ProductStar[L <: ELEMENT, R <: ELEMENT](
+  private def productStar[L <: ELEMENT, R <: ELEMENT](
     l: STAR[L], r: STAR[R]
-  ) extends STAR[L x R] {
+  ) = new AdapterStar[L x R] {
     override val getDot = (l.getDot x r.getDot).asInstanceOf[DOT[Any]]
-    override def asElement(anArrow: ARROW[Any, Any]) = new x[L, R] { self: x[L, R] =>
+    override def asElement(anArrow: ARROW[Any, Any]) = new xI[L, R] with Element { // self: x[L, R] =>
       override val left: L = l.asElement(
         topos.leftProjection(l.getDot, r.getDot).asInstanceOf[ARROW[Any, Any]](anArrow))
       override val right: R = r.asElement(
@@ -119,8 +119,8 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
 
   private val standardProductStar = new ResultStore[(
     StrictRef[STAR[WrappedArrow[Any]]], StrictRef[STAR[WrappedArrow[Any]]]
-    ),ProductStar[WrappedArrow[Any], WrappedArrow[Any]]](tupled {
-    (x, y) => new ProductStar(x.wrappedValue, y.wrappedValue)
+    ),STAR[WrappedArrow[Any] x WrappedArrow[Any]]](tupled {
+    (x, y) => productStar(x.wrappedValue, y.wrappedValue)
   })
 
   def arrowAsFunction[X, Y, S <: Element, T <: Element](

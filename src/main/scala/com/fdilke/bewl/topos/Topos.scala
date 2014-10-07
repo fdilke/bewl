@@ -5,7 +5,7 @@ trait Topos {
   type STAR[S <: ELEMENT] <: Star[S]
   type QUIVER[S <: ELEMENT, T <: ELEMENT] <: Quiver[S, T]
 
-  type x[T <: ELEMENT, U <: ELEMENT] <: xI[T, U] with ELEMENT // TODO: make this =
+  type x[T <: ELEMENT, U <: ELEMENT] = xI[T, U] with ELEMENT
 
   trait xI[T <: ELEMENT, U <: ELEMENT] {
     val left: T
