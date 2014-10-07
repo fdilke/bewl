@@ -103,14 +103,14 @@ object DiagrammaticFiniteSets extends DiagrammaticTopos {
   }
 
   class FiniteSetsEqualizer[M, T](arrow: FiniteSetsArrow[M, T], arrow2: FiniteSetsArrow[M, T])
-    extends Equalizer[M, T] {
+    extends Equalizer[M] {
     import arrow._
 
-    override val equalizerSource = FiniteSetsDot[EQUALIZER_SOURCE[M, T]](
+    override val equalizerSource = FiniteSetsDot[EQUALIZER_SOURCE[M]](
       source.filter(s => arrow.function(s) == arrow2.function(s))
     )
 
-    override val equalizer = FiniteSetsArrow[EQUALIZER_SOURCE[M, T], M](
+    override val equalizer = FiniteSetsArrow[EQUALIZER_SOURCE[M], M](
       equalizerSource, source, identity
     )
 
@@ -180,7 +180,7 @@ object DiagrammaticFiniteSets extends DiagrammaticTopos {
   type BIPRODUCT[L, R] = FiniteSetsBiproduct[L, R]
   type EXPONENTIAL[S, T] = FiniteSetsExponential[S, T]
   type EQUALIZER[M, T] = FiniteSetsEqualizer[M, T]
-  type EQUALIZER_SOURCE[M, T] = M
+  type EQUALIZER_SOURCE[M] = M
   type TERMINAL = Unit
   type OMEGA = Boolean
 

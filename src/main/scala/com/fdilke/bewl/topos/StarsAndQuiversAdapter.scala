@@ -77,7 +77,7 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
 
         def restrict[R <: ELEMENT](quiver: QUIVER[R, S]): QUIVER[R, EqualizingElement[S] with Element] =
           AdapterQuiver(quiver.source, this, // TODO: just "this"?
-            arrowAsFunction[Any, EQUALIZER_SOURCE[Any, Any], R, EqualizingElement[S] with Element](
+            arrowAsFunction[Any, EQUALIZER_SOURCE[Any], R, EqualizingElement[S] with Element](
               this, equalizer.restrict(quiver.arrow)
             ))
       }

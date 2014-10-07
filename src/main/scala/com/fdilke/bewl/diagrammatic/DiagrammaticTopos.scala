@@ -13,9 +13,9 @@ trait BaseDiagrammaticTopos {
   type ARROW[P, Q] <: Arrow[P, Q]
   type BIPRODUCT[P, Q] <: Biproduct[P, Q]
   type EXPONENTIAL[P, Q] <: Exponential[P, Q]
-  type EQUALIZER[M, T] <: Equalizer[M, T]
+  type EQUALIZER[M, T] <: Equalizer[M]
 
-  type EQUALIZER_SOURCE[M, T]
+  type EQUALIZER_SOURCE[M]
   type TERMINAL
   type OMEGA
 
@@ -115,11 +115,11 @@ trait BaseDiagrammaticTopos {
     def restrict[W](arrow: ARROW[W, Y]): ARROW[W, X]
   }
 
-  trait Equalizer[M, T] {
-    val equalizerSource: DOT[EQUALIZER_SOURCE[M, T]]
-    val equalizer: ARROW[EQUALIZER_SOURCE[M, T], M]
+  trait Equalizer[M] {
+    val equalizerSource: DOT[EQUALIZER_SOURCE[M]]
+    val equalizer: ARROW[EQUALIZER_SOURCE[M], M]
 
-    def restrict[S](equalizingArrow: ARROW[S, M]): ARROW[S, EQUALIZER_SOURCE[M, T]]
+    def restrict[S](equalizingArrow: ARROW[S, M]): ARROW[S, EQUALIZER_SOURCE[M]]
   }
 
   case class IntegerPower[X](_power: Dot[_], _projection: Seq[ARROW[_, _]]) {
