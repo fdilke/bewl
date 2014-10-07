@@ -11,7 +11,6 @@ trait DiagrammaticTopos extends BaseDiagrammaticTopos with Algebra with Algebrai
 trait BaseDiagrammaticTopos {
   type DOT[P] <: Dot[P]
   type ARROW[P, Q] <: Arrow[P, Q]
-  type BIPRODUCT[P, Q] <: Biproduct[P, Q]
 
   type EQUALIZER_SOURCE[M]
   type TERMINAL
@@ -28,12 +27,12 @@ trait BaseDiagrammaticTopos {
 
     def toI: ARROW[X, TERMINAL]
 
-    def multiply[Y](that: DOT[Y]): BIPRODUCT[X, Y]
+    def multiply[Y](that: DOT[Y]): Biproduct[X, Y]
 
     final def *[Y](that: DOT[Y]) =
       standardProducts(
         (StrictRef(this.asInstanceOf[DOT[Any]]),
-         StrictRef(that.asInstanceOf[DOT[Any]]))).asInstanceOf[BIPRODUCT[X, Y]]
+         StrictRef(that.asInstanceOf[DOT[Any]]))).asInstanceOf[Biproduct[X, Y]]
 
     final def x[Y](that: DOT[Y]) = (this * that).product
 
@@ -138,7 +137,7 @@ trait BaseDiagrammaticTopos {
   class Power[X] // just a marker, for now - will have methods as part of the DSL?
 
   private val standardProducts = new ResultStore[(StrictRef[DOT[Any]], StrictRef[DOT[Any]]),
-    BIPRODUCT[Any, Any]](tupled {
+    Biproduct[Any, Any]](tupled {
     (x, y) => x.wrappedValue multiply y.wrappedValue
   })
 

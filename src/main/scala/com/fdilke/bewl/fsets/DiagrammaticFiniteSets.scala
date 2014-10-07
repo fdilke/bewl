@@ -15,7 +15,17 @@ object DiagrammaticFiniteSets extends DiagrammaticTopos {
 
     override def identity: FiniteSetsArrow[X, X] = FiniteSetsArrow(this, this, x => x)
 
-    override def multiply[Y](that: FiniteSetsDot[Y]) = new FiniteSetsBiproduct[X, Y](this, that)
+    override def multiply[Y](that: FiniteSetsDot[Y]) =
+      new Biproduct[X, Y] {
+        override val product = FiniteSetsDot[(X, Y)](for (x <- FiniteSetsDot.this; y <- that) yield (x, y))
+
+        override val leftProjection = FiniteSetsArrow[(X, Y), X](product, FiniteSetsDot.this, tupled { (x, y)  => x} )
+
+        override val rightProjection = FiniteSetsArrow[(X, Y), Y](product, that, tupled { (x, y) => y})
+
+        override def multiply[W](leftArrow: FiniteSetsArrow[W, X], rightArrow: FiniteSetsArrow[W, Y]) =
+          FiniteSetsArrow(leftArrow.source, product, x => (leftArrow.function(x), rightArrow.function(x)) )
+    }
 
     override def exponential[Y](that: FiniteSetsDot[Y]) =
       new Exponential[Y, X] {
@@ -102,18 +112,6 @@ object DiagrammaticFiniteSets extends DiagrammaticTopos {
       }
   }
 
-  class FiniteSetsBiproduct[L, R](left: FiniteSetsDot[L], right: FiniteSetsDot[R]
-                                   ) extends Biproduct[L, R] {
-    override val product = FiniteSetsDot[(L, R)](for (x <- left; y <- right) yield (x, y))
-
-    override val leftProjection = FiniteSetsArrow[(L, R), L](product, left, tupled { (x, y)  => x} )
-
-    override val rightProjection = FiniteSetsArrow[(L, R), R](product, right, tupled { (x, y) => y})
-
-    override def multiply[W](leftArrow: FiniteSetsArrow[W, L], rightArrow: FiniteSetsArrow[W, R]) =
-      FiniteSetsArrow(leftArrow.source, product, x => (leftArrow.function(x), rightArrow.function(x)) )
-  }
-
   object FiniteSetsBiArrow {
     def apply[L, R, T](left: FiniteSetsDot[L],
                        right: FiniteSetsDot[R],
@@ -172,7 +170,6 @@ object DiagrammaticFiniteSets extends DiagrammaticTopos {
 
   type DOT[X] = FiniteSetsDot[X]
   type ARROW[S, T] = FiniteSetsArrow[S, T]
-  type BIPRODUCT[L, R] = FiniteSetsBiproduct[L, R]
   type EQUALIZER_SOURCE[M] = M
   type TERMINAL = Unit
   type OMEGA = Boolean
