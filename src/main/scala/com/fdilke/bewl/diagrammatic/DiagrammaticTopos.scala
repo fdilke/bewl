@@ -12,7 +12,6 @@ trait BaseDiagrammaticTopos {
   type DOT[P] <: Dot[P]
   type ARROW[P, Q] <: Arrow[P, Q]
   type BIPRODUCT[P, Q] <: Biproduct[P, Q]
-  type EXPONENTIAL[P, Q] <: Exponential[P, Q]
 
   type EQUALIZER_SOURCE[M]
   type TERMINAL
@@ -38,11 +37,11 @@ trait BaseDiagrammaticTopos {
 
     final def x[Y](that: DOT[Y]) = (this * that).product
 
-    def exponential[S](that: DOT[S]): EXPONENTIAL[S, X]
+    def exponential[S](that: DOT[S]): Exponential[S, X]
 
     final def A[S](that: DOT[S]) = standardExponentials(
       (StrictRef(this.asInstanceOf[DOT[Any]]),
-       StrictRef(that.asInstanceOf[DOT[Any]]))).asInstanceOf[EXPONENTIAL[S, X]]
+       StrictRef(that.asInstanceOf[DOT[Any]]))).asInstanceOf[Exponential[S, X]]
 
     final def ^[S](that: DOT[S]): DOT[S => X] = (this A that).exponentDot
 
@@ -144,7 +143,7 @@ trait BaseDiagrammaticTopos {
   })
 
   private val standardExponentials = new ResultStore[(StrictRef[DOT[Any]], StrictRef[DOT[Any]]),
-    EXPONENTIAL[Any, Any]](tupled {
+    Exponential[Any, Any]](tupled {
     (x, y) => x.wrappedValue exponential y.wrappedValue
   })
 

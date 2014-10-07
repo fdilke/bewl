@@ -17,7 +17,25 @@ object DiagrammaticFiniteSets extends DiagrammaticTopos {
 
     override def multiply[Y](that: FiniteSetsDot[Y]) = new FiniteSetsBiproduct[X, Y](this, that)
 
-    override def exponential[Y](that: FiniteSetsDot[Y]) = new FiniteSetsExponential[Y, X](that, this)
+    override def exponential[Y](that: FiniteSetsDot[Y]) =
+      new Exponential[Y, X] {
+        // the 'function equality' semantics are needed even if these are all maps, because
+        // we'll be comparing against things that aren't
+        val theAllMaps: Traversable[Y => X] = allMaps(that, FiniteSetsDot.this).
+          map(FunctionWithEquality(that, _))
+        override val exponentDot: FiniteSetsDot[Y => X] = FiniteSetsDot[Y => X](theAllMaps)
+
+        override val evaluation = new BiArrow[Y => X, Y, X](exponentDot, that,
+          FiniteSetsArrow[(Y => X, Y), X](exponentDot x that, FiniteSetsDot.this, tupled {
+            (f:Y => X, y:Y) => f(y)
+          }))
+
+        override def transpose[W](multiArrow: BiArrow[W, Y, X]) =
+          FiniteSetsArrow[W, Y => X](multiArrow.left, exponentDot,
+            (w: W) => FunctionWithEquality[Y, X](multiArrow.right, { s => multiArrow.arrow.function((w, s)) })
+          )
+      }
+
 
     override def toI = FiniteSetsArrow[X, TERMINAL](this, I, const () _)
 
@@ -96,26 +114,6 @@ object DiagrammaticFiniteSets extends DiagrammaticTopos {
       FiniteSetsArrow(leftArrow.source, product, x => (leftArrow.function(x), rightArrow.function(x)) )
   }
 
-  class FiniteSetsExponential[S, T](source: FiniteSetsDot[S], target: FiniteSetsDot[T])
-    extends Exponential[S, T] {
-
-    // the 'function equality' semantics are needed even if these are all maps, because
-    // we'll be comparing against things that aren't
-    val theAllMaps: Traversable[S => T] = allMaps(source, target).
-      map(FunctionWithEquality(source, _))
-    override val exponentDot: FiniteSetsDot[S => T] = FiniteSetsDot[S => T](theAllMaps)
-
-    override val evaluation = new BiArrow[S => T, S, T](exponentDot, source,
-      FiniteSetsArrow[(S => T, S), T](exponentDot x source, target, tupled {
-        (f:S => T, s:S) => f(s)
-      }))
-
-    override def transpose[W](multiArrow: BiArrow[W, S, T]) =
-      FiniteSetsArrow[W, S => T](multiArrow.left, exponentDot,
-        (w: W) => FunctionWithEquality[S, T](multiArrow.right, { s => multiArrow.arrow.function((w, s)) })
-      )
-  }
-
   object FiniteSetsBiArrow {
     def apply[L, R, T](left: FiniteSetsDot[L],
                        right: FiniteSetsDot[R],
@@ -175,7 +173,6 @@ object DiagrammaticFiniteSets extends DiagrammaticTopos {
   type DOT[X] = FiniteSetsDot[X]
   type ARROW[S, T] = FiniteSetsArrow[S, T]
   type BIPRODUCT[L, R] = FiniteSetsBiproduct[L, R]
-  type EXPONENTIAL[S, T] = FiniteSetsExponential[S, T]
   type EQUALIZER_SOURCE[M] = M
   type TERMINAL = Unit
   type OMEGA = Boolean
