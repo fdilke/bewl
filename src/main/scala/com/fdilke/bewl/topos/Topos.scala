@@ -5,9 +5,7 @@ trait Topos {
   type STAR[S <: ELEMENT] <: Star[S]
   type QUIVER[S <: ELEMENT, T <: ELEMENT] <: Quiver[S, T]
 
-  type x[T <: ELEMENT, U <: ELEMENT] <: xI[T, U] with ELEMENT
-
-  type EQUALIZING_STAR[S <: ELEMENT, T <: ELEMENT] <: EqualizingStarI[S, T] // TODO: need T here?
+  type x[T <: ELEMENT, U <: ELEMENT] <: xI[T, U] with ELEMENT // TODO: make this =
 
   trait xI[T <: ELEMENT, U <: ELEMENT] {
     val left: T
@@ -41,7 +39,7 @@ trait Topos {
     val source: STAR[S]
     val target: STAR[T]
 
-    def ?=(that: QUIVER[S, T]): EQUALIZING_STAR[S, T]
+    def ?=(that: QUIVER[S, T]): EqualizingStarI[S, T] with STAR[EqualizingElementI[S, T] with ELEMENT]
     def o[R <: ELEMENT](that: QUIVER[R, S]) : QUIVER[R, T]
     def x[U <: ELEMENT](that: QUIVER[S, U]): QUIVER[S, T x U]
     def sanityTest
