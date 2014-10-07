@@ -62,22 +62,22 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
     }
 
     def ?=(that: QUIVER[S, T]) =
-      new AdapterStar[EqualizingElementI[S, T] with Element] with EqualizingStarI[S, T] {
+      new AdapterStar[EqualizingElementI[S] with Element] with EqualizingStarI[S] {
         private val equalizer = arrow ?= that.arrow
         override val equalizerTarget = AdapterQuiver.this.source
 
         override protected[StarsAndQuiversAdapter] val getDot = equalizer.equalizerSource.asInstanceOf[DOT[Any]]
 
-        override def asElement(anArrow: ARROW[Any, Any]): EqualizingElementI[S, T] with Element =
-        new EqualizingElementI[S, T] with Element {
+        override def asElement(anArrow: ARROW[Any, Any]): EqualizingElementI[S] with Element =
+        new EqualizingElementI[S] with Element {
           override val include: S =
             equalizerTarget.asElement(equalizer.equalizer.asInstanceOf[ARROW[Any, Any]](anArrow))
           override protected[StarsAndQuiversAdapter] val arrow = anArrow
         }
 
-        def restrict[R <: ELEMENT](quiver: QUIVER[R, S]): QUIVER[R, EqualizingElementI[S, T] with Element] =
+        def restrict[R <: ELEMENT](quiver: QUIVER[R, S]): QUIVER[R, EqualizingElementI[S] with Element] =
           AdapterQuiver(quiver.source, this, // TODO: just "this"?
-            arrowAsFunction[Any, EQUALIZER_SOURCE[Any, Any], R, EqualizingElementI[S, T] with Element](
+            arrowAsFunction[Any, EQUALIZER_SOURCE[Any, Any], R, EqualizingElementI[S] with Element](
               this, equalizer.restrict(quiver.arrow)
             ))
       }

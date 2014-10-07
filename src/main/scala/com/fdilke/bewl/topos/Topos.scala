@@ -12,14 +12,14 @@ trait Topos {
     val right: U
   }
 
-  trait EqualizingStarI[S <: ELEMENT, T <: ELEMENT] { star: STAR[EqualizingElementI[S, T] with ELEMENT] =>
+  trait EqualizingStarI[S <: ELEMENT] { star: STAR[EqualizingElementI[S] with ELEMENT] =>
     val equalizerTarget: STAR[S]
-    final val inclusion: QUIVER[EqualizingElementI[S, T] with ELEMENT, S] = this(equalizerTarget) { _.include }
-    def restrict[R <: ELEMENT](quiver: QUIVER[R, S]): QUIVER[R, EqualizingElementI[S, T] with ELEMENT]
+    final val inclusion: QUIVER[EqualizingElementI[S] with ELEMENT, S] = this(equalizerTarget) { _.include }
+    def restrict[R <: ELEMENT](quiver: QUIVER[R, S]): QUIVER[R, EqualizingElementI[S] with ELEMENT]
   }
 
   // TODO: rename
-  trait EqualizingElementI[S <: ELEMENT, T <: ELEMENT] { element: ELEMENT =>
+  trait EqualizingElementI[S <: ELEMENT] { element: ELEMENT =>
     val include: S
   }
 
@@ -39,7 +39,7 @@ trait Topos {
     val source: STAR[S]
     val target: STAR[T]
 
-    def ?=(that: QUIVER[S, T]): EqualizingStarI[S, T] with STAR[EqualizingElementI[S, T] with ELEMENT]
+    def ?=(that: QUIVER[S, T]): EqualizingStarI[S] with STAR[EqualizingElementI[S] with ELEMENT]
     def o[R <: ELEMENT](that: QUIVER[R, S]) : QUIVER[R, T]
     def x[U <: ELEMENT](that: QUIVER[S, U]): QUIVER[S, T x U]
     def sanityTest
