@@ -15,7 +15,14 @@ class FiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
   def makeStar[T](elements: T*) = star(DiagrammaticFiniteSets.FiniteSetsDot(elements))
 
   def makeQuiver[S, T](source: STAR[WrappedArrow[S]], target: STAR[WrappedArrow[T]], map: (S, T)*) =
-    cleverQuiver(source, target, Map(map :_*))
+    functionAsQuiver(source, target, Map(map: _*))
+
+  def makeBiQuiver[L, R, T](
+    left: STAR[WrappedArrow[L]],
+    right: STAR[WrappedArrow[R]],
+    target: STAR[WrappedArrow[T]],
+    mappings: ((L, R), T)*) =
+    bifunctionAsBiQuiver(left, right, target, (l: L, r: R) => Map(mappings:_*)((l, r)))
 
   override val foo = makeStar(true, false)
   override val bar = makeStar("X", "Y")
@@ -23,9 +30,9 @@ class FiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
   override val baz = makeStar(1, 2, 3)
   override val foo2ImageOfBar = makeQuiver(foo, baz, true -> 3, false -> 2)
 
-  //  override val foobar2baz = FiniteSetsBiArrow[FOO, BAR, BAZ](
-  //    foo, bar, baz, (true, "X") -> 2, (false, "X") -> 3, (true, "Y") -> 1, (false, "Y") -> 2
-  //  )
+  override val foobar2baz = makeBiQuiver(
+    foo, bar, baz, (true, "X") -> 2, (false, "X") -> 3, (true, "Y") -> 1, (false, "Y") -> 2
+  )
 
   override val monicBar2baz = makeQuiver(
     bar, baz, "X" -> 2, "Y" -> 3

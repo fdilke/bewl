@@ -134,14 +134,14 @@ abstract class GenericDiagrammaticToposTests[TOPOS <: DiagrammaticTopos](
       ev.arrow.target shouldBe baz
       ev.arrow.sanityTest
 
-      val tran: ARROW[FOO, BAR => BAZ] = transpose(bar, baz, foobar2baz)
-      tran.sanityTest
-      tran should have('source(foo), 'target(ev.left))
+      val foo2bar2baz: ARROW[FOO, BAR => BAZ] = transpose(bar, baz, foobar2baz)
+      foo2bar2baz.sanityTest
+      foo2bar2baz should have('source(foo), 'target(ev.left))
 
       // Next, construct the arrow: transpose x 1 : foo x baz -> bar^baz x baz
       // as the product of foo x baz -> foo -> bar^baz and foo x baz -> baz -> baz
       foobar2baz.arrow shouldBe ev.arrow(
-        tran(leftProjection(foo, bar)) x rightProjection(foo, bar))
+        foo2bar2baz(leftProjection(foo, bar)) x rightProjection(foo, bar))
     }
 
     it("has standardized exponentials") {

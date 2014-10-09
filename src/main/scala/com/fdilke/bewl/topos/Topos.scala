@@ -17,12 +17,19 @@ trait Topos {
   type >[T <: ELEMENT, U <: ELEMENT] = ~>[T, U] with ELEMENT
 
   trait ExponentialStar[S <: ELEMENT, T <: ELEMENT] { star: STAR[S > T] =>
-    def transpose[R <: ELEMENT](quiver: QUIVER[R x S, T]): QUIVER[R, S > T]
+    val source: STAR[S]
+    val target: STAR[T]
+    def transpose[R <: ELEMENT](quiver: BiQuiver[R, S, T]): QUIVER[R, S > T]
+    final def evaluation: BiQuiver[S > T, S, T] = biQuiver(
+      this, source, target,
+      { (f, s) => f(s) }
+    )
   }
 
   trait EqualizingStar[S <: ELEMENT] { star: STAR[EqualizingElement[S] with ELEMENT] =>
     val equalizerTarget: STAR[S]
-    final val inclusion: QUIVER[EqualizingElement[S] with ELEMENT, S] = this(equalizerTarget) { _.include }
+    final val inclusion: QUIVER[EqualizingElement[S] with ELEMENT, S] =
+      this(equalizerTarget) { _.include }
     def restrict[R <: ELEMENT](quiver: QUIVER[R, S]): QUIVER[R, EqualizingElement[S] with ELEMENT]
   }
 
@@ -51,6 +58,34 @@ trait Topos {
     def o[R <: ELEMENT](that: QUIVER[R, S]) : QUIVER[R, T]
     def x[U <: ELEMENT](that: QUIVER[S, U]): QUIVER[S, T x U]
     def sanityTest
+  }
+
+  def biQuiver[
+  L <: ELEMENT,
+  R <: ELEMENT,
+  T <: ELEMENT
+  ](
+   left: STAR[L],
+   right: STAR[R],
+   target: STAR[T],
+   f: (L, R) => T
+   ) =
+  BiQuiver(left, right,
+    (left x right)(target) { pair =>
+      f(pair.left, pair.right)
+    })
+
+  case class BiQuiver[
+    L <: ELEMENT,
+    R <: ELEMENT,
+    T <: ELEMENT](
+    left: STAR[L],
+    right: STAR[R],
+    quiver: QUIVER[L x R, T]) {
+    def apply[S <: ELEMENT](
+      leftQuiver: QUIVER[S, L],
+      rightQuiver: QUIVER[S, R]): QUIVER[S, T] =
+      quiver o (leftQuiver x rightQuiver)
   }
 
   // TODO extras - separate into a trait?
@@ -88,7 +123,11 @@ trait Wrappings[
 
   def star[T](input: DOTINPUT[T]) : STAR[DOTWRAPPER[T]]
   def quiver[S, T](connector: CONNECTOR[S, T]) : QUIVER[DOTWRAPPER[S], DOTWRAPPER[T]]
-
-  // TODO: get rid of this abomination by introducing a map operation on DOTWRAPPER?
-  def cleverQuiver[S, T](source: STAR[DOTWRAPPER[S]], target: STAR[DOTWRAPPER[T]], f: S => T): QUIVER[DOTWRAPPER[S], DOTWRAPPER[T]]
+  def functionAsQuiver[S, T](source: STAR[DOTWRAPPER[S]], target: STAR[DOTWRAPPER[T]], f: S => T): QUIVER[DOTWRAPPER[S], DOTWRAPPER[T]]
+  def bifunctionAsBiQuiver[L, R, T] (
+      left: STAR[DOTWRAPPER[L]],
+      right: STAR[DOTWRAPPER[R]],
+      target: STAR[DOTWRAPPER[T]],
+      bifunc: (L, R) => T
+   ): BiQuiver[DOTWRAPPER[L], DOTWRAPPER[R], DOTWRAPPER[T]]
 }
