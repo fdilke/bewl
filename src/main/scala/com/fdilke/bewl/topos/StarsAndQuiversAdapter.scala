@@ -30,6 +30,12 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
         StrictRef(this.asInstanceOf[STAR[WrappedArrow[Any]]]),
         StrictRef(that.asInstanceOf[STAR[WrappedArrow[Any]]])
         )).asInstanceOf[STAR[T x U]]
+    override def >[U <: ELEMENT](that: STAR[U]) =
+      standardExponentialStar((
+        StrictRef(this.asInstanceOf[STAR[WrappedArrow[Any]]]),
+        StrictRef(that.asInstanceOf[STAR[WrappedArrow[Any]]])
+        )).asInstanceOf[STAR[T > U]]
+
     override def sanityTest = getDot.sanityTest
 
     override def apply[U <: ELEMENT](target: STAR[U])(f: T => U) =
@@ -108,6 +114,22 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
     }
   }
 
+  private def exponentialStar[S <: ELEMENT, T <: ELEMENT](
+    source: STAR[S], target: STAR[T]
+  ) = new AdapterStar[S > T] {
+    override val getDot = (target.getDot ^ source.getDot).asInstanceOf[DOT[Any]]
+    override def asElement(anArrow: ARROW[Any, Any]) = new ~>[S, T] with Element {
+      override def apply(s: S): T =
+        target.asElement(
+          topos.evaluation(source.getDot, target.getDot)(
+            anArrow.asInstanceOf[ARROW[Any, Any => Any]],
+            s.arrow
+        ))
+
+      override val arrow: ARROW[Any, Any] = anArrow
+    }
+  }
+
   private val standardWrappedDot = new ResultStore[StrictRef[DOT[Any]], Star[WrappedArrow[Any]]] (
     x => new WrappedDot(x.wrappedValue)
   )
@@ -116,6 +138,12 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
     StrictRef[STAR[WrappedArrow[Any]]], StrictRef[STAR[WrappedArrow[Any]]]
     ),STAR[WrappedArrow[Any] x WrappedArrow[Any]]](tupled {
     (x, y) => productStar(x.wrappedValue, y.wrappedValue)
+  })
+
+  private val standardExponentialStar = new ResultStore[(
+    StrictRef[STAR[WrappedArrow[Any]]], StrictRef[STAR[WrappedArrow[Any]]]
+    ),STAR[WrappedArrow[Any] > WrappedArrow[Any]]](tupled {
+    (x, y) => exponentialStar(x.wrappedValue, y.wrappedValue)
   })
 
   def arrowAsFunction[X, Y, S <: Element, T <: Element](

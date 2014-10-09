@@ -147,6 +147,26 @@ abstract class GenericToposTests[TOPOS <: Topos](
       rightProjection(bar, foo, baz) o productArrow shouldBe foo2baz
     }
 
+/*
+    it("can construct exponential diagrams") {
+      // Check evaluation maps baz^bar x bar -> baz
+      val ev = evaluation(bar, baz)
+      ev.left shouldBe baz ^ bar
+      ev.right shouldBe bar
+      ev.arrow.target shouldBe baz
+      ev.arrow.sanityTest
+
+      val tran: ARROW[FOO, BAR => BAZ] = transpose(bar, baz, foobar2baz)
+      tran.sanityTest
+      tran should have('source(foo), 'target(ev.left))
+
+      // Next, construct the arrow: transpose x 1 : foo x baz -> bar^baz x baz
+      // as the product of foo x baz -> foo -> bar^baz and foo x baz -> baz -> baz
+      foobar2baz.arrow shouldBe ev.arrow(
+        tran(leftProjection(foo, bar)) x rightProjection(foo, bar))
+    }
+*/
+
     it("has equalizers") {
       import equalizerSituation._
       val equalizer = s ?= t

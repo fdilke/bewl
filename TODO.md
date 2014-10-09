@@ -54,6 +54,10 @@ Aim for: it'll be *inherent* that if A is an X-algebra, A^B is automatically one
 
 use scala.Dynamic
 http://stackoverflow.com/questions/15799811/how-does-type-dynamic-work-and-how-to-use-it/15799812#15799812        
+
+# can tidy up syntax for using ResultStore? 
+
+e.g. standardProductStar - monstrous code.        
         
 # The Strong Binding Manifesto
 
