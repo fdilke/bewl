@@ -50,6 +50,7 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
     target: STAR[T],
     function: S => T
     ) extends Quiver[S, T]  {
+    override def apply(s: S) = function(s)
 
     override def o[R <: ELEMENT](that: QUIVER[R, S]) =
       AdapterQuiver(that.source, target, function compose that.function)
@@ -120,8 +121,6 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
   private def exponentialStar[S <: ELEMENT, T <: ELEMENT](
     _source : STAR[S], _target : STAR[T]
    ) = new AdapterStar[S > T] with ExponentialStar[S, T] {
-    println(s"source = ${_source}, target = ${_target}")
-    println(s"dots are: = ${_source.getDot}, target = ${_target.getDot}")
     override val source = _source
     override val target = _target
 
@@ -194,32 +193,22 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
     ).asInstanceOf[BASE#ARROW[DOTWRAPPER[S], DOTWRAPPER[T]]]
   ).asInstanceOf[QUIVER[DOTWRAPPER[S], DOTWRAPPER[T]]]
 
-
-  private def productIsomorphism[L, R](left: STAR[DOTWRAPPER[L]], right: STAR[DOTWRAPPER[R]]) :
-    QUIVER[DOTWRAPPER[L] x DOTWRAPPER[R], DOTWRAPPER[(L, R)]] = {
-    val targetProduct = star[(L, R)](  // TODO: eliminate duplication: calculating this twice!
-      left.getDot.asInstanceOf[DOT[L]] x
-      right.getDot.asInstanceOf[DOT[R]]
-    )
-    val sourceProduct = left x right
-    val arrow: ARROW[Any, Any] = sourceProduct.getDot.identity // ???!?
-    AdapterQuiver(sourceProduct, targetProduct,
-      arrowAsFunction[Any, Any, DOTWRAPPER[L] x DOTWRAPPER[R], DOTWRAPPER[(L, R)]](targetProduct, arrow)
-    )
-  }
-
   override def bifunctionAsBiQuiver[L, R, T] (
     left: STAR[DOTWRAPPER[L]],
     right: STAR[DOTWRAPPER[R]],
     target: STAR[DOTWRAPPER[T]],
     bifunc: (L, R) => T
   ) = {
-    val product = star[(L, R)](
+    val targetProduct = star[(L, R)](
       left.getDot.asInstanceOf[DOT[L]] x
       right.getDot.asInstanceOf[DOT[R]]
     )
-    BiQuiver(left, right,  functionAsQuiver[(L, R), T](product, target, {
+
+    BiQuiver(left, right,  functionAsQuiver[(L, R), T](targetProduct, target, {
       (pair: (L, R)) => bifunc(pair._1, pair._2)
-    }) o productIsomorphism[L, R](left, right))
+    }) o AdapterQuiver(left x right, targetProduct,
+      arrowAsFunction[Any, Any, DOTWRAPPER[L] x DOTWRAPPER[R], DOTWRAPPER[(L, R)]](
+        targetProduct, targetProduct.getDot.identity)
+    ))
   }
 }

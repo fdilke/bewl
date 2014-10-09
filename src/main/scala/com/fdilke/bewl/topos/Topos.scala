@@ -10,6 +10,9 @@ trait Topos {
     val right: U
   }
   type x[T <: ELEMENT, U <: ELEMENT] = xI[T, U] with ELEMENT
+  object x {
+    def unapply[L <: ELEMENT, R <: ELEMENT](pair: xI[L, R]): Option[(L, R)] = Some((pair.left, pair.right))
+  }
 
   trait ~>[T <: ELEMENT, U <: ELEMENT] { self: ELEMENT =>
     def apply(t: T): U
@@ -54,6 +57,7 @@ trait Topos {
     val source: STAR[S]
     val target: STAR[T]
 
+    def apply(s: S): T
     def ?=(that: QUIVER[S, T]): EqualizingStar[S] with STAR[EqualizingElement[S] with ELEMENT]
     def o[R <: ELEMENT](that: QUIVER[R, S]) : QUIVER[R, T]
     def x[U <: ELEMENT](that: QUIVER[S, U]): QUIVER[S, T x U]
@@ -71,8 +75,9 @@ trait Topos {
    f: (L, R) => T
    ) =
   BiQuiver(left, right,
-    (left x right)(target) { pair =>
-      f(pair.left, pair.right)
+    (left x right)(target) {
+      case l x r =>
+      f(l, r)
     })
 
   case class BiQuiver[

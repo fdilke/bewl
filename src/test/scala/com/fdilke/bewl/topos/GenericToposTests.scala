@@ -102,25 +102,30 @@ abstract class GenericToposTests[TOPOS <: Topos](
     }
 
     it("has identity arrows which can be composed") {
+      foo(foo)(identity) shouldBe foo.identity
       foo2bar o foo.identity shouldBe foo2bar
       bar.identity o foo2bar shouldBe foo2bar
     }
 
     it("can construct biproduct diagrams") {
-      val barXbaz = bar x baz
+      val productQuiver = foo2bar x foo2baz
 
-      val productArrow = foo2bar x foo2baz
-
-      productArrow.source shouldBe foo
-      productArrow.target shouldBe barXbaz
-
-      productArrow.sanityTest
+      productQuiver should have (
+        'source (foo),
+        'target (bar x baz),
+        'sanityTest (null)
+      )
 
       leftProjection(bar, baz).sanityTest
       rightProjection(bar, baz).sanityTest
 
-      leftProjection(bar, baz) o productArrow shouldBe foo2bar
-      rightProjection(bar, baz) o productArrow shouldBe foo2baz
+      foo(bar) {
+        x => productQuiver(x).left
+      } shouldBe foo2bar
+
+      foo(baz) {
+        x => productQuiver(x).right
+      } shouldBe foo2baz
     }
 
     it("has a terminator") {
@@ -139,14 +144,14 @@ abstract class GenericToposTests[TOPOS <: Topos](
 
     it("can chain products") {
       val barXfooXbaz = bar x foo x baz
-      val productArrow = foo2bar x foo.identity x foo2baz
-      productArrow.source shouldBe foo
-      productArrow.target shouldBe barXfooXbaz
-      productArrow.sanityTest
+      val productQuiver = foo2bar x foo.identity x foo2baz
+      productQuiver.source shouldBe foo
+      productQuiver.target shouldBe barXfooXbaz
+      productQuiver.sanityTest
 
-      leftProjection(bar, foo, baz) o productArrow shouldBe foo2bar
-      midProjection(bar, foo, baz) o productArrow shouldBe foo.identity
-      rightProjection(bar, foo, baz) o productArrow shouldBe foo2baz
+      leftProjection(bar, foo, baz) o productQuiver shouldBe foo2bar
+      midProjection(bar, foo, baz) o productQuiver shouldBe foo.identity
+      rightProjection(bar, foo, baz) o productQuiver shouldBe foo2baz
     }
 
     it("can construct exponential diagrams") {
@@ -164,13 +169,10 @@ abstract class GenericToposTests[TOPOS <: Topos](
         'target(bar > baz)
       )
 
-      // Next, construct the arrow: transpose x 1 : foo x baz -> bar^baz x baz
-      // as the product of foo x baz -> foo -> bar^baz and foo x baz -> baz -> baz
-
-      foobar2baz.quiver shouldBe (evaluation.quiver o
-        ((foo2bar2baz o leftProjection(foo, bar)) x rightProjection(foo, bar)))
-      // TODO: the DSL should let us construct this quiver more easily
-      // TODO: why is there not a notation for quiver(element)? Wouldn't it be useful?
+      (foo x bar)(baz) {
+        case f x b =>
+          foo2bar2baz(f)(b)
+      } shouldBe foobar2baz.quiver
     }
 
     it("has standardized exponentials") {
