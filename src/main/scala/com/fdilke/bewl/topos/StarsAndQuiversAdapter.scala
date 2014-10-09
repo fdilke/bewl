@@ -34,7 +34,7 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
       standardExponentialStar((
         StrictRef(this.asInstanceOf[STAR[WrappedArrow[Any]]]),
         StrictRef(that.asInstanceOf[STAR[WrappedArrow[Any]]])
-        )).asInstanceOf[STAR[T > U]]
+        )).asInstanceOf[ExponentialStar[T, U] with STAR[T > U]]
 
     override def sanityTest = getDot.sanityTest
 
@@ -116,8 +116,10 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
 
   private def exponentialStar[S <: ELEMENT, T <: ELEMENT](
     source: STAR[S], target: STAR[T]
-  ) = new AdapterStar[S > T] {
+  ) = new AdapterStar[S > T] with ExponentialStar[S, T] {
     override val getDot = (target.getDot ^ source.getDot).asInstanceOf[DOT[Any]]
+    override def transpose[R <: ELEMENT](quiver: QUIVER[R x S, T]): QUIVER[R, S > T] = ???
+
     override def asElement(anArrow: ARROW[Any, Any]) = new ~>[S, T] with Element {
       override def apply(s: S): T =
         target.asElement(

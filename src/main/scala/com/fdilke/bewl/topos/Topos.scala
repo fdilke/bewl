@@ -16,6 +16,10 @@ trait Topos {
   }
   type >[T <: ELEMENT, U <: ELEMENT] = ~>[T, U] with ELEMENT
 
+  trait ExponentialStar[S <: ELEMENT, T <: ELEMENT] { star: STAR[S > T] =>
+    def transpose[R <: ELEMENT](quiver: QUIVER[R x S, T]): QUIVER[R, S > T]
+  }
+
   trait EqualizingStar[S <: ELEMENT] { star: STAR[EqualizingElement[S] with ELEMENT] =>
     val equalizerTarget: STAR[S]
     final val inclusion: QUIVER[EqualizingElement[S] with ELEMENT, S] = this(equalizerTarget) { _.include }
@@ -33,7 +37,7 @@ trait Topos {
     val identity: QUIVER[S, S]
     val toI: QUIVER[S, UNIT]
     def x[T <: ELEMENT](that: STAR[T]): STAR[S x T]
-    def >[T <: ELEMENT](that: STAR[T]): STAR[S > T]
+    def >[T <: ELEMENT](that: STAR[T]): ExponentialStar[S, T] with STAR[S > T]
     def sanityTest
 
     def apply[T <: ELEMENT](target: STAR[T])(f: S => T) : QUIVER[S, T]
