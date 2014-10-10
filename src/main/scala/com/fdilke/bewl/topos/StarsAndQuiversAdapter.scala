@@ -41,11 +41,11 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
       AdapterQuiver[T, U](this, target, f)
 
     protected[StarsAndQuiversAdapter] val dot: DOT[Any]
-    private[StarsAndQuiversAdapter] def apply[X, Y, U <: Element] (
+    private[StarsAndQuiversAdapter] def apply[U <: Element] (
       target: STAR[U],
-      arrow: ARROW[X, Y]
+      arrow: ARROW[_, _]
       ): QUIVER[T, U] = this(target)(
-      t => target.asElement(arrow.asInstanceOf[ARROW[Any, Any]](t.arrow)) // TODO: lose cast?
+      t => target.asElement(arrow.asInstanceOf[ARROW[Any, Any]](t.arrow))
     )
 
     def asElement(arrow: ARROW[_, _]) : T
@@ -72,11 +72,11 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
         override protected[StarsAndQuiversAdapter] val dot = equalizer.equalizerSource.asInstanceOf[DOT[Any]]
 
         override def asElement(anArrow: ARROW[_, _]): EqualizingElement[S] with Element =
-        new EqualizingElement[S] with Element {
-          override protected[StarsAndQuiversAdapter] val arrow = anArrow.asInstanceOf[ARROW[Any, Any]]
-          override val include =
-            equalizerTarget.asElement(equalizer.equalizer.asInstanceOf[ARROW[Any, Any]](arrow))
-        }
+          new EqualizingElement[S] with Element {
+            override protected[StarsAndQuiversAdapter] val arrow = anArrow.asInstanceOf[ARROW[Any, Any]]
+            override val include =
+              equalizerTarget.asElement(equalizer.equalizer.asInstanceOf[ARROW[Any, Any]](arrow))
+          }
 
         override def restrict[R <: ELEMENT](quiver: QUIVER[R, S]) =
           quiver.source(this, equalizer.restrict(quiver.arrow))
