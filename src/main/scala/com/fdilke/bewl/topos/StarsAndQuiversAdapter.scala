@@ -22,7 +22,7 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
 
   trait AdapterStar[T <: Element] extends Star[T] {
     override lazy val toI: QUIVER[T, UNIT] =
-      quiver(getDot.toI).asInstanceOf[QUIVER[T, UNIT]]
+      quiver(dot.toI).asInstanceOf[QUIVER[T, UNIT]]
 
     override def x[U <: Element](that: STAR[U]) =
       standardProductStar((
@@ -35,12 +35,12 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
         StrictRef(that.asInstanceOf[STAR[WrappedArrow[Any]]])
         )).asInstanceOf[ExponentialStar[T, U] with STAR[T > U]]
 
-    override def sanityTest = getDot.sanityTest
+    override def sanityTest = dot.sanityTest
 
     override def apply[U <: ELEMENT](target: STAR[U])(f: T => U) =
       AdapterQuiver[T, U](this, target, f)
 
-    protected[StarsAndQuiversAdapter] val getDot: DOT[Any]
+    protected[StarsAndQuiversAdapter] val dot: DOT[Any]
     private[StarsAndQuiversAdapter] def apply[X, Y, U <: Element] (
       target: STAR[U],
       arrow: ARROW[X, Y]
@@ -69,7 +69,7 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
         private val equalizer = arrow ?= that.arrow
         override val equalizerTarget = AdapterQuiver.this.source
 
-        override protected[StarsAndQuiversAdapter] val getDot = equalizer.equalizerSource.asInstanceOf[DOT[Any]]
+        override protected[StarsAndQuiversAdapter] val dot = equalizer.equalizerSource.asInstanceOf[DOT[Any]]
 
         override def asElement(anArrow: ARROW[Any, Any]): EqualizingElement[S] with Element =
         new EqualizingElement[S] with Element {
@@ -88,7 +88,7 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
     }
     override def sanityTest = arrow.sanityTest
     private[StarsAndQuiversAdapter] lazy val arrow: ARROW[Any, Any] =
-      function(source.asElement(source.getDot.identity)).arrow
+      function(source.asElement(source.dot.identity)).arrow
   }
 
   class WrappedArrow[X](protected[StarsAndQuiversAdapter] val arrow: ARROW[Any, Any]) extends ELEMENT {
@@ -96,7 +96,7 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
   }
 
   private class WrappedDot[X](innerDot: DOT[X]) extends STAR[WrappedArrow[X]] {
-    override val getDot: DOT[Any] = innerDot.asInstanceOf[DOT[Any]]  // TODO rename to dot
+    override val dot: DOT[Any] = innerDot.asInstanceOf[DOT[Any]]
     override def asElement(arrow: ARROW[Any, Any]) =
       new WrappedArrow(arrow)
   }
@@ -104,12 +104,12 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
   private def productStar[L <: ELEMENT, R <: ELEMENT](
     l: STAR[L], r: STAR[R]
   ) = new AdapterStar[L x R] {
-    override val getDot = (l.getDot x r.getDot).asInstanceOf[DOT[Any]]
+    override val dot = (l.dot x r.dot).asInstanceOf[DOT[Any]]
     override def asElement(anArrow: ARROW[Any, Any]) = new xI[L, R] with Element {
       override val left: L = l.asElement(
-        topos.leftProjection(l.getDot, r.getDot).asInstanceOf[ARROW[Any, Any]](anArrow))
+        topos.leftProjection(l.dot, r.dot).asInstanceOf[ARROW[Any, Any]](anArrow))
       override val right: R = r.asElement(
-        topos.rightProjection(l.getDot, r.getDot).asInstanceOf[ARROW[Any, Any]](anArrow))
+        topos.rightProjection(l.dot, r.dot).asInstanceOf[ARROW[Any, Any]](anArrow))
       override val arrow: ARROW[Any, Any] = anArrow
     }
   }
@@ -120,17 +120,17 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
     override val source = _source
     override val target = _target
 
-    private val exponential = target.getDot A source.getDot
-    override val getDot = exponential.exponentDot.asInstanceOf[DOT[Any]]
+    private val exponential = target.dot A source.dot
+    override val dot = exponential.exponentDot.asInstanceOf[DOT[Any]]
     override def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, S, T]) =
       biQuiver.left(this, exponential.transpose(
-        topos.BiArrow(biQuiver.left.getDot, biQuiver.right.getDot, biQuiver.quiver.arrow.asInstanceOf[ARROW[(Any, Any), Any]])
+        topos.BiArrow(biQuiver.left.dot, biQuiver.right.dot, biQuiver.quiver.arrow.asInstanceOf[ARROW[(Any, Any), Any]])
       ))
 
     override def asElement(anArrow: ARROW[Any, Any]) = new ~>[S, T] with Element {
       override def apply(s: S): T =
         target.asElement(
-          topos.evaluation(source.getDot, target.getDot)(
+          topos.evaluation(source.dot, target.dot)(
             anArrow.asInstanceOf[ARROW[Any, Any => Any]],
             s.arrow
         ))
@@ -169,8 +169,8 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
 
   override def functionAsQuiver[S, T](source: STAR[WrappedArrow[S]], target: STAR[WrappedArrow[T]], f: S => T) =
     quiver(buildArrow[S, T](
-      source.getDot.asInstanceOf[DOT[S]],
-      target.getDot.asInstanceOf[DOT[T]],
+      source.dot.asInstanceOf[DOT[S]],
+      target.dot.asInstanceOf[DOT[T]],
       f
     ).asInstanceOf[BASE#ARROW[DOTWRAPPER[S], DOTWRAPPER[T]]]
   ).asInstanceOf[QUIVER[DOTWRAPPER[S], DOTWRAPPER[T]]]
@@ -182,14 +182,14 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
     bifunc: (L, R) => T
   ) = {
     val targetProduct = star[(L, R)](
-      left.getDot.asInstanceOf[DOT[L]] x
-      right.getDot.asInstanceOf[DOT[R]]
+      left.dot.asInstanceOf[DOT[L]] x
+      right.dot.asInstanceOf[DOT[R]]
     )
 
     BiQuiver(left, right,  functionAsQuiver[(L, R), T](targetProduct, target, {
       case (l, r) => bifunc(l, r)
     }) o
-      (left x right)(targetProduct, targetProduct.getDot.identity)
+      (left x right)(targetProduct, targetProduct.dot.identity)
     )
   }
 }
