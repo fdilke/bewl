@@ -52,15 +52,13 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
     override def apply(s: S) = function(s)
 
     override def o[R <: ELEMENT](that: QUIVER[R, S]) =
-      AdapterQuiver(that.source, target, function compose that.function)
+      that.source(target)(function compose that.function)
 
     override def x[U <: ELEMENT](that: QUIVER[S, U]) = {
       val product = target x that.target
-      AdapterQuiver[S, T x U](
-        source,
-        product,
-        arrowAsFunction(product, arrow x that.arrow))
-    }
+      source(product)(
+        arrowAsFunction(product, arrow x that.arrow)
+      )}
 
     def ?=(that: QUIVER[S, T]) =
       new AdapterStar[EqualizingElement[S] with Element] with EqualizingStar[S] {
@@ -77,7 +75,7 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
         }
 
         def restrict[R <: ELEMENT](quiver: QUIVER[R, S]): QUIVER[R, EqualizingElement[S] with Element] =
-          AdapterQuiver(quiver.source, this, // TODO: just "this"?
+          quiver.source(this)(
             arrowAsFunction[Any, EQUALIZER_SOURCE[Any], R, EqualizingElement[S] with Element](
               this, equalizer.restrict(quiver.arrow)
             ))
@@ -94,7 +92,6 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
   }
 
   class WrappedArrow[X](protected[StarsAndQuiversAdapter] val arrow: ARROW[Any, Any]) extends ELEMENT {
-    // TODO: shouldn't need this!
     override def toString: String = s"WrappedArrow($arrow)"
   }
 
@@ -128,7 +125,7 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
     override def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, S, T]): QUIVER[R, S > T] = {
       val biArrow = topos.BiArrow(biQuiver.left.getDot, biQuiver.right.getDot, biQuiver.quiver.arrow.asInstanceOf[ARROW[(Any, Any), Any]])
       val tran = exponential.transpose(biArrow)
-      AdapterQuiver(biQuiver.left, this,
+      biQuiver.left(this)(
         arrowAsFunction[Any, Any => Any, R, S > T](this, tran)
       )
     }
@@ -177,9 +174,8 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
     ).asInstanceOf[STAR[WrappedArrow[S]]]
 
   override def quiver[S, T](arrow: BASE#ARROW[S, T]) : QUIVER[DOTWRAPPER[S], DOTWRAPPER[T]] = {
-    val source = star(arrow.source)
     val target = star(arrow.target)
-    AdapterQuiver(source, target,
+    star(arrow.source)(target) (
       arrowAsFunction[S, T, WrappedArrow[S], WrappedArrow[T]](target, arrow.asInstanceOf[ARROW[S, T]])
     )
   }
@@ -205,7 +201,7 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
 
     BiQuiver(left, right,  functionAsQuiver[(L, R), T](targetProduct, target, {
       (pair: (L, R)) => bifunc(pair._1, pair._2)
-    }) o AdapterQuiver(left x right, targetProduct,
+    }) o (left x right)(targetProduct)(
       arrowAsFunction[Any, Any, DOTWRAPPER[L] x DOTWRAPPER[R], DOTWRAPPER[(L, R)]](
         targetProduct, targetProduct.getDot.identity)
     ))
