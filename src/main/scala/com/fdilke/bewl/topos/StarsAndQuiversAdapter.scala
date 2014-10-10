@@ -41,6 +41,13 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
       AdapterQuiver[T, U](this, target, f)
 
     protected[StarsAndQuiversAdapter] val getDot: DOT[Any]
+    private[StarsAndQuiversAdapter] def apply[X, Y, U <: Element] (
+      target: STAR[U],
+      arrow: ARROW[X, Y]
+      ): QUIVER[T, U] = this(target)(
+      t => target.asElement(arrow.asInstanceOf[ARROW[Any, Any]](t.arrow)) // TODO: lose cast?
+    )
+
     def asElement(arrow: ARROW[Any, Any]) : T
   }
 
@@ -55,9 +62,7 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
       that.source(target)(function compose that.function)
 
     override def x[U <: ELEMENT](that: QUIVER[S, U]) =
-      arrowAsQuiver(source, target x that.target,
-        arrow x that.arrow
-      )
+      source(target x that.target, arrow x that.arrow)
 
     def ?=(that: QUIVER[S, T]) =
       new AdapterStar[EqualizingElement[S] with Element] with EqualizingStar[S] {
@@ -68,16 +73,14 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
 
         override def asElement(anArrow: ARROW[Any, Any]): EqualizingElement[S] with Element =
         new EqualizingElement[S] with Element {
-          override val include: S =
+          override val include =
             equalizerTarget.asElement(equalizer.equalizer.asInstanceOf[ARROW[Any, Any]](anArrow))
           override protected[StarsAndQuiversAdapter] val arrow = anArrow
         }
 
-        def restrict[R <: ELEMENT](quiver: QUIVER[R, S]): QUIVER[R, EqualizingElement[S] with Element] =
-          arrowAsQuiver(quiver.source, this, equalizer.restrict(quiver.arrow))
+        override def restrict[R <: ELEMENT](quiver: QUIVER[R, S]) =
+          quiver.source(this, equalizer.restrict(quiver.arrow))
       }
-
-    // TODO: make arrowAsQuiver a private[xx] 'apply' function on star?
 
     override def equals(other: Any): Boolean = other match {
       case that: QUIVER[S, T] => arrow == that.arrow
@@ -119,10 +122,10 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
 
     private val exponential = target.getDot A source.getDot
     override val getDot = exponential.exponentDot.asInstanceOf[DOT[Any]]
-    override def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, S, T]): QUIVER[R, S > T] = {
-      val biArrow = topos.BiArrow(biQuiver.left.getDot, biQuiver.right.getDot, biQuiver.quiver.arrow.asInstanceOf[ARROW[(Any, Any), Any]])
-      arrowAsQuiver(biQuiver.left, this, exponential.transpose(biArrow))
-    }
+    override def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, S, T]) =
+      biQuiver.left(this, exponential.transpose(
+        topos.BiArrow(biQuiver.left.getDot, biQuiver.right.getDot, biQuiver.quiver.arrow.asInstanceOf[ARROW[(Any, Any), Any]])
+      ))
 
     override def asElement(anArrow: ARROW[Any, Any]) = new ~>[S, T] with Element {
       override def apply(s: S): T =
@@ -162,15 +165,7 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
     ).asInstanceOf[STAR[WrappedArrow[S]]]
 
   override def quiver[S, T](arrow: BASE#ARROW[S, T]) : QUIVER[DOTWRAPPER[S], DOTWRAPPER[T]] =
-    arrowAsQuiver(star(arrow.source), star(arrow.target), arrow.asInstanceOf[ARROW[S, T]])
-
-  private def arrowAsQuiver[X, Y, S <: Element, T <: Element] (
-    source: STAR[S],
-    target: STAR[T],
-    arrow: ARROW[X, Y]
-    ) = source(target)(
-    s => target.asElement(arrow.asInstanceOf[ARROW[Any, Any]](s.arrow))
-  )
+    star(arrow.source)(star(arrow.target), arrow.asInstanceOf[ARROW[S, T]])
 
   override def functionAsQuiver[S, T](source: STAR[WrappedArrow[S]], target: STAR[WrappedArrow[T]], f: S => T) =
     quiver(buildArrow[S, T](
@@ -193,8 +188,8 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
 
     BiQuiver(left, right,  functionAsQuiver[(L, R), T](targetProduct, target, {
       case (l, r) => bifunc(l, r)
-    }) o arrowAsQuiver(
-      left x right, targetProduct, targetProduct.getDot.identity
-    ))
+    }) o
+      (left x right)(targetProduct, targetProduct.getDot.identity)
+    )
   }
 }
