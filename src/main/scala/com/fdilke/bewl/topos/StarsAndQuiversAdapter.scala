@@ -24,7 +24,6 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
     override lazy val toI: QUIVER[T, UNIT] =
       quiver(getDot.toI).asInstanceOf[QUIVER[T, UNIT]]
 
-    override val identity = AdapterQuiver[T, T](this, this, x => x)
     override def x[U <: Element](that: STAR[U]) =
       standardProductStar((
         StrictRef(this.asInstanceOf[STAR[WrappedArrow[Any]]]),

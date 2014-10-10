@@ -43,8 +43,8 @@ trait Topos {
   type UNIT <: ELEMENT
   val I : STAR[UNIT]
 
-  trait Star[S <: ELEMENT] {
-    val identity: QUIVER[S, S]
+  trait Star[S <: ELEMENT] { self: STAR[S] =>
+    final lazy val identity: QUIVER[S, S] = this(self)(Predef.identity)
     val toI: QUIVER[S, UNIT]
     def x[T <: ELEMENT](that: STAR[T]): STAR[S x T]
     def >[T <: ELEMENT](that: STAR[T]): ExponentialStar[S, T] with STAR[S > T]
