@@ -60,12 +60,13 @@ trait Topos {
   trait Quiver[S <: ELEMENT, T <: ELEMENT] {
     val source: STAR[S]
     val target: STAR[T]
+    val chi: QUIVER[T, TRUTH]
 
     def apply(s: S): T
     def ?=(that: QUIVER[S, T]): EqualizingStar[S] with STAR[EqualizingElement[S] with ELEMENT]
     def o[R <: ELEMENT](that: QUIVER[R, S]) : QUIVER[R, T]
     def x[U <: ELEMENT](that: QUIVER[S, U]): QUIVER[S, T x U]
-    val chi: QUIVER[T, TRUTH]
+    def \[U <: ELEMENT](monic: QUIVER[U, T]) : QUIVER[S, U]
     def sanityTest
   }
 

@@ -89,17 +89,23 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
           quiver.source(this, equalizer.restrict(quiver.arrow))
       }
 
-    override def equals(other: Any): Boolean = other match {
+    override def equals(other: Any) = other match {
       case that: QUIVER[S, T] => arrow == that.arrow
       case _ => false
     }
 
     override lazy val chi =
-      target(omega, arrow.chi.arrow)
+      target(omega, arrowChi.arrow)
+
+    override def \[U <: ELEMENT](monic: QUIVER[U, T]) =
+      source(monic.source, monic.arrowChi.restrict(arrow))
 
     override def sanityTest = arrow.sanityTest
-    private[StarsAndQuiversAdapter] lazy val arrow: ARROW[Any, Any] =
+
+    private[StarsAndQuiversAdapter] lazy val arrow =
       function(source.asElement(source.dot.identity)).arrow
+
+    private lazy val arrowChi = arrow.chi
   }
 
   class WrappedArrow[X](protected[StarsAndQuiversAdapter] val arrow: ARROW[Any, Any]) extends ELEMENT {
