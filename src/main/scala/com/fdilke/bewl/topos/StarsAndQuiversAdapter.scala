@@ -7,18 +7,25 @@ import scala.Function._
 
 class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extends Topos with Wrappings[BASE#DOT, BASE#ARROW] {
 
-  import topos.{ I => _, _ }
+  import topos.{ I => _, omega => _, _ }
 
-  type ELEMENT = Element
-  type STAR[S <: ELEMENT] = AdapterStar[S]
-  type QUIVER[S <: ELEMENT, T <: ELEMENT] = AdapterQuiver[S, T]
-
+  override type ELEMENT = Element
   trait Element {
     protected[StarsAndQuiversAdapter] val arrow: ARROW[Any, Any]
   }
 
-  type UNIT = WrappedArrow[Unit]
-  lazy val I : STAR[UNIT] = star(topos.I).asInstanceOf[AdapterStar[UNIT]]
+  override type STAR[S <: ELEMENT] = AdapterStar[S]
+  override type QUIVER[S <: ELEMENT, T <: ELEMENT] = AdapterQuiver[S, T]
+
+  override type UNIT = WrappedArrow[Unit]
+  lazy val I : STAR[UNIT] = star(topos.I).asInstanceOf[STAR[UNIT]]
+
+  override type TRUTH = AdapterTruth
+  override lazy val omega = star(topos.omega).asInstanceOf[STAR[TRUTH]]
+  override lazy val truth = quiver(topos.truth).asInstanceOf[QUIVER[UNIT, TRUTH]]
+
+  trait AdapterTruth extends Element {
+  }
 
   trait AdapterStar[T <: Element] extends Star[T] {
     override lazy val toI: QUIVER[T, UNIT] =
@@ -156,7 +163,7 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
 
   // wrappings
 
-  type DOTWRAPPER[S] = WrappedArrow[S]
+  override type DOTWRAPPER[S] = WrappedArrow[S]
 
   override def star[S](dot: BASE#DOT[S]) =
     standardWrappedDot(

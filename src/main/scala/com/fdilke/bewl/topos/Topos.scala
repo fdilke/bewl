@@ -19,6 +19,13 @@ trait Topos {
   }
   type >[T <: ELEMENT, U <: ELEMENT] = ~>[T, U] with ELEMENT
 
+  type UNIT <: ELEMENT
+  val I : STAR[UNIT]
+
+  type TRUTH <: ELEMENT
+  val omega: STAR[TRUTH]
+  val truth: QUIVER[UNIT, TRUTH]
+
   trait ExponentialStar[S <: ELEMENT, T <: ELEMENT] { star: STAR[S > T] =>
     val source: STAR[S]
     val target: STAR[T]
@@ -39,9 +46,6 @@ trait Topos {
   trait EqualizingElement[S <: ELEMENT] { element: ELEMENT =>
     val include: S
   }
-
-  type UNIT <: ELEMENT
-  val I : STAR[UNIT]
 
   trait Star[S <: ELEMENT] { self: STAR[S] =>
     final lazy val identity: QUIVER[S, S] = this(self)(Predef.identity)
