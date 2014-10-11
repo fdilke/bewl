@@ -1,13 +1,10 @@
 package com.fdilke.bewl.fsets
 
-import com.fdilke.bewl.fsets.DiagrammaticFiniteSets.FiniteSetsUtilities
-import FiniteSetsUtilities._
+import DiagrammaticFiniteSetsUtilities._
 import org.scalatest.{Matchers, FunSpec}
 import Matchers._
 
-// User: Felix Date: 28/05/2014 Time: 18:48
-
-class FiniteSetsUtilitiesTest extends FunSpec {
+class DiagrammaticFiniteSetsUtilitiesTest extends FunSpec {
   describe("cartesian products") {
     it("work in the trivial case") {
       cartesian[String](List()) shouldBe Seq(

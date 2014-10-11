@@ -1,6 +1,6 @@
 package com.fdilke.bewl.diagrammatic.algebra
 
-import com.fdilke.bewl.fsets.DiagrammaticFiniteSets.FiniteSetsUtilities._
+import com.fdilke.bewl.fsets.DiagrammaticFiniteSetsUtilities._
 import com.fdilke.bewl.fsets.DiagrammaticFiniteSets._
 import org.scalatest.{Matchers, FunSpec}
 import Matchers.{all => _, _}
