@@ -4,7 +4,6 @@ import com.fdilke.bewl.diagrammatic.DiagrammaticTopos
 import com.fdilke.bewl.fsets.DiagrammaticFiniteSetsUtilities.allMaps
 import com.fdilke.bewl.helper.FunctionWithEquality
 import com.fdilke.bewl.topos.StarsAndQuiversAdapter
-
 import scala.Function.{const, tupled}
 
 object DiagrammaticFiniteSets extends DiagrammaticTopos {
@@ -55,10 +54,10 @@ object DiagrammaticFiniteSets extends DiagrammaticTopos {
   }
 
   case class FiniteSetsArrow[X, Y](
-                                    source: FiniteSetsDot[X],
-                                    target: FiniteSetsDot[Y],
-                                    function: X => Y
-                                    ) extends Arrow[X, Y] {
+    source: FiniteSetsDot[X],
+    target: FiniteSetsDot[Y],
+    function: X => Y
+  ) extends Arrow[X, Y] {
     override def toString = s"""FiniteSetsArrow(${source}, ${target},
       |${Map(source.map(x => (x, function(x))).toList: _*)})""".stripMargin
 
@@ -80,11 +79,10 @@ object DiagrammaticFiniteSets extends DiagrammaticTopos {
         equalizerSource, source, identity
       )
 
-      override def restrict[S](equalizingArrow: FiniteSetsArrow[S, X]) = FiniteSetsArrow[S, X](
+      override def restrict[S](equalizingArrow: FiniteSetsArrow[S, X]) = FiniteSetsArrow(
         equalizingArrow.source, equalizerSource, equalizingArrow.function
       )
     }
-
 
     override lazy val chi = new Characteristic[X, Y] {
       val arrow = FiniteSetsArrow[Y, Boolean](target, omega,
@@ -121,11 +119,11 @@ object DiagrammaticFiniteSets extends DiagrammaticTopos {
         FiniteSetsArrow[(L, R), T](left x right, target, Map(map:_*)))
   }
 
-  type DOT[X] = FiniteSetsDot[X]
-  type ARROW[S, T] = FiniteSetsArrow[S, T]
-  type EQUALIZER_SOURCE[M] = M
-  type TERMINAL = Unit
-  type OMEGA = Boolean
+  override type DOT[X] = FiniteSetsDot[X]
+  override type ARROW[S, T] = FiniteSetsArrow[S, T]
+  override type EQUALIZER_SOURCE[M] = M
+  override type TERMINAL = Unit
+  override type OMEGA = Boolean
 
   override val I = FiniteSetsDot[Unit](Traversable(()))
   override val omega = FiniteSetsDot[Boolean](Traversable(true, false))
