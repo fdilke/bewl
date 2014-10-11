@@ -93,6 +93,10 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extend
       case that: QUIVER[S, T] => arrow == that.arrow
       case _ => false
     }
+
+    override lazy val chi =
+      target(omega, arrow.chi.arrow)
+
     override def sanityTest = arrow.sanityTest
     private[StarsAndQuiversAdapter] lazy val arrow: ARROW[Any, Any] =
       function(source.asElement(source.dot.identity)).arrow

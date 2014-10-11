@@ -65,6 +65,7 @@ trait Topos {
     def ?=(that: QUIVER[S, T]): EqualizingStar[S] with STAR[EqualizingElement[S] with ELEMENT]
     def o[R <: ELEMENT](that: QUIVER[R, S]) : QUIVER[R, T]
     def x[U <: ELEMENT](that: QUIVER[S, U]): QUIVER[S, T x U]
+    val chi: QUIVER[T, TRUTH]
     def sanityTest
   }
 

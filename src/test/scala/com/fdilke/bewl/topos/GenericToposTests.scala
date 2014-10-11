@@ -189,22 +189,24 @@ abstract class GenericToposTests[TOPOS <: Topos](
       (e o q) shouldBe r
     }
 
-/*
     it("has a truth object (subobject classifier)") {
       truth.source shouldBe I
       truth.target shouldBe omega
 
       val char = monicBar2baz.chi
-      char.arrow.source shouldBe baz
-      char.arrow.target shouldBe omega
-      char.arrow(monicBar2baz) shouldBe truth(bar.toI)
+      char.source shouldBe baz
+      char.target shouldBe omega
+      (char o monicBar2baz) shouldBe (truth o bar.toI)
+//
+//      val restriction = char.restrict(foo2ImageOfBar)
+//      restriction.source shouldBe foo
+//      restriction.target shouldBe bar
+//      monicBar2baz(restriction) shouldBe foo2ImageOfBar
 
-      val restriction = char.restrict(foo2ImageOfBar)
-      restriction.source shouldBe foo
-      restriction.target shouldBe bar
-      monicBar2baz(restriction) shouldBe foo2ImageOfBar
+      // TODO: contruct a non-monic arrow, have chi throw a NotMonicException
     }
 
+/*
     it("can construct integer powers") {
       foo ^ 0 shouldBe I
 
