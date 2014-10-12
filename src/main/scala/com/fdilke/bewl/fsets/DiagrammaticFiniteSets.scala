@@ -105,7 +105,7 @@ object DiagrammaticFiniteSets extends DiagrammaticTopos {
     override def hashCode(): Int = 0 // don't use these as keys
 
     def sanityTest =
-      if (source.map(function).exists(x => target.forall(_ != x))) {
+      if (!source.map(function).forall(x => target.exists(_ == x))) {
         throw new IllegalArgumentException("Map values not in target")
       }
   }

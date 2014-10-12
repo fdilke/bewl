@@ -57,7 +57,8 @@ http://stackoverflow.com/questions/15799811/how-does-type-dynamic-work-and-how-t
 
 # can tidy up syntax for using ResultStore? 
 
-e.g. standardProductStar - monstrous code.        
+e.g. standardProductStar - monstrous code.
+Should be possible because there is so much boilerplate. Also reexamine, refactor.        
         
 # The Strong Binding Manifesto
 
@@ -69,13 +70,15 @@ Quivers wrap functions A => B (A,B elements) and also:
     remember their source and target
     can test equality        
 
-Abandoned the idea of regarding a quiver as an element. (Translation is possible.)
+Abandoned the idea of regarding a quiver as an element. (Translation is possible. So far, haven't needed this.)
+In fact it does not seem inherent that an element really is an arrow. See NativeFiniteSets, where it's not.
 
 Abandoned the map notation for(x <- atar) because an element would have to know its target...
 Could be rescued. In map() on a star, we make the identity arrow into an element,
     then invoke the function on it, then take the target of that... Seems unnecessary calc.
 The functional notation is kind of better anyway.
-May resuscitate this idea for operators.
+May resuscitate this idea for operators. We could have: for(f <- foo :> bar) [ an expression in f ]
+Then by default that's a unary operator, can have map work on those to yield binary operators, and so on.
     
 Implementation:
 Quivers have a lazily calculated arrow inside them.    

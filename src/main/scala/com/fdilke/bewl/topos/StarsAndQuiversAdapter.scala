@@ -172,7 +172,7 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
     (x, y) => exponentialStar(x.wrappedValue, y.wrappedValue)
   })
 
-  // wrappings
+  // wrapping API
 
   override type WRAPPER[S] = WrappedArrow[S]
 
