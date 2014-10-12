@@ -174,14 +174,14 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
 
   // wrappings
 
-  override type DOTWRAPPER[S] = WrappedArrow[S]
+  override type WRAPPER[S] = WrappedArrow[S]
 
   override def star[S](dot: BASE#DOT[S]) =
     standardWrappedDot(
       StrictRef(dot.asInstanceOf[DOT[Any]])
     ).asInstanceOf[STAR[WrappedArrow[S]]]
 
-  override def quiver[S, T](arrow: BASE#ARROW[S, T]) : QUIVER[DOTWRAPPER[S], DOTWRAPPER[T]] =
+  override def quiver[S, T](arrow: BASE#ARROW[S, T]) : QUIVER[WRAPPER[S], WRAPPER[T]] =
     star(arrow.source)(star(arrow.target), arrow.asInstanceOf[ARROW[S, T]])
 
   override def functionAsQuiver[S, T](source: STAR[WrappedArrow[S]], target: STAR[WrappedArrow[T]], f: S => T) =
@@ -189,13 +189,13 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
       source.dot.asInstanceOf[DOT[S]],
       target.dot.asInstanceOf[DOT[T]],
       f
-    ).asInstanceOf[BASE#ARROW[DOTWRAPPER[S], DOTWRAPPER[T]]]
-  ).asInstanceOf[QUIVER[DOTWRAPPER[S], DOTWRAPPER[T]]]
+    ).asInstanceOf[BASE#ARROW[WRAPPER[S], WRAPPER[T]]]
+  ).asInstanceOf[QUIVER[WRAPPER[S], WRAPPER[T]]]
 
   override def bifunctionAsBiQuiver[L, R, T] (
-    left: STAR[DOTWRAPPER[L]],
-    right: STAR[DOTWRAPPER[R]],
-    target: STAR[DOTWRAPPER[T]],
+    left: STAR[WRAPPER[L]],
+    right: STAR[WRAPPER[R]],
+    target: STAR[WRAPPER[T]],
     bifunc: (L, R) => T
   ) = {
     val targetProduct = star[(L, R)](

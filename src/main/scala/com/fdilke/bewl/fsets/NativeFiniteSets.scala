@@ -1,13 +1,15 @@
 package com.fdilke.bewl.fsets
 
-import com.fdilke.bewl.topos.Topos
+import com.fdilke.bewl.topos.{Wrappings, Topos}
 
-class NativeFiniteSets extends Topos { // TODO: add Wrappings[DOTINPUT, CONNECTOR]
+class NativeFiniteSets extends Topos
+  with Wrappings[Traversable, Function] {
+
   override type ELEMENT = Any
   override type STAR[S <: ELEMENT] = FiniteSetsStar[S]
   override type QUIVER[S <: ELEMENT, T <: ELEMENT] = FiniteSetsQuiver[S, T]
-  override type UNIT = this.type
-  override type TRUTH = this.type
+  override type UNIT = Unit
+  override type TRUTH = Boolean
   override val I: STAR[UNIT] = ???
   override val omega: STAR[TRUTH] = ???
   override val truth: QUIVER[UNIT, TRUTH] = ???
@@ -42,4 +44,16 @@ class NativeFiniteSets extends Topos { // TODO: add Wrappings[DOTINPUT, CONNECTO
     override val chi: QUIVER[T, TRUTH] = ???
     override val target: STAR[T] = ???
   }
+
+  // wrapping layer
+
+  override type WRAPPER[T] = T
+
+  override def functionAsQuiver[S, T](source: STAR[S], target: STAR[T], f: S => T): QUIVER[S, T] = ???
+
+  override def quiver[S, T](connector: Function1[S, T]) = ???
+
+  override def star[T](input: Traversable[T]) = ???
+
+  override def bifunctionAsBiQuiver[L, R, T](left: STAR[L], right: STAR[R], target: STAR[T], bifunc: (L, R) => T): BiQuiver[L, R, T] = ???
 }

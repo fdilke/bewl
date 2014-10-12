@@ -129,18 +129,18 @@ trait BaseTopos {
 }
 
 trait Wrappings[
-  DOTINPUT[T],    // TODO: rename these types
-  CONNECTOR[S, T]
+  PRESTAR[T],
+  PREQUIVER[S, T]
 ] { topos: BaseTopos =>
-  type DOTWRAPPER[T] <: ELEMENT
+  type WRAPPER[T] <: ELEMENT
 
-  def star[T](input: DOTINPUT[T]) : STAR[DOTWRAPPER[T]]
-  def quiver[S, T](connector: CONNECTOR[S, T]) : QUIVER[DOTWRAPPER[S], DOTWRAPPER[T]]
-  def functionAsQuiver[S, T](source: STAR[DOTWRAPPER[S]], target: STAR[DOTWRAPPER[T]], f: S => T): QUIVER[DOTWRAPPER[S], DOTWRAPPER[T]]
+  def star[T](input: PRESTAR[T]) : STAR[WRAPPER[T]]
+  def quiver[S, T](connector: PREQUIVER[S, T]) : QUIVER[WRAPPER[S], WRAPPER[T]]
+  def functionAsQuiver[S, T](source: STAR[WRAPPER[S]], target: STAR[WRAPPER[T]], f: S => T): QUIVER[WRAPPER[S], WRAPPER[T]]
   def bifunctionAsBiQuiver[L, R, T] (
-      left: STAR[DOTWRAPPER[L]],
-      right: STAR[DOTWRAPPER[R]],
-      target: STAR[DOTWRAPPER[T]],
+      left: STAR[WRAPPER[L]],
+      right: STAR[WRAPPER[R]],
+      target: STAR[WRAPPER[T]],
       bifunc: (L, R) => T
-   ): BiQuiver[DOTWRAPPER[L], DOTWRAPPER[R], DOTWRAPPER[T]]
+   ): BiQuiver[WRAPPER[L], WRAPPER[R], WRAPPER[T]]
 }
