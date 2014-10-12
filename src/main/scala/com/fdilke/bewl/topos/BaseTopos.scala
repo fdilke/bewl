@@ -1,6 +1,8 @@
 package com.fdilke.bewl.topos
 
-trait Topos {
+trait Topos extends BaseTopos with SafeAlgebra
+
+trait BaseTopos {
   type ELEMENT
   type STAR[S <: ELEMENT] <: Star[S]
   type QUIVER[S <: ELEMENT, T <: ELEMENT] <: Quiver[S, T]
@@ -129,7 +131,7 @@ trait Topos {
 trait Wrappings[
   DOTINPUT[T],
   CONNECTOR[S, T]
-] { topos: Topos =>
+] { topos: BaseTopos =>
   type DOTWRAPPER[T] <: ELEMENT
 
   def star[T](input: DOTINPUT[T]) : STAR[DOTWRAPPER[T]]

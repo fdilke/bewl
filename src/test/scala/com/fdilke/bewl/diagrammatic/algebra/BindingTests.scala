@@ -17,13 +17,13 @@ class BindingTests  extends FunSpec {
       val dot = set(i, x, y)
       val unit = nullaryOperator(dot, i)
       type X = Symbol
-      val productOp = FiniteSetsArrow[Power[X], X](
+      val productOp = DiagrammaticFiniteSetsArrow[Power[X], X](
         dot ^ 2, dot, Map(
           (i, i) -> i, (i, x) -> x, (i, y) -> y,
           (x, i) -> x, (x, x) -> x, (x, y) -> x,
           (y, i) -> y, (y, x) -> y, (y, y) -> y
         ))
-      val unitOp = FiniteSetsArrow[Power[X], X](
+      val unitOp = DiagrammaticFiniteSetsArrow[Power[X], X](
         dot ^ 0, dot, Map(() -> i)
       )
 

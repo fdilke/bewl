@@ -4,7 +4,7 @@ import com.fdilke.bewl.fsets.DiagrammaticFiniteSetsUtilities.set
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
-class FiniteSetsExponentialTest extends FunSpec {
+class DiagrammaticFiniteSetsExponentialTest extends FunSpec {
   describe("The exponential") {
     describe("has the correct number of values, all distinct") {
       val source = set('a, 'b, 'c)

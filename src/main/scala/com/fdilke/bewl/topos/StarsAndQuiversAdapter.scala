@@ -5,7 +5,8 @@ import com.fdilke.bewl.helper.{ResultStore, StrictRef}
 
 import scala.Function._
 
-class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE) extends Topos with Wrappings[BASE#DOT, BASE#ARROW] {
+class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
+  extends Topos with Wrappings[BASE#DOT, BASE#ARROW] {
 
   import topos.{ I => _, omega => _, _ }
 

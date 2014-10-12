@@ -1,13 +1,13 @@
 package com.fdilke.bewl.fsets
 
-import com.fdilke.bewl.fsets.DiagrammaticFiniteSets.{FiniteSetsDot, FiniteSetsArrow}
+import com.fdilke.bewl.fsets.DiagrammaticFiniteSets.{DiagrammaticFiniteSetsDot, DiagrammaticFiniteSetsArrow}
 import DiagrammaticFiniteSets.Power
 
 object DiagrammaticFiniteSetsUtilities {
-  def set[T](elements: T*) = FiniteSetsDot(elements)
+  def set[T](elements: T*) = DiagrammaticFiniteSetsDot(elements)
 
-  def arrow[S, T](source: FiniteSetsDot[S], target: FiniteSetsDot[T], map: (S, T)*) =
-    FiniteSetsArrow[S, T](source, target, Map(map:_*))
+  def arrow[S, T](source: DiagrammaticFiniteSetsDot[S], target: DiagrammaticFiniteSetsDot[T], map: (S, T)*) =
+    DiagrammaticFiniteSetsArrow[S, T](source, target, Map(map:_*))
 
   def cartesian[A](factors: Seq[Seq[A]]): Traversable[Seq[A]] = factors match {
     case Nil => Traversable(Seq())
@@ -28,25 +28,25 @@ object DiagrammaticFiniteSetsUtilities {
           }
     }
 
-  def nullaryOperator[X](dot: FiniteSetsDot[X], constant: X) =
-    FiniteSetsArrow[Power[X], X](
+  def nullaryOperator[X](dot: DiagrammaticFiniteSetsDot[X], constant: X) =
+    DiagrammaticFiniteSetsArrow[Power[X], X](
       dot ^ 0, dot, Map(() -> constant)
     )
 
-  def unaryOperator[X](dot: FiniteSetsDot[X], entries: (X, X)*) =
-    FiniteSetsArrow[Power[X], X](
+  def unaryOperator[X](dot: DiagrammaticFiniteSetsDot[X], entries: (X, X)*) =
+    DiagrammaticFiniteSetsArrow[Power[X], X](
       dot ^ 1, dot, Map(entries:_*)
     )
 
-  def unaryOperator[X](dot: FiniteSetsDot[X], unaryFunc: X => X): FiniteSetsArrow[Power[X], X] =
+  def unaryOperator[X](dot: DiagrammaticFiniteSetsDot[X], unaryFunc: X => X): DiagrammaticFiniteSetsArrow[Power[X], X] =
     unaryOperator(dot, dot.map { x => (x, unaryFunc(x)) }.toList: _*)
 
-  def binaryOperator[X](dot: FiniteSetsDot[X], entries: ((X, X), X)*) =
-    FiniteSetsArrow[Power[X], X](
+  def binaryOperator[X](dot: DiagrammaticFiniteSetsDot[X], entries: ((X, X), X)*) =
+    DiagrammaticFiniteSetsArrow[Power[X], X](
       dot ^ 2, dot, Map(entries:_*)
     )
 
-  def binaryOperator[X](dot: FiniteSetsDot[X], binaryFunc: (X, X) => X): FiniteSetsArrow[Power[X], X] =
+  def binaryOperator[X](dot: DiagrammaticFiniteSetsDot[X], binaryFunc: (X, X) => X): DiagrammaticFiniteSetsArrow[Power[X], X] =
     binaryOperator(dot, (dot x dot).map { case (x, y) => ((x, y), binaryFunc(x,y)) }.toList: _*)
 }
 

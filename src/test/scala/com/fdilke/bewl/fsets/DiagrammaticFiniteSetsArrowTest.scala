@@ -4,7 +4,7 @@ import com.fdilke.bewl.fsets.DiagrammaticFiniteSetsUtilities.{arrow, set}
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
-class FiniteSetsArrowTest extends FunSpec {
+class DiagrammaticFiniteSetsArrowTest extends FunSpec {
   val dot = set("a", "b")
   val dotBig = set("a", "b", "c")
   val dotSmall = set("a")

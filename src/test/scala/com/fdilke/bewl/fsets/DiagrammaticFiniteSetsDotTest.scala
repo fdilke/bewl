@@ -4,7 +4,7 @@ import com.fdilke.bewl.fsets.DiagrammaticFiniteSetsUtilities.{arrow, set}
 import org.scalatest.{FunSpec, Matchers}
 import Matchers._
 
-class FiniteSetsDotTest extends FunSpec {
+class DiagrammaticFiniteSetsDotTest extends FunSpec {
   describe("A dot representing a finite set") {
     it("should have partly sensible equality semantics") {
       val dot = set[String]("a", "b")

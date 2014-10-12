@@ -1,6 +1,6 @@
 package com.fdilke.bewl.topos
 
-trait SafeAlgebra { topos: Topos =>
+trait SafeAlgebra { topos: BaseTopos =>
 
   trait SafeArgument {
     type TYPE <: ELEMENT

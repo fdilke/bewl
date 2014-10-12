@@ -2,9 +2,9 @@ package com.fdilke.bewl.fsets
 
 import com.fdilke.bewl.topos.{GenericToposTests, ToposWithFixtures}
 
-class FiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
-  type TOPOS = FiniteSets.type
-  val topos = FiniteSets
+class LayeredFiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
+  type TOPOS = LayeredFiniteSets.type
+  val topos = LayeredFiniteSets
 
   import topos._
 
@@ -12,7 +12,7 @@ class FiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
   type BAR = WrappedArrow[String]
   type BAZ = WrappedArrow[Int]
 
-  def makeStar[T](elements: T*) = star(DiagrammaticFiniteSets.FiniteSetsDot(elements))
+  def makeStar[T](elements: T*) = star(DiagrammaticFiniteSets.DiagrammaticFiniteSetsDot(elements))
 
   def makeQuiver[S, T](source: STAR[WrappedArrow[S]], target: STAR[WrappedArrow[T]], map: (S, T)*) =
     functionAsQuiver(source, target, Map(map: _*))
@@ -38,8 +38,8 @@ class FiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
     bar, baz, "X" -> 2, "Y" -> 3
   )
 
-  private val sampleDotSource = DiagrammaticFiniteSets.FiniteSetsDot(Seq(1, 2))
-  private val sampleDotTarget = DiagrammaticFiniteSets.FiniteSetsDot(Seq(true, false))
+  private val sampleDotSource = DiagrammaticFiniteSets.DiagrammaticFiniteSetsDot(Seq(1, 2))
+  private val sampleDotTarget = DiagrammaticFiniteSets.DiagrammaticFiniteSetsDot(Seq(true, false))
 
   override def makeSampleStar() = star(sampleDotSource)
 

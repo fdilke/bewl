@@ -1,6 +1,6 @@
 package com.fdilke.bewl.apps
 
-import com.fdilke.bewl.fsets.DiagrammaticFiniteSets.FiniteSetsDot
+import com.fdilke.bewl.fsets.DiagrammaticFiniteSets.DiagrammaticFiniteSetsDot
 
 // Originally for finding 'difference-preserving binary operators'.
 // It doesn't find any up to n=3.
@@ -9,7 +9,7 @@ import com.fdilke.bewl.fsets.DiagrammaticFiniteSets.FiniteSetsDot
 object DPFunctions extends App {
 
   def countDP(n: Int) = {
-    val sizeN = FiniteSetsDot(0 until n)
+    val sizeN = DiagrammaticFiniteSetsDot(0 until n)
     val pairs = sizeN x sizeN
     var numExamined = 0
 
