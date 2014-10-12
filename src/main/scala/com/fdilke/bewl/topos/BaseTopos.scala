@@ -129,7 +129,7 @@ trait BaseTopos {
 }
 
 trait Wrappings[
-  DOTINPUT[T],
+  DOTINPUT[T],    // TODO: rename these types
   CONNECTOR[S, T]
 ] { topos: BaseTopos =>
   type DOTWRAPPER[T] <: ELEMENT
