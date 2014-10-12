@@ -2,6 +2,7 @@ package com.fdilke.bewl.fsets
 
 import com.fdilke.bewl.helper.{ResultStore, StrictRef}
 import com.fdilke.bewl.topos.{Wrappings, Topos}
+import Function.const
 
 class NativeFiniteSets extends Topos
   with Wrappings[Traversable, FiniteSetsPreQuiver] {
@@ -11,49 +12,85 @@ class NativeFiniteSets extends Topos
   override type QUIVER[S <: ELEMENT, T <: ELEMENT] = FiniteSetsQuiver[S, T]
   override type UNIT = Unit
   override type TRUTH = Boolean
-  override val I: STAR[UNIT] = ???
-  override val omega: STAR[TRUTH] = ???
-  override val truth: QUIVER[UNIT, TRUTH] = ???
+  override val I = star(Traversable(()))
+  override val omega = star(Traversable(true, false))
+  override val truth = I(omega) { _ => true }
 
-  class FiniteSetsStar[S](elements: Traversable[S]) extends Star[S] with Traversable[S] {
-    override val toI: QUIVER[S, UNIT] = ???
+  class FiniteSetsStar[S](elements: Traversable[S])
+    extends Star[S] with Traversable[S] {
+    override lazy val toI = this(I) { _ => () }
 
     override def >[T <: ELEMENT](that: STAR[T]) = ???
 
     override def x[T <: ELEMENT](that: STAR[T]): STAR[x[S, T]] = ???
 
-    override def apply[T <: ELEMENT](target: STAR[T])(f: (S) => T): QUIVER[S, T] = ???
+    override def apply[T <: ELEMENT](target: STAR[T])(f: S => T) =
+      new FiniteSetsQuiver(this, target, f)
 
     override def sanityTest =
       for (x <- elements ; y <- elements)
         x == y
 
-    override def foreach[U](f: S => U) = elements.foreach(f)
+    override def foreach[U](f: S => U) =
+      elements foreach f
   }
 
   class FiniteSetsQuiver[S, T](
     val source: FiniteSetsStar[S],
     val target: FiniteSetsStar[T],
     private[NativeFiniteSets] val function: S => T
-  ) extends Quiver[S, T] {
+  ) extends Quiver[S, T] { self =>
 
-    override def \[U <: ELEMENT](monic: QUIVER[U, T]): QUIVER[S, U] = ???
+    override def \[U <: ELEMENT](monic: QUIVER[U, T]) =
+      source(monic.source) { s =>
+        val quarry: T = function(s)
+        monic.source.find { u =>
+          monic(u) == quarry
+        } getOrElse {
+          throw new IllegalArgumentException(s"Cannot backdivide $self by monic $monic")
+      }}
 
     override def sanityTest =
       if (!source.map(function).forall(x => target.exists(_ == x))) {
         throw new IllegalArgumentException("Map values not in target")
       }
 
-    override def ?=(that: QUIVER[S, T]): EqualizingStar[S] with STAR[EqualizingElement[S] with ELEMENT] = ???
+    override def ?=(that: QUIVER[S, T]) = {
+      val equalizerSource = new FiniteSetsStar(
+            for (s <- source if function(s) == that.function(s))
+              yield new EqualizingElement[S] { // TODO: note: may be an issue about comparing equality with these
+                override val include = s
+              })
+      new FiniteSetsStar[EqualizingElement[S]](
+        equalizerSource
+      ) with EqualizingStar[S] {
+        override val equalizerTarget = source
+
+        override def restrict[R](substar: QUIVER[R, S]) =
+          substar.source(equalizerSource) { r =>
+            val quarry = substar(r)
+            equalizerSource.find {
+              _.include == quarry
+            } getOrElse {
+              throw new IllegalArgumentException(s"Cannot restrict $self by monic $substar") // TODO: need this logic twice??
+            }
+          }
+      }
+    }
 
     override def x[U <: ELEMENT](that: QUIVER[S, U]): QUIVER[S, x[T, U]] = ???
 
-    override def apply(s: S): T = function(s)
+    override def apply(s: S) =
+      function(s)
 
     override def o[R <: ELEMENT](that: QUIVER[R, S]) =
-      new FiniteSetsQuiver[R, T](that.source, target, function compose that.function)
+      that.source(target)(function compose that.function)
 
-    override val chi: QUIVER[T, TRUTH] = ???
+    override lazy val chi =
+      target(omega) { t =>
+        source.exists { s =>
+          this(s) == t
+      }}
   }
 
   private val standardStar = new ResultStore[StrictRef[Traversable[Any]], STAR[Any]] (
@@ -64,10 +101,11 @@ class NativeFiniteSets extends Topos
 
   override type WRAPPER[T] = T
 
-  override def functionAsQuiver[S, T](source: STAR[S], target: STAR[T], f: S => T): QUIVER[S, T] = ???
+  override def functionAsQuiver[S, T](source: STAR[S], target: STAR[T], f: S => T) =
+    source(target)(f)
 
   override def quiver[S, T](prequiver: FiniteSetsPreQuiver[S, T]) =
-    new FiniteSetsQuiver[S, T](star(prequiver.source), star(prequiver.target), prequiver.function)
+    star(prequiver.source)(star(prequiver.target))(prequiver.function)
 
   override def star[T](input: Traversable[T]) =
     standardStar(
