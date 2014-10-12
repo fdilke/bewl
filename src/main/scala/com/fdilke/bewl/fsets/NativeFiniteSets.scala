@@ -1,8 +1,7 @@
 package com.fdilke.bewl.fsets
 
 import com.fdilke.bewl.helper.{ResultStore, StrictRef}
-import com.fdilke.bewl.topos.{Wrappings, Topos}
-import Function.const
+import com.fdilke.bewl.topos.{Topos, Wrappings}
 
 class NativeFiniteSets extends Topos
   with Wrappings[Traversable, FiniteSetsPreQuiver] {
@@ -55,28 +54,30 @@ class NativeFiniteSets extends Topos
         throw new IllegalArgumentException("Map values not in target")
       }
 
-    override def ?=(that: QUIVER[S, T]) = {
-      val equalizerSource = new FiniteSetsStar(
-            for (s <- source if function(s) == that.function(s))
-              yield new EqualizingElement[S] { // TODO: note: may be an issue about comparing equality with these
-                override val include = s
-              })
-      new FiniteSetsStar[EqualizingElement[S]](
-        equalizerSource
+    override def ?=(that: QUIVER[S, T]) =
+      new FiniteSetsStar[EqualizingElement[S] with Any](
+        for (s <- source if function(s) == that.function(s))
+          yield new EqualizingElement[S] {
+            override val include = s
+
+            override def equals(obj: scala.Any): Boolean = {
+              println("Aaargh") // TODO: note: may be an issue about comparing equality with these
+              super.equals(obj)
+            }
+        }
       ) with EqualizingStar[S] {
         override val equalizerTarget = source
 
         override def restrict[R](substar: QUIVER[R, S]) =
-          substar.source(equalizerSource) { r =>
+          substar.source(this) { r: R =>
             val quarry = substar(r)
-            equalizerSource.find {
+            find {
               _.include == quarry
             } getOrElse {
               throw new IllegalArgumentException(s"Cannot restrict $self by monic $substar") // TODO: need this logic twice??
             }
           }
       }
-    }
 
     override def x[U <: ELEMENT](that: QUIVER[S, U]): QUIVER[S, x[T, U]] = ???
 
