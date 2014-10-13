@@ -102,7 +102,7 @@ object DiagrammaticFiniteSets extends DiagrammaticTopos {
       case _ => false
     }
 
-    override def hashCode(): Int = 0 // don't use these as keys
+    override def hashCode() = (source, target, function).hashCode
 
     def sanityTest =
       if (!source.map(function).forall(x => target.exists(_ == x))) {
