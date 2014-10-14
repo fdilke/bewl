@@ -1,7 +1,7 @@
 package com.fdilke.bewl.topos
 
 import com.fdilke.bewl.diagrammatic.BaseDiagrammaticTopos
-import com.fdilke.bewl.helper.{ResultStore, StrictRef}
+import com.fdilke.bewl.helper.{Memoize, ResultStore, StrictRef}
 
 import scala.Function._
 
@@ -132,6 +132,14 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
     }
   }
 
+  private val standardProductStar = new ResultStore[(
+    StrictRef[STAR[WrappedArrow[Any]]], StrictRef[STAR[WrappedArrow[Any]]]
+    ),STAR[WrappedArrow[Any] x WrappedArrow[Any]]](tupled {
+    (x, y) => productStar(x.wrappedValue, y.wrappedValue)
+  })
+
+//  private val standardProductStar2 =
+
   private def exponentialStar[S <: ELEMENT, T <: ELEMENT](
     _source : STAR[S], _target : STAR[T]
    ) = new AdapterStar[S > T] with ExponentialStar[S, T] {
@@ -156,30 +164,33 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
     }
   }
 
-  private val standardWrappedDot = new ResultStore[StrictRef[DOT[Any]], Star[WrappedArrow[Any]]] (
-    x => new WrappedDot(x.wrappedValue)
-  )
-
-  private val standardProductStar = new ResultStore[(
-    StrictRef[STAR[WrappedArrow[Any]]], StrictRef[STAR[WrappedArrow[Any]]]
-    ),STAR[WrappedArrow[Any] x WrappedArrow[Any]]](tupled {
-    (x, y) => productStar(x.wrappedValue, y.wrappedValue)
-  })
-
   private val standardExponentialStar = new ResultStore[(
     StrictRef[STAR[WrappedArrow[Any]]], StrictRef[STAR[WrappedArrow[Any]]]
     ),STAR[WrappedArrow[Any] > WrappedArrow[Any]]](tupled {
     (x, y) => exponentialStar(x.wrappedValue, y.wrappedValue)
   })
 
+  private object standardWrappedDot {
+    private case class WrappedStar[T](star: STAR[WrappedArrow[T]])
+
+    private def wrapDot[T](dot: DOT[T]) = WrappedStar[T](
+      new WrappedDot(dot)
+    )
+
+    private val memoized = Memoize(wrapDot)
+
+    def apply[T](dot: DOT[T]): STAR[WrappedArrow[T]] =
+      memoized(dot).star
+  }
+
   // wrapping API
 
   override type WRAPPER[S] = WrappedArrow[S]
 
-  override def star[S](dot: BASE#DOT[S]) =
+  override def star[S](dot: BASE#DOT[S]) : STAR[WrappedArrow[S]] =
     standardWrappedDot(
-      StrictRef(dot.asInstanceOf[DOT[Any]])
-    ).asInstanceOf[STAR[WrappedArrow[S]]]
+      dot.asInstanceOf[DOT[S]]
+    )
 
   override def quiver[S, T](arrow: BASE#ARROW[S, T]) : QUIVER[WRAPPER[S], WRAPPER[T]] =
     star(arrow.source)(star(arrow.target), arrow.asInstanceOf[ARROW[S, T]])
