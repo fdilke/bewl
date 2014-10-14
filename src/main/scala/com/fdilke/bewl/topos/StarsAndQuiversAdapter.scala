@@ -138,8 +138,6 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
     (x, y) => productStar(x.wrappedValue, y.wrappedValue)
   })
 
-//  private val standardProductStar2 =
-
   private def exponentialStar[S <: ELEMENT, T <: ELEMENT](
     _source : STAR[S], _target : STAR[T]
    ) = new AdapterStar[S > T] with ExponentialStar[S, T] {
@@ -171,16 +169,10 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
   })
 
   private object standardWrappedDot {
-    private case class WrappedStar[T](star: STAR[WrappedArrow[T]])
-
-    private def wrapDot[T](dot: DOT[T]) = WrappedStar[T](
-      new WrappedDot(dot)
-    )
-
+    private type Widget[T] = STAR[WrappedArrow[T]]
+    private def wrapDot[T](dot: DOT[T]): Widget[T] = new WrappedDot(dot)
     private val memoized = Memoize(wrapDot)
-
-    def apply[T](dot: DOT[T]): STAR[WrappedArrow[T]] =
-      memoized(dot).star
+    def apply[T](dot: DOT[T]) = memoized(dot)
   }
 
   // wrapping API
