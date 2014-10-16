@@ -38,10 +38,10 @@ class MemoizeTest extends FunSpec {
       def instrumentedFunc[T](input: Input[T]): Output[T] =
         counter(input)
 
-      val memoizedFunc = Memoize(instrumentedFunc)
+      val memoizedFunc = Memoize[Input, Output, Any](instrumentedFunc)
 
       counter.check {
-        memoizedFunc(
+        memoizedFunc[Int](
           new Input[Int](Seq(2))
         ).seq shouldBe Seq(2,2)
       }
@@ -58,7 +58,7 @@ class MemoizeTest extends FunSpec {
       def instrumentedFunc[T](input: Seq[T]): Widget[T] =
         counter(input)
 
-      val memoizedFunc = Memoize.apply(instrumentedFunc)
+      val memoizedFunc = Memoize[Seq, Widget, Any](instrumentedFunc)
 
       counter.check {
         memoizedFunc(

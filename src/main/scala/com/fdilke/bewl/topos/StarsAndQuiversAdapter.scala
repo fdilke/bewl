@@ -32,11 +32,15 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
     override lazy val toI: QUIVER[T, UNIT] =
       quiver(dot.toI).asInstanceOf[QUIVER[T, UNIT]]
 
+    private object standardProductStar {
+      private type Widget[U <: ELEMENT] = STAR[T x U]
+      private def product[U <: ELEMENT](that: STAR[U]): Widget[U] = productStar(AdapterStar.this, that)
+      private val memoized = Memoize[STAR, Widget, ELEMENT](product)
+      def apply[U <: ELEMENT](that: STAR[U]) = memoized(that)
+    }
+
     override def x[U <: Element](that: STAR[U]) =
-      standardProductStar((
-        StrictRef(this.asInstanceOf[STAR[WrappedArrow[Any]]]),
-        StrictRef(that.asInstanceOf[STAR[WrappedArrow[Any]]])
-        )).asInstanceOf[STAR[T x U]]
+      standardProductStar(that)
     override def >[U <: ELEMENT](that: STAR[U]) =
       standardExponentialStar((
         StrictRef(this.asInstanceOf[STAR[WrappedArrow[Any]]]),
@@ -132,12 +136,6 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
     }
   }
 
-  private val standardProductStar = new ResultStore[(
-    StrictRef[STAR[WrappedArrow[Any]]], StrictRef[STAR[WrappedArrow[Any]]]
-    ),STAR[WrappedArrow[Any] x WrappedArrow[Any]]](tupled {
-    (x, y) => productStar(x.wrappedValue, y.wrappedValue)
-  })
-
   private def exponentialStar[S <: ELEMENT, T <: ELEMENT](
     _source : STAR[S], _target : STAR[T]
    ) = new AdapterStar[S > T] with ExponentialStar[S, T] {
@@ -171,7 +169,7 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
   private object standardWrappedDot {
     private type Widget[T] = STAR[WrappedArrow[T]]
     private def wrapDot[T](dot: DOT[T]): Widget[T] = new WrappedDot(dot)
-    private val memoized = Memoize(wrapDot)
+    private val memoized = Memoize[DOT, Widget, Any](wrapDot)
     def apply[T](dot: DOT[T]) = memoized(dot)
   }
 
