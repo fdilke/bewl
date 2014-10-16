@@ -34,7 +34,17 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
 
     private object standardProductStar {
       private type Widget[U <: ELEMENT] = STAR[T x U]
-      private def product[U <: ELEMENT](that: STAR[U]): Widget[U] = productStar(AdapterStar.this, that)
+      private def product[U <: ELEMENT](that: STAR[U]): Widget[U] =
+        new AdapterStar[T x U] {
+          override val dot = (AdapterStar.this.dot x that.dot).asInstanceOf[DOT[Any]]
+          override def asElement(anArrow: ARROW[_, _]) = new xI[T, U] with Element {
+            override val arrow: ARROW[Any, Any] = anArrow.asInstanceOf[ARROW[Any, Any]]
+            override val left: T = AdapterStar.this.asElement(
+              topos.leftProjection(AdapterStar.this.dot, that.dot).asInstanceOf[ARROW[Any, Any]](arrow))
+            override val right: U = that.asElement(
+              topos.rightProjection(AdapterStar.this.dot, that.dot).asInstanceOf[ARROW[Any, Any]](arrow))
+          }
+        }
       private val memoized = Memoize[STAR, Widget, ELEMENT](product)
       def apply[U <: ELEMENT](that: STAR[U]) = memoized(that)
     }
@@ -121,19 +131,6 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
     override val dot: DOT[Any] = innerDot.asInstanceOf[DOT[Any]]
     override def asElement(arrow: ARROW[_, _]) =
       new WrappedArrow(arrow.asInstanceOf[ARROW[Any, Any]])
-  }
-
-  private def productStar[L <: ELEMENT, R <: ELEMENT](
-    l: STAR[L], r: STAR[R]
-  ) = new AdapterStar[L x R] {
-    override val dot = (l.dot x r.dot).asInstanceOf[DOT[Any]]
-    override def asElement(anArrow: ARROW[_, _]) = new xI[L, R] with Element {
-      override val arrow: ARROW[Any, Any] = anArrow.asInstanceOf[ARROW[Any, Any]]
-      override val left: L = l.asElement(
-        topos.leftProjection(l.dot, r.dot).asInstanceOf[ARROW[Any, Any]](arrow))
-      override val right: R = r.asElement(
-        topos.rightProjection(l.dot, r.dot).asInstanceOf[ARROW[Any, Any]](arrow))
-    }
   }
 
   private def exponentialStar[S <: ELEMENT, T <: ELEMENT](
