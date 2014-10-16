@@ -45,7 +45,7 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
               topos.rightProjection(AdapterStar.this.dot, that.dot).asInstanceOf[ARROW[Any, Any]](arrow))
           }
         }
-      private val memoized = Memoize[STAR, Widget, ELEMENT](product)
+      private val memoized = Memoize.withLowerBound[STAR, Widget, ELEMENT](product)
       def apply[U <: ELEMENT](that: STAR[U]) = memoized(that)
     }
 
@@ -166,7 +166,7 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
   private object standardWrappedDot {
     private type Widget[T] = STAR[WrappedArrow[T]]
     private def wrapDot[T](dot: DOT[T]): Widget[T] = new WrappedDot(dot)
-    private val memoized = Memoize[DOT, Widget, Any](wrapDot)
+    private val memoized = Memoize.withLowerBound[DOT, Widget, Any](wrapDot)
     def apply[T](dot: DOT[T]) = memoized(dot)
   }
 
