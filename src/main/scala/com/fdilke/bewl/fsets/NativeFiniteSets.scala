@@ -1,7 +1,7 @@
 package com.fdilke.bewl.fsets
 
 import com.fdilke.bewl.fsets.DiagrammaticFiniteSetsUtilities._
-import com.fdilke.bewl.helper.{FunctionWithEquality, Memoize}
+import com.fdilke.bewl.helper.Memoize
 import com.fdilke.bewl.topos.{Topos, Wrappings}
 
 class NativeFiniteSets extends Topos
@@ -47,20 +47,28 @@ class NativeFiniteSets extends Topos
     override def >[T <: ELEMENT](that: STAR[T]): ExponentialStar[S, T] with STAR[S > T] = memoizedExponential(that)
 
     private val memoizedProduct = {
-      type PRODUCT[T <: ELEMENT] = STAR[S x T]
-      def pair[T <: ELEMENT](s: S, t: T): S x T =
+      type PRODUCT[T <: ELEMENT] = ProductStar[S, T] with STAR[S x T]
+      def _pair[T <: ELEMENT](s: S, t: T): S x T =
         new xI[S, T] {
           override val left = s
           override val right = t
         }
       def product[T <: ELEMENT](that: STAR[T]) =
         new FiniteSetsStar[S x T](
-          for(s <- this ; t <- that)
-            yield pair(s, t)
-        )
+        for(s <- this ; t <- that)
+        yield _pair(s, t)
+        ) with ProductStar[S, T] {
+          override val left: STAR[S] = self
+          override val right: STAR[T] = that
+          override def pair(l: S, r: T): x[S, T] = _pair(l, r)
+//
+//          override def foreach[U](f: (x[S, T]) => U): Unit = ???
+//
+//          override def apply[T <: ELEMENT](target: STAR[T])(f: (x[S, T]) => T): QUIVER[x[S, T], T] = ???
+        }
       Memoize.generic.withLowerBound[STAR, PRODUCT, ELEMENT](product)
     }
-    override def x[T <: ELEMENT](that: STAR[T]): STAR[x[S, T]] = memoizedProduct(that)
+    override def x[T <: ELEMENT](that: STAR[T]): ProductStar[S, T] with STAR[x[S, T]] = memoizedProduct(that)
 
     override def apply[T <: ELEMENT](target: STAR[T])(f: S => T) =
       new FiniteSetsQuiver(this, target, f)

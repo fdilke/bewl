@@ -108,6 +108,10 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
     }
 
     it("can construct biproduct diagrams") {
+      (bar x baz) should have(
+        'left (bar),
+        'right (baz)
+      )
       val productQuiver = foo2bar x foo2baz
 
       productQuiver should have (
@@ -126,6 +130,11 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
       foo(baz) {
         x => productQuiver(x).right
       } shouldBe foo2baz
+
+      val fooXbar = foo x bar
+      fooXbar(fooXbar) {
+        case f x b => fooXbar.pair(f, b)
+      } shouldBe fooXbar.identity
     }
 
     it("has a terminator") {
@@ -138,8 +147,7 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
     }
 
     it("has standardized products") {
-      val product: STAR[FOO x BAR] = foo x bar
-      product shouldBe (foo x bar)
+      (foo x bar) shouldBe (foo x bar)
     }
 
     it("can chain products") {

@@ -38,6 +38,12 @@ trait BaseTopos {
     )
   }
 
+  trait ProductStar[L <: ELEMENT, R <: ELEMENT] { star: STAR[L x R] =>
+    val left: STAR[L]
+    val right: STAR[R]
+    def pair(l: L, r: R): L x R
+  }
+
   trait EqualizingStar[S <: ELEMENT] { star: STAR[EqualizingElement[S] with ELEMENT] =>
     val equalizerTarget: STAR[S]
     final val inclusion: QUIVER[EqualizingElement[S] with ELEMENT, S] =
@@ -52,7 +58,7 @@ trait BaseTopos {
   trait Star[S <: ELEMENT] { self: STAR[S] =>
     final lazy val identity: QUIVER[S, S] = this(self)(Predef.identity)
     val toI: QUIVER[S, UNIT]
-    def x[T <: ELEMENT](that: STAR[T]): STAR[S x T]
+    def x[T <: ELEMENT](that: STAR[T]): ProductStar[S, T] with STAR[S x T]
     def >[T <: ELEMENT](that: STAR[T]): ExponentialStar[S, T] with STAR[S > T]
     def sanityTest
 

@@ -26,27 +26,30 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
   trait AdapterTruth extends Element {
   }
 
-  trait AdapterStar[T <: Element] extends Star[T] {
+  trait AdapterStar[T <: Element] extends Star[T] { self =>
     override lazy val toI: QUIVER[T, UNIT] =
       quiver(dot.toI).asInstanceOf[QUIVER[T, UNIT]]
 
     private val memoizedProductStar = {
-      type PRODUCT[U <: ELEMENT] = STAR[T x U]
+      type PRODUCT[U <: ELEMENT] = STAR[T x U] with ProductStar[T, U]
       def product[U <: ELEMENT](that: STAR[U]) =
-        new AdapterStar[T x U] {
-          override private[StarsAndQuiversAdapter] val dot = (AdapterStar.this.dot x that.dot).asInstanceOf[DOT[Any]]
+        new AdapterStar[T x U] with ProductStar[T, U] {
+          override val left = self
+          override val right = that
+          override def pair(t: T,u: U) = asElement(t.arrow x u.arrow)
+          override private[StarsAndQuiversAdapter] val dot = (self.dot x that.dot).asInstanceOf[DOT[Any]]
           override private[StarsAndQuiversAdapter] def asElement(anArrow: ARROW[_, _]) = new xI[T, U] with Element {
             override val arrow: ARROW[Any, Any] = anArrow.asInstanceOf[ARROW[Any, Any]]
-            override val left: T = AdapterStar.this.asElement(
-              topos.leftProjection(AdapterStar.this.dot, that.dot).asInstanceOf[ARROW[Any, Any]](arrow))
+            override val left: T = self.asElement(
+              topos.leftProjection(self.dot, that.dot).asInstanceOf[ARROW[Any, Any]](arrow))
             override val right: U = that.asElement(
-              topos.rightProjection(AdapterStar.this.dot, that.dot).asInstanceOf[ARROW[Any, Any]](arrow))
+              topos.rightProjection(self.dot, that.dot).asInstanceOf[ARROW[Any, Any]](arrow))
           }
         }
       Memoize.generic.withLowerBound[STAR, PRODUCT, ELEMENT](product)
     }
 
-    override def x[U <: Element](that: STAR[U]): STAR[T x U] =
+    override def x[U <: Element](that: STAR[U]): ProductStar[T, U] with STAR[T x U] = // TODO sort out 'with' ordering for all of these & exponents
       memoizedProductStar(that)
 
     private val memoizedExponentialStar = {
