@@ -14,12 +14,10 @@ object Memoize {
       function.asInstanceOf[INPUT[_] => OUTPUT[_]]
     )
 
-  object withLowerBound {
-    def apply[INPUT[T <: BASE], OUTPUT[T <: BASE], BASE](function: INPUT[BASE] => OUTPUT[BASE]) =
-      new MemoizedFunction[INPUT, OUTPUT, BASE](
-        function.asInstanceOf[INPUT[_ <: BASE] => OUTPUT[_ <: BASE]]
-      )
-  }
+  def withLowerBound[INPUT[T <: BASE], OUTPUT[T <: BASE], BASE](function: INPUT[BASE] => OUTPUT[BASE]) =
+    new MemoizedFunction[INPUT, OUTPUT, BASE](
+      function.asInstanceOf[INPUT[_ <: BASE] => OUTPUT[_ <: BASE]]
+    )
 }
 
 
