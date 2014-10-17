@@ -30,10 +30,9 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
     override lazy val toI: QUIVER[T, UNIT] =
       quiver(dot.toI).asInstanceOf[QUIVER[T, UNIT]]
 
-
-    private val standardProductStar = {
+    private val memoizedProductStar = {
       type PRODUCT[U <: ELEMENT] = STAR[T x U]
-      def funnyProduct[U <: ELEMENT](that: STAR[U]) =
+      def product[U <: ELEMENT](that: STAR[U]) =
         new AdapterStar[T x U] {
           override val dot = (AdapterStar.this.dot x that.dot).asInstanceOf[DOT[Any]]
           override def asElement(anArrow: ARROW[_, _]) = new xI[T, U] with Element {
@@ -44,16 +43,15 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
               topos.rightProjection(AdapterStar.this.dot, that.dot).asInstanceOf[ARROW[Any, Any]](arrow))
           }
         }
-
-      Memoize.withLowerBound[STAR, PRODUCT, ELEMENT](funnyProduct)
+      Memoize.withLowerBound[STAR, PRODUCT, ELEMENT](product)
     }
 
     override def x[U <: Element](that: STAR[U]): STAR[T x U] =
-      standardProductStar(that)
+      memoizedProductStar(that)
 
-    private object standardExponentialStar {
-      private type EXPONENT[U <: ELEMENT] = ExponentialStar[T, U] with STAR[T > U]
-      private def product[U <: ELEMENT](that: STAR[U]): EXPONENT[U] =
+    private val memoizedExponentialStar = {
+      type EXPONENT[U <: ELEMENT] = ExponentialStar[T, U] with STAR[T > U]
+      def exponential[U <: ELEMENT](that: STAR[U]) =
         new AdapterStar[T > U] with ExponentialStar[T, U] {
         override val source = AdapterStar.this
         override val target = that
@@ -75,12 +73,11 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
               ))
         }
       }
-      private val memoized = Memoize.withLowerBound[STAR, EXPONENT, ELEMENT](product)
-      def apply[U <: ELEMENT](that: STAR[U]) = memoized(that)
+      Memoize.withLowerBound[STAR, EXPONENT, ELEMENT](exponential)
     }
 
     override def >[U <: ELEMENT](that: STAR[U]) =
-      standardExponentialStar(that).asInstanceOf[ExponentialStar[T, U] with STAR[T > U]]
+      memoizedExponentialStar(that)
 
     override def sanityTest = dot.sanityTest
 
@@ -94,7 +91,6 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
       ): QUIVER[T, U] = this(target)(
       t => target.asElement(arrow.asInstanceOf[ARROW[Any, Any]](t.arrow))
     )
-
     def asElement(arrow: ARROW[_, _]) : T
   }
 
@@ -124,7 +120,6 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
             override val include =
               equalizerTarget.asElement(equalizer.equalizer.asInstanceOf[ARROW[Any, Any]](arrow))
           }
-
         override def restrict[R <: ELEMENT](quiver: QUIVER[R, S]) =
           quiver.source(this, equalizer.restrict(quiver.arrow))
       }
