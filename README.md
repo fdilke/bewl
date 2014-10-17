@@ -2,16 +2,19 @@
 
 A DSL for the internal (Mitchell-Benabou) language of a topos.
 
-This [animated video](http://www.youtube.com/watch/?v=nUwjGBHXKYs) attempts a gentle introduction to Project Bewl (formerly Bile)
+This [animated video](http://www.youtube.com/watch/?v=nUwjGBHXKYs) attempts a gentle introduction to Project Bewl (formerly Bile).
+See also [this presentation](https://www.evernote.com/shard/s141/sh/8e6b9d94-bc20-4fde-b2bf-9e844f486f76/d11244bad0729071fa00d19eaad312ce)
 
 I've implemented this in Java, Clojure and now Scala. Really it should be in Haskell but I am only partway through
-[Barely Remember you a Hask](http://learnyouahaskell.com)
-
+[learning the language](http://learnyouahaskell.com)
 
 # Intended applications
 
 - Explore the topos of graphs. Bewl will let us talk about graphs as if they were sets
+- Explore fuzzy sets (using the more careful definition that makes them into a topos)
 - Explore parity in other topoi (as it's so poorly understood for sets)
+- Explore Lawvere-Tierney topologies (and perhaps save [these](http://www.math.uchicago.edu/~may/VIGRE/VIGRE2007/REUPapers/FINALFULL/Bartlett.pdf) 
+[poor](http://user.cs.tu-berlin.de/~noll/ToposOfTriads.pdf) music theorists from having to calculate them by hand)
 
 # Done so far
 
@@ -23,7 +26,8 @@ I've implemented this in Java, Clojure and now Scala. Really it should be in Has
 - Structure definitions for monoid, group, abelian group, ring with their respective algebraic laws
 - Can extend and remap algebraic structures, e.g. ring extends abelian group remaps group with an extra law
 - Universal and existential quantifiers
-- Strong binding 1a: a new layer with stars/quivers concreting over dots/arrows. Done for products.
+- Strong binding: a new layer with stars/quivers concreting over dots/arrows ; stars bound to classes ; quivers/functions interchangeable
+- Specialized element types: e.g. product has left, right ; exponential can apply
 
 # Tech tasks done
 - cleaner memoization; optionally uses generics and lower bound types; works with structural types 
@@ -34,7 +38,6 @@ I've implemented this in Java, Clojure and now Scala. Really it should be in Has
 - Formalize constructions like: automorphism group, endomorphism ring, group of invertible elements of a monoid
 - Extract the Heyting algebra structure of the subobject classifier
 - Construct coproducts and colimits
-- Add bindings: the type arguments have their own methods e.g. product has left, right
 
 # Questions
 
