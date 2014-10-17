@@ -1,7 +1,7 @@
 package com.fdilke.bewl.diagrammatic
 
 import com.fdilke.bewl.diagrammatic.algebra.{Algebra, AlgebraicLaws, AlgebraicStructures, TruthObject}
-import com.fdilke.bewl.helper.{ResultStore, StrictRef}
+import com.fdilke.bewl.helper.{Memoize, ResultStore, StrictRef}
 
 import scala.Function.tupled
 
@@ -149,6 +149,11 @@ trait BaseDiagrammaticTopos {
   private val standardPowers = new ResultStore[(StrictRef[DOT[Any]], Int), IntegerPower[Any]](tupled {
     (x, n) => x.wrappedValue toPower n
   })
+
+//  private val memoizedPower = {
+//    def power[T](exponent: Int) = this toPower n
+//    Memoize(power)
+//  }
 
   // Helper methods for biproducts
   def leftProjection[X, Y](x: DOT[X], y: DOT[Y]) = (x * y).leftProjection

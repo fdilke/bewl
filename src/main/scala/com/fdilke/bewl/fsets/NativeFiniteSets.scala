@@ -97,7 +97,7 @@ class NativeFiniteSets extends Topos
   private val memoizedStarWrapper = {
     def wrap[T](elements: Traversable[T]) =
       new FiniteSetsStar(elements)
-    Memoize(wrap)
+    Memoize.generic(wrap)
   }
 
   // wrapping API

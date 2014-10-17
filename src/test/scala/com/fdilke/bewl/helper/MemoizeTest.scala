@@ -8,7 +8,24 @@ class MemoizeTest extends FunSpec {
   private case class Input[T](seq: Seq[T])
   private case class Output[T](seq: Seq[T])
 
-  private class Counterize[I[T], O[T]](func: I[_] => O[_]) {
+  private class Counterize[I, O](func: I => O) {
+    private var count = 0
+
+    def check(verify: => Unit) {
+      count shouldBe 0
+      verify
+      count shouldBe 1
+      verify
+      count shouldBe 1
+    }
+
+    def apply[U](i: I): O = {
+      count += 1
+      func(i)
+    }
+  }
+
+  private class CounterizeGeneric[I[T], O[T]](func: I[_] => O[_]) {
     private var count = 0
 
     def check(verify: => Unit) {
@@ -25,7 +42,7 @@ class MemoizeTest extends FunSpec {
     }
   }
 
-  private class CounterizeWithBase[BASE, I[T <: BASE], O[T <: BASE]](func: I[BASE] => O[BASE]) {
+  private class CounterizeGenericWithBase[BASE, I[T <: BASE], O[T <: BASE]](func: I[BASE] => O[BASE]) {
     private var count = 0
 
     def check(verify: => Unit) {
@@ -44,18 +61,32 @@ class MemoizeTest extends FunSpec {
 
   describe("A memoized function") {
 
-    it("caches its results") {
-      var numCalls = 0
+    it("caches results for a vanilla function") {
+      def testFunc(n: Int) : String =
+        "Hello " + n
 
+      val counter = new Counterize[Int, String](testFunc)
+
+      def instrumentedFunc(input: Int): String =
+        counter(input)
+
+      val memoizedFunc = Memoize(instrumentedFunc)
+
+      counter.check {
+        memoizedFunc(2) shouldBe "Hello 2"
+      }
+    }
+
+    it("caches its results, with a generic parameter") {
       def testFunc(input: Input[_]): Output[_] =
         new Output(input.seq ++ input.seq)
 
-      val counter = new Counterize[Input, Output](testFunc)
+      val counter = new CounterizeGeneric[Input, Output](testFunc)
 
       def instrumentedFunc[T](input: Input[T]): Output[T] =
         counter(input)
 
-      val memoizedFunc = Memoize(instrumentedFunc)
+      val memoizedFunc = Memoize.generic(instrumentedFunc)
 
       counter.check {
         memoizedFunc(
@@ -70,12 +101,12 @@ class MemoizeTest extends FunSpec {
       def testFunc[T](input: Seq[_]): Widget[_] =
         Seq(input.headOption, None)
 
-      val counter = new Counterize[Seq, Widget](testFunc)
+      val counter = new CounterizeGeneric[Seq, Widget](testFunc)
 
       def instrumentedFunc[T](input: Seq[T]): Widget[T] =
         counter(input)
 
-      val memoizedFunc = Memoize(instrumentedFunc)
+      val memoizedFunc = Memoize.generic(instrumentedFunc)
 
       counter.check {
         memoizedFunc(
@@ -90,12 +121,12 @@ class MemoizeTest extends FunSpec {
       def testFunc[T <: Number](input: Seq[T]): Widget[T] =
         Seq(input.headOption, None)
 
-      val counter = new CounterizeWithBase[Number, Seq, Widget](testFunc)
+      val counter = new CounterizeGenericWithBase[Number, Seq, Widget](testFunc)
 
       def instrumentedFunc[T <: Number](input: Seq[T]): Widget[T] =
         counter(input)
 
-      val memoizedFunc = Memoize.withLowerBound[Seq, Widget, Number](instrumentedFunc)
+      val memoizedFunc = Memoize.generic.withLowerBound[Seq, Widget, Number](instrumentedFunc)
 
       counter.check {
         memoizedFunc[java.lang.Double](
@@ -103,21 +134,6 @@ class MemoizeTest extends FunSpec {
         ) shouldBe Seq(Some(2.0), None)
       }
     }
-
-    /* Note may need to automate this kind of fancy-pants code:
-  private object standardWrappedDot {
-    private case class WrappedStar[T](star: STAR[WrappedArrow[T]])
-
-    private def wrapDot[T](dot: DOT[T]) = WrappedStar[T](
-      new WrappedDot(dot)
-    )
-
-    private val memoized = Memoize(wrapDot)
-
-    def apply[T](dot: DOT[T]): STAR[WrappedArrow[T]] =
-      memoized(dot).star
-  }
-     */
   }
 }
 

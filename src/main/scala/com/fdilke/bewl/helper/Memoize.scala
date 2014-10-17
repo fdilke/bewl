@@ -1,23 +1,34 @@
 package com.fdilke.bewl.helper
 
 object Memoize {
-  class MemoizedFunction[INPUT[T <: BASE], OUTPUT[T <: BASE], BASE](function: INPUT[_ <: BASE] => OUTPUT[_ <: BASE]) {
+  def apply[INPUT, OUTPUT](function: INPUT => OUTPUT) =
+    new MemoizedFunction[INPUT, OUTPUT](function)
 
-    private val resultMap = scala.collection.mutable.Map[INPUT[_], OUTPUT[_]]()
+  class MemoizedFunction[INPUT, OUTPUT](function: INPUT => OUTPUT) {
+    private val resultMap = scala.collection.mutable.Map[INPUT, OUTPUT]()
 
-    def apply[T <: BASE](input: INPUT[T]): OUTPUT[T] =
-      resultMap.getOrElseUpdate(input, function(input)).asInstanceOf[OUTPUT[T]]
+    def apply(input: INPUT): OUTPUT =
+      resultMap.getOrElseUpdate(input, function(input))
   }
 
-  def apply[INPUT[T], OUTPUT[T]](function: INPUT[Nothing] => OUTPUT[Nothing]) =
-    new MemoizedFunction[INPUT, OUTPUT, Any](
-      function.asInstanceOf[INPUT[_] => OUTPUT[_]]
-    )
+  object generic {
+    def apply[INPUT[T], OUTPUT[T]](function: INPUT[Nothing] => OUTPUT[Nothing]) =
+      new MemoizedFunctionGeneric[INPUT, OUTPUT, Any](
+        function.asInstanceOf[INPUT[_] => OUTPUT[_]]
+      )
 
-  def withLowerBound[INPUT[T <: BASE], OUTPUT[T <: BASE], BASE](function: INPUT[BASE] => OUTPUT[BASE]) =
-    new MemoizedFunction[INPUT, OUTPUT, BASE](
-      function.asInstanceOf[INPUT[_ <: BASE] => OUTPUT[_ <: BASE]]
-    )
+    class MemoizedFunctionGeneric[INPUT[T <: BASE], OUTPUT[T <: BASE], BASE](function: INPUT[_ <: BASE] => OUTPUT[_ <: BASE]) {
+      private val resultMap = scala.collection.mutable.Map[INPUT[_], OUTPUT[_]]()
+
+      def apply[T <: BASE](input: INPUT[T]): OUTPUT[T] =
+        resultMap.getOrElseUpdate(input, function(input)).asInstanceOf[OUTPUT[T]]
+    }
+
+    def withLowerBound[INPUT[T <: BASE], OUTPUT[T <: BASE], BASE](function: INPUT[BASE] => OUTPUT[BASE]) =
+      new MemoizedFunctionGeneric[INPUT, OUTPUT, BASE](
+        function.asInstanceOf[INPUT[_ <: BASE] => OUTPUT[_ <: BASE]]
+      )
+  }
 }
 
 
