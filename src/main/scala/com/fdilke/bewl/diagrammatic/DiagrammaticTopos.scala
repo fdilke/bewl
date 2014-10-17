@@ -1,9 +1,7 @@
 package com.fdilke.bewl.diagrammatic
 
 import com.fdilke.bewl.diagrammatic.algebra.{Algebra, AlgebraicLaws, AlgebraicStructures, TruthObject}
-import com.fdilke.bewl.helper.{Memoize, ResultStore, StrictRef}
-
-import scala.Function.tupled
+import com.fdilke.bewl.helper.Memoize
 
 trait DiagrammaticTopos extends BaseDiagrammaticTopos with Algebra with AlgebraicLaws with
   AlgebraicStructures with TruthObject
@@ -29,24 +27,34 @@ trait BaseDiagrammaticTopos {
 
     def multiply[Y](that: DOT[Y]): Biproduct[X, Y]
 
-    final def *[Y](that: DOT[Y]) =
-      standardProducts(
-        (StrictRef(this.asInstanceOf[DOT[Any]]),
-         StrictRef(that.asInstanceOf[DOT[Any]]))).asInstanceOf[Biproduct[X, Y]]
+    private val memoizedBiproduct = {
+      type BIPRODUCT[Y] = Biproduct[X, Y]
+      def biproduct[Y](that: DOT[Y]): BIPRODUCT[Y] = this multiply that
+      Memoize.generic[DOT, BIPRODUCT](biproduct)
+    }
+
+    final def *[Y](that: DOT[Y]): Biproduct[X, Y] = memoizedBiproduct(that)
 
     final def x[Y](that: DOT[Y]) = (this * that).product
 
     def exponential[S](that: DOT[S]): Exponential[S, X]
 
-    final def A[S](that: DOT[S]) = standardExponentials(
-      (StrictRef(this.asInstanceOf[DOT[Any]]),
-       StrictRef(that.asInstanceOf[DOT[Any]]))).asInstanceOf[Exponential[S, X]]
+    private val memoizedExponential = {
+      type EXPONENTIAL[S] = Exponential[S, X]
+      def exponential[S](that: DOT[S]): EXPONENTIAL[S] = this exponential that
+      Memoize.generic[DOT, EXPONENTIAL](exponential)
+    }
+
+    final def A[S](that: DOT[S]): Exponential[S, X] = memoizedExponential(that)
 
     final def ^[S](that: DOT[S]): DOT[S => X] = (this A that).exponentDot
 
-    final def A(exponent: Int) = standardPowers(
-      StrictRef(this.asInstanceOf[DOT[Any]]),
-      exponent).asInstanceOf[IntegerPower[X]]
+    private val memoizedPower = {
+      def power[T](exponent: Int) = this toPower exponent
+      Memoize(power)
+    }
+
+    final def A(exponent: Int) = memoizedPower(exponent)
 
     final def ^(exponent: Int): DOT[Power[X]] = (this A exponent).power
 
@@ -135,25 +143,6 @@ trait BaseDiagrammaticTopos {
   }
 
   class Power[X] // just a marker, for now - will have methods as part of the DSL?
-
-  private val standardProducts = new ResultStore[(StrictRef[DOT[Any]], StrictRef[DOT[Any]]),
-    Biproduct[Any, Any]](tupled {
-    (x, y) => x.wrappedValue multiply y.wrappedValue
-  })
-
-  private val standardExponentials = new ResultStore[(StrictRef[DOT[Any]], StrictRef[DOT[Any]]),
-    Exponential[Any, Any]](tupled {
-    (x, y) => x.wrappedValue exponential y.wrappedValue
-  })
-
-  private val standardPowers = new ResultStore[(StrictRef[DOT[Any]], Int), IntegerPower[Any]](tupled {
-    (x, n) => x.wrappedValue toPower n
-  })
-
-//  private val memoizedPower = {
-//    def power[T](exponent: Int) = this toPower n
-//    Memoize(power)
-//  }
 
   // Helper methods for biproducts
   def leftProjection[X, Y](x: DOT[X], y: DOT[Y]) = (x * y).leftProjection
