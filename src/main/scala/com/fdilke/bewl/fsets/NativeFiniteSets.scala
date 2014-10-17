@@ -1,6 +1,6 @@
 package com.fdilke.bewl.fsets
 
-import com.fdilke.bewl.helper.{ResultStore, StrictRef}
+import com.fdilke.bewl.helper.{Memoize, ResultStore, StrictRef}
 import com.fdilke.bewl.topos.{Topos, Wrappings}
 
 class NativeFiniteSets extends Topos
@@ -94,9 +94,11 @@ class NativeFiniteSets extends Topos
       }}
   }
 
-  private val standardStar = new ResultStore[StrictRef[Traversable[Any]], STAR[Any]] (
-    x => new FiniteSetsStar(x.wrappedValue)
-  )
+  private val memoizedStarWrapper = {
+    def wrap[T](elements: Traversable[T]) =
+      new FiniteSetsStar(elements)
+    Memoize(wrap)
+  }
 
   // wrapping API
 
@@ -109,9 +111,7 @@ class NativeFiniteSets extends Topos
     star(prequiver.source)(star(prequiver.target))(prequiver.function)
 
   override def star[T](input: Traversable[T]) =
-    standardStar(
-      StrictRef(input.asInstanceOf[Traversable[T]])
-    ).asInstanceOf[STAR[T]]
+    memoizedStarWrapper(input)
 
   override def bifunctionAsBiQuiver[L, R, T](left: STAR[L], right: STAR[R], target: STAR[T], bifunc: (L, R) => T): BiQuiver[L, R, T] = ???
 }

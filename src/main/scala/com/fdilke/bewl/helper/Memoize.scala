@@ -9,10 +9,7 @@ object Memoize {
       resultMap.getOrElseUpdate(input, function(input)).asInstanceOf[OUTPUT[T]]
   }
 
-//  def apply[INPUT[T], OUTPUT[T]](function: INPUT[Any] => OUTPUT[Any]) =
-//    withLowerBound[INPUT, OUTPUT, Any](function)
-
-  def apply[INPUT[T], OUTPUT[T], U](function: INPUT[U] => OUTPUT[U]) =
+  def apply[INPUT[T], OUTPUT[T]](function: INPUT[Nothing] => OUTPUT[Nothing]) =
     new MemoizedFunction[INPUT, OUTPUT, Any](
       function.asInstanceOf[INPUT[_] => OUTPUT[_]]
     )

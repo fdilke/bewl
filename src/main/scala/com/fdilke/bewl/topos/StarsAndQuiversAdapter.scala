@@ -153,7 +153,7 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
       new WrappedArrow(arrow.asInstanceOf[ARROW[Any, Any]])
   }
 
-  private val standardWrappedDot = {
+  private val memoizedWrappedDot = {
     type WRAPPER[T] = STAR[WrappedArrow[T]]
     def wrapDot[T](dot: DOT[T]): WRAPPER[T] = new WrappedDot(dot)
     Memoize.withLowerBound[DOT, WRAPPER, Any](wrapDot)
@@ -164,7 +164,7 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
   override type WRAPPER[S] = WrappedArrow[S]
 
   override def star[S](dot: BASE#DOT[S]) : STAR[WrappedArrow[S]] =
-    standardWrappedDot(
+    memoizedWrappedDot(
       dot.asInstanceOf[DOT[S]]
     )
 
