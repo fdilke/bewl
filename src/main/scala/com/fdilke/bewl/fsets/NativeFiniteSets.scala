@@ -1,6 +1,6 @@
 package com.fdilke.bewl.fsets
 
-import com.fdilke.bewl.helper.{Memoize, ResultStore, StrictRef}
+import com.fdilke.bewl.helper.Memoize
 import com.fdilke.bewl.topos.{Topos, Wrappings}
 
 class NativeFiniteSets extends Topos

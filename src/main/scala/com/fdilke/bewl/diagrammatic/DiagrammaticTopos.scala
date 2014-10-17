@@ -22,9 +22,7 @@ trait BaseDiagrammaticTopos {
 
   trait Dot[X] {
     def identity: ARROW[X, X]
-
     def toI: ARROW[X, TERMINAL]
-
     def multiply[Y](that: DOT[Y]): Biproduct[X, Y]
 
     private val memoizedBiproduct = {
@@ -34,11 +32,8 @@ trait BaseDiagrammaticTopos {
     }
 
     final def *[Y](that: DOT[Y]): Biproduct[X, Y] = memoizedBiproduct(that)
-
     final def x[Y](that: DOT[Y]) = (this * that).product
-
     def exponential[S](that: DOT[S]): Exponential[S, X]
-
     private val memoizedExponential = {
       type EXPONENTIAL[S] = Exponential[S, X]
       def exponential[S](that: DOT[S]): EXPONENTIAL[S] = this exponential that
@@ -46,18 +41,13 @@ trait BaseDiagrammaticTopos {
     }
 
     final def A[S](that: DOT[S]): Exponential[S, X] = memoizedExponential(that)
-
     final def ^[S](that: DOT[S]): DOT[S => X] = (this A that).exponentDot
-
     private val memoizedPower = {
       def power[T](exponent: Int) = this toPower exponent
       Memoize(power)
     }
-
     final def A(exponent: Int) = memoizedPower(exponent)
-
     final def ^(exponent: Int): DOT[Power[X]] = (this A exponent).power
-
     final def toPower(exponent: Int): IntegerPower[X] = exponent match {
       case 0 => IntegerPower[X](I, Seq.empty)
       case 1 => IntegerPower[X](this, Seq(this.identity))

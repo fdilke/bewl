@@ -25,6 +25,9 @@ I've implemented this in Java, Clojure and now Scala. Really it should be in Has
 - Universal and existential quantifiers
 - Strong binding 1a: a new layer with stars/quivers concreting over dots/arrows. Done for products.
 
+# Tech tasks done
+- cleaner memoization; optionally uses generics and lower bound types; works with structural types 
+
 # To do
 
 - Broaden definition of algebraic structures to include models and parameterized operations
