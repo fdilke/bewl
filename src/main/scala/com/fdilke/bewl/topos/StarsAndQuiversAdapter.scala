@@ -1,14 +1,12 @@
 package com.fdilke.bewl.topos
 
 import com.fdilke.bewl.diagrammatic.BaseDiagrammaticTopos
-import com.fdilke.bewl.helper.{Memoize, ResultStore, StrictRef}
-
-import scala.Function._
+import com.fdilke.bewl.helper.Memoize
 
 class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
   extends Topos with Wrappings[BASE#DOT, BASE#ARROW] {
 
-  import topos.{ I => _, omega => _, _ }
+  import topos.{I => _, omega => _, _}
 
   override type ELEMENT = Element
   trait Element {
@@ -32,9 +30,10 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
     override lazy val toI: QUIVER[T, UNIT] =
       quiver(dot.toI).asInstanceOf[QUIVER[T, UNIT]]
 
-    private object standardProductStar {
-      private type PRODUCT[U <: ELEMENT] = STAR[T x U]
-      private def product[U <: ELEMENT](that: STAR[U]): PRODUCT[U] =
+
+    private val standardProductStar = {
+      type PRODUCT[U <: ELEMENT] = STAR[T x U]
+      def funnyProduct[U <: ELEMENT](that: STAR[U]) =
         new AdapterStar[T x U] {
           override val dot = (AdapterStar.this.dot x that.dot).asInstanceOf[DOT[Any]]
           override def asElement(anArrow: ARROW[_, _]) = new xI[T, U] with Element {
@@ -45,22 +44,19 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
               topos.rightProjection(AdapterStar.this.dot, that.dot).asInstanceOf[ARROW[Any, Any]](arrow))
           }
         }
-      private val memoized = Memoize.withLowerBound[STAR, PRODUCT, ELEMENT](product)
-      def apply[U <: ELEMENT](that: STAR[U]) = memoized(that)
+
+      Memoize.withLowerBound[STAR, PRODUCT, ELEMENT](funnyProduct)
     }
 
-    override def x[U <: Element](that: STAR[U]) =
+    override def x[U <: Element](that: STAR[U]): STAR[T x U] =
       standardProductStar(that)
 
     private object standardExponentialStar {
       private type EXPONENT[U <: ELEMENT] = ExponentialStar[T, U] with STAR[T > U]
       private def product[U <: ELEMENT](that: STAR[U]): EXPONENT[U] =
-        exponentialStar(that)
-      private def exponentialStar[U <: ELEMENT](
-             _target : STAR[U]
-       ) = new AdapterStar[T > U] with ExponentialStar[T, U] {
+        new AdapterStar[T > U] with ExponentialStar[T, U] {
         override val source = AdapterStar.this
-        override val target = _target
+        override val target = that
 
         private val exponential = target.dot A source.dot
         override val dot = exponential.exponentDot.asInstanceOf[DOT[Any]]
@@ -79,7 +75,6 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
               ))
         }
       }
-
       private val memoized = Memoize.withLowerBound[STAR, EXPONENT, ELEMENT](product)
       def apply[U <: ELEMENT](that: STAR[U]) = memoized(that)
     }
@@ -163,11 +158,10 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
       new WrappedArrow(arrow.asInstanceOf[ARROW[Any, Any]])
   }
 
-  private object standardWrappedDot {
-    private type Widget[T] = STAR[WrappedArrow[T]]
-    private def wrapDot[T](dot: DOT[T]): Widget[T] = new WrappedDot(dot)
-    private val memoized = Memoize.withLowerBound[DOT, Widget, Any](wrapDot)
-    def apply[T](dot: DOT[T]) = memoized(dot)
+  private val standardWrappedDot = {
+    type WRAPPER[T] = STAR[WrappedArrow[T]]
+    def wrapDot[T](dot: DOT[T]): WRAPPER[T] = new WrappedDot(dot)
+    Memoize.withLowerBound[DOT, WRAPPER, Any](wrapDot)
   }
 
   // wrapping API
