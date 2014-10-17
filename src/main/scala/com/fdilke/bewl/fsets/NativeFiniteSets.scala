@@ -15,13 +15,28 @@ class NativeFiniteSets extends Topos
   override val omega = star(Traversable(true, false))
   override val truth = I(omega) { _ => true }
 
+  private def pair[S <: ELEMENT, T <: ELEMENT](s: S, t: T): S x T =
+    new xI[S, T] {
+      override val left = s
+      override val right = t
+    }
+
   class FiniteSetsStar[S](elements: Traversable[S])
     extends Star[S] with Traversable[S] {
     override lazy val toI = this(I) { _ => () }
 
     override def >[T <: ELEMENT](that: STAR[T]) = ???
 
-    override def x[T <: ELEMENT](that: STAR[T]): STAR[x[S, T]] = ???
+    private val memoizedProduct = {
+      type PRODUCT[T <: ELEMENT] = STAR[S x T]
+      def product[T <: ELEMENT](that: STAR[T]) =
+        new FiniteSetsStar[S x T](
+          for(s <- this ; t <- that)
+            yield pair(s, t)
+        )
+      Memoize.generic.withLowerBound[STAR, PRODUCT, ELEMENT](product)
+    }
+    override def x[T <: ELEMENT](that: STAR[T]): STAR[x[S, T]] = memoizedProduct(that)
 
     override def apply[T <: ELEMENT](target: STAR[T])(f: S => T) =
       new FiniteSetsQuiver(this, target, f)
