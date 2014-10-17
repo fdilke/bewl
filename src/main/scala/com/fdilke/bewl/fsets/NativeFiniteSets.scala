@@ -1,6 +1,7 @@
 package com.fdilke.bewl.fsets
 
-import com.fdilke.bewl.helper.Memoize
+import com.fdilke.bewl.fsets.DiagrammaticFiniteSetsUtilities._
+import com.fdilke.bewl.helper.{FunctionWithEquality, Memoize}
 import com.fdilke.bewl.topos.{Topos, Wrappings}
 
 class NativeFiniteSets extends Topos
@@ -22,10 +23,35 @@ class NativeFiniteSets extends Topos
     }
 
   class FiniteSetsStar[S](elements: Traversable[S])
-    extends Star[S] with Traversable[S] {
+    extends Star[S] with Traversable[S] { self =>
     override lazy val toI = this(I) { _ => () }
 
-    override def >[T <: ELEMENT](that: STAR[T]) = ???
+    private val memoizedExponential = {
+      type EXPONENTIAL[T <: ELEMENT] = ExponentialStar[S, T] with STAR[S > T]
+      def exponential[T <: ELEMENT](that: STAR[T]) = {
+        case class FunctionElement(function: S => T) extends ~>[S, T] {
+        override def equals(that: scala.Any): Boolean = that match {
+            case that: FunctionElement => elements.forall {
+              s => function(s) == that.function(s)
+            }}
+          override def hashCode = 0 // consistent semantics; no one will use them as keys
+          def apply(s: S): T = function(s) // Could check membership of the domain, but we don't
+        }
+        new FiniteSetsStar[S > T](
+          allMaps(self, that).map { FunctionElement } // TODO: coalesce
+        ) with ExponentialStar[S, T] { exponentialStar =>
+          override val source: STAR[S] = self
+          override val target: STAR[T] = that
+
+          override def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, S, T]): QUIVER[R, S > T] =
+            biQuiver.left(exponentialStar) { r =>
+              FunctionElement((s: S) => ??? // biQuiver(r, s)
+              )
+            }
+        }}
+      Memoize.generic.withLowerBound[STAR, EXPONENTIAL, ELEMENT](exponential)
+    }
+    override def >[T <: ELEMENT](that: STAR[T]): ExponentialStar[S, T] with STAR[S > T] = memoizedExponential(that)
 
     private val memoizedProduct = {
       type PRODUCT[T <: ELEMENT] = STAR[S x T]

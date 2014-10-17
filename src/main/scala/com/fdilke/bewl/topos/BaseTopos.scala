@@ -31,7 +31,7 @@ trait BaseTopos {
   trait ExponentialStar[S <: ELEMENT, T <: ELEMENT] { star: STAR[S > T] =>
     val source: STAR[S]
     val target: STAR[T]
-    def transpose[R <: ELEMENT](quiver: BiQuiver[R, S, T]): QUIVER[R, S > T]
+    def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, S, T]): QUIVER[R, S > T]
     final def evaluation: BiQuiver[S > T, S, T] = biQuiver(
       this, source, target,
       { (f, s) => f(s) }
@@ -96,9 +96,8 @@ trait BaseTopos {
     right: STAR[R],
     quiver: QUIVER[L x R, T]) {
     def apply[S <: ELEMENT](
-      leftQuiver: QUIVER[S, L],
-      rightQuiver: QUIVER[S, R]): QUIVER[S, T] =
-      quiver o (leftQuiver x rightQuiver)
+      l: L, r: R): T = ???
+      // quiver o (leftQuiver x rightQuiver)
   }
 
   // TODO extras - separate into a trait?
