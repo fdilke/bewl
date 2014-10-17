@@ -16,12 +16,6 @@ class NativeFiniteSets extends Topos
   override val omega = star(Traversable(true, false))
   override val truth = I(omega) { _ => true }
 
-  private def pair[S <: ELEMENT, T <: ELEMENT](s: S, t: T): S x T =
-    new xI[S, T] {
-      override val left = s
-      override val right = t
-    }
-
   class FiniteSetsStar[S](elements: Traversable[S])
     extends Star[S] with Traversable[S] { self =>
     override lazy val toI = this(I) { _ => () }
@@ -43,18 +37,22 @@ class NativeFiniteSets extends Topos
           override val source: STAR[S] = self
           override val target: STAR[T] = that
 
-          override def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, S, T]): QUIVER[R, S > T] =
-            biQuiver.left(exponentialStar) { r =>
-              FunctionElement((s: S) => ??? // biQuiver(r, s)
-              )
-            }
-        }}
+          override def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, S, T]) =
+            biQuiver.left(exponentialStar) {
+              r => FunctionElement {
+              s => biQuiver(r, s)
+            }}}}
       Memoize.generic.withLowerBound[STAR, EXPONENTIAL, ELEMENT](exponential)
     }
     override def >[T <: ELEMENT](that: STAR[T]): ExponentialStar[S, T] with STAR[S > T] = memoizedExponential(that)
 
     private val memoizedProduct = {
       type PRODUCT[T <: ELEMENT] = STAR[S x T]
+      def pair[T <: ELEMENT](s: S, t: T): S x T =
+        new xI[S, T] {
+          override val left = s
+          override val right = t
+        }
       def product[T <: ELEMENT](that: STAR[T]) =
         new FiniteSetsStar[S x T](
           for(s <- this ; t <- that)
@@ -80,7 +78,6 @@ class NativeFiniteSets extends Topos
     val target: FiniteSetsStar[T],
     private[NativeFiniteSets] val function: S => T
   ) extends Quiver[S, T] { self =>
-
     override def \[U <: ELEMENT](monic: QUIVER[U, T]) =
       source(monic.source) { s =>
         val quarry: T = function(s)
@@ -89,14 +86,12 @@ class NativeFiniteSets extends Topos
         } getOrElse {
           throw new IllegalArgumentException(s"Cannot backdivide $self by monic $monic")
       }}
-
     override def sanityTest =
       if (!source.map(function).forall(x => target.exists(_ == x))) {
         throw new IllegalArgumentException("Map values not in target")
       }
-
     override def ?=(that: QUIVER[S, T]) =
-      new FiniteSetsStar[EqualizingElement[S] with Any](
+      new FiniteSetsStar[EqualizingElement[S] with Any] (
         for (s <- source if function(s) == that.function(s))
           yield new EqualizingElement[S] {
             override val include = s
@@ -108,7 +103,6 @@ class NativeFiniteSets extends Topos
         }
       ) with EqualizingStar[S] {
         override val equalizerTarget = source
-
         override def restrict[R](substar: QUIVER[R, S]) =
           substar.source(this) { r: R =>
             val quarry = substar(r)
@@ -116,9 +110,7 @@ class NativeFiniteSets extends Topos
               _.include == quarry
             } getOrElse {
               throw new IllegalArgumentException(s"Cannot restrict $self by monic $substar") // TODO: need this logic twice??
-            }
-          }
-      }
+            }}}
 
     override def x[U <: ELEMENT](that: QUIVER[S, U]): QUIVER[S, x[T, U]] = ???
 

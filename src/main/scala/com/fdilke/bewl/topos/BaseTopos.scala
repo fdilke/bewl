@@ -96,8 +96,10 @@ trait BaseTopos {
     right: STAR[R],
     quiver: QUIVER[L x R, T]) {
     def apply[S <: ELEMENT](
-      l: L, r: R): T = ???
-      // quiver o (leftQuiver x rightQuiver)
+      l: L, r: R): T =
+      (right > quiver.target).transpose(this)(l)(r)
+    // TODO: ingenious, but inefficient? Builds an exponential...
+    // TODO: ...we shouldn't really need. Refactor via LxR.pair()?
   }
 
   // TODO extras - separate into a trait?
