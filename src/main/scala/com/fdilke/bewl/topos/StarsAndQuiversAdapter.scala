@@ -33,8 +33,8 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
       quiver(dot.toI).asInstanceOf[QUIVER[T, UNIT]]
 
     private object standardProductStar {
-      private type Widget[U <: ELEMENT] = STAR[T x U]
-      private def product[U <: ELEMENT](that: STAR[U]): Widget[U] =
+      private type PRODUCT[U <: ELEMENT] = STAR[T x U]
+      private def product[U <: ELEMENT](that: STAR[U]): PRODUCT[U] =
         new AdapterStar[T x U] {
           override val dot = (AdapterStar.this.dot x that.dot).asInstanceOf[DOT[Any]]
           override def asElement(anArrow: ARROW[_, _]) = new xI[T, U] with Element {
@@ -45,17 +45,47 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
               topos.rightProjection(AdapterStar.this.dot, that.dot).asInstanceOf[ARROW[Any, Any]](arrow))
           }
         }
-      private val memoized = Memoize.withLowerBound[STAR, Widget, ELEMENT](product)
+      private val memoized = Memoize.withLowerBound[STAR, PRODUCT, ELEMENT](product)
       def apply[U <: ELEMENT](that: STAR[U]) = memoized(that)
     }
 
     override def x[U <: Element](that: STAR[U]) =
       standardProductStar(that)
+
+    private object standardExponentialStar {
+      private type EXPONENT[U <: ELEMENT] = ExponentialStar[T, U] with STAR[T > U]
+      private def product[U <: ELEMENT](that: STAR[U]): EXPONENT[U] =
+        exponentialStar(that)
+      private def exponentialStar[U <: ELEMENT](
+             _target : STAR[U]
+       ) = new AdapterStar[T > U] with ExponentialStar[T, U] {
+        override val source = AdapterStar.this
+        override val target = _target
+
+        private val exponential = target.dot A source.dot
+        override val dot = exponential.exponentDot.asInstanceOf[DOT[Any]]
+        override def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, T, U]) =
+          biQuiver.left(this, exponential.transpose(
+            topos.BiArrow(biQuiver.left.dot, biQuiver.right.dot, biQuiver.quiver.arrow.asInstanceOf[ARROW[(Any, Any), Any]])
+          ))
+
+        override def asElement(anArrow: ARROW[_, _]) = new ~>[T, U] with Element {
+          override val arrow: ARROW[Any, Any] = anArrow.asInstanceOf[ARROW[Any, Any]]
+          override def apply(s: T): U =
+            target.asElement(
+              topos.evaluation(source.dot, target.dot)(
+                anArrow.asInstanceOf[ARROW[Any, Any => Any]],
+                s.arrow
+              ))
+        }
+      }
+
+      private val memoized = Memoize.withLowerBound[STAR, EXPONENT, ELEMENT](product)
+      def apply[U <: ELEMENT](that: STAR[U]) = memoized(that)
+    }
+
     override def >[U <: ELEMENT](that: STAR[U]) =
-      standardExponentialStar((
-        StrictRef(this.asInstanceOf[STAR[WrappedArrow[Any]]]),
-        StrictRef(that.asInstanceOf[STAR[WrappedArrow[Any]]])
-        )).asInstanceOf[ExponentialStar[T, U] with STAR[T > U]]
+      standardExponentialStar(that).asInstanceOf[ExponentialStar[T, U] with STAR[T > U]]
 
     override def sanityTest = dot.sanityTest
 
@@ -132,36 +162,6 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
     override def asElement(arrow: ARROW[_, _]) =
       new WrappedArrow(arrow.asInstanceOf[ARROW[Any, Any]])
   }
-
-  private def exponentialStar[S <: ELEMENT, T <: ELEMENT](
-    _source : STAR[S], _target : STAR[T]
-   ) = new AdapterStar[S > T] with ExponentialStar[S, T] {
-    override val source = _source
-    override val target = _target
-
-    private val exponential = target.dot A source.dot
-    override val dot = exponential.exponentDot.asInstanceOf[DOT[Any]]
-    override def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, S, T]) =
-      biQuiver.left(this, exponential.transpose(
-        topos.BiArrow(biQuiver.left.dot, biQuiver.right.dot, biQuiver.quiver.arrow.asInstanceOf[ARROW[(Any, Any), Any]])
-      ))
-
-    override def asElement(anArrow: ARROW[_, _]) = new ~>[S, T] with Element {
-      override val arrow: ARROW[Any, Any] = anArrow.asInstanceOf[ARROW[Any, Any]]
-      override def apply(s: S): T =
-        target.asElement(
-          topos.evaluation(source.dot, target.dot)(
-            anArrow.asInstanceOf[ARROW[Any, Any => Any]],
-            s.arrow
-        ))
-    }
-  }
-
-  private val standardExponentialStar = new ResultStore[(
-    StrictRef[STAR[WrappedArrow[Any]]], StrictRef[STAR[WrappedArrow[Any]]]
-    ),STAR[WrappedArrow[Any] > WrappedArrow[Any]]](tupled {
-    (x, y) => exponentialStar(x.wrappedValue, y.wrappedValue)
-  })
 
   private object standardWrappedDot {
     private type Widget[T] = STAR[WrappedArrow[T]]
