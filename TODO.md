@@ -1,3 +1,10 @@
+# TODO
+sort out this todo list, it's a mess
+rename ELEMENT to ~?
+lose leftProjection, rightProjection by having indices on a biproduct
+Can use symbols like ∀, ∃ for method names? Yes. So festoon code with symbols. How do you type them?
+try 'lazy me' experiment with pairs
+
 # Lower level TODOs
 
 - can 'isCommutative' be a method on Group, Ring? Requires some refactoring of law verification?

@@ -44,6 +44,8 @@ trait BaseTopos {
     val left: STAR[L]
     val right: STAR[R]
     def pair(l: L, r: R): L x R
+    final def π0 = star(left) { _.left }
+    final def π1 = star(right) { _.right }
   }
 
   type EQUALIZER[S <: ELEMENT] = EqualizingStar[S] with STAR[EqualizingElement[S] with ELEMENT]
@@ -106,31 +108,22 @@ trait BaseTopos {
     def apply(l: L, r: R): T = quiver(product.pair(l, r))
   }
 
-  // TODO extras - separate into a trait?
-
-  // Helper methods for biproducts: Compactify?
-
-  def leftProjection[A <: ELEMENT, B <: ELEMENT](left: STAR[A], right: STAR[B]) : QUIVER[A x B, A] =
-    (left x right)(left) { _.left }
-
-  def rightProjection[A <: ELEMENT, B <: ELEMENT](left: STAR[A], right: STAR[B]) : QUIVER[A x B, B] =
-    (left x right)(right) { _.right }
-
-  // Helper methods for triproducts (this could obviously be extended). Note, are these used outside tests?
+  // Helper methods for triproducts (this could obviously be extended).
+  // TODO: Only used in tests: delete when there is a satisfactory replacement (multiproducts)
   def leftProjection[X <: ELEMENT, Y <: ELEMENT, Z <: ELEMENT](
     x: STAR[X], y: STAR[Y], z: STAR[Z]
   ) : QUIVER[X x Y x Z, X] =
-    leftProjection(x, y) o leftProjection(x x y, z)
+    (x x y).π0 o (x x y x z).π0
 
   def midProjection[X <: ELEMENT, Y <: ELEMENT, Z <: ELEMENT](
    x: STAR[X], y: STAR[Y], z: STAR[Z]
   ) : QUIVER[X x Y x Z, Y] =
-    rightProjection(x, y) o leftProjection(x x y, z)
+    (x x y).π1 o (x x y x z).π0
 
   def rightProjection[X <: ELEMENT, Y <: ELEMENT, Z <: ELEMENT](
    x: STAR[X], y: STAR[Y], z: STAR[Z]
   ) : QUIVER[X x Y x Z, Z] =
-    rightProjection(x x y, z)
+    (x x y x z).π1
 }
 
 trait Wrappings[

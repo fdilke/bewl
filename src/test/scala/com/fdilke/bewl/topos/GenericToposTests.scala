@@ -120,8 +120,8 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
         'sanityTest (null)
       )
 
-      leftProjection(bar, baz).sanityTest
-      rightProjection(bar, baz).sanityTest
+      (bar x baz).π0.sanityTest
+      (bar x baz).π1.sanityTest
 
       foo(bar) {
         x => productQuiver(x).left
