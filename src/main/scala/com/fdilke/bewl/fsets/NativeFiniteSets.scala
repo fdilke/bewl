@@ -116,7 +116,12 @@ class NativeFiniteSets extends Topos
               throw new IllegalArgumentException(s"Cannot restrict $self by monic $substar") // TODO: need this logic twice??
             }}}
 
-    override def x[U <: ELEMENT](that: QUIVER[S, U]): QUIVER[S, x[T, U]] = ???
+    // TODO: generic! Should be a final method on Quiver
+    override def x[U <: ELEMENT](that: QUIVER[S, U]): QUIVER[S, x[T, U]] = {
+      val product = this.target x that.target
+      source(product) {
+        s => product.pair(this(s), that(s))
+      }}
 
     override def apply(s: S) =
       function(s)
@@ -150,7 +155,17 @@ class NativeFiniteSets extends Topos
   override def star[T](input: Traversable[T]) =
     memoizedStarWrapper(input)
 
-  override def bifunctionAsBiQuiver[L, R, T](left: STAR[L], right: STAR[R], target: STAR[T], bifunc: (L, R) => T): BiQuiver[L, R, T] = ???
+  // TODO: generic! This doesn't belong in the wrapping layer. Refactor to a final helper method on ProductStar
+  override def bifunctionAsBiQuiver[L, R, T](
+    left: STAR[L],
+    right: STAR[R],
+    target: STAR[T],
+    bifunc: (L, R) => T): BiQuiver[L, R, T] = {
+    val product = left x right
+    BiQuiver(product, product(target) {
+          case l x r => bifunc(l, r)
+        })
+  }
 }
 
 case class FiniteSetsPreQuiver[S, T](

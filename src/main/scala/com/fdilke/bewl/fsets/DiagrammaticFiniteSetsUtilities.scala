@@ -13,20 +13,19 @@ object DiagrammaticFiniteSetsUtilities {
     case Nil => Traversable(Seq())
     case head :: tail =>
       for (h <- head; sequence <- cartesian[A](tail))
-      yield(h +: sequence)
+        yield(h +: sequence)
   }
 
-  def allMaps[A, B](source: Traversable[A], target: Traversable[B]): Traversable[A=>B] =
+  def allMaps[A, B](source: Traversable[A], target: Traversable[B]) : Traversable[A => B] =
     new Traversable[A => B] {
-      override def foreach[U](func: (A => B) => U): Unit =
+      override def foreach[U](enumerate: (A => B) => U) =
         if (source.isEmpty)
-          func(_ => ???)
+          enumerate { _ => ??? }
         else
           for (f <- allMaps(source.tail, target);
                choice <- target) {
-            func { x => if (x == source.head) choice else f(x)}
-          }
-    }
+            enumerate { x => if (x == source.head) choice else f(x)}
+          }}
 
   def nullaryOperator[X](dot: DiagrammaticFiniteSetsDot[X], constant: X) =
     DiagrammaticFiniteSetsArrow[Power[X], X](
