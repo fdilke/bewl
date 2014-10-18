@@ -21,15 +21,15 @@ class NativeFiniteSets extends Topos
     override lazy val toI = this(I) { _ => () }
 
     private val memoizedExponential = {
-      type EXPONENTIAL[T <: ELEMENT] = ExponentialStar[S, T] with STAR[S > T]
+      type CURRIED_EXPONENTIAL[T <: ELEMENT] = EXPONENTIAL[S, T]
       def exponential[T <: ELEMENT](that: STAR[T]) = {
         case class FunctionElement(function: S => T) extends ~>[S, T] {
-        override def equals(that: scala.Any): Boolean = that match {
-            case that: FunctionElement => elements.forall {
-              s => function(s) == that.function(s)
-            }}
-          override def hashCode = 0 // consistent semantics; no one will use them as keys
-          def apply(s: S): T = function(s) // Could check membership of the domain, but we don't
+          override def equals(that: scala.Any): Boolean = that match {
+              case that: FunctionElement => elements.forall {
+                s => function(s) == that.function(s)
+              }}
+          override def hashCode = 0
+          def apply(s: S): T = function(s)
         }
         new FiniteSetsStar[S > T](
           allMaps(self, that).map { FunctionElement } // TODO: coalesce
@@ -42,33 +42,29 @@ class NativeFiniteSets extends Topos
               r => FunctionElement {
               s => biQuiver(r, s)
             }}}}
-      Memoize.generic.withLowerBound[STAR, EXPONENTIAL, ELEMENT](exponential)
+      Memoize.generic.withLowerBound[STAR, CURRIED_EXPONENTIAL, ELEMENT](exponential)
     }
-    override def >[T <: ELEMENT](that: STAR[T]): ExponentialStar[S, T] with STAR[S > T] = memoizedExponential(that)
+    override def >[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[S, T] = memoizedExponential(that)
 
     private val memoizedProduct = {
-      type PRODUCT[T <: ELEMENT] = ProductStar[S, T] with STAR[S x T]
+      type CURRIED_BIPRODUCT[T <: ELEMENT] = BIPRODUCT[S, T]
       def _pair[T <: ELEMENT](s: S, t: T): S x T =
         new xI[S, T] {
           override val left = s
           override val right = t
         }
-      def product[T <: ELEMENT](that: STAR[T]) =
+      def product[T <: ELEMENT](that: STAR[T]) = // TODO: refactor to call pair instead of _pair
         new FiniteSetsStar[S x T](
-        for(s <- this ; t <- that)
-        yield _pair(s, t)
-        ) with ProductStar[S, T] {
+          for(s <- this ; t <- that)
+            yield _pair(s, t)
+        ) with BiproductStar[S, T] {
           override val left: STAR[S] = self
           override val right: STAR[T] = that
           override def pair(l: S, r: T): x[S, T] = _pair(l, r)
-//
-//          override def foreach[U](f: (x[S, T]) => U): Unit = ???
-//
-//          override def apply[T <: ELEMENT](target: STAR[T])(f: (x[S, T]) => T): QUIVER[x[S, T], T] = ???
         }
-      Memoize.generic.withLowerBound[STAR, PRODUCT, ELEMENT](product)
+      Memoize.generic.withLowerBound[STAR, CURRIED_BIPRODUCT, ELEMENT](product)
     }
-    override def x[T <: ELEMENT](that: STAR[T]): ProductStar[S, T] with STAR[x[S, T]] = memoizedProduct(that)
+    override def x[T <: ELEMENT](that: STAR[T]): BIPRODUCT[S, T] = memoizedProduct(that)
 
     override def apply[T <: ELEMENT](target: STAR[T])(f: S => T) =
       new FiniteSetsQuiver(this, target, f)

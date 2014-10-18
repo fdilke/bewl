@@ -28,6 +28,7 @@ trait BaseTopos {
   val omega: STAR[TRUTH]
   val truth: QUIVER[UNIT, TRUTH]
 
+  type EXPONENTIAL[S <: ELEMENT, T <: ELEMENT] = ExponentialStar[S, T] with STAR[S > T]
   trait ExponentialStar[S <: ELEMENT, T <: ELEMENT] { star: STAR[S > T] =>
     val source: STAR[S]
     val target: STAR[T]
@@ -38,12 +39,14 @@ trait BaseTopos {
     )
   }
 
-  trait ProductStar[L <: ELEMENT, R <: ELEMENT] { star: STAR[L x R] =>
+  type BIPRODUCT[L <: ELEMENT, R <: ELEMENT] = BiproductStar[L, R] with STAR[L x R]
+  trait BiproductStar[L <: ELEMENT, R <: ELEMENT] { star: STAR[L x R] =>
     val left: STAR[L]
     val right: STAR[R]
     def pair(l: L, r: R): L x R
   }
 
+  type EQUALIZER[S <: ELEMENT] = EqualizingStar[S] with STAR[EqualizingElement[S] with ELEMENT]
   trait EqualizingStar[S <: ELEMENT] { star: STAR[EqualizingElement[S] with ELEMENT] =>
     val equalizerTarget: STAR[S]
     final val inclusion: QUIVER[EqualizingElement[S] with ELEMENT, S] =
@@ -58,8 +61,8 @@ trait BaseTopos {
   trait Star[S <: ELEMENT] { self: STAR[S] =>
     final lazy val identity: QUIVER[S, S] = this(self)(Predef.identity)
     val toI: QUIVER[S, UNIT]
-    def x[T <: ELEMENT](that: STAR[T]): ProductStar[S, T] with STAR[S x T]
-    def >[T <: ELEMENT](that: STAR[T]): ExponentialStar[S, T] with STAR[S > T]
+    def x[T <: ELEMENT](that: STAR[T]): BIPRODUCT[S, T]
+    def >[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[S, T]
     def sanityTest
 
     def apply[T <: ELEMENT](target: STAR[T])(f: S => T) : QUIVER[S, T]
@@ -71,7 +74,7 @@ trait BaseTopos {
     val chi: QUIVER[T, TRUTH]
 
     def apply(s: S): T
-    def ?=(that: QUIVER[S, T]): EqualizingStar[S] with STAR[EqualizingElement[S] with ELEMENT]
+    def ?=(that: QUIVER[S, T]): EQUALIZER[S]
     def o[R <: ELEMENT](that: QUIVER[R, S]) : QUIVER[R, T]
     def x[U <: ELEMENT](that: QUIVER[S, U]): QUIVER[S, T x U]
     def \[U <: ELEMENT](monic: QUIVER[U, T]) : QUIVER[S, U]

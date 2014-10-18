@@ -31,31 +31,31 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
       quiver(dot.toI).asInstanceOf[QUIVER[T, UNIT]]
 
     private val memoizedProductStar = {
-      type PRODUCT[U <: ELEMENT] = STAR[T x U] with ProductStar[T, U]
+      type CURRIED_BIPRODUCT[U <: ELEMENT] = BIPRODUCT[T, U]
       def product[U <: ELEMENT](that: STAR[U]) =
-        new AdapterStar[T x U] with ProductStar[T, U] {
+        new AdapterStar[T x U] with BiproductStar[T, U] { // TODO: use BIPRODUCT[] here?
           override val left = self
           override val right = that
           override def pair(t: T,u: U) = asElement(t.arrow x u.arrow)
           override private[StarsAndQuiversAdapter] val dot = (self.dot x that.dot).asInstanceOf[DOT[Any]]
-          override private[StarsAndQuiversAdapter] def asElement(anArrow: ARROW[_, _]) = new xI[T, U] with Element {
-            override val arrow: ARROW[Any, Any] = anArrow.asInstanceOf[ARROW[Any, Any]]
-            override val left: T = self.asElement(
-              topos.leftProjection(self.dot, that.dot).asInstanceOf[ARROW[Any, Any]](arrow))
-            override val right: U = that.asElement(
-              topos.rightProjection(self.dot, that.dot).asInstanceOf[ARROW[Any, Any]](arrow))
-          }
-        }
-      Memoize.generic.withLowerBound[STAR, PRODUCT, ELEMENT](product)
+          override private[StarsAndQuiversAdapter] def asElement(anArrow: ARROW[_, _]) =
+            new xI[T, U] with Element {
+              override val arrow: ARROW[Any, Any] = anArrow.asInstanceOf[ARROW[Any, Any]]
+              override val left: T = self.asElement(
+                topos.leftProjection(self.dot, that.dot).asInstanceOf[ARROW[Any, Any]](arrow))
+              override val right: U = that.asElement(
+                topos.rightProjection(self.dot, that.dot).asInstanceOf[ARROW[Any, Any]](arrow))
+          }}
+      Memoize.generic.withLowerBound[STAR, CURRIED_BIPRODUCT, ELEMENT](product)
     }
 
-    override def x[U <: Element](that: STAR[U]): ProductStar[T, U] with STAR[T x U] = // TODO sort out 'with' ordering for all of these & exponents
+    override def x[U <: Element](that: STAR[U]): BIPRODUCT[T, U] =
       memoizedProductStar(that)
 
     private val memoizedExponentialStar = {
-      type EXPONENT[U <: ELEMENT] = ExponentialStar[T, U] with STAR[T > U]
+      type CURRIED_EXPONENTIAL[U <: ELEMENT] = EXPONENTIAL[T, U]
       def exponential[U <: ELEMENT](that: STAR[U]) =
-        new AdapterStar[T > U] with ExponentialStar[T, U] {
+        new AdapterStar[T > U] with ExponentialStar[T, U] { // TODO: use EXPONENTIAL here?
         override val source = AdapterStar.this
         override val target = that
 
@@ -65,18 +65,16 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
           biQuiver.left(this, exponential.transpose(
             topos.BiArrow(biQuiver.left.dot, biQuiver.right.dot, biQuiver.quiver.arrow.asInstanceOf[ARROW[(Any, Any), Any]])
           ))
-
-        override private[StarsAndQuiversAdapter] def asElement(anArrow: ARROW[_, _]) = new ~>[T, U] with Element {
-          override val arrow: ARROW[Any, Any] = anArrow.asInstanceOf[ARROW[Any, Any]]
-          override def apply(s: T): U =
-            target.asElement(
-              topos.evaluation(source.dot, target.dot)(
-                anArrow.asInstanceOf[ARROW[Any, Any => Any]],
-                s.arrow
-              ))
-        }
-      }
-      Memoize.generic.withLowerBound[STAR, EXPONENT, ELEMENT](exponential)
+        override private[StarsAndQuiversAdapter] def asElement(anArrow: ARROW[_, _]) =
+          new ~>[T, U] with Element {
+            override val arrow: ARROW[Any, Any] = anArrow.asInstanceOf[ARROW[Any, Any]]
+            override def apply(s: T): U =
+              target.asElement(
+                topos.evaluation(source.dot, target.dot)(
+                  anArrow.asInstanceOf[ARROW[Any, Any => Any]],
+                  s.arrow
+                ))}}
+      Memoize.generic.withLowerBound[STAR, CURRIED_EXPONENTIAL, ELEMENT](exponential)
     }
 
     override def >[U <: ELEMENT](that: STAR[U]) =
@@ -111,7 +109,7 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
       source(target x that.target, arrow x that.arrow)
 
     def ?=(that: QUIVER[S, T]) =
-      new AdapterStar[EqualizingElement[S] with Element] with EqualizingStar[S] {
+      new AdapterStar[EqualizingElement[S] with Element] with EqualizingStar[S] {  // TODO: use EQUALIZER?
         private val equalizer = arrow ?= that.arrow
         override val equalizerTarget = AdapterQuiver.this.source
 
