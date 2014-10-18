@@ -38,7 +38,7 @@ class NativeFiniteSets extends Topos
           override val target: STAR[T] = that
 
           override def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, S, T]) =
-            biQuiver.left(exponentialStar) {
+            biQuiver.product.left(exponentialStar) {
               r => FunctionElement {
               s => biQuiver(r, s)
             }}}}

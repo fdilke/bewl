@@ -91,7 +91,7 @@ trait BaseTopos {
    target: STAR[T],
    f: (L, R) => T
    ) =
-  BiQuiver(left, right,
+  BiQuiver(left x right,
     (left x right)(target) {
       case l x r =>
       f(l, r)
@@ -101,14 +101,9 @@ trait BaseTopos {
     L <: ELEMENT,
     R <: ELEMENT,
     T <: ELEMENT](
-    left: STAR[L],
-    right: STAR[R],
+    product: BIPRODUCT[L, R],
     quiver: QUIVER[L x R, T]) {
-    def apply[S <: ELEMENT](
-      l: L, r: R): T =
-      (right > quiver.target).transpose(this)(l)(r)
-    // TODO: ingenious, but inefficient? Builds an exponential...
-    // TODO: ...we shouldn't really need. Refactor via LxR.pair()?
+    def apply(l: L, r: R): T = quiver(product.pair(l, r))
   }
 
   // TODO extras - separate into a trait?

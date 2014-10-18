@@ -24,8 +24,8 @@ abstract class ToposFixtureSanityTests[T <: BaseTopos](fixtures: ToposWithFixtur
       foo2baz.target shouldBe baz
       foo2baz.sanityTest
 
-      foobar2baz.left shouldBe foo
-      foobar2baz.right shouldBe bar
+      foobar2baz.product.left shouldBe foo
+      foobar2baz.product.right shouldBe bar
       foobar2baz.quiver.source shouldBe (foo x bar)
       foobar2baz.quiver.target shouldBe baz
       foobar2baz.quiver.sanityTest
@@ -165,8 +165,8 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
     it("can construct exponential diagrams") {
       // Check evaluation maps baz^bar x bar -> baz
       val evaluation = (bar > baz).evaluation
-      evaluation.left shouldBe (bar > baz)
-      evaluation.right shouldBe bar
+      evaluation.product.left shouldBe (bar > baz)
+      evaluation.product.right shouldBe bar
       evaluation.quiver.target shouldBe baz
       evaluation.quiver.sanityTest
 

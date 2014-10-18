@@ -62,9 +62,7 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
         private val exponential = target.dot A source.dot
         override private[StarsAndQuiversAdapter] val dot = exponential.exponentDot.asInstanceOf[DOT[Any]]
         override def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, T, U]) =
-          biQuiver.left(this, exponential.transpose(
-            topos.BiArrow(biQuiver.left.dot, biQuiver.right.dot, biQuiver.quiver.arrow.asInstanceOf[ARROW[(Any, Any), Any]])
-          ))
+          biQuiver.product.left(this, exponential.transpose(biArrow(biQuiver)))
         override private[StarsAndQuiversAdapter] def asElement(anArrow: ARROW[_, _]) =
           new ~>[T, U] with Element {
             override val arrow: ARROW[Any, Any] = anArrow.asInstanceOf[ARROW[Any, Any]]
@@ -189,11 +187,15 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
       left.dot.asInstanceOf[DOT[L]] x
       right.dot.asInstanceOf[DOT[R]]
     )
-
-    BiQuiver(left, right,  functionAsQuiver[(L, R), T](targetProduct, target, {
+    BiQuiver(left x right,  functionAsQuiver[(L, R), T](targetProduct, target, {
       case (l, r) => bifunc(l, r)
     }) o
       (left x right)(targetProduct, targetProduct.dot.identity)
     )
   }
+
+  private def biArrow[L <: ELEMENT, R <: ELEMENT, T <: ELEMENT](biQuiver: BiQuiver[L, R, T]) =
+    topos.BiArrow(biQuiver.product.left.dot,
+      biQuiver.product.right.dot,
+      biQuiver.quiver.arrow.asInstanceOf[ARROW[(Any, Any), Any]])
 }
