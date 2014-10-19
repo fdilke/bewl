@@ -32,7 +32,7 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
     private val memoizedProductStar = {
       type CURRIED_BIPRODUCT[U <: ELEMENT] = BIPRODUCT[T, U]
       def product[U <: ELEMENT](that: STAR[U]) =
-        new AdapterStar[T x U] with BiproductStar[T, U] { // TODO: use BIPRODUCT[] here?
+        new AdapterStar[T x U] with BiproductStar[T, U] {
           override val left = self
           override val right = that
           override def pair(t: T,u: U) = asElement(t.arrow x u.arrow)
@@ -54,7 +54,7 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
     private val memoizedExponentialStar = {
       type CURRIED_EXPONENTIAL[U <: ELEMENT] = EXPONENTIAL[T, U]
       def exponential[U <: ELEMENT](that: STAR[U]) =
-        new AdapterStar[T > U] with ExponentialStar[T, U] { // TODO: use EXPONENTIAL here?
+        new AdapterStar[T > U] with ExponentialStar[T, U] {
         override val source = AdapterStar.this
         override val target = that
 
@@ -103,7 +103,7 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
       that.source(target)(function compose that.function)
 
     def ?=(that: QUIVER[S, T]) =
-      new AdapterStar[S] with EqualizingStar[S] {  // TODO: use EQUALIZER?
+      new AdapterStar[S] with EqualizingStar[S] {
         private val equalizer = arrow ?= that.arrow
         override val equalizerTarget = AdapterQuiver.this.source
 
