@@ -55,12 +55,11 @@ trait BaseTopos {
         case l x r => bifunc(l, r)
       })}
 
-  type EQUALIZING_ELEMENT[S <: ELEMENT] <: ELEMENT
-  type EQUALIZER[S <: ELEMENT] = EqualizingStar[S] with STAR[EQUALIZING_ELEMENT[S]]
-  trait EqualizingStar[S <: ELEMENT] { star: STAR[EQUALIZING_ELEMENT[S]] =>
+  type EQUALIZER[S <: ELEMENT] = EqualizingStar[S] with STAR[S]
+  trait EqualizingStar[S <: ELEMENT] { star: STAR[S] =>
     val equalizerTarget: STAR[S]
-    val inclusion: QUIVER[EQUALIZING_ELEMENT[S], S]
-    def restrict[R <: ELEMENT](quiver: QUIVER[R, S]): QUIVER[R, EQUALIZING_ELEMENT[S]]
+    val inclusion: QUIVER[S, S]
+    def restrict[R <: ELEMENT](quiver: QUIVER[R, S]): QUIVER[R, S]
   }
 
   trait Star[S <: ELEMENT] { self: STAR[S] =>

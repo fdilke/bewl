@@ -10,7 +10,6 @@ object NativeFiniteSets extends Topos
   override type ELEMENT = Any
   override type STAR[S <: ELEMENT] = FiniteSetsStar[S]
   override type QUIVER[S <: ELEMENT, T <: ELEMENT] = FiniteSetsQuiver[S, T]
-  override type EQUALIZING_ELEMENT[S <: ELEMENT] = S
   override type UNIT = Unit
   override type TRUTH = Boolean
   override lazy val I = star(Traversable(()))
