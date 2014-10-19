@@ -102,19 +102,11 @@ object NativeFiniteSets extends Topos
       }
     override def ?=(that: QUIVER[S, T]) =
       new FiniteSetsStar[S] (
-        for (s <- source if function(s) == that.function(s))
-          yield s // TODO refactor
+        source.filter { s => function(s) == that.function(s) }
       ) with EqualizingStar[S] { equalizer =>
         override val equalizerTarget = source
         override def restrict[R](substar: QUIVER[R, S]) =
-          substar.source(this) { r: R =>
-            val quarry = substar(r)
-            find {
-              _ == quarry  // TODO: refactor!!
-            } getOrElse {
-              throw new IllegalArgumentException(s"Cannot restrict $self by monic $substar") // TODO: need this logic twice??
-            }}
-
+          substar.source(this) { substar(_) }
         override val inclusion: QUIVER[S, S] = equalizer(source) { Predef.identity }
       }
 
