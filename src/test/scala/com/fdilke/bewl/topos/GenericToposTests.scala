@@ -53,7 +53,6 @@ abstract class ToposWithFixtures {
   import topos._
 
   def makeSampleStar(): STAR[_ <: ELEMENT]
-
   def makeSampleQuiver(): QUIVER[_ <: ELEMENT, _ <: ELEMENT]
 
   val foo : STAR[FOO]
@@ -193,8 +192,7 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
       val e = equalizer.inclusion
 
       (s o e) shouldBe (t o e)
-      val q = equalizer.restrict(r)
-      (e o q) shouldBe r
+      (e o equalizer.restrict(r)) shouldBe r
     }
 
     it("has a truth object (subobject classifier)") {

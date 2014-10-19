@@ -4,7 +4,7 @@ import com.fdilke.bewl.fsets.DiagrammaticFiniteSetsUtilities._
 import com.fdilke.bewl.helper.Memoize
 import com.fdilke.bewl.topos.{Topos, Wrappings}
 
-class NativeFiniteSets extends Topos
+object NativeFiniteSets extends Topos
   with Wrappings[Traversable, FiniteSetsPreQuiver] {
 
   override type ELEMENT = Any
@@ -12,9 +12,9 @@ class NativeFiniteSets extends Topos
   override type QUIVER[S <: ELEMENT, T <: ELEMENT] = FiniteSetsQuiver[S, T]
   override type UNIT = Unit
   override type TRUTH = Boolean
-  override val I = star(Traversable(()))
-  override val omega = star(Traversable(true, false))
-  override val truth = I(omega) { _ => true }
+  override lazy val I = star(Traversable(()))
+  override lazy val omega = star(Traversable(true, false))
+  override lazy val truth = I(omega) { _ => true }
 
   class FiniteSetsStar[S](elements: Traversable[S])
     extends Star[S] with Traversable[S] { self =>
@@ -48,19 +48,24 @@ class NativeFiniteSets extends Topos
 
     private val memoizedProduct = {
       type CURRIED_BIPRODUCT[T <: ELEMENT] = BIPRODUCT[S, T]
-      def _pair[T <: ELEMENT](s: S, t: T): S x T =
-        new xI[S, T] {
+      class Pair[T <: ELEMENT](s: S, t: T) extends xI[S, T] {
           override val left = s
           override val right = t
+          override def equals(other: Any): Boolean = other match {
+            case that: Pair[T] =>
+              left == that.left && right == that.right
+            case _ => false
+          }
+          override def hashCode = 0
         }
       def product[T <: ELEMENT](that: STAR[T]) = // TODO: refactor to call pair instead of _pair
         new FiniteSetsStar[S x T](
           for(s <- this ; t <- that)
-            yield _pair(s, t)
+            yield new Pair(s, t)
         ) with BiproductStar[S, T] {
           override val left: STAR[S] = self
           override val right: STAR[T] = that
-          override def pair(l: S, r: T): x[S, T] = _pair(l, r)
+          override def pair(l: S, r: T): x[S, T] = new Pair(l, r)
         }
       Memoize.generic.withLowerBound[STAR, CURRIED_BIPRODUCT, ELEMENT](product)
     }
@@ -134,6 +139,20 @@ class NativeFiniteSets extends Topos
         source.exists { s =>
           this(s) == t
       }}
+
+    override def equals(other: Any): Boolean = other match {
+      case that: FiniteSetsQuiver[S, T] =>
+        source == that.source && target == that.target &&
+          source.forall(x => function(x) == that.function(x))
+      case _ => false
+    }
+    override def hashCode = 0
+
+    override def toString =
+      s"FiniteSetsQuiver[$source -> $target : ${
+        for(s <- source)
+          s -> this(s)
+      }]"
   }
 
   private val memoizedStarWrapper = {

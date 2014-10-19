@@ -51,7 +51,7 @@ trait BaseTopos {
   type EQUALIZER[S <: ELEMENT] = EqualizingStar[S] with STAR[EqualizingElement[S] with ELEMENT]
   trait EqualizingStar[S <: ELEMENT] { star: STAR[EqualizingElement[S] with ELEMENT] =>
     val equalizerTarget: STAR[S]
-    final val inclusion: QUIVER[EqualizingElement[S] with ELEMENT, S] =
+    final lazy val inclusion: QUIVER[EqualizingElement[S] with ELEMENT, S] =
       this(equalizerTarget) { _.include }
     def restrict[R <: ELEMENT](quiver: QUIVER[R, S]): QUIVER[R, EqualizingElement[S] with ELEMENT]
   }
