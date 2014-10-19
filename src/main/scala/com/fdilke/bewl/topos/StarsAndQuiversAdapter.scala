@@ -3,8 +3,8 @@ package com.fdilke.bewl.topos
 import com.fdilke.bewl.diagrammatic.BaseDiagrammaticTopos
 import com.fdilke.bewl.helper.Memoize
 
-class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
-  extends Topos with Wrappings[BASE#DOT, BASE#ARROW] {
+class StarsAndQuiversAdapter(val topos : BaseDiagrammaticTopos)
+  extends Topos with Wrappings {
 
   import topos.{I => _, omega => _, _}
 
@@ -150,25 +150,28 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
   private def fletch[X, Y](arrow: ARROW[X, Y]) =
     arrow.asInstanceOf[ARROW[Any, Any]]
 
-  // wrapping API
+  // wrapping API: TODO make this comment part of the structure
 
+  override type PRESTAR[S] = DOT[S]
+  override type PREQUIVER[S, T] = ARROW[S, T]
   override type WRAPPER[S] = WrappedArrow[S]
 
-  override def star[S](dot: BASE#DOT[S]) : STAR[WrappedArrow[S]] =
-    memoizedWrappedDot(
-      dot.asInstanceOf[DOT[S]]
-    )
+  override def star[S](dot: DOT[S]) : STAR[WrappedArrow[S]] =
+    memoizedWrappedDot(dot)
 
-  override def quiver[S, T](arrow: BASE#ARROW[S, T]) : QUIVER[WRAPPER[S], WRAPPER[T]] =
-    star(arrow.source)(star(arrow.target), arrow.asInstanceOf[ARROW[S, T]])
+  override def quiver[S, T](arrow: ARROW[S, T]) : QUIVER[WRAPPER[S], WRAPPER[T]] =
+    star(arrow.source)(star(arrow.target), arrow)
 
-  override def functionAsQuiver[S, T](source: STAR[WrappedArrow[S]], target: STAR[WrappedArrow[T]], f: S => T) =
-    quiver(buildArrow[S, T](
-      source.dot.asInstanceOf[DOT[S]],
-      target.dot.asInstanceOf[DOT[T]],
-      f
-    ).asInstanceOf[BASE#ARROW[WRAPPER[S], WRAPPER[T]]]
-  ).asInstanceOf[QUIVER[WRAPPER[S], WRAPPER[T]]]
+  override def functionAsQuiver[S, T](
+    source: STAR[WrappedArrow[S]],
+    target: STAR[WrappedArrow[T]],
+    f: S => T
+  ) = quiver(buildArrow[S, T](
+        source.dot.asInstanceOf[DOT[S]],
+        target.dot.asInstanceOf[DOT[T]],
+        f
+      ).asInstanceOf[ARROW[WRAPPER[S], WRAPPER[T]]]
+    ).asInstanceOf[QUIVER[WRAPPER[S], WRAPPER[T]]]
 
   override def bifunctionAsBiQuiver[L, R, T] (
     left: STAR[WRAPPER[L]],

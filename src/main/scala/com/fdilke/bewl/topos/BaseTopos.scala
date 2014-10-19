@@ -134,10 +134,9 @@ trait BaseTopos {
     (x x y x z).π1
 }
 
-trait Wrappings[
-  PRESTAR[T],
-  PREQUIVER[S, T]
-] { topos: BaseTopos =>
+trait Wrappings { topos: BaseTopos =>
+  type PRESTAR[T]
+  type PREQUIVER[S, T]
   type WRAPPER[T] <: ELEMENT
 
   def star[T](input: PRESTAR[T]) : STAR[WRAPPER[T]]
