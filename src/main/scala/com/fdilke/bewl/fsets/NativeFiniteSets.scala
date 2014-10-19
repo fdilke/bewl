@@ -10,6 +10,7 @@ object NativeFiniteSets extends Topos
   override type ELEMENT = Any
   override type STAR[S <: ELEMENT] = FiniteSetsStar[S]
   override type QUIVER[S <: ELEMENT, T <: ELEMENT] = FiniteSetsQuiver[S, T]
+  override type EQUALIZING_ELEMENT[S <: ELEMENT] = S
   override type UNIT = Unit
   override type TRUTH = Boolean
   override lazy val I = star(Traversable(()))
@@ -100,26 +101,22 @@ object NativeFiniteSets extends Topos
         throw new IllegalArgumentException("Map values not in target")
       }
     override def ?=(that: QUIVER[S, T]) =
-      new FiniteSetsStar[EqualizingElement[S] with Any] (
+      new FiniteSetsStar[S] (
         for (s <- source if function(s) == that.function(s))
-          yield new EqualizingElement[S] {
-            override val include = s
-
-            override def equals(obj: scala.Any): Boolean = {
-              println("Aaargh") // TODO: note: may be an issue about comparing equality with these
-              super.equals(obj)
-            }
-        }
-      ) with EqualizingStar[S] {
+          yield s // TODO refactor
+      ) with EqualizingStar[S] { equalizer =>
         override val equalizerTarget = source
         override def restrict[R](substar: QUIVER[R, S]) =
           substar.source(this) { r: R =>
             val quarry = substar(r)
             find {
-              _.include == quarry
+              _ == quarry  // TODO: refactor!!
             } getOrElse {
               throw new IllegalArgumentException(s"Cannot restrict $self by monic $substar") // TODO: need this logic twice??
-            }}}
+            }}
+
+        override val inclusion: QUIVER[S, S] = equalizer(source) { Predef.identity }
+      }
 
     // TODO: generic! Should be a final method on Quiver
     override def x[U <: ELEMENT](that: QUIVER[S, U]): QUIVER[S, x[T, U]] = {

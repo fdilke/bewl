@@ -23,7 +23,11 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
   override lazy val omega = star(topos.omega).asInstanceOf[STAR[TRUTH]]
   override lazy val truth = quiver(topos.truth).asInstanceOf[QUIVER[UNIT, TRUTH]]
 
-  trait AdapterTruth extends Element {
+  override type EQUALIZING_ELEMENT[S <: ELEMENT] = EqualizingElement[S]
+
+  trait AdapterTruth extends Element
+  trait EqualizingElement[S <: ELEMENT] extends Element { // TODO: eliminate this?
+    val include: S
   }
 
   trait AdapterStar[T <: Element] extends Star[T] { self =>
@@ -107,20 +111,22 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
       source(target x that.target, arrow x that.arrow)
 
     def ?=(that: QUIVER[S, T]) =
-      new AdapterStar[EqualizingElement[S] with Element] with EqualizingStar[S] {  // TODO: use EQUALIZER?
+      new AdapterStar[EqualizingElement[S]] with EqualizingStar[S] {  // TODO: use EQUALIZER?
         private val equalizer = arrow ?= that.arrow
         override val equalizerTarget = AdapterQuiver.this.source
 
         override private[StarsAndQuiversAdapter] val dot = equalizer.equalizerSource.asInstanceOf[DOT[Any]]
 
-        override private[StarsAndQuiversAdapter] def asElement(anArrow: ARROW[_, _]): EqualizingElement[S] with Element =
-          new EqualizingElement[S] with Element {
+        override private[StarsAndQuiversAdapter] def asElement(anArrow: ARROW[_, _]): EqualizingElement[S] =
+          new EqualizingElement[S] {
             override protected[StarsAndQuiversAdapter] val arrow = anArrow.asInstanceOf[ARROW[Any, Any]]
             override val include =
               equalizerTarget.asElement(equalizer.equalizer.asInstanceOf[ARROW[Any, Any]](arrow))
           }
         override def restrict[R <: ELEMENT](quiver: QUIVER[R, S]) =
           quiver.source(this, equalizer.restrict(quiver.arrow))
+        val inclusion: QUIVER[EqualizingElement[S], S] =
+          this(source) { _.include }
       }
 
     override def equals(other: Any) = other match {
