@@ -106,7 +106,7 @@ object NativeFiniteSets extends Topos
         override val equalizerTarget = source
         override def restrict[R](substar: QUIVER[R, S]) =
           substar.source(this) { substar(_) }
-        override val inclusion: QUIVER[S, S] = equalizer(source) { Predef.identity }
+        override val inclusion: QUIVER[S, S] = equalizer(source) { s => s }
       }
 
     // TODO: generic! Should be a final method on Quiver

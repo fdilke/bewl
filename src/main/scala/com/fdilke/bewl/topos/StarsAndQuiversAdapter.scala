@@ -39,11 +39,11 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
           override private[StarsAndQuiversAdapter] val dot = (self.dot x that.dot).asInstanceOf[DOT[Any]]
           override private[StarsAndQuiversAdapter] def asElement(anArrow: ARROW[_, _]) =
             new xI[T, U] with Element {
-              override val arrow: ARROW[Any, Any] = anArrow.asInstanceOf[ARROW[Any, Any]]
+              override val arrow: ARROW[Any, Any] = fletch(anArrow)
               override val left: T = self.asElement(
-                topos.leftProjection(self.dot, that.dot).asInstanceOf[ARROW[Any, Any]](arrow))
+                fletch(topos.leftProjection(self.dot, that.dot))(arrow))
               override val right: U = that.asElement(
-                topos.rightProjection(self.dot, that.dot).asInstanceOf[ARROW[Any, Any]](arrow))
+                fletch(topos.rightProjection(self.dot, that.dot))(arrow))
           }}
       Memoize.generic.withLowerBound[STAR, CURRIED_BIPRODUCT, ELEMENT](product)
     }
@@ -64,7 +64,7 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
           biQuiver.product.left(this, exponential.transpose(biArrow(biQuiver)))
         override private[StarsAndQuiversAdapter] def asElement(anArrow: ARROW[_, _]) =
           new ~>[T, U] with Element {
-            override val arrow: ARROW[Any, Any] = anArrow.asInstanceOf[ARROW[Any, Any]]
+            override val arrow: ARROW[Any, Any] = fletch(anArrow)
             override def apply(s: T): U =
               target.asElement(
                 topos.evaluation(source.dot, target.dot)(
@@ -87,7 +87,7 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
       target: STAR[U],
       arrow: ARROW[_, _]
       ): QUIVER[T, U] = this(target)(
-      t => target.asElement(arrow.asInstanceOf[ARROW[Any, Any]](t.arrow))
+      t => target.asElement(fletch(arrow)(t.arrow))
     )
     private[StarsAndQuiversAdapter] def asElement(arrow: ARROW[_, _]) : T
   }
@@ -112,24 +112,18 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
 
         override private[StarsAndQuiversAdapter] val dot = equalizer.equalizerSource.asInstanceOf[DOT[Any]]
 
-        override private[StarsAndQuiversAdapter] def asElement(anArrow: ARROW[_, _]): S = {
-          val arrow = anArrow.asInstanceOf[ARROW[Any, Any]] // TODO fletch
-          equalizerTarget.asElement(equalizer.equalizer.asInstanceOf[ARROW[Any, Any]](arrow))
-        }
+        override private[StarsAndQuiversAdapter] def asElement(anArrow: ARROW[_, _]): S =
+          equalizerTarget.asElement(fletch(equalizer.equalizer)(fletch(anArrow)))
         override def restrict[R <: ELEMENT](quiver: QUIVER[R, S]) =
           quiver.source(this, equalizer.restrict(quiver.arrow))
         val inclusion: QUIVER[S, S] =
-          this(source) { s => s }// TODO don't use Predef.identity anywhere
+          this(source) { s => s }
       }
-
     override def equals(other: Any) = other match {
       case that: QUIVER[S, T] => arrow == that.arrow
       case _ => false
     }
-
-    override lazy val chi =
-      target(omega, arrowChi.arrow)
-
+    override lazy val chi = target(omega, arrowChi.arrow)
     override def \[U <: ELEMENT](monic: QUIVER[U, T]) =
       source(monic.source, monic.arrowChi.restrict(arrow))
 
@@ -148,13 +142,16 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
   private class WrappedDot[X](innerDot: DOT[X]) extends STAR[WrappedArrow[X]] {
     override private[StarsAndQuiversAdapter] val dot: DOT[Any] = innerDot.asInstanceOf[DOT[Any]]
     override private[StarsAndQuiversAdapter] def asElement(arrow: ARROW[_, _]) =
-      new WrappedArrow(arrow.asInstanceOf[ARROW[Any, Any]])
+      new WrappedArrow(fletch(arrow))
   }
 
   private val memoizedWrappedDot = {
     def wrapDot[T](dot: DOT[T]) = new WrappedDot(dot)
     Memoize.generic(wrapDot)
   }
+
+  private def fletch[X, Y](arrow: ARROW[X, Y]) =
+    arrow.asInstanceOf[ARROW[Any, Any]]
 
   // wrapping API
 

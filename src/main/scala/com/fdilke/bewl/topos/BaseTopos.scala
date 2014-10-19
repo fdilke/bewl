@@ -63,7 +63,7 @@ trait BaseTopos {
   }
 
   trait Star[S <: ELEMENT] { self: STAR[S] =>
-    final lazy val identity: QUIVER[S, S] = this(self)(Predef.identity)
+    final lazy val identity: QUIVER[S, S] = this(self) { s => s }
     val toI: QUIVER[S, UNIT]
     def x[T <: ELEMENT](that: STAR[T]): BIPRODUCT[S, T]
     def >[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[S, T]
