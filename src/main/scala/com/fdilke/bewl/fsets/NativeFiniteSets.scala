@@ -174,17 +174,13 @@ object NativeFiniteSets extends Topos
   override def star[T](input: Traversable[T]) =
     memoizedStarWrapper(input)
 
-  // TODO: generic! This doesn't belong in the wrapping layer. Refactor to a final helper method on ProductStar
+  // unusually simple generic definition for this topos because WRAPPER is trivial
   override def bifunctionAsBiQuiver[L, R, T](
     left: STAR[L],
     right: STAR[R],
     target: STAR[T],
-    bifunc: (L, R) => T): BiQuiver[L, R, T] = {
-    val product = left x right
-    BiQuiver(product, product(target) {
-          case l x r => bifunc(l, r)
-        })
-  }
+    bifunc: (L, R) => T): BiQuiver[L, R, T] =
+    (left x right).biQuiver(target) { bifunc }
 }
 
 case class FiniteSetsPreQuiver[S, T](

@@ -46,7 +46,14 @@ trait BaseTopos {
     def pair(l: L, r: R): L x R
     final def π0 = star(left) { _.left }
     final def π1 = star(right) { _.right }
-  }
+    final def biQuiver[T <: ELEMENT](
+      target: STAR[T]
+      ) (
+      bifunc: (L, R) => T
+      ) : BiQuiver[L, R, T] =
+      BiQuiver(this, this(target) {
+        case l x r => bifunc(l, r)
+      })}
 
   type EQUALIZER[S <: ELEMENT] = EqualizingStar[S] with STAR[EqualizingElement[S] with ELEMENT]
   trait EqualizingStar[S <: ELEMENT] { star: STAR[EqualizingElement[S] with ELEMENT] =>
