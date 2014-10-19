@@ -102,9 +102,6 @@ class StarsAndQuiversAdapter[BASE <: BaseDiagrammaticTopos](topos : BASE)
     override def o[R <: ELEMENT](that: QUIVER[R, S]) =
       that.source(target)(function compose that.function)
 
-    override def x[U <: ELEMENT](that: QUIVER[S, U]) =
-      source(target x that.target, arrow x that.arrow)
-
     def ?=(that: QUIVER[S, T]) =
       new AdapterStar[S] with EqualizingStar[S] {  // TODO: use EQUALIZER?
         private val equalizer = arrow ?= that.arrow

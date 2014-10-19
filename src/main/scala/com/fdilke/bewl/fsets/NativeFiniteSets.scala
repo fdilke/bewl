@@ -109,13 +109,6 @@ object NativeFiniteSets extends Topos
         override val inclusion: QUIVER[S, S] = equalizer(source) { s => s }
       }
 
-    // TODO: generic! Should be a final method on Quiver
-    override def x[U <: ELEMENT](that: QUIVER[S, U]): QUIVER[S, x[T, U]] = {
-      val product = this.target x that.target
-      source(product) {
-        s => product.pair(this(s), that(s))
-      }}
-
     override def apply(s: S) =
       function(s)
 

@@ -1,5 +1,7 @@
 package com.fdilke.bewl.topos
 
+import com.fdilke.bewl.fsets.NativeFiniteSets._
+
 trait Topos extends BaseTopos with SafeAlgebra
 
 trait BaseTopos {
@@ -79,7 +81,12 @@ trait BaseTopos {
     def apply(s: S): T
     def ?=(that: QUIVER[S, T]): EQUALIZER[S]
     def o[R <: ELEMENT](that: QUIVER[R, S]) : QUIVER[R, T]
-    def x[U <: ELEMENT](that: QUIVER[S, U]): QUIVER[S, T x U]
+    final def x[U <: ELEMENT](that: QUIVER[S, U]): QUIVER[S, x[T, U]] = {
+      val product = this.target x that.target
+      source(product) {
+        s => product.pair(this(s), that(s))
+      }}
+
     def \[U <: ELEMENT](monic: QUIVER[U, T]) : QUIVER[S, U]
     def sanityTest
   }
