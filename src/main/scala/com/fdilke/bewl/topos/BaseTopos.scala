@@ -1,5 +1,7 @@
 package com.fdilke.bewl.topos
 
+import Function.tupled
+
 trait Topos extends BaseTopos with SafeAlgebra
 
 trait BaseTopos {
@@ -22,9 +24,8 @@ trait BaseTopos {
     val source: STAR[S]
     val target: STAR[T]
     def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, S, T]): QUIVER[R, S > T]
-    final def evaluation: BiQuiver[S > T, S, T] = biQuiver(
-      this, source, target, { (f, s) => f(s) }
-    )
+    final def evaluation: BiQuiver[S > T, S, T] =
+      (this x source).biQuiver(target) { (f, s) => f(s) }
   }
 
   type BIPRODUCT[L <: ELEMENT, R <: ELEMENT] = BiproductStar[L, R] with STAR[L x R]
@@ -32,16 +33,17 @@ trait BaseTopos {
     val left: STAR[L]
     val right: STAR[R]
     def pair(l: L, r: R): L x R
-    final def π0 = star(left) { _._1 }
-    final def π1 = star(right) { _._2 }
+    final lazy val π0 = star(left) { _._1 }
+    final lazy val π1 = star(right) { _._2 }
     final def biQuiver[T <: ELEMENT](
       target: STAR[T]
       ) (
       bifunc: (L, R) => T
       ) : BiQuiver[L, R, T] =
-      BiQuiver(this, this(target) {
-        case (l, r) => bifunc(l, r)
-      })}
+      BiQuiver(this, this(target) (
+        tupled[L,R,T](bifunc)
+      ))
+    }
 
   type EQUALIZER[S <: ELEMENT] = EqualizingStar[S] with STAR[S]
   trait EqualizingStar[S <: ELEMENT] { star: STAR[S] =>
@@ -55,8 +57,8 @@ trait BaseTopos {
     val toI: QUIVER[S, UNIT]
     def x[T <: ELEMENT](that: STAR[T]): BIPRODUCT[S, T]
     def >[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[S, T]
-    def sanityTest
     def apply[T <: ELEMENT](target: STAR[T])(f: S => T) : QUIVER[S, T]
+    def sanityTest
   }
 
   trait Quiver[S <: ELEMENT, T <: ELEMENT] {
@@ -76,21 +78,6 @@ trait BaseTopos {
     def \[U <: ELEMENT](monic: QUIVER[U, T]) : QUIVER[S, U]
     def sanityTest
   }
-
-  def biQuiver[
-  L <: ELEMENT,
-  R <: ELEMENT,
-  T <: ELEMENT
-  ](
-   left: STAR[L],
-   right: STAR[R],
-   target: STAR[T],
-   f: (L, R) => T
-   ) =
-  BiQuiver(left x right,
-    (left x right)(target) {
-      case (l, r) => f(l, r)
-    })
 
   case class BiQuiver[
     L <: ELEMENT,
