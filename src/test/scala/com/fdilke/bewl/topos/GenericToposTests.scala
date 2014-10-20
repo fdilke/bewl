@@ -123,16 +123,16 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
       (bar x baz).π1.sanityTest
 
       foo(bar) {
-        x => productQuiver(x).left
+        x => productQuiver(x)._1
       } shouldBe foo2bar
 
       foo(baz) {
-        x => productQuiver(x).right
+        x => productQuiver(x)._2
       } shouldBe foo2baz
 
       val fooXbar = foo x bar
       fooXbar(fooXbar) {
-        case f x b => fooXbar.pair(f, b)
+        case (f, b) => fooXbar.pair(f, b)
       } shouldBe fooXbar.identity
     }
 
@@ -177,7 +177,7 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
       )
 
       (foo x bar)(baz) {
-        case f x b =>
+        case (f, b) =>
           foo2bar2baz(f)(b)
       } shouldBe foobar2baz.quiver
     }

@@ -38,12 +38,11 @@ class StarsAndQuiversAdapter(val topos : BaseDiagrammaticTopos)
           override def pair(t: T,u: U) = asElement(t.arrow x u.arrow)
           override private[StarsAndQuiversAdapter] val dot = (self.dot x that.dot).asInstanceOf[DOT[Any]]
           override private[StarsAndQuiversAdapter] def asElement(anArrow: ARROW[_, _]) =
-            new xI[T, U] with Element {
+            new Tuple2[T, U] (
+              self.asElement(fletch(topos.leftProjection(self.dot, that.dot))(fletch(anArrow))),
+              that.asElement(fletch(topos.rightProjection(self.dot, that.dot))(fletch(anArrow)))
+            ) with Element {
               override val arrow: ARROW[Any, Any] = fletch(anArrow)
-              override val left: T = self.asElement(
-                fletch(topos.leftProjection(self.dot, that.dot))(arrow))
-              override val right: U = that.asElement(
-                fletch(topos.rightProjection(self.dot, that.dot))(arrow))
           }}
       Memoize.generic.withLowerBound[STAR, CURRIED_BIPRODUCT, ELEMENT](product)
     }

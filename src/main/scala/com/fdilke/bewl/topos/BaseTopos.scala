@@ -1,7 +1,5 @@
 package com.fdilke.bewl.topos
 
-import com.fdilke.bewl.fsets.NativeFiniteSets._
-
 trait Topos extends BaseTopos with SafeAlgebra
 
 trait BaseTopos {
@@ -9,19 +7,11 @@ trait BaseTopos {
   type STAR[S <: ELEMENT] <: Star[S]
   type QUIVER[S <: ELEMENT, T <: ELEMENT] <: Quiver[S, T]
 
-  trait xI[T <: ELEMENT, U <: ELEMENT] { self: ELEMENT =>
-    val left: T
-    val right: U
-  }
-  type x[T <: ELEMENT, U <: ELEMENT] = xI[T, U] with ELEMENT
-  object x {
-    def unapply[L <: ELEMENT, R <: ELEMENT](pair: xI[L, R]): Option[(L, R)] = Some((pair.left, pair.right))
-  }
-
   trait ~>[T <: ELEMENT, U <: ELEMENT] { self: ELEMENT =>
     def apply(t: T): U
   }
   type >[T <: ELEMENT, U <: ELEMENT] = ~>[T, U] with ELEMENT
+  type x[T <: ELEMENT, U <: ELEMENT] = (T, U) with ELEMENT
 
   type UNIT <: ELEMENT
   val I : STAR[UNIT]
@@ -36,8 +26,7 @@ trait BaseTopos {
     val target: STAR[T]
     def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, S, T]): QUIVER[R, S > T]
     final def evaluation: BiQuiver[S > T, S, T] = biQuiver(
-      this, source, target,
-      { (f, s) => f(s) }
+      this, source, target, { (f, s) => f(s) }
     )
   }
 
@@ -46,15 +35,15 @@ trait BaseTopos {
     val left: STAR[L]
     val right: STAR[R]
     def pair(l: L, r: R): L x R
-    final def π0 = star(left) { _.left }
-    final def π1 = star(right) { _.right }
+    final def π0 = star(left) { _._1 }
+    final def π1 = star(right) { _._2 }
     final def biQuiver[T <: ELEMENT](
       target: STAR[T]
       ) (
       bifunc: (L, R) => T
       ) : BiQuiver[L, R, T] =
       BiQuiver(this, this(target) {
-        case l x r => bifunc(l, r)
+        case (l, r) => bifunc(l, r)
       })}
 
   type EQUALIZER[S <: ELEMENT] = EqualizingStar[S] with STAR[S]
@@ -103,8 +92,7 @@ trait BaseTopos {
    ) =
   BiQuiver(left x right,
     (left x right)(target) {
-      case l x r =>
-      f(l, r)
+      case (l, r) => f(l, r)
     })
 
   case class BiQuiver[

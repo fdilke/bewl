@@ -46,24 +46,14 @@ object NativeFiniteSets extends Topos with Wrappings {
 
     private val memoizedProduct = {
       type CURRIED_BIPRODUCT[T <: ELEMENT] = BIPRODUCT[S, T]
-      class Pair[T <: ELEMENT](s: S, t: T) extends xI[S, T] {
-          override val left = s
-          override val right = t
-          override def equals(other: Any): Boolean = other match {
-            case that: Pair[T] =>
-              left == that.left && right == that.right
-            case _ => false
-          }
-          override def hashCode = 0
-        }
-      def product[T <: ELEMENT](that: STAR[T]) = // TODO: refactor to call pair instead of _pair
+      def product[T <: ELEMENT](that: STAR[T]) =
         new FiniteSetsStar[S x T](
           for(s <- this ; t <- that)
-            yield new Pair(s, t)
+            yield (s, t)
         ) with BiproductStar[S, T] {
           override val left: STAR[S] = self
           override val right: STAR[T] = that
-          override def pair(l: S, r: T): x[S, T] = new Pair(l, r)
+          override def pair(l: S, r: T): x[S, T] = (l, r)
         }
       Memoize.generic.withLowerBound[STAR, CURRIED_BIPRODUCT, ELEMENT](product)
     }
