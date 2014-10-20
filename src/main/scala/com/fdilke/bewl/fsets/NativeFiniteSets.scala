@@ -21,7 +21,7 @@ object NativeFiniteSets extends Topos with Wrappings {
     private val memoizedExponential = {
       type CURRIED_EXPONENTIAL[T <: ELEMENT] = EXPONENTIAL[S, T]
       def exponential[T <: ELEMENT](that: STAR[T]) = {
-        case class FunctionElement(function: S => T) extends ~>[S, T] {
+        case class FunctionElement(function: S => T) extends (S => T) {
           override def equals(that: scala.Any): Boolean = that match {
               case that: FunctionElement => elements.forall {
                 s => function(s) == that.function(s)

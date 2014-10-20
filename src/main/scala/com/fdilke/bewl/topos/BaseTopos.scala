@@ -7,10 +7,7 @@ trait BaseTopos {
   type STAR[S <: ELEMENT] <: Star[S]
   type QUIVER[S <: ELEMENT, T <: ELEMENT] <: Quiver[S, T]
 
-  trait ~>[T <: ELEMENT, U <: ELEMENT] { self: ELEMENT =>
-    def apply(t: T): U
-  }
-  type >[T <: ELEMENT, U <: ELEMENT] = ~>[T, U] with ELEMENT
+  type >[T <: ELEMENT, U <: ELEMENT] = (T => U) with ELEMENT
   type x[T <: ELEMENT, U <: ELEMENT] = (T, U) with ELEMENT
 
   type UNIT <: ELEMENT

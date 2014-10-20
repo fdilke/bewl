@@ -38,7 +38,7 @@ class StarsAndQuiversAdapter(val topos : BaseDiagrammaticTopos)
           override def pair(t: T,u: U) = asElement(t.arrow x u.arrow)
           override private[StarsAndQuiversAdapter] val dot = (self.dot x that.dot).asInstanceOf[DOT[Any]]
           override private[StarsAndQuiversAdapter] def asElement(anArrow: ARROW[_, _]) =
-            new Tuple2[T, U] (
+            new (T, U) (
               self.asElement(fletch(topos.leftProjection(self.dot, that.dot))(fletch(anArrow))),
               that.asElement(fletch(topos.rightProjection(self.dot, that.dot))(fletch(anArrow)))
             ) with Element {
@@ -62,7 +62,7 @@ class StarsAndQuiversAdapter(val topos : BaseDiagrammaticTopos)
         override def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, T, U]) =
           biQuiver.product.left(this, exponential.transpose(biArrow(biQuiver)))
         override private[StarsAndQuiversAdapter] def asElement(anArrow: ARROW[_, _]) =
-          new ~>[T, U] with Element {
+          new (T => U) with Element {
             override val arrow: ARROW[Any, Any] = fletch(anArrow)
             override def apply(s: T): U =
               target.asElement(
