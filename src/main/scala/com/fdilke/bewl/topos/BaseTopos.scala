@@ -121,3 +121,4 @@ trait Wrappings { topos: BaseTopos =>
       bifunc: (L, R) => T
    ): BiQuiver[WRAPPER[L], WRAPPER[R], WRAPPER[T]]
 }
+
