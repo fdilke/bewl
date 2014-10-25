@@ -2,9 +2,9 @@ package com.fdilke.bewl.fsets
 
 import com.fdilke.bewl.fsets.DiagrammaticFiniteSetsUtilities._
 import com.fdilke.bewl.helper.Memoize
-import com.fdilke.bewl.topos.{BetterWrappings, Topos}
+import com.fdilke.bewl.topos.{Wrappings, Topos}
 
-object NativeFiniteSets extends Topos with BetterWrappings[Traversable, FiniteSetsPreQuiver] {
+object NativeFiniteSets extends Topos with Wrappings[Traversable, FiniteSetsPreQuiver] {
   override type ELEMENT = Any
   override type STAR[S <: ELEMENT] = FiniteSetsStar[S]
   override type QUIVER[S <: ELEMENT, T <: ELEMENT] = FiniteSetsQuiver[S, T]

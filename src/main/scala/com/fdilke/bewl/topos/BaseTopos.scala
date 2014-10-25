@@ -106,19 +106,17 @@ trait BaseTopos {
     (x x y x z).π1
 }
 
-trait Wrappings { topos: BaseTopos =>
-  type PRESTAR[T]
-  type PREQUIVER[S, T]
+trait Wrappings[PRESTAR[_], PREQUIVER[_, _]] { topos: BaseTopos =>
   type WRAPPER[T] <: ELEMENT
 
   def star[T](input: PRESTAR[T]) : STAR[WRAPPER[T]]
   def quiver[S, T](connector: PREQUIVER[S, T]) : QUIVER[WRAPPER[S], WRAPPER[T]]
   def functionAsQuiver[S, T](source: STAR[WRAPPER[S]], target: STAR[WRAPPER[T]], f: S => T): QUIVER[WRAPPER[S], WRAPPER[T]]
   def bifunctionAsBiQuiver[L, R, T] (
-      left: STAR[WRAPPER[L]],
-      right: STAR[WRAPPER[R]],
-      target: STAR[WRAPPER[T]],
-      bifunc: (L, R) => T
-   ): BiQuiver[WRAPPER[L], WRAPPER[R], WRAPPER[T]]
+                                      left: STAR[WRAPPER[L]],
+                                      right: STAR[WRAPPER[R]],
+                                      target: STAR[WRAPPER[T]],
+                                      bifunc: (L, R) => T
+                                      ): BiQuiver[WRAPPER[L], WRAPPER[R], WRAPPER[T]]
 }
 

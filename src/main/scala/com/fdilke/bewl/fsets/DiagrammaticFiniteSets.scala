@@ -3,7 +3,6 @@ package com.fdilke.bewl.fsets
 import com.fdilke.bewl.diagrammatic.DiagrammaticTopos
 import com.fdilke.bewl.fsets.DiagrammaticFiniteSetsUtilities.allMaps
 import com.fdilke.bewl.helper.FunctionWithEquality
-import com.fdilke.bewl.topos.StarsAndQuiversAdapter
 import scala.Function.{const, tupled}
 
 object DiagrammaticFiniteSets extends DiagrammaticTopos {
@@ -129,8 +128,9 @@ object DiagrammaticFiniteSets extends DiagrammaticTopos {
   override val omega = DiagrammaticFiniteSetsDot[Boolean](Traversable(true, false))
   override val truth = DiagrammaticFiniteSetsArrow[Unit, Boolean](I, omega, const (true) _)
 
-  override def buildArrow[S, T](source: DiagrammaticFiniteSetsDot[S], target: DiagrammaticFiniteSetsDot[T], f: S => T) =
+  override def buildArrow[S, T](
+    source: DiagrammaticFiniteSetsDot[S],
+    target: DiagrammaticFiniteSetsDot[T], f: S => T
+  ) =
     DiagrammaticFiniteSetsArrow(source, target, f)
 }
-
-//object LayeredFiniteSets extends StarsAndQuiversAdapter(DiagrammaticFiniteSets)

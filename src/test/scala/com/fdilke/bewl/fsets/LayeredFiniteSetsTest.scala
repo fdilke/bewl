@@ -1,7 +1,7 @@
 package com.fdilke.bewl.fsets
 
 import com.fdilke.bewl.fsets.DiagrammaticFiniteSets.{ARROW, DOT}
-import com.fdilke.bewl.topos.{BetterWrappings, Topos, GenericToposTests, ToposWithFixtures}
+import com.fdilke.bewl.topos.{Wrappings, Topos, GenericToposTests, ToposWithFixtures}
 
 class LayeredFiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
   val topos = LayeredFiniteSets

@@ -5,23 +5,9 @@ import com.fdilke.bewl.helper.Memoize
 
 import scala.Function._
 
-trait BetterWrappings[PRESTAR[_], PREQUIVER[_, _]] { topos: BaseTopos =>
-  type WRAPPER[T] <: ELEMENT
-
-  def star[T](input: PRESTAR[T]) : STAR[WRAPPER[T]]
-  def quiver[S, T](connector: PREQUIVER[S, T]) : QUIVER[WRAPPER[S], WRAPPER[T]]
-  def functionAsQuiver[S, T](source: STAR[WRAPPER[S]], target: STAR[WRAPPER[T]], f: S => T): QUIVER[WRAPPER[S], WRAPPER[T]]
-  def bifunctionAsBiQuiver[L, R, T] (
-    left: STAR[WRAPPER[L]],
-    right: STAR[WRAPPER[R]],
-    target: STAR[WRAPPER[T]],
-    bifunc: (L, R) => T
-  ): BiQuiver[WRAPPER[L], WRAPPER[R], WRAPPER[T]]
-}
-
 object StarsAndQuiversLayer {
-  def apply(topos: BaseDiagrammaticTopos): Topos with BetterWrappings[topos.DOT, topos.ARROW] = {
-    class FancyTopos extends Topos with BetterWrappings[topos.DOT, topos.ARROW] {
+  def apply(topos: BaseDiagrammaticTopos): Topos with Wrappings[topos.DOT, topos.ARROW] = {
+    class FancyTopos extends Topos with Wrappings[topos.DOT, topos.ARROW] {
       import topos.{ARROW, DOT, BiArrow, buildArrow}
 
       override type ELEMENT = Element
