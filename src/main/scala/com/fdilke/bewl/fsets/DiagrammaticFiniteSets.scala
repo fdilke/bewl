@@ -133,4 +133,4 @@ object DiagrammaticFiniteSets extends DiagrammaticTopos {
     DiagrammaticFiniteSetsArrow(source, target, f)
 }
 
-object LayeredFiniteSets extends StarsAndQuiversAdapter(DiagrammaticFiniteSets)
+//object LayeredFiniteSets extends StarsAndQuiversAdapter(DiagrammaticFiniteSets)

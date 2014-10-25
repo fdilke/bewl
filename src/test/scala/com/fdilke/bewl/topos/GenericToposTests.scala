@@ -6,7 +6,7 @@ import org.scalatest._
 abstract class ToposFixtureSanityTests[T <: BaseTopos](fixtures: ToposWithFixtures) extends FunSpec {
   import fixtures._
 
-  describe(s"The fixtures for ${fixtures.topos.getClass.getSimpleName}") {
+  describe(s"The fixtures for ${fixtures.topos.getClass.getName}") {
     it("include distinct sane objects") {
       val objects = Set(foo, bar, baz)
 
@@ -40,8 +40,7 @@ abstract class ToposFixtureSanityTests[T <: BaseTopos](fixtures: ToposWithFixtur
 }
 
 abstract class ToposWithFixtures {
-  type TOPOS <: BaseTopos
-  val topos : TOPOS
+  val topos : Topos
 
   import topos.ELEMENT
 
@@ -90,7 +89,7 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
   import fixtures._
   import fixtures.topos._
 
-  describe(s"The topos ${topos.getClass.getSimpleName}") {
+  describe(s"The topos ${topos.getClass.getName}") {
 
     it("wraps dots and arrows with relatively sane equality semantics") {
       makeSampleStar() shouldBe makeSampleStar()

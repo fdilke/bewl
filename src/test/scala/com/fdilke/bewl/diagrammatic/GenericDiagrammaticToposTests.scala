@@ -38,8 +38,7 @@ abstract class DiagrammaticToposFixtureSanityTests[T <: DiagrammaticTopos](fixtu
 }
 
 abstract class DiagrammaticToposWithFixtures {
-  type TOPOS <: DiagrammaticTopos
-  val topos : TOPOS
+  val topos: DiagrammaticTopos
 
   type FOO
   type BAR
@@ -79,7 +78,7 @@ abstract class GenericDiagrammaticToposTests[TOPOS <: DiagrammaticTopos](
   import fixtures._
   import fixtures.topos._
 
-  describe(s"The topos ${topos.getClass.getSimpleName}") {
+  describe(s"The topos ${topos.getClass.getName}") {
     it("has identity arrows which can be composed") {
       foo2bar(foo.identity) shouldBe foo2bar
       bar.identity(foo2bar) shouldBe foo2bar

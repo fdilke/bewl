@@ -4,9 +4,7 @@ import com.fdilke.bewl.diagrammatic.{DiagrammaticToposWithFixtures, GenericDiagr
 import com.fdilke.bewl.fsets.DiagrammaticFiniteSetsUtilities.{arrow, set}
 
 class DiagrammaticFiniteSetsTest extends GenericDiagrammaticToposTests(new DiagrammaticToposWithFixtures {
-  type TOPOS = DiagrammaticFiniteSets.type
   val topos = DiagrammaticFiniteSets
-
   import topos._
 
   type FOO = Boolean
