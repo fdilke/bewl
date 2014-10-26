@@ -49,6 +49,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
         x => multiply(unit(carrier.toI(x)), x)
       } != carrier.identity)
         throw new IllegalArgumentException("Left unit law for * with unit 1")
+
       // check the right unit law
       if (carrier(carrier) {
         x => multiply(x, unit(carrier.toI(x)))
@@ -63,5 +64,16 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       })
         throw new IllegalArgumentException("Associative law for *")
     }
+
+    def rightAction[A <: ELEMENT](actionCarrier: STAR[A], actionMultiply: BiQuiver[A, X, A]) =
+      new RightMonoidAction[A, X](this, actionCarrier, actionMultiply)
+  }
+
+  class RightMonoidAction[A <: ELEMENT, X <: ELEMENT] (
+    monoid: Monoid[X],
+    actionCarrier: STAR[A],
+    actionMultiply: BiQuiver[A, X, A]
+  ) {
+    def sanityTest = {}
   }
 }
