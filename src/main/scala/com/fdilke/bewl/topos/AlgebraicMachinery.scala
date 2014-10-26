@@ -74,6 +74,20 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     actionCarrier: STAR[A],
     actionMultiply: BiQuiver[A, X, A]
   ) {
-    def sanityTest = {}
+    def sanityTest = {
+      // check the right unit law
+      if (actionCarrier(actionCarrier) {
+        a => actionMultiply(a, monoid.unit(actionCarrier.toI(a)))
+      } != actionCarrier.identity)
+        throw new IllegalArgumentException("Right unit law for * with unit 1")
+
+      // check the associative law
+      if ((actionCarrier x monoid.carrier x monoid.carrier)(actionCarrier) {
+        case ((a, x), y) => actionMultiply(a, monoid.multiply(x, y))
+      } != (actionCarrier x monoid.carrier x monoid.carrier)(actionCarrier) {
+        case ((a, x), y) => actionMultiply(actionMultiply(a, x), y)
+      })
+        throw new IllegalArgumentException("Associative law for monoid action *")
+    }
   }
 }

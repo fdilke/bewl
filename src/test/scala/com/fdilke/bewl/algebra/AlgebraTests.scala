@@ -78,14 +78,39 @@ class AlgebraTests extends FunSpec {
     }
 
     it("can define a right action for a monoid") {
-      val (i, x, y) = ('i, 'x, 'y)
-      val actionCarrier = makeStar('A, 'B)
+      val (i, x, y, a, b) = ('i, 'x, 'y, 'a, 'b)
+      val actionCarrier = makeStar(a, b)
       val actionMultiply = makeBiQuiver(actionCarrier, monoid4.carrier, actionCarrier,
-        (i, i) -> i, (i, x) -> x, (i, y) -> y,
-        (x, i) -> x, (x, x) -> x, (x, y) -> x,
-        (y, i) -> y, (y, x) -> y, (y, y) -> y
+        (a, i) -> a, (a, x) -> a, (a, y) -> a,
+        (b, i) -> b, (b, x) -> b, (b, y) -> b
       )
       monoid4.rightAction(actionCarrier, actionMultiply).sanityTest
+    }
+
+    it("checks the right unit law for a right monoid action") {
+      val (i, x, y, a, b) = ('i, 'x, 'y, 'a, 'b)
+      val actionCarrier = makeStar(a, b)
+      val actionMultiply = makeBiQuiver(actionCarrier, monoid4.carrier, actionCarrier,
+        (a, i) -> b, (a, x) -> a, (a, y) -> a,
+        (b, i) -> a, (b, x) -> b, (b, y) -> b
+      )
+      intercept[IllegalArgumentException] {
+        monoid4.rightAction(actionCarrier, actionMultiply).sanityTest
+      }.
+        getMessage shouldBe "Right unit law for * with unit 1"
+    }
+
+    it("checks the associative law for a right monoid action") {
+      val (i, x, y, a, b) = ('i, 'x, 'y, 'a, 'b)
+      val actionCarrier = makeStar(a, b)
+      val actionMultiply = makeBiQuiver(actionCarrier, monoid4.carrier, actionCarrier,
+        (a, i) -> a, (a, x) -> b, (a, y) -> a,
+        (b, i) -> b, (b, x) -> b, (b, y) -> a
+      )
+      intercept[IllegalArgumentException] {
+        monoid4.rightAction(actionCarrier, actionMultiply).sanityTest
+      }.
+        getMessage shouldBe "Associative law for monoid action *"
     }
   }
 }
