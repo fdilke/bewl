@@ -201,14 +201,13 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
       val char = monicBar2baz.chi
       char.source shouldBe baz
       char.target shouldBe omega
-      (char o monicBar2baz) shouldBe (truth o bar.toI)
+      char o monicBar2baz shouldBe (truth o bar.toI)
 
       val restriction = foo2ImageOfBar \ monicBar2baz
       restriction.source shouldBe foo
       restriction.target shouldBe bar
-      (monicBar2baz o restriction) shouldBe foo2ImageOfBar
+      monicBar2baz o restriction shouldBe foo2ImageOfBar
 
-      // TODO: lose unnecessary brackets
       // TODO: contruct a non-monic arrow, have chi throw a NotMonicException
       // TODO: try backdividing by a monic when we can't
       // TODO: refactor with quiver.subStar = Option[SubStar] ?

@@ -31,7 +31,7 @@ object DiagrammaticFiniteSets extends DiagrammaticTopos {
         // we'll be comparing against things that aren't
         val theAllMaps: Traversable[Y => X] = allMaps(that, DiagrammaticFiniteSetsDot.this).
           map(FunctionWithEquality(that, _))
-        override val exponentDot: DiagrammaticFiniteSetsDot[Y => X] = DiagrammaticFiniteSetsDot[Y => X](theAllMaps) // TODO: inline this argument
+        override val exponentDot: DiagrammaticFiniteSetsDot[Y => X] = DiagrammaticFiniteSetsDot[Y => X](theAllMaps)
 
         override val evaluation = new BiArrow[Y => X, Y, X](exponentDot, that,
           DiagrammaticFiniteSetsArrow[(Y => X, Y), X](exponentDot x that, DiagrammaticFiniteSetsDot.this, tupled {
