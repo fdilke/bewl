@@ -54,6 +54,14 @@ trait AlgebraicMachinery { topos: BaseTopos =>
         x => multiply(x, unit(carrier.toI(x)))
       } != carrier.identity)
         throw new IllegalArgumentException("Right unit law for * with unit 1")
+
+      // check the associative law
+      if ((carrier x carrier x carrier)(carrier) {
+        case ((x, y), z) => multiply(x, multiply(y, z))
+      } != (carrier x carrier x carrier)(carrier) {
+        case ((x, y), z) => multiply(multiply(x, y), z)
+      })
+        throw new IllegalArgumentException("Associative law for *")
     }
   }
 }
