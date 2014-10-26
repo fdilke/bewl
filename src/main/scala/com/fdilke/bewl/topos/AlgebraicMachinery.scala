@@ -1,6 +1,6 @@
 package com.fdilke.bewl.topos
 
-trait SafeAlgebra { topos: BaseTopos =>
+trait AlgebraicMachinery { topos: BaseTopos =>
 
   trait SafeArgument {
     type TYPE <: ELEMENT
@@ -36,9 +36,24 @@ trait SafeAlgebra { topos: BaseTopos =>
 //      signature = Seq(AbstractOp.I[X], AbstractOp.*[X, X, X]),
 //      laws =
 //    )
-//  class Monoid[X <: ELEMENT](carrier: STAR[X], unit: NullaryOp[X], multiply: BinaryOp[X]) extends
-//    Algebra[X](
-//      signature = Seq(AbstractOp.I[X], AbstractOp.*[X, X, X]),
-//      laws =
-//    )
+//     Algebra[X](
+//  signature = Seq(AbstractOp.I[X], AbstractOp.*[X, X, X]),
+//  laws =
+//  )
+
+
+  case class Monoid[X <: ELEMENT](carrier: STAR[X], unit: NullaryOp[X], multiply: BinaryOp[X]) {
+    def sanityTest {
+      // check the left unit law
+      if (carrier(carrier) {
+        x => multiply(unit(carrier.toI(x)), x)
+      } != carrier.identity)
+        throw new IllegalArgumentException("Left unit law for * with unit 1")
+      // check the right unit law
+      if (carrier(carrier) {
+        x => multiply(x, unit(carrier.toI(x)))
+      } != carrier.identity)
+        throw new IllegalArgumentException("Right unit law for * with unit 1")
+    }
+  }
 }

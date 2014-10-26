@@ -2,7 +2,7 @@ package com.fdilke.bewl.topos
 
 import Function.tupled
 
-trait Topos extends BaseTopos with SafeAlgebra
+trait Topos extends BaseTopos with AlgebraicMachinery
 
 trait BaseTopos {
   type ELEMENT

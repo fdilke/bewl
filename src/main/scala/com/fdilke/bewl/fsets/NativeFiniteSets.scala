@@ -157,3 +157,29 @@ case class FiniteSetsPreQuiver[S, T](
   target: Traversable[T],
   function: S => T
 )
+
+object NativeFiniteSetsUtilities {
+  import NativeFiniteSets._
+
+  def makeStar[T](elements: T*) = star(elements)
+
+  def makeQuiver[S, T](source: STAR[S], target: STAR[T], map: (S, T)*) =
+    functionAsQuiver(source, target, Map(map: _*))
+
+  def makeBiQuiver[L, R, T](
+                             left: STAR[L],
+                             right: STAR[R],
+                             target: STAR[T],
+                             mappings: ((L, R), T)*
+                             ) =
+    bifunctionAsBiQuiver(left, right, target, (l: L, r: R) => Map(mappings:_*)((l, r)))
+
+  def makeNullaryOperator[X](carrier: STAR[X], value: X) =
+    functionAsQuiver(I, carrier, (_: UNIT) => value)
+
+  def makeBinaryOperator[X](
+    carrier: STAR[X],
+    mappings: ((X, X), X)*
+  ) =
+    bifunctionAsBiQuiver(carrier, carrier, carrier, (l: X, r: X) => Map(mappings:_*)((l, r)))
+}

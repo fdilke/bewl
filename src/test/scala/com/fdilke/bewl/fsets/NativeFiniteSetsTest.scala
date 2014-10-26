@@ -1,6 +1,7 @@
 package com.fdilke.bewl.fsets
 
 import com.fdilke.bewl.topos.{GenericToposTests, ToposWithFixtures}
+import NativeFiniteSetsUtilities._
 
 class NativeFiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
   type TOPOS = NativeFiniteSets.type
@@ -11,19 +12,6 @@ class NativeFiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
   type FOO = Boolean
   type BAR = String
   type BAZ = Int
-
-  def makeStar[T](elements: T*) = star(elements)
-
-  def makeQuiver[S, T](source: STAR[S], target: STAR[T], map: (S, T)*) =
-    functionAsQuiver(source, target, Map(map: _*))
-
-  def makeBiQuiver[L, R, T](
-    left: STAR[L],
-    right: STAR[R],
-    target: STAR[T],
-    mappings: ((L, R), T)*
-  ) =
-    bifunctionAsBiQuiver(left, right, target, (l: L, r: R) => Map(mappings:_*)((l, r)))
 
   override val foo = makeStar(true, false)
   override val bar = makeStar("X", "Y")
