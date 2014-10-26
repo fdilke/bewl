@@ -49,5 +49,20 @@ class AlgebraTests extends FunSpec {
       }.
         getMessage shouldBe "Right unit law for * with unit 1"
     }
+
+    it("checks multiplication is associative") {
+        val (i, x, y) = ('i, 'x, 'y)
+        val carrier = makeStar(i, x, y)
+        val unit = makeNullaryOperator(carrier, i)
+        val product = makeBinaryOperator(carrier,
+          (i, i) -> i, (i, x) -> x, (i, y) -> y,
+          (x, i) -> x, (x, x) -> y, (x, y) -> y,
+          (y, i) -> y, (y, x) -> x, (y, y) -> y
+        )
+      intercept[IllegalArgumentException] {
+        Monoid[Symbol](carrier, unit, product).sanityTest
+      }.
+        getMessage shouldBe "Associative law for *"
+    }
   }
 }
