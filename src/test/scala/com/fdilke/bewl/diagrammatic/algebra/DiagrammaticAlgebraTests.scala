@@ -5,20 +5,20 @@ import com.fdilke.bewl.fsets.DiagrammaticFiniteSetsUtilities._
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
-class AlgebraTests extends FunSpec {
+class DiagrammaticAlgebraTests extends FunSpec {
   import DiagrammaticFiniteSets._
-  import AbstractOperator._
+  import DiagrammaticAbstractOperator._
 
-  def Magmas = new AlgebraicTheory(Seq(*))
-  case class Magma[X](dot: DOT[X], product: Operator[X]) extends AlgebraicStructure[X] (
+  def Magmas = new DiagrammaticAlgebraicTheory(Seq(*))
+  case class Magma[X](dot: DOT[X], product: Operator[X]) extends DiagrammaticAlgebraicStructure[X] (
     carrier = dot,
     operatorMap = Map(* -> product),
     theory = Magmas
   )
-  def CommutativeMagmas = new AlgebraicTheory(Seq(*),
+  def CommutativeMagmas = new DiagrammaticAlgebraicTheory(Seq(*),
     commutative(*)
   )
-  case class CommutativeMagma[X](dot: DOT[X], product: Operator[X]) extends AlgebraicStructure[X] (
+  case class CommutativeMagma[X](dot: DOT[X], product: Operator[X]) extends DiagrammaticAlgebraicStructure[X] (
     carrier = dot,
     operatorMap = Map(* -> product),
     theory = CommutativeMagmas
@@ -27,7 +27,7 @@ class AlgebraTests extends FunSpec {
   describe("Algebraic theories") {
     it("must define all the operations used in their laws") {
       intercept[IllegalArgumentException] {
-        new AlgebraicTheory(Seq(), commutative(*))
+        new DiagrammaticAlgebraicTheory(Seq(), commutative(*))
       }.getMessage shouldBe "Law uses undefined operator *"
     }
     // Note it's OK to define operations but not make use of them in laws - e.g. magmas

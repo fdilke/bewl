@@ -1,43 +1,43 @@
 package com.fdilke.bewl.diagrammatic.algebra
 
-import AbstractOperator._
+import DiagrammaticAbstractOperator._
 import com.fdilke.bewl.diagrammatic.BaseDiagrammaticTopos
 
-trait AlgebraicStructures { topos: BaseDiagrammaticTopos with Algebra with AlgebraicLaws =>
-  class AlgebraicTheory(signature: Seq[AbstractOperator], laws: Law*) {
+trait DiagrammaticAlgebraicStructures { topos: BaseDiagrammaticTopos with DiagrammaticAlgebra with DiagrammaticAlgebraicLaws =>
+  class DiagrammaticAlgebraicTheory(signature: Seq[DiagrammaticAbstractOperator], laws: Law*) {
 
     // Make sure all the operators used in the laws are defined
     for(law <- laws) {
       law.checkCoveredBy(signature)
     }
 
-    def verify[X](carrier: DOT[X], operatorMap: Map[AbstractOperator, Operator[X]]) = laws.map {
+    def verify[X](carrier: DOT[X], operatorMap: Map[DiagrammaticAbstractOperator, Operator[X]]) = laws.map {
       _.verify(carrier, operatorMap)
     }
 
-    def extend(moreLaws: Law*): AlgebraicTheory =
+    def extend(moreLaws: Law*): DiagrammaticAlgebraicTheory =
       extend(Seq(), moreLaws :_*)
 
-    def extend(moreOperators: Seq[AbstractOperator], moreLaws: Law*) =
-      new AlgebraicTheory(signature ++ moreOperators, (laws ++ moreLaws):_*)
+    def extend(moreOperators: Seq[DiagrammaticAbstractOperator], moreLaws: Law*) =
+      new DiagrammaticAlgebraicTheory(signature ++ moreOperators, (laws ++ moreLaws):_*)
 
-    def remap(mappings: (AbstractOperator, AbstractOperator)*) = {
+    def remap(mappings: (DiagrammaticAbstractOperator, DiagrammaticAbstractOperator)*) = {
       val mappingsMap = Map(mappings :_*)
       val remappedSignature = signature.map { aop =>
         mappingsMap.get(aop).getOrElse(aop)
       }
       val remappedLaws = laws.map { _.remap(mappingsMap)}
-      new AlgebraicTheory(remappedSignature, remappedLaws :_*)
+      new DiagrammaticAlgebraicTheory(remappedSignature, remappedLaws :_*)
     }
   }
 
-  class AlgebraicStructure[X](val carrier: DOT[X],
-    val operatorMap: Map[AbstractOperator, Operator[X]],
-    val theory: AlgebraicTheory) {
+  class DiagrammaticAlgebraicStructure[X](val carrier: DOT[X],
+    val operatorMap: Map[DiagrammaticAbstractOperator, Operator[X]],
+    val theory: DiagrammaticAlgebraicTheory) {
     def verify = theory.verify(carrier, operatorMap)
   }
 
-  def Monoids = new AlgebraicTheory(Seq(_1, *),
+  def Monoids = new DiagrammaticAlgebraicTheory(Seq(_1, *),
         leftUnit(_1, *),
         rightUnit(_1, *),
         associative(*)
@@ -66,7 +66,7 @@ trait AlgebraicStructures { topos: BaseDiagrammaticTopos with Algebra with Algeb
     rightDistributive(*, ++)
   )
 
-  def Lattices = new AlgebraicTheory(Seq(_0, _1, v, ^),
+  def Lattices = new DiagrammaticAlgebraicTheory(Seq(_0, _1, v, ^),
     leftUnit(_0, v),
     rightUnit(_0, v),
     commutative(v),
@@ -88,7 +88,7 @@ trait AlgebraicStructures { topos: BaseDiagrammaticTopos with Algebra with Algeb
     leftDistributive(>, ^)
   )
 
-  case class Monoid[X](dot: DOT[X], unit: Operator[X], product: Operator[X]) extends AlgebraicStructure[X] (
+  case class Monoid[X](dot: DOT[X], unit: Operator[X], product: Operator[X]) extends DiagrammaticAlgebraicStructure[X] (
     carrier = dot,
     operatorMap = Map(_1 -> unit, * -> product),
     theory = Monoids
@@ -97,7 +97,7 @@ trait AlgebraicStructures { topos: BaseDiagrammaticTopos with Algebra with Algeb
   case class Group[X](dot: DOT[X],
                       unit: Operator[X],
                       product: Operator[X],
-                      inversion: Operator[X]) extends AlgebraicStructure[X] (
+                      inversion: Operator[X]) extends DiagrammaticAlgebraicStructure[X] (
     carrier = dot,
     operatorMap = Map(_1 -> unit,
                       * -> product,
@@ -108,7 +108,7 @@ trait AlgebraicStructures { topos: BaseDiagrammaticTopos with Algebra with Algeb
   case class AdditiveAbelianGroup[X](dot: DOT[X],
                       zero: Operator[X],
                       sum: Operator[X],
-                      negate: Operator[X]) extends AlgebraicStructure[X] (
+                      negate: Operator[X]) extends DiagrammaticAlgebraicStructure[X] (
     carrier = dot,
     operatorMap = Map(_0 -> zero,
                       ++ -> sum,
@@ -121,7 +121,7 @@ trait AlgebraicStructures { topos: BaseDiagrammaticTopos with Algebra with Algeb
                      one: Operator[X],
                      sum: Operator[X],
                      negate: Operator[X],
-                     product: Operator[X]) extends AlgebraicStructure[X] (
+                     product: Operator[X]) extends DiagrammaticAlgebraicStructure[X] (
     carrier = dot,
     operatorMap = Map(_0 -> zero,
                       _1 -> one,
@@ -135,7 +135,7 @@ trait AlgebraicStructures { topos: BaseDiagrammaticTopos with Algebra with Algeb
                      zero: Operator[X],
                      one: Operator[X],
                      meet: Operator[X],
-                     join: Operator[X]) extends AlgebraicStructure[X] (
+                     join: Operator[X]) extends DiagrammaticAlgebraicStructure[X] (
     carrier = dot,
     operatorMap = Map(_0 -> zero,
                       _1 -> one,
@@ -150,7 +150,7 @@ trait AlgebraicStructures { topos: BaseDiagrammaticTopos with Algebra with Algeb
                      one: Operator[X],
                      meet: Operator[X],
                      join: Operator[X],
-                     implies: Operator[X]) extends AlgebraicStructure[X] (
+                     implies: Operator[X]) extends DiagrammaticAlgebraicStructure[X] (
     carrier = dot,
     operatorMap = Map(_0 -> zero,
                       _1 -> one,

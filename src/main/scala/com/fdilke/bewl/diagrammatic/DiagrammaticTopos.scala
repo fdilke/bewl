@@ -1,10 +1,10 @@
 package com.fdilke.bewl.diagrammatic
 
-import com.fdilke.bewl.diagrammatic.algebra.{Algebra, AlgebraicLaws, AlgebraicStructures, TruthObject}
+import com.fdilke.bewl.diagrammatic.algebra.{DiagrammaticAlgebra, DiagrammaticAlgebraicLaws, DiagrammaticAlgebraicStructures, TruthObject}
 import com.fdilke.bewl.helper.Memoize
 
-trait DiagrammaticTopos extends BaseDiagrammaticTopos with Algebra with AlgebraicLaws with
-  AlgebraicStructures with TruthObject
+trait DiagrammaticTopos extends BaseDiagrammaticTopos with DiagrammaticAlgebra with DiagrammaticAlgebraicLaws with
+  DiagrammaticAlgebraicStructures with TruthObject
 
 trait BaseDiagrammaticTopos {
   type DOT[P] <: Dot[P]

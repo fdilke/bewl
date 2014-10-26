@@ -30,8 +30,8 @@ class BindingTests  extends FunSpec {
       // 2. Bind them to a power of the carrier as source
 
       val source: DOT[DiagrammaticFiniteSets.Power[Symbol]] = dot ^ 3
-      val boundUnitOp = BoundAlgebraicOperator(source, unitOp)
-      val boundProductOp = BoundAlgebraicOperator(source, productOp)
+      val boundUnitOp = BoundDiagrammaticAlgebraicOperator(source, unitOp)
+      val boundProductOp = BoundDiagrammaticAlgebraicOperator(source, productOp)
 
       // 3. Use 'universal variables' to verify algebraic laws
 

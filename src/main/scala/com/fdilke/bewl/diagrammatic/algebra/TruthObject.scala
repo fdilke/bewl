@@ -2,7 +2,7 @@ package com.fdilke.bewl.diagrammatic.algebra
 
 import com.fdilke.bewl.diagrammatic.BaseDiagrammaticTopos
 
-trait TruthObject { topos: BaseDiagrammaticTopos with Algebra with AlgebraicLaws with AlgebraicStructures =>
+trait TruthObject { topos: BaseDiagrammaticTopos with DiagrammaticAlgebra with DiagrammaticAlgebraicLaws with DiagrammaticAlgebraicStructures =>
 
   // TODO: do thee need to be lazy? why?
   private lazy val and: ARROW[(OMEGA, OMEGA), OMEGA] = (truth x truth).chi.arrow

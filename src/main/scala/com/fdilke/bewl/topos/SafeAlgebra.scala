@@ -19,4 +19,26 @@ trait SafeAlgebra { topos: BaseTopos =>
   ) {
     def eval(assignments: ST#Assignments)
   }
+
+  type NullaryOp[X <: ELEMENT] = QUIVER[UNIT, X]
+  type Unary[X <: ELEMENT] = QUIVER[UNIT, X]
+  type BinaryOp[X <: ELEMENT] = BiQuiver[X, X, X]
+
+  class AbstractOp
+  object AbstractOp {
+    def I[X <: ELEMENT]: AbstractOp = ???
+    def *[L <: ELEMENT, R <: ELEMENT, T <: ELEMENT]: AbstractOp = ???
+  }
+  class AlgebraicTheory {}
+  class Algebra[X](val signature: Seq[AbstractOp]) {}
+
+//  object Monoids extends AlgebraicTheory {
+//      signature = Seq(AbstractOp.I[X], AbstractOp.*[X, X, X]),
+//      laws =
+//    )
+//  class Monoid[X <: ELEMENT](carrier: STAR[X], unit: NullaryOp[X], multiply: BinaryOp[X]) extends
+//    Algebra[X](
+//      signature = Seq(AbstractOp.I[X], AbstractOp.*[X, X, X]),
+//      laws =
+//    )
 }
