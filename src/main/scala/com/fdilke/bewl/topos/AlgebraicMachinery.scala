@@ -2,6 +2,7 @@ package com.fdilke.bewl.topos
 
 trait AlgebraicMachinery { topos: BaseTopos =>
 
+  /*
   trait SafeArgument {
     type TYPE <: ELEMENT
     val star: STAR[TYPE]
@@ -19,18 +20,52 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   ) {
     def eval(assignments: ST#Assignments)
   }
+  */
 
   type NullaryOp[X <: ELEMENT] = QUIVER[UNIT, X]
   type Unary[X <: ELEMENT] = QUIVER[UNIT, X]
   type BinaryOp[X <: ELEMENT] = BiQuiver[X, X, X]
 
-  class AbstractOp
-  object AbstractOp {
-    def I[X <: ELEMENT]: AbstractOp = ???
-    def *[L <: ELEMENT, R <: ELEMENT, T <: ELEMENT]: AbstractOp = ???
+  object StarTag extends Enumeration {
+    type StarTag = Value
+    val principal, rightMonoid = Value
   }
-  class AlgebraicTheory {}
-  class Algebra[X](val signature: Seq[AbstractOp]) {}
+  import StarTag._  
+  
+  abstract class AbstractOp(name: String, arity: Seq[StarTag]) {
+//    type SOURCE[X <: ELEMENT]
+//    def := [X <: ELEMENT](source: SOURCE[X])
+  }
+  class AbstractNullaryOp(name: String) extends AbstractOp(name, Seq.empty) {
+    def := [X <: ELEMENT](source: NullaryOp[X]) = ???
+  }
+  class AbstractBinaryOp(name: String) extends AbstractOp(name, Seq(principal, principal)) {
+    def := [X <: ELEMENT](source: BinaryOp[X]) = ???
+  }
+  object AbstractOp {
+    def unit = new AbstractNullaryOp("unit")
+    def multiply = new AbstractBinaryOp("multiply")
+  }
+  
+  trait Law
+  object Law {
+    def leftUnit(unit: AbstractNullaryOp, multiply: AbstractBinaryOp): Law = ???
+    def rightUnit(unit: AbstractNullaryOp, multiply: AbstractBinaryOp): Law = ???
+    def associative(multiply: AbstractBinaryOp): Law = ???
+  }
+
+  trait OperatorAssignment[X <: ELEMENT]
+
+  class AlgebraicTheory(operators: Set[AbstractOp], laws: Seq[Law]) {
+    def apply[X <: ELEMENT](carrier: STAR[X], assignments: OperatorAssignment[X]*): Algebra[X] =
+      new Algebra(this, carrier, assignments)
+  }
+
+  class Algebra[X <: ELEMENT](theory: AlgebraicTheory, carrier: STAR[X], assignments: Seq[OperatorAssignment[X]]) {
+    def sanityTest = ???
+  }
+
+//  class Algebra[X](val signature: Seq[AbstractOperator]) {}
 
 //  object Monoids extends AlgebraicTheory {
 //      signature = Seq(AbstractOp.I[X], AbstractOp.*[X, X, X]),

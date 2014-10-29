@@ -7,6 +7,27 @@ import org.scalatest.Matchers._
 import NativeFiniteSets._
 
 class AlgebraTests extends FunSpec {
+  describe("Algebraic theories") {
+    ignore("can be defined and used to create instances") {
+      val monoids = new AlgebraicTheory(
+        operators = Set(AbstractOp.unit, AbstractOp.multiply),
+        laws = Seq(
+          Law.leftUnit(AbstractOp.unit, AbstractOp.multiply),
+          Law.rightUnit(AbstractOp.unit, AbstractOp.multiply),
+          Law.associative(AbstractOp.multiply)
+        ))
+      val (i, x, y) = ('i, 'x, 'y)
+      val carrier = makeStar(i, x, y)
+      val unit = makeNullaryOperator(carrier, i)
+      val product = makeBinaryOperator(carrier,
+        (i, i) -> i, (i, x) -> x, (i, y) -> y,
+        (x, i) -> x, (x, x) -> x, (x, y) -> x,
+        (y, i) -> y, (y, x) -> y, (y, y) -> y
+      )
+      monoids[Symbol](carrier, AbstractOp.unit := unit, AbstractOp.multiply := product).sanityTest
+    }
+  }
+
   describe("The topos algebra machinery") {
     it("can define a monoid with carrier, unit and multiplication") {
         val (i, x, y) = ('i, 'x, 'y)
