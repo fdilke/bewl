@@ -2,7 +2,7 @@ name := "bewl"
 
 version := "1.0"
 
-scalaVersion := "2.11.1"
+scalaVersion := "2.11.2"
 
 libraryDependencies ++= Seq(
   "junit" % "junit" % "4.11" % "test" withSources() withJavadoc(),
