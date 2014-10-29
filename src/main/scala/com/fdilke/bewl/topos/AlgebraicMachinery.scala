@@ -36,33 +36,78 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 //    type SOURCE[X <: ELEMENT]
 //    def := [X <: ELEMENT](source: SOURCE[X])
   }
-  class AbstractNullaryOp(name: String) extends AbstractOp(name, Seq.empty) {
-    def := [X <: ELEMENT](source: NullaryOp[X]) = ???
+  class AbstractNullaryOp(name: String) extends AbstractOp(name, Seq.empty) with Expression {
+    def := [X <: ELEMENT](source: NullaryOp[X]) = new OperatorAssignment[X] {}
+    def evaluate[X <: ELEMENT](algebra: Algebra[X]) = ???
   }
   class AbstractBinaryOp(name: String) extends AbstractOp(name, Seq(principal, principal)) {
-    def := [X <: ELEMENT](source: BinaryOp[X]) = ???
+    def := [X <: ELEMENT](source: BinaryOp[X]) = new OperatorAssignment[X] {}
+    def apply(left: Expression, right: Expression) = new Expression {
+      def evaluate[X <: ELEMENT](algebra: Algebra[X]) = ???
+    }
   }
   object AbstractOp {
     def unit = new AbstractNullaryOp("unit")
     def multiply = new AbstractBinaryOp("multiply")
   }
-  
-  trait Law
+
+  trait Variable extends Expression {
+
+  }
+  trait Expression {
+    def evaluate[X <: ELEMENT](algebra: Algebra[X])
+    def ::== (other: Expression) = new Equation(this, other)
+  }
+  class Equation(leftSide: Expression, rightSide: Expression) {
+    def holds[X <: ELEMENT](algebra: Algebra[X]) =
+      leftSide.evaluate(algebra) == rightSide.evaluate(algebra)
+  }
+
+  class Law(assigner: VariableAssigner, makeEquation: VariableAssignments => Equation, message: String) {
+    def verify[X <: ELEMENT](algebra: Algebra[X]) = {
+      val equation = makeEquation(assigner.assign(algebra))
+      if (!equation.holds(algebra))
+        throw new IllegalArgumentException(message)
+    }
+  }
   object Law {
-    def leftUnit(unit: AbstractNullaryOp, multiply: AbstractBinaryOp): Law = ???
-    def rightUnit(unit: AbstractNullaryOp, multiply: AbstractBinaryOp): Law = ???
-    def associative(multiply: AbstractBinaryOp): Law = ???
+    def leftUnit(unit: AbstractNullaryOp, multiply: AbstractBinaryOp): Law = Law("not a left unit", x =>
+      multiply(unit, x) ::== x
+    )
+    def rightUnit(unit: AbstractNullaryOp, multiply: AbstractBinaryOp): Law = Law("not a right unit", x =>
+      multiply(x, unit) ::== x
+    )
+    def associative(multiply: AbstractBinaryOp): Law = Law("not associative", (x, y, z) =>
+      multiply(x, multiply(y, z)) ::== multiply(multiply(x, y), z)
+    )
+
+    def apply(message: String, f: Variable => Equation): Law = {
+      val assigner = new VariableAssigner(principal)
+      new Law(assigner, assignments => f(assignments.get(0)), message)
+    }
+//    def apply(message: String)(f: (Variable, Variable) => Equation): Law = ???
+    def apply(message: String, f: (Variable, Variable, Variable) => Equation): Law = {
+      val assigner = new VariableAssigner(principal, principal, principal)
+      new Law(assigner, assignments => f(assignments.get(0), assignments.get(1), assignments.get(2)), message)
+    }
+  }
+
+  trait VariableAssignments {
+    def get(index: Int): Variable = ???
+  }
+
+  class VariableAssigner(arity: StarTag*) {
+    def assign[X <: ELEMENT](algebra: Algebra[X]): VariableAssignments = ???
   }
 
   trait OperatorAssignment[X <: ELEMENT]
 
-  class AlgebraicTheory(operators: Set[AbstractOp], laws: Seq[Law]) {
-    def apply[X <: ELEMENT](carrier: STAR[X], assignments: OperatorAssignment[X]*): Algebra[X] =
-      new Algebra(this, carrier, assignments)
+  class AlgebraicTheory(operators: Set[AbstractOp], val laws: Seq[Law]) {
+    def apply[X <: ELEMENT](carrier: STAR[X], assignments: OperatorAssignment[X]*) = Algebra(this, carrier, assignments)
   }
 
-  class Algebra[X <: ELEMENT](theory: AlgebraicTheory, carrier: STAR[X], assignments: Seq[OperatorAssignment[X]]) {
-    def sanityTest = ???
+  case class Algebra[X <: ELEMENT](theory: AlgebraicTheory, carrier: STAR[X], assignments: Seq[OperatorAssignment[X]]) {
+    def sanityTest = theory.laws.foreach { _.verify(this)}
   }
 
 //  class Algebra[X](val signature: Seq[AbstractOperator]) {}
