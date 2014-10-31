@@ -199,9 +199,10 @@ abstract class GenericDiagrammaticToposTests[TOPOS <: DiagrammaticTopos](
       foo3 shouldBe (foo ^ 3)
     }
 
-    ignore("has a Heyting algebra structure for the truth object") {
-      omegaHeyting.isInstanceOf[HeytingAlgebra[OMEGA]] shouldBe true
-      //      omegaHeyting.verify
-    }
+    // TODO: should be able to do this with new algebra layer
+//    ignore("has a Heyting algebra structure for the truth object") {
+//      omegaHeyting.isInstanceOf[HeytingAlgebra[OMEGA]] shouldBe true
+//      //      omegaHeyting.verify
+//    }
   }
 }

@@ -2,26 +2,6 @@ package com.fdilke.bewl.topos
 
 trait AlgebraicMachinery { topos: BaseTopos =>
 
-  /*
-  trait SafeArgument {
-    type TYPE <: ELEMENT
-    val star: STAR[TYPE]
-  }
-
-  abstract class SafeTuple[ST <: SafeTuple[ST]](args: Seq[SafeArgument]) {
-    class Assignments
-  }
-
-  abstract class SafeOperator[
-    X <: ELEMENT,
-    ST <: SafeTuple[ST]
-  ] (
-    tuple: ST
-  ) {
-    def eval(assignments: ST#Assignments)
-  }
-  */
-
   type NullaryOp[X <: ELEMENT] = QUIVER[UNIT, X]
   type Unary[X <: ELEMENT] = QUIVER[UNIT, X]
   type BinaryOp[X <: ELEMENT] = BiQuiver[X, X, X]
@@ -31,19 +11,20 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     val principal, rightMonoid = Value
   }
   import StarTag._  
-  
+
+/*
   abstract class AbstractOp(name: String, arity: Seq[StarTag]) {
 //    type SOURCE[X <: ELEMENT]
 //    def := [X <: ELEMENT](source: SOURCE[X])
   }
   class AbstractNullaryOp(name: String) extends AbstractOp(name, Seq.empty) with Expression {
     def := [X <: ELEMENT](source: NullaryOp[X]) = new OperatorAssignment[X] {}
-    def evaluate[X <: ELEMENT](algebra: Algebra[X]) = ???
+    override def evaluate[X <: ELEMENT](algebra: Algebra[X]) = ???
   }
   class AbstractBinaryOp(name: String) extends AbstractOp(name, Seq(principal, principal)) {
     def := [X <: ELEMENT](source: BinaryOp[X]) = new OperatorAssignment[X] {}
     def apply(left: Expression, right: Expression) = new Expression {
-      def evaluate[X <: ELEMENT](algebra: Algebra[X]) = ???
+      override def evaluate[X <: ELEMENT](algebra: Algebra[X]) = ???
     }
   }
   object AbstractOp {
@@ -55,7 +36,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   }
   trait Expression {
-    def evaluate[X <: ELEMENT](algebra: Algebra[X])
+    def evaluate[X <: ELEMENT](algebra: Algebra[X]): X
     def ::== (other: Expression) = new Equation(this, other)
   }
   class Equation(leftSide: Expression, rightSide: Expression) {
@@ -63,7 +44,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       leftSide.evaluate(algebra) == rightSide.evaluate(algebra)
   }
 
-  class Law(assigner: VariableAssigner, makeEquation: VariableAssignments => Equation, message: String) {
+  class Law(assigner: VariableAssigner, makeEquation: Array[Variable] => Equation, message: String) {
     def verify[X <: ELEMENT](algebra: Algebra[X]) = {
       val equation = makeEquation(assigner.assign(algebra))
       if (!equation.holds(algebra))
@@ -81,93 +62,63 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       multiply(x, multiply(y, z)) ::== multiply(multiply(x, y), z)
     )
 
+    // TODO refactor so that the function takes an array and we don't have to overload
     def apply(message: String, f: Variable => Equation): Law = {
       val assigner = new VariableAssigner(principal)
-      new Law(assigner, assignments => f(assignments.get(0)), message)
+      new Law(assigner, assignments => f(assignments(0)), message)
     }
 //    def apply(message: String)(f: (Variable, Variable) => Equation): Law = ???
     def apply(message: String, f: (Variable, Variable, Variable) => Equation): Law = {
       val assigner = new VariableAssigner(principal, principal, principal)
-      new Law(assigner, assignments => f(assignments.get(0), assignments.get(1), assignments.get(2)), message)
+      new Law(assigner, assignments => f(assignments(0), assignments(1), assignments(2)), message)
     }
   }
 
-  trait VariableAssignments {
-    def get(index: Int): Variable = ???
+  abstract class RootContext {
+    type ROOT <: ELEMENT
+    val root: STAR[ROOT]
+    abstract class Projection {
+      type COMPONENT <: ELEMENT
+      val projection: QUIVER[ROOT, COMPONENT]
+    }
+    def projection[COMPONENT_TYPE <: ELEMENT](projectionQuiver: QUIVER[ROOT, COMPONENT_TYPE]) =
+      new Projection {
+        override type COMPONENT = COMPONENT_TYPE
+        override val projection = projectionQuiver
+      }
+    def variables(projections: Projection*): Array[Variable] =
+      Array(new Variable {
+        // wrap root.identity somehow
+        override def evaluate[X <: ELEMENT](algebra: Algebra[X]) = ???
+      })
   }
 
   class VariableAssigner(arity: StarTag*) {
-    def assign[X <: ELEMENT](algebra: Algebra[X]): VariableAssignments = ???
+    def assign[X <: ELEMENT](algebra: Algebra[X]): Array[Variable] = arity match {
+      case Seq() => Array()
+      case Seq(tag) =>
+        import algebra.carrier
+        val rootContext = new RootContext {
+          override type ROOT = X
+          override val root = carrier
+        }
+        rootContext.variables(rootContext.projection[X](carrier.identity))
+      case _ => throw new IllegalArgumentException(s"Can't handle this many tags: ${arity.size}")
+        // TODO: recursive function that can handle any number of them?
+        // TODO: handle the tags properly (don't assume they are all principal)
+    }
   }
 
   trait OperatorAssignment[X <: ELEMENT]
+  class OperatorAssignments[X <: ELEMENT](assignments:  Seq[OperatorAssignment[X]])
 
   class AlgebraicTheory(operators: Set[AbstractOp], val laws: Seq[Law]) {
-    def apply[X <: ELEMENT](carrier: STAR[X], assignments: OperatorAssignment[X]*) = Algebra(this, carrier, assignments)
+    def apply[X <: ELEMENT](carrier: STAR[X], assignments: OperatorAssignment[X]*) =
+      Algebra(this, carrier, new OperatorAssignments(assignments))
   }
 
-  case class Algebra[X <: ELEMENT](theory: AlgebraicTheory, carrier: STAR[X], assignments: Seq[OperatorAssignment[X]]) {
+  case class Algebra[X <: ELEMENT](theory: AlgebraicTheory, carrier: STAR[X], assignments: OperatorAssignments[X]) {
     def sanityTest = theory.laws.foreach { _.verify(this)}
   }
-
-//  class Algebra[X](val signature: Seq[AbstractOperator]) {}
-
-//  object Monoids extends AlgebraicTheory {
-//      signature = Seq(AbstractOp.I[X], AbstractOp.*[X, X, X]),
-//      laws =
-//    )
-//     Algebra[X](
-//  signature = Seq(AbstractOp.I[X], AbstractOp.*[X, X, X]),
-//  laws =
-//  )
-
-
-  case class Monoid[X <: ELEMENT](carrier: STAR[X], unit: NullaryOp[X], multiply: BinaryOp[X]) {
-    def sanityTest {
-      // check the left unit law
-      if (carrier(carrier) {
-        x => multiply(unit(carrier.toI(x)), x)
-      } != carrier.identity)
-        throw new IllegalArgumentException("Left unit law for * with unit 1")
-
-      // check the right unit law
-      if (carrier(carrier) {
-        x => multiply(x, unit(carrier.toI(x)))
-      } != carrier.identity)
-        throw new IllegalArgumentException("Right unit law for * with unit 1")
-
-      // check the associative law
-      if ((carrier x carrier x carrier)(carrier) {
-        case ((x, y), z) => multiply(x, multiply(y, z))
-      } != (carrier x carrier x carrier)(carrier) {
-        case ((x, y), z) => multiply(multiply(x, y), z)
-      })
-        throw new IllegalArgumentException("Associative law for *")
-    }
-
-    def rightAction[A <: ELEMENT](actionCarrier: STAR[A], actionMultiply: BiQuiver[A, X, A]) =
-      new RightMonoidAction[A, X](this, actionCarrier, actionMultiply)
-  }
-
-  class RightMonoidAction[A <: ELEMENT, X <: ELEMENT] (
-    monoid: Monoid[X],
-    actionCarrier: STAR[A],
-    actionMultiply: BiQuiver[A, X, A]
-  ) {
-    def sanityTest = {
-      // check the right unit law
-      if (actionCarrier(actionCarrier) {
-        a => actionMultiply(a, monoid.unit(actionCarrier.toI(a)))
-      } != actionCarrier.identity)
-        throw new IllegalArgumentException("Right unit law for * with unit 1")
-
-      // check the associative law
-      if ((actionCarrier x monoid.carrier x monoid.carrier)(actionCarrier) {
-        case ((a, x), y) => actionMultiply(a, monoid.multiply(x, y))
-      } != (actionCarrier x monoid.carrier x monoid.carrier)(actionCarrier) {
-        case ((a, x), y) => actionMultiply(actionMultiply(a, x), y)
-      })
-        throw new IllegalArgumentException("Associative law for monoid action *")
-    }
-  }
+*/
 }
