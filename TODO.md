@@ -57,4 +57,14 @@ Having spiked, work out a way to test-drive this from the bottom up. Some concep
 - star tags: principal, rightScalar, etc 
 - algebraic theories (include a map from star tags to stars)
 - root context (a product, with a way to handle projections as variables)
-- expressions that can be built up recursively, then evaluated in a root context to test algebraic laws 
+- expressions that can be built up recursively, then evaluated in a root context to test algebraic laws
+- abstract operators that operate on StarTag's
+ - bound versions of them for a particular algebra, which can in fact be elements, and exist in the context
+ of some quiver construction: root(component) { rootElement => ... }
+ So we can be passing elements around by the time we are dealing with Variables.
+
+Then maybe a Variable wraps an ELEMENT of the given type. How to make it all type safe??
+Or better to have a sanity test on the operators as we build expressions? [MUCH better done at compile time] 
+ 
+Can we easily associate a type with each StarTag? Maybe they should actually be types, or have types?
+Could now do type-safe products? Would these be useful inside RootContext, or as a dress rehearsal for it?    
