@@ -1,27 +1,24 @@
 package com.fdilke.bewl.testutil
 
-import java.io.File
 import java.net.URLClassLoader
 
-import com.fdilke.bewl.topos.Topos
 import org.scalatest.FunSpec
-import org.scalatest.matchers.{Matcher, MatchResult}
+import org.scalatest.matchers.{MatchResult, Matcher}
 
-import scala.tools.nsc.util.ClassPath
-import scala.tools.nsc.{Settings, Interpreter}
+import scala.tools.nsc.Settings
 import scala.tools.nsc.interpreter.IMain
+import scala.tools.nsc.util.ClassPath
 
 trait RunTimeCompilation { self: FunSpec =>
   private lazy val engine = {
     val settings = new Settings
-
+    // add the Scala library to our classpath
     val loader = getClass.getClassLoader.asInstanceOf[URLClassLoader]
     val entries = loader.getURLs map(_.getPath)
-    // annoyingly, the Scala library is not in our classpath, so we have to add it manually
-    val sclpath = entries find(_.endsWith("scala-compiler.jar")) map(
-      _.replaceAll("scala-compiler.jar", "scala-library.jar"))
+    val sclpath = entries find(_.endsWith("scala-compiler.jar")) map {
+      _.replaceAll("scala-compiler.jar", "scala-library.jar")
+    }
     settings.classpath.value = ClassPath.join((entries ++ sclpath) : _*)
-
     new IMain(settings)
   }
 
@@ -51,5 +48,4 @@ trait RunTimeCompilation { self: FunSpec =>
   //  println(engine.put("@", 5))
   //  val result = engine.eval("1 to n.asInstanceOf[Int] foreach println")
   //  println(s"result = $result")
-
 }

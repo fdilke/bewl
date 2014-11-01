@@ -1,17 +1,11 @@
 package com.fdilke.bewl.topos
 
 object StarTag extends Enumeration {
-  class StarTag[SAMETYPE] {
-    type TYPE
-  }
+  class StarTag[TAG_TYPE]
 
   class Principal
-  val principal = new StarTag[Principal] {
-    override type TYPE = Principal
-  }
+  val principal = new StarTag[Principal]
 
   class RightScalar
-  val rightScalar = new StarTag[RightScalar] {
-    override type TYPE = RightScalar
-  }
+  val rightScalar = new StarTag[RightScalar]
 }

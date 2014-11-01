@@ -10,7 +10,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   type RightScalarBinaryOp[X <: ELEMENT, S <: ELEMENT] = BiQuiver[X, S, X]
 
   object AbstractOp {
-    def unit: AbstractNullaryOp[principal.TYPE] = abstractNullaryOp("unit")
+    def unit: AbstractNullaryOp[Principal] = abstractNullaryOp("unit")
     def unitRightScalar = abstractNullaryOp("right scalar unit", rightScalar)
     def multiply = abstractBinaryOp("multiply")
     def rightScalarMultiply = new AbstractRightScalarBinaryOp("right scalar multiply")
@@ -40,7 +40,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   class AbstractRightScalarBinaryOp(name: String) extends AbstractOp(name, Arity(principal, rightScalar), principal) {
     def :=[X <: ELEMENT, S <: ELEMENT](op: RightScalarBinaryOp[X, S]): OpAssignment[X] =
       RightScalarBinaryOpAssignment(this, op)
-    def apply(left: Term[principal.TYPE], right: Term[rightScalar.TYPE]) = new Term[principal.TYPE] {}
+    def apply(left: Term[Principal], right: Term[RightScalar]) = new Term[Principal] {}
   }
 
   trait Term[A] {
