@@ -2,11 +2,35 @@ package com.fdilke.bewl.algebra
 
 import com.fdilke.bewl.fsets.{NativeFiniteSets, NativeFiniteSetsUtilities}
 import NativeFiniteSetsUtilities._
+import com.fdilke.bewl.topos.StarTag.Principal
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 import NativeFiniteSets._
 
 class AlgebraTests extends FunSpec {
+
+//  describe("Arities") {
+//    it("have a computed type") {
+//      Arity().calcType.TYPE
+//    }
+//  }
+
+  describe("Abstract operators") {
+    it("can be combined only with matching arities and types") {
+      import AbstractOp._
+
+      multiply(unit, unit)
+      rightScalarMultiply(unit, unitRightScalar)
+
+//      intercept[IllegalArgumentException] {
+//        multiply(unit, unitRightScalar)
+//      }
+//      intercept[IllegalArgumentException] {
+//        rightScalarMultiply(unit, unit)
+//      }
+    }
+  }
+
   describe("Algebraic theories") {
 
     it("can be defined and used to create instances") {
@@ -35,7 +59,7 @@ class AlgebraTests extends FunSpec {
     it("can be expressed by building identities from abstract operators and constants") {
       import AbstractOp._
 
-      val leftUnitLaw = Law("not a left unit", x =>
+      val leftUnitLaw = Law("not a left unit", (x : Variable[Principal]) =>
         multiply(unit, x) ::== x
       )
 

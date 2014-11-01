@@ -7,36 +7,54 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   type NullaryOp[X <: ELEMENT] = QUIVER[UNIT, X]
   type Unary[X <: ELEMENT] = QUIVER[UNIT, X]
   type BinaryOp[X <: ELEMENT] = BiQuiver[X, X, X]
+  type RightScalarBinaryOp[X <: ELEMENT, S <: ELEMENT] = BiQuiver[X, S, X]
 
   object AbstractOp {
-    def unit = new AbstractNullaryOp("unit")
-    def multiply = new AbstractBinaryOp("multiply")
+    def unit: AbstractNullaryOp[principal.TYPE] = abstractNullaryOp("unit")
+    def unitRightScalar = abstractNullaryOp("right scalar unit", rightScalar)
+    def multiply = abstractBinaryOp("multiply")
+    def rightScalarMultiply = new AbstractRightScalarBinaryOp("right scalar multiply")
+
+    def abstractNullaryOp[A](name: String, starTag: StarTag[A] = principal) =
+      new AbstractNullaryOp[A](name, starTag)
+
+    def abstractBinaryOp[A](name: String, starTag: StarTag[A] = principal) =
+      new AbstractBinaryOp[A](name, starTag)
   }
 
-  abstract class AbstractOp(name: String, arity: Seq[StarTag])
+  case class Arity(tags: StarTag[_]*)
+  trait Signature[RETURN_TYPE]
+  class AbstractOp[R](name: String, arity: Arity, returnTag: StarTag[R])
 
-  class AbstractNullaryOp(name: String) extends AbstractOp(name, Seq.empty) with Variable {
+  class AbstractNullaryOp[A](name: String, starTag: StarTag[A]) extends AbstractOp[A](name, Arity(), starTag) with Variable[A] {
     def :=[X <: ELEMENT](op: NullaryOp[X]): OpAssignment[X] =
       NullaryOpAssignment(this, op)
   }
 
-  class AbstractBinaryOp(name: String) extends AbstractOp(name, Seq(principal, principal)) {
+  class AbstractBinaryOp[A](name: String, starTag: StarTag[A]) extends AbstractOp[A](name, Arity(starTag, starTag), starTag) {
     def :=[X <: ELEMENT](op: BinaryOp[X]): OpAssignment[X] =
       BinaryOpAssignment(this, op)
-    def apply(left: Term, right: Term) = new Term {}
+    def apply(left: Term[A], right: Term[A]) = new Term[A] {}
   }
 
-  trait Term {
-    def ::== (rightSide: Term) = Equation(this, rightSide)
+  class AbstractRightScalarBinaryOp(name: String) extends AbstractOp(name, Arity(principal, rightScalar), principal) {
+    def :=[X <: ELEMENT, S <: ELEMENT](op: RightScalarBinaryOp[X, S]): OpAssignment[X] =
+      RightScalarBinaryOpAssignment(this, op)
+    def apply(left: Term[principal.TYPE], right: Term[rightScalar.TYPE]) = new Term[principal.TYPE] {}
   }
-  trait Variable extends Term
-  case class Equation(left: Term, right: Term)
+
+  trait Term[A] {
+    def ::== (rightSide: Term[A]) = Equation[A](this, rightSide)
+  }
+  trait Variable[A] extends Term[A]
+  case class Equation[A](left: Term[A], right: Term[A])
 
   object Law {
-    def apply(message: String, f: Variable => Equation): Law = new Law(Seq(principal)) {}
+    def apply[A, E](message: String, f: Variable[A] => Equation[E]): Law =
+      new Law(Arity(principal)) {}
   }
 
-  class Law(arity: Seq[StarTag]) {
+  class Law(arity: Arity) {
     def verify[X <: ELEMENT](algebra: Algebra[X]) = {
       val context = new RootContext(algebra, arity)
       // ... add verification stuff here
@@ -44,14 +62,18 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     }
   }
 
-  class RootContext[X <: ELEMENT](algebra: Algebra[X], arity: Seq[StarTag]) {}
+  class RootContext[X <: ELEMENT](algebra: Algebra[X], arity: Arity) {
+
+  }
 
   trait OpAssignment[X <: ELEMENT]
-  case class NullaryOpAssignment[X <: ELEMENT](abstractOp: AbstractNullaryOp, op: NullaryOp[X]) extends OpAssignment[X]
-  case class BinaryOpAssignment[X <: ELEMENT](abstractOp: AbstractBinaryOp, op: BinaryOp[X]) extends OpAssignment[X]
+  case class NullaryOpAssignment[X <: ELEMENT, A](abstractOp: AbstractNullaryOp[A], op: NullaryOp[X]) extends OpAssignment[X]
+  case class BinaryOpAssignment[X <: ELEMENT, A](abstractOp: AbstractBinaryOp[A], op: BinaryOp[X]) extends OpAssignment[X]
+  case class RightScalarBinaryOpAssignment[X <: ELEMENT, S <: ELEMENT](
+    abstractOp: AbstractRightScalarBinaryOp, op: RightScalarBinaryOp[X, S]) extends OpAssignment[X]
   case class OpAssignments[X <: ELEMENT](assignments: Seq[OpAssignment[X]])
 
-  case class AlgebraicTheory(operators: Seq[AbstractOp], val laws: Seq[Law]) {
+  case class AlgebraicTheory(operators: Seq[AbstractOp[_]], val laws: Seq[Law]) {
     def apply[X <: ELEMENT](carrier: STAR[X], assignments: OpAssignment[X]*) =
       Algebra(this, carrier, OpAssignments(assignments))
   }
