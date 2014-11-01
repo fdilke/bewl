@@ -1,13 +1,14 @@
 package com.fdilke.bewl.algebra
 
+import com.fdilke.bewl.fsets.NativeFiniteSets._
+import com.fdilke.bewl.fsets.NativeFiniteSetsUtilities._
 import com.fdilke.bewl.fsets.{NativeFiniteSets, NativeFiniteSetsUtilities}
-import NativeFiniteSetsUtilities._
+import com.fdilke.bewl.testutil.RunTimeCompilation
 import com.fdilke.bewl.topos.StarTag.Principal
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
-import NativeFiniteSets._
 
-class AlgebraTests extends FunSpec {
+class AlgebraTests extends FunSpec with RunTimeCompilation {
 
 //  describe("Arities") {
 //    it("have a computed type") {
@@ -16,18 +17,15 @@ class AlgebraTests extends FunSpec {
 //  }
 
   describe("Abstract operators") {
-    it("can be combined only with matching arities and types") {
-      import AbstractOp._
+    it("are typed so that they can be combined only with matching arities and return values") {
+      inContextOf(imports = Seq("com.fdilke.bewl.fsets.NativeFiniteSets.AbstractOp._")) {
+        "multiply(unit, unit)" should compile
+        "rightScalarMultiply(unit, unitRightScalar)" should compile
 
-      multiply(unit, unit)
-      rightScalarMultiply(unit, unitRightScalar)
-
-//      intercept[IllegalArgumentException] {
-//        multiply(unit, unitRightScalar)
-//      }
-//      intercept[IllegalArgumentException] {
-//        rightScalarMultiply(unit, unit)
-//      }
+        "multiply(unit)" should not (compile)
+        "multiply(unit, unitRightScalar)" should not (compile)
+        "rightScalarMultiply(unit, unit)" should not (compile)
+      }
     }
   }
 
