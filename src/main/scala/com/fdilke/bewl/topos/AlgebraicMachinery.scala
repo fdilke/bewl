@@ -22,22 +22,34 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       new AbstractBinaryOp[A](name, starTag)
   }
 
-  case class Arity(tags: StarTag[_]*)
-  trait Signature[RETURN_TYPE]
-  class AbstractOp[R](name: String, arity: Arity, returnTag: StarTag[R])
+  case class Arity[A](tags: StarTag[_]*)
+//  object Arity {
+//    def apply(tag: StarTag[_], tags: StarTag[_]*) = new Arity()
+//  }
 
-  class AbstractNullaryOp[A](name: String, starTag: StarTag[A]) extends AbstractOp[A](name, Arity(), starTag) with Variable[A] {
+//  trait Signature[RETURN_TYPE]
+  class AbstractOp[A, R](name: String, arity: Arity[A], returnTag: StarTag[R])
+
+  class AbstractNullaryOp[A](name: String, starTag: StarTag[A]) extends AbstractOp[Unit, A](name, Arity[Unit](), starTag) with Variable[A] {
     def :=[X <: ELEMENT](op: NullaryOp[X]): OpAssignment[X] =
       NullaryOpAssignment(this, op)
   }
 
-  class AbstractBinaryOp[A](name: String, starTag: StarTag[A]) extends AbstractOp[A](name, Arity(starTag, starTag), starTag) {
+  class AbstractBinaryOp[A](name: String, starTag: StarTag[A])
+    extends AbstractOp[((Unit, A), A), A](
+      name,
+      Arity[((Unit, A), A)](starTag, starTag), starTag) {
     def :=[X <: ELEMENT](op: BinaryOp[X]): OpAssignment[X] =
       BinaryOpAssignment(this, op)
     def apply(left: Term[A], right: Term[A]) = new Term[A] {}
   }
 
-  class AbstractRightScalarBinaryOp(name: String) extends AbstractOp(name, Arity(principal, rightScalar), principal) {
+  class AbstractRightScalarBinaryOp(name: String)
+    extends AbstractOp[((Unit, Principal), RightScalar), Principal](
+      name,
+      Arity[((Unit, Principal), RightScalar)](principal, rightScalar),
+      principal
+  ) {
     def :=[X <: ELEMENT, S <: ELEMENT](op: RightScalarBinaryOp[X, S]): OpAssignment[X] =
       RightScalarBinaryOpAssignment(this, op)
     def apply(left: Term[Principal], right: Term[RightScalar]) = new Term[Principal] {}
@@ -50,11 +62,11 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   case class Equation[A](left: Term[A], right: Term[A])
 
   object Law {
-    def apply[A, E](message: String, f: Variable[A] => Equation[E]): Law =
-      new Law(Arity(principal)) {}
+    def apply[A, E](message: String, f: Variable[A] => Equation[E]): Law[(Unit, Principal)] =
+      new Law(Arity[(Unit, Principal)](principal)) {}
   }
 
-  class Law(arity: Arity) {
+  class Law[A](arity: Arity[A]) {
     def verify[X <: ELEMENT](algebra: Algebra[X]) = {
 //      val context = new RootContext(algebra, arity)
       // ... add verification stuff here
@@ -62,7 +74,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     }
   }
 
-  case class RootContext[X <: ELEMENT](algebra: Algebra[X], arity: Arity) {
+  case class RootContext[A, X <: ELEMENT](algebra: Algebra[X], arity: Arity[A]) {
     type ROOT = TRUTH // <: ELEMENT
     val root: STAR[ROOT] = omega // <: PRODUCT
     def evaluate(term: Term[Principal]) : Quiver[ROOT, X] = ???
@@ -75,7 +87,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     abstractOp: AbstractRightScalarBinaryOp, op: RightScalarBinaryOp[X, S]) extends OpAssignment[X]
   case class OpAssignments[X <: ELEMENT](assignments: Seq[OpAssignment[X]])
 
-  case class AlgebraicTheory(operators: Seq[AbstractOp[_]], val laws: Seq[Law]) {
+  case class AlgebraicTheory(operators: Seq[AbstractOp[_, _]], val laws: Seq[Law[_]]) {
     def apply[X <: ELEMENT](carrier: STAR[X], assignments: OpAssignment[X]*) =
       Algebra(this, carrier, OpAssignments(assignments))
   }

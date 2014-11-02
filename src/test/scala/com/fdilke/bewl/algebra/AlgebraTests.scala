@@ -49,7 +49,8 @@ class AlgebraTests extends FunSpec with RunTimeCompilation {
 
       val context = RootContext(zMod4, Arity(principal, principal))
 
-//      context.evaluate(unit) shouldBe (myUnit o context.root.toI)
+      if (false)
+        context.evaluate(unit) shouldBe (myUnit o context.root.toI)
     }
   }
 
