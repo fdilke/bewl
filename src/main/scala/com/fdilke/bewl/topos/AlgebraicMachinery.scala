@@ -1,36 +1,11 @@
 package com.fdilke.bewl.topos
 
 import com.fdilke.bewl.topos.StarTag._
+import scala.reflect.runtime.universe._
 
 trait AlgebraicMachinery { topos: BaseTopos =>
 
   // Multiproducts. TODO: split out as separate trait?
-
-  object MultiProduct {
-    def apply(components: TypedStar[_]*) = components match {
-      case Seq() =>
-        new MultiProduct[UNIT] {
-          val root = I
-          val projections = Seq.empty
-        }
-// ?      case Seq[TypedStar[X]](star) forSome { type X } =>
-      case Seq(star: TypedStar[_]) =>
-        new MultiProduct[star.TYPE]  {
-          val root = star.star
-          val projections = Seq(root.identity)
-        }
-//      case Seq(star: TypedStar) =>
-//        new MultiProduct[star.TYPE] {
-//          val root = star.star
-//          val projections = Seq(root.identity)
-//        }
-    }
-  }
-
-  abstract class MultiProduct[A <: ELEMENT] {
-    val root: STAR[A]
-    val projections: Seq[Quiver[A, _]]
-  }
 
   case class TypedStar[X <: ELEMENT](star: STAR[X]) {
     type TYPE = X
@@ -42,6 +17,38 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   implicit def enrich[X <: ELEMENT](star: STAR[X]) = new RichStar[X] {
     override def typed = new TypedStar[X](star)
+  }
+
+  object MultiProduct {
+
+    def apply(components: STAR[_ <: ELEMENT]*): MultiProduct[_] = components map { _.typed } match {
+      case Seq() =>
+        new MultiProduct[UNIT] {
+          val root = I
+          val projections = Seq.empty
+        }
+
+      case Seq(star: TypedStar[_]) =>
+        new MultiProduct[star.TYPE]  {
+          val root = star.star
+          val projections = Seq(root.identity)
+        }
+
+//      case prevStars :+ star =>
+//        val prevProduct = MultiProduct(prevStars map { _.star } :_*)
+//        new MultiProduct[prevProduct.TYPE x star.TYPE]  {
+//          val root = prevProduct.root x star.star
+//          val projections = prevProduct.projections map { (p: QUIVER[prevProduct.TYPE, _]) =>
+//            p o root.π0
+//          } :+  root.π1
+//        }
+    }
+  }
+
+  abstract class MultiProduct[A <: ELEMENT] {
+    type TYPE = A
+    val root: STAR[A]
+    val projections: Seq[QUIVER[A, _]]
   }
 
   // Multiproducts. end
@@ -57,55 +64,75 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     def multiply = abstractBinaryOp("multiply")
     def rightScalarMultiply = new AbstractRightScalarBinaryOp("right scalar multiply")
 
-    def abstractNullaryOp[A](name: String, starTag: StarTag[A] = principal) =
+    def abstractNullaryOp[A: TypeTag](name: String, starTag: StarTag[A] = principal) =
       new AbstractNullaryOp[A](name, starTag)
 
     def abstractBinaryOp[A](name: String, starTag: StarTag[A] = principal) =
       new AbstractBinaryOp[A](name, starTag)
   }
 
-  case class Arity[A](tags: StarTag[_]*)
-//  object Arity {
-//    def apply(tag: StarTag[_], tags: StarTag[_]*) = new Arity()
-//  }
+  class Arity[A](tags: StarTag[_]*)
+  object Arity {
+    def apply() = new Arity[Unit]()
+    def apply[A](tag: StarTag[A]) = new Arity[A](tag)
+    def apply[A, B](tagA: StarTag[A], tagB: StarTag[B]) = new Arity[(A, B)](tagA, tagB)
+  }
 
 //  trait Signature[RETURN_TYPE]
   class AbstractOp[A, R](name: String, arity: Arity[A], returnTag: StarTag[R])
 
-  class AbstractNullaryOp[A](name: String, starTag: StarTag[A]) extends AbstractOp[Unit, A](name, Arity[Unit](), starTag) with Variable[A] {
+  class AbstractNullaryOp[A: TypeTag](name: String, starTag: StarTag[A]) extends
+    AbstractOp[Unit, A](name, Arity(), starTag)
+    with Variable[A] {
     def :=[X <: ELEMENT](op: NullaryOp[X]): OpAssignment[X] =
       NullaryOpAssignment(this, op)
+    def evaluate[X <: ELEMENT](context: EvaluationContext[X]): QUIVER[context.ROOT, X] =
+      context.assignments.lookup(this) o context.root.toI
   }
 
   class AbstractBinaryOp[A](name: String, starTag: StarTag[A])
-    extends AbstractOp[((Unit, A), A), A](
+    extends AbstractOp[(A, A), A](
       name,
-      Arity[((Unit, A), A)](starTag, starTag), starTag) {
+      Arity(starTag, starTag), starTag) {
     def :=[X <: ELEMENT](op: BinaryOp[X]): OpAssignment[X] =
       BinaryOpAssignment(this, op)
-    def apply(left: Term[A], right: Term[A]) = new Term[A] {}
+    def apply(left: Term[A], right: Term[A]) = new Term[A] {
+      override def evaluate[X <: ELEMENT](context: EvaluationContext[X]): QUIVER[context.ROOT, X] =
+        context.assignments.lookup(AbstractBinaryOp.this)(
+          left.evaluate(context),
+          right.evaluate(context)
+        )
+    }
   }
 
   class AbstractRightScalarBinaryOp(name: String)
-    extends AbstractOp[((Unit, Principal), RightScalar), Principal](
+    extends AbstractOp[(Principal, RightScalar), Principal](
       name,
-      Arity[((Unit, Principal), RightScalar)](principal, rightScalar),
+      Arity(principal, rightScalar),
       principal
   ) {
     def :=[X <: ELEMENT, S <: ELEMENT](op: RightScalarBinaryOp[X, S]): OpAssignment[X] =
       RightScalarBinaryOpAssignment(this, op)
-    def apply(left: Term[Principal], right: Term[RightScalar]) = new Term[Principal] {}
+    def apply(left: Term[Principal], right: Term[RightScalar]) = new Term[Principal] {
+      override def evaluate[X <: ELEMENT](context: EvaluationContext[X]): QUIVER[context.type#ROOT, X] =
+        ??? // TODO: add more machinery to make this paragraoh work
+//        context.assignments.lookup(AbstractRightScalarBinaryOp.this)(
+//          left.evaluate(context),
+//          right.evaluate(context)
+//        )
+    }
   }
 
   trait Term[A] {
     def ::== (rightSide: Term[A]) = Equation[A](this, rightSide)
+    def evaluate[X <: ELEMENT](context: EvaluationContext[X]): QUIVER[context.ROOT, X]
   }
   trait Variable[A] extends Term[A]
   case class Equation[A](left: Term[A], right: Term[A])
 
   object Law {
-    def apply[A, E](message: String, f: Variable[A] => Equation[E]): Law[(Unit, Principal)] =
-      new Law(Arity[(Unit, Principal)](principal)) {}
+    def apply[A, E](message: String, f: Variable[A] => Equation[E]): Law[Principal] =
+      new Law(Arity(principal)) {}
   }
 
   class Law[A](arity: Arity[A]) {
@@ -116,18 +143,45 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     }
   }
 
-  case class RootContext[A, X <: ELEMENT](algebra: Algebra[X], arity: Arity[A]) {
-    type ROOT = TRUTH // <: ELEMENT
-    val root: STAR[ROOT] = omega // <: PRODUCT
-    def evaluate(term: Term[Principal]) : Quiver[ROOT, X] = ???
+  abstract trait EvaluationContext[X <: ELEMENT] {
+    type ROOT <: ELEMENT
+    val root: STAR[ROOT]
+    val assignments: OpAssignments[X]
+    def evaluate(term: Term[Principal]) : Quiver[ROOT, X]
   }
 
-  trait OpAssignment[X <: ELEMENT]
-  case class NullaryOpAssignment[X <: ELEMENT, A](abstractOp: AbstractNullaryOp[A], op: NullaryOp[X]) extends OpAssignment[X]
+  abstract class RootContext[A, X <: ELEMENT](algebra: Algebra[X], arity: Arity[A]) extends EvaluationContext[X] {
+    val assignments = algebra.assignments
+  }
+
+  object RootContext {
+    def apply[X <: ELEMENT](algebra: Algebra[X], arity: Arity[Unit]) =
+      new RootContext[Unit, X](algebra, arity) {
+        type ROOT = UNIT
+        val root = I
+        def evaluate(term: Term[Principal]) : Quiver[ROOT, X] =
+          term.evaluate(this)
+      }
+  }
+
+  trait OpAssignment[X <: ELEMENT] {
+    def get[A: TypeTag](abOp: AbstractNullaryOp[A]): NullaryOp[X] = ???
+  }
+  case class NullaryOpAssignment[X <: ELEMENT, A: TypeTag](abstractOp: AbstractNullaryOp[A], op: NullaryOp[X]) extends OpAssignment[X] {
+    override def get[B: TypeTag](abOp: AbstractNullaryOp[B]) =
+      if (typeOf[B] =:= typeOf[A])
+        op
+      else ???
+  }
   case class BinaryOpAssignment[X <: ELEMENT, A](abstractOp: AbstractBinaryOp[A], op: BinaryOp[X]) extends OpAssignment[X]
   case class RightScalarBinaryOpAssignment[X <: ELEMENT, S <: ELEMENT](
     abstractOp: AbstractRightScalarBinaryOp, op: RightScalarBinaryOp[X, S]) extends OpAssignment[X]
-  case class OpAssignments[X <: ELEMENT](assignments: Seq[OpAssignment[X]])
+  case class OpAssignments[X <: ELEMENT](assignments: Seq[OpAssignment[X]]) {
+    // TODO: fix these up with some mechanism like A#TYPE where A = e.g. Principal??
+    def lookup[A: TypeTag](op0: AbstractNullaryOp[A]): NullaryOp[X] =
+      assignments.collectFirst (PartialFunction( _.get(op0) )).get
+    def lookup[A](op2: AbstractBinaryOp[A]): BinaryOp[X] = ???
+  }
 
   case class AlgebraicTheory(operators: Seq[AbstractOp[_, _]], val laws: Seq[Law[_]]) {
     def apply[X <: ELEMENT](carrier: STAR[X], assignments: OpAssignment[X]*) =

@@ -86,6 +86,7 @@ trait BaseTopos {
     product: BIPRODUCT[L, R],
     quiver: QUIVER[L x R, T]) {
     def apply(l: L, r: R): T = quiver(product.pair(l, r))
+    def apply[S <: ELEMENT](l: QUIVER[S, L], r: QUIVER[S, R]): QUIVER[S, T] = quiver o (l x r)
   }
 
   // Helper methods for triproducts (this could obviously be extended).

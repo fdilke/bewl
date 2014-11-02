@@ -34,11 +34,20 @@ class AlgebraTests extends FunSpec with RunTimeCompilation {
     }
 
     it("are computed sensibly for a product of 1") {
-      val star = makeStar(1,2)
-      val multiProduct = MultiProduct(star.typed)
+      val star = makeStar(1, 2)
+      val multiProduct = MultiProduct(star)
       multiProduct.root shouldBe star
       multiProduct.projections shouldBe Seq(star.identity)
     }
+
+//    it("are computed sensibly for a product of 2") {
+//      val star1 = makeStar(1, 2, 3)
+//      val star2 = makeStar(true, false)
+//      val multiProduct = MultiProduct(star1, star2)
+//      val expectedProduct = star1 x star2
+//      multiProduct.root shouldBe expectedProduct
+//      multiProduct.projections shouldBe Seq(expectedProduct.π0, expectedProduct.π1)
+//    }
   }
 
   describe("Abstract operators") {
@@ -62,10 +71,14 @@ class AlgebraTests extends FunSpec with RunTimeCompilation {
       val myUnit: FiniteSetsQuiver[WRAPPER[Unit], Int] = makeNullaryOperator(carrier, 0)
       val zMod4 = magmasWith1(carrier, unit := myUnit, multiply := product)
 
-      val context = RootContext(zMod4, Arity(principal, principal))
+      val context0 = RootContext(zMod4, Arity())
 
-      if (false)
-        context.evaluate(unit) shouldBe (myUnit o context.root.toI)
+      context0.evaluate(unit) shouldBe (myUnit o context0.root.toI)
+
+//      val context = RootContext(zMod4, Arity(principal, principal))
+//
+//      if (false)
+//        context.evaluate(unit) shouldBe (myUnit o context.root.toI)
     }
   }
 
