@@ -24,7 +24,7 @@ class LayeredFiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
     right: STAR[WRAPPER[R]],
     target: STAR[WRAPPER[T]],
     mappings: ((L, R), T)*) =
-    bifunctionAsBiQuiver(left, right, target, (l: L, r: R) => Map(mappings:_*)((l, r)))
+    bifunctionAsBiQuiver(left, right, target) { (l, r) => Map(mappings:_*)((l, r)) }
 
   override val foo = makeStar(true, false)
   override val bar = makeStar("X", "Y")
