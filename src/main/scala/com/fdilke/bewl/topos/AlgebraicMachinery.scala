@@ -4,6 +4,22 @@ import com.fdilke.bewl.topos.StarTag._
 
 trait AlgebraicMachinery { topos: BaseTopos =>
 
+  // Multiproducts. TODO: split out as separate trait?
+
+  object MultiProduct {
+    def apply() = new MultiProduct[UNIT] {
+      val root = I
+      val projections = Seq.empty
+    }
+  }
+
+  abstract class MultiProduct[A <: ELEMENT] {
+    val root: STAR[A]
+    val projections: Seq[Quiver[A, _]]
+  }
+
+  // Multiproducts. end
+
   type NullaryOp[X <: ELEMENT] = QUIVER[UNIT, X]
   type Unary[X <: ELEMENT] = QUIVER[UNIT, X]
   type BinaryOp[X <: ELEMENT] = BiQuiver[X, X, X]

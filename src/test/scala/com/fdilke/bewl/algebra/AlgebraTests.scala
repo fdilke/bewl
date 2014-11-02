@@ -26,6 +26,15 @@ class AlgebraTests extends FunSpec with RunTimeCompilation {
 //    }
 //  }
 
+  describe("Multiproducts") {
+    it("are computed sensibly for a product of 0") {
+      val multiProduct = MultiProduct()
+      multiProduct.root shouldBe I
+      multiProduct.projections shouldBe 'empty
+    }
+    //      val star = makeStar(1,2)
+  }
+
   describe("Abstract operators") {
     it("are typed so that they can be combined only with matching arities and return values") {
       inContextOf(imports = Seq("com.fdilke.bewl.fsets.NativeFiniteSets.AbstractOp._")) {
