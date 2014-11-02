@@ -32,7 +32,13 @@ class AlgebraTests extends FunSpec with RunTimeCompilation {
       multiProduct.root shouldBe I
       multiProduct.projections shouldBe 'empty
     }
-    //      val star = makeStar(1,2)
+
+    it("are computed sensibly for a product of 1") {
+      val star = makeStar(1,2)
+      val multiProduct = MultiProduct(star.typed)
+      multiProduct.root shouldBe star
+      multiProduct.projections shouldBe Seq(star.identity)
+    }
   }
 
   describe("Abstract operators") {

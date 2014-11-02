@@ -7,15 +7,41 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   // Multiproducts. TODO: split out as separate trait?
 
   object MultiProduct {
-    def apply() = new MultiProduct[UNIT] {
-      val root = I
-      val projections = Seq.empty
+    def apply(components: TypedStar[_]*) = components match {
+      case Seq() =>
+        new MultiProduct[UNIT] {
+          val root = I
+          val projections = Seq.empty
+        }
+// ?      case Seq[TypedStar[X]](star) forSome { type X } =>
+      case Seq(star: TypedStar[_]) =>
+        new MultiProduct[star.TYPE]  {
+          val root = star.star
+          val projections = Seq(root.identity)
+        }
+//      case Seq(star: TypedStar) =>
+//        new MultiProduct[star.TYPE] {
+//          val root = star.star
+//          val projections = Seq(root.identity)
+//        }
     }
   }
 
   abstract class MultiProduct[A <: ELEMENT] {
     val root: STAR[A]
     val projections: Seq[Quiver[A, _]]
+  }
+
+  case class TypedStar[X <: ELEMENT](star: STAR[X]) {
+    type TYPE = X
+  }
+
+  abstract class RichStar[X <: ELEMENT] {
+    def typed: TypedStar[X]
+  }
+
+  implicit def enrich[X <: ELEMENT](star: STAR[X]) = new RichStar[X] {
+    override def typed = new TypedStar[X](star)
   }
 
   // Multiproducts. end
