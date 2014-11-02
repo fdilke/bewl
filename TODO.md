@@ -67,4 +67,14 @@ Then maybe a Variable wraps an ELEMENT of the given type. How to make it all typ
 Or better to have a sanity test on the operators as we build expressions? [MUCH better done at compile time] 
  
 Can we easily associate a type with each StarTag? Maybe they should actually be types, or have types?
-Could now do type-safe products? Would these be useful inside RootContext, or as a dress rehearsal for it?    
+Could now do type-safe products? Would these be useful inside RootContext, or as a dress rehearsal for it?
+
+Better to have Topos stripped down to use 'RichStar' and an implicit conversion, rather than include 
+all the things the definition of a star doesn't have to have?
+      
+# Factoring through
+
+Can we have a predicate "f factors through g'? Or even 'f factors through g uniquely'? Useful in tests.
+f: R -> X factors through g: S -> X means:
+(1) for each r, there exists s with f(r) = g(s)
+(2) there exists h: R -> S with f = gh

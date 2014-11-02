@@ -41,12 +41,15 @@ class AlgebraTests extends FunSpec with RunTimeCompilation {
     it("can construct terms which can be evaluated in a root context") {
 
       val carrier = makeStar(0, 1, 2, 3)
-      val product = bifunctionAsBiQuiver[Int, Int, Int](carrier, carrier, carrier, { (x, y) =>
+      val product = bifunctionAsBiQuiver[Int](carrier) { (x, y) =>
         (x + y) % 4
-      })
-      val zMod4 = magmasWith1(carrier, unit := makeNullaryOperator(carrier, 0), multiply := product)
+      }
+      val myUnit: FiniteSetsQuiver[WRAPPER[Unit], Int] = makeNullaryOperator(carrier, 0)
+      val zMod4 = magmasWith1(carrier, unit := myUnit, multiply := product)
 
       val context = RootContext(zMod4, Arity(principal, principal))
+
+//      context.evaluate(unit) shouldBe (myUnit o context.root.toI)
     }
   }
 

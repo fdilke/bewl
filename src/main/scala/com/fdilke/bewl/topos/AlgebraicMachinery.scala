@@ -63,7 +63,9 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   }
 
   case class RootContext[X <: ELEMENT](algebra: Algebra[X], arity: Arity) {
-
+    type ROOT = TRUTH // <: ELEMENT
+    val root: STAR[ROOT] = omega // <: PRODUCT
+    def evaluate(term: Term[Principal]) : Quiver[ROOT, X] = ???
   }
 
   trait OpAssignment[X <: ELEMENT]
