@@ -56,13 +56,13 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   class Law(arity: Arity) {
     def verify[X <: ELEMENT](algebra: Algebra[X]) = {
-      val context = new RootContext(algebra, arity)
+//      val context = new RootContext(algebra, arity)
       // ... add verification stuff here
       // TDD RootContext??
     }
   }
 
-  class RootContext[X <: ELEMENT](algebra: Algebra[X], arity: Arity) {
+  case class RootContext[X <: ELEMENT](algebra: Algebra[X], arity: Arity) {
 
   }
 

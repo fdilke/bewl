@@ -147,8 +147,10 @@ object NativeFiniteSets extends Topos with Wrappings[Traversable, FiniteSetsPreQ
   override def bifunctionAsBiQuiver[L, R, T](
     left: STAR[L],
     right: STAR[R],
-    target: STAR[T],
-    bifunc: (L, R) => T): BiQuiver[L, R, T] =
+    target: STAR[T]
+  ) (
+    bifunc: (L, R) => T
+  ): BiQuiver[L, R, T] =
     (left x right).biQuiver(target) { bifunc }
 }
 
@@ -172,7 +174,7 @@ object NativeFiniteSetsUtilities {
                              target: STAR[T],
                              mappings: ((L, R), T)*
                              ) =
-    bifunctionAsBiQuiver(left, right, target, (l: L, r: R) => Map(mappings:_*)((l, r)))
+    bifunctionAsBiQuiver[L, R, T](left, right, target) { (l, r) => Map(mappings:_*)((l, r)) }
 
   def makeNullaryOperator[X](carrier: STAR[X], value: X) =
     functionAsQuiver(I, carrier, (_: UNIT) => value)
@@ -181,5 +183,5 @@ object NativeFiniteSetsUtilities {
     carrier: STAR[X],
     mappings: ((X, X), X)*
   ) =
-    bifunctionAsBiQuiver(carrier, carrier, carrier, (l: X, r: X) => Map(mappings:_*)((l, r)))
+    bifunctionAsBiQuiver[X](carrier) { (x, y) => Map(mappings:_*)((x, y)) }
 }

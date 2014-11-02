@@ -113,10 +113,18 @@ trait Wrappings[PRESTAR[_], PREQUIVER[_, _]] { topos: BaseTopos =>
   def quiver[S, T](connector: PREQUIVER[S, T]) : QUIVER[WRAPPER[S], WRAPPER[T]]
   def functionAsQuiver[S, T](source: STAR[WRAPPER[S]], target: STAR[WRAPPER[T]], f: S => T): QUIVER[WRAPPER[S], WRAPPER[T]]
   def bifunctionAsBiQuiver[L, R, T] (
-                                      left: STAR[WRAPPER[L]],
-                                      right: STAR[WRAPPER[R]],
-                                      target: STAR[WRAPPER[T]],
-                                      bifunc: (L, R) => T
-                                      ): BiQuiver[WRAPPER[L], WRAPPER[R], WRAPPER[T]]
+    left: STAR[WRAPPER[L]],
+    right: STAR[WRAPPER[R]],
+    target: STAR[WRAPPER[T]]
+  ) (
+    bifunc: (L, R) => T
+  ): BiQuiver[WRAPPER[L], WRAPPER[R], WRAPPER[T]]
+
+  def bifunctionAsBiQuiver[X] (
+    star: STAR[WRAPPER[X]]
+  ) (
+     bifunc: (X, X) => X
+  ): BiQuiver[WRAPPER[X], WRAPPER[X], WRAPPER[X]] =
+    bifunctionAsBiQuiver[X, X, X](star, star, star) { bifunc }
 }
 

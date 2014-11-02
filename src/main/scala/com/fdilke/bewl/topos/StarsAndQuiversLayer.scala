@@ -192,11 +192,12 @@ object StarsAndQuiversLayer {
       ).asInstanceOf[QUIVER[WRAPPER[S], WRAPPER[T]]]
 
       override def bifunctionAsBiQuiver[L, R, T](
-                                                  left: STAR[WRAPPER[L]],
-                                                  right: STAR[WRAPPER[R]],
-                                                  target: STAR[WRAPPER[T]],
-                                                  bifunc: (L, R) => T
-                                                  ) = {
+        left: STAR[WRAPPER[L]],
+        right: STAR[WRAPPER[R]],
+        target: STAR[WRAPPER[T]]
+      ) (
+        bifunc: (L, R) => T
+      ) = {
         val targetProduct = star[(L, R)](
           left.dot.asInstanceOf[DOT[L]] x
             right.dot.asInstanceOf[DOT[R]]

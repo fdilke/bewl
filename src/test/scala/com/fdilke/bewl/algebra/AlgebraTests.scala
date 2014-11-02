@@ -4,11 +4,21 @@ import com.fdilke.bewl.fsets.NativeFiniteSets._
 import com.fdilke.bewl.fsets.NativeFiniteSetsUtilities._
 import com.fdilke.bewl.fsets.{NativeFiniteSets, NativeFiniteSetsUtilities}
 import com.fdilke.bewl.testutil.RunTimeCompilation
-import com.fdilke.bewl.topos.StarTag.Principal
+import NativeFiniteSets.AbstractOp._
+import com.fdilke.bewl.topos.StarTag.{principal, Principal}
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
 class AlgebraTests extends FunSpec with RunTimeCompilation {
+
+  private val leftUnitLaw = Law("not a left unit", (x : Variable[Principal]) =>
+    multiply(unit, x) ::== x
+  )
+
+  private val magmasWith1 = AlgebraicTheory(
+    operators = Seq(unit, multiply),
+    laws = Seq(leftUnitLaw)
+  )
 
 //  describe("Arities") {
 //    it("have a computed type") {
@@ -26,6 +36,17 @@ class AlgebraTests extends FunSpec with RunTimeCompilation {
         "multiply(unit, unitRightScalar)" should not (compile)
         "rightScalarMultiply(unit, unit)" should not (compile)
       }
+    }
+
+    it("can construct terms which can be evaluated in a root context") {
+
+      val carrier = makeStar(0, 1, 2, 3)
+      val product = bifunctionAsBiQuiver[Int, Int, Int](carrier, carrier, carrier, { (x, y) =>
+        (x + y) % 4
+      })
+      val zMod4 = magmasWith1(carrier, unit := makeNullaryOperator(carrier, 0), multiply := product)
+
+      val context = RootContext(zMod4, Arity(principal, principal))
     }
   }
 
@@ -54,28 +75,16 @@ class AlgebraTests extends FunSpec with RunTimeCompilation {
   }
 
   describe("Algebraic laws") {
-    it("can be expressed by building identities from abstract operators and constants") {
-      import AbstractOp._
-
-      val leftUnitLaw = Law("not a left unit", (x : Variable[Principal]) =>
-        multiply(unit, x) ::== x
-      )
-
-      val magmasWith1 = AlgebraicTheory(
-        operators = Seq(unit, multiply),
-        laws = Seq(leftUnitLaw)
-      )
-
+    it("can be verified for particular algebras") {
       val carrier = makeStar(1, -1)
-      def makeUnit(i: Int) = makeNullaryOperator(carrier, i)
       val product = makeBinaryOperator(carrier,
         (1, 1) -> 1, (1, -1) -> -1, (-1, 1) -> -1, (-1, -1) -> 1
       )
-      val goodMagmaWith1 = magmasWith1(carrier, unit := makeUnit(1), multiply := product)
+      val goodMagmaWith1 = magmasWith1(carrier, unit := makeNullaryOperator(carrier, 1), multiply := product)
       goodMagmaWith1.sanityTest
 
       if (false) {        // TODO: fix
-        val badMagmaWith1 = magmasWith1(carrier, unit := makeUnit(-1), multiply := product)
+        val badMagmaWith1 = magmasWith1(carrier, unit := makeNullaryOperator(carrier, -1), multiply := product)
         intercept[IllegalArgumentException] {
           badMagmaWith1.sanityTest
         }.getMessage shouldBe "Left unit law failed"
