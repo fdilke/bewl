@@ -95,6 +95,9 @@ class AlgebraTests extends FunSpec with RunTimeCompilation {
 
       context0.evaluate(unit) shouldBe (myUnit o context0.root.toI)
       context0.evaluate(unaryOperator(unit)) shouldBe (constant(3) o context0.root.toI)
+      context0.evaluate(multiply(unaryOperator(unit), unaryOperator(unit))) shouldBe (constant(2) o context0.root.toI)
+
+      // TODO: root contexts with a nonempty arity ... ?
     }
   }
 
