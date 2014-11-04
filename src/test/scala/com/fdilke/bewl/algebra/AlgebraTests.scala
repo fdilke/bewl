@@ -20,6 +20,11 @@ class AlgebraTests extends FunSpec with RunTimeCompilation {
     laws = Seq(leftUnitLaw)
   )
 
+  private val magmasWith1WithUnaryOperator = AlgebraicTheory(
+    operators = Seq(unit, multiply, unaryOperator),
+    laws = Seq(leftUnitLaw)
+  )
+
 //  describe("Arities") {
 //    it("have a computed type") {
 //      Arity().calcType.TYPE
@@ -51,6 +56,7 @@ class AlgebraTests extends FunSpec with RunTimeCompilation {
   }
 
   describe("Abstract operators") {
+
     it("are typed so that they can be combined only with matching arities and return values") {
       inContextOf(imports = Seq("com.fdilke.bewl.fsets.NativeFiniteSets.AbstractOp._")) {
         "multiply(unit, unit)" should compile
@@ -62,23 +68,33 @@ class AlgebraTests extends FunSpec with RunTimeCompilation {
       }
     }
 
+    it("can be used as keys to a map of operator assignments") {
+      val carrier = makeStar(true, false)
+      val scalars = makeStar(1, 2, 3)
+      val op0 = makeNullaryOperator(carrier, true)
+      val op1 = carrier.identity
+      val op2 = bifunctionAsBiQuiver(carrier) { _ & _ }
+      val opRSM = bifunctionAsBiQuiver(carrier, scalars, carrier) { (b, n) => if (b) (n > 1) else true }
+      val assignments = new OpAssignments[Boolean](unit := op0, unaryOperator := op1, multiply := op2, rightScalarMultiply := opRSM)
+      assignments.lookup(unit) shouldBe op0
+      assignments.lookup(unaryOperator) shouldBe op1
+      assignments.lookup(multiply) shouldBe op2
+      assignments.lookup(rightScalarMultiply) shouldBe opRSM
+    }
+
     it("can construct terms which can be evaluated in a root context") {
 
       val carrier = makeStar(0, 1, 2, 3)
-      val product = bifunctionAsBiQuiver[Int](carrier) { (x, y) =>
-        (x + y) % 4
-      }
-      val myUnit: FiniteSetsQuiver[WRAPPER[Unit], Int] = makeNullaryOperator(carrier, 0)
-      val zMod4 = magmasWith1(carrier, unit := myUnit, multiply := product)
+      val product = bifunctionAsBiQuiver(carrier) { (x, y) => (x + y) % 4 }
+      def constant(i: Int) = makeNullaryOperator(carrier, i)
+      val myUnit = constant(0)
+      val myUnaryOperator = carrier(carrier) { x => 3 - x }
+      val zMod4 = magmasWith1WithUnaryOperator(carrier, unit := myUnit, multiply := product, unaryOperator := myUnaryOperator)
 
       val context0 = RootContext(zMod4, Arity())
 
       context0.evaluate(unit) shouldBe (myUnit o context0.root.toI)
-
-//      val context = RootContext(zMod4, Arity(principal, principal))
-//
-//      if (false)
-//        context.evaluate(unit) shouldBe (myUnit o context.root.toI)
+      context0.evaluate(unaryOperator(unit)) shouldBe (constant(3) o context0.root.toI)
     }
   }
 

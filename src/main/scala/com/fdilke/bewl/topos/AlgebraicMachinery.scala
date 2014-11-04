@@ -54,7 +54,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   // Multiproducts. end
 
   type NullaryOp[X <: ELEMENT] = QUIVER[UNIT, X]
-  type Unary[X <: ELEMENT] = QUIVER[UNIT, X]
+  type UnaryOp[X <: ELEMENT] = QUIVER[X, X]
   type BinaryOp[X <: ELEMENT] = BiQuiver[X, X, X]
   type RightScalarBinaryOp[X <: ELEMENT, S <: ELEMENT] = BiQuiver[X, S, X]
 
@@ -62,12 +62,16 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     def unit: AbstractNullaryOp[Principal] = abstractNullaryOp("unit")
     def unitRightScalar = abstractNullaryOp("right scalar unit", rightScalar)
     def multiply = abstractBinaryOp("multiply")
-    def rightScalarMultiply = new AbstractRightScalarBinaryOp("right scalar multiply")
+    def unaryOperator = abstractUnaryOp("unaryOperator")
+    def rightScalarMultiply = new AbstractRightScalarBinaryOp("right scalar multiply", principal, rightScalar)
 
     def abstractNullaryOp[A: TypeTag](name: String, starTag: StarTag[A] = principal) =
       new AbstractNullaryOp[A](name, starTag)
 
-    def abstractBinaryOp[A](name: String, starTag: StarTag[A] = principal) =
+    def abstractUnaryOp[A: TypeTag](name: String, starTag: StarTag[A] = principal) =
+      new AbstractUnaryOp[A](name, starTag)
+
+    def abstractBinaryOp[A: TypeTag](name: String, starTag: StarTag[A] = principal) =
       new AbstractBinaryOp[A](name, starTag)
   }
 
@@ -90,26 +94,40 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       context.assignments.lookup(this) o context.root.toI
   }
 
-  class AbstractBinaryOp[A](name: String, starTag: StarTag[A])
+  class AbstractUnaryOp[A: TypeTag](name: String, starTag: StarTag[A])
+    extends AbstractOp[A, A](
+      name,
+      Arity(starTag), starTag) {
+    def :=[X <: ELEMENT](op: UnaryOp[X]): OpAssignment[X] =
+      UnaryOpAssignment(this, op)
+    def apply(argument: Term[A]) = new Term[A] {
+      override def evaluate[X <: ELEMENT](context: EvaluationContext[X]): QUIVER[context.ROOT, X] =
+        context.assignments.lookup(AbstractUnaryOp.this) o argument.evaluate(context)
+    }
+  }
+
+  class AbstractBinaryOp[A: TypeTag](name: String, starTag: StarTag[A])
     extends AbstractOp[(A, A), A](
       name,
       Arity(starTag, starTag), starTag) {
     def :=[X <: ELEMENT](op: BinaryOp[X]): OpAssignment[X] =
       BinaryOpAssignment(this, op)
     def apply(left: Term[A], right: Term[A]) = new Term[A] {
-      override def evaluate[X <: ELEMENT](context: EvaluationContext[X]): QUIVER[context.ROOT, X] =
-        context.assignments.lookup(AbstractBinaryOp.this)(
+      override def evaluate[X <: ELEMENT](context: EvaluationContext[X]): QUIVER[context.ROOT, X] = {
+        val q = context.assignments.lookup(AbstractBinaryOp.this)
+        q(
           left.evaluate(context),
           right.evaluate(context)
         )
+      }
     }
   }
 
-  class AbstractRightScalarBinaryOp(name: String)
-    extends AbstractOp[(Principal, RightScalar), Principal](
+  class AbstractRightScalarBinaryOp[A, R](name: String, starTagA: StarTag[A], starTagR: StarTag[R])
+    extends AbstractOp[(A, R), A](
       name,
-      Arity(principal, rightScalar),
-      principal
+      Arity(starTagA, starTagR),
+      starTagA
   ) {
     def :=[X <: ELEMENT, S <: ELEMENT](op: RightScalarBinaryOp[X, S]): OpAssignment[X] =
       RightScalarBinaryOpAssignment(this, op)
@@ -165,27 +183,49 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   }
 
   trait OpAssignment[X <: ELEMENT] {
-    def get[A: TypeTag](abOp: AbstractNullaryOp[A]): NullaryOp[X] = ???
+    def get[A: TypeTag](abOp: AbstractNullaryOp[A]): Option[NullaryOp[X]] = None
+    def get[A: TypeTag](abOp: AbstractUnaryOp[A]): Option[UnaryOp[X]] = None
+    def get[A: TypeTag](abOp: AbstractBinaryOp[A]): Option[BinaryOp[X]] = None
+    def get[A: TypeTag, R](abOp: AbstractRightScalarBinaryOp[A, R]): Option[RightScalarBinaryOp[X, _]] = None
   }
   case class NullaryOpAssignment[X <: ELEMENT, A: TypeTag](abstractOp: AbstractNullaryOp[A], op: NullaryOp[X]) extends OpAssignment[X] {
     override def get[B: TypeTag](abOp: AbstractNullaryOp[B]) =
       if (typeOf[B] =:= typeOf[A])
-        op
-      else ???
+        Some(op)
+      else None
   }
-  case class BinaryOpAssignment[X <: ELEMENT, A](abstractOp: AbstractBinaryOp[A], op: BinaryOp[X]) extends OpAssignment[X]
-  case class RightScalarBinaryOpAssignment[X <: ELEMENT, S <: ELEMENT](
-    abstractOp: AbstractRightScalarBinaryOp, op: RightScalarBinaryOp[X, S]) extends OpAssignment[X]
-  case class OpAssignments[X <: ELEMENT](assignments: Seq[OpAssignment[X]]) {
+  case class UnaryOpAssignment[X <: ELEMENT, A: TypeTag](abstractOp: AbstractUnaryOp[A], op: UnaryOp[X]) extends OpAssignment[X] {
+    override def get[B: TypeTag](abOp: AbstractUnaryOp[B]) =
+      if (typeOf[B] =:= typeOf[A])
+        Some(op)
+      else None
+  }
+  case class BinaryOpAssignment[X <: ELEMENT, A: TypeTag](abstractOp: AbstractBinaryOp[A], op: BinaryOp[X]) extends OpAssignment[X] {
+    override def get[B: TypeTag](abOp: AbstractBinaryOp[B]) =
+      if (typeOf[B] =:= typeOf[A])
+        Some(op)
+      else None
+  }
+  case class RightScalarBinaryOpAssignment[X <: ELEMENT, S <: ELEMENT, A, R](
+    abstractOp: AbstractRightScalarBinaryOp[A, R], op: RightScalarBinaryOp[X, S]) extends OpAssignment[X] {
+    override def get[A: TypeTag, R](abOp: AbstractRightScalarBinaryOp[A, R]): Option[RightScalarBinaryOp[X, _]] =
+        Some(op)
+  }
+  case class OpAssignments[X <: ELEMENT](assignments: OpAssignment[X]*) {
     // TODO: fix these up with some mechanism like A#TYPE where A = e.g. Principal??
     def lookup[A: TypeTag](op0: AbstractNullaryOp[A]): NullaryOp[X] =
-      assignments.collectFirst (PartialFunction( _.get(op0) )).get
-    def lookup[A](op2: AbstractBinaryOp[A]): BinaryOp[X] = ???
+      assignments.iterator.map { _.get(op0) }.collectFirst { case Some(x) => x }.get
+    def lookup[A: TypeTag](op1: AbstractUnaryOp[A]): UnaryOp[X] =
+      assignments.iterator.map { _.get(op1) }.collectFirst { case Some(x) => x }.get
+    def lookup[A: TypeTag](op2: AbstractBinaryOp[A]): BinaryOp[X] =
+      assignments.iterator.map { _.get(op2) }.collectFirst { case Some(x) => x }.get
+    def lookup[A: TypeTag, R](opRSM: AbstractRightScalarBinaryOp[A, R]): RightScalarBinaryOp[X, _] =
+      assignments.iterator.map { _.get(opRSM) }.collectFirst { case Some(x) => x }.get
   }
 
   case class AlgebraicTheory(operators: Seq[AbstractOp[_, _]], val laws: Seq[Law[_]]) {
     def apply[X <: ELEMENT](carrier: STAR[X], assignments: OpAssignment[X]*) =
-      Algebra(this, carrier, OpAssignments(assignments))
+      Algebra(this, carrier, OpAssignments(assignments :_*))
   }
 
   case class Algebra[X <: ELEMENT](theory: AlgebraicTheory, carrier: STAR[X], assignments: OpAssignments[X]) {
