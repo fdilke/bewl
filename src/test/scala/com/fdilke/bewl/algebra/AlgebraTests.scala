@@ -1,11 +1,11 @@
 package com.fdilke.bewl.algebra
 
+import com.fdilke.bewl.fsets.NativeFiniteSets
+import com.fdilke.bewl.fsets.NativeFiniteSets.AbstractOp._
 import com.fdilke.bewl.fsets.NativeFiniteSets._
 import com.fdilke.bewl.fsets.NativeFiniteSetsUtilities._
-import com.fdilke.bewl.fsets.{NativeFiniteSets, NativeFiniteSetsUtilities}
 import com.fdilke.bewl.testutil.RunTimeCompilation
-import NativeFiniteSets.AbstractOp._
-import com.fdilke.bewl.topos.StarTag.{principal, Principal}
+import com.fdilke.bewl.topos.StarTag.Principal
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 

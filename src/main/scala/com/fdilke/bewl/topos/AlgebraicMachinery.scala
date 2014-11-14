@@ -11,11 +11,11 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     type TYPE = X
   }
 
-  abstract class RichStar[X <: ELEMENT] {
+  abstract class OtherRichStar[X <: ELEMENT] {
     def typed: TypedStar[X]
   }
 
-  implicit def enrich[X <: ELEMENT](star: STAR[X]) = new RichStar[X] {
+  implicit def enrichOther[X <: ELEMENT](star: STAR[X]) = new OtherRichStar[X] {
     override def typed = new TypedStar[X](star)
   }
 

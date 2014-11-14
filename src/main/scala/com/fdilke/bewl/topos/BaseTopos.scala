@@ -1,10 +1,10 @@
 package com.fdilke.bewl.topos
 
-import Function.tupled
+import scala.Function.tupled
 
-trait Topos extends BaseTopos with AlgebraicMachinery
+trait Topos extends BaseTopos with AlgebraicMachinery with RichStarsAndQuivers
 
-trait BaseTopos {
+trait BaseTopos { self: RichStarsAndQuivers =>
   type ELEMENT
   type STAR[S <: ELEMENT] <: Star[S]
   type QUIVER[S <: ELEMENT, T <: ELEMENT] <: Quiver[S, T]
@@ -69,12 +69,6 @@ trait BaseTopos {
     def apply(s: S): T
     def ?=(that: QUIVER[S, T]): EQUALIZER[S]
     def o[R <: ELEMENT](that: QUIVER[R, S]) : QUIVER[R, T]
-    final def x[U <: ELEMENT](that: QUIVER[S, U]): QUIVER[S, x[T, U]] = {
-      val product = this.target x that.target
-      source(product) {
-        s => product.pair(this(s), that(s))
-      }}
-
     def \[U <: ELEMENT](monic: QUIVER[U, T]) : QUIVER[S, U]
     def sanityTest
   }
