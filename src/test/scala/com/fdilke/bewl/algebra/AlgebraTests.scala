@@ -101,6 +101,12 @@ class AlgebraTests extends FunSpec with RunTimeCompilation {
     }
   }
 
+  describe("Star patterns") {
+    it("can be defined ") {
+
+    }
+  }
+
   describe("Algebraic theories") {
 
     it("can be defined and used to create instances") {

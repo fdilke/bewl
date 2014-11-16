@@ -28,6 +28,7 @@ I've implemented this in Java, Clojure and now Scala. Really it should be in Has
 - Universal and existential quantifiers
 - Strong binding: a new layer with stars/quivers concreting over dots/arrows ; stars bound to classes ; quivers/functions interchangeable
 - Specialized element types: e.g. product has left, right ; exponential can apply
+- Adapter that makes a dots-and-arrows topos look like a stars-and-quivers one
 
 # Tech tasks done
 - cleaner memoization; optionally uses generics and lower bound types; works with structural types 
