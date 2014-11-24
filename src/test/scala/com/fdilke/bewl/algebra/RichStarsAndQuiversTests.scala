@@ -22,4 +22,24 @@ class RichStarsAndQuiversTests extends FunSpec {
       ∀ o (totalSet.identity.chi.name) shouldBe truth
     }
   }
+
+  describe("Sequence comprehensions for operators") {
+    it("can define unary operators") {
+      val set = makeStar(-1, 0, 1)
+      val unaryMinus = for (x <- set) yield -x
+      unaryMinus shouldBe makeQuiver(set, set,
+        -1 -> 1, 0 -> 0, 1 -> -1
+      )
+    }
+
+    it("can define binary operators") {
+      val set = makeStar(0, 1, 2)
+      val subtract = for (x <- set ; y <- set) yield (x - y + 3) % 3;
+      subtract shouldBe makeBinaryOperator(set,
+        (0, 0) -> 0, (0, 1) -> 2, (0, 2) -> 1,
+        (1, 0) -> 1, (1, 1) -> 0, (1, 2) -> 2,
+        (2, 0) -> 2, (2, 1) -> 1, (2, 2) -> 0
+      ).quiver
+    }
+  }
 }

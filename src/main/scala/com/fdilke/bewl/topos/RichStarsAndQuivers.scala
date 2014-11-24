@@ -23,6 +23,13 @@ trait RichStarsAndQuivers { topos: BaseTopos =>
     import star._
 
     def ∀ = (truth o toI).name.chi
+
+    def map(f: X => X): QUIVER[X, X] = star(star)(f)
+    def flatMap(f2: X => QUIVER[X, X]): QUIVER[X x X, X] =
+      (star x star)(star) {
+        case (x, y) => f2(x)(y)
+      }
+
   }
 
   implicit def enrich[X <: ELEMENT](star: STAR[X]) = new RichStar(star)

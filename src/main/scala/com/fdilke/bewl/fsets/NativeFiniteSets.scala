@@ -14,13 +14,13 @@ object NativeFiniteSets extends Topos with Wrappings[Traversable, FiniteSetsPreQ
   override lazy val omega = star(Traversable(true, false))
   override lazy val truth = I(omega) { _ => true }
 
-  class FiniteSetsStar[S](elements: Traversable[S])
-    extends Star[S] with Traversable[S] { self =>
+  class FiniteSetsStar[S](private[NativeFiniteSets] val elements: Traversable[S])
+    extends Star[S] { self =>
     override lazy val toI = this(I) { _ => () }
 
     private val memoizedExponential = {
       type CURRIED_EXPONENTIAL[T <: ELEMENT] = EXPONENTIAL[S, T]
-      def exponential[T <: ELEMENT](that: STAR[T]) = {
+      def exponential[T <: ELEMENT](that: FiniteSetsStar[T]) = {
         case class FunctionElement(function: S => T) extends (S => T) {
           override def equals(that: scala.Any): Boolean = that match {
               case that: FunctionElement => elements.forall {
@@ -30,7 +30,7 @@ object NativeFiniteSets extends Topos with Wrappings[Traversable, FiniteSetsPreQ
           def apply(s: S): T = function(s)
         }
         new FiniteSetsStar[S > T](
-          allMaps(self, that).map { FunctionElement } // TODO: coalesce
+          allMaps(self.elements, that.elements).map { FunctionElement } // TODO: coalesce
         ) with ExponentialStar[S, T] { exponentialStar =>
           override val source: STAR[S] = self
           override val target: STAR[T] = that
@@ -48,7 +48,7 @@ object NativeFiniteSets extends Topos with Wrappings[Traversable, FiniteSetsPreQ
       type CURRIED_BIPRODUCT[T <: ELEMENT] = BIPRODUCT[S, T]
       def product[T <: ELEMENT](that: STAR[T]) =
         new FiniteSetsStar[S x T](
-          for(s <- this ; t <- that)
+          for(s <- this.elements ; t <- that.elements)
             yield (s, t)
         ) with BiproductStar[S, T] {
           override val left: STAR[S] = self
@@ -65,9 +65,6 @@ object NativeFiniteSets extends Topos with Wrappings[Traversable, FiniteSetsPreQ
     override def sanityTest =
       for (x <- elements ; y <- elements)
         x == y
-
-    override def foreach[U](f: S => U) =
-      elements foreach f
   }
 
   class FiniteSetsQuiver[S, T](
@@ -78,18 +75,18 @@ object NativeFiniteSets extends Topos with Wrappings[Traversable, FiniteSetsPreQ
     override def \[U <: ELEMENT](monic: QUIVER[U, T]) =
       source(monic.source) { s =>
         val quarry: T = function(s)
-        monic.source.find { u =>
+        monic.source.elements.find { u =>
           monic(u) == quarry
         } getOrElse {
           throw new IllegalArgumentException(s"Cannot backdivide $self by monic $monic")
       }}
     override def sanityTest =
-      if (!source.map(function).forall(x => target.exists(_ == x))) {
+      if (!source.elements.map(function).forall(x => target.elements.exists(_ == x))) {
         throw new IllegalArgumentException("Map values not in target")
       }
     override def ?=(that: QUIVER[S, T]) =
       new FiniteSetsStar[S] (
-        source.filter { s => function(s) == that.function(s) }
+        source.elements.filter { s => function(s) == that.function(s) }
       ) with EqualizingStar[S] { equalizer =>
         override val equalizerTarget = source
         override def restrict[R](substar: QUIVER[R, S]) =
@@ -105,21 +102,21 @@ object NativeFiniteSets extends Topos with Wrappings[Traversable, FiniteSetsPreQ
 
     override lazy val chi =
       target(omega) { t =>
-        source.exists { s =>
+        source.elements.exists { s =>
           this(s) == t
       }}
 
     override def equals(other: Any): Boolean = other match {
       case that: FiniteSetsQuiver[S, T] =>
         source == that.source && target == that.target &&
-          source.forall(x => function(x) == that.function(x))
+          source.elements.forall(x => function(x) == that.function(x))
       case _ => false
     }
     override def hashCode = 0
 
     override def toString =
       s"FiniteSetsQuiver[$source -> $target : ${
-        for(s <- source)
+        for(s <- source.elements)
           s -> this(s)
       }]"
   }
