@@ -170,15 +170,28 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   abstract class RootContext[A, X <: ELEMENT](algebra: Algebra[X], arity: Arity[A]) extends EvaluationContext[X] {
     val assignments = algebra.assignments
+    val variables: Array[Variable[A]]
   }
 
   object RootContext {
-    def apply[X <: ELEMENT](algebra: Algebra[X], arity: Arity[Unit]) =
-      new RootContext[Unit, X](algebra, arity) {
-        type ROOT = UNIT
-        val root = I
-        def evaluate(term: Term[Principal]) : Quiver[ROOT, X] =
+    def forNullary[X <: ELEMENT](algebra: Algebra[X]) =
+      new RootContext[Unit, X](algebra, Arity()) {
+        override type ROOT = UNIT
+        override val root = I
+        override def evaluate(term: Term[Principal]) : Quiver[ROOT, X] =
           term.evaluate(this)
+        override val variables: Array[Variable[Unit]] = Array.empty
+      }
+    def forUnary[X <: ELEMENT](algebra: Algebra[X]) =
+      new RootContext[Principal, X](algebra, Arity(principal)) {
+        override type ROOT = X
+        override val root = algebra.carrier
+        override def evaluate(term: Term[Principal]) : Quiver[ROOT, X] =
+          term.evaluate(this)
+        override val variables: Array[Variable[Principal]] = Array(new Variable[Principal] {
+          override def evaluate[X <: ELEMENT](context: EvaluationContext[X]): QUIVER[context.type#ROOT, X] =
+            ??? // TODO: fill in!
+        })
       }
   }
 

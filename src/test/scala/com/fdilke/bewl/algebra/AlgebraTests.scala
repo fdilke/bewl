@@ -1,17 +1,17 @@
 package com.fdilke.bewl.algebra
 
-import com.fdilke.bewl.fsets.NativeFiniteSets
 import com.fdilke.bewl.fsets.NativeFiniteSets.AbstractOp._
 import com.fdilke.bewl.fsets.NativeFiniteSets._
 import com.fdilke.bewl.fsets.NativeFiniteSetsUtilities._
 import com.fdilke.bewl.testutil.RunTimeCompilation
 import com.fdilke.bewl.topos.StarTag.Principal
+import com.fdilke.bewl.topos.StarTag.principal
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
 class AlgebraTests extends FunSpec with RunTimeCompilation {
 
-  private val leftUnitLaw = Law("not a left unit", (x : Variable[Principal]) =>
+  private val leftUnitLaw = Law("not a left unit", (x: Variable[Principal]) =>
     multiply(unit, x) ::== x
   )
 
@@ -25,11 +25,11 @@ class AlgebraTests extends FunSpec with RunTimeCompilation {
     laws = Seq(leftUnitLaw)
   )
 
-//  describe("Arities") {
-//    it("have a computed type") {
-//      Arity().calcType.TYPE
-//    }
-//  }
+  //  describe("Arities") {
+  //    it("have a computed type") {
+  //      Arity().calcType.TYPE
+  //    }
+  //  }
 
   describe("Multiproducts") {
     it("are computed sensibly for a product of 0") {
@@ -45,14 +45,14 @@ class AlgebraTests extends FunSpec with RunTimeCompilation {
       multiProduct.projections shouldBe Seq(star.identity)
     }
 
-//    it("are computed sensibly for a product of 2") {
-//      val star1 = makeStar(1, 2, 3)
-//      val star2 = makeStar(true, false)
-//      val multiProduct = MultiProduct(star1, star2)
-//      val expectedProduct = star1 x star2
-//      multiProduct.root shouldBe expectedProduct
-//      multiProduct.projections shouldBe Seq(expectedProduct.π0, expectedProduct.π1)
-//    }
+    //    it("are computed sensibly for a product of 2") {
+    //      val star1 = makeStar(1, 2, 3)
+    //      val star2 = makeStar(true, false)
+    //      val multiProduct = MultiProduct(star1, star2)
+    //      val expectedProduct = star1 x star2
+    //      multiProduct.root shouldBe expectedProduct
+    //      multiProduct.projections shouldBe Seq(expectedProduct.π0, expectedProduct.π1)
+    //    }
   }
 
   describe("Abstract operators") {
@@ -62,9 +62,9 @@ class AlgebraTests extends FunSpec with RunTimeCompilation {
         "multiply(unit, unit)" should compile
         "rightScalarMultiply(unit, unitRightScalar)" should compile
 
-        "multiply(unit)" should not (compile)
-        "multiply(unit, unitRightScalar)" should not (compile)
-        "rightScalarMultiply(unit, unit)" should not (compile)
+        "multiply(unit)" should not(compile)
+        "multiply(unit, unitRightScalar)" should not(compile)
+        "rightScalarMultiply(unit, unit)" should not(compile)
       }
     }
 
@@ -73,8 +73,10 @@ class AlgebraTests extends FunSpec with RunTimeCompilation {
       val scalars = makeStar(1, 2, 3)
       val op0 = makeNullaryOperator(carrier, true)
       val op1 = carrier.identity
-      val op2 = bifunctionAsBiQuiver(carrier) { _ & _ }
-      val opRSM = bifunctionAsBiQuiver(carrier, scalars, carrier) { (b, n) => if (b) (n > 1) else true }
+      val op2 = bifunctionAsBiQuiver(carrier) {
+        _ & _
+      }
+      val opRSM = bifunctionAsBiQuiver(carrier, scalars, carrier) { (b, n) => if (b) (n > 1) else true}
       val assignments = new OpAssignments[Boolean](unit := op0, unaryOperator := op1, multiply := op2, rightScalarMultiply := opRSM)
       assignments.lookup(unit) shouldBe op0
       assignments.lookup(unaryOperator) shouldBe op1
@@ -85,19 +87,24 @@ class AlgebraTests extends FunSpec with RunTimeCompilation {
     it("can construct terms which can be evaluated in a root context") {
 
       val carrier = makeStar(0, 1, 2, 3)
-      val product = bifunctionAsBiQuiver(carrier) { (x, y) => (x + y) % 4 }
+      val product = bifunctionAsBiQuiver(carrier) { (x, y) => (x + y) % 4}
       def constant(i: Int) = makeNullaryOperator(carrier, i)
       val myUnit = constant(0)
-      val myUnaryOperator = carrier(carrier) { x => 3 - x }
+      val myUnaryOperator = carrier(carrier) { x => 3 - x}
       val zMod4 = magmasWith1WithUnaryOperator(carrier, unit := myUnit, multiply := product, unaryOperator := myUnaryOperator)
 
-      val context0 = RootContext(zMod4, Arity())
+      val context0 = RootContext.forNullary(zMod4)
 
       context0.evaluate(unit) shouldBe (myUnit o context0.root.toI)
       context0.evaluate(unaryOperator(unit)) shouldBe (constant(3) o context0.root.toI)
       context0.evaluate(multiply(unaryOperator(unit), unaryOperator(unit))) shouldBe (constant(2) o context0.root.toI)
 
       // TODO: root contexts with a nonempty arity ... ?
+
+      val context1 = RootContext.forUnary(zMod4)
+      // TODO: make this work!
+      if (false)
+        context1.evaluate(unaryOperator(context1.variables(0))) shouldBe myUnaryOperator
     }
   }
 
@@ -140,7 +147,8 @@ class AlgebraTests extends FunSpec with RunTimeCompilation {
       val goodMagmaWith1 = magmasWith1(carrier, unit := makeNullaryOperator(carrier, 1), multiply := product)
       goodMagmaWith1.sanityTest
 
-      if (false) {        // TODO: fix
+      if (false) {
+        // TODO: fix
         val badMagmaWith1 = magmasWith1(carrier, unit := makeNullaryOperator(carrier, -1), multiply := product)
         intercept[IllegalArgumentException] {
           badMagmaWith1.sanityTest
