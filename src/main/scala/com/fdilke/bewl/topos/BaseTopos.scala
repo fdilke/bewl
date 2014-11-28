@@ -1,5 +1,7 @@
 package com.fdilke.bewl.topos
 
+import com.fdilke.bewl.actions.NaiveMonoidsAndActions
+
 import scala.Function.tupled
 
 trait Topos extends BaseTopos with NaiveMonoidsAndActions with AlgebraicMachinery with RichStarsAndQuivers

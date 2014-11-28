@@ -91,6 +91,11 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
 
   describe(s"The topos ${topos.getClass.getName}") {
 
+    it("has sane built-in objects") {
+      I.sanityTest
+      omega.sanityTest
+    }
+
     it("wraps dots and arrows with relatively sane equality semantics") {
       makeSampleStar() shouldBe makeSampleStar()
       (makeSampleStar() eq makeSampleStar()) shouldBe true
