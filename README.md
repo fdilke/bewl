@@ -8,7 +8,7 @@ See also [this presentation](https://www.evernote.com/shard/s141/sh/8e6b9d94-bc2
 I've implemented this in Java, Clojure and now Scala. Really it should be in Haskell but I am only partway through
 [learning the language](http://learnyouahaskell.com)
 
-[This presentation](https://prezi.com/dwrz2mft3y-g/bewls-latest-update/) explains the new "intrinsic" Bewl 2.0 DSL and why it's
+[This presentation](http://prezi.com/dwrz2mft3y-g/?utm_campaign=share&utm_medium=copy&rc=ex0share) explains the new "intrinsic" Bewl 2.0 DSL and why it's
  better than the previous "diagrammatic" 1.0 one.
 
 # Intended applications
