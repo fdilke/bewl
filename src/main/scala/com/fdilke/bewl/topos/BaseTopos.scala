@@ -2,7 +2,7 @@ package com.fdilke.bewl.topos
 
 import scala.Function.tupled
 
-trait Topos extends BaseTopos with AlgebraicMachinery with RichStarsAndQuivers
+trait Topos extends BaseTopos with NaiveMonoidsAndActions with AlgebraicMachinery with RichStarsAndQuivers
 
 trait BaseTopos { self: RichStarsAndQuivers =>
   type ELEMENT

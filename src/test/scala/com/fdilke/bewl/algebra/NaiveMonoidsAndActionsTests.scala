@@ -6,60 +6,8 @@ import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 import NativeFiniteSets._
 
-// Illustrates how to define monoids and monoid actions as 'one-off' structures.
-// TODO: once more general machinery is in place, port all the tests to use that
+class NaiveMonoidsAndActionsTests extends FunSpec {
 
-class AlgebraSpikeTests extends FunSpec {
-
-  case class Monoid[X <: ELEMENT](carrier: STAR[X], unit: NullaryOp[X], multiply: BinaryOp[X]) {
-    def sanityTest {
-      // check the left unit law
-      if (carrier(carrier) {
-        x => multiply(unit(carrier.toI(x)), x)
-      } != carrier.identity)
-        throw new IllegalArgumentException("Left unit law for * with unit 1")
-
-      // check the right unit law
-      if (carrier(carrier) {
-        x => multiply(x, unit(carrier.toI(x)))
-      } != carrier.identity)
-        throw new IllegalArgumentException("Right unit law for * with unit 1")
-
-      // check the associative law
-      if ((carrier x carrier x carrier)(carrier) {
-        case ((x, y), z) => multiply(x, multiply(y, z))
-      } != (carrier x carrier x carrier)(carrier) {
-        case ((x, y), z) => multiply(multiply(x, y), z)
-      })
-        throw new IllegalArgumentException("Associative law for *")
-    }
-
-    def rightAction[A <: ELEMENT](actionCarrier: STAR[A], actionMultiply: BiQuiver[A, X, A]) =
-      new RightMonoidAction[A, X](this, actionCarrier, actionMultiply)
-  }
-
-  class RightMonoidAction[A <: ELEMENT, X <: ELEMENT] (
-                                                        monoid: Monoid[X],
-                                                        actionCarrier: STAR[A],
-                                                        actionMultiply: BiQuiver[A, X, A]
-                                                        ) {
-    def sanityTest = {
-      // check the right unit law
-      if (actionCarrier(actionCarrier) {
-        a => actionMultiply(a, monoid.unit(actionCarrier.toI(a)))
-      } != actionCarrier.identity)
-        throw new IllegalArgumentException("Right unit law for * with unit 1")
-
-      // check the associative law
-      if ((actionCarrier x monoid.carrier x monoid.carrier)(actionCarrier) {
-        case ((a, x), y) => actionMultiply(a, monoid.multiply(x, y))
-      } != (actionCarrier x monoid.carrier x monoid.carrier)(actionCarrier) {
-        case ((a, x), y) => actionMultiply(actionMultiply(a, x), y)
-      })
-        throw new IllegalArgumentException("Associative law for monoid action *")
-    }
-  }
-  
   describe("The topos algebra machinery") {
     it("can define a monoid with carrier, unit and multiplication") {
         val (i, x, y) = ('i, 'x, 'y)
@@ -70,7 +18,7 @@ class AlgebraSpikeTests extends FunSpec {
           (x, i) -> x, (x, x) -> x, (x, y) -> x,
           (y, i) -> y, (y, x) -> y, (y, y) -> y
         )
-        Monoid[Symbol](carrier, unit, product).sanityTest
+        NaiveMonoid[Symbol](carrier, unit, product).sanityTest
     }
 
     it("checks a monoid has a left unit element") {
@@ -83,7 +31,7 @@ class AlgebraSpikeTests extends FunSpec {
           (y, i) -> y, (y, x) -> y, (y, y) -> y
         )
       intercept[IllegalArgumentException] {
-        Monoid[Symbol](carrier, unit, product).sanityTest
+        NaiveMonoid[Symbol](carrier, unit, product).sanityTest
       }.
         getMessage shouldBe "Left unit law for * with unit 1"
     }
@@ -98,7 +46,7 @@ class AlgebraSpikeTests extends FunSpec {
           (y, i) -> i, (y, x) -> x, (y, y) -> y
         )
       intercept[IllegalArgumentException] {
-        Monoid[Symbol](carrier, unit, product).sanityTest
+        NaiveMonoid[Symbol](carrier, unit, product).sanityTest
       }.
         getMessage shouldBe "Right unit law for * with unit 1"
     }
@@ -113,7 +61,7 @@ class AlgebraSpikeTests extends FunSpec {
           (y, i) -> y, (y, x) -> x, (y, y) -> y
         )
       intercept[IllegalArgumentException] {
-        Monoid[Symbol](carrier, unit, product).sanityTest
+        NaiveMonoid[Symbol](carrier, unit, product).sanityTest
       }.
         getMessage shouldBe "Associative law for *"
     }
@@ -127,7 +75,7 @@ class AlgebraSpikeTests extends FunSpec {
         (x, i) -> x, (x, x) -> x, (x, y) -> x,
         (y, i) -> y, (y, x) -> y, (y, y) -> y
       )
-      Monoid[Symbol](carrier, unit, product)
+      NaiveMonoid[Symbol](carrier, unit, product)
     }
 
     it("can define a right action for a monoid") {
