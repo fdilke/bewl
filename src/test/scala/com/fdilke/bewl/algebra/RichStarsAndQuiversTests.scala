@@ -1,8 +1,8 @@
 package com.fdilke.bewl.algebra
 
 import org.scalatest.FunSpec
-import com.fdilke.bewl.fsets.NativeFiniteSets._
-import com.fdilke.bewl.fsets.NativeFiniteSetsUtilities._
+import com.fdilke.bewl.fsets.FiniteSets._
+import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.Matchers._
 
 class RichStarsAndQuiversTests extends FunSpec {

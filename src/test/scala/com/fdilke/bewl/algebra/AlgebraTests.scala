@@ -1,8 +1,8 @@
 package com.fdilke.bewl.algebra
 
-import com.fdilke.bewl.fsets.NativeFiniteSets.AbstractOp._
-import com.fdilke.bewl.fsets.NativeFiniteSets._
-import com.fdilke.bewl.fsets.NativeFiniteSetsUtilities._
+import com.fdilke.bewl.fsets.FiniteSets.AbstractOp._
+import com.fdilke.bewl.fsets.FiniteSets._
+import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import com.fdilke.bewl.testutil.RunTimeCompilation
 import com.fdilke.bewl.topos.StarTag.Principal
 import com.fdilke.bewl.topos.StarTag.principal
@@ -58,7 +58,7 @@ class AlgebraTests extends FunSpec with RunTimeCompilation {
   describe("Abstract operators") {
 
     it("are typed so that they can be combined only with matching arities and return values") {
-      inContextOf(imports = Seq("com.fdilke.bewl.fsets.NativeFiniteSets.AbstractOp._")) {
+      inContextOf(imports = Seq("com.fdilke.bewl.fsets.FiniteSets.AbstractOp._")) {
         "multiply(unit, unit)" should compile
         "rightScalarMultiply(unit, unitRightScalar)" should compile
 

@@ -1,10 +1,10 @@
 package com.fdilke.bewl.algebra
 
-import com.fdilke.bewl.fsets.{NativeFiniteSets, NativeFiniteSetsUtilities}
-import NativeFiniteSetsUtilities._
+import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsUtilities}
+import FiniteSetsUtilities._
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
-import NativeFiniteSets._
+import FiniteSets._
 
 class NaiveMonoidsAndActionsTests extends FunSpec {
 

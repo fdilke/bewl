@@ -4,7 +4,7 @@ import com.fdilke.bewl.fsets.DiagrammaticFiniteSetsUtilities._
 import com.fdilke.bewl.helper.Memoize
 import com.fdilke.bewl.topos.{Wrappings, Topos}
 
-object NativeFiniteSets extends Topos with Wrappings[Traversable, FiniteSetsPreQuiver] {
+object FiniteSets extends Topos with Wrappings[Traversable, FiniteSetsPreQuiver] {
   override type ELEMENT = Any
   override type STAR[S <: ELEMENT] = FiniteSetsStar[S]
   override type QUIVER[S <: ELEMENT, T <: ELEMENT] = FiniteSetsQuiver[S, T]
@@ -14,7 +14,7 @@ object NativeFiniteSets extends Topos with Wrappings[Traversable, FiniteSetsPreQ
   override lazy val omega = star(Traversable(true, false))
   override lazy val truth = I(omega) { _ => true }
 
-  class FiniteSetsStar[S](private[NativeFiniteSets] val elements: Traversable[S])
+  class FiniteSetsStar[S](private[FiniteSets] val elements: Traversable[S])
     extends Star[S] { self =>
     override lazy val toI = this(I) { _ => () }
 
@@ -70,7 +70,7 @@ object NativeFiniteSets extends Topos with Wrappings[Traversable, FiniteSetsPreQ
   class FiniteSetsQuiver[S, T](
     val source: FiniteSetsStar[S],
     val target: FiniteSetsStar[T],
-    private[NativeFiniteSets] val function: S => T
+    private[FiniteSets] val function: S => T
   ) extends Quiver[S, T] { self =>
     override def \[U <: ELEMENT](monic: QUIVER[U, T]) =
       source(monic.source) { s =>
@@ -157,8 +157,8 @@ case class FiniteSetsPreQuiver[S, T](
   function: S => T
 )
 
-object NativeFiniteSetsUtilities {
-  import NativeFiniteSets._
+object FiniteSetsUtilities {
+  import FiniteSets._
 
   def makeStar[T](elements: T*) = star(elements)
 

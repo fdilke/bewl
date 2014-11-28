@@ -1,11 +1,11 @@
 package com.fdilke.bewl.fsets
 
 import com.fdilke.bewl.topos.{GenericToposTests, ToposWithFixtures}
-import NativeFiniteSetsUtilities._
+import FiniteSetsUtilities._
 
-class NativeFiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
-  type TOPOS = NativeFiniteSets.type
-  val topos = NativeFiniteSets
+class FiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
+  type TOPOS = FiniteSets.type
+  val topos = FiniteSets
 
   import topos._
 
