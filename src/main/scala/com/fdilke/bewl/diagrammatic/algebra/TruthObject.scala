@@ -4,7 +4,7 @@ import com.fdilke.bewl.diagrammatic.BaseDiagrammaticTopos
 
 trait TruthObject { topos: BaseDiagrammaticTopos with DiagrammaticAlgebra with DiagrammaticAlgebraicLaws with DiagrammaticAlgebraicStructures =>
 
-  // TODO: do thee need to be lazy? why?
+  // TODO: do these need to be lazy? why?
   private lazy val and: ARROW[(OMEGA, OMEGA), OMEGA] = (truth x truth).chi.arrow
   private lazy val omegaId = omega.identity
   private lazy val diagonal = (omegaId x omegaId).chi.arrow     // TODO: factor out

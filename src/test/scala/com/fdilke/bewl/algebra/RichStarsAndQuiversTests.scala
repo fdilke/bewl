@@ -33,13 +33,31 @@ class RichStarsAndQuiversTests extends FunSpec {
     }
 
     it("can define binary operators") {
-      val set = makeStar(0, 1, 2)
-      val subtract = for (x <- set ; y <- set) yield (x - y + 3) % 3;
-      subtract shouldBe makeBinaryOperator(set,
+      val three = makeStar(0, 1, 2)
+      val subtract = for (x <- three ; y <- three) yield (x - y + 3) % 3;
+      subtract shouldBe makeBinaryOperator(three,
         (0, 0) -> 0, (0, 1) -> 2, (0, 2) -> 1,
         (1, 0) -> 1, (1, 1) -> 0, (1, 2) -> 2,
         (2, 0) -> 2, (2, 1) -> 1, (2, 2) -> 0
-      ).quiver
+      )
     }
+  }
+
+  describe("The truth object") {
+    it("has the correct binary operations for binary operations") {
+      TruthObject.and shouldBe (
+        for(i <- omega ; j <- omega)
+          yield i & j
+        )
+      TruthObject.implies shouldBe (
+        for(i <- omega ; j <- omega)
+          yield !i | j
+        )
+    }
+//    subtract shouldBe makeBinaryOperator(set,
+//      (0, 0) -> 0, (0, 1) -> 2, (0, 2) -> 1,
+//      (1, 0) -> 1, (1, 1) -> 0, (1, 2) -> 2,
+//      (2, 0) -> 2, (2, 1) -> 1, (2, 2) -> 0
+//    ).quiver
   }
 }
