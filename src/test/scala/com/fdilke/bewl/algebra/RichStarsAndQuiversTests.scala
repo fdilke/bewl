@@ -23,6 +23,25 @@ class RichStarsAndQuiversTests extends FunSpec {
     }
   }
 
+  describe("The existential quantifier") {
+    it("detects whether a subobject is NOT empty") {
+      val totalSet = makeStar(1, 2, 3, 4)
+      val subset = makeStar(1, 3)
+      val emptySet = makeStar[Int]()
+
+      val embed = subset(totalSet) { x => x}
+      val embedEmpty = emptySet(totalSet) { x => x}
+      val exists = totalSet.∃
+      exists should have(
+        'source(totalSet > omega),
+        'target(omega)
+      )
+      exists o (embed.chi.name) should be(truth)
+      exists o (embedEmpty.chi.name) should not be(truth)
+      exists o (totalSet.identity.chi.name) shouldBe truth
+    }
+  }
+
   describe("Sequence comprehensions for operators") {
     it("can define unary operators") {
       val set = makeStar(-1, 0, 1)

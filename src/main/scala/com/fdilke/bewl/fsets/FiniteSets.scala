@@ -62,6 +62,9 @@ object FiniteSets extends Topos with Wrappings[Traversable, FiniteSetsPreQuiver]
     override def apply[T <: ELEMENT](target: STAR[T])(f: S => T) =
       new FiniteSetsQuiver(this, target, f)
 
+    override def toString =
+      s"FiniteSetsStar[$elements]"
+
     override def sanityTest =
       for (x <- elements ; y <- elements)
         x == y
@@ -117,7 +120,7 @@ object FiniteSets extends Topos with Wrappings[Traversable, FiniteSetsPreQuiver]
     override def toString =
       s"FiniteSetsQuiver[$source -> $target : ${
         for(s <- source.elements)
-          s -> this(s)
+          yield s -> this(s)
       }]"
   }
 
