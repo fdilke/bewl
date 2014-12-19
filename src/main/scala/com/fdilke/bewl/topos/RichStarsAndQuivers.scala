@@ -51,32 +51,22 @@ trait RichStarsAndQuivers { topos: BaseTopos =>
 
   private def ∃[X <: ELEMENT](star: STAR[X]) = {
     val p = star > omega
-    val lhs = p.evaluation(leftProjection(p, omega, star), rightProjection(p, omega, star))
-    val rhs = midProjection(p, omega, star)
-    val fx_implies_w = TruthObject.implies(lhs, rhs)
+    val fx_implies_w =
+      (p x omega x star)(omega) {
+        case ((f, w), x) => TruthObject.implies(f(x), w)
+      }
+
     val b = BiQuiver(p x omega x star, fx_implies_w)
-    val forall_x_fx_implies_w  = star.∀ o p.transpose(b)
-    val bigImplies = TruthObject.implies(forall_x_fx_implies_w, (p x omega).π1)
+    val forall_x_fx_implies_w  = BiQuiver(p x omega, star.∀ o p.transpose(b))
+
+    val bigImplies =
+      (p x omega)(omega) {
+        case (f, w) =>
+          TruthObject.implies(forall_x_fx_implies_w(f, w), w)
+      }
+
     omega.∀ o (omega > omega).transpose(BiQuiver(p x omega, bigImplies))
   }
-
-  // TODO: refactor using bindings
-    // intention is this:
-    //    (omega ^ x).lambda { f =>
-    //      all(omega)(omega.lambda { w =>
-    //        all(x)(x.lambda { y =>
-    //        implies(omega.all(implies(f(y), w)), w)
-    //      })
-    //    })
-    //      val p = omega ^ x
-    //      val pox: DOT[((X => OMEGA, OMEGA), X)] = p x omega x x
-    //
-    //      val lhs: ARROW[((X => OMEGA, OMEGA), X), OMEGA] = evaluation(x, omega)(leftProjection(p, omega, x), rightProjection(p, omega, x))
-    //      val rhs: ARROW[((X => OMEGA, OMEGA), X), OMEGA] = midProjection(p, omega, x)
-    //      val fx_implies_w: ARROW[((X => OMEGA, OMEGA), X), OMEGA] = implies(lhs x rhs)
-    //      val forall_x_fx_implies_w : ARROW[(X => OMEGA, OMEGA), OMEGA] = all(x)(transpose(x, omega, BiArrow(p x omega, x, fx_implies_w)))
-    //      val bigImplies: ARROW[(X => OMEGA, OMEGA), OMEGA] = implies(forall_x_fx_implies_w x rightProjection(p, omega))
-    //      all(omega)(transpose(omega, omega, BiArrow(p, omega, bigImplies)))
 
   object TruthObject { // TODO: This should eventually express omega as a complete Heyting algebra
     lazy val omegaSquared = omega x omega
