@@ -23,7 +23,9 @@ trait RichStarsAndQuivers { topos: BaseTopos =>
   class RichStar[X <: ELEMENT](star: STAR[X]) {
     import star._
 
-    def ∀ = (truth o toI).name.chi
+    lazy val power = star > omega
+
+    lazy val ∀ = (truth o toI).name.chi
 
     def map(f: X => X): QUIVER[X, X] = star(star)(f)
     def flatMap(f2: X => QUIVER[X, X]): BiQuiver[X, X, X] =
@@ -31,42 +33,21 @@ trait RichStarsAndQuivers { topos: BaseTopos =>
           case (x, y) => f2(x)(y)
       }
 
-    def ∃ = RichStarsAndQuivers.this.∃(star)
+    lazy val ∃ = RichStarsAndQuivers.this.∃(star)
   }
 
   implicit def enrich[X <: ELEMENT](star: STAR[X]) = new RichStar(star)
 
-//  private def ∃[X <: ELEMENT](star: STAR[X]) =
-//    (star > omega)(omega) { f  =>
-//      omega.∀ o (
-//        omega(omega) { w =>
-//          star.∀ o (
-//            star(omega) { y =>
-//              TruthObject.implies(f(y), w)
-//            }
-//          )
-//        }
-//      )
-//    }
-
-  private def ∃[X <: ELEMENT](star: STAR[X]) = {
-    val p = star > omega
-    val fx_implies_w =
-      (p x omega x star)(omega) {
-        case ((f, w), x) => TruthObject.implies(f(x), w)
-      }
-
-    val b = BiQuiver(p x omega x star, fx_implies_w)
-    val forall_x_fx_implies_w  = BiQuiver(p x omega, star.∀ o p.transpose(b))
-
-    val bigImplies =
-      (p x omega)(omega) {
+  private def ∃[X <: ELEMENT](star: STAR[X]) =
+    omega.∀ o omega.power.transpose(
+      (star.power x omega).biQuiver(omega) {
         case (f, w) =>
-          TruthObject.implies(forall_x_fx_implies_w(f, w), w)
-      }
-
-    omega.∀ o (omega > omega).transpose(BiQuiver(p x omega, bigImplies))
-  }
+          TruthObject.implies(BiQuiver(star.power x omega, star.∀ o star.power.transpose(
+            (star.power x omega x star).biQuiver(omega) {
+              case ((f, w), x) => TruthObject.implies(f(x), w)
+            }
+          ))(f, w), w)
+        })
 
   object TruthObject { // TODO: This should eventually express omega as a complete Heyting algebra
     lazy val omegaSquared = omega x omega
