@@ -33,6 +33,7 @@ I've implemented this in Java, Clojure and now Scala. Really it should be in Has
 - Specialized element types: e.g. product has left, right ; exponential can apply
 - Adapter that makes a dots-and-arrows topos look like a stars-and-quivers one
 - Implementation of FiniteSets using new DSL
+- Defined quantifiers in new DSL
 
 # Tech tasks done
 - cleaner memoization; optionally uses generics and lower bound types; works with structural types 
