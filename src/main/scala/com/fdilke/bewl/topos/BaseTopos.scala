@@ -45,6 +45,8 @@ trait BaseTopos { self: RichStarsAndQuivers =>
       BiQuiver(this, this(target) (
         tupled[L,R,T](bifunc)
       ))
+      final def universally[T <: ELEMENT](target: STAR[T])(bifunc: ((L x R), (L x R)) => TRUTH) =
+        BiQuiver(this, star.forAll(this)(bifunc))
     }
 
   type EQUALIZER[S <: ELEMENT] = EqualizingStar[S] with STAR[S]
