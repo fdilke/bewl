@@ -46,10 +46,9 @@ trait RichStarsAndQuivers { topos: BaseTopos =>
   private def ∃[X <: ELEMENT](star: STAR[X]) =
     omega.forAll(star.power) {
         case (f, w) =>
-          TruthObject.implies(BiQuiver(star.power x omega, star.forAll(star.power x omega) {
+          TruthObject.implies((star.power x omega).universally(star) {
               case ((f, w), x) => TruthObject.implies(f(x), w)
-            }
-          )(f, w), w)
+            }(f, w), w)
         }
 
   object TruthObject { // TODO: This should eventually express omega as a complete Heyting algebra
