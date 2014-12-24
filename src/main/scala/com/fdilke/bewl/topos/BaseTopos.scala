@@ -91,7 +91,7 @@ trait BaseTopos { self: RichStarsAndQuivers =>
       )
   }
 
-  trait Quiver[S <: ELEMENT, T <: ELEMENT] {
+  trait BaseQuiver[S <: ELEMENT, T <: ELEMENT] {
     val source: STAR[S]
     val target: STAR[T]
     val chi: QUIVER[T, TRUTH]
@@ -101,6 +101,19 @@ trait BaseTopos { self: RichStarsAndQuivers =>
     def o[R <: ELEMENT](that: QUIVER[R, S]) : QUIVER[R, T]
     def \[U <: ELEMENT](monic: QUIVER[U, T]) : QUIVER[S, U]
     def sanityTest
+  }
+
+  trait Quiver[X <: ELEMENT, Y <: ELEMENT] extends BaseQuiver[X, Y] {
+    def name =
+      (source > target).transpose(
+        (I x source).biQuiver(target) {
+          case (i, x) => this(x)
+        })
+    def x[Z <: ELEMENT](that: QUIVER[X, Z]): QUIVER[X, Y x Z] = {
+      val product = target x that.target
+      source(product) {
+        s => product.pair(this(s), that(s))
+      }}
   }
 
   case class BiQuiver[
