@@ -1,11 +1,11 @@
 package com.fdilke.bewl.actions
 
-import com.fdilke.bewl.topos.{Topos, AlgebraicMachinery, BaseTopos}
+import com.fdilke.bewl.topos.{RichStarsAndQuivers, Topos, AlgebraicMachinery, BaseTopos}
 
 // Monoids and monoid actions define as 'one-off' structures.
 // TODO: once more general machinery is in place, update all monoid code and deprecate this
 
-trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery =>
+trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with RichStarsAndQuivers =>
   case class NaiveMonoid[X <: ELEMENT](carrier: STAR[X], unit: NullaryOp[X], multiply: BinaryOp[X]) {
     def sanityTest {
       // check the left unit law
@@ -60,42 +60,42 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery =>
   private def rightMonoidActions[SCALAR <: ELEMENT](monoid: NaiveMonoid[SCALAR]) =
     null.asInstanceOf[Topos]
 /*
-      new Topos {
+  private class RightMonoidActionsTopos[SCALAR <: ELEMENT](
+    monoid: NaiveMonoid[SCALAR]
+  ) extends Topos {
         override type ELEMENT = self.ELEMENT
-        override type STAR = RightActionStar
-        override type QUIVER = RightActionQuiver
+        override type STAR[X <: ELEMENT] = RightActionStar[X]
+        override type QUIVER[S <: ELEMENT, T <: ELEMENT] = RightActionQuiver[S, T]
         override type UNIT = self.UNIT
         override type TRUTH = SCALAR > self.TRUTH
         override val I =
           new RightActionStar[UNIT](monoid.rightAction(self.I,
             (self.I x monoid.carrier).biQuiver(self.I) {
-              for(i <- self.I ; c <- monoid.carrier)
-                yield i
+              (i, m) => i
             }))
         override val omega = {
-          val possibleIdeals: EXPONENTIAL[SCALAR, TRUTH] = monoid.carrier > omega
-          val ideals = (self.truth o possibleIdeals.toI) ?= possibleIdeals(omega) { r =>
-            // TODO: fix: want "for all s,t: r(s) implies r(st)"
-            (monoid.carrier x monoid.carrier).∀
-            null.asInstanceOf[self.TRUTH]
+          val possibleIdeals = monoid.carrier.power
+          val isIdeal = (monoid.carrier x monoid.carrier).forAll(possibleIdeals) {
+            case (f, (m, n)) => TruthObject.implies(f(m), f(monoid.multiply(m, n)))
           }
-          new RightActionStar[TRUTH](monoid.rightAction(ideals,
-            (ideals x monoid.carrier).biQuiver(ideals) {
-              for(i <- ideals ; s <- monoid.carrier)
-              yield i // TODO: yield x such that i(s(x)) is true
-            }))
+          val ideals = (self.truth o possibleIdeals.toI) ?= isIdeal
+          val idealMultiply = possibleIdeals.transpose(
+            (ideals x monoid.carrier x monoid.carrier).biQuiver(self.omega) {
+            case ((i, s), t) => ideals.include(i(monoid.multiply(s, t)))
+            })
+          new RightActionStar[TRUTH](monoid.rightAction(ideals, ideals.restrict(idealMultiply)))
         }
         override val truth: QUIVER[UNIT, TRUTH] =
           new RightActionQuiver[UNIT, TRUTH]_
 
-        class RightActionStar[X <: ELEMENT](action: monoid.RightAction[X]) extends Star[S] {
+        class RightActionStar[X <: ELEMENT](action: monoid.RightAction[X]) extends Star[X] {
 
         }
 
         class RightActionQuiver[S <: ELEMENT, T <: ELEMENT](
           val source: RightActionStar[S],
           val target: RightActionStar[T],
-          val quiver: QUIVER[S, T]
+          val quiver: self.QUIVER[S, T]
           ) extends Quiver[S, T] {
         }
 
@@ -103,5 +103,5 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery =>
 
         }
       }
-*/
+      */
 }
