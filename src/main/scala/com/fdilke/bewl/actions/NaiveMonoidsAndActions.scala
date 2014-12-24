@@ -59,49 +59,94 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Rich
 
   private def rightMonoidActions[SCALAR <: ELEMENT](monoid: NaiveMonoid[SCALAR]) =
     null.asInstanceOf[Topos]
-/*
+
   private class RightMonoidActionsTopos[SCALAR <: ELEMENT](
     monoid: NaiveMonoid[SCALAR]
   ) extends Topos {
-        override type ELEMENT = self.ELEMENT
-        override type STAR[X <: ELEMENT] = RightActionStar[X]
-        override type QUIVER[S <: ELEMENT, T <: ELEMENT] = RightActionQuiver[S, T]
-        override type UNIT = self.UNIT
-        override type TRUTH = SCALAR > self.TRUTH
-        override val I =
-          new RightActionStar[UNIT](monoid.rightAction(self.I,
-            (self.I x monoid.carrier).biQuiver(self.I) {
-              (i, m) => i
-            }))
-        override val omega = {
-          val possibleIdeals = monoid.carrier.power
-          val isIdeal = (monoid.carrier x monoid.carrier).forAll(possibleIdeals) {
-            case (f, (m, n)) => TruthObject.implies(f(m), f(monoid.multiply(m, n)))
+    override type ELEMENT = self.ELEMENT
+    override type STAR[X <: ELEMENT] = RightActionStar[X]
+    override type QUIVER[S <: ELEMENT, T <: ELEMENT] = RightActionQuiver[S, T]
+    override type UNIT = self.UNIT
+    override type TRUTH = SCALAR > self.TRUTH
+    override val I =
+      new RightActionStar[UNIT](monoid.rightAction(self.I,
+        (self.I x monoid.carrier).biQuiver(self.I) {
+          (i, m) => i
+        }))
+
+//    val pester = monoid.carrier.power
+    override val omega = null.asInstanceOf[STAR[TRUTH]]
+    override val truth = null.asInstanceOf[QUIVER[UNIT, TRUTH]]
+
+    class RightActionStar[X <: ELEMENT](action: monoid.RightAction[X]) extends Star[X] {
+      override val toI: QUIVER[X, UNIT] = null
+
+      override def >[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[X, T] = null
+
+      override def sanityTest = {}
+
+      override def x[T <: ELEMENT](that: STAR[T]): BIPRODUCT[X, T] = null
+
+      override def apply[T <: ELEMENT](target: STAR[T])(f: (X) => T): QUIVER[X, T] = null
+    }
+
+    class RightActionQuiver[S <: ELEMENT, T <: ELEMENT](
+      val source: RightActionStar[S],
+      val target: RightActionStar[T],
+      val quiver: self.QUIVER[S, T]
+     ) extends Quiver[S, T] {
+      override val chi: QUIVER[T, TRUTH] = null
+
+      override def \[U <: ELEMENT](monic: QUIVER[U, T]): QUIVER[S, U] = null
+
+      override def sanityTest = {}
+
+      override def ?=(that: QUIVER[S, T]): EQUALIZER[S] = null
+
+      override def apply(s: S): T = null.asInstanceOf[T]
+
+      override def o[R <: ELEMENT](that: QUIVER[R, S]): QUIVER[R, T] = null
+    }
+  }
+    /*
+      private class RightMonoidActionsTopos[SCALAR <: ELEMENT](
+        monoid: NaiveMonoid[SCALAR]
+      ) extends Topos {
+            override type ELEMENT = self.ELEMENT
+            override type STAR[X <: ELEMENT] = RightActionStar[X]
+            override type QUIVER[S <: ELEMENT, T <: ELEMENT] = RightActionQuiver[S, T]
+            override type UNIT = self.UNIT
+            override type TRUTH = SCALAR > self.TRUTH
+            override val I =
+            override val omega = {
+              val possibleIdeals = monoid.carrier.power
+              val isIdeal = (monoid.carrier x monoid.carrier).forAll(possibleIdeals) {
+                case (f, (m, n)) => TruthObject.implies(f(m), f(monoid.multiply(m, n)))
+              }
+              val ideals = (self.truth o possibleIdeals.toI) ?= isIdeal
+              val idealMultiply = possibleIdeals.transpose(
+                (ideals x monoid.carrier x monoid.carrier).biQuiver(self.omega) {
+                case ((i, s), t) => ideals.include(i(monoid.multiply(s, t)))
+                })
+              new RightActionStar[TRUTH](monoid.rightAction(ideals, ideals.restrict(idealMultiply)))
+            }
+            override val truth: QUIVER[UNIT, TRUTH] =
+              new RightActionQuiver[UNIT, TRUTH]_
+
+            class RightActionStar[X <: ELEMENT](action: monoid.RightAction[X]) extends Star[X] {
+
+            }
+
+            class RightActionQuiver[S <: ELEMENT, T <: ELEMENT](
+              val source: RightActionStar[S],
+              val target: RightActionStar[T],
+              val quiver: self.QUIVER[S, T]
+              ) extends Quiver[S, T] {
+            }
+
+            class RightIdeal[IDEAL <: ELEMENT](ideal: self.STAR[IDEAL]) {
+
+            }
           }
-          val ideals = (self.truth o possibleIdeals.toI) ?= isIdeal
-          val idealMultiply = possibleIdeals.transpose(
-            (ideals x monoid.carrier x monoid.carrier).biQuiver(self.omega) {
-            case ((i, s), t) => ideals.include(i(monoid.multiply(s, t)))
-            })
-          new RightActionStar[TRUTH](monoid.rightAction(ideals, ideals.restrict(idealMultiply)))
-        }
-        override val truth: QUIVER[UNIT, TRUTH] =
-          new RightActionQuiver[UNIT, TRUTH]_
-
-        class RightActionStar[X <: ELEMENT](action: monoid.RightAction[X]) extends Star[X] {
-
-        }
-
-        class RightActionQuiver[S <: ELEMENT, T <: ELEMENT](
-          val source: RightActionStar[S],
-          val target: RightActionStar[T],
-          val quiver: self.QUIVER[S, T]
-          ) extends Quiver[S, T] {
-        }
-
-        class RightIdeal[IDEAL <: ELEMENT](ideal: self.STAR[IDEAL]) {
-
-        }
-      }
-      */
+          */
 }

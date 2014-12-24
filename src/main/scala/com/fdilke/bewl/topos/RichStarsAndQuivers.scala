@@ -2,7 +2,7 @@ package com.fdilke.bewl.topos
 
 trait RichStarsAndQuivers { topos: BaseTopos =>
 
-  class RichQuiver[X <: ELEMENT, Y <: ELEMENT](quiver: QUIVER[X, Y]) {
+  implicit class RichQuiver[X <: ELEMENT, Y <: ELEMENT](quiver: QUIVER[X, Y]) {
     import quiver._
 
     def name = 
@@ -17,10 +17,8 @@ trait RichStarsAndQuivers { topos: BaseTopos =>
       }}
   }
 
-  implicit def enrich[X <: ELEMENT, Y <: ELEMENT](quiver: QUIVER[X, Y]) = new RichQuiver(quiver)
-
   // TODO: make this a trait always included, ∀ and ∃ lazy val
-  class RichStar[X <: ELEMENT](star: STAR[X]) {
+  implicit class RichStar[X <: ELEMENT](star: STAR[X]) {
     import star._
 
     lazy val power = star > omega
@@ -40,8 +38,6 @@ trait RichStarsAndQuivers { topos: BaseTopos =>
         (target x star).biQuiver(omega)(g)
       )
   }
-
-  implicit def enrich[X <: ELEMENT](star: STAR[X]) = new RichStar(star)
 
   private def ∃[X <: ELEMENT](star: STAR[X]) =
     omega.forAll(star.power) {
