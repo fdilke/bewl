@@ -18,34 +18,8 @@ trait RichStarsAndQuivers { topos: BaseTopos =>
   }
 
   // TODO: make this a trait always included, ∀ and ∃ lazy val
-  implicit class RichStar[X <: ELEMENT](star: STAR[X]) {
-    import star._
 
-    lazy val power = star > omega
-
-    lazy val ∀ = (truth o toI).name.chi
-
-    def map(f: X => X): QUIVER[X, X] = star(star)(f)
-    def flatMap(f2: X => QUIVER[X, X]): BiQuiver[X, X, X] =
-      (star x star).biQuiver(star) {
-          case (x, y) => f2(x)(y)
-      }
-
-    lazy val ∃ = RichStarsAndQuivers.this.∃(star)
-
-    def forAll[R <: ELEMENT](target: STAR[R])(g: (R, X) => TRUTH): QUIVER[R, TRUTH] =
-      ∀ o power.transpose(
-        (target x star).biQuiver(omega)(g)
-      )
-  }
-
-  private def ∃[X <: ELEMENT](star: STAR[X]) =
-    omega.forAll(star.power) {
-        case (f, w) =>
-          TruthObject.implies((star.power x omega).universally(star) {
-              case ((f, w), x) => TruthObject.implies(f(x), w)
-            }(f, w), w)
-        }
+//  private def ∃[X <: ELEMENT](star: STAR[X]) =
 
   object TruthObject { // TODO: This should eventually express omega as a complete Heyting algebra
     lazy val omegaSquared = omega x omega

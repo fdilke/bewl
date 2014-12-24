@@ -56,13 +56,39 @@ trait BaseTopos { self: RichStarsAndQuivers =>
     def restrict[R <: ELEMENT](quiver: QUIVER[R, S]): QUIVER[R, S]
   }
 
-  trait Star[S <: ELEMENT] { self: STAR[S] =>
+  trait BaseStar[S <: ELEMENT] { self: STAR[S] =>
     final lazy val identity: QUIVER[S, S] = this(self) { s => s }
     val toI: QUIVER[S, UNIT]
     def x[T <: ELEMENT](that: STAR[T]): BIPRODUCT[S, T]
     def >[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[S, T]
     def apply[T <: ELEMENT](target: STAR[T])(f: S => T) : QUIVER[S, T]
     def sanityTest
+  }
+
+  trait Star[S <: ELEMENT] extends BaseStar[S] { self: STAR[S] =>
+    lazy val power = this > omega
+
+    lazy val ∀ = (truth o toI).name.chi
+
+    def map(f: S => S): QUIVER[S, S] = this(this)(f)
+    def flatMap(f2: S => QUIVER[S, S]): BiQuiver[S, S, S] =
+      (this x this).biQuiver(this) {
+        case (x, y) => f2(x)(y)
+      }
+
+    lazy val ∃ =
+      omega.forAll(power) {
+        case (f, w) =>
+          TruthObject.implies((power x omega).universally(this) {
+            case ((f, w), x) => TruthObject.implies(f(x), w)
+          }(f, w), w)
+      }
+
+
+    def forAll[R <: ELEMENT](target: STAR[R])(g: (R, S) => TRUTH): QUIVER[R, TRUTH] =
+      ∀ o power.transpose(
+        (target x this).biQuiver(omega)(g)
+      )
   }
 
   trait Quiver[S <: ELEMENT, T <: ELEMENT] {
