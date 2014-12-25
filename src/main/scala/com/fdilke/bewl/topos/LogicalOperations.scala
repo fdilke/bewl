@@ -1,8 +1,6 @@
 package com.fdilke.bewl.topos
 
-trait RichStarsAndQuivers { topos: BaseTopos =>
-
-  // TODO: make this a trait always included, ∀ and ∃ lazy val
+trait LogicalOperations { topos: BaseTopos =>
 
   object TruthObject { // TODO: This should eventually express omega as a complete Heyting algebra
     lazy val omegaSquared = omega x omega

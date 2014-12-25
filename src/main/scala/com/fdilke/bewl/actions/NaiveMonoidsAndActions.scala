@@ -1,11 +1,11 @@
 package com.fdilke.bewl.actions
 
-import com.fdilke.bewl.topos.{RichStarsAndQuivers, Topos, AlgebraicMachinery, BaseTopos}
+import com.fdilke.bewl.topos.{LogicalOperations, Topos, AlgebraicMachinery, BaseTopos}
 
 // Monoids and monoid actions define as 'one-off' structures.
 // TODO: once more general machinery is in place, update all monoid code and deprecate this
 
-trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with RichStarsAndQuivers =>
+trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with LogicalOperations =>
   case class NaiveMonoid[X <: ELEMENT](carrier: STAR[X], unit: NullaryOp[X], multiply: BinaryOp[X]) {
     def sanityTest {
       // check the left unit law
@@ -74,8 +74,20 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Rich
           (i, m) => i
         }))
 
-//    val pester = monoid.carrier.power
-    override val omega = null.asInstanceOf[STAR[TRUTH]]
+    override val omega = {
+      val possibleIdeals = monoid.carrier.power
+      val isIdeal = (monoid.carrier x monoid.carrier).forAll(possibleIdeals) {
+        case (f, (m, n)) =>
+          self.TruthObject.implies(f(m), f(monoid.multiply(m, n)))
+      }
+      val ideals = (self.truth o possibleIdeals.toI) ?= isIdeal
+      val idealMultiply = ideals.restrict(possibleIdeals.transpose(
+        (ideals x monoid.carrier x monoid.carrier).biQuiver(self.omega) {
+          case ((i, s), t) => i(monoid.multiply(s, t)) // ideals.inclusion() somewhere?
+        }))
+      new RightActionStar[TRUTH](monoid.rightAction(ideals, self.BiQuiver(ideals x monoid.carrier, idealMultiply)))
+    }
+
     override val truth = null.asInstanceOf[QUIVER[UNIT, TRUTH]]
 
     class RightActionStar[X <: ELEMENT](action: monoid.RightAction[X]) extends Star[X] {

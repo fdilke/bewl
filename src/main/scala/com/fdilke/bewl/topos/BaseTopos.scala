@@ -4,9 +4,9 @@ import com.fdilke.bewl.actions.NaiveMonoidsAndActions
 
 import scala.Function.tupled
 
-trait Topos extends BaseTopos with NaiveMonoidsAndActions with AlgebraicMachinery with RichStarsAndQuivers
+trait Topos extends BaseTopos with NaiveMonoidsAndActions with AlgebraicMachinery with LogicalOperations
 
-trait BaseTopos { self: RichStarsAndQuivers =>
+trait BaseTopos { self: LogicalOperations =>
   type ELEMENT
   type STAR[S <: ELEMENT] <: Star[S]
   type QUIVER[S <: ELEMENT, T <: ELEMENT] <: Quiver[S, T]
