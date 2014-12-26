@@ -1,6 +1,7 @@
 package com.fdilke.bewl.topos
 
 import com.fdilke.bewl.actions.NaiveMonoidsAndActions
+import com.fdilke.bewl.helper.Memoize
 
 import scala.Function.tupled
 
@@ -59,13 +60,22 @@ trait BaseTopos { self: LogicalOperations =>
   trait BaseStar[S <: ELEMENT] { self: STAR[S] =>
     final lazy val identity: QUIVER[S, S] = this(self) { s => s }
     val toI: QUIVER[S, UNIT]
-    def x[T <: ELEMENT](that: STAR[T]): BIPRODUCT[S, T]
+    def xUncached[T <: ELEMENT](that: STAR[T]): BIPRODUCT[S, T]
     def >[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[S, T]
     def apply[T <: ELEMENT](target: STAR[T])(f: S => T) : QUIVER[S, T]
     def sanityTest
   }
 
   trait Star[S <: ELEMENT] extends BaseStar[S] { self: STAR[S] =>
+
+    private val memoizedProductStar = {
+      type CURRIED_BIPRODUCT[U <: ELEMENT] = BIPRODUCT[S, U]
+      Memoize.generic.withLowerBound[STAR, CURRIED_BIPRODUCT, ELEMENT](xUncached)
+    }
+
+    final def x[U <: ELEMENT](that: STAR[U]): BIPRODUCT[S, U] =
+      memoizedProductStar(that)
+
     lazy val power = this > omega
 
     lazy val ∀ = (truth o toI).name.chi

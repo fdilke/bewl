@@ -33,7 +33,7 @@ object StarsAndQuiversLayer {
         override lazy val toI: QUIVER[T, UNIT] =
           quiver(dot.toI).asInstanceOf[QUIVER[T, UNIT]]
 
-        def xUncached[U <: ELEMENT](that: STAR[U]) =
+        override def xUncached[U <: ELEMENT](that: STAR[U]) =
           new AdapterStar[T x U] with BiproductStar[T, U] {
             override val left = self
             override val right = that
@@ -50,14 +50,6 @@ object StarsAndQuiversLayer {
                 override val arrow: ARROW[Any, Any] = fletch(anArrow)
               }
           }
-
-        private val memoizedProductStar = {
-          type CURRIED_BIPRODUCT[U <: ELEMENT] = BIPRODUCT[T, U]
-          Memoize.generic.withLowerBound[STAR, CURRIED_BIPRODUCT, ELEMENT](xUncached)
-        }
-
-        override def x[U <: Element](that: STAR[U]): BIPRODUCT[T, U] =
-          memoizedProductStar(that)
 
         private val memoizedExponentialStar = {
           type CURRIED_EXPONENTIAL[U <: ELEMENT] = EXPONENTIAL[T, U]

@@ -100,7 +100,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
 
       override def sanityTest = {}
 
-      override def x[T <: ELEMENT](that: STAR[T]): BIPRODUCT[X, T] = null
+      override def xUncached[T <: ELEMENT](that: STAR[T]): BIPRODUCT[X, T] = null
 
       override def apply[T <: ELEMENT](target: STAR[T])(f: (X) => T): QUIVER[X, T] = null
     }
