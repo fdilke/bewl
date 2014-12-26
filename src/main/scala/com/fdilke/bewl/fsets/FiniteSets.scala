@@ -18,31 +18,26 @@ object FiniteSets extends Topos with Wrappings[Traversable, FiniteSetsPreQuiver]
     extends Star[S] { self =>
     override lazy val toI = this(I) { _ => () }
 
-    private val memoizedExponential = {
-      type CURRIED_EXPONENTIAL[T <: ELEMENT] = EXPONENTIAL[S, T]
-      def exponential[T <: ELEMENT](that: FiniteSetsStar[T]) = {
-        case class FunctionElement(function: S => T) extends (S => T) {
-          override def equals(that: scala.Any): Boolean = that match {
-              case that: FunctionElement => elements.forall {
-                s => function(s) == that.function(s)
-              }}
-          override def hashCode = 0
-          def apply(s: S): T = function(s)
-        }
-        new FiniteSetsStar[S > T](
-          allMaps(self.elements, that.elements).map { FunctionElement } // TODO: coalesce
-        ) with ExponentialStar[S, T] { exponentialStar =>
-          override val source: STAR[S] = self
-          override val target: STAR[T] = that
+    override def `>Uncached`[T <: ELEMENT](that: FiniteSetsStar[T]) = {
+      case class FunctionElement(function: S => T) extends (S => T) {
+        override def equals(that: scala.Any): Boolean = that match {
+          case that: FunctionElement => elements.forall {
+            s => function(s) == that.function(s)
+          }}
+        override def hashCode = 0
+        def apply(s: S): T = function(s)
+      }
+      new FiniteSetsStar[S > T](
+        allMaps(self.elements, that.elements).map { FunctionElement } // TODO: coalesce
+      ) with ExponentialStar[S, T] { exponentialStar =>
+        override val source: STAR[S] = self
+        override val target: STAR[T] = that
 
-          override def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, S, T]) =
-            biQuiver.product.left(exponentialStar) {
-              r => FunctionElement {
+        override def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, S, T]) =
+          biQuiver.product.left(exponentialStar) {
+            r => FunctionElement {
               s => biQuiver(r, s)
             }}}}
-      Memoize.generic.withLowerBound[STAR, CURRIED_EXPONENTIAL, ELEMENT](exponential)
-    }
-    override def >[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[S, T] = memoizedExponential(that)
 
     override def xUncached[T <: ELEMENT](that: STAR[T]) =
       new FiniteSetsStar[S x T](

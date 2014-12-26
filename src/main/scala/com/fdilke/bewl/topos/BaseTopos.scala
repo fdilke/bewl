@@ -61,20 +61,24 @@ trait BaseTopos { self: LogicalOperations =>
     final lazy val identity: QUIVER[S, S] = this(self) { s => s }
     val toI: QUIVER[S, UNIT]
     def xUncached[T <: ELEMENT](that: STAR[T]): BIPRODUCT[S, T]
-    def >[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[S, T]
+    def `>Uncached`[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[S, T]
     def apply[T <: ELEMENT](target: STAR[T])(f: S => T) : QUIVER[S, T]
     def sanityTest
   }
 
   trait Star[S <: ELEMENT] extends BaseStar[S] { self: STAR[S] =>
 
-    private val memoizedProductStar = {
+    private val memoizedProduct = {
       type CURRIED_BIPRODUCT[U <: ELEMENT] = BIPRODUCT[S, U]
       Memoize.generic.withLowerBound[STAR, CURRIED_BIPRODUCT, ELEMENT](xUncached)
     }
+    final def x[U <: ELEMENT](that: STAR[U]): BIPRODUCT[S, U] = memoizedProduct(that)
 
-    final def x[U <: ELEMENT](that: STAR[U]): BIPRODUCT[S, U] =
-      memoizedProductStar(that)
+    private val memoizedExponential = {
+      type CURRIED_EXPONENTIAL[T <: ELEMENT] = EXPONENTIAL[S, T]
+      Memoize.generic.withLowerBound[STAR, CURRIED_EXPONENTIAL, ELEMENT](`>Uncached`)
+    }
+    final def >[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[S, T] = memoizedExponential(that)
 
     lazy val power = this > omega
 

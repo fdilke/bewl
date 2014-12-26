@@ -51,36 +51,29 @@ object StarsAndQuiversLayer {
               }
           }
 
-        private val memoizedExponentialStar = {
-          type CURRIED_EXPONENTIAL[U <: ELEMENT] = EXPONENTIAL[T, U]
-          def exponential[U <: ELEMENT](that: STAR[U]) =
-            new AdapterStar[T > U] with ExponentialStar[T, U] {
-              override val source = AdapterStar.this
-              override val target = that
+        override def `>Uncached`[U <: ELEMENT](that: STAR[U]) =
+          new AdapterStar[T > U] with ExponentialStar[T, U] {
+            override val source = AdapterStar.this
+            override val target = that
 
-              private val exponential = target.dot A source.dot
-              override private[StarsAndQuiversLayer] val dot = exponential.exponentDot.asInstanceOf[DOT[Any]]
+            private val exponential = target.dot A source.dot
+            override private[StarsAndQuiversLayer] val dot = exponential.exponentDot.asInstanceOf[DOT[Any]]
 
-              override def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, T, U]) =
-                AdapterQuiver.fromArrow(biQuiver.product.left, this, exponential.transpose(biArrow(biQuiver)))
+            override def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, T, U]) =
+              AdapterQuiver.fromArrow(biQuiver.product.left, this, exponential.transpose(biArrow(biQuiver)))
 
-              override private[StarsAndQuiversLayer] def asElement(anArrow: ARROW[_, _]) =
-                new (T => U) with Element {
-                  override val arrow: ARROW[Any, Any] = fletch(anArrow)
+            override private[StarsAndQuiversLayer] def asElement(anArrow: ARROW[_, _]) =
+              new (T => U) with Element {
+                override val arrow: ARROW[Any, Any] = fletch(anArrow)
 
-                  override def apply(s: T): U =
-                    target.asElement(
-                      topos.evaluation(source.dot, target.dot)(
-                        anArrow.asInstanceOf[ARROW[Any, Any => Any]],
-                        s.arrow
-                      ))
-                }
-            }
-          Memoize.generic.withLowerBound[STAR, CURRIED_EXPONENTIAL, ELEMENT](exponential)
-        }
-
-        override def >[U <: ELEMENT](that: STAR[U]) =
-          memoizedExponentialStar(that)
+                override def apply(s: T): U =
+                  target.asElement(
+                    topos.evaluation(source.dot, target.dot)(
+                      anArrow.asInstanceOf[ARROW[Any, Any => Any]],
+                      s.arrow
+                    ))
+              }
+          }
 
         override def sanityTest = dot.sanityTest
 

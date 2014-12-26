@@ -96,13 +96,13 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
       override val toI: QUIVER[X, UNIT] = 
         new RightActionQuiver(this, I, action.actionCarrier.toI)
 
-      override def >[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[X, T] = null
-
       override def sanityTest = {}
 
       override def xUncached[T <: ELEMENT](that: STAR[T]): BIPRODUCT[X, T] = null
 
-      override def apply[T <: ELEMENT](target: STAR[T])(f: (X) => T): QUIVER[X, T] = null
+      override def `>Uncached`[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[X, T] = null
+
+      override def apply[T <: ELEMENT](target: STAR[T])(f: X => T): QUIVER[X, T] = null
     }
 
     class RightActionQuiver[S <: ELEMENT, T <: ELEMENT](
