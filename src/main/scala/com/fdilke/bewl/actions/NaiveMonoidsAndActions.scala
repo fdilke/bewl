@@ -87,14 +87,14 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
       new RightActionStar[TRUTH](monoid.rightAction(ideals, self.BiQuiver(ideals x carrier, idealMultiply)))
     }
 
-    override val truth = { 
+    override val truth = 
       new RightActionQuiver(I, omega, carrier.power.transpose((self.I x carrier).biQuiver(self.omega) {
           case(x, m) => self.truth(x)
       }))
-    }
 
     class RightActionStar[X <: ELEMENT](private[RightMonoidActions] val action: monoid.RightAction[X]) extends Star[X] {
-      override val toI: QUIVER[X, UNIT] = null
+      override val toI: QUIVER[X, UNIT] = 
+        new RightActionQuiver(this, I, action.actionCarrier.toI)
 
       override def >[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[X, T] = null
 

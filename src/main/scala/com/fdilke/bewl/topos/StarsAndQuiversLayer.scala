@@ -33,26 +33,27 @@ object StarsAndQuiversLayer {
         override lazy val toI: QUIVER[T, UNIT] =
           quiver(dot.toI).asInstanceOf[QUIVER[T, UNIT]]
 
+        def xUncached[U <: ELEMENT](that: STAR[U]) =
+          new AdapterStar[T x U] with BiproductStar[T, U] {
+            override val left = self
+            override val right = that
+
+            override def pair(t: T, u: U) = asElement(t.arrow x u.arrow)
+
+            override private[StarsAndQuiversLayer] val dot = (self.dot x that.dot).asInstanceOf[DOT[Any]]
+
+            override private[StarsAndQuiversLayer] def asElement(anArrow: ARROW[_, _]) =
+              new (T, U)(
+                self.asElement(fletch(topos.leftProjection(self.dot, that.dot))(fletch(anArrow))),
+                that.asElement(fletch(topos.rightProjection(self.dot, that.dot))(fletch(anArrow)))
+              ) with Element {
+                override val arrow: ARROW[Any, Any] = fletch(anArrow)
+              }
+          }
+
         private val memoizedProductStar = {
           type CURRIED_BIPRODUCT[U <: ELEMENT] = BIPRODUCT[T, U]
-          def product[U <: ELEMENT](that: STAR[U]) =
-            new AdapterStar[T x U] with BiproductStar[T, U] {
-              override val left = self
-              override val right = that
-
-              override def pair(t: T, u: U) = asElement(t.arrow x u.arrow)
-
-              override private[StarsAndQuiversLayer] val dot = (self.dot x that.dot).asInstanceOf[DOT[Any]]
-
-              override private[StarsAndQuiversLayer] def asElement(anArrow: ARROW[_, _]) =
-                new (T, U)(
-                  self.asElement(fletch(topos.leftProjection(self.dot, that.dot))(fletch(anArrow))),
-                  that.asElement(fletch(topos.rightProjection(self.dot, that.dot))(fletch(anArrow)))
-                ) with Element {
-                  override val arrow: ARROW[Any, Any] = fletch(anArrow)
-                }
-            }
-          Memoize.generic.withLowerBound[STAR, CURRIED_BIPRODUCT, ELEMENT](product)
+          Memoize.generic.withLowerBound[STAR, CURRIED_BIPRODUCT, ELEMENT](xUncached)
         }
 
         override def x[U <: Element](that: STAR[U]): BIPRODUCT[T, U] =

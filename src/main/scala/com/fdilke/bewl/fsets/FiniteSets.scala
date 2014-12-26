@@ -44,18 +44,19 @@ object FiniteSets extends Topos with Wrappings[Traversable, FiniteSetsPreQuiver]
     }
     override def >[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[S, T] = memoizedExponential(that)
 
+    private def xUncached[T <: ELEMENT](that: STAR[T]) =
+      new FiniteSetsStar[S x T](
+        for(s <- this.elements ; t <- that.elements)
+        yield (s, t)
+      ) with BiproductStar[S, T] {
+        override val left: STAR[S] = self
+        override val right: STAR[T] = that
+        override def pair(l: S, r: T): x[S, T] = (l, r)
+      }
+
     private val memoizedProduct = {
       type CURRIED_BIPRODUCT[T <: ELEMENT] = BIPRODUCT[S, T]
-      def product[T <: ELEMENT](that: STAR[T]) =
-        new FiniteSetsStar[S x T](
-          for(s <- this.elements ; t <- that.elements)
-            yield (s, t)
-        ) with BiproductStar[S, T] {
-          override val left: STAR[S] = self
-          override val right: STAR[T] = that
-          override def pair(l: S, r: T): x[S, T] = (l, r)
-        }
-      Memoize.generic.withLowerBound[STAR, CURRIED_BIPRODUCT, ELEMENT](product)
+      Memoize.generic.withLowerBound[STAR, CURRIED_BIPRODUCT, ELEMENT](xUncached)
     }
     override def x[T <: ELEMENT](that: STAR[T]): BIPRODUCT[S, T] = memoizedProduct(that)
 
