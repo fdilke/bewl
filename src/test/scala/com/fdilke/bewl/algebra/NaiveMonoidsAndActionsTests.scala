@@ -85,7 +85,7 @@ class NaiveMonoidsAndActionsTests extends FunSpec {
         (a, i) -> a, (a, x) -> a, (a, y) -> a,
         (b, i) -> b, (b, x) -> b, (b, y) -> b
       )
-      monoid4.rightAction(actionCarrier, actionMultiply).sanityTest
+      monoid4.rightAction(actionCarrier)(actionMultiply.apply).sanityTest
     }
 
     it("checks the right unit law for a right monoid action") {
@@ -96,7 +96,7 @@ class NaiveMonoidsAndActionsTests extends FunSpec {
         (b, i) -> a, (b, x) -> b, (b, y) -> b
       )
       intercept[IllegalArgumentException] {
-        monoid4.rightAction(actionCarrier, actionMultiply).sanityTest
+        monoid4.rightAction(actionCarrier)(actionMultiply.apply).sanityTest
       }.
         getMessage shouldBe "Right unit law for * with unit 1"
     }
@@ -109,7 +109,7 @@ class NaiveMonoidsAndActionsTests extends FunSpec {
         (b, i) -> b, (b, x) -> b, (b, y) -> a
       )
       intercept[IllegalArgumentException] {
-        monoid4.rightAction(actionCarrier, actionMultiply).sanityTest
+        monoid4.rightAction(actionCarrier)(actionMultiply.apply).sanityTest
       }.
         getMessage shouldBe "Associative law for monoid action *"
     }

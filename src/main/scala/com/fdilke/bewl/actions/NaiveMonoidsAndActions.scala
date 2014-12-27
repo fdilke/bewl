@@ -29,7 +29,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         throw new IllegalArgumentException("Associative law for *")
     }
 
-    def rightAction[A <: ELEMENT](actionCarrier: STAR[A], actionMultiply: BiQuiver[A, X, A]) =
+    def rightAction[A <: ELEMENT](actionCarrier: STAR[A])(actionMultiply: (A, X) => A) =
       new RightAction[A](actionCarrier, actionMultiply)
 
     lazy val rightActions : Topos =
@@ -37,7 +37,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
 
     case class RightAction[A <: ELEMENT] (
       actionCarrier: STAR[A],
-      actionMultiply: BiQuiver[A, X, A]
+      actionMultiply: (A, X) => A
     ) {
       def sanityTest = {
         // check the right unit law
@@ -68,10 +68,9 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
     override type UNIT = self.UNIT
     override type TRUTH = SCALAR > self.TRUTH
     override val I =
-      new RightActionStar[UNIT](monoid.rightAction(self.I,
-        (self.I x carrier).biQuiver(self.I) {
+      new RightActionStar[UNIT](monoid.rightAction(self.I) {
           (i, m) => i
-        }))
+        })
 
     override val omega = {
       val possibleIdeals = carrier.power
@@ -82,9 +81,11 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
       val ideals = (self.truth o possibleIdeals.toI) ?= isIdeal
       val idealMultiply = ideals.restrict(possibleIdeals.transpose(
         (ideals x carrier x carrier).biQuiver(self.omega) {
-          case ((i, s), t) => i(monoid.multiply(s, t)) // ideals.inclusion() somewhere?
+          case ((i, s), t) => ideals.inclusion(i)(monoid.multiply(s, t))
         }))
-      new RightActionStar[TRUTH](monoid.rightAction(ideals, self.BiQuiver(ideals x carrier, idealMultiply)))
+      new RightActionStar[TRUTH](monoid.rightAction(ideals)(
+          self.BiQuiver(ideals x carrier, idealMultiply).apply
+        ))
     }
 
     override val truth = 
@@ -103,12 +104,12 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
 
       override def xUncached[Y <: ELEMENT](that: STAR[Y]): BIPRODUCT[X, Y] = {
         val product = action.actionCarrier x that.action.actionCarrier
-        val productMultiply = (product x carrier)(product) { case ((x, y), s) =>
+        new RightActionStar[X x Y](monoid.rightAction(product){
+          case ((x, y), s) =>
+          // (pair, s) =>
+          // val (x, y) = pair
           product.pair(action.actionMultiply(x, s), that.action.actionMultiply(y, s))
-        }
-        new RightActionStar[X x Y](monoid.rightAction(product,
-          self.BiQuiver(product x carrier, productMultiply))
-        ) with BiproductStar[X, Y] {
+        }) with BiproductStar[X, Y] {
           override val left: STAR[X] = RightActionStar.this
           override val right: STAR[Y] = that
           override def pair(l: X, r: Y): x[X, Y] = product.pair(l, r)
@@ -117,7 +118,9 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
 
       override def `>Uncached`[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[X, T] = null
 
-      override def apply[T <: ELEMENT](target: STAR[T])(f: X => T): QUIVER[X, T] = null
+      override def apply[T <: ELEMENT](target: STAR[T])(f: X => T): QUIVER[X, T] =
+        new RightActionQuiver(this, target,
+          action.actionCarrier(target.action.actionCarrier){ f })
     }
 
     class RightActionQuiver[S <: ELEMENT, T <: ELEMENT](
