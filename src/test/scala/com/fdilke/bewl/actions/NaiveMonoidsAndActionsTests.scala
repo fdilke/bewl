@@ -157,7 +157,7 @@ class NaiveMonoidsAndActionsTests extends FunSpec {
       rightAction.isMorphism(rightAction2, nonActionMorphism) shouldBe false
     }
 
-    it("can verify the triadic monoid") {
+    it("can verify the triadic monoid") { // TODO: remove when triadic monoid is used properly for action tests
       val triadicMonoid = {
         val (i, a, b, c, f, f2, g, g2) = ('i, 'a, 'b, 'c, 'f, 'f2, 'g, 'g2)
         val carrier = makeStar(i, a, b, c, f, f2, g, g2)
