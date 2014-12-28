@@ -140,7 +140,10 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
 
       override def \[U <: ELEMENT](monic: QUIVER[U, T]): QUIVER[S, U] = null
 
-      override def sanityTest = {}
+      override def sanityTest = {
+        quiver.sanityTest
+        assert(source.action.isMorphism(target.action, quiver))
+      }
 
       override def ?=(that: QUIVER[S, T]): EQUALIZER[S] = null
 
