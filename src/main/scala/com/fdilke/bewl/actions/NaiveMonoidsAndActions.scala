@@ -39,6 +39,16 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
       actionCarrier: STAR[A],
       actionMultiply: (A, X) => A
     ) {
+      def isMorphism[B <: ELEMENT](that: RightAction[B], quiver: QUIVER[A, B]) = 
+        (quiver.source == this.actionCarrier) &&
+        (quiver.target == that.actionCarrier) && (
+          carrier.forAll(actionCarrier) { (x, m) =>
+            that.actionCarrier.diagonal(
+              quiver(this.actionMultiply(x, m)),
+              that.actionMultiply(quiver(x), m)
+            )
+          } == (truth o actionCarrier.toI)
+        )
       def sanityTest = {
         // check the right unit law
         if (actionCarrier(actionCarrier) {
@@ -106,8 +116,6 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         val product = action.actionCarrier x that.action.actionCarrier
         new RightActionStar[X x Y](monoid.rightAction(product){
           case ((x, y), s) =>
-          // (pair, s) =>
-          // val (x, y) = pair
           product.pair(action.actionMultiply(x, s), that.action.actionMultiply(y, s))
         }) with BiproductStar[X, Y] {
           override val left: STAR[X] = RightActionStar.this

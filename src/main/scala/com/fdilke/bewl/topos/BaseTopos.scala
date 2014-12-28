@@ -99,10 +99,17 @@ trait BaseTopos { self: LogicalOperations =>
       }
 
 
-    def forAll[R <: ELEMENT](target: STAR[R])(g: (R, S) => TRUTH): QUIVER[R, TRUTH] =
+    def forAll[R <: ELEMENT](source: STAR[R])(g: (R, S) => TRUTH): QUIVER[R, TRUTH] =
       ∀ o power.transpose(
-        (target x this).biQuiver(omega)(g)
+        (source x this).biQuiver(omega)(g)
       )
+
+    lazy val diagonal: BiQuiver[S, S, TRUTH] = {// TODO: proper test of this
+      val square = this x this
+      BiQuiver(square, this(square) { x => square.pair(x, x)
+        }.chi
+      )
+    }
   }
 
   trait BaseQuiver[S <: ELEMENT, T <: ELEMENT] {
