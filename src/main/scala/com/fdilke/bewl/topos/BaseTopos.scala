@@ -80,9 +80,9 @@ trait BaseTopos { self: LogicalOperations =>
     }
     final def >[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[S, T] = memoizedExponential(that)
 
+    lazy val toTrue = truth o toI
     lazy val power = this > omega
-
-    lazy val ∀ = (truth o toI).name.chi
+    lazy val ∀ = toTrue.name.chi
 
     def map(f: S => S): QUIVER[S, S] = this(this)(f)
     def flatMap(f2: S => QUIVER[S, S]): BiQuiver[S, S, S] =

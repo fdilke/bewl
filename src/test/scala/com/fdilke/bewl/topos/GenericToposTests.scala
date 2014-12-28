@@ -206,7 +206,7 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
       val char = monicBar2baz.chi
       char.source shouldBe baz
       char.target shouldBe omega
-      char o monicBar2baz shouldBe (truth o bar.toI)
+      char o monicBar2baz shouldBe bar.toTrue
 
       val restriction = foo2ImageOfBar \ monicBar2baz
       restriction.source shouldBe foo

@@ -47,7 +47,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
               quiver(this.actionMultiply(x, m)),
               that.actionMultiply(quiver(x), m)
             )
-          } == (truth o actionCarrier.toI)
+          } == actionCarrier.toTrue
         )
       def sanityTest = {
         // check the right unit law
@@ -88,7 +88,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         case (f, (m, n)) =>
           self.TruthObject.implies(f(m), f(monoid.multiply(m, n)))
       }
-      val ideals = (self.truth o possibleIdeals.toI) ?= isIdeal
+      val ideals = possibleIdeals.toTrue ?= isIdeal
       val idealMultiply = ideals.restrict(possibleIdeals.transpose(
         (ideals x carrier x carrier).biQuiver(self.omega) {
           case ((i, s), t) => ideals.inclusion(i)(monoid.multiply(s, t))
