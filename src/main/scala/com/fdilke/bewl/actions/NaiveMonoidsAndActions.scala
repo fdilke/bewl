@@ -77,10 +77,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
     override type QUIVER[S <: ELEMENT, T <: ELEMENT] = RightActionQuiver[S, T]
     override type UNIT = self.UNIT
     override type TRUTH = SCALAR > self.TRUTH
-    override val I =
-      new RightActionStar[UNIT](monoid.rightAction(self.I) {
-          (i, m) => i
-        })
+    override val I = RightActionStar(self.I) { (i, m) => i }
 
     override val omega = {
       val possibleIdeals = carrier.power
@@ -93,9 +90,9 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         (ideals x carrier x carrier).biQuiver(self.omega) {
           case ((i, s), t) => ideals.inclusion(i)(monoid.multiply(s, t))
         }))
-      new RightActionStar[TRUTH](monoid.rightAction(ideals)(
+      RightActionStar[TRUTH](ideals)(
           self.BiQuiver(ideals x carrier, idealMultiply).apply
-        ))
+        )
     }
 
     override val truth = 
@@ -115,8 +112,10 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
       override def xUncached[Y <: ELEMENT](that: STAR[Y]): BIPRODUCT[X, Y] = {
         val product = action.actionCarrier x that.action.actionCarrier
         new RightActionStar[X x Y](monoid.rightAction(product){
-          case ((x, y), s) =>
-          product.pair(action.actionMultiply(x, s), that.action.actionMultiply(y, s))
+          case ((x, y), s) => product.pair(
+            action.actionMultiply(x, s), 
+            that.action.actionMultiply(y, s)
+            )
         }) with BiproductStar[X, Y] {
           override val left: STAR[X] = RightActionStar.this
           override val right: STAR[Y] = that
@@ -129,6 +128,13 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
       override def apply[T <: ELEMENT](target: STAR[T])(f: X => T): QUIVER[X, T] =
         new RightActionQuiver(this, target,
           action.actionCarrier(target.action.actionCarrier){ f })
+    }
+
+    object RightActionStar {
+      def apply[A <: ELEMENT](actionCarrier: self.STAR[A])(actionMultiply: (A, SCALAR) => A) = {
+        val pigter = monoid.rightAction(actionCarrier)(actionMultiply)
+        new RightActionStar(monoid.rightAction(actionCarrier)(actionMultiply))
+      }
     }
 
     class RightActionQuiver[S <: ELEMENT, T <: ELEMENT](
