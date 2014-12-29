@@ -83,33 +83,26 @@ trait BaseTopos { self: LogicalOperations =>
     lazy val toTrue = truth o toI
     lazy val power = this > omega
     lazy val ∀ = toTrue.name.chi
+    lazy val square = this x this
 
-    def map(f: S => S): QUIVER[S, S] = this(this)(f)
-    def flatMap(f2: S => QUIVER[S, S]): BiQuiver[S, S, S] =
-      (this x this).biQuiver(this) {
-        case (x, y) => f2(x)(y)
-      }
+    def map(f: S => S) = this(this)(f)
+    def flatMap(f2: S => QUIVER[S, S]) =
+      (this x this).biQuiver(this) { f2(_)(_) }
 
     lazy val ∃ =
-      omega.forAll(power) {
-        case (f, w) =>
+      omega.forAll(power) { (f, w) =>
           TruthObject.implies((power x omega).universally(this) {
             case ((f, w), x) => TruthObject.implies(f(x), w)
           }(f, w), w)
       }
-
 
     def forAll[R <: ELEMENT](source: STAR[R])(g: (R, S) => TRUTH): QUIVER[R, TRUTH] =
       ∀ o power.transpose(
         (source x this).biQuiver(omega)(g)
       )
 
-    lazy val diagonal: BiQuiver[S, S, TRUTH] = {// TODO: proper test of this
-      val square = this x this
-      BiQuiver(square, this(square) { x => square.pair(x, x)
-        }.chi
-      )
-    }
+    lazy val diagonal: BiQuiver[S, S, TRUTH] = 
+      BiQuiver(square, this(square) { x => square.pair(x, x) }.chi)
   }
 
   trait BaseQuiver[S <: ELEMENT, T <: ELEMENT] {
@@ -128,7 +121,7 @@ trait BaseTopos { self: LogicalOperations =>
     def name =
       (source > target).transpose(
         (I x source).biQuiver(target) {
-          case (i, x) => this(x)
+          (i, x) => this(x)
         })
     def x[Z <: ELEMENT](that: QUIVER[X, Z]): QUIVER[X, Y x Z] = {
       val product = target x that.target
@@ -148,7 +141,6 @@ trait BaseTopos { self: LogicalOperations =>
   }
 
   // Helper methods for triproducts (this could obviously be extended).
-  // TODO: Only used in tests: delete when there is a satisfactory replacement (multiproducts)
   def leftProjection[X <: ELEMENT, Y <: ELEMENT, Z <: ELEMENT](
     x: STAR[X], y: STAR[Y], z: STAR[Z]
   ) : QUIVER[X x Y x Z, X] =
