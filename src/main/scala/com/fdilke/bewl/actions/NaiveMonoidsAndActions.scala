@@ -141,42 +141,21 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
             case ((f, s), (t, y)) => morphisms.inclusion(f)(
               pairs.pair(monoid.multiply(s, t), y)
           )}))
-        val shepee = new RightActionStar[(SCALAR x X) > T](monoid.rightAction(morphisms)(
+        new RightActionStar[(SCALAR x X) > T](monoid.rightAction(morphisms)(
             self.BiQuiver(morphisms x carrier, morphismMultiply).apply
           )) with ExponentialStar[SCALAR x X, T] { exponentialStar =>
           override val source = star.asInstanceOf[STAR[SCALAR x X]]
           override val target = that
 
-          override def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, SCALAR x X, T]) = null
-            // biQuiver.product.left(exponentialStar) {
-            //   r => FunctionElement {
-            //     s => biQuiver(r, s)
-            //   }}}}
-        }
-        null
-/*
-        case class FunctionElement(function: S => T) extends (S => T) {
-          override def equals(that: scala.Any): Boolean = that match {
-            case that: FunctionElement => elements.forall {
-              s => function(s) == that.function(s)
-            }}
-          override def hashCode = 0
-          def apply(s: S): T = function(s)
-        }
-        new FiniteSetsStar[S > T](
-          allMaps(self.elements, that.elements).map { FunctionElement } // TODO: coalesce
-        ) with ExponentialStar[S, T] { exponentialStar =>
-          override val source: STAR[S] = self
-          override val target: STAR[T] = that
-
-          override def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, S, T]) =
-            biQuiver.product.left(exponentialStar) {
-              r => FunctionElement {
-                s => biQuiver(r, s)
-              }}}}
-*/
-    }
-
+          override def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, SCALAR x X, T]) = {
+            val lhs = biQuiver.product.left
+            new RightActionQuiver(lhs, exponentialStar, morphisms.restrict(possibleMorphisms.transpose(
+              (lhs.action.actionCarrier x pairs).biQuiver(that.action.actionCarrier) {
+                case (r, (t, x)) => biQuiver(
+                  lhs.action.actionMultiply(r, t), 
+                  x.asInstanceOf[SCALAR x X]
+                )})))}}.asInstanceOf[EXPONENTIAL[X, T]]
+      }
       override def apply[T <: ELEMENT](target: STAR[T])(f: X => T): QUIVER[X, T] =
         new RightActionQuiver(this, target,
           action.actionCarrier(target.action.actionCarrier){ f })
