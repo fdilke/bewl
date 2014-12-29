@@ -100,7 +100,9 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
           case(x, m) => self.truth(x)
       }))
 
-    class RightActionStar[X <: ELEMENT](private[RightMonoidActions] val action: monoid.RightAction[X]) extends Star[X] {
+    class RightActionStar[X <: ELEMENT](
+      private[RightMonoidActions] val action: monoid.RightAction[X]
+      ) extends Star[X] { star =>
       override val toI: QUIVER[X, UNIT] = 
         new RightActionQuiver(this, I, action.actionCarrier.toI)
 
@@ -117,13 +119,63 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
             that.action.actionMultiply(y, s)
             )
         }) with BiproductStar[X, Y] {
-          override val left: STAR[X] = RightActionStar.this
+          override val left: STAR[X] = star
           override val right: STAR[Y] = that
           override def pair(l: X, r: Y): x[X, Y] = product.pair(l, r)
         }
       }
 
-      override def `>Uncached`[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[X, T] = null
+      override def `>Uncached`[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[X, T] = {
+        val pairs = carrier x action.actionCarrier
+        val possibleMorphisms = pairs > that.action.actionCarrier
+        val isMorphism = (pairs x carrier).forAll(possibleMorphisms) {
+          case (f, ((s, x), t)) =>
+            that.action.actionCarrier.diagonal(
+              f(pairs.pair(monoid.multiply(s, t), this.action.actionMultiply(x, t))),
+              that.action.actionMultiply(f(pairs.pair(s, x)), t)
+            )
+        }
+        val morphisms = possibleMorphisms.toTrue ?= isMorphism
+        val morphismMultiply = morphisms.restrict(possibleMorphisms.transpose(
+          (morphisms x carrier x pairs).biQuiver(that.action.actionCarrier) {
+            case ((f, s), (t, y)) => morphisms.inclusion(f)(
+              pairs.pair(monoid.multiply(s, t), y)
+          )}))
+        val shepee = new RightActionStar[(SCALAR x X) > T](monoid.rightAction(morphisms)(
+            self.BiQuiver(morphisms x carrier, morphismMultiply).apply
+          )) with ExponentialStar[SCALAR x X, T] { exponentialStar =>
+          override val source = star.asInstanceOf[STAR[SCALAR x X]]
+          override val target = that
+
+          override def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, SCALAR x X, T]) = null
+            // biQuiver.product.left(exponentialStar) {
+            //   r => FunctionElement {
+            //     s => biQuiver(r, s)
+            //   }}}}
+        }
+        null
+/*
+        case class FunctionElement(function: S => T) extends (S => T) {
+          override def equals(that: scala.Any): Boolean = that match {
+            case that: FunctionElement => elements.forall {
+              s => function(s) == that.function(s)
+            }}
+          override def hashCode = 0
+          def apply(s: S): T = function(s)
+        }
+        new FiniteSetsStar[S > T](
+          allMaps(self.elements, that.elements).map { FunctionElement } // TODO: coalesce
+        ) with ExponentialStar[S, T] { exponentialStar =>
+          override val source: STAR[S] = self
+          override val target: STAR[T] = that
+
+          override def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, S, T]) =
+            biQuiver.product.left(exponentialStar) {
+              r => FunctionElement {
+                s => biQuiver(r, s)
+              }}}}
+*/
+    }
 
       override def apply[T <: ELEMENT](target: STAR[T])(f: X => T): QUIVER[X, T] =
         new RightActionQuiver(this, target,
@@ -131,10 +183,8 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
     }
 
     object RightActionStar {
-      def apply[A <: ELEMENT](actionCarrier: self.STAR[A])(actionMultiply: (A, SCALAR) => A) = {
-        val pigter = monoid.rightAction(actionCarrier)(actionMultiply)
+      def apply[A <: ELEMENT](actionCarrier: self.STAR[A])(actionMultiply: (A, SCALAR) => A) =
         new RightActionStar(monoid.rightAction(actionCarrier)(actionMultiply))
-      }
     }
 
     class RightActionQuiver[S <: ELEMENT, T <: ELEMENT](
