@@ -172,7 +172,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
           action.actionCarrier(target.action.actionCarrier){ f })
     }
 
-    object RightActionStar {
+    object RightActionStar { // TODO: refactor to constructor?? then abolish "new RAS{...}"
       def apply[A <: ELEMENT](actionCarrier: self.STAR[A])(actionMultiply: (A, SCALAR) => A) =
         new RightActionStar(monoid.rightAction(actionCarrier)(actionMultiply))
     }
@@ -184,18 +184,29 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
      ) extends Quiver[S, T] {
       override lazy val chi = RightIdeals.chi(this)
 
-      override def \[U <: ELEMENT](monic: QUIVER[U, T]): QUIVER[S, U] = null
+      override def \[U <: ELEMENT](monic: QUIVER[U, T]) = 
+        new RightActionQuiver(source, monic.source, quiver \ monic.quiver)
 
       override def sanityTest = {
         quiver.sanityTest
         assert(source.action.isMorphism(target.action, quiver))
       }
 
-      override def ?=(that: QUIVER[S, T]): EQUALIZER[S] = null
+      override def ?=(that: QUIVER[S, T]): EQUALIZER[S] = {
+        val thunkedEqualizer = quiver ?= that.quiver
+        new RightActionStar(monoid.rightAction(thunkedEqualizer)(source.action.actionMultiply(_, _))) with EqualizingStar[S] { equalizingStar =>
+          override val equalizerTarget = source
+          override val inclusion: QUIVER[S, S] = new RightActionQuiver(equalizingStar, source, thunkedEqualizer.inclusion)
+          override def restrict[R <: ELEMENT](quiver: QUIVER[R, S]) =
+            new RightActionQuiver(quiver.source, equalizingStar, 
+              thunkedEqualizer.restrict(quiver.quiver))
+        }
+      }
 
-      override def apply(s: S): T = null.asInstanceOf[T]
+      override def apply(s: S) = quiver(s)        
 
-      override def o[R <: ELEMENT](that: QUIVER[R, S]): QUIVER[R, T] = null
+      override def o[R <: ELEMENT](that: QUIVER[R, S]): QUIVER[R, T] = 
+        new RightActionQuiver(that.source, target, quiver o that.quiver)
     }
   }
 }
