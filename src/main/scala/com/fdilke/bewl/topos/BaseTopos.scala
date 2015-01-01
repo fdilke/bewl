@@ -48,6 +48,8 @@ trait BaseTopos { self: LogicalOperations =>
       ))
       final def universally[T <: ELEMENT](target: STAR[T])(bifunc: ((L x R), T) => TRUTH) =
         BiQuiver(this, target.forAll(this)(bifunc))
+      final def existentially[T <: ELEMENT](target: STAR[T])(bifunc: ((L x R), T) => TRUTH) =
+        BiQuiver(this, target.exists(this)(bifunc))
     }
 
   type EQUALIZER[S <: ELEMENT] = EqualizingStar[S] with STAR[S]
@@ -98,6 +100,11 @@ trait BaseTopos { self: LogicalOperations =>
 
     def forAll[R <: ELEMENT](source: STAR[R])(g: (R, S) => TRUTH): QUIVER[R, TRUTH] =
       ∀ o power.transpose(
+        (source x this).biQuiver(omega)(g)
+      )
+
+    def exists[R <: ELEMENT](source: STAR[R])(g: (R, S) => TRUTH): QUIVER[R, TRUTH] =
+      ∃ o power.transpose(
         (source x this).biQuiver(omega)(g)
       )
 

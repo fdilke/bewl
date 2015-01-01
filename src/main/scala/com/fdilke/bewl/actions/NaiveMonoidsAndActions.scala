@@ -79,21 +79,32 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
     override type TRUTH = SCALAR > self.TRUTH
     override val I = RightActionStar(self.I) { (i, m) => i }
 
-    override val omega = {
-      val possibleIdeals = carrier.power
-      val isIdeal = (carrier x carrier).forAll(possibleIdeals) {
+    private object RightIdeals {
+      private val possibleIdeals = carrier.power
+      private val isIdeal = (carrier x carrier).forAll(possibleIdeals) {
         case (f, (m, n)) =>
           self.TruthObject.implies(f(m), f(monoid.multiply(m, n)))
       }
-      val ideals = possibleIdeals.toTrue ?= isIdeal
-      val idealMultiply = ideals.restrict(possibleIdeals.transpose(
+      private val ideals = possibleIdeals.toTrue ?= isIdeal
+      
+      private val idealMultiply = ideals.restrict(possibleIdeals.transpose(
         (ideals x carrier x carrier).biQuiver(self.omega) {
           case ((i, s), t) => ideals.inclusion(i)(monoid.multiply(s, t))
         }))
-      RightActionStar[TRUTH](ideals)(
-          self.BiQuiver(ideals x carrier, idealMultiply).apply
+
+      val omega = RightActionStar[TRUTH](ideals)(
+          self.BiQuiver(ideals x carrier, idealMultiply)(_,_)
         )
+
+      def chi[S <: ELEMENT, T <: ELEMENT](monic: QUIVER[S, T]): QUIVER[T, TRUTH] = 
+        new RightActionQuiver(monic.target, omega, 
+          ideals.restrict(possibleIdeals.transpose(
+            (monic.target.action.actionCarrier x carrier).biQuiver(self.omega) {
+              (t, m) => monic.quiver.chi(monic.target.action.actionMultiply(t, m))
+          })))
     }
+
+    override val omega = RightIdeals.omega
 
     override val truth = 
       new RightActionQuiver(I, omega, carrier.power.transpose((self.I x carrier).biQuiver(self.omega) {
@@ -171,7 +182,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
       val target: RightActionStar[T],
       val quiver: self.QUIVER[S, T]
      ) extends Quiver[S, T] {
-      override val chi: QUIVER[T, TRUTH] = null
+      override lazy val chi = RightIdeals.chi(this)
 
       override def \[U <: ELEMENT](monic: QUIVER[U, T]): QUIVER[S, U] = null
 
