@@ -69,7 +69,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
 
   private class RightMonoidActions[SCALAR <: ELEMENT](
     monoid: NaiveMonoid[SCALAR]
-  ) extends Topos {
+  ) extends Topos { // with Wrappings[RightAction, QUIVER] {
     import monoid.carrier
 
     override type ELEMENT = self.ELEMENT
@@ -208,5 +208,37 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
       override def o[R <: ELEMENT](that: QUIVER[R, S]): QUIVER[R, T] = 
         new RightActionQuiver(that.source, target, quiver o that.quiver)
     }
+
+  //   type WRAPPER[T <: ELEMENT] = T
+
+  //   override def star[T](input: RightAction[T]) =
+  //     new RightActionStar(input)
+
+  //   override def quiver[S, T](connector: self.QUIVER[S, T]) : QUIVER[WRAPPER[S], WRAPPER[T]]
+  // def functionAsQuiver[S, T](source: STAR[WRAPPER[S]], target: STAR[WRAPPER[T]], f: S => T): QUIVER[WRAPPER[S], WRAPPER[T]]
+  // def bifunctionAsBiQuiver[L, R, T] (
+  //   left: STAR[WRAPPER[L]],
+  //   right: STAR[WRAPPER[R]],
+  //   target: STAR[WRAPPER[T]]
+  // ) (
+  //   bifunc: (L, R) => T
+  // ): BiQuiver[WRAPPER[L], WRAPPER[R], WRAPPER[T]]
+
+  // def bifunctionAsBiQuiver[X] (
+  //   star: STAR[WRAPPER[X]]
+  // ) (
+  //    bifunc: (X, X) => X
+  // ): BiQuiver[WRAPPER[X], WRAPPER[X], WRAPPER[X]] =
+  //   bifunctionAsBiQuiver[X, X, X](star, star, star) { bifunc }
+
+  // }
+
+  // case class FiniteSetsPreQuiver[S, T](
+  //   source: Traversable[S],
+  //   target: Traversable[T],
+  //   function: S => T
+  // )
   }
 }
+
+

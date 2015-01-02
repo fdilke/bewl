@@ -28,8 +28,7 @@ object StarsAndQuiversLayer {
 
       trait AdapterTruth extends Element
 
-      trait AdapterStar[T <: Element] extends Star[T] {
-        self =>
+      trait AdapterStar[T <: Element] extends Star[T] { self =>
         override lazy val toI: QUIVER[T, UNIT] =
           quiver(dot.toI).asInstanceOf[QUIVER[T, UNIT]]
 
