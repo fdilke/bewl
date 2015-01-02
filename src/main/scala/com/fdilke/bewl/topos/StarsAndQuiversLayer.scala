@@ -6,8 +6,8 @@ import com.fdilke.bewl.helper.Memoize
 import scala.Function._
 
 object StarsAndQuiversLayer {
-  def apply(topos: BaseDiagrammaticTopos): Topos with Wrappings[topos.DOT, topos.ARROW] = {
-    class FancyTopos extends Topos with Wrappings[topos.DOT, topos.ARROW] {
+  def apply(topos: BaseDiagrammaticTopos): Topos with Wrappings[Any, topos.DOT, topos.ARROW] = {
+    class FancyTopos extends Topos with Wrappings[Any, topos.DOT, topos.ARROW] {
       import topos.{ARROW, DOT, BiArrow, buildArrow}
 
       override type ELEMENT = Element

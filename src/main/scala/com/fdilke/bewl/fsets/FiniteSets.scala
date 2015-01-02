@@ -4,7 +4,7 @@ import com.fdilke.bewl.fsets.DiagrammaticFiniteSetsUtilities._
 import com.fdilke.bewl.helper.Memoize
 import com.fdilke.bewl.topos.{Wrappings, Topos}
 
-object FiniteSets extends Topos with Wrappings[Traversable, FiniteSetsPreQuiver] {
+object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreQuiver] {
   override type ELEMENT = Any
   override type STAR[S <: ELEMENT] = FiniteSetsStar[S]
   override type QUIVER[S <: ELEMENT, T <: ELEMENT] = FiniteSetsQuiver[S, T]

@@ -164,13 +164,13 @@ trait BaseTopos { self: LogicalOperations =>
     (x x y x z).π1
 }
 
-trait Wrappings[PRESTAR[_], PREQUIVER[_, _]] { topos: BaseTopos =>
-  type WRAPPER[T] <: ELEMENT
+trait Wrappings[BASE, PRESTAR[_ <: BASE], PREQUIVER[_ <: BASE, _ <: BASE]] { topos: BaseTopos =>
+  type WRAPPER[T <: BASE] <: ELEMENT
 
-  def star[T](input: PRESTAR[T]) : STAR[WRAPPER[T]]
-  def quiver[S, T](connector: PREQUIVER[S, T]) : QUIVER[WRAPPER[S], WRAPPER[T]]
-  def functionAsQuiver[S, T](source: STAR[WRAPPER[S]], target: STAR[WRAPPER[T]], f: S => T): QUIVER[WRAPPER[S], WRAPPER[T]]
-  def bifunctionAsBiQuiver[L, R, T] (
+  def star[T <: BASE](input: PRESTAR[T]) : STAR[WRAPPER[T]]
+  def quiver[S <: BASE, T <: BASE](connector: PREQUIVER[S, T]) : QUIVER[WRAPPER[S], WRAPPER[T]]
+  def functionAsQuiver[S <: BASE, T <: BASE](source: STAR[WRAPPER[S]], target: STAR[WRAPPER[T]], f: S => T): QUIVER[WRAPPER[S], WRAPPER[T]]
+  def bifunctionAsBiQuiver[L <: BASE, R <: BASE, T <: BASE] (
     left: STAR[WRAPPER[L]],
     right: STAR[WRAPPER[R]],
     target: STAR[WRAPPER[T]]
@@ -178,7 +178,7 @@ trait Wrappings[PRESTAR[_], PREQUIVER[_, _]] { topos: BaseTopos =>
     bifunc: (L, R) => T
   ): BiQuiver[WRAPPER[L], WRAPPER[R], WRAPPER[T]]
 
-  def bifunctionAsBiQuiver[X] (
+  def bifunctionAsBiQuiver[X <: BASE] (
     star: STAR[WRAPPER[X]]
   ) (
      bifunc: (X, X) => X
