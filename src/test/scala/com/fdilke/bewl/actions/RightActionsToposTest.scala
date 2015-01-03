@@ -1,9 +1,9 @@
 package com.fdilke.bewl.actions
 
-//import com.fdilke.bewl.fsets.FiniteSets
-//import com.fdilke.bewl.fsets.FiniteSets.NaiveMonoid
-//import com.fdilke.bewl.fsets.FiniteSetsUtilities._
-//import com.fdilke.bewl.topos.{Topos, ToposWithFixtures, GenericToposTests}
+import com.fdilke.bewl.fsets.FiniteSets
+import com.fdilke.bewl.fsets.FiniteSets.NaiveMonoid
+import com.fdilke.bewl.fsets.FiniteSetsUtilities._
+import com.fdilke.bewl.topos.{Wrappings, Topos, ToposWithFixtures, GenericToposTests}
 import org.scalatest.FunSpec
 
 class RightActionsToposTest extends FunSpec {
@@ -14,7 +14,7 @@ class RightActionsToposTest extends FunSpec {
 
 /*
 class RightActionsToposTest extends GenericToposTests(new ToposWithFixtures {
-  private val triadicMonoid = {
+  val triadicMonoid = {
     val (i, a, b, c, f, f2, g, g2) = ('i, 'a, 'b, 'c, 'f, 'f2, 'g, 'g2)
     val carrier = makeStar(i, a, b, c, f, f2, g, g2)
     val unit = makeNullaryOperator(carrier, i)
@@ -31,15 +31,23 @@ class RightActionsToposTest extends GenericToposTests(new ToposWithFixtures {
     NaiveMonoid[Symbol](carrier, unit, product)
   }
 
-  type TOPOS = Topos
-  val topos = triadicMonoid.rightActions
+  type TOPOS = Topos with Wrappings[FiniteSets.ELEMENT, triadicMonoid.RightAction, triadicMonoid.RightActionPrequiver]
+  val topos : TOPOS = triadicMonoid.rightActions
 
-  import topos._
+//  import topos._
 
-  type FOO = Boolean
-  type BAR = String
+  type FOO = Symbol
+  type BAR = String  // essentially the image of left multiplication by f
   type BAZ = Int
 
-  override val foo = triadicMonoid...
-}
+  override val foo = topos.star(triadicMonoid.rightRegularAction)
+
+  private val barStar = makeStar("f", "f2", "b", "c")
+
+  private val barTable = Map[(String, Symbol), String](
+
+  )
+  private val xx: (String, Symbol) => String = (s, m) => barTable((s, m))
+  override val bar = triadicMonoid.rightAction(barStar)(xx(_, _)) // barTable((_, _)))
+})
 */

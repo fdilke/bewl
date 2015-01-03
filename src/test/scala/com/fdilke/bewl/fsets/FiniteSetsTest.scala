@@ -4,7 +4,6 @@ import com.fdilke.bewl.topos.{GenericToposTests, ToposWithFixtures}
 import FiniteSetsUtilities._
 
 class FiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
-  type TOPOS = FiniteSets.type
   val topos = FiniteSets
 
   import topos._

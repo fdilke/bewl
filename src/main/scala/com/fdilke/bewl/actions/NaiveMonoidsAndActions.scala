@@ -33,7 +33,10 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
     def rightAction[A <: ELEMENT](actionCarrier: STAR[A])(actionMultiply: (A, X) => A) =
       new RightAction[A](actionCarrier, actionMultiply)
 
-    lazy val rightActions : Topos =
+    lazy val rightRegularAction = 
+      rightAction(carrier) { multiply(_, _) }
+
+    lazy val rightActions : Topos with Wrappings[ELEMENT, RightAction, RightActionPrequiver] =
       new RightMonoidActions
 
     case class RightAction[A <: ELEMENT] (
