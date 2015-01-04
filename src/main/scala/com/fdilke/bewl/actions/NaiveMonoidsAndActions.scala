@@ -1,6 +1,6 @@
 package com.fdilke.bewl.actions
 
-import com.fdilke.bewl.topos.{LogicalOperations, Topos, AlgebraicMachinery, BaseTopos, Wrappings}
+import com.fdilke.bewl.topos._
 import com.fdilke.bewl.helper.Memoize
 
 // Monoids and monoid actions defined as 'one-off' structures.
@@ -36,7 +36,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
     lazy val rightRegularAction = 
       rightAction(carrier) { multiply(_, _) }
 
-    lazy val rightActions : Topos with Wrappings[ELEMENT, RightAction, RightActionPrequiver] =
+    lazy val rightActions = // : Topos with Wrappings[ELEMENT, RightAction, RightActionPrequiver] = // TODO: need type ?
       new RightMonoidActions
 
     case class RightAction[A <: ELEMENT] (
@@ -78,7 +78,8 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
       function: S => T
     )
 
-    class RightMonoidActions extends Topos with Wrappings[ELEMENT, RightAction, RightActionPrequiver] {
+    class RightMonoidActions extends Topos with 
+      Wrappings[ELEMENT, RightAction, RightActionPrequiver] {
       override type ELEMENT = self.ELEMENT
       override type STAR[S <: ELEMENT] = RightActionStar[S]
       override type QUIVER[S <: ELEMENT, T <: ELEMENT] = RightActionQuiver[S, T]

@@ -186,3 +186,4 @@ trait Wrappings[BASE, PRESTAR[_ <: BASE], PREQUIVER[_ <: BASE, _ <: BASE]] { top
     bifunctionAsBiQuiver[X, X, X](star, star, star) { bifunc }
 }
 
+

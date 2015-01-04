@@ -2,23 +2,15 @@ package com.fdilke.bewl.actions
 
 import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSets.NaiveMonoid
-import com.fdilke.bewl.fsets.FiniteSetsUtilities._
-import com.fdilke.bewl.topos.{Wrappings, Topos, ToposWithFixtures, GenericToposTests}
-import org.scalatest.FunSpec
+import com.fdilke.bewl.fsets.FiniteSetsUtilities
+import com.fdilke.bewl.topos.{ToposWithFixtures, GenericToposTests}
 
-class RightActionsToposTest extends FunSpec {
-  it("<placeholder for a proper test>") {
-    // ...
-  }
-}
-
-/*
-class RightActionsToposTest extends GenericToposTests(new ToposWithFixtures {
-  val triadicMonoid = {
+abstract class RightActionsToposTest extends GenericToposTests(new ToposWithFixtures {
+  val triadicMonoid: FiniteSets.NaiveMonoid[Symbol] = {
     val (i, a, b, c, f, f2, g, g2) = ('i, 'a, 'b, 'c, 'f, 'f2, 'g, 'g2)
-    val carrier = makeStar(i, a, b, c, f, f2, g, g2)
-    val unit = makeNullaryOperator(carrier, i)
-    val product = makeBinaryOperator(carrier,
+    val carrier = FiniteSetsUtilities.makeStar(i, a, b, c, f, f2, g, g2)
+    val unit = FiniteSetsUtilities.makeNullaryOperator(carrier, i)
+    val product = FiniteSetsUtilities.makeBinaryOperator(carrier,
       (i, i) -> i, (i, a) -> a, (i, b) -> b, (i, c) -> c, (i, f) -> f, (i, f2) -> f2, (i, g) -> g, (i, g2) -> g2,
       (a, i) -> a, (a, a) -> a, (a, b) -> a, (a, c) -> a, (a, f) -> a, (a, f2) -> a,  (a, g) -> a, (a, g2) -> a,
       (b, i) -> b, (b, a) -> b, (b, b) -> b, (b, c) -> b, (b, f) -> b, (b, f2) -> b,  (b, g) -> b, (b, g2) -> b,
@@ -31,23 +23,35 @@ class RightActionsToposTest extends GenericToposTests(new ToposWithFixtures {
     NaiveMonoid[Symbol](carrier, unit, product)
   }
 
-  type TOPOS = Topos with Wrappings[FiniteSets.ELEMENT, triadicMonoid.RightAction, triadicMonoid.RightActionPrequiver]
-  val topos : TOPOS = triadicMonoid.rightActions
+  override val topos = triadicMonoid.rightActions
 
-//  import topos._
+  import topos._
 
-  type FOO = Symbol
-  type BAR = String  // essentially the image of left multiplication by f
-  type BAZ = Int
+  override type FOO = WRAPPER[Symbol]
+  override type BAR = WRAPPER[String] // essentially the image of left multiplication by f
+  override type BAZ = WRAPPER[Int]
 
-  override val foo = topos.star(triadicMonoid.rightRegularAction)
+  override val foo = star(triadicMonoid.rightRegularAction)
 
-  private val barStar = makeStar("f", "f2", "b", "c")
+  private val barStar: FiniteSets.STAR[String] = FiniteSetsUtilities.makeStar("f", "f2", "b", "c")
 
   private val barTable = Map[(String, Symbol), String](
-
   )
-  private val xx: (String, Symbol) => String = (s, m) => barTable((s, m))
-  override val bar = triadicMonoid.rightAction(barStar)(xx(_, _)) // barTable((_, _)))
+  private val yy: (String, Symbol) => String = (s, m) => barTable((s, m))
+  override val bar = star(triadicMonoid.rightAction(barStar)(yy))
+
+
+  override val baz = null.asInstanceOf[STAR[BAZ]]
+  override val equalizerSituation = null
+  override val foo2ImageOfBar = null.asInstanceOf[QUIVER[FOO, BAZ]]
+  override val foo2bar = null.asInstanceOf[QUIVER[FOO, BAR]]
+  override val foobar2baz = null
+  override val monicBar2baz = null.asInstanceOf[QUIVER[BAR, BAZ]]
+
+  override def makeSampleStar(): STAR[_ <: ELEMENT] =
+    null.asInstanceOf[STAR[_ <: ELEMENT]]
+
+  override def makeSampleQuiver(): QUIVER[_ <: ELEMENT, _ <: ELEMENT] =
+    null.asInstanceOf[QUIVER[_ <: ELEMENT, _ <: ELEMENT]]
+
 })
-*/
