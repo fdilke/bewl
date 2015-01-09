@@ -175,6 +175,8 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         override def apply[T <: ELEMENT](target: STAR[T])(f: A => T): QUIVER[A, T] =
           new RightActionQuiver(this, target,
             action.actionCarrier(target.action.actionCarrier){ f })
+
+        override def toString = "RightAction[" + action.actionCarrier + "]"
       }
 
       object RightActionStar {
@@ -212,6 +214,15 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
 
         override def o[R <: ELEMENT](that: QUIVER[R, S]): QUIVER[R, T] = 
           new RightActionQuiver(that.source, target, quiver o that.quiver)
+
+        override def toString = "RightActionQuiver[" + quiver + "]"
+
+        override def equals(other: Any): Boolean = other match {
+          case that: RightActionQuiver[S, T] =>
+            source == that.source && target == that.target && quiver == that.quiver
+          case _ => false
+        }
+        override def hashCode = 0
       }
 
       override type WRAPPER[T <: ELEMENT] = T
