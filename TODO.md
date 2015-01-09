@@ -78,3 +78,13 @@ Can we have a predicate "f factors through g'? Or even 'f factors through g uniq
 f: R -> X factors through g: S -> X means:
 (1) for each r, there exists s with f(r) = g(s)
 (2) there exists h: R -> S with f = gh
+
+# Monoid limitations
+
+Here's why we can't currently construct the triadic topos.
+The monoid T has order 8, and to construct the right ideals over it,
+we have to construct "isIdeal" which tests for f: M -> Ω that:
+∀ (s, t) in T x T, f(s) => f(st)
+This involves ∀ing over T x T, i.e. constructing an arrow from Ω ^ (T x T) to Ω.
+But the left hand star has 2 ^ 64 elements!
+

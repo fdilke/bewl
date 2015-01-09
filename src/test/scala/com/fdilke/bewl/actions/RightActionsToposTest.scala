@@ -35,10 +35,9 @@ abstract class RightActionsToposTest extends GenericToposTests(new ToposWithFixt
 
   private val barStar: FiniteSets.STAR[String] = FiniteSetsUtilities.makeStar("f", "f2", "b", "c")
 
-  private val barTable = Map[(String, Symbol), String](
-  )
-  private val yy: (String, Symbol) => String = (s, m) => barTable((s, m))
-  override val bar = star(triadicMonoid.rightAction(barStar)(yy))
+  private val scalarMultiply: (String, Symbol) => String = (s, m) =>
+    triadicMonoid.multiply(Symbol(s), m).name
+  override val bar = star(triadicMonoid.rightAction(barStar)(scalarMultiply))
 
 
   override val baz = null.asInstanceOf[STAR[BAZ]]

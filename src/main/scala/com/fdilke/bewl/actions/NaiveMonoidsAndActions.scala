@@ -109,9 +109,9 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
             })))
       }
 
-      override val omega = RightIdeals.omega
+      override lazy val omega = RightIdeals.omega
 
-      override val truth = 
+      override lazy val truth = 
         new RightActionQuiver(I, omega, carrier.power.transpose((self.I x carrier).biQuiver(self.omega) {
             case(x, m) => self.truth(x)
         }))
@@ -123,8 +123,8 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
           new RightActionQuiver(this, I, action.actionCarrier.toI)
 
         override def sanityTest = {
-          action.sanityTest
           action.actionCarrier.sanityTest
+          action.sanityTest
         }
 
         override def xUncached[B <: ELEMENT](that: STAR[B]): BIPRODUCT[A, B] = {
