@@ -259,4 +259,3 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
   }
 }
 
-

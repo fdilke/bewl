@@ -25,7 +25,7 @@ trait BaseTopos { self: LogicalOperations =>
   implicit class OmegaEnrichments(truthValue: TRUTH) {
     def >(that: TRUTH) = TruthObject.implies(truthValue, that)
     def ^(that: TRUTH) = TruthObject.and(truthValue, that)
-    // TODO: add 'or'
+    def v(that: TRUTH) = TruthObject.or(truthValue, that)
   }
 
   type EXPONENTIAL[S <: ELEMENT, T <: ELEMENT] = ExponentialStar[S, T] with STAR[S > T]
@@ -91,7 +91,7 @@ trait BaseTopos { self: LogicalOperations =>
     lazy val toTrue = truth o toI
     lazy val power = this > omega
     lazy val ∀ = toTrue.name.chi
-    lazy val square = this x this
+    lazy val squared = this x this
 
     def map(f: S => S) = this(this)(f)
     def flatMap(f2: S => QUIVER[S, S]) =
@@ -115,7 +115,7 @@ trait BaseTopos { self: LogicalOperations =>
       )
 
     lazy val diagonal: BiQuiver[S, S, TRUTH] = 
-      BiQuiver(square, this(square) { x => square.pair(x, x) }.chi)
+      BiQuiver(squared, this(squared) { x => squared.pair(x, x) }.chi)
   }
 
   trait BaseQuiver[S <: ELEMENT, T <: ELEMENT] {

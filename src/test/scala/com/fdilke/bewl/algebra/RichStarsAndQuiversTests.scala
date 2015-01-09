@@ -68,6 +68,10 @@ class RichStarsAndQuiversTests extends FunSpec {
         for(i <- omega ; j <- omega)
           yield i & j
         )
+      TruthObject.or shouldBe (
+        for(i <- omega ; j <- omega)
+          yield i | j
+        )
       TruthObject.implies shouldBe (
         for(i <- omega ; j <- omega)
           yield !i | j
