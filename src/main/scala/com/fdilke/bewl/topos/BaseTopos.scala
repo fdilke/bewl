@@ -22,6 +22,12 @@ trait BaseTopos { self: LogicalOperations =>
   val omega: STAR[TRUTH]
   val truth: QUIVER[UNIT, TRUTH]
 
+  implicit class OmegaEnrichments(truthValue: TRUTH) {
+    def >(that: TRUTH) = TruthObject.implies(truthValue, that)
+    def ^(that: TRUTH) = TruthObject.and(truthValue, that)
+    // TODO: add 'or'
+  }
+
   type EXPONENTIAL[S <: ELEMENT, T <: ELEMENT] = ExponentialStar[S, T] with STAR[S > T]
   trait ExponentialStar[S <: ELEMENT, T <: ELEMENT] { star: STAR[S > T] =>
     val source: STAR[S]
@@ -93,9 +99,9 @@ trait BaseTopos { self: LogicalOperations =>
 
     lazy val ∃ =
       omega.forAll(power) { (f, w) =>
-          TruthObject.implies((power x omega).universally(this) {
-            case ((f, w), x) => TruthObject.implies(f(x), w)
-          }(f, w), w)
+          (power x omega).universally(this) {
+            case ((f, w), x) => f(x) > w
+          }(f, w) > w
       }
 
     def forAll[R <: ELEMENT](source: STAR[R])(g: (R, S) => TRUTH): QUIVER[R, TRUTH] =
