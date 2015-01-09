@@ -7,7 +7,7 @@ import com.fdilke.bewl.helper.Memoize
 // TODO: once more general machinery is in place, update all monoid code and deprecate this
 
 trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with LogicalOperations =>
-  case class NaiveMonoid[X <: ELEMENT](carrier: STAR[X], unit: NullaryOp[X], multiply: BinaryOp[X]) {
+  case class NaiveMonoid[M <: ELEMENT](carrier: STAR[M], unit: NullaryOp[M], multiply: BinaryOp[M]) {
     def sanityTest {
       // check the left unit law
       if (carrier(carrier) {
@@ -30,18 +30,17 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         throw new IllegalArgumentException("Associative law for *")
     }
 
-    def rightAction[A <: ELEMENT](actionCarrier: STAR[A])(actionMultiply: (A, X) => A) =
+    def rightAction[A <: ELEMENT](actionCarrier: STAR[A])(actionMultiply: (A, M) => A) =
       new RightAction[A](actionCarrier, actionMultiply)
 
     lazy val rightRegularAction = 
       rightAction(carrier) { multiply(_, _) }
 
-    lazy val rightActions = // : Topos with Wrappings[ELEMENT, RightAction, RightActionPrequiver] = // TODO: need type ?
-      new RightMonoidActions
+    lazy val rightActions = new RightMonoidActions
 
     case class RightAction[A <: ELEMENT] (
       actionCarrier: STAR[A],
-      actionMultiply: (A, X) => A
+      actionMultiply: (A, M) => A
     ) {
       def isMorphism[B <: ELEMENT](that: RightAction[B], quiver: QUIVER[A, B]) = 
         (quiver.source == this.actionCarrier) &&
@@ -70,8 +69,6 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
       }
     }
 
-    type SCALAR = X // TODO: eliminate!!
-
     case class RightActionPrequiver[S <: ELEMENT, T <: ELEMENT](
       source: RightAction[S],
       target: RightAction[T],
@@ -84,7 +81,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
       override type STAR[S <: ELEMENT] = RightActionStar[S]
       override type QUIVER[S <: ELEMENT, T <: ELEMENT] = RightActionQuiver[S, T]
       override type UNIT = self.UNIT
-      override type TRUTH = SCALAR > self.TRUTH
+      override type TRUTH = M > self.TRUTH
       override val I = RightActionStar(self.I) { (i, m) => i }
 
       private object RightIdeals {
@@ -160,19 +157,19 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
               case ((f, s), (t, y)) => morphisms.inclusion(f)(
                 pairs.pair(multiply(s, t), y)
             )}))
-          new RightActionStar[(SCALAR x A) > T](rightAction(morphisms)(
+          new RightActionStar[(M x A) > T](rightAction(morphisms)(
               self.BiQuiver(morphisms x carrier, morphismMultiply).apply
-            )) with ExponentialStar[SCALAR x A, T] { exponentialStar =>
-            override val source = star.asInstanceOf[STAR[SCALAR x A]]
+            )) with ExponentialStar[M x A, T] { exponentialStar =>
+            override val source = star.asInstanceOf[STAR[M x A]]
             override val target = that
 
-            override def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, SCALAR x A, T]) = {
+            override def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, M x A, T]) = {
               val lhs = biQuiver.product.left
               new RightActionQuiver(lhs, exponentialStar, morphisms.restrict(possibleMorphisms.transpose(
                 (lhs.action.actionCarrier x pairs).biQuiver(that.action.actionCarrier) {
                   case (r, (t, x)) => biQuiver(
                     lhs.action.actionMultiply(r, t), 
-                    x.asInstanceOf[SCALAR x A]
+                    x.asInstanceOf[M x A]
                   )})))}}.asInstanceOf[EXPONENTIAL[A, T]]
         }
         override def apply[T <: ELEMENT](target: STAR[T])(f: A => T): QUIVER[A, T] =
@@ -181,7 +178,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
       }
 
       object RightActionStar {
-        def apply[A <: ELEMENT](actionCarrier: self.STAR[A])(actionMultiply: (A, SCALAR) => A) =
+        def apply[A <: ELEMENT](actionCarrier: self.STAR[A])(actionMultiply: (A, M) => A) =
           new RightActionStar(rightAction(actionCarrier)(actionMultiply))
       }
 
