@@ -49,14 +49,14 @@ abstract class RightActionsToposTest extends GenericToposTests(new ToposWithFixt
 
   override val baz = star(bazAction)
   override val equalizerSituation = null
-  override val foo2ImageOfBar = null.asInstanceOf[QUIVER[FOO, BAZ]]
+  override val foo2ImageOfBar = functionAsQuiver(foo, baz, Map[FOO, BAZ]('i -> 1, 'x -> 1, 'y -> 2))
   override val foo2bar = functionAsQuiver(foo, bar, Map[FOO, BAR]('i -> "x", 'x -> "x", 'y -> "x"))
   private def foobar2BazFunc(x: Symbol, y : String) = Map[(Symbol, String), Int](
-    ('i, "x") -> 0, ('x, "x") -> 0, ('y, "x") -> 0,
-    ('i, "y") -> 0, ('x, "y") -> 0, ('y, "y") -> 0
+    ('i, "x") -> 2, ('x, "x") -> 1, ('y, "x") -> 1,
+    ('i, "y") -> 1, ('x, "y") -> 2, ('y, "y") -> 2
   )((x, y))
   override val foobar2baz = bifunctionAsBiQuiver(foo, bar, baz)(foobar2BazFunc)
-  override val monicBar2baz = null.asInstanceOf[QUIVER[BAR, BAZ]]
+  override val monicBar2baz = functionAsQuiver(bar, baz, Map[BAR, BAZ]("x" -> 1, "y" -> 2))
 
   override def makeSampleStar() =
     star(bazAction)
