@@ -63,7 +63,7 @@ abstract class ToposWithFixtures {
   val foobar2baz : BiQuiver[FOO, BAR, BAZ]
   val monicBar2baz: QUIVER[BAR, BAZ]
 
-  val equalizerSituation: EqualizerSituation[FOO, BAR, BAZ]
+  val equalizerSituation: EqualizerSituation[_ <: ELEMENT, _ <: ELEMENT, _ <: ELEMENT]
 
   case class EqualizerSituation[S <: ELEMENT, M <: ELEMENT, T <: ELEMENT](
     r: QUIVER[S, M],
@@ -195,12 +195,16 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
     }
 
     it("has equalizers", Tag("eq")) {
-      import equalizerSituation._
-      val equalizer = s ?= t
-      val e = equalizer.inclusion
+      // minor hackery required to extract the types
+      def runTest[S <: ELEMENT, M <: ELEMENT, T <: ELEMENT](situation: EqualizerSituation[S, M, T]) {
+          import situation._
+          val equalizer = s ?= t
+          val e = equalizer.inclusion
 
-      (s o e) shouldBe (t o e)
-      (e o equalizer.restrict(r)) shouldBe r
+          (s o e) shouldBe (t o e)
+          (e o equalizer.restrict(r)) shouldBe r
+      }
+      runTest(equalizerSituation)
     }
 
     it("has a truth object (subobject classifier)") {
