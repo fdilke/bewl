@@ -35,7 +35,7 @@ abstract class RightActionsToposTest extends GenericToposTests(new ToposWithFixt
     monoidOf3.multiply(Symbol(s), m).name
   override val bar = star(monoidOf3.rightAction(barStar)(scalarMultiply))
 
-  private val bazStar: FiniteSets.STAR[Int] = FiniteSetsUtilities.makeStar(0, 1, 2)
+  private val bazStar: FiniteSets.STAR[Int] = FiniteSetsUtilities.makeStar(0, 1, 2, 3)
 
   private def bazMultiply(n: Int, r: Symbol) : Int =
     if (n == 0)
@@ -51,11 +51,12 @@ abstract class RightActionsToposTest extends GenericToposTests(new ToposWithFixt
   override val foo2ImageOfBar = functionAsQuiver(foo, baz, Map[FOO, BAZ]('i -> 1, 'x -> 1, 'y -> 2))
   override val foo2bar = functionAsQuiver(foo, bar, Map[FOO, BAR]('i -> "x", 'x -> "x", 'y -> "y"))
   private def foobar2BazFunc(x: Symbol, y : String) = Map[(Symbol, String), Int](
+    ('i, "i") -> 1, ('x, "i") -> 2, ('y, "i") -> 1,
     ('i, "x") -> 2, ('x, "x") -> 1, ('y, "x") -> 1,
     ('i, "y") -> 1, ('x, "y") -> 2, ('y, "y") -> 2
   )((x, y))
   override val foobar2baz = bifunctionAsBiQuiver(foo, bar, baz)(foobar2BazFunc)
-  override val monicBar2baz = functionAsQuiver(bar, baz, Map[BAR, BAZ]("x" -> 1, "y" -> 2))
+  override val monicBar2baz = functionAsQuiver(bar, baz, Map[BAR, BAZ]("i" -> 3, "x" -> 1, "y" -> 2))
 
   override def makeSampleStar() =
     star(bazAction)
@@ -63,16 +64,15 @@ abstract class RightActionsToposTest extends GenericToposTests(new ToposWithFixt
   override def makeSampleQuiver() =
     functionAsQuiver(foo, bar, Map[FOO, BAR]('i -> "x", 'x -> "x", 'y -> "x"))
 
-  // not good enough: didn't need any equalizing!
   override val equalizerSituation = {
-//    type BINARY = WRAPPER[Boolean]
-//    val binaryStar : FiniteSets.STAR[Boolean] = FiniteSetsUtilities.makeStar(true, false)
-//    def binaryMultiply(b: Boolean, r: Symbol) : Boolean = b
-//    val binary = star(monoidOf3.rightAction(binaryStar)(binaryMultiply))
-    new EqualizerSituation[FOO, BAR, BAZ](
-          foo2bar,
-          functionAsQuiver(bar, baz, Map[BAR, BAZ]("x" -> 1, "y" -> 2)),
-          functionAsQuiver(bar, baz, Map[BAR, BAZ]("x" -> 1, "y" -> 2))
+    type BINARY = WRAPPER[Boolean]
+    val binaryStar : FiniteSets.STAR[Boolean] = FiniteSetsUtilities.makeStar(true, false)
+    def binaryMultiply(b: Boolean, r: Symbol) : Boolean = b
+    val binary = star(monoidOf3.rightAction(binaryStar)(binaryMultiply))
+    new EqualizerSituation[FOO, BAZ, BINARY](
+      foo2baz,
+      functionAsQuiver(baz, binary, Map[BAZ, BINARY](0 -> true, 1 -> true, 2 -> true, 3 -> true)),
+      functionAsQuiver(baz, binary, Map[BAZ, BINARY](0 -> false, 1 -> true, 2 -> true, 3 -> true))
     )
   }
 
