@@ -29,7 +29,7 @@ abstract class RightActionsToposTest extends GenericToposTests(new ToposWithFixt
 
   override val foo = star(monoidOf3.rightRegularAction)
 
-  private val barStar: FiniteSets.STAR[String] = FiniteSetsUtilities.makeStar("x", "y")
+  private val barStar: FiniteSets.STAR[String] = FiniteSetsUtilities.makeStar("i", "x", "y")
 
   private val scalarMultiply: (String, Symbol) => String = (s, m) =>
     monoidOf3.multiply(Symbol(s), m).name
@@ -48,9 +48,8 @@ abstract class RightActionsToposTest extends GenericToposTests(new ToposWithFixt
   val bazAction = monoidOf3.rightAction(bazStar)(bazMultiply)
 
   override val baz = star(bazAction)
-  override val equalizerSituation = null
   override val foo2ImageOfBar = functionAsQuiver(foo, baz, Map[FOO, BAZ]('i -> 1, 'x -> 1, 'y -> 2))
-  override val foo2bar = functionAsQuiver(foo, bar, Map[FOO, BAR]('i -> "x", 'x -> "x", 'y -> "x"))
+  override val foo2bar = functionAsQuiver(foo, bar, Map[FOO, BAR]('i -> "x", 'x -> "x", 'y -> "y"))
   private def foobar2BazFunc(x: Symbol, y : String) = Map[(Symbol, String), Int](
     ('i, "x") -> 2, ('x, "x") -> 1, ('y, "x") -> 1,
     ('i, "y") -> 1, ('x, "y") -> 2, ('y, "y") -> 2
@@ -63,5 +62,22 @@ abstract class RightActionsToposTest extends GenericToposTests(new ToposWithFixt
 
   override def makeSampleQuiver() =
     functionAsQuiver(foo, bar, Map[FOO, BAR]('i -> "x", 'x -> "x", 'y -> "x"))
+
+  // not good enough: didn't need any equalizing!
+  override val equalizerSituation = {
+//    type BINARY = WRAPPER[Boolean]
+//    val binaryStar : FiniteSets.STAR[Boolean] = FiniteSetsUtilities.makeStar(true, false)
+//    def binaryMultiply(b: Boolean, r: Symbol) : Boolean = b
+//    val binary = star(monoidOf3.rightAction(binaryStar)(binaryMultiply))
+    new EqualizerSituation[FOO, BAR, BAZ](
+          foo2bar,
+          functionAsQuiver(bar, baz, Map[BAR, BAZ]("x" -> 1, "y" -> 2)),
+          functionAsQuiver(bar, baz, Map[BAR, BAZ]("x" -> 1, "y" -> 2))
+    )
+  }
+
+//  foo2bar,
+//  functionAsQuiver(bar, baz, Map[BAR, BAZ]("i" -> _, "x" -> 1, "y" -> 2)),
+//  functionAsQuiver(bar, baz, Map[BAR, BAZ]("i" -> _, "x" -> 1, "y" -> 2))
 
 })

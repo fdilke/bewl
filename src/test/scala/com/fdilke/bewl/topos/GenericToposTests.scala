@@ -76,6 +76,10 @@ abstract class ToposWithFixtures {
       t.sanityTest
     }
 
+    if (s == t) {
+      throw new IllegalArgumentException("equalizing two quivers that are already equal!")
+    }
+
     (s o r) shouldBe (t o r)
   }
 
@@ -190,7 +194,7 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
       (foo > bar) shouldBe (foo > bar)
     }
 
-    it("has equalizers") {
+    it("has equalizers", Tag("eq")) {
       import equalizerSituation._
       val equalizer = s ?= t
       val e = equalizer.inclusion
