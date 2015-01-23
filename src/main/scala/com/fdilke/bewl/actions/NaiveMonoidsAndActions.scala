@@ -268,10 +268,28 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
       override type STAR[S <: ELEMENT] = RightActionStar[_, S]
       override type QUIVER[S <: ELEMENT, T <: ELEMENT] = RightActionQuiver[_, S, _, T]
       override type UNIT = self.ElementProxy[self.UNIT]
-      override type TRUTH = self.ElementProxy[self.>[M, self.TRUTH]]
-      override val I = null
+      type RIGHT_IDEAL = self.>[M, self.TRUTH]
+      override type TRUTH = self.ElementProxy[RIGHT_IDEAL]
+      override val I = RightActionStar(self.I) { (i, m) => i }
 
-      override lazy val omega = null
+      private object RightIdeals {
+        val possible = carrier.power
+        private val isIdeal = (carrier x carrier).forAll(possible) {
+          case (f, (m, n)) =>
+            self.TruthObject.implies(f(m), f(multiply(m, n)))
+        }
+        val all = possible.toTrue ?= isIdeal
+
+        private val idealMultiply = all.restrict(possible.transpose(
+          (all x carrier x carrier).biQuiver(self.omega) {
+            case ((i, s), t) => all.inclusion(i)(multiply(s, t))
+          }))
+
+        val omega = RightActionStar[RIGHT_IDEAL](all)(
+            self.BiQuiver[RIGHT_IDEAL, M, RIGHT_IDEAL](all x carrier, idealMultiply)(_, _)
+          )
+      }
+      override lazy val omega = RightIdeals.omega
 
       override lazy val truth = null
 
@@ -303,7 +321,19 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         val target: RightActionStar[T, F],
         val quiver: self.QUIVER[S, T]
        ) extends Quiver[E, F] {
-        override lazy val chi = null
+        override lazy val chi: QUIVER[F, TRUTH] = {
+            val bigt = {
+                  (t: T, m: M) => { 
+                    val weebly : T = target.action.actionMultiply(t, m)
+                    quiver.chi(weebly) 
+                  }
+              }
+            val blah = (target.action.actionCarrier x carrier).biQuiver(self.omega) (bigt)
+            new RightActionQuiver(target, omega, 
+              RightIdeals.all.restrict(RightIdeals.possible.transpose(
+                blah
+                )))
+          }
 
         override def \[U <: ELEMENT](monic: QUIVER[U, F]) = null
 
