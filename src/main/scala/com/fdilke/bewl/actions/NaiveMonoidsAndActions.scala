@@ -272,24 +272,30 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
       override val I = RightActionStar(self.I) { (i, m) => i }
 
       private object RightIdeals {
-        val possible = carrier.power
-        private val isIdeal = (carrier x carrier).forAll(possible) {
+        private val possibleIdeals = carrier.power
+        private val isIdeal = (carrier x carrier).forAll(possibleIdeals) {
           case (f, (m, n)) => self.OmegaEnrichments(f(m)) > f(multiply(m, n))
         }
-        val all = possible.toTrue ?= isIdeal
+        private val ideals = possibleIdeals.toTrue ?= isIdeal
 
-        private val idealMultiply = all.restrict(possible.transpose(
-          (all x carrier x carrier).biQuiver(self.omega) {
-            case ((i, s), t) => all.inclusion(i)(multiply(s, t))
-          }))
+        def restrict[H <: self.ELEMENT](that: self.STAR[H])(bifunc: (H, M) => self.TRUTH): self.QUIVER[H, RIGHT_IDEAL] = 
+          ideals.restrict(possibleIdeals.transpose(
+            (that x carrier).biQuiver(self.omega)(bifunc)
+          ))
 
-        val omega = RightActionStar[RIGHT_IDEAL](all)(
-            self.BiQuiver[RIGHT_IDEAL, M, RIGHT_IDEAL](all x carrier, idealMultiply)(_, _)
+        private val idealMultiply = restrict(ideals x carrier) {
+            case ((i, s), t) => ideals.inclusion(i)(multiply(s, t))
+          }
+        val omega = RightActionStar[RIGHT_IDEAL](ideals)(
+            self.BiQuiver[RIGHT_IDEAL, M, RIGHT_IDEAL](ideals x carrier, idealMultiply)(_, _)
           )
       }
       override lazy val omega = RightIdeals.omega
 
-      override lazy val truth = null
+      override lazy val truth = 
+        new RightActionQuiver(I, omega, carrier.power.transpose((self.I x carrier).biQuiver(self.omega) {
+            case (x, m) => self.truth(x)
+        }))
 
       class RightActionStar[A <: self.ELEMENT, E <: self.ElementProxy[A]](
         private[RightMonoidActionsInDraft] val action: RightAction[A]
@@ -319,19 +325,11 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         val target: RightActionStar[T, F],
         val quiver: self.QUIVER[S, T]
        ) extends Quiver[E, F] {
-        override lazy val chi: QUIVER[F, TRUTH] = {
-            val bigt = {
-                  (t: T, m: M) => { 
-                    val weebly : T = target.action.actionMultiply(t, m)
-                    quiver.chi(weebly) 
-                  }
-              }
-            val blah = (target.action.actionCarrier x carrier).biQuiver(self.omega) (bigt)
-            new RightActionQuiver(target, omega, 
-              RightIdeals.all.restrict(RightIdeals.possible.transpose(
-                blah
-                )))
-          }
+        override lazy val chi: QUIVER[F, TRUTH] = 
+          new RightActionQuiver(target, omega, 
+            RightIdeals.restrict(target.action.actionCarrier) {
+                (t, m) => quiver.chi(target.action.actionMultiply(t, m)) 
+            })
 
         override def \[U <: ELEMENT](monic: QUIVER[U, F]) = null
 

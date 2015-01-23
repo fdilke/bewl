@@ -45,10 +45,10 @@ class NaiveMonoidsAndActionsTests extends FunSpec {
           (x, i) -> i, (x, x) -> x, (x, y) -> y,
           (y, i) -> i, (y, x) -> x, (y, y) -> y
         )
-      intercept[IllegalArgumentException] {
-        NaiveMonoid[Symbol](carrier, unit, product).sanityTest
-      }.
-        getMessage shouldBe "Right unit law for * with unit 1"
+        intercept[IllegalArgumentException] {
+          NaiveMonoid[Symbol](carrier, unit, product).sanityTest
+        }.
+          getMessage shouldBe "Right unit law for * with unit 1"
     }
 
     it("checks a monoid's multiplication is associative") {
@@ -60,10 +60,10 @@ class NaiveMonoidsAndActionsTests extends FunSpec {
           (x, i) -> x, (x, x) -> y, (x, y) -> y,
           (y, i) -> y, (y, x) -> x, (y, y) -> y
         )
-      intercept[IllegalArgumentException] {
-        NaiveMonoid[Symbol](carrier, unit, product).sanityTest
-      }.
-        getMessage shouldBe "Associative law for *"
+        intercept[IllegalArgumentException] {
+          NaiveMonoid[Symbol](carrier, unit, product).sanityTest
+        }.
+          getMessage shouldBe "Associative law for *"
     }
 
     val monoid4 = {
