@@ -261,7 +261,6 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         (left x right).biQuiver(target) { bifunc }
     }    
 
-
     class RightMonoidActionsInDraft extends Topos with 
       Wrappings[self.ELEMENT, RightAction, RightActionPrequiver] {
       override type ELEMENT = self.ElementProxy[_]
@@ -275,8 +274,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
       private object RightIdeals {
         val possible = carrier.power
         private val isIdeal = (carrier x carrier).forAll(possible) {
-          case (f, (m, n)) =>
-            self.TruthObject.implies(f(m), f(multiply(m, n)))
+          case (f, (m, n)) => self.OmegaEnrichments(f(m)) > f(multiply(m, n))
         }
         val all = possible.toTrue ?= isIdeal
 
