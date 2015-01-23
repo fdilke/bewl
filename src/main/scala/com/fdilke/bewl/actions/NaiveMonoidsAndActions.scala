@@ -300,15 +300,41 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
       class RightActionStar[A <: self.ELEMENT, E <: self.ElementProxy[A]](
         private[RightMonoidActionsInDraft] val action: RightAction[A]
         ) extends Star[E] { star =>
-        override val toI: QUIVER[E, UNIT] = null // .asInstanceOf[QUIVER[E, UNIT]]
+        override val toI: QUIVER[E, UNIT] = 
+          new RightActionQuiver(this, I, action.actionCarrier.toI)
 
         override def sanityTest = {
           action.actionCarrier.sanityTest
           action.sanityTest
         }
 
-        override def xUncached[B <: ELEMENT](that: STAR[B]): BIPRODUCT[E, B] = null
+        // override def xUncached[B <: ELEMENT](that: STAR[B]): BIPRODUCT[E, B] = null
+          // override def xUncached[B <: self.ELEMENT, F <: ELEMENT](that: RightActionStar[B, F]): BIPRODUCT[E, F] = {
+        override def xUncached[F <: ELEMENT](that: STAR[F]): BIPRODUCT[E, F] = 
+          that.preMultiplyUncached(this)
 
+        private def preMultiplyUncached[Z <: self.ELEMENT, D <: self.ElementProxy[Z]](pre: RightActionStar[Z, D]) : BIPRODUCT[D, E] = null
+/*          
+        private def preMultiplyUncached[Z <: self.ELEMENT, D <: self.ElementProxy[Z]](pre: RightActionStar[Z, D]) : BIPRODUCT[D, E] = {
+          val product = pre.action.actionCarrier x action.actionCarrier 
+          val test1: (D, E) with self.ElementProxy[self.x[Z, A]] = null.asInstanceOf[(D, E) with self.ElementProxy[self.x[Z, A]]]
+          val test2: D x E = test1
+          val test3: D x E = null.asInstanceOf[D x E]
+          val test4: (D, E) with self.ElementProxy[self.x[Z, A]] = test3
+          new RightActionStar[self.x[Z, A], (D, E) with self.ElementProxy[self.x[Z, A]]] (
+            rightAction(product){
+              case ((z, a), m) => product.pair(
+                  pre.action.actionMultiply(z, m),
+                  action.actionMultiply(a, m) 
+                )
+              }) with BiproductStar[D, E] {
+                override val left: STAR[D] = pre
+                override val right: STAR[E] = star
+                override def pair(l: D, r: E): x[D, E] = null.asInstanceOf[D x E]; // product.pair(l.element, r.element)
+                // }.asInstanceOf[BIPRODUCT[E, F]] // TODO: fix cast?
+              }
+        }
+*/
         override def `>Uncached`[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[E, T] =  null
         override def apply[T <: ELEMENT](target: STAR[T])(f: E => T): QUIVER[E, T] = null
 
