@@ -1,23 +1,20 @@
 
 package com.fdilke.bewl.actions
 
+import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsUtilities}
-import com.fdilke.bewl.fsets.FiniteSets.NaiveMonoid
 import com.fdilke.bewl.topos.{ToposWithFixtures, GenericToposTests}
 
 abstract class RightActionsToposTest extends GenericToposTests(new ToposWithFixtures {
 
-  val monoidOf3: FiniteSets.NaiveMonoid[Symbol] = {
-    val (i, x, y) = ('i, 'x, 'y)
-    val carrier = FiniteSetsUtilities.makeStar(i, x, y)
-    val unit = FiniteSetsUtilities.makeNullaryOperator(carrier, i)
-    val product = FiniteSetsUtilities.makeBinaryOperator(carrier,
-      (i, i) -> i, (i, x) -> x, (i, y) -> y,
-      (x, i) -> x, (x, x) -> x, (x, y) -> y,
-      (y, i) -> y, (y, x) -> x, (y, y) -> y
+  private val (i, x, y) = ('i, 'x, 'y)
+
+  val monoidOf3 =
+    monoidFromTable(
+      i, x, y,
+      x, x, y,
+      y, x, y
     )
-    NaiveMonoid[Symbol](carrier, unit, product)
-  }
 
   override val topos = monoidOf3.rightActions
 
@@ -41,20 +38,20 @@ abstract class RightActionsToposTest extends GenericToposTests(new ToposWithFixt
     if (n == 0)
       0
     else r match {
-      case 'i => n
-      case 'x => 1
-      case 'y => 2
+      case `i` => n
+      case `x` => 1
+      case `y` => 2
     }
   val bazAction = monoidOf3.rightAction(bazStar)(bazMultiply)
 
   override val baz = star(bazAction)
   override val foo2ImageOfBar = functionAsQuiver(foo, baz, Map[FOO, BAZ]('i -> 1, 'x -> 1, 'y -> 2))
   override val foo2bar = functionAsQuiver(foo, bar, Map[FOO, BAR]('i -> "x", 'x -> "x", 'y -> "y"))
-  private def foobar2BazFunc(x: Symbol, y : String) = Map[(Symbol, String), Int](
-    ('i, "i") -> 1, ('x, "i") -> 2, ('y, "i") -> 1,
-    ('i, "x") -> 2, ('x, "x") -> 1, ('y, "x") -> 1,
-    ('i, "y") -> 1, ('x, "y") -> 2, ('y, "y") -> 2
-  )((x, y))
+  private def foobar2BazFunc(a: Symbol, b : String) = Map[(Symbol, String), Int](
+    (i, "i") -> 1, (x, "i") -> 2, (y, "i") -> 1,
+    (i, "x") -> 2, (x, "x") -> 1, (y, "x") -> 1,
+    (i, "y") -> 1, (x, "y") -> 2, (y, "y") -> 2
+  )((a, b))
   override val foobar2baz = bifunctionAsBiQuiver(foo, bar, baz)(foobar2BazFunc)
   override val monicBar2baz = functionAsQuiver(bar, baz, Map[BAR, BAZ]("i" -> 3, "x" -> 1, "y" -> 2))
 
@@ -62,7 +59,7 @@ abstract class RightActionsToposTest extends GenericToposTests(new ToposWithFixt
     star(bazAction)
 
   override def makeSampleQuiver() =
-    functionAsQuiver(foo, bar, Map[FOO, BAR]('i -> "x", 'x -> "x", 'y -> "x"))
+    functionAsQuiver(foo, bar, Map[FOO, BAR](i -> "x", x -> "x", y -> "x"))
 
   override val equalizerSituation = {
     type BINARY = WRAPPER[Boolean]
@@ -75,9 +72,4 @@ abstract class RightActionsToposTest extends GenericToposTests(new ToposWithFixt
       functionAsQuiver(baz, binary, Map[BAZ, BINARY](0 -> false, 1 -> true, 2 -> true, 3 -> true))
     )
   }
-
-//  foo2bar,
-//  functionAsQuiver(bar, baz, Map[BAR, BAZ]("i" -> _, "x" -> 1, "y" -> 2)),
-//  functionAsQuiver(bar, baz, Map[BAR, BAZ]("i" -> _, "x" -> 1, "y" -> 2))
-
 })

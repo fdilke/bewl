@@ -174,4 +174,25 @@ object FiniteSetsUtilities {
     mappings: ((X, X), X)*
   ) =
     bifunctionAsBiQuiver[X](carrier) { (x, y) => Map(mappings:_*)((x, y)) }
+
+  private def intSqrt(square: Int) =
+    (1 until square).find { n =>
+      n * n == square
+    }.getOrElse {
+      throw new IllegalArgumentException("Not a valid monoid multiplication table: size " + square)
+    }
+
+  def monoidFromTable[M](table: M*): NaiveMonoid[M] = {
+    val carrierSize = intSqrt(table.size)
+    val carrierAsList = table.take(carrierSize)
+    val carrier = makeStar(carrierAsList :_*)
+    val mappings = for (i <- 0 until carrierSize ; j <- 0 until carrierSize)
+      yield (carrierAsList(i), carrierAsList(j)) -> table(i * carrierSize + j)
+    val product = makeBinaryOperator(carrier, mappings:_ *)
+    NaiveMonoid[M](
+      carrier,
+      makeNullaryOperator(carrier, carrierAsList.head),
+      product
+    )
+  }
 }
