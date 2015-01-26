@@ -455,30 +455,45 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
       override val omega = null 
       override val truth = null 
 
-      trait RightActionStarFacade[E <: self.UntypedElementProxy] extends Star[E] { star => 
+      trait RightActionStarFacade[E <: self.UntypedElementProxy] extends Star[E] { facade => 
+      }
+
+      class RightActionStar[A <: self.ELEMENT](private[RightMonoidActionsInDraft2] val action: RightAction[A]) extends
+        RightActionStarFacade[self.ElementProxy[A]] {
+        private type E = self.ElementProxy[A]
+
         override val toI: QUIVER[E, UNIT] = null
 
         override def sanityTest = {
-          // action.actionCarrier.sanityTest
-          // action.sanityTest
+          action.actionCarrier.sanityTest
+          action.sanityTest
         }
-
         override def xUncached[F <: ELEMENT](that: STAR[F]): BIPRODUCT[E, F] = null
         override def `>Uncached`[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[E, T] =  null
         override def apply[T <: ELEMENT](target: STAR[T])(f: E => T): QUIVER[E, T] = null
 
-        override def toString = null // "RightAction[" + action.actionCarrier + "]"
+        override def toString = "RightActionStar[" + action.actionCarrier + "]"
       }
 
       trait RightActionQuiverFacade[E <: self.UntypedElementProxy, F <: self.UntypedElementProxy] extends
-        Quiver[E, F] {
+        Quiver[E, F] { facade =>
+      }
+
+      class RightActionQuiver[A <: self.ELEMENT, B <: self.ELEMENT](
+        val source: RightActionStar[A],
+        val target: RightActionStar[B],
+        val quiver: self.QUIVER[A, B]
+      ) extends RightActionQuiverFacade[self.ElementProxy[A], self.ElementProxy[B]] {
+        private type E = self.ElementProxy[A]
+        private type F = self.ElementProxy[B]
+
         override lazy val chi: QUIVER[F, TRUTH] = null
 
         override def \[U <: ELEMENT](monic: QUIVER[U, F]) = null
 
         override def sanityTest = {
-          // quiver.sanityTest
-          // assert(source.action.isMorphism(target.action, quiver))
+          quiver.sanityTest
+          assert(source.action.isMorphism(target.action, quiver))
         }
 
         override def ?=(that: QUIVER[E, F]): EQUALIZER[E] = null
@@ -487,7 +502,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
 
         override def o[R <: ELEMENT](that: QUIVER[R, E]): QUIVER[R, F] = null
 
-        override def toString = null // "RightActionQuiver[" + quiver + "]"
+        override def toString = "RightActionQuiver[" + quiver + "]"
 
         override def equals(other: Any): Boolean = false
         override def hashCode = 0
