@@ -502,8 +502,32 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         override private[RightMonoidActionsInDraft2] def 
           preMultiplyUncached[Z <: self.ELEMENT, D <: ELEMENT](
           pre: RightActionStar[Z] with RightActionStarFacade[D]
-        ) : BIPRODUCT[D, E] = null        
+        ) : BIPRODUCT[D, E] = null 
 
+/*
+  not quite. A RightActionStar[Z xx A] needs to be a xxFacade[~px[Z] x ~px[A]]
+  Maybe a RAS[A, H] can be a xFacade[T] whenever suitable conversions exist, as
+  provided by some kind of converter which is an additional construction argument?          
+          {
+          val product = pre.action.actionCarrier x action.actionCarrier 
+          // val test1: (D, E) with self.ElementProxy0[self.x[Z, A]] = null.asInstanceOf[(D, E) with self.ElementProxy0[self.x[Z, A]]]
+          // val test2: D x E = test1
+          // val test3: D x E = null.asInstanceOf[D x E]
+          // val test4: (D, E) with self.ElementProxy0[self.x[Z, A]] = test3
+          new RightActionStar[self.x[Z, A]] ( // , (D, E) with self.ElementProxy0[self.x[Z, A]]] (
+            rightAction(product){
+              case ((z, a), m) => product.pair(
+                  pre.action.actionMultiply(z, m),
+                  action.actionMultiply(a, m) 
+                )
+              }) with BiproductStar[D, E] {
+                override val left: STAR[D] = pre
+                override val right: STAR[E] = star
+                override def pair(l: D, r: E): x[D, E] = null.asInstanceOf[D x E]; // product.pair(l.element, r.element)
+                // }.asInstanceOf[BIPRODUCT[E, F]] // TODO: fix cast?
+              }
+        }
+*/
         override def `>Uncached`[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[E, T] =  null
         override def apply[T <: ELEMENT](target: STAR[T])(f: E => T): QUIVER[E, T] = null
 
