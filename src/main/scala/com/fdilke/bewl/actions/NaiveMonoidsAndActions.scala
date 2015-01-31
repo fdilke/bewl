@@ -2,6 +2,7 @@ package com.fdilke.bewl.actions
 
 import com.fdilke.bewl.topos._
 import com.fdilke.bewl.helper.Memoize
+import com.fdilke.bewl.helper.Duality
 
 // Monoids and monoid actions defined as 'one-off' structures.
 // TODO: once more general machinery is in place, update all monoid code and deprecate this
@@ -484,6 +485,25 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         ) : BIPRODUCT[D, E]
       }
 
+      class LaxRightActionStarFacade[E <: self.UntypedElementProxy, F <: self.UntypedElementProxy](
+          delegate: RightActionStarFacade[E],
+          Δ: Duality[E, F]
+        ) extends RightActionStarFacade[F] {
+        lazy val toI: QUIVER[F, UNIT] =
+          new LeftLaxRightActionQuiverFacade(delegate.toI, Δ)
+        def xUncached[T <: ELEMENT](that: STAR[T]): BIPRODUCT[F, T] =
+          null
+        def `>Uncached`[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[F, T] =
+          null
+        def apply[T <: ELEMENT](target: STAR[T])(f: F => T) : QUIVER[F, T] = 
+          new LeftLaxRightActionQuiverFacade(delegate(target)(f compose (Δ./)), Δ)
+        def sanityTest = delegate.sanityTest
+
+        override private[RightMonoidActionsInDraft2] def preMultiplyUncached[Z <: self.ELEMENT, D <: ELEMENT](
+          pre: RightActionStar[Z] with RightActionStarFacade[D]
+        ) : BIPRODUCT[D, F] = null
+      }
+
       class RightActionStar[A <: self.ELEMENT](private[RightMonoidActionsInDraft2] val action: RightAction[A]) extends
         RightActionStarFacade[self.ElementProxy[A]] {
         private type E = self.ElementProxy[A]
@@ -541,6 +561,28 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
 
       trait RightActionQuiverFacade[E <: self.UntypedElementProxy, F <: self.UntypedElementProxy] extends
         Quiver[E, F] { facade =>
+      }
+
+      class LeftLaxRightActionQuiverFacade[
+        E <: self.UntypedElementProxy, 
+        F <: self.UntypedElementProxy,
+        G <: self.UntypedElementProxy
+      ](
+          delegate: RightActionQuiverFacade[E, G],
+          Δ: Duality[E, F]
+        ) extends RightActionQuiverFacade[F, G] {
+        lazy val source: STAR[F] = new LaxRightActionStarFacade(delegate.source, Δ)
+        val target: STAR[G] = delegate.target
+        lazy val chi: QUIVER[G, TRUTH] = delegate.chi
+
+        def apply(f: F): G = delegate(Δ \ f)
+        def ?=(that: QUIVER[F, G]): EQUALIZER[F] =
+          null
+        def o[R <: ELEMENT](that: QUIVER[R, F]) : QUIVER[R, G] =
+          null
+        def \[U <: ELEMENT](monic: QUIVER[U, G]) : QUIVER[F, U] =
+          null
+        def sanityTest = delegate.sanityTest
       }
 
       class RightActionQuiver[A <: self.ELEMENT, B <: self.ELEMENT](
