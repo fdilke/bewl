@@ -490,13 +490,13 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
           Δ: Duality[E, F]
         ) extends RightActionStarFacade[F] {
         lazy val toI: QUIVER[F, UNIT] =
-          new LeftLaxRightActionQuiverFacade(delegate.toI, Δ)
+          new LeftLaxRightActionQuiverFacade(delegate.toI, Δ, this)
         def xUncached[T <: ELEMENT](that: STAR[T]): BIPRODUCT[F, T] =
           null
         def `>Uncached`[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[F, T] =
           null
         def apply[T <: ELEMENT](target: STAR[T])(f: F => T) : QUIVER[F, T] = 
-          new LeftLaxRightActionQuiverFacade(delegate(target)(f compose (Δ./)), Δ)
+          new LeftLaxRightActionQuiverFacade(delegate(target)(f compose (Δ./)), Δ, this)
         def sanityTest = delegate.sanityTest
 
         override private[RightMonoidActionsInDraft2] def preMultiplyUncached[Z <: self.ELEMENT, D <: ELEMENT](
@@ -563,15 +563,17 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         Quiver[E, F] { facade =>
       }
 
+/* not the right way to do things...? */
       class LeftLaxRightActionQuiverFacade[
         E <: self.UntypedElementProxy, 
         F <: self.UntypedElementProxy,
         G <: self.UntypedElementProxy
       ](
           delegate: RightActionQuiverFacade[E, G],
-          Δ: Duality[E, F]
+          Δ: Duality[E, F],
+          val source: RightActionStarFacade[F]
         ) extends RightActionQuiverFacade[F, G] {
-        lazy val source: STAR[F] = new LaxRightActionStarFacade(delegate.source, Δ)
+        // lazy val source: STAR[F] = dual
         val target: STAR[G] = delegate.target
         lazy val chi: QUIVER[G, TRUTH] = delegate.chi
 
@@ -579,9 +581,13 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         def ?=(that: QUIVER[F, G]): EQUALIZER[F] =
           null
         def o[R <: ELEMENT](that: QUIVER[R, F]) : QUIVER[R, G] =
-          null
+          that.source(delegate.target) { r =>
+            delegate(Δ \ (that(r)))
+          }
         def \[U <: ELEMENT](monic: QUIVER[U, G]) : QUIVER[F, U] =
-          null
+          source(monic.source) { f => 
+            (delegate \ monic)(Δ \ f)
+          }
         def sanityTest = delegate.sanityTest
       }
 
