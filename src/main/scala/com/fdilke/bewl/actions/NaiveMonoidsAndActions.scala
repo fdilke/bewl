@@ -499,7 +499,17 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         ) : BIPRODUCT[D, E]
       }
 
-      private class LaxRightActionStarFacade[E <: self.UntypedElementProxy, F <: self.UntypedElementProxy](
+      // private class RightLaxBiproduct[
+      //   D <: self.UntypedElementProxy,
+      //   E <: self.UntypedElementProxy, 
+      //   F <: self.UntypedElementProxy
+      // ] (
+      //   delegate: BIPRODUCT[D, E],
+      //   Δ: Duality[E, F],
+      //   laxStar: STAR[F]
+      // ) extends LaxR
+
+      private class LeftLaxRightActionStarFacade[E <: self.UntypedElementProxy, F <: self.UntypedElementProxy](
           delegate: RightActionStarFacade[E],
           Δ: Duality[E, F]
         ) extends RightActionStarFacade[F] {
@@ -515,8 +525,8 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
 
         override private[RightMonoidActionsInDraft2] def preMultiplyUncached[Z <: self.ELEMENT, D <: ELEMENT](
           pre: RightActionStar[Z] with RightActionStarFacade[D]
-        ) : BIPRODUCT[D, F] = null // pre.xUncached(this)
-          // new LeftLaxBiproduct(delegate.preMultiplyUncached(that), Δ)
+        ) : BIPRODUCT[D, F] = null
+          // new RightLaxBiproduct(delegate.preMultiplyUncached(that), Δ, this)
       }
 
       private class LeftLaxBiproduct[
@@ -527,7 +537,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         delegate: BIPRODUCT[E, G],
         Δ: Duality[E, F],
         laxStar: STAR[F]
-      ) extends LaxRightActionStarFacade[E x G, F x G](delegate, 
+      ) extends LeftLaxRightActionStarFacade[E x G, F x G](delegate, 
         new Duality[E x G, F x G](
           exg => leftLaxPair(Δ / (exg._1), exg._2, delegate, Δ),
           fxg => delegate.pair(Δ \ (fxg._1), fxg._2)
@@ -545,8 +555,8 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
       ] (f: F, g: G, biproduct: BIPRODUCT[E, G], Δ: Duality[E, F]) : F x G = {
           val innerPair: E x G = biproduct.pair(Δ \ f, g)
           new (F, G)(f, g) with self.UntypedElementProxy {
-            type BASE = innerPair.BASE
-            val element = innerPair.element
+            override type BASE = innerPair.BASE
+            override val element = innerPair.element
           }
       }
 
@@ -569,9 +579,6 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
           preMultiplyUncached[Z <: self.ELEMENT, D <: ELEMENT](
           pre: RightActionStar[Z] with RightActionStarFacade[D]
         ) : BIPRODUCT[D, E] = {
-/*
-  Construction involves a duality between ~[Z x A] and D x E
-*/  
           val product = pre.action.actionCarrier x action.actionCarrier 
           val innerStar = new RightActionStar[self.x[Z, A]] (
             rightAction(product){
@@ -580,12 +587,19 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
                   action.actionMultiply(a, m) 
                 )
               })
+          val innerBiproduct: self.BIPRODUCT[Z, A] = pre.action.actionCarrier x action.actionCarrier
           val duality: Duality[self.ElementProxy[self.x[Z, A]], D x E] = null
-          new LaxRightActionStarFacade(innerStar, duality) with BiproductStar[D, E] {
+          new LeftLaxRightActionStarFacade(innerStar, duality) with BiproductStar[D, E] {
                 override val left: STAR[D] = pre
                 override val right: STAR[E] = star
-                override def pair(l: D, r: E): x[D, E] = null.asInstanceOf[D x E]; // product.pair(l.element, r.element)
-                // }.asInstanceOf[BIPRODUCT[E, F]] // TODO: fix cast?
+                override def pair(d: D, e: E): x[D, E] = { 
+                  val z: Z = d.element.asInstanceOf[Z] // TODO: fix cast
+                  val a: A = e.element
+                  new (D, E)(d, e) with self.UntypedElementProxy {
+                    override type BASE = self.x[Z, A]
+                    override val element = innerBiproduct.pair(z, a)
+                  }
+                }
               }
         }
 
