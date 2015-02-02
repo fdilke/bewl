@@ -499,17 +499,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         ) : BIPRODUCT[D, E]
       }
 
-      // private class RightLaxBiproduct[
-      //   D <: self.UntypedElementProxy,
-      //   E <: self.UntypedElementProxy, 
-      //   F <: self.UntypedElementProxy
-      // ] (
-      //   delegate: BIPRODUCT[D, E],
-      //   Δ: Duality[E, F],
-      //   laxStar: STAR[F]
-      // ) extends LaxR
-
-      private class LeftLaxRightActionStarFacade[E <: self.UntypedElementProxy, F <: self.UntypedElementProxy](
+      private class LaxRightActionStarFacade[E <: self.UntypedElementProxy, F <: self.UntypedElementProxy](
           delegate: RightActionStarFacade[E],
           Δ: Duality[E, F]
         ) extends RightActionStarFacade[F] {
@@ -525,8 +515,40 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
 
         override private[RightMonoidActionsInDraft2] def preMultiplyUncached[Z <: self.ELEMENT, D <: ELEMENT](
           pre: RightActionStar[Z] with RightActionStarFacade[D]
-        ) : BIPRODUCT[D, F] = null
-          // new RightLaxBiproduct(delegate.preMultiplyUncached(that), Δ, this)
+        ) : BIPRODUCT[D, F] = 
+          new RightLaxBiproduct(delegate.preMultiplyUncached[Z, D](pre), Δ, this)
+      }
+
+      private class RightLaxBiproduct[
+        D <: self.UntypedElementProxy,
+        E <: self.UntypedElementProxy, 
+        F <: self.UntypedElementProxy
+      ] (
+        delegate: BIPRODUCT[D, E],
+        Δ: Duality[E, F],
+        laxStar: STAR[F]
+      ) extends LaxRightActionStarFacade[D x E, D x F](delegate,
+        new Duality[D x E, D x F] (
+          dxe => rightLaxPair(dxe._1, Δ / dxe._2, delegate, Δ),
+          dxf => delegate.pair(dxf._1, Δ \ dxf._2)
+        )
+      ) with BiproductStar[D, F] {
+        val left: STAR[D] = delegate.left
+        val right: STAR[F] = laxStar
+        def pair(d: D, f: F): D x F = rightLaxPair(d, f, delegate, Δ)
+      }
+
+      private def rightLaxPair[
+        D <: self.UntypedElementProxy,
+        E <: self.UntypedElementProxy, 
+        F <: self.UntypedElementProxy
+      ] (d: D, f: F, biproduct: BIPRODUCT[D, E], Δ: Duality[E, F]) : D x F = {
+          val innerPair: D x E = biproduct.pair(d, Δ \ f) 
+          // TODO: factor out this common pattern
+          new (D, F)(d, f) with self.UntypedElementProxy {
+            override type BASE = innerPair.BASE
+            override val element = innerPair.element
+          }
       }
 
       private class LeftLaxBiproduct[
@@ -537,7 +559,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         delegate: BIPRODUCT[E, G],
         Δ: Duality[E, F],
         laxStar: STAR[F]
-      ) extends LeftLaxRightActionStarFacade[E x G, F x G](delegate, 
+      ) extends LaxRightActionStarFacade[E x G, F x G](delegate, 
         new Duality[E x G, F x G](
           exg => leftLaxPair(Δ / (exg._1), exg._2, delegate, Δ),
           fxg => delegate.pair(Δ \ (fxg._1), fxg._2)
@@ -589,7 +611,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
               })
           val innerBiproduct: self.BIPRODUCT[Z, A] = pre.action.actionCarrier x action.actionCarrier
           val duality: Duality[self.ElementProxy[self.x[Z, A]], D x E] = null
-          new LeftLaxRightActionStarFacade(innerStar, duality) with BiproductStar[D, E] {
+          new LaxRightActionStarFacade(innerStar, duality) with BiproductStar[D, E] {
                 override val left: STAR[D] = pre
                 override val right: STAR[E] = star
                 override def pair(d: D, e: E): x[D, E] = { 
