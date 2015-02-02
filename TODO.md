@@ -88,3 +88,15 @@ we have to construct "isIdeal" which tests for f: M -> Ω that:
 This involves ∀ing over T x T, i.e. constructing an arrow from Ω ^ (T x T) to Ω.
 But the left hand star has 2 ^ 64 elements!
 
+# Fixing the exponential problem for monoid actions
+
+Currently: a > b has to be an EXPONENTIAL{A, B] = STAR[A > B] with ExponentialStar[A, B]
+where A > B ::== (A => B) with ELEMENT
+
+If > was user-defined, we could have:
+A >M B ::== (M x A) > B with ELEMENT with (noddy evaluation)
+We still have to fix up real evaluation (somehow)
+and we have to have built into every topos, a class like:
+class RewiredExponential[X, A, B](x:X, f: A => B): A > B
+
+This might work, but it seems definitely something to try on a branch.

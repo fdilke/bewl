@@ -185,6 +185,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
               case ((f, s), (t, y)) => morphisms.inclusion(f)(
                 pairs.pair(multiply(s, t), y)
             )}))
+
           new RightActionStar[(M x A) > T](rightAction(morphisms)(
               self.BiQuiver(morphisms x carrier, morphismMultiply).apply
             )) with ExponentialStar[M x A, T] { exponentialStar =>
@@ -508,7 +509,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         def xUncached[T <: ELEMENT](that: STAR[T]): BIPRODUCT[F, T] =
           new LeftLaxBiproduct(delegate.xUncached(that), Δ, this)
         def `>Uncached`[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[F, T] =
-          null
+          new LeftLaxExponentialStar(delegate.`>Uncached`(that), Δ, this)
         def apply[T <: ELEMENT](target: STAR[T])(f: F => T) : QUIVER[F, T] = 
           new LeftLaxRightActionQuiverFacade(delegate(target)(f compose (Δ./)), Δ, this)
         def sanityTest = delegate.sanityTest
@@ -580,6 +581,47 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
             override type BASE = innerPair.BASE
             override val element = innerPair.element
           }
+      }
+
+      private def leftLaxExponential[
+        E <: self.UntypedElementProxy, 
+        F <: self.UntypedElementProxy,
+        G <: self.UntypedElementProxy
+      ] (e2g: E > G, Δ: Duality[E, F]) : F > G = 
+          new (F => G) with self.UntypedElementProxy {
+            override def apply(f: F): G = e2g(Δ \ f)
+            override type BASE = e2g.BASE
+            override val element = e2g.element
+          }
+
+      private class LeftLaxExponentialStar[
+        E <: self.UntypedElementProxy, 
+        F <: self.UntypedElementProxy,
+        G <: self.UntypedElementProxy
+      ] (
+        delegate: EXPONENTIAL[E, G],
+        Δ: Duality[E, F],
+        laxStar: STAR[F]
+        ) extends LaxRightActionStarFacade[E > G, F > G](delegate,
+        new Duality[E > G, F > G](
+          e2g => leftLaxExponential(e2g, Δ),
+          f2g => leftLaxExponential(f2g, ~Δ)
+        )
+      ) with ExponentialStar[F, G] { laxExponential =>
+        val source: STAR[F] = laxStar
+        val target: STAR[G] = delegate.target
+        def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, F, G]): QUIVER[R, F > G] = {
+          val rStar: STAR[R] = biQuiver.product.left
+          val r2e2g = delegate.transpose[R](
+            (rStar x delegate.source).biQuiver(delegate.target) {
+              (r, e) => biQuiver(r, Δ / e)
+            }
+          )
+          def rfun(r: R): F > G = leftLaxExponential(r2e2g(r), Δ)
+          rStar(laxExponential) {
+            r => rfun(r)
+          }
+        }
       }
 
       class RightActionStar[A <: self.ELEMENT](private[RightMonoidActionsInDraft2] val action: RightAction[A]) extends
