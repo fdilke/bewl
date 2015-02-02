@@ -21,10 +21,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
     type BASE = A
   }
 
-        // def pair(f: F, g: G): F x G = self.ElementProxy.pair(f, g)
-        // F <: self.UntypedElementProxy,
-        // G <: self.UntypedElementProxy
-
+/*
   object ElementProxy {
     def pair[L <: UntypedElementProxy, R <: UntypedElementProxy](
       l: L, 
@@ -36,6 +33,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
       val element = productStar.pair(l.element, r.element) 
     }
   }
+*/
 
   case class NaiveMonoid[M <: ELEMENT](carrier: STAR[M], unit: NullaryOp[M], multiply: BinaryOp[M]) {
     def sanityTest {
@@ -531,28 +529,25 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         laxStar: STAR[F]
       ) extends LaxRightActionStarFacade[E x G, F x G](delegate, 
         new Duality[E x G, F x G](
-          exg => new LeftLaxPair(Δ / (exg._1), exg._2),
+          exg => leftLaxPair(Δ / (exg._1), exg._2, delegate, Δ),
           fxg => delegate.pair(Δ \ (fxg._1), fxg._2)
         )
       ) with BiproductStar[F, G] {
         val left: STAR[F] = laxStar
         val right: STAR[G] = delegate.right
-        def pair(f: F, g: G): F x G = // new LeftLaxPair(delegate.pair(Δ \ f, g), Δ)
-          new LeftLaxPair(f, g)
+        def pair(f: F, g: G): F x G = leftLaxPair(f, g, delegate, Δ)
       }
 
-      private class LeftLaxPair[
+      private def leftLaxPair[
         E <: self.UntypedElementProxy, 
         F <: self.UntypedElementProxy,
         G <: self.UntypedElementProxy
-      ] (
-        // delegate: E x G,
-        f: F,
-        g: G
-        // Δ: Duality[E, F]
-      ) extends (F, G)(f, g) with self.UntypedElementProxy {
-        type BASE = self.x[F#BASE, G#BASE]
-        val element = ???
+      ] (f: F, g: G, biproduct: BIPRODUCT[E, G], Δ: Duality[E, F]) : F x G = {
+          val innerPair: E x G = biproduct.pair(Δ \ f, g)
+          new (F, G)(f, g) with self.UntypedElementProxy {
+            type BASE = innerPair.BASE
+            val element = innerPair.element
+          }
       }
 
       class RightActionStar[A <: self.ELEMENT](private[RightMonoidActionsInDraft2] val action: RightAction[A]) extends
