@@ -498,6 +498,9 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         private[RightMonoidActionsInDraft2] def preMultiplyUncached[Z <: self.ELEMENT, D <: ELEMENT](
           pre: RightActionStar[Z] with RightActionStarFacade[D]
         ) : BIPRODUCT[D, E]
+        private[RightMonoidActionsInDraft2] def preExponentiateUncached[Z <: self.ELEMENT, D <: ELEMENT](
+          pre: RightActionStar[Z] with RightActionStarFacade[D]
+        ) : EXPONENTIAL[D, E]
       }
 
       private class LaxRightActionStarFacade[E <: self.UntypedElementProxy, F <: self.UntypedElementProxy](
@@ -518,6 +521,11 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
           pre: RightActionStar[Z] with RightActionStarFacade[D]
         ) : BIPRODUCT[D, F] = 
           new RightLaxBiproduct(delegate.preMultiplyUncached[Z, D](pre), Δ, this)
+
+        private[RightMonoidActionsInDraft2] def preExponentiateUncached[Z <: self.ELEMENT, D <: ELEMENT](
+          pre: RightActionStar[Z] with RightActionStarFacade[D]
+        ) : EXPONENTIAL[D, F] =
+          new RightLaxExponentialStar(delegate.preExponentiateUncached[Z, D](pre), Δ, this)
       }
 
       private class RightLaxBiproduct[
@@ -594,6 +602,17 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
             override val element = e2g.element
           }
 
+      private def rightLaxExponential[
+        D <: self.UntypedElementProxy, 
+        E <: self.UntypedElementProxy,
+        F <: self.UntypedElementProxy
+      ] (d2e: D > E, Δ: Duality[E, F]) : D > F = 
+          new (D => F) with self.UntypedElementProxy {
+            override def apply(d: D): F = Δ / d2e(d)
+            override type BASE = d2e.BASE
+            override val element = d2e.element
+          }
+
       private class LeftLaxExponentialStar[
         E <: self.UntypedElementProxy, 
         F <: self.UntypedElementProxy,
@@ -602,7 +621,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         delegate: EXPONENTIAL[E, G],
         Δ: Duality[E, F],
         laxStar: STAR[F]
-        ) extends LaxRightActionStarFacade[E > G, F > G](delegate,
+      ) extends LaxRightActionStarFacade[E > G, F > G](delegate,
         new Duality[E > G, F > G](
           e2g => leftLaxExponential(e2g, Δ),
           f2g => leftLaxExponential(f2g, ~Δ)
@@ -618,7 +637,37 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
             }
           )
           def rfun(r: R): F > G = leftLaxExponential(r2e2g(r), Δ)
-          rStar(laxExponential) {
+          rStar(laxExponential) { // TODO: simplify
+            r => rfun(r)
+          }
+        }
+      }
+
+      private class RightLaxExponentialStar[
+        D <: self.UntypedElementProxy, 
+        E <: self.UntypedElementProxy,
+        F <: self.UntypedElementProxy
+      ] (
+        delegate: EXPONENTIAL[D, E],
+        Δ: Duality[E, F],
+        laxStar: STAR[F]
+      ) extends LaxRightActionStarFacade[D > E, D > F](delegate,
+        new Duality[D > E, D > F](
+          d2e => rightLaxExponential(d2e, Δ),
+          d2f => rightLaxExponential(d2f, ~Δ)
+        )
+      ) with ExponentialStar[D, F] { laxExponential =>
+        val source: STAR[D] = delegate.source
+        val target: STAR[F] = laxStar
+        def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, D, F]): QUIVER[R, D > F] = {
+          val rStar: STAR[R] = biQuiver.product.left
+          val r2d2e = delegate.transpose[R](
+            (rStar x delegate.source).biQuiver(delegate.target) {
+              (r, d) => Δ \ biQuiver(r, d)
+            }
+          )
+          def rfun(r: R): D > F = rightLaxExponential(r2d2e(r), Δ)
+          rStar(laxExponential) { // TODO: simplify
             r => rfun(r)
           }
         }
@@ -678,7 +727,48 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
               }
         }
 
-        override def `>Uncached`[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[E, T] =  null
+        override def `>Uncached`[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[E, T] =  
+          that.preExponentiateUncached[A, E](this)
+
+        override private[RightMonoidActionsInDraft2] def 
+          preExponentiateUncached[Z <: self.ELEMENT, D <: ELEMENT](
+          pre: RightActionStar[Z] with RightActionStarFacade[D]
+        ) : EXPONENTIAL[D, E] = null
+
+/*
+        override def `>Uncached`[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[A, T] = {
+          val pairs = carrier x action.actionCarrier
+          val possibleMorphisms = pairs > that.action.actionCarrier
+          val isMorphism = (pairs x carrier).forAll(possibleMorphisms) {
+            case (f, ((s, x), t)) =>
+              that.action.actionCarrier.diagonal(
+                f(pairs.pair(multiply(s, t), this.action.actionMultiply(x, t))),
+                that.action.actionMultiply(f(pairs.pair(s, x)), t)
+              )
+          }
+          val morphisms = possibleMorphisms.toTrue ?= isMorphism
+          val morphismMultiply = morphisms.restrict(possibleMorphisms.transpose(
+            (morphisms x carrier x pairs).biQuiver(that.action.actionCarrier) {
+              case ((f, s), (t, y)) => morphisms.inclusion(f)(
+                pairs.pair(multiply(s, t), y)
+            )}))
+
+          new RightActionStar[(M x A) > T](rightAction(morphisms)(
+              self.BiQuiver(morphisms x carrier, morphismMultiply).apply
+            )) with ExponentialStar[M x A, T] { exponentialStar =>
+            override val source = star.asInstanceOf[STAR[M x A]]
+            override val target = that
+
+            override def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, M x A, T]) = {
+              val lhs = biQuiver.product.left
+              new RightActionQuiver(lhs, exponentialStar, morphisms.restrict(possibleMorphisms.transpose(
+                (lhs.action.actionCarrier x pairs).biQuiver(that.action.actionCarrier) {
+                  case (r, (t, x)) => biQuiver(
+                    lhs.action.actionMultiply(r, t), 
+                    x.asInstanceOf[M x A]
+                  )})))}}.asInstanceOf[EXPONENTIAL[A, T]]
+        }
+*/                
         override def apply[T <: ELEMENT](target: STAR[T])(f: E => T): QUIVER[E, T] = null
 
         override def toString = "RightActionStar[" + action.actionCarrier + "]"
