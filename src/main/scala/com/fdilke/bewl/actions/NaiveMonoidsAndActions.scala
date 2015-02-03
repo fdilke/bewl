@@ -652,7 +652,18 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
                 )
               })
           val innerBiproduct: self.BIPRODUCT[Z, A] = pre.action.actionCarrier x action.actionCarrier
-          val duality: Duality[self.ElementProxy[self.x[Z, A]], D x E] = null
+          val duality = new Duality[self.ElementProxy[self.x[Z, A]], D x E](
+            zxa => zxa.element match { case (z, a) =>
+                new (D, E)(
+                  new self.ElementProxy[Z](z).asInstanceOf[D], // TODO: fix cast
+                  new self.ElementProxy[A](a)
+                ) with self.UntypedElementProxy {
+                  override type BASE = self.x[Z, A]
+                  override val element = zxa.element
+                }
+              },
+              dxe => new self.ElementProxy(dxe.element.asInstanceOf[self.x[Z, A]])
+            )
           new LaxRightActionStarFacade(innerStar, duality) with BiproductStar[D, E] {
                 override val left: STAR[D] = pre
                 override val right: STAR[E] = star
