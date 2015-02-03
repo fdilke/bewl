@@ -631,14 +631,12 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         val target: STAR[G] = delegate.target
         def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, F, G]): QUIVER[R, F > G] = {
           val rStar: STAR[R] = biQuiver.product.left
-          val r2e2g = delegate.transpose[R](
-            (rStar x delegate.source).biQuiver(delegate.target) {
-              (r, e) => biQuiver(r, Δ / e)
-            }
-          )
-          def rfun(r: R): F > G = leftLaxExponential(r2e2g(r), Δ)
-          rStar(laxExponential) { // TODO: simplify
-            r => rfun(r)
+          rStar(laxExponential) { r => 
+            leftLaxExponential(delegate.transpose(
+              (rStar x delegate.source).biQuiver(delegate.target) {
+                (r, e) => biQuiver(r, Δ / e)
+              }
+            )(r), Δ)
           }
         }
       }
@@ -661,14 +659,12 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         val target: STAR[F] = laxStar
         def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, D, F]): QUIVER[R, D > F] = {
           val rStar: STAR[R] = biQuiver.product.left
-          val r2d2e = delegate.transpose[R](
-            (rStar x delegate.source).biQuiver(delegate.target) {
-              (r, d) => Δ \ biQuiver(r, d)
-            }
-          )
-          def rfun(r: R): D > F = rightLaxExponential(r2d2e(r), Δ)
-          rStar(laxExponential) { // TODO: simplify
-            r => rfun(r)
+          rStar(laxExponential) { r =>
+            rightLaxExponential(delegate.transpose(
+              (rStar x delegate.source).biQuiver(delegate.target) {
+                (r, d) => Δ \ biQuiver(r, d)
+              }
+            )(r), Δ)
           }
         }
       }
@@ -733,7 +729,43 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         override private[RightMonoidActionsInDraft2] def 
           preExponentiateUncached[Z <: self.ELEMENT, D <: ELEMENT](
           pre: RightActionStar[Z] with RightActionStarFacade[D]
-        ) : EXPONENTIAL[D, E] = null
+        ) : EXPONENTIAL[D, E] = {
+            val pairs = carrier x pre.action.actionCarrier
+            val possibleMorphisms = pairs > action.actionCarrier
+            val isMorphism = (pairs x carrier).forAll(possibleMorphisms) {
+              case (f, ((s, x), t)) =>
+                action.actionCarrier.diagonal(
+                  f(pairs.pair(multiply(s, t), pre.action.actionMultiply(x, t))),
+                  action.actionMultiply(f(pairs.pair(s, x)), t)
+                )
+            }
+            val morphisms = possibleMorphisms.toTrue ?= isMorphism
+            val morphismMultiply = morphisms.restrict(possibleMorphisms.transpose(
+              (morphisms x carrier x pairs).biQuiver(action.actionCarrier) {
+                case ((f, s), (t, y)) => morphisms.inclusion(f)(
+                  pairs.pair(multiply(s, t), y)
+              )}))
+      // to make this work, quivers need to be between star facades
+            // val ccc = new RightActionStar[(M x A) > E](rightAction(morphisms)(
+            //   self.BiQuiver(morphisms x carrier, morphismMultiply).apply
+            // )) with ExponentialStar[M x A, E] { exponentialStar =>
+            // override val source = pre.asInstanceOf[STAR[M x A]]
+            // override val target = star
+            // override def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, M x A, E]) = {
+            //   val lhs: STAR[R] = biQuiver.product.left
+            //   new RightActionQuiver(lhs, exponentialStar, morphisms.restrict(possibleMorphisms.transpose(
+            //     (lhs.action.actionCarrier x pairs).biQuiver(action.actionCarrier) {
+            //       case (r, (t, x)) => biQuiver(
+            //         lhs.action.actionMultiply(r, t), 
+            //         x.asInstanceOf[M x A]
+            //       )})))}}
+            null
+          }
+
+          // RI.restrict(that)(bifunc) does:
+          // ideals.restrict(possibleIdeals.transpose(
+          //   (that x carrier).biQuiver(self.omega)(bifunc)
+          // ))
 
 /*
         override def `>Uncached`[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[A, T] = {
@@ -783,6 +815,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         Quiver[E, F] { facade =>
       }
 
+      // TODO: do we need this? Can a quiver just be between StarFacades?
       class LeftLaxRightActionQuiverFacade[
         E <: self.UntypedElementProxy, 
         F <: self.UntypedElementProxy,
@@ -792,7 +825,6 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
           Δ: Duality[E, F],
           val source: RightActionStarFacade[F]
         ) extends RightActionQuiverFacade[F, G] {
-        // lazy val source: STAR[F] = dual
         val target: STAR[G] = delegate.target
         lazy val chi: QUIVER[G, TRUTH] = delegate.chi
 
