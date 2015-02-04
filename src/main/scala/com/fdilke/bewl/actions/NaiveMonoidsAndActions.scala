@@ -697,7 +697,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
                 )
               })
           val innerBiproduct: self.BIPRODUCT[Z, A] = pre.action.actionCarrier x action.actionCarrier
-          val duality = new Duality[self.ElementProxy[self.x[Z, A]], D x E](
+          val Δ = new Duality[self.ElementProxy[self.x[Z, A]], D x E](
             zxa => zxa.element match { case (z, a) =>
                 new (D, E)(
                   new self.ElementProxy[Z](z).asInstanceOf[D], // TODO: fix cast
@@ -709,7 +709,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
               },
               dxe => new self.ElementProxy(dxe.element.asInstanceOf[self.x[Z, A]])
             )
-          new LaxRightActionStarFacade(innerStar, duality) with BiproductStar[D, E] {
+          new LaxRightActionStarFacade(innerStar, Δ) with BiproductStar[D, E] {
                 override val left: STAR[D] = pre
                 override val right: STAR[E] = star
                 override def pair(d: D, e: E): x[D, E] = { 
@@ -746,6 +746,19 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
                   pairs.pair(multiply(s, t), y)
               )}))
       // to make this work, quivers need to be between star facades
+            type N = self.>[self.x[M, Z],A]
+            type O = self.ElementProxy[N]
+
+            val innerExpStar: STAR[O] = new RightActionStar[N](rightAction(morphisms)(
+              self.BiQuiver(morphisms x carrier, morphismMultiply).apply
+            )) 
+            val Δ: Duality[O, D > E] = null
+            new LaxRightActionStarFacade(innerExpStar, Δ) with ExponentialStar[D, E] {
+              val source: STAR[D] = pre
+              val target: STAR[E] = star
+              def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, D, E]): QUIVER[R, D > E] = 
+                ???
+            }
             // val ccc = new RightActionStar[(M x A) > E](rightAction(morphisms)(
             //   self.BiQuiver(morphisms x carrier, morphismMultiply).apply
             // )) with ExponentialStar[M x A, E] { exponentialStar =>
@@ -759,7 +772,6 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
             //         lhs.action.actionMultiply(r, t), 
             //         x.asInstanceOf[M x A]
             //       )})))}}
-            null
           }
 
           // RI.restrict(that)(bifunc) does:
