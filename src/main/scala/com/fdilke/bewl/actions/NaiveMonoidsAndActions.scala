@@ -547,18 +547,29 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         def pair(d: D, f: F): D x F = rightLaxPair(d, f, delegate, Δ)
       }
 
+      private def laxPair[
+        E <: self.UntypedElementProxy, 
+        F <: self.UntypedElementProxy,
+        G <: self.UntypedElementProxy
+        ] (delegate: E, f: F, g: G): F x G =
+          new (F, G)(f, g) with self.UntypedElementProxy {
+            override type BASE = delegate.BASE
+            override val element = delegate.element
+          }
+
+      private def leftLaxPair[
+        E <: self.UntypedElementProxy, 
+        F <: self.UntypedElementProxy,
+        G <: self.UntypedElementProxy
+      ] (f: F, g: G, biproduct: BIPRODUCT[E, G], Δ: Duality[E, F]) : F x G = 
+          laxPair(biproduct.pair(Δ \ f, g), f, g)
+
       private def rightLaxPair[
         D <: self.UntypedElementProxy,
         E <: self.UntypedElementProxy, 
         F <: self.UntypedElementProxy
-      ] (d: D, f: F, biproduct: BIPRODUCT[D, E], Δ: Duality[E, F]) : D x F = {
-          val innerPair: D x E = biproduct.pair(d, Δ \ f) 
-          // TODO: factor out this common pattern
-          new (D, F)(d, f) with self.UntypedElementProxy {
-            override type BASE = innerPair.BASE
-            override val element = innerPair.element
-          }
-      }
+      ] (d: D, f: F, biproduct: BIPRODUCT[D, E], Δ: Duality[E, F]) : D x F = 
+          laxPair(biproduct.pair(d, Δ \ f), d, f)
 
       private class LeftLaxBiproduct[
         E <: self.UntypedElementProxy, 
@@ -577,18 +588,6 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         val left: STAR[F] = laxStar
         val right: STAR[G] = delegate.right
         def pair(f: F, g: G): F x G = leftLaxPair(f, g, delegate, Δ)
-      }
-
-      private def leftLaxPair[
-        E <: self.UntypedElementProxy, 
-        F <: self.UntypedElementProxy,
-        G <: self.UntypedElementProxy
-      ] (f: F, g: G, biproduct: BIPRODUCT[E, G], Δ: Duality[E, F]) : F x G = {
-          val innerPair: E x G = biproduct.pair(Δ \ f, g)
-          new (F, G)(f, g) with self.UntypedElementProxy {
-            override type BASE = innerPair.BASE
-            override val element = innerPair.element
-          }
       }
 
       private def leftLaxExponential[
