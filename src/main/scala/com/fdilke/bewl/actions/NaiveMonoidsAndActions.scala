@@ -109,7 +109,9 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
       override type STAR[S <: ELEMENT] = RightActionStar[S]
       override type QUIVER[S <: ELEMENT, T <: ELEMENT] = RightActionQuiver[S, T]
       override type UNIT = self.UNIT
-      override type TRUTH = M > self.TRUTH
+
+      type RIGHT_IDEAL = M > self.TRUTH
+      override type TRUTH = RIGHT_IDEAL
       override val I = RightActionStar(self.I) { (i, m) => i }
 
       private object RightIdeals {
@@ -120,21 +122,34 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         }
         private val ideals = possibleIdeals.toTrue ?= isIdeal
         
-        private val idealMultiply = ideals.restrict(possibleIdeals.transpose(
-          (ideals x carrier x carrier).biQuiver(self.omega) {
+        // private val idealMultiply = ideals.restrict(possibleIdeals.transpose(
+        //   (ideals x carrier x carrier).biQuiver(self.omega) {
+        //     case ((i, s), t) => ideals.inclusion(i)(multiply(s, t))
+        //   }))
+
+        // val omega = RightActionStar[TRUTH](ideals)(
+        //     self.BiQuiver(ideals x carrier, idealMultiply)(_,_)
+        //   )
+
+        // def chi[S <: ELEMENT, T <: ELEMENT](monic: QUIVER[S, T]): QUIVER[T, TRUTH] = 
+        //   new RightActionQuiver(monic.target, omega, 
+        //     ideals.restrict(possibleIdeals.transpose(
+        //       (monic.target.action.actionCarrier x carrier).biQuiver(self.omega) {
+        //         (t, m) => monic.quiver.chi(monic.target.action.actionMultiply(t, m))
+        //     })))
+
+        def restrict[H <: self.ELEMENT](that: self.STAR[H])(bifunc: (H, M) => self.TRUTH): self.QUIVER[H, RIGHT_IDEAL] = 
+          ideals.restrict(possibleIdeals.transpose(
+            (that x carrier).biQuiver(self.omega)(bifunc)
+          ))
+
+        private val idealMultiply = restrict(ideals x carrier) {
             case ((i, s), t) => ideals.inclusion(i)(multiply(s, t))
-          }))
+          }
 
-        val omega = RightActionStar[TRUTH](ideals)(
-            self.BiQuiver(ideals x carrier, idealMultiply)(_,_)
+        val omega = RightActionStar[RIGHT_IDEAL](ideals)(
+            self.BiQuiver[RIGHT_IDEAL, M, RIGHT_IDEAL](ideals x carrier, idealMultiply)(_, _)
           )
-
-        def chi[S <: ELEMENT, T <: ELEMENT](monic: QUIVER[S, T]): QUIVER[T, TRUTH] = 
-          new RightActionQuiver(monic.target, omega, 
-            ideals.restrict(possibleIdeals.transpose(
-              (monic.target.action.actionCarrier x carrier).biQuiver(self.omega) {
-                (t, m) => monic.quiver.chi(monic.target.action.actionMultiply(t, m))
-            })))
       }
 
       override lazy val omega = RightIdeals.omega
@@ -218,7 +233,11 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         val target: RightActionStar[T],
         val quiver: self.QUIVER[S, T]
        ) extends Quiver[S, T] {
-        override lazy val chi = RightIdeals.chi(this)
+        override lazy val chi = 
+          new RightActionQuiver(target, omega, 
+            RightIdeals.restrict(target.action.actionCarrier) {
+                (t, m) => quiver.chi(target.action.actionMultiply(t, m)) 
+            })
 
         override def \[U <: ELEMENT](monic: QUIVER[U, T]) = 
           new RightActionQuiver(source, monic.source, quiver \ monic.quiver)
