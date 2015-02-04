@@ -746,18 +746,44 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
                   pairs.pair(multiply(s, t), y)
               )}))
       // to make this work, quivers need to be between star facades
-            type N = self.>[self.x[M, Z],A]
-            type O = self.ElementProxy[N]
+            type P = self.>[self.x[M, Z],A]
+            type Q = self.ElementProxy[P]
 
-            val innerExpStar: STAR[O] = new RightActionStar[N](rightAction(morphisms)(
+            val innerExpStar: STAR[Q] = new RightActionStar[P](rightAction(morphisms)(
               self.BiQuiver(morphisms x carrier, morphismMultiply).apply
             )) 
-            val Δ: Duality[O, D > E] = null
-            new LaxRightActionStarFacade(innerExpStar, Δ) with ExponentialStar[D, E] {
+            val Δ = new Duality[Q, D > E](
+              q => new (D => E) with self.UntypedElementProxy {
+                override def apply(d: D):E = {
+                  val z = d.element.asInstanceOf[Z] // TODO: fix cast
+                  val p: P = q.element
+                  val unitM: M = unit(pre.action.actionCarrier.toI(z))
+                  val a: A = p(pairs.pair(unitM, z))
+                  new self.ElementProxy(a)
+                }
+                override type BASE = q.BASE
+                override val element = q.element
+              },
+              d2e => {
+                val p = d2e.element.asInstanceOf[P] // TODO: fix cast?
+                new self.ElementProxy(p)
+              }
+            )
+            new LaxRightActionStarFacade(innerExpStar, Δ) with ExponentialStar[D, E] { exponentialStar =>
               val source: STAR[D] = pre
               val target: STAR[E] = star
               def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, D, E]): QUIVER[R, D > E] = 
                 ???
+              // {
+              //   val lhs: STAR[R] = biQuiver.product.left
+              //   new RightActionQuiver(lhs, exponentialStar, morphisms.restrict(possibleMorphisms.transpose(
+              //     (lhs.action.actionCarrier x pairs).biQuiver(action.actionCarrier) {
+              //       case (r, (t, x)) => biQuiver(
+              //         lhs.action.actionMultiply(r, t), 
+              //         x.asInstanceOf[M x A]
+              //       )
+              //       })))
+              // }
             }
             // val ccc = new RightActionStar[(M x A) > E](rightAction(morphisms)(
             //   self.BiQuiver(morphisms x carrier, morphismMultiply).apply
