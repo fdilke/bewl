@@ -790,8 +790,20 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
             new LaxRightActionStarFacade(innerExpStar, Δ) with ExponentialStar[D, E] { exponentialStar =>
               val source: STAR[D] = pre
               val target: STAR[E] = star
-              def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, D, E]): QUIVER[R, D > E] = 
+              def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, D, E]): QUIVER[R, D > E] = {
+                // val lhs: STAR[R] = biQuiver.product.left
+                // val innerQ = morphisms.restrict(possibleMorphisms.transpose(
+                //   (lhs.action.actionCarrier x pairs).biQuiver(action.actionCarrier) {
+                //     case (r, (t, x)) => biQuiver(
+                //       lhs.action.actionMultiply(r, t), 
+                //       x.asInstanceOf[M x A]
+                //     )
+                //     }))
+                // lhs(exponentialStar) {
+                //   ... something from innerQ
+                // }
                 ???
+              }
               // {
               //   val lhs: STAR[R] = biQuiver.product.left
               //   new RightActionQuiver(lhs, exponentialStar, morphisms.restrict(possibleMorphisms.transpose(
