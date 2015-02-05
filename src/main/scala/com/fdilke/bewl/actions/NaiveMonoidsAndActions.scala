@@ -122,22 +122,6 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         }
         private val ideals = possibleIdeals.toTrue ?= isIdeal
         
-        // private val idealMultiply = ideals.restrict(possibleIdeals.transpose(
-        //   (ideals x carrier x carrier).biQuiver(self.omega) {
-        //     case ((i, s), t) => ideals.inclusion(i)(multiply(s, t))
-        //   }))
-
-        // val omega = RightActionStar[TRUTH](ideals)(
-        //     self.BiQuiver(ideals x carrier, idealMultiply)(_,_)
-        //   )
-
-        // def chi[S <: ELEMENT, T <: ELEMENT](monic: QUIVER[S, T]): QUIVER[T, TRUTH] = 
-        //   new RightActionQuiver(monic.target, omega, 
-        //     ideals.restrict(possibleIdeals.transpose(
-        //       (monic.target.action.actionCarrier x carrier).biQuiver(self.omega) {
-        //         (t, m) => monic.quiver.chi(monic.target.action.actionMultiply(t, m))
-        //     })))
-
         def restrict[H <: self.ELEMENT](that: self.STAR[H])(bifunc: (H, M) => self.TRUTH): self.QUIVER[H, RIGHT_IDEAL] = 
           ideals.restrict(possibleIdeals.transpose(
             (that x carrier).biQuiver(self.omega)(bifunc)
@@ -815,60 +799,8 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
               //       })))
               // }
             }
-            // val ccc = new RightActionStar[(M x A) > E](rightAction(morphisms)(
-            //   self.BiQuiver(morphisms x carrier, morphismMultiply).apply
-            // )) with ExponentialStar[M x A, E] { exponentialStar =>
-            // override val source = pre.asInstanceOf[STAR[M x A]]
-            // override val target = star
-            // override def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, M x A, E]) = {
-            //   val lhs: STAR[R] = biQuiver.product.left
-            //   new RightActionQuiver(lhs, exponentialStar, morphisms.restrict(possibleMorphisms.transpose(
-            //     (lhs.action.actionCarrier x pairs).biQuiver(action.actionCarrier) {
-            //       case (r, (t, x)) => biQuiver(
-            //         lhs.action.actionMultiply(r, t), 
-            //         x.asInstanceOf[M x A]
-            //       )})))}}
           }
 
-          // RI.restrict(that)(bifunc) does:
-          // ideals.restrict(possibleIdeals.transpose(
-          //   (that x carrier).biQuiver(self.omega)(bifunc)
-          // ))
-
-/*
-        override def `>Uncached`[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[A, T] = {
-          val pairs = carrier x action.actionCarrier
-          val possibleMorphisms = pairs > that.action.actionCarrier
-          val isMorphism = (pairs x carrier).forAll(possibleMorphisms) {
-            case (f, ((s, x), t)) =>
-              that.action.actionCarrier.diagonal(
-                f(pairs.pair(multiply(s, t), this.action.actionMultiply(x, t))),
-                that.action.actionMultiply(f(pairs.pair(s, x)), t)
-              )
-          }
-          val morphisms = possibleMorphisms.toTrue ?= isMorphism
-          val morphismMultiply = morphisms.restrict(possibleMorphisms.transpose(
-            (morphisms x carrier x pairs).biQuiver(that.action.actionCarrier) {
-              case ((f, s), (t, y)) => morphisms.inclusion(f)(
-                pairs.pair(multiply(s, t), y)
-            )}))
-
-          new RightActionStar[(M x A) > T](rightAction(morphisms)(
-              self.BiQuiver(morphisms x carrier, morphismMultiply).apply
-            )) with ExponentialStar[M x A, T] { exponentialStar =>
-            override val source = star.asInstanceOf[STAR[M x A]]
-            override val target = that
-
-            override def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, M x A, T]) = {
-              val lhs = biQuiver.product.left
-              new RightActionQuiver(lhs, exponentialStar, morphisms.restrict(possibleMorphisms.transpose(
-                (lhs.action.actionCarrier x pairs).biQuiver(that.action.actionCarrier) {
-                  case (r, (t, x)) => biQuiver(
-                    lhs.action.actionMultiply(r, t), 
-                    x.asInstanceOf[M x A]
-                  )})))}}.asInstanceOf[EXPONENTIAL[A, T]]
-        }
-*/                
         override def apply[T <: ELEMENT](target: STAR[T])(f: E => T): QUIVER[E, T] = null
 
         override def toString = "RightActionStar[" + action.actionCarrier + "]"
