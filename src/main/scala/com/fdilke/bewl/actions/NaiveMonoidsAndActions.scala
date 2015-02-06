@@ -554,26 +554,19 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         def pair(d: D, f: F): D x F = rightLaxPair(d, f, delegate, Δ)
       }
 
-      private def laxPair[
-        E <: ELEMENT, 
-        F <: ELEMENT,
-        G <: ELEMENT
-        ] (delegate: E, f: F, g: G): F x G =
-          delegate.asPair(f, g) 
-
       private def leftLaxPair[
         E <: ELEMENT, 
         F <: ELEMENT,
         G <: ELEMENT
       ] (f: F, g: G, biproduct: BIPRODUCT[E, G], Δ: Duality[E, F]) : F x G = 
-          laxPair(biproduct.pair(Δ \ f, g), f, g)
+          biproduct.pair(Δ \ f, g).asPair(f, g)
 
       private def rightLaxPair[
         D <: ELEMENT,
         E <: ELEMENT, 
         F <: ELEMENT
       ] (d: D, f: F, biproduct: BIPRODUCT[D, E], Δ: Duality[E, F]) : D x F = 
-          laxPair(biproduct.pair(d, Δ \ f), d, f)
+          biproduct.pair(d, Δ \ f).asPair(d, f)
 
       private class LeftLaxBiproduct[
         E <: ELEMENT, 
@@ -748,17 +741,6 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
                 val a: A = p(pairs.pair(unitM, z))
                 Ɛ.ElementWrapper(a)
               }),
-              // new (D => AA) with ELEMENT {
-              //   override def apply(d: D):AA = {
-              //     val z = d.element.asInstanceOf[Z] // TODO: fix cast
-              //     val p: P = q.element
-              //     val unitM: M = unit(pre.action.actionCarrier.toI(z))
-              //     val a: A = p(pairs.pair(unitM, z))
-              //     Ɛ.ElementWrapper(a)
-              //   }
-              //   override type BASE = q.BASE
-              //   override val element = q.element
-              // },
               d2e => {
                 val p = d2e.element.asInstanceOf[P] // TODO: fix cast?
                 Ɛ.ElementWrapper(p)
