@@ -506,9 +506,6 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
       }
 
       trait RightActionStarFacade[AA <: ELEMENT] extends Star[AA] { facade => 
-        private[RightMonoidActionsInDraft2] def preMultiplyUncached[Z <: Ɛ.ELEMENT, ZZ <: ELEMENT](
-          pre: RightActionStar[Z] with RightActionStarOuterFacade[Z, ZZ]
-        ) : BIPRODUCT[ZZ, AA]
         private[RightMonoidActionsInDraft2] def preExponentiateUncached[Z <: Ɛ.ELEMENT, ZZ <: ELEMENT](
           pre: RightActionStar[Z] with RightActionStarOuterFacade[Z, ZZ]
         ) : EXPONENTIAL[ZZ, AA]
@@ -528,11 +525,6 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         def apply[TT <: ELEMENT](target: STAR[TT])(f: BB => TT) : QUIVER[BB, TT] = 
           new LeftLaxRightActionQuiverFacade(delegate(target)(f compose (Δ./)), Δ, this)
         def sanityTest = delegate.sanityTest
-
-        override private[RightMonoidActionsInDraft2] def preMultiplyUncached[Z <: Ɛ.ELEMENT, ZZ <: ELEMENT](
-          pre: RightActionStar[Z] with RightActionStarOuterFacade[Z, ZZ]
-        ) : BIPRODUCT[ZZ, BB] = 
-          new RightLaxBiproduct(delegate.preMultiplyUncached[Z, ZZ](pre), Δ, this)
 
         private[RightMonoidActionsInDraft2] def preExponentiateUncached[Z <: Ɛ.ELEMENT, ZZ <: ELEMENT](
           pre: RightActionStar[Z] with RightActionStarOuterFacade[Z, ZZ]
@@ -715,40 +707,6 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
                 }
               }
             }})
-          // that.preMultiplyUncached[A, AA](this)
-
-        override private[RightMonoidActionsInDraft2] def 
-          preMultiplyUncached[Z <: Ɛ.ELEMENT, ZZ <: ELEMENT](
-          pre: RightActionStar[Z] with RightActionStarOuterFacade[Z, ZZ]
-        ) : BIPRODUCT[ZZ, AA] = {
-          val product = pre.action.actionCarrier x action.actionCarrier 
-          val innerStar = new RightActionStar[Ɛ.x[Z, A]] (
-            rightAction(product){
-              case ((z, a), m) => product.pair(
-                  pre.action.actionMultiply(z, m),
-                  action.actionMultiply(a, m) 
-                )
-              })
-          val innerBiproduct: Ɛ.BIPRODUCT[Z, A] = pre.action.actionCarrier x action.actionCarrier
-          val Δ = new ↔[Ɛ.ElementWrapper[Ɛ.x[Z, A]], ZZ x AA](
-            zxa => zxa.element match { case (z, a) =>
-              zxa(
-                  Ɛ.ElementWrapper[Z](z).asInstanceOf[ZZ], // TODO: fix cast
-                  Ɛ.ElementWrapper[A](a) // TODO: shouldn't need all these generic args
-                )
-              },
-              zzXe => Ɛ.ElementWrapper(zzXe.element.asInstanceOf[Ɛ.x[Z, A]]) // TODO: fix cast?
-            )
-          new LaxRightActionStarFacade(innerStar, Δ) with BiproductStar[ZZ, AA] {
-            override val left: STAR[ZZ] = pre
-            override val right: STAR[AA] = star
-            override def pair(d: ZZ, e: AA): x[ZZ, AA] = { 
-              val z: Z = d.element.asInstanceOf[Z] // TODO: fix cast
-              val a: A = e.element
-              Ɛ.ElementWrapper(innerBiproduct.pair(z, a))(d, e)
-            }
-          }
-        }
 
         override def `>Uncached`[TT <: ELEMENT](that: STAR[TT]): EXPONENTIAL[AA, TT] =  
           that.preExponentiateUncached[A, AA](this)
@@ -830,6 +788,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
           new RightActionStar[A](rightAction(actionCarrier)(actionMultiply))
       }
 
+      // TODO: fix, not adding any value
       trait RightActionQuiverFacade[E <: ELEMENT, F <: ELEMENT] extends
         Quiver[E, F] { facade =>
       }
