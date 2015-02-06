@@ -507,7 +507,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
 
       trait RightActionStarFacade[AA <: ELEMENT] extends Star[AA] { facade => 
         private[RightMonoidActionsInDraft2] def preMultiplyUncached[Z <: Ɛ.ELEMENT, ZZ <: ELEMENT](
-          pre: RightActionStar[Z] with RightActionStarFacade[ZZ]
+          pre: RightActionStar[Z] with RightActionStarOuterFacade[Z, ZZ]
         ) : BIPRODUCT[ZZ, AA]
         private[RightMonoidActionsInDraft2] def preExponentiateUncached[Z <: Ɛ.ELEMENT, ZZ <: ELEMENT](
           pre: RightActionStar[Z] with RightActionStarOuterFacade[Z, ZZ]
@@ -530,7 +530,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         def sanityTest = delegate.sanityTest
 
         override private[RightMonoidActionsInDraft2] def preMultiplyUncached[Z <: Ɛ.ELEMENT, ZZ <: ELEMENT](
-          pre: RightActionStar[Z] with RightActionStarFacade[ZZ]
+          pre: RightActionStar[Z] with RightActionStarOuterFacade[Z, ZZ]
         ) : BIPRODUCT[ZZ, BB] = 
           new RightLaxBiproduct(delegate.preMultiplyUncached[Z, ZZ](pre), Δ, this)
 
@@ -684,13 +684,43 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
           action.sanityTest
         }
 
-        override def xUncached[F <: ELEMENT](that: STAR[F]): BIPRODUCT[AA, F] = 
-          that.preMultiplyUncached[A, AA](this)
+        override def xUncached[FF <: ELEMENT](that: STAR[FF]): BIPRODUCT[AA, FF] = 
+          that.withAction(new ActionReceiver[FF, BIPRODUCT[AA, FF]] {
+            override def receive[F <: Ɛ.ELEMENT](thatActionStar: RightActionStar[F], Δ: F ↔ FF) = {            
+              val product = action.actionCarrier x thatActionStar.action.actionCarrier 
+              val innerStar = new RightActionStar[Ɛ.x[A, F]] (
+                rightAction(product){
+                  case ((a, f), m) => product.pair(
+                      action.actionMultiply(a, m),
+                      thatActionStar.action.actionMultiply(f, m) 
+                    )
+                  })
+              val innerBiproduct: Ɛ.BIPRODUCT[A, F] = product // TODO: need alias?
+              val Δ = new ↔[Ɛ.ElementWrapper[Ɛ.x[A, F]], AA x FF](
+                axf => axf.element match { case (a, f) =>
+                  axf(
+                      Ɛ.ElementWrapper[A](a), // TODO: shouldn't need all these generic args
+                      Ɛ.ElementWrapper[F](f).asInstanceOf[FF] // TODO: fix cast
+                    )
+                  },
+                  aaXff => Ɛ.ElementWrapper(aaXff.element.asInstanceOf[Ɛ.x[A, F]]) // TODO: fix cast?
+                )
+              new LaxRightActionStarFacade(innerStar, Δ) with BiproductStar[AA, FF] {
+                override val left: STAR[AA] = star
+                override val right: STAR[FF] = that
+                override def pair(aa: AA, ff: FF): x[AA, FF] = { 
+                  val a: A = aa.element
+                  val f: F = ff.element.asInstanceOf[F] // TODO: fix cast
+                  Ɛ.ElementWrapper(innerBiproduct.pair(a, f))(aa, ff)
+                }
+              }
+            }})
+          // that.preMultiplyUncached[A, AA](this)
 
         override private[RightMonoidActionsInDraft2] def 
-          preMultiplyUncached[Z <: Ɛ.ELEMENT, D <: ELEMENT](
-          pre: RightActionStar[Z] with RightActionStarFacade[D]
-        ) : BIPRODUCT[D, AA] = {
+          preMultiplyUncached[Z <: Ɛ.ELEMENT, ZZ <: ELEMENT](
+          pre: RightActionStar[Z] with RightActionStarOuterFacade[Z, ZZ]
+        ) : BIPRODUCT[ZZ, AA] = {
           val product = pre.action.actionCarrier x action.actionCarrier 
           val innerStar = new RightActionStar[Ɛ.x[Z, A]] (
             rightAction(product){
@@ -700,19 +730,19 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
                 )
               })
           val innerBiproduct: Ɛ.BIPRODUCT[Z, A] = pre.action.actionCarrier x action.actionCarrier
-          val Δ = new ↔[Ɛ.ElementWrapper[Ɛ.x[Z, A]], D x AA](
+          val Δ = new ↔[Ɛ.ElementWrapper[Ɛ.x[Z, A]], ZZ x AA](
             zxa => zxa.element match { case (z, a) =>
               zxa(
-                  Ɛ.ElementWrapper[Z](z).asInstanceOf[D], // TODO: fix cast
+                  Ɛ.ElementWrapper[Z](z).asInstanceOf[ZZ], // TODO: fix cast
                   Ɛ.ElementWrapper[A](a) // TODO: shouldn't need all these generic args
                 )
               },
-              dxe => Ɛ.ElementWrapper(dxe.element.asInstanceOf[Ɛ.x[Z, A]]) // TODO: fix cast?
+              zzXe => Ɛ.ElementWrapper(zzXe.element.asInstanceOf[Ɛ.x[Z, A]]) // TODO: fix cast?
             )
-          new LaxRightActionStarFacade(innerStar, Δ) with BiproductStar[D, AA] {
-            override val left: STAR[D] = pre
+          new LaxRightActionStarFacade(innerStar, Δ) with BiproductStar[ZZ, AA] {
+            override val left: STAR[ZZ] = pre
             override val right: STAR[AA] = star
-            override def pair(d: D, e: AA): x[D, AA] = { 
+            override def pair(d: ZZ, e: AA): x[ZZ, AA] = { 
               val z: Z = d.element.asInstanceOf[Z] // TODO: fix cast
               val a: A = e.element
               Ɛ.ElementWrapper(innerBiproduct.pair(z, a))(d, e)
