@@ -727,6 +727,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
           preExponentiateUncached[Z <: Ɛ.ELEMENT, ZZ <: ELEMENT](
           pre: RightActionStar[Z] with RightActionStarOuterFacade[Z, ZZ]
         ) : EXPONENTIAL[ZZ, AA] = {
+            val outerFacade: RightActionStarOuterFacade[Z, ZZ] = pre
             val pairs = carrier x pre.action.actionCarrier
             val possibleMorphisms = pairs > action.actionCarrier
             val isMorphism = (pairs x carrier).forAll(possibleMorphisms) {
@@ -750,14 +751,14 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
             )) 
             val Δ = new ↔[PP, ZZ > AA](
               pp => pp { (zz: ZZ) => {
-                val z = zz.element.asInstanceOf[Z] // TODO: fix cast
+                val z = outerFacade.equivalence \ zz
                 val p: P = pp.element
                 val unitM: M = unit(pre.action.actionCarrier.toI(z))
                 val a: A = p(pairs.pair(unitM, z))
                 Ɛ.ElementWrapper(a)
               }},
               zz2aa => {
-                val p = zz2aa.element.asInstanceOf[P] // TODO: fix cast?
+                val p = zz2aa.element.asInstanceOf[P] // TODO: fix cast? Need topos API method to adjust elements here?
                 Ɛ.ElementWrapper(p)
               }
             )
@@ -766,21 +767,22 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
               val target: STAR[AA] = star
               def transpose[RR <: ELEMENT](biQuiver: BiQuiver[RR, ZZ, AA]): QUIVER[RR, ZZ > AA] = {
                 val lhs: STAR[RR] = biQuiver.product.left
-                val innerQ = lhs.withAction(new ActionReceiver[RR, Any] {
-                  override def receive[A <: Ɛ.ELEMENT](lhsActionStar: RightActionStar[A], Δ: A ↔ RR): Any = {
-                    morphisms.restrict(possibleMorphisms.transpose(
-                      (lhsActionStar.action.actionCarrier x pairs).biQuiver(action.actionCarrier) {
-                        case (a, (m, z)) => 
-                          val outerFacade: RightActionStarOuterFacade[Z, ZZ] = pre
-                          val rr: RR = Δ / lhsActionStar.action.actionMultiply(a, m)
-                          val zz: ZZ = outerFacade.equivalence / z
-                          equivalence \ biQuiver(rr, zz)
-                        }))
+                lhs.withAction(new ActionReceiver[RR, QUIVER[RR, ZZ > AA]] {
+                  override def receive[R <: Ɛ.ELEMENT](lhsActionStar: RightActionStar[R], Ψ: R ↔ RR) = {
+                    val innerQuiver: Ɛ.QUIVER[R, P] =
+                      morphisms.restrict(possibleMorphisms.transpose(
+                        (lhsActionStar.action.actionCarrier x pairs).biQuiver(action.actionCarrier) {
+                          case (r, (m, z)) => 
+                            val rr: RR = Ψ / lhsActionStar.action.actionMultiply(r, m)
+                            val zz: ZZ = outerFacade.equivalence / z
+                            equivalence \ biQuiver(rr, zz)
+                          }))
+                      lhs(exponentialStar) { rr =>
+                         val p: P = innerQuiver(Ψ \ rr)
+                         val pp = Ɛ.ElementWrapper(p)
+                         Δ / pp
+                      }
                   }})
-                // lhs(exponentialStar) {
-                //   ... something from innerQ
-                // }
-                ???
               }
             }
           }
