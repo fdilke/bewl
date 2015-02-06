@@ -501,57 +501,57 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
             case (x, m) => Ɛ.truth(x)
         }))
 
-      trait RightActionStarFacade[E <: ELEMENT] extends Star[E] { facade => 
-        private[RightMonoidActionsInDraft2] def preMultiplyUncached[Z <: Ɛ.ELEMENT, D <: ELEMENT](
-          pre: RightActionStar[Z] with RightActionStarFacade[D]
-        ) : BIPRODUCT[D, E]
-        private[RightMonoidActionsInDraft2] def preExponentiateUncached[Z <: Ɛ.ELEMENT, D <: ELEMENT](
-          pre: RightActionStar[Z] with RightActionStarFacade[D]
-        ) : EXPONENTIAL[D, E]
+      trait RightActionStarFacade[AA <: ELEMENT] extends Star[AA] { facade => 
+        private[RightMonoidActionsInDraft2] def preMultiplyUncached[Z <: Ɛ.ELEMENT, ZZ <: ELEMENT](
+          pre: RightActionStar[Z] with RightActionStarFacade[ZZ]
+        ) : BIPRODUCT[ZZ, AA]
+        private[RightMonoidActionsInDraft2] def preExponentiateUncached[Z <: Ɛ.ELEMENT, ZZ <: ELEMENT](
+          pre: RightActionStar[Z] with RightActionStarFacade[ZZ]
+        ) : EXPONENTIAL[ZZ, AA]
       }
 
-      private class LaxRightActionStarFacade[E <: ELEMENT, F <: ELEMENT](
-          delegate: RightActionStarFacade[E],
-          Δ: Duality[E, F]
-        ) extends RightActionStarFacade[F] {
-        lazy val toI: QUIVER[F, UNIT] =
+      private class LaxRightActionStarFacade[AA <: ELEMENT, BB <: ELEMENT](
+          delegate: RightActionStarFacade[AA],
+          Δ: Duality[AA, BB]
+        ) extends RightActionStarFacade[BB] {
+        lazy val toI: QUIVER[BB, UNIT] =
           new LeftLaxRightActionQuiverFacade(delegate.toI, Δ, this)
-        def xUncached[T <: ELEMENT](that: STAR[T]): BIPRODUCT[F, T] =
+        def xUncached[TT <: ELEMENT](that: STAR[TT]): BIPRODUCT[BB, TT] =
           new LeftLaxBiproduct(delegate.xUncached(that), Δ, this)
-        def `>Uncached`[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[F, T] =
+        def `>Uncached`[TT <: ELEMENT](that: STAR[TT]): EXPONENTIAL[BB, TT] =
           new LeftLaxExponentialStar(delegate.`>Uncached`(that), Δ, this)
-        def apply[T <: ELEMENT](target: STAR[T])(f: F => T) : QUIVER[F, T] = 
+        def apply[TT <: ELEMENT](target: STAR[TT])(f: BB => TT) : QUIVER[BB, TT] = 
           new LeftLaxRightActionQuiverFacade(delegate(target)(f compose (Δ./)), Δ, this)
         def sanityTest = delegate.sanityTest
 
-        override private[RightMonoidActionsInDraft2] def preMultiplyUncached[Z <: Ɛ.ELEMENT, D <: ELEMENT](
-          pre: RightActionStar[Z] with RightActionStarFacade[D]
-        ) : BIPRODUCT[D, F] = 
-          new RightLaxBiproduct(delegate.preMultiplyUncached[Z, D](pre), Δ, this)
+        override private[RightMonoidActionsInDraft2] def preMultiplyUncached[Z <: Ɛ.ELEMENT, ZZ <: ELEMENT](
+          pre: RightActionStar[Z] with RightActionStarFacade[ZZ]
+        ) : BIPRODUCT[ZZ, BB] = 
+          new RightLaxBiproduct(delegate.preMultiplyUncached[Z, ZZ](pre), Δ, this)
 
-        private[RightMonoidActionsInDraft2] def preExponentiateUncached[Z <: Ɛ.ELEMENT, D <: ELEMENT](
-          pre: RightActionStar[Z] with RightActionStarFacade[D]
-        ) : EXPONENTIAL[D, F] =
-          new RightLaxExponentialStar(delegate.preExponentiateUncached[Z, D](pre), Δ, this)
+        private[RightMonoidActionsInDraft2] def preExponentiateUncached[Z <: Ɛ.ELEMENT, ZZ <: ELEMENT](
+          pre: RightActionStar[Z] with RightActionStarFacade[ZZ]
+        ) : EXPONENTIAL[ZZ, BB] =
+          new RightLaxExponentialStar(delegate.preExponentiateUncached[Z, ZZ](pre), Δ, this)
       }
 
       private class RightLaxBiproduct[
-        D <: ELEMENT,
-        E <: ELEMENT, 
-        F <: ELEMENT
+        AA <: ELEMENT,
+        BB <: ELEMENT, 
+        CC <: ELEMENT
       ] (
-        delegate: BIPRODUCT[D, E],
-        Δ: Duality[E, F],
-        laxStar: STAR[F]
-      ) extends LaxRightActionStarFacade[D x E, D x F](delegate,
-        new Duality[D x E, D x F] (
+        delegate: BIPRODUCT[AA, BB],
+        Δ: Duality[BB, CC],
+        laxStar: STAR[CC]
+      ) extends LaxRightActionStarFacade[AA x BB, AA x CC](delegate,
+        new Duality[AA x BB, AA x CC] (
           dxe => rightLaxPair(dxe._1, Δ / dxe._2, delegate, Δ),
           dxf => delegate.pair(dxf._1, Δ \ dxf._2)
         )
-      ) with BiproductStar[D, F] {
-        val left: STAR[D] = delegate.left
-        val right: STAR[F] = laxStar
-        def pair(d: D, f: F): D x F = rightLaxPair(d, f, delegate, Δ)
+      ) with BiproductStar[AA, CC] {
+        val left: STAR[AA] = delegate.left
+        val right: STAR[CC] = laxStar
+        def pair(aa: AA, cc: CC): AA x CC = rightLaxPair(aa, cc, delegate, Δ)
       }
 
       private def leftLaxPair[
@@ -705,7 +705,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
               }
         }
 
-        override def `>Uncached`[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[AA, T] =  
+        override def `>Uncached`[TT <: ELEMENT](that: STAR[TT]): EXPONENTIAL[AA, TT] =  
           that.preExponentiateUncached[A, AA](this)
 
         override private[RightMonoidActionsInDraft2] def 
@@ -776,7 +776,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
             }
           }
 
-        override def apply[T <: ELEMENT](target: STAR[T])(f: AA => T): QUIVER[AA, T] = null
+        override def apply[TT <: ELEMENT](target: STAR[TT])(f: AA => TT): QUIVER[AA, TT] = null
 
         override def toString = "RightActionStar[" + action.actionCarrier + "]"
       }
