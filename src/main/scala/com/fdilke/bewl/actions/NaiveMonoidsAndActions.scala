@@ -506,9 +506,6 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
       }
 
       trait RightActionStarFacade[AA <: ELEMENT] extends Star[AA] { facade => 
-        private[RightMonoidActionsInDraft2] def preExponentiateUncached[Z <: Ɛ.ELEMENT, ZZ <: ELEMENT](
-          pre: RightActionStar[Z] with RightActionStarOuterFacade[Z, ZZ]
-        ) : EXPONENTIAL[ZZ, AA]
         private[RightMonoidActionsInDraft2] def withAction[H](receiver: ActionReceiver[AA, H]): H
       }
 
@@ -525,11 +522,6 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         def apply[TT <: ELEMENT](target: STAR[TT])(f: BB => TT) : QUIVER[BB, TT] = 
           new LeftLaxRightActionQuiverFacade(delegate(target)(f compose (Δ./)), Δ, this)
         def sanityTest = delegate.sanityTest
-
-        private[RightMonoidActionsInDraft2] def preExponentiateUncached[Z <: Ɛ.ELEMENT, ZZ <: ELEMENT](
-          pre: RightActionStar[Z] with RightActionStarOuterFacade[Z, ZZ]
-        ) : EXPONENTIAL[ZZ, BB] =
-          new RightLaxExponentialStar(delegate.preExponentiateUncached[Z, ZZ](pre), Δ, this)
 
         private[RightMonoidActionsInDraft2] def withAction[H](receiver: ActionReceiver[BB, H]): H =
           delegate.withAction(new ActionReceiver[AA, H] {
@@ -709,71 +701,61 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
             }})
 
         override def `>Uncached`[TT <: ELEMENT](that: STAR[TT]): EXPONENTIAL[AA, TT] =  
-          that.preExponentiateUncached[A, AA](this)
-
-        override private[RightMonoidActionsInDraft2] def 
-          preExponentiateUncached[Z <: Ɛ.ELEMENT, ZZ <: ELEMENT](
-          pre: RightActionStar[Z] with RightActionStarOuterFacade[Z, ZZ]
-        ) : EXPONENTIAL[ZZ, AA] = {
-            val outerFacade: RightActionStarOuterFacade[Z, ZZ] = pre
-            val pairs = carrier x pre.action.actionCarrier
-            val possibleMorphisms = pairs > action.actionCarrier
-            val isMorphism = (pairs x carrier).forAll(possibleMorphisms) {
-              case (f, ((s, x), t)) =>
-                action.actionCarrier.diagonal(
-                  f(pairs.pair(multiply(s, t), pre.action.actionMultiply(x, t))),
-                  action.actionMultiply(f(pairs.pair(s, x)), t)
-                )
-            }
-            val morphisms = possibleMorphisms.toTrue ?= isMorphism
-            val morphismMultiply = morphisms.restrict(possibleMorphisms.transpose(
-              (morphisms x carrier x pairs).biQuiver(action.actionCarrier) {
-                case ((f, s), (t, y)) => morphisms.inclusion(f)(
-                  pairs.pair(multiply(s, t), y)
-              )}))
-            type P = Ɛ.>[Ɛ.x[M, Z],A]
-            type PP = Ɛ.ElementWrapper[P]
-
-            val innerExpStar: STAR[PP] = new RightActionStar[P](rightAction(morphisms)(
-              Ɛ.BiQuiver(morphisms x carrier, morphismMultiply).apply
-            )) 
-            val Δ = new ↔[PP, ZZ > AA](
-              pp => pp { (zz: ZZ) => {
-                val z = outerFacade.equivalence \ zz
-                val p: P = pp.element
-                val unitM: M = unit(pre.action.actionCarrier.toI(z))
-                val a: A = p(pairs.pair(unitM, z))
-                Ɛ.ElementWrapper(a)
-              }},
-              zz2aa => {
-                val p = zz2aa.element.asInstanceOf[P] // TODO: fix cast? Need topos API method to adjust elements here?
-                Ɛ.ElementWrapper(p)
+          that.withAction(new ActionReceiver[TT, EXPONENTIAL[AA, TT]] {
+            override def receive[T <: Ɛ.ELEMENT](thatStar: RightActionStar[T], Δ: T ↔ TT) = {            
+              val pairs = carrier x action.actionCarrier
+              val possibleMorphisms = pairs > thatStar.action.actionCarrier
+              val isMorphism = (pairs x carrier).forAll(possibleMorphisms) {
+                case (f, ((m, x), n)) =>
+                  thatStar.action.actionCarrier.diagonal(
+                    f(pairs.pair(multiply(m, n), action.actionMultiply(x, n))),
+                    thatStar.action.actionMultiply(f(pairs.pair(m, x)), n)
+                  )
               }
-            )
-            new LaxRightActionStarFacade(innerExpStar, Δ) with ExponentialStar[ZZ, AA] { exponentialStar =>
-              val source: STAR[ZZ] = pre
-              val target: STAR[AA] = star
-              def transpose[RR <: ELEMENT](biQuiver: BiQuiver[RR, ZZ, AA]): QUIVER[RR, ZZ > AA] = {
-                val lhs: STAR[RR] = biQuiver.product.left
-                lhs.withAction(new ActionReceiver[RR, QUIVER[RR, ZZ > AA]] {
-                  override def receive[R <: Ɛ.ELEMENT](lhsActionStar: RightActionStar[R], Ψ: R ↔ RR) = {
-                    val innerQuiver: Ɛ.QUIVER[R, P] =
-                      morphisms.restrict(possibleMorphisms.transpose(
-                        (lhsActionStar.action.actionCarrier x pairs).biQuiver(action.actionCarrier) {
-                          case (r, (m, z)) => 
-                            val rr: RR = Ψ / lhsActionStar.action.actionMultiply(r, m)
-                            val zz: ZZ = outerFacade.equivalence / z
-                            equivalence \ biQuiver(rr, zz)
-                          }))
-                      lhs(exponentialStar) { rr =>
-                         val p: P = innerQuiver(Ψ \ rr)
-                         val pp = Ɛ.ElementWrapper(p)
-                         Δ / pp
-                      }
-                  }})
-              }
-            }
-          }
+              val morphisms = possibleMorphisms.toTrue ?= isMorphism
+              val morphismMultiply = morphisms.restrict(possibleMorphisms.transpose(
+                (morphisms x carrier x pairs).biQuiver(thatStar.action.actionCarrier) {
+                  case ((f, s), (t, y)) => morphisms.inclusion(f)(
+                    pairs.pair(multiply(s, t), y)
+                )}))
+              type P = Ɛ.>[Ɛ.x[M, A],T]
+              type PP = Ɛ.ElementWrapper[P]
+              val innerExpStar: STAR[PP] = new RightActionStar[P](rightAction(morphisms)(
+                Ɛ.BiQuiver(morphisms x carrier, morphismMultiply).apply
+              )) 
+              val Γ = new ↔[PP, AA > TT](
+                pp => pp { (aa: AA) => {
+                  val a = equivalence \ aa
+                  val p: P = pp.element
+                  val unitM: M = unit(action.actionCarrier.toI(a))
+                  val t: T = p(pairs.pair(unitM, a))
+                  Δ / t
+                }},
+                aa2tt => {
+                  val p = aa2tt.element.asInstanceOf[P] // TODO: fix cast? Need topos API method to adjust elements here?
+                  Ɛ.ElementWrapper(p)
+                }
+              )
+              new LaxRightActionStarFacade(innerExpStar, Γ) with ExponentialStar[AA, TT] { exponentialStar =>
+                val source: STAR[AA] = star
+                val target: STAR[TT] = that
+                def transpose[RR <: ELEMENT](biQuiver: BiQuiver[RR, AA, TT]): QUIVER[RR, AA > TT] = {
+                  val lhs: STAR[RR] = biQuiver.product.left
+                  lhs.withAction(new ActionReceiver[RR, QUIVER[RR, AA > TT]] {
+                    override def receive[R <: Ɛ.ELEMENT](lhsActionStar: RightActionStar[R], Ψ: R ↔ RR) = {
+                      val innerQuiver: Ɛ.QUIVER[R, P] =
+                        morphisms.restrict(possibleMorphisms.transpose(
+                          (lhsActionStar.action.actionCarrier x pairs).biQuiver(thatStar.action.actionCarrier) {
+                            case (r, (m, a)) => 
+                              val rr: RR = Ψ / lhsActionStar.action.actionMultiply(r, m)
+                              val aa: AA = equivalence / a
+                              Δ \ biQuiver(rr, aa)
+                            }))
+                        lhs(exponentialStar) { rr =>
+                           val p: P = innerQuiver(Ψ \ rr)
+                           val pp = Ɛ.ElementWrapper(p)
+                           Γ / pp
+                        }}})}}}})
 
         override def apply[TT <: ELEMENT](target: STAR[TT])(f: AA => TT): QUIVER[AA, TT] = null
 
