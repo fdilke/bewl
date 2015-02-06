@@ -14,12 +14,12 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
   trait ElementWrapper[A <: ELEMENT] { wrapper =>
     val element: A
 
-    def asPair[F, G](f: F, g: G) =
+    def apply[F, G](f: F, g: G): (F, G) with ElementWrapper[A] =
       new (F, G)(f, g) with ElementWrapper[A] {
         override val element = wrapper.element
       }
 
-    def asFunction[F, G](f2g: F => G) =
+    def apply[F, G](f2g: F => G): (F => G) with ElementWrapper[A] =
       new (F => G) with ElementWrapper[A] {
         def apply(f: F): G = f2g(f)
         override val element = wrapper.element
@@ -559,14 +559,14 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         F <: ELEMENT,
         G <: ELEMENT
       ] (f: F, g: G, biproduct: BIPRODUCT[E, G], Δ: Duality[E, F]) : F x G = 
-          biproduct.pair(Δ \ f, g).asPair(f, g)
+          biproduct.pair(Δ \ f, g)(f, g)
 
       private def rightLaxPair[
         D <: ELEMENT,
         E <: ELEMENT, 
         F <: ELEMENT
       ] (d: D, f: F, biproduct: BIPRODUCT[D, E], Δ: Duality[E, F]) : D x F = 
-          biproduct.pair(d, Δ \ f).asPair(d, f)
+          biproduct.pair(d, Δ \ f)(d, f)
 
       private class LeftLaxBiproduct[
         E <: ELEMENT, 
@@ -592,14 +592,14 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         F <: ELEMENT,
         G <: ELEMENT
       ] (e2g: E > G, Δ: Duality[E, F]) : F > G = 
-        e2g.asFunction((f: F) => e2g(Δ \ f))
+        e2g { (f: F) => e2g(Δ \ f) }
 
       private def rightLaxExponential[
         D <: ELEMENT, 
         E <: ELEMENT,
         F <: ELEMENT
       ] (d2e: D > E, Δ: Duality[E, F]) : D > F = 
-        d2e.asFunction((d: D) =>  Δ / d2e(d))
+        d2e { (d: D) =>  Δ / d2e(d) }
 
       private class LeftLaxExponentialStar[
         E <: ELEMENT, 
@@ -687,7 +687,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
           val innerBiproduct: Ɛ.BIPRODUCT[Z, A] = pre.action.actionCarrier x action.actionCarrier
           val Δ = new Duality[Ɛ.ElementWrapper[Ɛ.x[Z, A]], D x AA](
             zxa => zxa.element match { case (z, a) =>
-              zxa.asPair(
+              zxa(
                   Ɛ.ElementWrapper[Z](z).asInstanceOf[D], // TODO: fix cast
                   Ɛ.ElementWrapper[A](a) // TODO: shouldn't need all these generic args
                 )
@@ -700,7 +700,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
                 override def pair(d: D, e: AA): x[D, AA] = { 
                   val z: Z = d.element.asInstanceOf[Z] // TODO: fix cast
                   val a: A = e.element
-                  Ɛ.ElementWrapper(innerBiproduct.pair(z, a)).asPair(d, e)
+                  Ɛ.ElementWrapper(innerBiproduct.pair(z, a))(d, e)
                 }
               }
         }
@@ -734,13 +734,13 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
               Ɛ.BiQuiver(morphisms x carrier, morphismMultiply).apply
             )) 
             val Δ = new Duality[Q, D > AA](
-              q => q.asFunction( (d: D) => {
+              q => q { (d: D) => {
                 val z = d.element.asInstanceOf[Z] // TODO: fix cast
                 val p: P = q.element
                 val unitM: M = unit(pre.action.actionCarrier.toI(z))
                 val a: A = p(pairs.pair(unitM, z))
                 Ɛ.ElementWrapper(a)
-              }),
+              }},
               d2e => {
                 val p = d2e.element.asInstanceOf[P] // TODO: fix cast?
                 Ɛ.ElementWrapper(p)
