@@ -7,7 +7,7 @@ import com.fdilke.bewl.helper.Duality
 // Monoids and monoid actions defined as 'one-off' structures.
 // TODO: once more general machinery is in place, update all monoid code and deprecate this
 
-trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with LogicalOperations =>
+trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with LogicalOperations =>
 
   case class ElementProxy0[A <: ELEMENT](element: A)
 
@@ -38,29 +38,6 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         aa => aa.element
       )
   }
-
-/*
-  trait UntypedElementProxy {
-    type BASE <: ELEMENT
-    val element: BASE
-  }
-
-  class ElementProxy[A <: ELEMENT](override val element: A) extends UntypedElementProxy {
-    type BASE = A
-  }
-
-  object ElementProxy {
-    def pair[L <: UntypedElementProxy, R <: UntypedElementProxy](
-      l: L, 
-      r: R,
-      productStar: BiproductStar[L#BASE, R#BASE]
-    ) = 
-    new (L, R)(l, r) with UntypedElementProxy {
-      type BASE = L#BASE x R#BASE
-      val element = productStar.pair(l.element, r.element) 
-    }
-  }
-*/
 
   case class NaiveMonoid[M <: ELEMENT](carrier: STAR[M], unit: NullaryOp[M], multiply: BinaryOp[M]) {
     def sanityTest {
@@ -132,26 +109,26 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
 
     class RightMonoidActions extends Topos with 
       Wrappings[ELEMENT, RightAction, RightActionPrequiver] {
-      override type ELEMENT = self.ELEMENT
+      override type ELEMENT = Ɛ.ELEMENT
       override type STAR[S <: ELEMENT] = RightActionStar[S]
       override type QUIVER[S <: ELEMENT, T <: ELEMENT] = RightActionQuiver[S, T]
-      override type UNIT = self.UNIT
+      override type UNIT = Ɛ.UNIT
 
-      type RIGHT_IDEAL = M > self.TRUTH
+      type RIGHT_IDEAL = M > Ɛ.TRUTH
       override type TRUTH = RIGHT_IDEAL
-      override val I = RightActionStar(self.I) { (i, m) => i }
+      override val I = RightActionStar(Ɛ.I) { (i, m) => i }
 
       private object RightIdeals {
         private val possibleIdeals = carrier.power
         private val isIdeal = (carrier x carrier).forAll(possibleIdeals) {
           case (f, (m, n)) =>
-            self.TruthObject.implies(f(m), f(multiply(m, n)))
+            Ɛ.TruthObject.implies(f(m), f(multiply(m, n)))
         }
         private val ideals = possibleIdeals.toTrue ?= isIdeal
         
-        def restrict[H <: self.ELEMENT](that: self.STAR[H])(bifunc: (H, M) => self.TRUTH): self.QUIVER[H, RIGHT_IDEAL] = 
+        def restrict[H <: Ɛ.ELEMENT](that: Ɛ.STAR[H])(bifunc: (H, M) => Ɛ.TRUTH): Ɛ.QUIVER[H, RIGHT_IDEAL] = 
           ideals.restrict(possibleIdeals.transpose(
-            (that x carrier).biQuiver(self.omega)(bifunc)
+            (that x carrier).biQuiver(Ɛ.omega)(bifunc)
           ))
 
         private val idealMultiply = restrict(ideals x carrier) {
@@ -159,15 +136,15 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
           }
 
         val omega = RightActionStar[RIGHT_IDEAL](ideals)(
-            self.BiQuiver[RIGHT_IDEAL, M, RIGHT_IDEAL](ideals x carrier, idealMultiply)(_, _)
+            Ɛ.BiQuiver[RIGHT_IDEAL, M, RIGHT_IDEAL](ideals x carrier, idealMultiply)(_, _)
           )
       }
 
       override lazy val omega = RightIdeals.omega
 
       override lazy val truth = 
-        new RightActionQuiver(I, omega, carrier.power.transpose((self.I x carrier).biQuiver(self.omega) {
-            case(x, m) => self.truth(x)
+        new RightActionQuiver(I, omega, carrier.power.transpose((Ɛ.I x carrier).biQuiver(Ɛ.omega) {
+            case(x, m) => Ɛ.truth(x)
         }))
 
       class RightActionStar[A <: ELEMENT](
@@ -213,7 +190,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
             )}))
 
           new RightActionStar[(M x A) > T](rightAction(morphisms)(
-              self.BiQuiver(morphisms x carrier, morphismMultiply).apply
+              Ɛ.BiQuiver(morphisms x carrier, morphismMultiply).apply
             )) with ExponentialStar[M x A, T] { exponentialStar =>
             override val source = star.asInstanceOf[STAR[M x A]]
             override val target = that
@@ -235,14 +212,14 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
       }
 
       object RightActionStar {
-        def apply[A <: ELEMENT](actionCarrier: self.STAR[A])(actionMultiply: (A, M) => A) =
+        def apply[A <: ELEMENT](actionCarrier: Ɛ.STAR[A])(actionMultiply: (A, M) => A) =
           new RightActionStar(rightAction(actionCarrier)(actionMultiply))
       }
 
       class RightActionQuiver[S <: ELEMENT, T <: ELEMENT](
         val source: RightActionStar[S],
         val target: RightActionStar[T],
-        val quiver: self.QUIVER[S, T]
+        val quiver: Ɛ.QUIVER[S, T]
        ) extends Quiver[S, T] {
         override lazy val chi = 
           new RightActionQuiver(target, omega, 
@@ -317,42 +294,42 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
     }    
 
     class RightMonoidActionsInDraft extends Topos with 
-      Wrappings[self.ELEMENT, RightAction, RightActionPrequiver] {
-      override type ELEMENT = self.ElementProxy0[_]
+      Wrappings[Ɛ.ELEMENT, RightAction, RightActionPrequiver] {
+      override type ELEMENT = Ɛ.ElementProxy0[_]
       override type STAR[S <: ELEMENT] = RightActionStar[_, S]
       override type QUIVER[S <: ELEMENT, T <: ELEMENT] = RightActionQuiver[_, S, _, T]
-      override type UNIT = self.ElementProxy0[self.UNIT]
-      type RIGHT_IDEAL = self.>[M, self.TRUTH]
-      override type TRUTH = self.ElementProxy0[RIGHT_IDEAL]
-      override val I = RightActionStar(self.I) { (i, m) => i }
+      override type UNIT = Ɛ.ElementProxy0[Ɛ.UNIT]
+      type RIGHT_IDEAL = Ɛ.>[M, Ɛ.TRUTH]
+      override type TRUTH = Ɛ.ElementProxy0[RIGHT_IDEAL]
+      override val I = RightActionStar(Ɛ.I) { (i, m) => i }
 
       private object RightIdeals {
         private val possibleIdeals = carrier.power
         private val isIdeal = (carrier x carrier).forAll(possibleIdeals) {
-          case (f, (m, n)) => self.OmegaEnrichments(f(m)) > f(multiply(m, n))
+          case (f, (m, n)) => Ɛ.OmegaEnrichments(f(m)) > f(multiply(m, n))
         }
         private val ideals = possibleIdeals.toTrue ?= isIdeal
 
-        def restrict[H <: self.ELEMENT](that: self.STAR[H])(bifunc: (H, M) => self.TRUTH): self.QUIVER[H, RIGHT_IDEAL] = 
+        def restrict[H <: Ɛ.ELEMENT](that: Ɛ.STAR[H])(bifunc: (H, M) => Ɛ.TRUTH): Ɛ.QUIVER[H, RIGHT_IDEAL] = 
           ideals.restrict(possibleIdeals.transpose(
-            (that x carrier).biQuiver(self.omega)(bifunc)
+            (that x carrier).biQuiver(Ɛ.omega)(bifunc)
           ))
 
         private val idealMultiply = restrict(ideals x carrier) {
             case ((i, s), t) => ideals.inclusion(i)(multiply(s, t))
           }
         val omega = RightActionStar[RIGHT_IDEAL](ideals)(
-            self.BiQuiver[RIGHT_IDEAL, M, RIGHT_IDEAL](ideals x carrier, idealMultiply)(_, _)
+            Ɛ.BiQuiver[RIGHT_IDEAL, M, RIGHT_IDEAL](ideals x carrier, idealMultiply)(_, _)
           )
       }
       override lazy val omega = RightIdeals.omega
 
       override lazy val truth = 
-        new RightActionQuiver(I, omega, carrier.power.transpose((self.I x carrier).biQuiver(self.omega) {
-            case (x, m) => self.truth(x)
+        new RightActionQuiver(I, omega, carrier.power.transpose((Ɛ.I x carrier).biQuiver(Ɛ.omega) {
+            case (x, m) => Ɛ.truth(x)
         }))
 
-      class RightActionStar[A <: self.ELEMENT, E <: self.ElementProxy0[A]](
+      class RightActionStar[A <: Ɛ.ELEMENT, E <: Ɛ.ElementProxy0[A]](
         private[RightMonoidActionsInDraft] val action: RightAction[A]
         ) extends Star[E] { star =>
         override val toI: QUIVER[E, UNIT] = 
@@ -364,19 +341,19 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         }
 
         // override def xUncached[B <: ELEMENT](that: STAR[B]): BIPRODUCT[E, B] = null
-          // override def xUncached[B <: self.ELEMENT, F <: ELEMENT](that: RightActionStar[B, F]): BIPRODUCT[E, F] = {
+          // override def xUncached[B <: Ɛ.ELEMENT, F <: ELEMENT](that: RightActionStar[B, F]): BIPRODUCT[E, F] = {
         override def xUncached[F <: ELEMENT](that: STAR[F]): BIPRODUCT[E, F] = 
           that.preMultiplyUncached(this)
 
-        private def preMultiplyUncached[Z <: self.ELEMENT, D <: self.ElementProxy0[Z]](pre: RightActionStar[Z, D]) : BIPRODUCT[D, E] = null
+        private def preMultiplyUncached[Z <: Ɛ.ELEMENT, D <: Ɛ.ElementProxy0[Z]](pre: RightActionStar[Z, D]) : BIPRODUCT[D, E] = null
 /*          
-        private def preMultiplyUncached[Z <: self.ELEMENT, D <: self.ElementProxy0[Z]](pre: RightActionStar[Z, D]) : BIPRODUCT[D, E] = {
+        private def preMultiplyUncached[Z <: Ɛ.ELEMENT, D <: Ɛ.ElementProxy0[Z]](pre: RightActionStar[Z, D]) : BIPRODUCT[D, E] = {
           val product = pre.action.actionCarrier x action.actionCarrier 
-          val test1: (D, E) with self.ElementProxy0[self.x[Z, A]] = null.asInstanceOf[(D, E) with self.ElementProxy0[self.x[Z, A]]]
+          val test1: (D, E) with Ɛ.ElementProxy0[Ɛ.x[Z, A]] = null.asInstanceOf[(D, E) with Ɛ.ElementProxy0[Ɛ.x[Z, A]]]
           val test2: D x E = test1
           val test3: D x E = null.asInstanceOf[D x E]
-          val test4: (D, E) with self.ElementProxy0[self.x[Z, A]] = test3
-          new RightActionStar[self.x[Z, A], (D, E) with self.ElementProxy0[self.x[Z, A]]] (
+          val test4: (D, E) with Ɛ.ElementProxy0[Ɛ.x[Z, A]] = test3
+          new RightActionStar[Ɛ.x[Z, A], (D, E) with Ɛ.ElementProxy0[Ɛ.x[Z, A]]] (
             rightAction(product){
               case ((z, a), m) => product.pair(
                   pre.action.actionMultiply(z, m),
@@ -397,14 +374,14 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
       }
 
       object RightActionStar {
-        def apply[A <: self.ELEMENT](actionCarrier: self.STAR[A])(actionMultiply: (A, M) => A) =
-          new RightActionStar[A, self.ElementProxy0[A]](rightAction(actionCarrier)(actionMultiply))
+        def apply[A <: Ɛ.ELEMENT](actionCarrier: Ɛ.STAR[A])(actionMultiply: (A, M) => A) =
+          new RightActionStar[A, Ɛ.ElementProxy0[A]](rightAction(actionCarrier)(actionMultiply))
       }
 
-      class RightActionQuiver[S <: self.ELEMENT, E <: self.ElementProxy0[S], T <: self.ELEMENT, F <: self.ElementProxy0[T]](
+      class RightActionQuiver[S <: Ɛ.ELEMENT, E <: Ɛ.ElementProxy0[S], T <: Ɛ.ELEMENT, F <: Ɛ.ElementProxy0[T]](
         val source: RightActionStar[S, E],
         val target: RightActionStar[T, F],
-        val quiver: self.QUIVER[S, T]
+        val quiver: Ɛ.QUIVER[S, T]
        ) extends Quiver[E, F] {
         override lazy val chi: QUIVER[F, TRUTH] = 
           new RightActionQuiver(target, omega, 
@@ -435,19 +412,19 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         override def hashCode = 0
       }
 
-      override type WRAPPER[T <: self.ELEMENT] = self.ElementProxy0[T]
+      override type WRAPPER[T <: Ɛ.ELEMENT] = Ɛ.ElementProxy0[T]
 
       private val memoizedStarWrapper = {
-        type STAR_WRAPPER[T <: self.ELEMENT] = STAR[WRAPPER[T]]
-        def wrap[T <: self.ELEMENT](input: RightAction[T]): STAR_WRAPPER[T] =
+        type STAR_WRAPPER[T <: Ɛ.ELEMENT] = STAR[WRAPPER[T]]
+        def wrap[T <: Ɛ.ELEMENT](input: RightAction[T]): STAR_WRAPPER[T] =
           new RightActionStar[T, WRAPPER[T]](input)
-        Memoize.generic.withLowerBound[RightAction, STAR_WRAPPER, self.ELEMENT](wrap)
+        Memoize.generic.withLowerBound[RightAction, STAR_WRAPPER, Ɛ.ELEMENT](wrap)
       }
 
-      override def star[T <: self.ELEMENT](input: RightAction[T]): STAR[WRAPPER[T]] =
+      override def star[T <: Ɛ.ELEMENT](input: RightAction[T]): STAR[WRAPPER[T]] =
         memoizedStarWrapper(input)
 
-      override def quiver[S <: self.ELEMENT, T <: self.ELEMENT](
+      override def quiver[S <: Ɛ.ELEMENT, T <: Ɛ.ELEMENT](
         prequiver: RightActionPrequiver[S, T]
       ) = functionAsQuiver(
         star(prequiver.source), 
@@ -455,7 +432,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         prequiver.function
       )
 
-      override def functionAsQuiver[S <: self.ELEMENT, T <: self.ELEMENT](
+      override def functionAsQuiver[S <: Ɛ.ELEMENT, T <: Ɛ.ELEMENT](
         source: STAR[WRAPPER[S]], 
         target: STAR[WRAPPER[T]], 
         f: S => T
@@ -470,9 +447,9 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
       }
 
       override def bifunctionAsBiQuiver[
-        L <: self.ELEMENT, 
-        R <: self.ELEMENT, 
-        T <: self.ELEMENT
+        L <: Ɛ.ELEMENT, 
+        R <: Ɛ.ELEMENT, 
+        T <: Ɛ.ELEMENT
       ] (
         left: STAR[WRAPPER[L]],
         right: STAR[WRAPPER[R]],
@@ -484,51 +461,51 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         val r =   left.asInstanceOf[RightActionStar[R, WRAPPER[R]]]
         val t = target.asInstanceOf[RightActionStar[T, WRAPPER[T]]]
         (l x r).biQuiver(t) { (a, b) =>
-          self.ElementProxy0(bifunc(a.element, b.element))
+          Ɛ.ElementProxy0(bifunc(a.element, b.element))
         }
       }
     }
 
     class RightMonoidActionsInDraft2 extends Topos with 
-      Wrappings[self.ELEMENT, RightAction, RightActionPrequiver] {
-      override type ELEMENT = self.ElementWrapper[_ <: self.ELEMENT]
+      Wrappings[Ɛ.ELEMENT, RightAction, RightActionPrequiver] {
+      override type ELEMENT = Ɛ.ElementWrapper[_ <: Ɛ.ELEMENT]
       override type STAR[E <: ELEMENT] = RightActionStarFacade[E]
       override type QUIVER[E <: ELEMENT, F <: ELEMENT] = RightActionQuiverFacade[E, F]
-      override type UNIT = self.ElementWrapper[self.UNIT]
-      type RIGHT_IDEAL = self.>[M, self.TRUTH]
-      override type TRUTH = self.ElementWrapper[RIGHT_IDEAL]
-      override val I = RightActionStar(self.I) { (i, m) => i }
+      override type UNIT = Ɛ.ElementWrapper[Ɛ.UNIT]
+      type RIGHT_IDEAL = Ɛ.>[M, Ɛ.TRUTH]
+      override type TRUTH = Ɛ.ElementWrapper[RIGHT_IDEAL]
+      override val I = RightActionStar(Ɛ.I) { (i, m) => i }
 
       private object RightIdeals {
         private val possibleIdeals = carrier.power
         private val isIdeal = (carrier x carrier).forAll(possibleIdeals) {
-          case (f, (m, n)) => self.OmegaEnrichments(f(m)) > f(multiply(m, n))
+          case (f, (m, n)) => Ɛ.OmegaEnrichments(f(m)) > f(multiply(m, n))
         }
         private val ideals = possibleIdeals.toTrue ?= isIdeal
 
-        def restrict[H <: self.ELEMENT](that: self.STAR[H])(bifunc: (H, M) => self.TRUTH): self.QUIVER[H, RIGHT_IDEAL] = 
+        def restrict[H <: Ɛ.ELEMENT](that: Ɛ.STAR[H])(bifunc: (H, M) => Ɛ.TRUTH): Ɛ.QUIVER[H, RIGHT_IDEAL] = 
           ideals.restrict(possibleIdeals.transpose(
-            (that x carrier).biQuiver(self.omega)(bifunc)
+            (that x carrier).biQuiver(Ɛ.omega)(bifunc)
           ))
 
         private val idealMultiply = restrict(ideals x carrier) {
             case ((i, s), t) => ideals.inclusion(i)(multiply(s, t))
           }
         val omega = RightActionStar[RIGHT_IDEAL](ideals)(
-            self.BiQuiver[RIGHT_IDEAL, M, RIGHT_IDEAL](ideals x carrier, idealMultiply)(_, _)
+            Ɛ.BiQuiver[RIGHT_IDEAL, M, RIGHT_IDEAL](ideals x carrier, idealMultiply)(_, _)
           )
       }
       override lazy val omega = RightIdeals.omega
       override lazy val truth = 
-        new RightActionQuiver(I, omega, carrier.power.transpose((self.I x carrier).biQuiver(self.omega) {
-            case (x, m) => self.truth(x)
+        new RightActionQuiver(I, omega, carrier.power.transpose((Ɛ.I x carrier).biQuiver(Ɛ.omega) {
+            case (x, m) => Ɛ.truth(x)
         }))
 
       trait RightActionStarFacade[E <: ELEMENT] extends Star[E] { facade => 
-        private[RightMonoidActionsInDraft2] def preMultiplyUncached[Z <: self.ELEMENT, D <: ELEMENT](
+        private[RightMonoidActionsInDraft2] def preMultiplyUncached[Z <: Ɛ.ELEMENT, D <: ELEMENT](
           pre: RightActionStar[Z] with RightActionStarFacade[D]
         ) : BIPRODUCT[D, E]
-        private[RightMonoidActionsInDraft2] def preExponentiateUncached[Z <: self.ELEMENT, D <: ELEMENT](
+        private[RightMonoidActionsInDraft2] def preExponentiateUncached[Z <: Ɛ.ELEMENT, D <: ELEMENT](
           pre: RightActionStar[Z] with RightActionStarFacade[D]
         ) : EXPONENTIAL[D, E]
       }
@@ -547,12 +524,12 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
           new LeftLaxRightActionQuiverFacade(delegate(target)(f compose (Δ./)), Δ, this)
         def sanityTest = delegate.sanityTest
 
-        override private[RightMonoidActionsInDraft2] def preMultiplyUncached[Z <: self.ELEMENT, D <: ELEMENT](
+        override private[RightMonoidActionsInDraft2] def preMultiplyUncached[Z <: Ɛ.ELEMENT, D <: ELEMENT](
           pre: RightActionStar[Z] with RightActionStarFacade[D]
         ) : BIPRODUCT[D, F] = 
           new RightLaxBiproduct(delegate.preMultiplyUncached[Z, D](pre), Δ, this)
 
-        private[RightMonoidActionsInDraft2] def preExponentiateUncached[Z <: self.ELEMENT, D <: ELEMENT](
+        private[RightMonoidActionsInDraft2] def preExponentiateUncached[Z <: Ɛ.ELEMENT, D <: ELEMENT](
           pre: RightActionStar[Z] with RightActionStarFacade[D]
         ) : EXPONENTIAL[D, F] =
           new RightLaxExponentialStar(delegate.preExponentiateUncached[Z, D](pre), Δ, this)
@@ -582,10 +559,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         F <: ELEMENT,
         G <: ELEMENT
         ] (delegate: E, f: F, g: G): F x G =
-          delegate.asPair(f, g) // TODO: inline
-          // new (F, G)(f, g) with self.ElementWrapper[delegate.BASE] { // TODO: refactor into ElementWrapper
-          //   override val element = delegate.element
-          // }
+          delegate.asPair(f, g) 
 
       private def leftLaxPair[
         E <: ELEMENT, 
@@ -690,9 +664,9 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         }
       }
 
-      class RightActionStar[A <: self.ELEMENT](private[RightMonoidActionsInDraft2] val action: RightAction[A]) extends
-        RightActionStarFacade[self.ElementWrapper[A]] { star =>
-        private type AA = self.ElementWrapper[A]
+      class RightActionStar[A <: Ɛ.ELEMENT](private[RightMonoidActionsInDraft2] val action: RightAction[A]) extends
+        RightActionStarFacade[Ɛ.ElementWrapper[A]] { star =>
+        private type AA = Ɛ.ElementWrapper[A]
 
         override val toI: QUIVER[AA, UNIT] = 
           new RightActionQuiver(this, I, action.actionCarrier.toI)
@@ -706,26 +680,26 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
           that.preMultiplyUncached[A, AA](this)
 
         override private[RightMonoidActionsInDraft2] def 
-          preMultiplyUncached[Z <: self.ELEMENT, D <: ELEMENT](
+          preMultiplyUncached[Z <: Ɛ.ELEMENT, D <: ELEMENT](
           pre: RightActionStar[Z] with RightActionStarFacade[D]
         ) : BIPRODUCT[D, AA] = {
           val product = pre.action.actionCarrier x action.actionCarrier 
-          val innerStar = new RightActionStar[self.x[Z, A]] (
+          val innerStar = new RightActionStar[Ɛ.x[Z, A]] (
             rightAction(product){
               case ((z, a), m) => product.pair(
                   pre.action.actionMultiply(z, m),
                   action.actionMultiply(a, m) 
                 )
               })
-          val innerBiproduct: self.BIPRODUCT[Z, A] = pre.action.actionCarrier x action.actionCarrier
-          val Δ = new Duality[self.ElementWrapper[self.x[Z, A]], D x AA](
+          val innerBiproduct: Ɛ.BIPRODUCT[Z, A] = pre.action.actionCarrier x action.actionCarrier
+          val Δ = new Duality[Ɛ.ElementWrapper[Ɛ.x[Z, A]], D x AA](
             zxa => zxa.element match { case (z, a) =>
               zxa.asPair(
-                  self.ElementWrapper[Z](z).asInstanceOf[D], // TODO: fix cast
-                  self.ElementWrapper[A](a) // TODO: shouldn't need all these generic args
+                  Ɛ.ElementWrapper[Z](z).asInstanceOf[D], // TODO: fix cast
+                  Ɛ.ElementWrapper[A](a) // TODO: shouldn't need all these generic args
                 )
               },
-              dxe => self.ElementWrapper(dxe.element.asInstanceOf[self.x[Z, A]]) // TODO: fix cast?
+              dxe => Ɛ.ElementWrapper(dxe.element.asInstanceOf[Ɛ.x[Z, A]]) // TODO: fix cast?
             )
           new LaxRightActionStarFacade(innerStar, Δ) with BiproductStar[D, AA] {
                 override val left: STAR[D] = pre
@@ -733,7 +707,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
                 override def pair(d: D, e: AA): x[D, AA] = { 
                   val z: Z = d.element.asInstanceOf[Z] // TODO: fix cast
                   val a: A = e.element
-                  self.ElementWrapper(innerBiproduct.pair(z, a)).asPair(d, e)
+                  Ɛ.ElementWrapper(innerBiproduct.pair(z, a)).asPair(d, e)
                 }
               }
         }
@@ -742,7 +716,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
           that.preExponentiateUncached[A, AA](this)
 
         override private[RightMonoidActionsInDraft2] def 
-          preExponentiateUncached[Z <: self.ELEMENT, D <: ELEMENT](
+          preExponentiateUncached[Z <: Ɛ.ELEMENT, D <: ELEMENT](
           pre: RightActionStar[Z] with RightActionStarFacade[D]
         ) : EXPONENTIAL[D, AA] = {
             val pairs = carrier x pre.action.actionCarrier
@@ -760,11 +734,11 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
                 case ((f, s), (t, y)) => morphisms.inclusion(f)(
                   pairs.pair(multiply(s, t), y)
               )}))
-            type P = self.>[self.x[M, Z],A]
-            type Q = self.ElementWrapper[P]
+            type P = Ɛ.>[Ɛ.x[M, Z],A]
+            type Q = Ɛ.ElementWrapper[P]
 
             val innerExpStar: STAR[Q] = new RightActionStar[P](rightAction(morphisms)(
-              self.BiQuiver(morphisms x carrier, morphismMultiply).apply
+              Ɛ.BiQuiver(morphisms x carrier, morphismMultiply).apply
             )) 
             val Δ = new Duality[Q, D > AA](
               q => q.asFunction( (d: D) => {
@@ -772,7 +746,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
                 val p: P = q.element
                 val unitM: M = unit(pre.action.actionCarrier.toI(z))
                 val a: A = p(pairs.pair(unitM, z))
-                self.ElementWrapper(a)
+                Ɛ.ElementWrapper(a)
               }),
               // new (D => AA) with ELEMENT {
               //   override def apply(d: D):AA = {
@@ -780,14 +754,14 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
               //     val p: P = q.element
               //     val unitM: M = unit(pre.action.actionCarrier.toI(z))
               //     val a: A = p(pairs.pair(unitM, z))
-              //     self.ElementWrapper(a)
+              //     Ɛ.ElementWrapper(a)
               //   }
               //   override type BASE = q.BASE
               //   override val element = q.element
               // },
               d2e => {
                 val p = d2e.element.asInstanceOf[P] // TODO: fix cast?
-                self.ElementWrapper(p)
+                Ɛ.ElementWrapper(p)
               }
             )
             new LaxRightActionStarFacade(innerExpStar, Δ) with ExponentialStar[D, AA] { exponentialStar =>
@@ -826,7 +800,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
       }
 
       object RightActionStar {
-        def apply[A <: self.ELEMENT](actionCarrier: self.STAR[A])(actionMultiply: (A, M) => A) =
+        def apply[A <: Ɛ.ELEMENT](actionCarrier: Ɛ.STAR[A])(actionMultiply: (A, M) => A) =
           new RightActionStar[A](rightAction(actionCarrier)(actionMultiply))
       }
 
@@ -861,13 +835,13 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         def sanityTest = delegate.sanityTest
       }
 
-      class RightActionQuiver[A <: self.ELEMENT, B <: self.ELEMENT](
+      class RightActionQuiver[A <: Ɛ.ELEMENT, B <: Ɛ.ELEMENT](
         val source: RightActionStar[A],
         val target: RightActionStar[B],
-        val quiver: self.QUIVER[A, B]
-      ) extends RightActionQuiverFacade[self.ElementWrapper[A], self.ElementWrapper[B]] {
-        private type E = self.ElementWrapper[A]
-        private type F = self.ElementWrapper[B]
+        val quiver: Ɛ.QUIVER[A, B]
+      ) extends RightActionQuiverFacade[Ɛ.ElementWrapper[A], Ɛ.ElementWrapper[B]] {
+        private type E = Ɛ.ElementWrapper[A]
+        private type F = Ɛ.ElementWrapper[B]
 
         override lazy val chi: QUIVER[F, TRUTH] = null
 
@@ -890,19 +864,19 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         override def hashCode = 0
       }
 
-      override type WRAPPER[T <: self.ELEMENT] = self.ElementWrapper[T]
+      override type WRAPPER[T <: Ɛ.ELEMENT] = Ɛ.ElementWrapper[T]
 
       private val memoizedStarWrapper = {
-        type STAR_WRAPPER[T <: self.ELEMENT] = STAR[WRAPPER[T]]
-        def wrap[T <: self.ELEMENT](input: RightAction[T]): STAR_WRAPPER[T] =
+        type STAR_WRAPPER[T <: Ɛ.ELEMENT] = STAR[WRAPPER[T]]
+        def wrap[T <: Ɛ.ELEMENT](input: RightAction[T]): STAR_WRAPPER[T] =
           null // new RightActionStar[T, WRAPPER[T]](input)
-        Memoize.generic.withLowerBound[RightAction, STAR_WRAPPER, self.ELEMENT](wrap)
+        Memoize.generic.withLowerBound[RightAction, STAR_WRAPPER, Ɛ.ELEMENT](wrap)
       }
 
-      override def star[T <: self.ELEMENT](input: RightAction[T]): STAR[WRAPPER[T]] =
+      override def star[T <: Ɛ.ELEMENT](input: RightAction[T]): STAR[WRAPPER[T]] =
         null // memoizedStarWrapper(input)
 
-      override def quiver[S <: self.ELEMENT, T <: self.ELEMENT](
+      override def quiver[S <: Ɛ.ELEMENT, T <: Ɛ.ELEMENT](
         prequiver: RightActionPrequiver[S, T]
       ) = functionAsQuiver(
         star(prequiver.source), 
@@ -910,7 +884,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         prequiver.function
       )
 
-      override def functionAsQuiver[S <: self.ELEMENT, T <: self.ELEMENT](
+      override def functionAsQuiver[S <: Ɛ.ELEMENT, T <: Ɛ.ELEMENT](
         source: STAR[WRAPPER[S]], 
         target: STAR[WRAPPER[T]], 
         f: S => T
@@ -925,9 +899,9 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
       }
 
       override def bifunctionAsBiQuiver[
-        L <: self.ELEMENT, 
-        R <: self.ELEMENT, 
-        T <: self.ELEMENT
+        L <: Ɛ.ELEMENT, 
+        R <: Ɛ.ELEMENT, 
+        T <: Ɛ.ELEMENT
       ] (
         left: STAR[WRAPPER[L]],
         right: STAR[WRAPPER[R]],
@@ -940,7 +914,7 @@ trait NaiveMonoidsAndActions { self: BaseTopos with AlgebraicMachinery with Logi
         // val r =   left.asInstanceOf[RightActionStar[R, WRAPPER[R]]]
         // val t = target.asInstanceOf[RightActionStar[T, WRAPPER[T]]]
         // (l x r).biQuiver(t) { (a, b) =>
-        //   self.ElementProxy0(bifunc(a.element, b.element))
+        //   Ɛ.ElementProxy0(bifunc(a.element, b.element))
         // }
       }
     }
