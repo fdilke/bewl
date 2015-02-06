@@ -501,6 +501,10 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
             case (x, m) => Ɛ.truth(x)
         }))
 
+      trait ActionReceiver[AA, H] {
+        def receive[A <: Ɛ.ELEMENT](actionStar: RightActionStar[A], Δ: A ↔ AA): H
+      }
+
       trait RightActionStarFacade[AA <: ELEMENT] extends Star[AA] { facade => 
         private[RightMonoidActionsInDraft2] def preMultiplyUncached[Z <: Ɛ.ELEMENT, ZZ <: ELEMENT](
           pre: RightActionStar[Z] with RightActionStarFacade[ZZ]
@@ -508,6 +512,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         private[RightMonoidActionsInDraft2] def preExponentiateUncached[Z <: Ɛ.ELEMENT, ZZ <: ELEMENT](
           pre: RightActionStar[Z] with RightActionStarFacade[ZZ]
         ) : EXPONENTIAL[ZZ, AA]
+        private[RightMonoidActionsInDraft2] def withAction[H](receiver: ActionReceiver[AA, H]): H
       }
 
       private class LaxRightActionStarFacade[AA <: ELEMENT, BB <: ELEMENT](
@@ -533,6 +538,12 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
           pre: RightActionStar[Z] with RightActionStarFacade[ZZ]
         ) : EXPONENTIAL[ZZ, BB] =
           new RightLaxExponentialStar(delegate.preExponentiateUncached[Z, ZZ](pre), Δ, this)
+
+        private[RightMonoidActionsInDraft2] def withAction[H](receiver: ActionReceiver[BB, H]): H =
+          delegate.withAction(new ActionReceiver[AA, H] {
+            def receive[A <: Ɛ.ELEMENT](actionStar: RightActionStar[A], Ψ: A ↔ AA): H =
+              receiver.receive(actionStar, Ψ o Δ) // A ↔ BB from Ψ: A ↔ AA and Δ: AA ↔ BB)
+          })
       }
 
       private class RightLaxBiproduct[
@@ -657,8 +668,12 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         }
       }
 
+      trait RightActionStarOuterFacade[A <: Ɛ.ELEMENT, AA <: ELEMENT] extends RightActionStarFacade[AA] {
+        val equivalence: A ↔ AA
+      }
+
       class RightActionStar[A <: Ɛ.ELEMENT](private[RightMonoidActionsInDraft2] val action: RightAction[A]) extends
-        RightActionStarFacade[Ɛ.ElementWrapper[A]] { star =>
+        RightActionStarOuterFacade[A, Ɛ.ElementWrapper[A]] { star =>
         private type AA = Ɛ.ElementWrapper[A]
 
         override val toI: QUIVER[AA, UNIT] = 
@@ -778,7 +793,10 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
 
         override def apply[TT <: ELEMENT](target: STAR[TT])(f: AA => TT): QUIVER[AA, TT] = null
 
+        override val equivalence: A ↔ AA = Ɛ.ElementWrapper.↔[A]
         override def toString = "RightActionStar[" + action.actionCarrier + "]"
+        override private[RightMonoidActionsInDraft2] def withAction[H](receiver: ActionReceiver[AA, H]): H =
+          receiver.receive(star, equivalence)
       }
 
       object RightActionStar {
