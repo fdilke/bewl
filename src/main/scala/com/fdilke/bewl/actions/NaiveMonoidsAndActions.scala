@@ -709,9 +709,9 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
           that.preExponentiateUncached[A, AA](this)
 
         override private[RightMonoidActionsInDraft2] def 
-          preExponentiateUncached[Z <: Ɛ.ELEMENT, D <: ELEMENT](
-          pre: RightActionStar[Z] with RightActionStarFacade[D]
-        ) : EXPONENTIAL[D, AA] = {
+          preExponentiateUncached[Z <: Ɛ.ELEMENT, ZZ <: ELEMENT](
+          pre: RightActionStar[Z] with RightActionStarFacade[ZZ]
+        ) : EXPONENTIAL[ZZ, AA] = {
             val pairs = carrier x pre.action.actionCarrier
             val possibleMorphisms = pairs > action.actionCarrier
             val isMorphism = (pairs x carrier).forAll(possibleMorphisms) {
@@ -728,28 +728,28 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
                   pairs.pair(multiply(s, t), y)
               )}))
             type P = Ɛ.>[Ɛ.x[M, Z],A]
-            type Q = Ɛ.ElementWrapper[P]
+            type PP = Ɛ.ElementWrapper[P]
 
-            val innerExpStar: STAR[Q] = new RightActionStar[P](rightAction(morphisms)(
+            val innerExpStar: STAR[PP] = new RightActionStar[P](rightAction(morphisms)(
               Ɛ.BiQuiver(morphisms x carrier, morphismMultiply).apply
             )) 
-            val Δ = new Duality[Q, D > AA](
-              q => q { (d: D) => {
-                val z = d.element.asInstanceOf[Z] // TODO: fix cast
-                val p: P = q.element
+            val Δ = new Duality[PP, ZZ > AA](
+              pp => pp { (zz: ZZ) => {
+                val z = zz.element.asInstanceOf[Z] // TODO: fix cast
+                val p: P = pp.element
                 val unitM: M = unit(pre.action.actionCarrier.toI(z))
                 val a: A = p(pairs.pair(unitM, z))
                 Ɛ.ElementWrapper(a)
               }},
-              d2e => {
-                val p = d2e.element.asInstanceOf[P] // TODO: fix cast?
+              zz2aa => {
+                val p = zz2aa.element.asInstanceOf[P] // TODO: fix cast?
                 Ɛ.ElementWrapper(p)
               }
             )
-            new LaxRightActionStarFacade(innerExpStar, Δ) with ExponentialStar[D, AA] { exponentialStar =>
-              val source: STAR[D] = pre
+            new LaxRightActionStarFacade(innerExpStar, Δ) with ExponentialStar[ZZ, AA] { exponentialStar =>
+              val source: STAR[ZZ] = pre
               val target: STAR[AA] = star
-              def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, D, AA]): QUIVER[R, D > AA] = {
+              def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, ZZ, AA]): QUIVER[R, ZZ > AA] = {
                 // val lhs: STAR[R] = biQuiver.product.left
                 // val innerQ = morphisms.restrict(possibleMorphisms.transpose(
                 //   (lhs.action.actionCarrier x pairs).biQuiver(action.actionCarrier) {
