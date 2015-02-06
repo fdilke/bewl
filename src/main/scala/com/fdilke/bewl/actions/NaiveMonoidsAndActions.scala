@@ -2,7 +2,7 @@ package com.fdilke.bewl.actions
 
 import com.fdilke.bewl.topos._
 import com.fdilke.bewl.helper.Memoize
-import com.fdilke.bewl.helper.Duality
+import com.fdilke.bewl.helper.↔
 
 // Monoids and monoid actions defined as 'one-off' structures.
 // TODO: once more general machinery is in place, update all monoid code and deprecate this
@@ -32,8 +32,8 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         override val element = a
       }
 
-    def duality[A <: ELEMENT] =
-      new Duality[A, ElementWrapper[A]](
+    def ↔[A <: ELEMENT] =
+      new ↔[A, ElementWrapper[A]](
         a => ElementWrapper(a),
         aa => aa.element
       )
@@ -512,7 +512,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
 
       private class LaxRightActionStarFacade[AA <: ELEMENT, BB <: ELEMENT](
           delegate: RightActionStarFacade[AA],
-          Δ: Duality[AA, BB]
+          Δ: AA ↔ BB
         ) extends RightActionStarFacade[BB] {
         lazy val toI: QUIVER[BB, UNIT] =
           new LeftLaxRightActionQuiverFacade(delegate.toI, Δ, this)
@@ -541,10 +541,10 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         CC <: ELEMENT
       ] (
         delegate: BIPRODUCT[AA, BB],
-        Δ: Duality[BB, CC],
+        Δ: BB ↔ CC,
         laxStar: STAR[CC]
       ) extends LaxRightActionStarFacade[AA x BB, AA x CC](delegate,
-        new Duality[AA x BB, AA x CC] (
+        new ↔[AA x BB, AA x CC] (
           dxe => rightLaxPair(dxe._1, Δ / dxe._2, delegate, Δ),
           dxf => delegate.pair(dxf._1, Δ \ dxf._2)
         )
@@ -558,14 +558,14 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         E <: ELEMENT, 
         F <: ELEMENT,
         G <: ELEMENT
-      ] (f: F, g: G, biproduct: BIPRODUCT[E, G], Δ: Duality[E, F]) : F x G = 
+      ] (f: F, g: G, biproduct: BIPRODUCT[E, G], Δ: E ↔ F) : F x G = 
           biproduct.pair(Δ \ f, g)(f, g)
 
       private def rightLaxPair[
         D <: ELEMENT,
         E <: ELEMENT, 
         F <: ELEMENT
-      ] (d: D, f: F, biproduct: BIPRODUCT[D, E], Δ: Duality[E, F]) : D x F = 
+      ] (d: D, f: F, biproduct: BIPRODUCT[D, E], Δ: E ↔ F) : D x F = 
           biproduct.pair(d, Δ \ f)(d, f)
 
       private class LeftLaxBiproduct[
@@ -574,10 +574,10 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         G <: ELEMENT
       ] (
         delegate: BIPRODUCT[E, G],
-        Δ: Duality[E, F],
+        Δ: E ↔ F,
         laxStar: STAR[F]
       ) extends LaxRightActionStarFacade[E x G, F x G](delegate, 
-        new Duality[E x G, F x G](
+        new ↔[E x G, F x G](
           exg => leftLaxPair(Δ / (exg._1), exg._2, delegate, Δ),
           fxg => delegate.pair(Δ \ (fxg._1), fxg._2)
         )
@@ -591,14 +591,14 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         E <: ELEMENT, 
         F <: ELEMENT,
         G <: ELEMENT
-      ] (e2g: E > G, Δ: Duality[E, F]) : F > G = 
+      ] (e2g: E > G, Δ: E ↔ F) : F > G = 
         e2g { (f: F) => e2g(Δ \ f) }
 
       private def rightLaxExponential[
         D <: ELEMENT, 
         E <: ELEMENT,
         F <: ELEMENT
-      ] (d2e: D > E, Δ: Duality[E, F]) : D > F = 
+      ] (d2e: D > E, Δ: E ↔ F) : D > F = 
         d2e { (d: D) =>  Δ / d2e(d) }
 
       private class LeftLaxExponentialStar[
@@ -607,10 +607,10 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         G <: ELEMENT
       ] (
         delegate: EXPONENTIAL[E, G],
-        Δ: Duality[E, F],
+        Δ: E ↔ F,
         laxStar: STAR[F]
       ) extends LaxRightActionStarFacade[E > G, F > G](delegate,
-        new Duality[E > G, F > G](
+        new ↔[E > G, F > G](
           e2g => leftLaxExponential(e2g, Δ),
           f2g => leftLaxExponential(f2g, ~Δ)
         )
@@ -635,10 +635,10 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         F <: ELEMENT
       ] (
         delegate: EXPONENTIAL[D, E],
-        Δ: Duality[E, F],
+        Δ: E ↔ F,
         laxStar: STAR[F]
       ) extends LaxRightActionStarFacade[D > E, D > F](delegate,
-        new Duality[D > E, D > F](
+        new ↔[D > E, D > F](
           d2e => rightLaxExponential(d2e, Δ),
           d2f => rightLaxExponential(d2f, ~Δ)
         )
@@ -685,7 +685,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
                 )
               })
           val innerBiproduct: Ɛ.BIPRODUCT[Z, A] = pre.action.actionCarrier x action.actionCarrier
-          val Δ = new Duality[Ɛ.ElementWrapper[Ɛ.x[Z, A]], D x AA](
+          val Δ = new ↔[Ɛ.ElementWrapper[Ɛ.x[Z, A]], D x AA](
             zxa => zxa.element match { case (z, a) =>
               zxa(
                   Ɛ.ElementWrapper[Z](z).asInstanceOf[D], // TODO: fix cast
@@ -733,7 +733,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
             val innerExpStar: STAR[PP] = new RightActionStar[P](rightAction(morphisms)(
               Ɛ.BiQuiver(morphisms x carrier, morphismMultiply).apply
             )) 
-            val Δ = new Duality[PP, ZZ > AA](
+            val Δ = new ↔[PP, ZZ > AA](
               pp => pp { (zz: ZZ) => {
                 val z = zz.element.asInstanceOf[Z] // TODO: fix cast
                 val p: P = pp.element
@@ -797,7 +797,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         G <: ELEMENT
       ](
           delegate: RightActionQuiverFacade[E, G],
-          Δ: Duality[E, F],
+          Δ: E ↔ F,
           val source: RightActionStarFacade[F]
         ) extends RightActionQuiverFacade[F, G] {
         val target: STAR[G] = delegate.target
