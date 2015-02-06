@@ -100,3 +100,25 @@ and we have to have built into every topos, a class like:
 class RewiredExponential[X, A, B](x:X, f: A => B): A > B
 
 This might work, but it seems definitely something to try on a branch.
+
+# 'Laxifying' monoid actions
+Perhaps the fundamental unit is:
+  [  A and a RightAction[A]
+  [  AA and an equivalence A <-> AA
+If that works (and enables us to get rid of the LaxRightActionStar machinery),
+do the same for quivers.
+
+# Possible DSL extensions
+  Should an ELEMENT type always be an interface?
+  For the action exponentials to work, we need there to be an underlying object
+  which can be wrapped and rewrapped in multiple interfaces.
+  Does it matter that when an element of M x A -> B is regarded as an A -> B,
+  its function is no longer M-preserving? This seems acceptable only if the
+  function is only there for show, and the user doesn't have access to it.
+  Better to throw an exception if the function is ever called?
+  Should we have ELEMENT[X] instead of ELEMENT? in the mapping functions, for example?
+  Should the 'rewrapping' methods in ElementProxy be part of the topos API?
+  Can we arrange for a FiniteSet[X] to still ultimately be a Traversable[X], even if its
+  interface makes it look like a STAR[NEW_LAYER[X]] where NEW_LAYER has the rewrapper methods?
+
+  

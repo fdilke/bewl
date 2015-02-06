@@ -767,7 +767,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
           new RightActionStar[A](rightAction(actionCarrier)(actionMultiply))
       }
 
-      // TODO: fix, not adding any value
+      // TODO: will presumably be fleshed out as I populate the quiver API
       trait RightActionQuiverFacade[E <: ELEMENT, F <: ELEMENT] extends
         Quiver[E, F] { facade =>
       }
