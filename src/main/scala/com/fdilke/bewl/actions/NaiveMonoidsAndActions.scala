@@ -510,7 +510,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
           pre: RightActionStar[Z] with RightActionStarFacade[ZZ]
         ) : BIPRODUCT[ZZ, AA]
         private[RightMonoidActionsInDraft2] def preExponentiateUncached[Z <: Ɛ.ELEMENT, ZZ <: ELEMENT](
-          pre: RightActionStar[Z] with RightActionStarFacade[ZZ]
+          pre: RightActionStar[Z] with RightActionStarOuterFacade[Z, ZZ]
         ) : EXPONENTIAL[ZZ, AA]
         private[RightMonoidActionsInDraft2] def withAction[H](receiver: ActionReceiver[AA, H]): H
       }
@@ -535,13 +535,13 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
           new RightLaxBiproduct(delegate.preMultiplyUncached[Z, ZZ](pre), Δ, this)
 
         private[RightMonoidActionsInDraft2] def preExponentiateUncached[Z <: Ɛ.ELEMENT, ZZ <: ELEMENT](
-          pre: RightActionStar[Z] with RightActionStarFacade[ZZ]
+          pre: RightActionStar[Z] with RightActionStarOuterFacade[Z, ZZ]
         ) : EXPONENTIAL[ZZ, BB] =
           new RightLaxExponentialStar(delegate.preExponentiateUncached[Z, ZZ](pre), Δ, this)
 
         private[RightMonoidActionsInDraft2] def withAction[H](receiver: ActionReceiver[BB, H]): H =
           delegate.withAction(new ActionReceiver[AA, H] {
-            def receive[A <: Ɛ.ELEMENT](actionStar: RightActionStar[A], Ψ: A ↔ AA): H =
+            override def receive[A <: Ɛ.ELEMENT](actionStar: RightActionStar[A], Ψ: A ↔ AA): H =
               receiver.receive(actionStar, Ψ o Δ) // A ↔ BB from Ψ: A ↔ AA and Δ: AA ↔ BB)
           })
       }
@@ -710,14 +710,14 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
               dxe => Ɛ.ElementWrapper(dxe.element.asInstanceOf[Ɛ.x[Z, A]]) // TODO: fix cast?
             )
           new LaxRightActionStarFacade(innerStar, Δ) with BiproductStar[D, AA] {
-                override val left: STAR[D] = pre
-                override val right: STAR[AA] = star
-                override def pair(d: D, e: AA): x[D, AA] = { 
-                  val z: Z = d.element.asInstanceOf[Z] // TODO: fix cast
-                  val a: A = e.element
-                  Ɛ.ElementWrapper(innerBiproduct.pair(z, a))(d, e)
-                }
-              }
+            override val left: STAR[D] = pre
+            override val right: STAR[AA] = star
+            override def pair(d: D, e: AA): x[D, AA] = { 
+              val z: Z = d.element.asInstanceOf[Z] // TODO: fix cast
+              val a: A = e.element
+              Ɛ.ElementWrapper(innerBiproduct.pair(z, a))(d, e)
+            }
+          }
         }
 
         override def `>Uncached`[TT <: ELEMENT](that: STAR[TT]): EXPONENTIAL[AA, TT] =  
@@ -725,7 +725,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
 
         override private[RightMonoidActionsInDraft2] def 
           preExponentiateUncached[Z <: Ɛ.ELEMENT, ZZ <: ELEMENT](
-          pre: RightActionStar[Z] with RightActionStarFacade[ZZ]
+          pre: RightActionStar[Z] with RightActionStarOuterFacade[Z, ZZ]
         ) : EXPONENTIAL[ZZ, AA] = {
             val pairs = carrier x pre.action.actionCarrier
             val possibleMorphisms = pairs > action.actionCarrier
@@ -764,30 +764,24 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
             new LaxRightActionStarFacade(innerExpStar, Δ) with ExponentialStar[ZZ, AA] { exponentialStar =>
               val source: STAR[ZZ] = pre
               val target: STAR[AA] = star
-              def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, ZZ, AA]): QUIVER[R, ZZ > AA] = {
-                // val lhs: STAR[R] = biQuiver.product.left
-                // val innerQ = morphisms.restrict(possibleMorphisms.transpose(
-                //   (lhs.action.actionCarrier x pairs).biQuiver(action.actionCarrier) {
-                //     case (r, (t, x)) => biQuiver(
-                //       lhs.action.actionMultiply(r, t), 
-                //       x.asInstanceOf[M x A]
-                //     )
-                //     }))
+              def transpose[RR <: ELEMENT](biQuiver: BiQuiver[RR, ZZ, AA]): QUIVER[RR, ZZ > AA] = {
+                val lhs: STAR[RR] = biQuiver.product.left
+                val innerQ = lhs.withAction(new ActionReceiver[RR, Any] {
+                  override def receive[A <: Ɛ.ELEMENT](lhsActionStar: RightActionStar[A], Δ: A ↔ RR): Any = {
+                    morphisms.restrict(possibleMorphisms.transpose(
+                      (lhsActionStar.action.actionCarrier x pairs).biQuiver(action.actionCarrier) {
+                        case (a, (m, z)) => 
+                          val outerFacade: RightActionStarOuterFacade[Z, ZZ] = pre
+                          val rr: RR = Δ / lhsActionStar.action.actionMultiply(a, m)
+                          val zz: ZZ = outerFacade.equivalence / z
+                          equivalence \ biQuiver(rr, zz)
+                        }))
+                  }})
                 // lhs(exponentialStar) {
                 //   ... something from innerQ
                 // }
                 ???
               }
-              // {
-              //   val lhs: STAR[R] = biQuiver.product.left
-              //   new RightActionQuiver(lhs, exponentialStar, morphisms.restrict(possibleMorphisms.transpose(
-              //     (lhs.action.actionCarrier x pairs).biQuiver(action.actionCarrier) {
-              //       case (r, (t, x)) => biQuiver(
-              //         lhs.action.actionMultiply(r, t), 
-              //         x.asInstanceOf[M x A]
-              //       )
-              //       })))
-              // }
             }
           }
 
