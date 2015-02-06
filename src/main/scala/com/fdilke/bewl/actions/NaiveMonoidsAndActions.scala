@@ -672,33 +672,27 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
           that.withAction(new ActionReceiver[FF, BIPRODUCT[AA, FF]] {
             override def receive[F <: Ɛ.ELEMENT](thatActionStar: RightActionStar[F], Δ: F ↔ FF) = {            
               val product = action.actionCarrier x thatActionStar.action.actionCarrier 
-              val innerStar = new RightActionStar[Ɛ.x[A, F]] (
-                rightAction(product){
-                  case ((a, f), m) => product.pair(
-                      action.actionMultiply(a, m),
-                      thatActionStar.action.actionMultiply(f, m) 
-                    )
-                  })
-              val innerBiproduct: Ɛ.BIPRODUCT[A, F] = product // TODO: need alias?
-              val Δ = new ↔[Ɛ.ElementWrapper[Ɛ.x[A, F]], AA x FF](
-                axf => axf.element match { case (a, f) =>
-                  axf(
-                      Ɛ.ElementWrapper[A](a), // TODO: shouldn't need all these generic args
-                      Ɛ.ElementWrapper[F](f).asInstanceOf[FF] // TODO: fix cast
-                    )
+              new LaxRightActionStarFacade(
+                new RightActionStar[Ɛ.x[A, F]] (
+                  rightAction(product){
+                    case ((a, f), m) => product.pair(
+                        action.actionMultiply(a, m),
+                        thatActionStar.action.actionMultiply(f, m) 
+                      )
+                    }), 
+                new ↔[Ɛ.ElementWrapper[Ɛ.x[A, F]], AA x FF](
+                  axf => axf.element match { case (a, f) =>
+                    axf(equivalence / a, Δ / f)
                   },
                   aaXff => Ɛ.ElementWrapper(aaXff.element.asInstanceOf[Ɛ.x[A, F]]) // TODO: fix cast?
-                )
-              new LaxRightActionStarFacade(innerStar, Δ) with BiproductStar[AA, FF] {
-                override val left: STAR[AA] = star
-                override val right: STAR[FF] = that
-                override def pair(aa: AA, ff: FF): x[AA, FF] = { 
-                  val a: A = aa.element
-                  val f: F = ff.element.asInstanceOf[F] // TODO: fix cast
-                  Ɛ.ElementWrapper(innerBiproduct.pair(a, f))(aa, ff)
-                }
-              }
-            }})
+                )) with BiproductStar[AA, FF] {
+                  override val left: STAR[AA] = star
+                  override val right: STAR[FF] = that
+                  override def pair(aa: AA, ff: FF): x[AA, FF] = { 
+                    val a: A = aa.element
+                    val f: F = Δ \ ff
+                    Ɛ.ElementWrapper(product.pair(a, f))(aa, ff)
+                }}}})
 
         override def `>Uncached`[TT <: ELEMENT](that: STAR[TT]): EXPONENTIAL[AA, TT] =  
           that.withAction(new ActionReceiver[TT, EXPONENTIAL[AA, TT]] {
@@ -706,37 +700,40 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
               val pairs = carrier x action.actionCarrier
               val possibleMorphisms = pairs > thatStar.action.actionCarrier
               val isMorphism = (pairs x carrier).forAll(possibleMorphisms) {
-                case (f, ((m, x), n)) =>
+                case (f, ((m, a), n)) =>
                   thatStar.action.actionCarrier.diagonal(
-                    f(pairs.pair(multiply(m, n), action.actionMultiply(x, n))),
-                    thatStar.action.actionMultiply(f(pairs.pair(m, x)), n)
+                    f(pairs.pair(multiply(m, n), action.actionMultiply(a, n))),
+                    thatStar.action.actionMultiply(f(pairs.pair(m, a)), n)
                   )
               }
               val morphisms = possibleMorphisms.toTrue ?= isMorphism
               val morphismMultiply = morphisms.restrict(possibleMorphisms.transpose(
                 (morphisms x carrier x pairs).biQuiver(thatStar.action.actionCarrier) {
-                  case ((f, s), (t, y)) => morphisms.inclusion(f)(
-                    pairs.pair(multiply(s, t), y)
+                  case ((f, m), (n, a)) => morphisms.inclusion(f)(
+                    pairs.pair(multiply(m, n), a)
                 )}))
               type P = Ɛ.>[Ɛ.x[M, A],T]
               type PP = Ɛ.ElementWrapper[P]
-              val innerExpStar: STAR[PP] = new RightActionStar[P](rightAction(morphisms)(
-                Ɛ.BiQuiver(morphisms x carrier, morphismMultiply).apply
-              )) 
-              val Γ = new ↔[PP, AA > TT](
-                pp => pp { (aa: AA) => {
+              def pp2aa2tt(pp: PP) = pp { 
+                (aa: AA) => {
                   val a = equivalence \ aa
                   val p: P = pp.element
                   val unitM: M = unit(action.actionCarrier.toI(a))
                   val t: T = p(pairs.pair(unitM, a))
                   Δ / t
-                }},
-                aa2tt => {
-                  val p = aa2tt.element.asInstanceOf[P] // TODO: fix cast? Need topos API method to adjust elements here?
-                  Ɛ.ElementWrapper(p)
-                }
-              )
-              new LaxRightActionStarFacade(innerExpStar, Γ) with ExponentialStar[AA, TT] { exponentialStar =>
+                }}
+              new LaxRightActionStarFacade(
+                new RightActionStar[P](rightAction(morphisms)(
+                  Ɛ.BiQuiver(morphisms x carrier, morphismMultiply)(_,_)
+                )), 
+                new ↔[PP, AA > TT](
+                  pp2aa2tt,
+                  aa2tt => {
+                    val p = aa2tt.element.asInstanceOf[P] // TODO: fix cast? Need topos API method to adjust elements here?
+                    Ɛ.ElementWrapper(p)
+                  }
+                )
+              ) with ExponentialStar[AA, TT] { exponentialStar =>
                 val source: STAR[AA] = star
                 val target: STAR[TT] = that
                 def transpose[RR <: ELEMENT](biQuiver: BiQuiver[RR, AA, TT]): QUIVER[RR, AA > TT] = {
@@ -754,7 +751,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
                         lhs(exponentialStar) { rr =>
                            val p: P = innerQuiver(Ψ \ rr)
                            val pp = Ɛ.ElementWrapper(p)
-                           Γ / pp
+                           pp2aa2tt(pp)
                         }}})}}}})
 
         override def apply[TT <: ELEMENT](target: STAR[TT])(f: AA => TT): QUIVER[AA, TT] = null
