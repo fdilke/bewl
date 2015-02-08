@@ -12,6 +12,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
   case class ElementProxy0[A <: ELEMENT](element: A)
 
   trait ElementWrapper[A <: ELEMENT] { wrapper =>
+    type BASE = A
     val element: A
 
     def apply[F, G](f: F, g: G): (F, G) with ElementWrapper[A] =
@@ -469,12 +470,16 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
     class RightMonoidActionsInDraft2 extends Topos with 
       Wrappings[Ɛ.ELEMENT, RightAction, RightActionPrequiver] {
       override type ELEMENT = Ɛ.ElementWrapper[_ <: Ɛ.ELEMENT]
-      override type STAR[E <: ELEMENT] = RightActionStarFacade[E]
-      override type QUIVER[E <: ELEMENT, F <: ELEMENT] = RightActionQuiverFacade[E, F]
+      override type STAR[AA <: ELEMENT] = RightActionStarFacade[AA]
+      override type QUIVER[AA <: ELEMENT, BB <: ELEMENT] = RightActionQuiverFacade[AA, BB]
       override type UNIT = Ɛ.ElementWrapper[Ɛ.UNIT]
+
+      // experimental: tighten up the exponential type
+      // override type >[SS <: ELEMENT, TT <: ELEMENT] = (SS => TT) with Ɛ.ElementWrapper[Ɛ.>[Ɛ.x[M, SS#BASE], TT#BASE]]
+
       type RIGHT_IDEAL = Ɛ.>[M, Ɛ.TRUTH]
       override type TRUTH = Ɛ.ElementWrapper[RIGHT_IDEAL]
-      override val I = RightActionStar(Ɛ.I) { (i, m) => i }
+      override val I: RightActionStar[Ɛ.UNIT, UNIT] = RightActionStar(Ɛ.I) { (i, m) => i }
 
       private object RightIdeals {
         private val possibleIdeals = carrier.power
@@ -496,275 +501,134 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
           )
       }
       override lazy val omega = RightIdeals.omega
-      override lazy val truth = 
-        new RightActionQuiver(I, omega, carrier.power.transpose((Ɛ.I x carrier).biQuiver(Ɛ.omega) {
+      override lazy val truth: QUIVER[UNIT, TRUTH] = 
+        new RightActionQuiver[Ɛ.UNIT, UNIT, RIGHT_IDEAL, TRUTH](I, omega, // TODO: need generics?
+          carrier.power.transpose((Ɛ.I x carrier).biQuiver(Ɛ.omega) {
             case (x, m) => Ɛ.truth(x)
         }))
 
-      trait ActionReceiver[AA, H] {
-        def receive[A <: Ɛ.ELEMENT](actionStar: RightActionStar[A], Δ: A ↔ AA): H
+      trait ActionReceiver[AA <: ELEMENT, H] {
+        def receive[A <: Ɛ.ELEMENT](actionStar: RightActionStar[A, AA]): H
       }
 
       trait RightActionStarFacade[AA <: ELEMENT] extends Star[AA] { facade => 
-        private[RightMonoidActionsInDraft2] def withAction[H](receiver: ActionReceiver[AA, H]): H
+        private[RightMonoidActionsInDraft2] def reveal[H](receiver: ActionReceiver[AA, H]): H
       }
 
-      private class LaxRightActionStarFacade[AA <: ELEMENT, BB <: ELEMENT](
-          delegate: RightActionStarFacade[AA],
-          Δ: AA ↔ BB
-        ) extends RightActionStarFacade[BB] {
-        lazy val toI: QUIVER[BB, UNIT] =
-          new LeftLaxRightActionQuiverFacade(delegate.toI, Δ, this)
-        def xUncached[TT <: ELEMENT](that: STAR[TT]): BIPRODUCT[BB, TT] =
-          new LeftLaxBiproduct(delegate.xUncached(that), Δ, this)
-        def `>Uncached`[TT <: ELEMENT](that: STAR[TT]): EXPONENTIAL[BB, TT] =
-          new LeftLaxExponentialStar(delegate.`>Uncached`(that), Δ, this)
-        def apply[TT <: ELEMENT](target: STAR[TT])(f: BB => TT) : QUIVER[BB, TT] = 
-          new LeftLaxRightActionQuiverFacade(delegate(target)(f compose (Δ./)), Δ, this)
-        def sanityTest = delegate.sanityTest
-
-        private[RightMonoidActionsInDraft2] def withAction[H](receiver: ActionReceiver[BB, H]): H =
-          delegate.withAction(new ActionReceiver[AA, H] {
-            override def receive[A <: Ɛ.ELEMENT](actionStar: RightActionStar[A], Ψ: A ↔ AA): H =
-              receiver.receive(actionStar, Ψ o Δ) // A ↔ BB from Ψ: A ↔ AA and Δ: AA ↔ BB)
-          })
-      }
-
-      private class RightLaxBiproduct[
-        AA <: ELEMENT,
-        BB <: ELEMENT, 
-        CC <: ELEMENT
-      ] (
-        delegate: BIPRODUCT[AA, BB],
-        Δ: BB ↔ CC,
-        laxStar: STAR[CC]
-      ) extends LaxRightActionStarFacade[AA x BB, AA x CC](delegate,
-        new ↔[AA x BB, AA x CC] (
-          dxe => rightLaxPair(dxe._1, Δ / dxe._2, delegate, Δ),
-          dxf => delegate.pair(dxf._1, Δ \ dxf._2)
-        )
-      ) with BiproductStar[AA, CC] {
-        val left: STAR[AA] = delegate.left
-        val right: STAR[CC] = laxStar
-        def pair(aa: AA, cc: CC): AA x CC = rightLaxPair(aa, cc, delegate, Δ)
-      }
-
-      private def leftLaxPair[
-        E <: ELEMENT, 
-        F <: ELEMENT,
-        G <: ELEMENT
-      ] (f: F, g: G, biproduct: BIPRODUCT[E, G], Δ: E ↔ F) : F x G = 
-          biproduct.pair(Δ \ f, g)(f, g)
-
-      private def rightLaxPair[
-        D <: ELEMENT,
-        E <: ELEMENT, 
-        F <: ELEMENT
-      ] (d: D, f: F, biproduct: BIPRODUCT[D, E], Δ: E ↔ F) : D x F = 
-          biproduct.pair(d, Δ \ f)(d, f)
-
-      private class LeftLaxBiproduct[
-        E <: ELEMENT, 
-        F <: ELEMENT,
-        G <: ELEMENT
-      ] (
-        delegate: BIPRODUCT[E, G],
-        Δ: E ↔ F,
-        laxStar: STAR[F]
-      ) extends LaxRightActionStarFacade[E x G, F x G](delegate, 
-        new ↔[E x G, F x G](
-          exg => leftLaxPair(Δ / (exg._1), exg._2, delegate, Δ),
-          fxg => delegate.pair(Δ \ (fxg._1), fxg._2)
-        )
-      ) with BiproductStar[F, G] {
-        val left: STAR[F] = laxStar
-        val right: STAR[G] = delegate.right
-        def pair(f: F, g: G): F x G = leftLaxPair(f, g, delegate, Δ)
-      }
-
-      private def leftLaxExponential[
-        E <: ELEMENT, 
-        F <: ELEMENT,
-        G <: ELEMENT
-      ] (e2g: E > G, Δ: E ↔ F) : F > G = 
-        e2g { (f: F) => e2g(Δ \ f) }
-
-      private def rightLaxExponential[
-        D <: ELEMENT, 
-        E <: ELEMENT,
-        F <: ELEMENT
-      ] (d2e: D > E, Δ: E ↔ F) : D > F = 
-        d2e { (d: D) =>  Δ / d2e(d) }
-
-      private class LeftLaxExponentialStar[
-        E <: ELEMENT, 
-        F <: ELEMENT,
-        G <: ELEMENT
-      ] (
-        delegate: EXPONENTIAL[E, G],
-        Δ: E ↔ F,
-        laxStar: STAR[F]
-      ) extends LaxRightActionStarFacade[E > G, F > G](delegate,
-        new ↔[E > G, F > G](
-          e2g => leftLaxExponential(e2g, Δ),
-          f2g => leftLaxExponential(f2g, ~Δ)
-        )
-      ) with ExponentialStar[F, G] { laxExponential =>
-        val source: STAR[F] = laxStar
-        val target: STAR[G] = delegate.target
-        def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, F, G]): QUIVER[R, F > G] = {
-          val rStar: STAR[R] = biQuiver.product.left
-          rStar(laxExponential) { r => 
-            leftLaxExponential(delegate.transpose(
-              (rStar x delegate.source).biQuiver(delegate.target) {
-                (r, e) => biQuiver(r, Δ / e)
-              }
-            )(r), Δ)
-          }
-        }
-      }
-
-      private class RightLaxExponentialStar[
-        D <: ELEMENT, 
-        E <: ELEMENT,
-        F <: ELEMENT
-      ] (
-        delegate: EXPONENTIAL[D, E],
-        Δ: E ↔ F,
-        laxStar: STAR[F]
-      ) extends LaxRightActionStarFacade[D > E, D > F](delegate,
-        new ↔[D > E, D > F](
-          d2e => rightLaxExponential(d2e, Δ),
-          d2f => rightLaxExponential(d2f, ~Δ)
-        )
-      ) with ExponentialStar[D, F] { laxExponential =>
-        val source: STAR[D] = delegate.source
-        val target: STAR[F] = laxStar
-        def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, D, F]): QUIVER[R, D > F] = {
-          val rStar: STAR[R] = biQuiver.product.left
-          rStar(laxExponential) { r =>
-            rightLaxExponential(delegate.transpose(
-              (rStar x delegate.source).biQuiver(delegate.target) {
-                (r, d) => Δ \ biQuiver(r, d)
-              }
-            )(r), Δ)
-          }
-        }
-      }
-
-      trait RightActionStarOuterFacade[A <: Ɛ.ELEMENT, AA <: ELEMENT] extends RightActionStarFacade[AA] {
-        val equivalence: A ↔ AA
-      }
-
-      class RightActionStar[A <: Ɛ.ELEMENT](private[RightMonoidActionsInDraft2] val action: RightAction[A]) extends
-        RightActionStarOuterFacade[A, Ɛ.ElementWrapper[A]] { star =>
-        private type AA = Ɛ.ElementWrapper[A]
+      class RightActionStar[A <: Ɛ.ELEMENT, AA <: ELEMENT](
+        private[RightMonoidActionsInDraft2] val action: RightAction[A],
+        private[RightMonoidActionsInDraft2] val ↔ : A ↔ AA = Ɛ.ElementWrapper.↔[A] // TODO: bake into interface?
+      ) extends RightActionStarFacade[AA] { star =>
 
         override val toI: QUIVER[AA, UNIT] = 
-          new RightActionQuiver(this, I, action.actionCarrier.toI)
+          new RightActionQuiver[A, AA, Ɛ.UNIT, UNIT](this, I, action.actionCarrier.toI) // TODO: need generics?
 
         override def sanityTest = {
           action.actionCarrier.sanityTest
           action.sanityTest
         }
 
-        override def xUncached[FF <: ELEMENT](that: STAR[FF]): BIPRODUCT[AA, FF] = 
-          that.withAction(new ActionReceiver[FF, BIPRODUCT[AA, FF]] {
-            override def receive[F <: Ɛ.ELEMENT](thatActionStar: RightActionStar[F], Δ: F ↔ FF) = {            
-              val product = action.actionCarrier x thatActionStar.action.actionCarrier 
-              new LaxRightActionStarFacade(
-                new RightActionStar[Ɛ.x[A, F]] (
+        override def xUncached[FF <: ELEMENT](thatFacade: STAR[FF]): BIPRODUCT[AA, FF] = 
+          thatFacade.reveal(new ActionReceiver[FF, BIPRODUCT[AA, FF]] {
+            override def receive[F <: Ɛ.ELEMENT](that: RightActionStar[F, FF]) = {            
+              val product = action.actionCarrier x that.action.actionCarrier 
+              new RightActionStar[Ɛ.x[A, F], AA x FF] (
                   rightAction(product){
                     case ((a, f), m) => product.pair(
                         action.actionMultiply(a, m),
-                        thatActionStar.action.actionMultiply(f, m) 
+                        that.action.actionMultiply(f, m) 
                       )
-                    }), 
-                new ↔[Ɛ.ElementWrapper[Ɛ.x[A, F]], AA x FF](
-                  axf => axf.element match { case (a, f) =>
-                    axf(equivalence / a, Δ / f)
-                  },
-                  aaXff => Ɛ.ElementWrapper(aaXff.element.asInstanceOf[Ɛ.x[A, F]]) // TODO: fix cast?
+                    }, 
+                  new ↔[Ɛ.x[A, F], AA x FF](
+                    axf => axf match { case (a, f) =>
+                      Ɛ.ElementWrapper(axf)(↔ / a, that.↔ / f)
+                    },
+                    aaXff => aaXff.element.asInstanceOf[Ɛ.x[A, F]] // TODO: fix cast?
                 )) with BiproductStar[AA, FF] {
                   override val left: STAR[AA] = star
                   override val right: STAR[FF] = that
                   override def pair(aa: AA, ff: FF): x[AA, FF] = { 
-                    val a: A = aa.element
-                    val f: F = Δ \ ff
+                    val a: A = star.↔ \ aa
+                    val f: F = that.↔ \ ff
                     Ɛ.ElementWrapper(product.pair(a, f))(aa, ff)
                 }}}})
 
-        override def `>Uncached`[TT <: ELEMENT](that: STAR[TT]): EXPONENTIAL[AA, TT] =  
-          that.withAction(new ActionReceiver[TT, EXPONENTIAL[AA, TT]] {
-            override def receive[T <: Ɛ.ELEMENT](thatStar: RightActionStar[T], Δ: T ↔ TT) = {            
+        override def `>Uncached`[TT <: ELEMENT](thatFacade: STAR[TT]): EXPONENTIAL[AA, TT] =  
+          thatFacade.reveal(new ActionReceiver[TT, EXPONENTIAL[AA, TT]] {
+            override def receive[T <: Ɛ.ELEMENT](that: RightActionStar[T, TT]) = {            
               val pairs = carrier x action.actionCarrier
-              val possibleMorphisms = pairs > thatStar.action.actionCarrier
+              val possibleMorphisms = pairs > that.action.actionCarrier
               val isMorphism = (pairs x carrier).forAll(possibleMorphisms) {
                 case (f, ((m, a), n)) =>
-                  thatStar.action.actionCarrier.diagonal(
+                  that.action.actionCarrier.diagonal(
                     f(pairs.pair(multiply(m, n), action.actionMultiply(a, n))),
-                    thatStar.action.actionMultiply(f(pairs.pair(m, a)), n)
+                    that.action.actionMultiply(f(pairs.pair(m, a)), n)
                   )
               }
               val morphisms = possibleMorphisms.toTrue ?= isMorphism
               val morphismMultiply = morphisms.restrict(possibleMorphisms.transpose(
-                (morphisms x carrier x pairs).biQuiver(thatStar.action.actionCarrier) {
+                (morphisms x carrier x pairs).biQuiver(that.action.actionCarrier) {
                   case ((f, m), (n, a)) => morphisms.inclusion(f)(
                     pairs.pair(multiply(m, n), a)
                 )}))
               type P = Ɛ.>[Ɛ.x[M, A],T]
               type PP = Ɛ.ElementWrapper[P]
-              def pp2aa2tt(pp: PP) = pp { 
+              def p2aa2tt(p: P) = Ɛ.ElementWrapper(p) { 
                 (aa: AA) => {
-                  val a = equivalence \ aa
-                  val p: P = pp.element
+                  val a = ↔ \ aa
                   val unitM: M = unit(action.actionCarrier.toI(a))
                   val t: T = p(pairs.pair(unitM, a))
-                  Δ / t
+                  that.↔ / t
                 }}
-              new LaxRightActionStarFacade(
-                new RightActionStar[P](rightAction(morphisms)(
+              new RightActionStar[P, AA > TT](rightAction(morphisms) {
                   Ɛ.BiQuiver(morphisms x carrier, morphismMultiply)(_,_)
-                )), 
-                new ↔[PP, AA > TT](
-                  pp2aa2tt,
-                  aa2tt => {
-                    val p = aa2tt.element.asInstanceOf[P] // TODO: fix cast? Need topos API method to adjust elements here?
-                    Ɛ.ElementWrapper(p)
-                  }
+                }, 
+                new ↔[P, AA > TT](
+                  p2aa2tt,
+                  aa2tt => aa2tt.element.asInstanceOf[P] // TODO: fix cast? Need topos API method to adjust elements here?
                 )
               ) with ExponentialStar[AA, TT] { exponentialStar =>
                 val source: STAR[AA] = star
                 val target: STAR[TT] = that
                 def transpose[RR <: ELEMENT](biQuiver: BiQuiver[RR, AA, TT]): QUIVER[RR, AA > TT] = {
-                  val lhs: STAR[RR] = biQuiver.product.left
-                  lhs.withAction(new ActionReceiver[RR, QUIVER[RR, AA > TT]] {
-                    override def receive[R <: Ɛ.ELEMENT](lhsActionStar: RightActionStar[R], Ψ: R ↔ RR) = {
+                  val lhsFacade: STAR[RR] = biQuiver.product.left // TODO: inline
+                  lhsFacade.reveal(new ActionReceiver[RR, QUIVER[RR, AA > TT]] {
+                    override def receive[R <: Ɛ.ELEMENT](lhs: RightActionStar[R, RR]) = {
                       val innerQuiver: Ɛ.QUIVER[R, P] =
                         morphisms.restrict(possibleMorphisms.transpose(
-                          (lhsActionStar.action.actionCarrier x pairs).biQuiver(thatStar.action.actionCarrier) {
+                          (lhs.action.actionCarrier x pairs).biQuiver(that.action.actionCarrier) {
                             case (r, (m, a)) => 
-                              val rr: RR = Ψ / lhsActionStar.action.actionMultiply(r, m)
-                              val aa: AA = equivalence / a
-                              Δ \ biQuiver(rr, aa)
+                              val rr: RR = lhs.↔ / lhs.action.actionMultiply(r, m)
+                              val aa: AA = star.↔ / a
+                              that.↔ \ biQuiver(rr, aa)
                             }))
                         lhs(exponentialStar) { rr =>
-                           val p: P = innerQuiver(Ψ \ rr)
-                           val pp = Ɛ.ElementWrapper(p)
-                           pp2aa2tt(pp)
+                           val p: P = innerQuiver(lhs.↔ \ rr)
+                           p2aa2tt(p)
                         }}})}}}})
 
-        override def apply[TT <: ELEMENT](target: STAR[TT])(f: AA => TT): QUIVER[AA, TT] = null
+        override def apply[TT <: ELEMENT](targetFacade: STAR[TT])(f: AA => TT): QUIVER[AA, TT] = 
+          targetFacade.reveal(new ActionReceiver[TT, QUIVER[AA, TT]] {
+            override def receive[T <: Ɛ.ELEMENT](target: RightActionStar[T, TT]) = 
+              new RightActionQuiver[A, AA, T, TT](star, target, // TODO: need generics?
+                star.action.actionCarrier(target.action.actionCarrier) { a =>
+                  val aa = star.↔ / a
+                  val tt = f(aa)
+                  target.↔ \ tt    // TODO: condense
+                })})
 
-        override val equivalence: A ↔ AA = Ɛ.ElementWrapper.↔[A]
         override def toString = "RightActionStar[" + action.actionCarrier + "]"
-        override private[RightMonoidActionsInDraft2] def withAction[H](receiver: ActionReceiver[AA, H]): H =
-          receiver.receive(star, equivalence)
+        override private[RightMonoidActionsInDraft2] def reveal[H](
+          receiver: ActionReceiver[AA, H]
+        ): H = receiver.receive(star)
       }
 
       object RightActionStar {
         def apply[A <: Ɛ.ELEMENT](actionCarrier: Ɛ.STAR[A])(actionMultiply: (A, M) => A) =
-          new RightActionStar[A](rightAction(actionCarrier)(actionMultiply))
+          new RightActionStar[A, Ɛ.ElementWrapper[A]](
+            rightAction(actionCarrier)(actionMultiply),
+            Ɛ.ElementWrapper.↔[A]
+          )
       }
 
       // TODO: will presumably be fleshed out as I populate the quiver API
@@ -772,55 +636,26 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         Quiver[E, F] { facade =>
       }
 
-      // TODO: do we need this? Can a quiver just be between StarFacades?
-      class LeftLaxRightActionQuiverFacade[
-        E <: ELEMENT, 
-        F <: ELEMENT,
-        G <: ELEMENT
-      ](
-          delegate: RightActionQuiverFacade[E, G],
-          Δ: E ↔ F,
-          val source: RightActionStarFacade[F]
-        ) extends RightActionQuiverFacade[F, G] {
-        val target: STAR[G] = delegate.target
-        lazy val chi: QUIVER[G, TRUTH] = delegate.chi
-
-        def apply(f: F): G = delegate(Δ \ f)
-        def ?=(that: QUIVER[F, G]): EQUALIZER[F] =
-          null
-        def o[R <: ELEMENT](that: QUIVER[R, F]) : QUIVER[R, G] =
-          that.source(delegate.target) { r =>
-            delegate(Δ \ (that(r)))
-          }
-        def \[U <: ELEMENT](monic: QUIVER[U, G]) : QUIVER[F, U] =
-          source(monic.source) { f => 
-            (delegate \ monic)(Δ \ f)
-          }
-        def sanityTest = delegate.sanityTest
-      }
-
-      class RightActionQuiver[A <: Ɛ.ELEMENT, B <: Ɛ.ELEMENT](
-        val source: RightActionStar[A],
-        val target: RightActionStar[B],
+      class RightActionQuiver[A <: Ɛ.ELEMENT, AA <: ELEMENT, B <: Ɛ.ELEMENT, BB <: ELEMENT](
+        val source: RightActionStar[A, AA],
+        val target: RightActionStar[B, BB],
         val quiver: Ɛ.QUIVER[A, B]
-      ) extends RightActionQuiverFacade[Ɛ.ElementWrapper[A], Ɛ.ElementWrapper[B]] {
-        private type E = Ɛ.ElementWrapper[A]
-        private type F = Ɛ.ElementWrapper[B]
+      ) extends RightActionQuiverFacade[AA, BB] {
 
-        override lazy val chi: QUIVER[F, TRUTH] = null
+        override lazy val chi: QUIVER[BB, TRUTH] = null
 
-        override def \[U <: ELEMENT](monic: QUIVER[U, F]) = null
+        override def \[UU <: ELEMENT](monic: QUIVER[UU, BB]) = null
 
         override def sanityTest = {
           quiver.sanityTest
           assert(source.action.isMorphism(target.action, quiver))
         }
 
-        override def ?=(that: QUIVER[E, F]): EQUALIZER[E] = null
+        override def ?=(that: QUIVER[AA, BB]): EQUALIZER[AA] = null
 
-        override def apply(e: E) = null.asInstanceOf[F]
+        override def apply(e: AA) = null.asInstanceOf[BB]
 
-        override def o[R <: ELEMENT](that: QUIVER[R, E]): QUIVER[R, F] = null
+        override def o[ZZ <: ELEMENT](that: QUIVER[ZZ, AA]): QUIVER[ZZ, BB] = null
 
         override def toString = "RightActionQuiver[" + quiver + "]"
 
