@@ -572,6 +572,14 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
                     pairs.pair(multiply(m, n), a)
                 )}))
               type P = Ɛ.>[Ɛ.x[M, A],T]
+  // would need these to make it all properly typesafe :
+  //             type Q = Ɛ.>[Ɛ.x[M, AA#BASE], TT#BASE]
+              // def q2p(q: Q): P = q.reskin { (mxa: Ɛ.x[M, A]) => mxa match {
+              //   case (m, a) => that.↔ / q(mxa.reskin(m, (↔ / a).element)
+              // }} 
+              // def p2q(p: P): Q = p.reskin { (mxb: Ɛ.x[M, AA#BASE]) => mxb match {
+              //   case (m, b) => ? ↔ \ p(mxb.reskin(m, (? \ b).element)
+              // }}
               type PP = Ɛ.ElementWrapper[P]
               def p2aa2tt(p: P) = Ɛ.ElementWrapper(p) { 
                 (aa: AA) => {
