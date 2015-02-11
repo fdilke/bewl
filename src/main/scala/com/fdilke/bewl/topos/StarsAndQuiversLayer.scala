@@ -23,6 +23,9 @@ object StarsAndQuiversLayer {
       lazy val I: STAR[UNIT] = star(topos.I).asInstanceOf[STAR[UNIT]]
 
       override type TRUTH = AdapterTruth
+      type >[T <: ELEMENT, U <: ELEMENT] = (T => U) with ELEMENT
+      type x[T <: ELEMENT, U <: ELEMENT] = (T, U) with ELEMENT
+
       override lazy val omega = star(topos.omega).asInstanceOf[STAR[TRUTH]]
       override lazy val truth = quiver(topos.truth).asInstanceOf[QUIVER[UNIT, TRUTH]]
 

@@ -13,6 +13,8 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreQu
   override lazy val I = star(Traversable(()))
   override lazy val omega = star(Traversable(true, false))
   override lazy val truth = I(omega) { _ => true }
+  override type >[T <: ELEMENT, U <: ELEMENT] = (T => U) with ELEMENT
+  override type x[T <: ELEMENT, U <: ELEMENT] = (T, U) with ELEMENT
 
   class FiniteSetsStar[S](private[FiniteSets] val elements: Traversable[S])
     extends Star[S] { self =>

@@ -9,3 +9,7 @@ case class ↔[A, B] (
   def unary_~() =
     new ↔[B, A](\, /)
 }
+
+object ↔ {
+	def identity[A] = new ↔[A, A](Predef.identity, Predef.identity)
+}

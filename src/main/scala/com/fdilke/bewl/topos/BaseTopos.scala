@@ -12,8 +12,8 @@ trait BaseTopos { self: LogicalOperations =>
   type STAR[S <: ELEMENT] <: Star[S]
   type QUIVER[S <: ELEMENT, T <: ELEMENT] <: Quiver[S, T]
 
-  type >[T <: ELEMENT, U <: ELEMENT] = (T => U) with ELEMENT
-  type x[T <: ELEMENT, U <: ELEMENT] = (T, U) with ELEMENT
+  type >[T <: ELEMENT, U <: ELEMENT] <: (T => U) with ELEMENT
+  type x[T <: ELEMENT, U <: ELEMENT] <: (T, U) with ELEMENT
 
   type UNIT <: ELEMENT
   val I : STAR[UNIT]
