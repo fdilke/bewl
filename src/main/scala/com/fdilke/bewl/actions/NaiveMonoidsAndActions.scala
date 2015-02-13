@@ -515,10 +515,6 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
             case (x, m) => Ɛ.truth(x)
         }))
 
-      trait ActionReceiver[AA <: ELEMENT, H] {
-        def receive[A <: Ɛ.ELEMENT](actionStar: RightActionStar[A, AA]): H
-      }
-
       abstract class RightActionStar[A <: Ɛ.ELEMENT, AA <: Ɛ.ElementWrapper[A]](
         private[RightMonoidActionsInDraft2] val action: RightAction[A]
       ) extends Star[AA] { star =>
@@ -559,8 +555,9 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
               Ɛ.ElementWrapper(product.pair(a, f))(aa, ff).asInstanceOf[AA x FF] // TODO: fix with reveal?
           }}}
 
+        private val pairs: Ɛ.BIPRODUCT[M, A] = carrier x action.actionCarrier 
+
         override def `>Uncached`[T <: Ɛ.ELEMENT, TT <: Ɛ.ElementWrapper[T]](that: RightActionStar[T, TT]) = {            
-              val pairs = carrier x action.actionCarrier
               val possibleMorphisms = pairs > that.action.actionCarrier
               val isMorphism = (pairs x carrier).forAll(possibleMorphisms) {
                 case (f, ((m, a), n)) =>
@@ -569,13 +566,13 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
                     that.action.actionMultiply(f(pairs.pair(m, a)), n)
                   )
               }
-              val morphisms = possibleMorphisms.toTrue ?= isMorphism
+              type P = Ɛ.>[Ɛ.x[M, A],T]
+              val morphisms: Ɛ.EQUALIZER[P] = possibleMorphisms.toTrue ?= isMorphism
               val morphismMultiply = morphisms.restrict(possibleMorphisms.transpose(
                 (morphisms x carrier x pairs).biQuiver(that.action.actionCarrier) {
                   case ((f, m), (n, a)) => morphisms.inclusion(f)(
                     pairs.pair(multiply(m, n), a)
                 )}))
-              type P = Ɛ.>[Ɛ.x[M, A],T]
               new RightActionStar[P, AA > TT](rightAction(morphisms) {
                   Ɛ.BiQuiver(morphisms x carrier, morphismMultiply)(_,_)
               }) with ExponentialStar[AA, TT] { exponentialStar =>
@@ -589,7 +586,12 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
                   }}.asInstanceOf[AA > TT] // TODO: fix these casts dammit
                 val source: STAR[AA] = star
                 val target: STAR[TT] = that
-                def transpose[RR <: ELEMENT](biQuiver: BiQuiver[RR, AA, TT]): QUIVER[RR, AA > TT] = {
+                def transpose[RR <: ELEMENT](biQuiver: BiQuiver[RR, AA, TT]): QUIVER[RR, AA > TT] = 
+                  biQuiver.product.left.calcTranspose[A, AA, T, TT](
+                    star, that, morphisms, possibleMorphisms, exponentialStar, biQuiver
+                  )
+/*                  
+                {
                   val lhsFacade: STAR[RR] = biQuiver.product.left // TODO: inline
                   lhsFacade.reveal(new ActionReceiver[RR, QUIVER[RR, AA > TT]] {
                     override def receive[R <: Ɛ.ELEMENT](lhs: RightActionStar[R, RR]) = {
@@ -601,34 +603,41 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
                               val aa: AA = star ^ a
                               that.v(biQuiver(rr, aa))
                             }))
-                        //lhs.calcExponential[TT, P, R, RR](exponentialStar, innerQuiver)
                         lhs(exponentialStar) { rr =>
                            val p: P = innerQuiver(lhs v rr)
                            ^(p)
                         }
-                        }})}}}
+                        }})}
+*/                        
+                  }}
 
-        // private def calcExponential[TT <: ELEMENT, P <: Ɛ.ELEMENT, R <: Ɛ.ELEMENT, RR <: ELEMENT](
-        //   exponentialStar: RightActionStar[P, AA > TT], 
-        //   innerQuiver: Ɛ.QUIVER[R, P]
-        // ): QUIVER[RR, AA > TT] =
-        //   this(exponentialStar) { aa =>
-        //      val p: P = innerQuiver(aa.element)
-        //      exponentialStar ^ p
-        //   }
-
-        // TODO: optimize this away!
-        // private def reverseApply[Z <: Ɛ.ELEMENT, ZZ <: Ɛ.ElementWrapper[Z]](
-        //   source: RightActionStar[Z, ZZ]
-        // )(
-        //   f: ZZ => AA 
-        // ) : QUIVER[ZZ, AA] = source(this)(f)
-
-        // override def weakApply[T <: Ɛ.ELEMENT, TT <: ELEMENT](
-        //   target: RightActionStar[T, TT]
-        // )(
-        //   f: AA => TT
-        // ): QUIVER[AA, TT] = 
+        private def calcTranspose[
+          R <: Ɛ.ELEMENT, 
+          RR <: Ɛ.ElementWrapper[R], 
+          T <: Ɛ.ELEMENT, 
+          TT <: Ɛ.ElementWrapper[T] 
+        ] (
+          twin: RightActionStar[R, RR],
+          that: RightActionStar[T, TT],
+          morphisms: Ɛ.EQUALIZER[Ɛ.>[Ɛ.x[M, R], T]],
+          possibleMorphisms: Ɛ.EXPONENTIAL[Ɛ.x[M, R], T],
+          exponentialStar: RightActionStar[Ɛ.>[Ɛ.x[M, R], T], RR > TT],
+          biQuiver: BiQuiver[AA, RR, TT]
+        ): QUIVER[AA, RR > TT] = {
+          type P = Ɛ.>[Ɛ.x[M, R],T]
+          val innerQuiver: Ɛ.QUIVER[A, P] =
+            morphisms.restrict(possibleMorphisms.transpose(
+              (action.actionCarrier x twin.pairs).biQuiver(that.action.actionCarrier) {
+                case (a, (m, r)) => 
+                  val aa: AA = star ^ action.actionMultiply(a, m)
+                  val rr: RR = twin ^ r
+                  that.v(biQuiver(aa, rr))
+                }))
+          this(exponentialStar) { aa =>
+            val p: P = innerQuiver(this v aa)
+            exponentialStar ^ p
+          }              
+        }
 
         override def apply[T <: Ɛ.ELEMENT, TT <: ELEMENT] ( // Ɛ.ElementWrapper[T]](
           target: RightActionStar[T, TT]
@@ -643,9 +652,6 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
             })
 
         override def toString = "RightActionStar[" + action.actionCarrier + "]"
-        override private[RightMonoidActionsInDraft2] def reveal[H](
-          receiver: ActionReceiver[AA, H]
-        ): H = receiver.receive(star)
       }
 
       object RightActionStar {
