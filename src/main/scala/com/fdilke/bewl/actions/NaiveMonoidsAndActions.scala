@@ -428,65 +428,65 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
     class RightMonoidActionsInDraft2 extends Topos with 
       Wrappings[Ɛ.ELEMENT, RightAction, RightActionPrequiver] {
 
-      trait ElementWrapper[A <: Ɛ.ELEMENT] { wrapper =>
-        final type BASE = A
+      trait ElementWrapper[A <: Ɛ.ELEMENT, AA <: ElementWrapper[A, AA]] { wrapper =>
+        // final type BASE = A
         val element: A
 
-        def apply[F, G](f: F, g: G): (F, G) with ElementWrapper[A] =
-          new (F, G)(f, g) with ElementWrapper[A] {
-            override val element = wrapper.element
-          }
+        // def apply[F, G](f: F, g: G): (F, G) with ElementWrapper[A, AA] =
+        //   new (F, G)(f, g) with ElementWrapper[A, AA] {
+        //     override val element = wrapper.element
+        //   }
 
-        def apply[F, G](f2g: F => G): (F => G) with ElementWrapper[A] =
-          new (F => G) with ElementWrapper[A] {
-            def apply(f: F): G = f2g(f)
-            override val element = wrapper.element
-          }
+        // def apply[F, G](f2g: F => G): (F => G) with ElementWrapper[A, AA] =
+        //   new (F => G) with ElementWrapper[A, AA] {
+        //     def apply(f: F): G = f2g(f)
+        //     override val element = wrapper.element
+        //   }
+
+        type PREBIPRODUCT[ZZ <: ELEMENT] = ZZ#POSTBIPRODUCT[A, AA]
+        type POSTBIPRODUCT[B <: Ɛ.ELEMENT, BB <: ElementWrapper[B, BB]] = BiproductWrapper[A, AA, B, BB]
       }
 
-      object ElementWrapper {
-        def apply[A <: Ɛ.ELEMENT](a: A) =
-          new ElementWrapper[A] {
+      class BiproductWrapper[
+        A <: Ɛ.ELEMENT,
+        AA <: ElementWrapper[A, AA],
+        B <: Ɛ.ELEMENT,
+        BB <: ElementWrapper[B, BB]
+      ] (
+        aa: AA,
+        bb: BB,
+        aXb: Ɛ.x[A, B]
+      ) extends (AA, BB)(aa, bb) with ElementWrapper[
+        Ɛ.x[A, B],
+        BiproductWrapper[A, AA, B, BB]
+      ] {
+        override val element = aXb
+      }
+
+      class VanillaWrapper[A <: Ɛ.ELEMENT](a: A) extends
+        ElementWrapper[A, VanillaWrapper[A]] {
             override val element = a
-          }
       }
 
-      override type ELEMENT = ElementWrapper[_ <: Ɛ.ELEMENT]
+      override type ELEMENT = TT forSome {
+        type TT <: ElementWrapper[_ <: Ɛ.ELEMENT, TT]
+      }
       override type STAR[AA <: ELEMENT] = RightActionStar[_, AA] 
       override type QUIVER[AA <: ELEMENT, BB <: ELEMENT] = RightActionQuiverFacade[AA, BB]
-      override type UNIT = ElementWrapper[Ɛ.UNIT]
+      override type UNIT = VanillaWrapper[Ɛ.UNIT]
 
       // experimental: tighten up the biproduct type
-      override type x[SS <: ELEMENT, TT <: ELEMENT] = BiproductHelper[SS, TT]#XWRAPPER
-
-      private class BiproductHelper[SS <: ELEMENT, TT <: ELEMENT](
-        leftStar: STAR[SS],
-        rightStar: STAR[TT]
-      ) {
-        type S = SS#BASE
-        type T = TT#BASE
-        val product /*: Ɛ.BIPRODUCT[SS#BASE, TT#BASE]*/ = leftStar.action.actionCarrier x rightStar.action.actionCarrier
-
-        type EX = Ɛ.x[SS#BASE, TT#BASE]
-        type XWRAPPER = (SS, TT) with ElementWrapper[EX]
-
-        def biproduct(
-            action: RightAction[EX],
-            ^ : EX => XWRAPPER,
-            makePair: (SS, TT) => x[SS, TT]
-          ) : BIPRODUCT[SS, TT] =
-          new RightActionStar[EX, XWRAPPER](action, ^) with BiproductStar[SS, TT] {
-            override val left = leftStar
-            override val right = rightStar
-            override def pair(ss: SS, tt: TT) = makePair(ss, tt)
-          }
-      }
+      override type x[SS <: ELEMENT, TT <: ELEMENT] = TT#PREBIPRODUCT[SS]
 
       // experimental: tighten up the exponential type
-      override type >[SS <: ELEMENT, TT <: ELEMENT] = (SS => TT) with ElementWrapper[Ɛ.>[Ɛ.x[M, SS#BASE], TT#BASE]]
+      override type >[SS <: ELEMENT, TT <: ELEMENT] = (SS => TT) with ELEMENT
+      // HH forSome {
+      //   type H <: Ɛ.ELEMENT
+      //   type HH <: (SS => TT) with ElementWrapper[Ɛ.>[Ɛ.x[M, SS#BASE], TT#BASE], H]
+      // }
 
       type RIGHT_IDEAL = Ɛ.>[M, Ɛ.TRUTH]
-      override type TRUTH = ElementWrapper[RIGHT_IDEAL]
+      override type TRUTH = VanillaWrapper[RIGHT_IDEAL]
       override val I: RightActionStar[Ɛ.UNIT, UNIT] = RightActionStar(Ɛ.I) { (i, m) => i }
 
       private object RightIdeals {
@@ -515,7 +515,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
             case (x, m) => Ɛ.truth(x)
         }))
 
-      class RightActionStar[A <: Ɛ.ELEMENT, AA <: ElementWrapper[A]](
+      class RightActionStar[A <: Ɛ.ELEMENT, AA <: ElementWrapper[A, AA]](
         private[RightMonoidActionsInDraft2] val action: RightAction[A],
         private val ^ : A => AA
       ) extends Star[AA] { star =>
@@ -532,39 +532,53 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
 
         override def xUncached[BB <: ELEMENT](that: STAR[BB]) = that.preMultiplyUncached(this)
 
-        private def preMultiplyUncached[Z <: Ɛ.ELEMENT, ZZ <: ElementWrapper[Z]](
+        private def preMultiplyUncached[Z <: Ɛ.ELEMENT, ZZ <: ElementWrapper[Z, ZZ]](
           pre: RightActionStar[Z, ZZ]
         ): BIPRODUCT[ZZ, AA] = {
           val product: Ɛ.BIPRODUCT[Z, A] = pre.action.actionCarrier x action.actionCarrier           
-          val aRightAction: RightAction[Ɛ.x[ZZ#BASE, AA#BASE]] = rightAction(product){
-              case ((z, a), m) => product.pair(
-                  pre.action.actionMultiply(z, m),
-                  action.actionMultiply(a, m) 
-                )}
-          new BiproductHelper[ZZ, AA](pre, star).biproduct(
-            aRightAction,
-            (zxa: Ɛ.x[ZZ#BASE, AA#BASE]) =>
-              zxa match { case (z, a) =>
-                val zz: ZZ = pre ^ z
-                val aa: AA = star ^ a
-                val zxaWrapped: ElementWrapper[Ɛ.x[zz.BASE, aa.BASE]] = ElementWrapper(zxa)
-                zxaWrapped(zz, aa).asInstanceOf[ZZ x AA] // TODO: fix with reveal?
-              },
-            (zz: ZZ, aa: AA) => { 
-              val z: Z = zz.element
-              val a: A = aa.element
-              ElementWrapper(product.pair(z, a))(zz, aa).asInstanceOf[ZZ x AA] // TODO: fix with reveal?
-            }              
-          )
+          // val aRightAction: RightAction[Ɛ.x[Z, A]] = rightAction(product){
+          //     case ((z, a), m) => product.pair(
+          //         pre.action.actionMultiply(z, m),
+          //         action.actionMultiply(a, m) 
+          //       )}
 
-/*
-            action: RightAction[EX],
-            ^ : EX => XWRAPPER,
-            leftStar: STAR[SS],
-            rightStar: STAR[TT],
-            makePair: (SS, TT) => x[SS, TT]
-*/
 
+// self-type 
+//   RightActionStar[Ɛ.x[Z,A], BiproductWrapper[Z,ZZ,A,AA]] with BiproductStar[ZZ,AA] 
+// does not conform to BiproductStar[ZZ,AA]'s selftype 
+//   BiproductStar[ZZ,AA] with STAR[x[ZZ,AA]]
+// where:
+//   x[ZZ, AA] ::== AA#PREBIPRODUCT[ZZ] ::== BiproductWrapper[Z, ZZ, A, AA] but do we know that? 
+// is a STAR[BiproductWrapper[Z,ZZ,A,AA]] necessarily a STAR[ZZ x AA] ?
+
+        // val toozy: STAR[BiproductWrapper[Z,ZZ,A,AA]] = null
+        // val threezy: STAR[ZZ x AA] = toozy
+
+        val weezy: BiproductStar[ZZ, AA] with STAR[ZZ x AA] =
+       new RightActionStar[
+          Ɛ.x[Z, A],
+          x[ZZ, AA] // BiproductWrapper[Z, ZZ, A, AA]
+        ] (
+          rightAction(product){
+            case ((z, a), m) => product.pair(
+                pre.action.actionMultiply(z, m),
+                action.actionMultiply(a, m) 
+              )},
+          (zxa: Ɛ.x[Z, A]) =>
+            zxa match { case (z, a) =>
+              val zz: ZZ = pre ^ z
+              val aa: AA = star ^ a
+              new BiproductWrapper[Z, ZZ, A, AA](zz, aa, zxa).asInstanceOf[x[ZZ, AA]] // TODO can fix!!
+            }
+        ) with BiproductStar[ZZ, AA] {               
+          override val left: STAR[ZZ] = pre
+          override val right: STAR[AA] = star
+          override def pair(zz: ZZ, aa: AA): x[ZZ, AA] = { 
+            val z: Z = zz.element
+            val a: A = aa.element
+            new BiproductWrapper[Z, ZZ, A, AA](zz, aa, product.pair(z, a)).asInstanceOf[x[ZZ, AA]] // TODO can fix!!
+        }}
+        weezy
 
 /*          
           new RightActionStar[Ɛ.x[ZZ#BASE, AA#BASE], ZZ x AA] (
@@ -594,7 +608,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         override def `>Uncached`[BB <: ELEMENT](that: STAR[BB]): EXPONENTIAL[AA, BB] = 
           that.preExponentiateUncached(this)
 
-        private def preExponentiateUncached[Z <: Ɛ.ELEMENT, ZZ <: ElementWrapper[Z]](
+        private def preExponentiateUncached[Z <: Ɛ.ELEMENT, ZZ <: ElementWrapper[Z, ZZ]](
           pre: RightActionStar[Z, ZZ]
         ): EXPONENTIAL[ZZ, AA] = {
           val mXz = pre.pairs
@@ -613,12 +627,12 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
               case ((f, m), (n, z)) => morphisms.inclusion(f)(
                 mXz.pair(multiply(m, n), z)
             )}))
-
+/*
           new RightActionStar[P, ZZ > AA](
             rightAction(morphisms) {
               Ɛ.BiQuiver(morphisms x carrier, morphismMultiply)(_,_)
             },
-            (p: P) => ElementWrapper(p) { 
+            (p: P) => new VanillaWrapper(p) { 
               (zz: ZZ) => {
                 val z = zz.element
                 val unitM: M = unit(pre.action.actionCarrier.toI(z))
@@ -631,13 +645,16 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
             def transpose[RR <: ELEMENT](biQuiver: BiQuiver[RR, ZZ, AA]): QUIVER[RR, ZZ > AA] = 
               biQuiver.product.left.calcTranspose[Z, ZZ, A, AA](
                 pre, star, morphisms, possibleMorphisms, exponentialStar, biQuiver
-              )}}
+              )}
+*/
+              null.asInstanceOf[EXPONENTIAL[ZZ, AA]]
+            }
 
         private def calcTranspose[
           R <: Ɛ.ELEMENT, 
-          RR <: ElementWrapper[R], 
+          RR <: ElementWrapper[R, RR], 
           T <: Ɛ.ELEMENT, 
-          TT <: ElementWrapper[T] 
+          TT <: ElementWrapper[T, TT] 
         ] (
           source: RightActionStar[R, RR],
           target: RightActionStar[T, TT],
@@ -664,7 +681,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         override def apply[BB <: ELEMENT](that: STAR[BB])(f: AA => BB): QUIVER[AA, BB] =
           that.preApply(this)(f)
 
-        private def preApply[Z <: Ɛ.ELEMENT, ZZ <: ElementWrapper[Z]](
+        private def preApply[Z <: Ɛ.ELEMENT, ZZ <: ElementWrapper[Z, ZZ]](
           pre: RightActionStar[Z, ZZ]
         )(
           f: ZZ => AA
@@ -681,9 +698,9 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
 
       object RightActionStar {
         def apply[A <: Ɛ.ELEMENT](actionCarrier: Ɛ.STAR[A])(actionMultiply: (A, M) => A) =
-          new RightActionStar[A, ElementWrapper[A]](
+          new RightActionStar[A, VanillaWrapper[A]](
             rightAction(actionCarrier)(actionMultiply),
-            (a: A) => ElementWrapper(a)
+            (a: A) => new VanillaWrapper(a)
           ) 
       }
 
@@ -692,7 +709,12 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         Quiver[E, F] { facade =>
       }
 
-      class RightActionQuiver[A <: Ɛ.ELEMENT, AA <: ElementWrapper[A], B <: Ɛ.ELEMENT, BB <: ElementWrapper[B]](
+      class RightActionQuiver[
+        A <: Ɛ.ELEMENT, 
+        AA <: ElementWrapper[A, AA], 
+        B <: Ɛ.ELEMENT, 
+        BB <: ElementWrapper[B, BB]
+      ] (
         val source: RightActionStar[A, AA],
         val target: RightActionStar[B, BB],
         val quiver: Ɛ.QUIVER[A, B]
@@ -719,7 +741,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         override def hashCode = 0
       }
 
-      override type WRAPPER[T <: Ɛ.ELEMENT] = ElementWrapper[T]
+      override type WRAPPER[T <: Ɛ.ELEMENT] = VanillaWrapper[T]
 
       private val memoizedStarWrapper = {
         type STAR_WRAPPER[T <: Ɛ.ELEMENT] = STAR[WRAPPER[T]]
