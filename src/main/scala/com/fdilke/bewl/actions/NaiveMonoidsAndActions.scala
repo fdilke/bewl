@@ -443,8 +443,13 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         //     override val element = wrapper.element
         //   }
 
-        type PREBIPRODUCT[ZZ <: ELEMENT] = ZZ#POSTBIPRODUCT[A, AA]
-        type POSTBIPRODUCT[B <: Ɛ.ELEMENT, BB <: ElementWrapper[B, BB]] = BiproductWrapper[A, AA, B, BB]
+        // type PREBIPRODUCT[ZZ <: ELEMENT] = ZZ#POSTBIPRODUCT[A, AA]
+        // type POSTBIPRODUCT[B <: Ɛ.ELEMENT, BB <: ElementWrapper[B, BB]] = BiproductWrapper[A, AA, B, BB]
+
+        type PREBIPRODUCT[ZZ <: ELEMENT] = ZZ#POSTBIPRODUCT[A, AA] 
+        type POSTBIPRODUCT[B <: Ɛ.ELEMENT, BB <: ElementWrapper[B, BB]] = H forSome {
+          type H <: ElementWrapper[Ɛ.x[A, B], H]
+        }
       }
 
       class BiproductWrapper[
@@ -476,7 +481,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
       override type UNIT = VanillaWrapper[Ɛ.UNIT]
 
       // experimental: tighten up the biproduct type
-      override type x[SS <: ELEMENT, TT <: ELEMENT] = TT#PREBIPRODUCT[SS]
+      override type x[SS <: ELEMENT, TT <: ELEMENT] = (SS, TT) with TT#PREBIPRODUCT[SS]
 
       // experimental: tighten up the exponential type
       override type >[SS <: ELEMENT, TT <: ELEMENT] = (SS => TT) with ELEMENT
