@@ -476,7 +476,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
       override type ELEMENT = TT forSome {
         type TT <: ElementWrapper[_ <: Ɛ.ELEMENT, TT]
       }
-      override type STAR[AA <: ELEMENT] = RightActionStar[_, AA] 
+      override type STAR[AA <: ELEMENT] = ActionStarFacade[AA] 
       override type QUIVER[AA <: ELEMENT, BB <: ELEMENT] = RightActionQuiverFacade[AA, BB]
       override type UNIT = VanillaWrapper[Ɛ.UNIT]
 
@@ -520,10 +520,35 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
             case (x, m) => Ɛ.truth(x)
         }))
 
+      trait ActionStarFacade[AA <: ELEMENT] extends Star[AA] {
+        def preMultiplyUncached[
+          Z <: Ɛ.ELEMENT, 
+          ZZ <: ElementWrapper[Z, ZZ]
+        ] (
+          pre: RightActionStar[Z, ZZ]
+        ): BIPRODUCT[ZZ, AA]
+
+        def preExponentiateUncached[
+          Z <: Ɛ.ELEMENT, 
+          ZZ <: ElementWrapper[Z, ZZ]
+        ] (
+          pre: RightActionStar[Z, ZZ]
+        ): EXPONENTIAL[ZZ, AA]
+
+        def preApply[
+          Z <: Ɛ.ELEMENT, 
+          ZZ <: ElementWrapper[Z, ZZ]
+        ] (
+          pre: RightActionStar[Z, ZZ]
+        )(
+          f: ZZ => AA
+        ): QUIVER[ZZ, AA]
+      }
+
       class RightActionStar[A <: Ɛ.ELEMENT, AA <: ElementWrapper[A, AA]](
         private[RightMonoidActionsInDraft2] val action: RightAction[A],
         private val ^ : A => AA
-      ) extends Star[AA] { star =>
+      ) extends ActionStarFacade[AA] { star =>
         def v(aa: AA): A = aa.element // TODO: inline / optimize away?
         private lazy val pairs: Ɛ.BIPRODUCT[M, A] = carrier x action.actionCarrier 
 
@@ -537,7 +562,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
 
         override def xUncached[BB <: ELEMENT](that: STAR[BB]) = that.preMultiplyUncached(this)
 
-        private def preMultiplyUncached[Z <: Ɛ.ELEMENT, ZZ <: ElementWrapper[Z, ZZ]](
+        override def preMultiplyUncached[Z <: Ɛ.ELEMENT, ZZ <: ElementWrapper[Z, ZZ]](
           pre: RightActionStar[Z, ZZ]
         ): BIPRODUCT[ZZ, AA] = {
           val product: Ɛ.BIPRODUCT[Z, A] = pre.action.actionCarrier x action.actionCarrier           
@@ -556,10 +581,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
 //   x[ZZ, AA] ::== AA#PREBIPRODUCT[ZZ] ::== BiproductWrapper[Z, ZZ, A, AA] but do we know that? 
 // is a STAR[BiproductWrapper[Z,ZZ,A,AA]] necessarily a STAR[ZZ x AA] ?
 
-        // val toozy: STAR[BiproductWrapper[Z,ZZ,A,AA]] = null
-        // val threezy: STAR[ZZ x AA] = toozy
-
-        val weezy: BiproductStar[ZZ, AA] with STAR[ZZ x AA] =
+      val weezy: BIPRODUCT[ZZ, AA] =
        new RightActionStar[
           Ɛ.x[Z, A],
           x[ZZ, AA] // BiproductWrapper[Z, ZZ, A, AA]
@@ -584,7 +606,6 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
             new BiproductWrapper[Z, ZZ, A, AA](zz, aa, product.pair(z, a)).asInstanceOf[x[ZZ, AA]] // TODO can fix!!
         }}
         weezy
-
 /*          
           new RightActionStar[Ɛ.x[ZZ#BASE, AA#BASE], ZZ x AA] (
               rightAction(product){
@@ -613,7 +634,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         override def `>Uncached`[BB <: ELEMENT](that: STAR[BB]): EXPONENTIAL[AA, BB] = 
           that.preExponentiateUncached(this)
 
-        private def preExponentiateUncached[Z <: Ɛ.ELEMENT, ZZ <: ElementWrapper[Z, ZZ]](
+        override def preExponentiateUncached[Z <: Ɛ.ELEMENT, ZZ <: ElementWrapper[Z, ZZ]](
           pre: RightActionStar[Z, ZZ]
         ): EXPONENTIAL[ZZ, AA] = {
           val mXz = pre.pairs
@@ -686,7 +707,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         override def apply[BB <: ELEMENT](that: STAR[BB])(f: AA => BB): QUIVER[AA, BB] =
           that.preApply(this)(f)
 
-        private def preApply[Z <: Ɛ.ELEMENT, ZZ <: ElementWrapper[Z, ZZ]](
+        override def preApply[Z <: Ɛ.ELEMENT, ZZ <: ElementWrapper[Z, ZZ]](
           pre: RightActionStar[Z, ZZ]
         )(
           f: ZZ => AA
