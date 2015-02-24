@@ -446,10 +446,15 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         // type PREBIPRODUCT[ZZ <: ELEMENT] = ZZ#POSTBIPRODUCT[A, AA]
         // type POSTBIPRODUCT[B <: Ɛ.ELEMENT, BB <: ElementWrapper[B, BB]] = BiproductWrapper[A, AA, B, BB]
 
-        type PREBIPRODUCT[ZZ <: ELEMENT] = ZZ#POSTBIPRODUCT[A, AA] 
-        type POSTBIPRODUCT[B <: Ɛ.ELEMENT, BB <: ElementWrapper[B, BB]] = H forSome {
-          type H <: ElementWrapper[Ɛ.x[A, B], H]
-        }
+        // type PREBIPRODUCT[ZZ <: ELEMENT] = ZZ#POSTBIPRODUCT[A, AA] 
+        // type POSTBIPRODUCT[B <: Ɛ.ELEMENT, BB <: ElementWrapper[B, BB]] = H forSome {
+        //   type H <: ElementWrapper[Ɛ.x[A, B], H]
+        // }
+        type PREBIPRODUCT[ZZ <: ELEMENT] = ZZ#POSTBIPRODUCT[A, AA]
+        type POSTBIPRODUCT[B <: Ɛ.ELEMENT, BB <: ElementWrapper[B, BB]] = BiproductWrapper[A, AA, B, BB]
+        // H forSome {
+        //   type H <: ElementWrapper[Ɛ.x[A, B], H]
+        // }
       }
 
       class BiproductWrapper[
@@ -481,6 +486,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
       override type UNIT = VanillaWrapper[Ɛ.UNIT]
 
       // experimental: tighten up the biproduct type
+      // override type x[SS <: ELEMENT, TT <: ELEMENT] = (SS, TT) with ELEMENT
       override type x[SS <: ELEMENT, TT <: ELEMENT] = (SS, TT) with TT#PREBIPRODUCT[SS]
 
       // experimental: tighten up the exponential type
@@ -545,6 +551,26 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         ): QUIVER[ZZ, AA]
       }
 
+      trait WeakBiproductStar[L <: ELEMENT, R <: ELEMENT, LXR <: L x R] extends ActionStarFacade[LXR] { star: STAR[LXR] =>
+        val left: STAR[L]
+        val right: STAR[R]
+        def pair(l: L, r: R): L x R
+        // final lazy val π0 = star(left) { _._1 }
+        // final lazy val π1 = star(right) { _._2 }
+        // final def biQuiver[T <: ELEMENT](
+        //   target: STAR[T]
+        //   ) (
+        //   bifunc: (L, R) => T
+        //   ) : BiQuiver[L, R, T] =
+        //   BiQuiver(this, this(target) (
+        //     tupled[L,R,T](bifunc)
+        //   ))
+        //   final def universally[T <: ELEMENT](target: STAR[T])(bifunc: ((L x R), T) => TRUTH) =
+        //     BiQuiver(this, target.forAll(this)(bifunc))
+        //   final def existentially[T <: ELEMENT](target: STAR[T])(bifunc: ((L x R), T) => TRUTH) =
+        //     BiQuiver(this, target.exists(this)(bifunc))
+        }
+
       class RightActionStar[A <: Ɛ.ELEMENT, AA <: ElementWrapper[A, AA]](
         private[RightMonoidActionsInDraft2] val action: RightAction[A],
         private val ^ : A => AA
@@ -573,18 +599,15 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
           //       )}
 
 
-// self-type 
-//   RightActionStar[Ɛ.x[Z,A], BiproductWrapper[Z,ZZ,A,AA]] with BiproductStar[ZZ,AA] 
-// does not conform to BiproductStar[ZZ,AA]'s selftype 
-//   BiproductStar[ZZ,AA] with STAR[x[ZZ,AA]]
-// where:
-//   x[ZZ, AA] ::== AA#PREBIPRODUCT[ZZ] ::== BiproductWrapper[Z, ZZ, A, AA] but do we know that? 
-// is a STAR[BiproductWrapper[Z,ZZ,A,AA]] necessarily a STAR[ZZ x AA] ?
+ // self-type RightActionStar[x[Z,A], x[ZZ,AA]] with WeakBiproductStar[ZZ,AA,BiproductWrapper[Z,ZZ,A,AA]] 
+ // does not conform to 
+ // WeakBiproductStar[ZZ,AA,BiproductWrapper[Z,ZZ,A,AA]]'s selftype 
+ // WeakBiproductStar[ZZ,AA,BiproductWrapper[Z,ZZ,A,AA]] with STAR[BiproductWrapper[Z,ZZ,A,AA]]
 
-      val weezy: BIPRODUCT[ZZ, AA] =
+      val weezy =
        new RightActionStar[
           Ɛ.x[Z, A],
-          x[ZZ, AA] // BiproductWrapper[Z, ZZ, A, AA]
+          BiproductWrapper[Z, ZZ, A, AA] // ZZ x AA
         ] (
           rightAction(product){
             case ((z, a), m) => product.pair(
@@ -595,9 +618,9 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
             zxa match { case (z, a) =>
               val zz: ZZ = pre ^ z
               val aa: AA = star ^ a
-              new BiproductWrapper[Z, ZZ, A, AA](zz, aa, zxa).asInstanceOf[x[ZZ, AA]] // TODO can fix!!
+              new BiproductWrapper[Z, ZZ, A, AA](zz, aa, zxa) // .asInstanceOf[x[ZZ, AA]] // TODO can fix!!
             }
-        ) with BiproductStar[ZZ, AA] {               
+        ) with WeakBiproductStar[ZZ, AA, BiproductWrapper[Z, ZZ, A, AA]] {               
           override val left: STAR[ZZ] = pre
           override val right: STAR[AA] = star
           override def pair(zz: ZZ, aa: AA): x[ZZ, AA] = { 
@@ -605,7 +628,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
             val a: A = aa.element
             new BiproductWrapper[Z, ZZ, A, AA](zz, aa, product.pair(z, a)).asInstanceOf[x[ZZ, AA]] // TODO can fix!!
         }}
-        weezy
+        weezy.asInstanceOf[BIPRODUCT[ZZ, AA]]
 /*          
           new RightActionStar[Ɛ.x[ZZ#BASE, AA#BASE], ZZ x AA] (
               rightAction(product){
