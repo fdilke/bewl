@@ -45,21 +45,21 @@ abstract class RightActionsToposTest extends GenericToposTests(new ToposWithFixt
   val bazAction = monoidOf3.rightAction(bazStar)(bazMultiply)
 
   override val baz = star(bazAction)
-  override val foo2ImageOfBar = functionAsQuiver(foo, baz, Map[FOO, BAZ]('i -> 1, 'x -> 1, 'y -> 2))
-  override val foo2bar = functionAsQuiver(foo, bar, Map[FOO, BAR]('i -> "x", 'x -> "x", 'y -> "y"))
+  override val foo2ImageOfBar = functionAsQuiver(foo, baz, Map('i -> 1, 'x -> 1, 'y -> 2))
+  override val foo2bar = functionAsQuiver(foo, bar, Map('i -> "x", 'x -> "x", 'y -> "y"))
   private def foobar2BazFunc(a: Symbol, b : String) = Map[(Symbol, String), Int](
     (i, "i") -> 1, (x, "i") -> 2, (y, "i") -> 1,
     (i, "x") -> 2, (x, "x") -> 1, (y, "x") -> 1,
     (i, "y") -> 1, (x, "y") -> 2, (y, "y") -> 2
   )((a, b))
   override val foobar2baz = bifunctionAsBiQuiver(foo, bar, baz)(foobar2BazFunc)
-  override val monicBar2baz = functionAsQuiver(bar, baz, Map[BAR, BAZ]("i" -> 3, "x" -> 1, "y" -> 2))
+  override val monicBar2baz = functionAsQuiver(bar, baz, Map("i" -> 3, "x" -> 1, "y" -> 2))
 
   override def makeSampleStar() =
     star(bazAction)
 
   override def makeSampleQuiver() =
-    functionAsQuiver(foo, bar, Map[FOO, BAR](i -> "x", x -> "x", y -> "x"))
+    functionAsQuiver(foo, bar, Map(i -> "x", x -> "x", y -> "x"))
 
   override val equalizerSituation = {
     type BINARY = WRAPPER[Boolean]
@@ -68,8 +68,8 @@ abstract class RightActionsToposTest extends GenericToposTests(new ToposWithFixt
     val binary = star(monoidOf3.rightAction(binaryStar)(binaryMultiply))
     new EqualizerSituation[FOO, BAZ, BINARY](
       foo2baz,
-      functionAsQuiver(baz, binary, Map[BAZ, BINARY](0 -> true, 1 -> true, 2 -> true, 3 -> true)),
-      functionAsQuiver(baz, binary, Map[BAZ, BINARY](0 -> false, 1 -> true, 2 -> true, 3 -> true))
+      functionAsQuiver(baz, binary, Map(0 -> true, 1 -> true, 2 -> true, 3 -> true)),
+      functionAsQuiver(baz, binary, Map(0 -> false, 1 -> true, 2 -> true, 3 -> true))
     )
   }
 })
