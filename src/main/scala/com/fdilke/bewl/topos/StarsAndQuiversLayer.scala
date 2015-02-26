@@ -36,7 +36,7 @@ object StarsAndQuiversLayer {
           quiver(dot.toI).asInstanceOf[QUIVER[T, UNIT]]
 
         override def xUncached[U <: ELEMENT](that: STAR[U]) =
-          new AdapterStar[T x U] with BiproductStar[T, U] {
+          new AdapterStar[T x U] with BiproductStar[T, U, T x U] {
             override val left = self
             override val right = that
 

@@ -37,25 +37,49 @@ trait BaseTopos { self: LogicalOperations =>
       (this x source).biQuiver(target) { (f, s) => f(s) }
   }
 
-  type BIPRODUCT[L <: ELEMENT, R <: ELEMENT] = BiproductStar[L, R] with STAR[L x R]
-  trait BiproductStar[L <: ELEMENT, R <: ELEMENT] { star: STAR[L x R] =>
+  type BIPRODUCT[L <: ELEMENT, R <: ELEMENT] = BiproductStar[L, R, L x R] with STAR[L x R]
+
+  // trait BiproductStar[L <: ELEMENT, R <: ELEMENT] { star: STAR[L x R] =>
+  //   val left: STAR[L]
+  //   val right: STAR[R]
+  //   def pair(l: L, r: R): L x R
+  //   final lazy val π0 = star(left) { _._1 }
+  //   final lazy val π1 = star(right) { _._2 }
+  //   final def biQuiver[T <: ELEMENT](
+  //     target: STAR[T]
+  //     ) (
+  //     bifunc: (L, R) => T
+  //     ) : BiQuiver[L, R, T] =
+  //     BiQuiver(this, this(target) (
+  //       tupled[L,R,T](bifunc)
+  //     ))
+  //     final def universally[T <: ELEMENT](target: STAR[T])(bifunc: ((L x R), T) => TRUTH) =
+  //       BiQuiver(this, target.forAll(this)(bifunc))
+  //     final def existentially[T <: ELEMENT](target: STAR[T])(bifunc: ((L x R), T) => TRUTH) =
+  //       BiQuiver(this, target.exists(this)(bifunc))
+  //   }
+
+  trait BiproductStar[L <: ELEMENT, R <: ELEMENT, LxR <: (L, R) with ELEMENT] { star: STAR[LxR] =>
     val left: STAR[L]
     val right: STAR[R]
-    def pair(l: L, r: R): L x R
+    def pair(l: L, r: R): LxR
     final lazy val π0 = star(left) { _._1 }
     final lazy val π1 = star(right) { _._2 }
+
+    private val hackedThis: BIPRODUCT[L, R] = this.asInstanceOf[BIPRODUCT[L, R]]
+
     final def biQuiver[T <: ELEMENT](
       target: STAR[T]
       ) (
       bifunc: (L, R) => T
       ) : BiQuiver[L, R, T] =
-      BiQuiver(this, this(target) (
+      BiQuiver(hackedThis, hackedThis(target) (
         tupled[L,R,T](bifunc)
       ))
       final def universally[T <: ELEMENT](target: STAR[T])(bifunc: ((L x R), T) => TRUTH) =
-        BiQuiver(this, target.forAll(this)(bifunc))
+        BiQuiver(hackedThis, target.forAll(hackedThis)(bifunc))
       final def existentially[T <: ELEMENT](target: STAR[T])(bifunc: ((L x R), T) => TRUTH) =
-        BiQuiver(this, target.exists(this)(bifunc))
+        BiQuiver(hackedThis, target.exists(hackedThis)(bifunc))
     }
 
   type EQUALIZER[S <: ELEMENT] = EqualizingStar[S] with STAR[S]

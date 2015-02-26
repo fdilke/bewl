@@ -579,33 +579,29 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
           pre: RightActionStar[Z, ZZ]
         ): BIPRODUCT[ZZ, AA] = {
           val product: Ɛ.BIPRODUCT[Z, A] = pre.action.actionCarrier x action.actionCarrier           
-
-      val weezy = null
-      
-       // new RightActionStar[
-       //    Ɛ.x[Z, A],
-       //    BiproductWrapper[Z, ZZ, A, AA] // ZZ x AA
-       //  ] (
-       //    rightAction(product){
-       //      case ((z, a), m) => product.pair(
-       //          pre.action.actionMultiply(z, m),
-       //          action.actionMultiply(a, m) 
-       //        )},
-       //    (zxa: Ɛ.x[Z, A]) =>
-       //      zxa match { case (z, a) =>
-       //        val zz: ZZ = pre ^ z
-       //        val aa: AA = star ^ a
-       //        new BiproductWrapper[Z, ZZ, A, AA](zz, aa, zxa) // .asInstanceOf[x[ZZ, AA]] // TODO can fix!!
-       //      }
-       //  ) with WeakBiproductStar[ZZ, AA, BiproductWrapper[Z, ZZ, A, AA]] {               
-       //    override val left: STAR[ZZ] = pre
-       //    override val right: STAR[AA] = star
-       //    override def pair(zz: ZZ, aa: AA): x[ZZ, AA] = { 
-       //      val z: Z = zz.element
-       //      val a: A = aa.element
-       //      new BiproductWrapper[Z, ZZ, A, AA](zz, aa, product.pair(z, a)).asInstanceOf[x[ZZ, AA]] // TODO can fix!!
-       //  }}
-        weezy.asInstanceOf[BIPRODUCT[ZZ, AA]]
+          new RightActionStar[
+              Ɛ.x[Z, A],
+              BiproductWrapper[Z, ZZ, A, AA] // ZZ x AA
+            ] (
+              rightAction(product){
+                case ((z, a), m) => product.pair(
+                    pre.action.actionMultiply(z, m),
+                    action.actionMultiply(a, m) 
+                  )},
+              (zxa: Ɛ.x[Z, A]) =>
+                zxa match { case (z, a) =>
+                  val zz: ZZ = pre ^ z
+                  val aa: AA = star ^ a
+                  new BiproductWrapper[Z, ZZ, A, AA](zz, aa, zxa)
+                }
+            ) with BiproductStar[ZZ, AA, BiproductWrapper[Z, ZZ, A, AA]] {               
+              override val left: STAR[ZZ] = pre
+              override val right: STAR[AA] = star
+              override def pair(zz: ZZ, aa: AA) = { 
+                val z: Z = zz.element
+                val a: A = aa.element
+                new BiproductWrapper[Z, ZZ, A, AA](zz, aa, product.pair(z, a))
+            }}.asInstanceOf[BIPRODUCT[ZZ, AA]]
           
           // new RightActionStar[Ɛ.x[ZZ#BASE, AA#BASE], ZZ x AA] (
           //     rightAction(product){

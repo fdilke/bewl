@@ -45,7 +45,7 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreQu
       new FiniteSetsStar[S x T](
         for(s <- this.elements ; t <- that.elements)
         yield (s, t)
-      ) with BiproductStar[S, T] {
+      ) with BiproductStar[S, T, S x T] {
         override val left: STAR[S] = self
         override val right: STAR[T] = that
         override def pair(l: S, r: T): x[S, T] = (l, r)
