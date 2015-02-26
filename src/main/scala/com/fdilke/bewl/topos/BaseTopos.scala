@@ -28,36 +28,17 @@ trait BaseTopos { self: LogicalOperations =>
     def v(that: TRUTH) = TruthObject.or(truthValue, that)
   }
 
-  type EXPONENTIAL[S <: ELEMENT, T <: ELEMENT] = ExponentialStar[S, T] with STAR[S > T]
-  trait ExponentialStar[S <: ELEMENT, T <: ELEMENT] { star: STAR[S > T] =>
+  type EXPONENTIAL[S <: ELEMENT, T <: ELEMENT] = ExponentialStar[S, T, S > T] with STAR[S > T]
+  trait ExponentialStar[S <: ELEMENT, T <: ELEMENT, S_T <: (S => T) with ELEMENT] { star: STAR[S_T] =>
     val source: STAR[S]
     val target: STAR[T]
-    def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, S, T]): QUIVER[R, S > T]
-    final def evaluation: BiQuiver[S > T, S, T] =
+
+    def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, S, T]): QUIVER[R, S_T]
+    final def evaluation: BiQuiver[S_T, S, T] =
       (this x source).biQuiver(target) { (f, s) => f(s) }
   }
 
   type BIPRODUCT[L <: ELEMENT, R <: ELEMENT] = BiproductStar[L, R, L x R] with STAR[L x R]
-
-  // trait BiproductStar[L <: ELEMENT, R <: ELEMENT] { star: STAR[L x R] =>
-  //   val left: STAR[L]
-  //   val right: STAR[R]
-  //   def pair(l: L, r: R): L x R
-  //   final lazy val π0 = star(left) { _._1 }
-  //   final lazy val π1 = star(right) { _._2 }
-  //   final def biQuiver[T <: ELEMENT](
-  //     target: STAR[T]
-  //     ) (
-  //     bifunc: (L, R) => T
-  //     ) : BiQuiver[L, R, T] =
-  //     BiQuiver(this, this(target) (
-  //       tupled[L,R,T](bifunc)
-  //     ))
-  //     final def universally[T <: ELEMENT](target: STAR[T])(bifunc: ((L x R), T) => TRUTH) =
-  //       BiQuiver(this, target.forAll(this)(bifunc))
-  //     final def existentially[T <: ELEMENT](target: STAR[T])(bifunc: ((L x R), T) => TRUTH) =
-  //       BiQuiver(this, target.exists(this)(bifunc))
-  //   }
 
   trait BiproductStar[L <: ELEMENT, R <: ELEMENT, LxR <: (L, R) with ELEMENT] { star: STAR[LxR] =>
     val left: STAR[L]
