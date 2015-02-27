@@ -54,7 +54,7 @@ object StarsAndQuiversLayer {
           }
 
         override def `>Uncached`[U <: ELEMENT](that: STAR[U]) =
-          new AdapterStar[T > U] with ExponentialStar[T, U] {
+          new AdapterStar[T > U] with ExponentialStar[T, U, T > U] {
             override val source = AdapterStar.this
             override val target = that
 

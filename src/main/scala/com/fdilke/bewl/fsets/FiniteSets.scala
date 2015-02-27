@@ -31,7 +31,7 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreQu
       }
       new FiniteSetsStar[S > T](
         allMaps(self.elements, that.elements).map { FunctionElement } // TODO: coalesce
-      ) with ExponentialStar[S, T] { exponentialStar =>
+      ) with ExponentialStar[S, T, S > T] { exponentialStar =>
         override val source: STAR[S] = self
         override val target: STAR[T] = that
 

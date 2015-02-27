@@ -472,7 +472,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
     class RightMonoidActionsInDraft3 extends Topos with 
       Wrappings[Ɛ.ELEMENT, RightAction, RightActionPrequiver] {
 
-      trait ElementWrapper[A <: Ɛ.ELEMENT] { 
+      trait ElementWrapper[A <: Ɛ.ELEMENT] {
         val element: A
       }
 
@@ -493,12 +493,29 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         override val element = aXb
       }
 
+      class ExponentialWrapper[
+        A <: Ɛ.ELEMENT,
+        AA <: ElementWrapper[A],
+        B <: Ɛ.ELEMENT,
+        BB <: ElementWrapper[B]
+      ] (
+        ma2b: Ɛ.>[Ɛ.x[M, A], B],
+        aa2bb: AA => BB
+      ) extends (AA => BB) with ElementWrapper[
+        Ɛ.>[Ɛ.x[M, A], B]
+      ] {
+        def apply(aa: AA): BB = aa2bb(aa)
+
+        override val element = ma2b
+      }
+
       override type ELEMENT = ElementWrapper[_ <: Ɛ.ELEMENT]
       
       override type STAR[AA <: ELEMENT] = ActionStarFacade[AA] 
       override type QUIVER[AA <: ELEMENT, BB <: ELEMENT] = RightActionQuiverFacade[AA, BB]
       override type UNIT = VanillaWrapper[Ɛ.UNIT]
 
+      // TODO: nothing's being overridden: simplify this. OR sort it out properly!
       override type x[SS <: ELEMENT, TT <: ELEMENT] = (SS, TT) with ELEMENT
 
       override type >[SS <: ELEMENT, TT <: ELEMENT] = (SS => TT) with ELEMENT
@@ -556,6 +573,20 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         )(
           f: ZZ => AA
         ): QUIVER[ZZ, AA]
+
+        def calcTranspose[
+          R <: Ɛ.ELEMENT, 
+          RR <: ElementWrapper[R], 
+          T <: Ɛ.ELEMENT, 
+          TT <: ElementWrapper[T] 
+        ] (
+          source: RightActionStar[R, RR],
+          target: RightActionStar[T, TT],
+          morphisms: Ɛ.EQUALIZER[Ɛ.>[Ɛ.x[M, R], T]],
+          possibleMorphisms: Ɛ.EXPONENTIAL[Ɛ.x[M, R], T],
+          exponentialStar: RightActionStar[Ɛ.>[Ɛ.x[M, R], T], ExponentialWrapper[R, RR, T, TT]],
+          biQuiver: BiQuiver[AA, RR, TT]
+        ): QUIVER[AA, ExponentialWrapper[R, RR, T, TT]] 
       }
 
       class RightActionStar[A <: Ɛ.ELEMENT, AA <: ElementWrapper[A]](
@@ -581,7 +612,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
           val product: Ɛ.BIPRODUCT[Z, A] = pre.action.actionCarrier x action.actionCarrier           
           new RightActionStar[
               Ɛ.x[Z, A],
-              BiproductWrapper[Z, ZZ, A, AA] // ZZ x AA
+              BiproductWrapper[Z, ZZ, A, AA]
             ] (
               rightAction(product){
                 case ((z, a), m) => product.pair(
@@ -602,29 +633,6 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
                 val a: A = aa.element
                 new BiproductWrapper[Z, ZZ, A, AA](zz, aa, product.pair(z, a))
             }}.asInstanceOf[BIPRODUCT[ZZ, AA]]
-          
-          // new RightActionStar[Ɛ.x[ZZ#BASE, AA#BASE], ZZ x AA] (
-          //     rightAction(product){
-          //       case ((z, a), m) => product.pair(
-          //           pre.action.actionMultiply(z, m),
-          //           action.actionMultiply(a, m) 
-          //         )},
-          //     (zxa: Ɛ.x[Z, A]) =>
-          //       zxa match { case (z, a) =>
-          //         val zz: ZZ = pre ^ z
-          //         val aa: AA = star ^ a
-          //         val zxaWrapped: Ɛ.ElementWrapper[Ɛ.x[zz.BASE, aa.BASE]] = Ɛ.ElementWrapper(zxa)
-          //         zxaWrapped(zz, aa).asInstanceOf[ZZ x AA] // TODO: fix with reveal?
-          //       }
-          // ) with BiproductStar[ZZ, AA] {               
-          //   override val left: STAR[ZZ] = pre
-          //   override val right: STAR[AA] = star
-          //   override def pair(zz: ZZ, aa: AA): x[ZZ, AA] = { 
-          //     val z: Z = zz.element
-          //     val a: A = aa.element
-          //     Ɛ.ElementWrapper(product.pair(z, a))(zz, aa).asInstanceOf[ZZ x AA] // TODO: fix with reveal?
-          // }}
-          
           }
 
         override def `>Uncached`[BB <: ELEMENT](that: STAR[BB]): EXPONENTIAL[AA, BB] = 
@@ -650,55 +658,54 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
                 mXz.pair(multiply(m, n), z)
             )}))
 
-          // new RightActionStar[P, ZZ > AA](
-          //   rightAction(morphisms) {
-          //     Ɛ.BiQuiver(morphisms x carrier, morphismMultiply)(_,_)
-          //   },
-          //   (p: P) => new VanillaWrapper(p) { 
-          //     (zz: ZZ) => {
-          //       val z = zz.element
-          //       val unitM: M = unit(pre.action.actionCarrier.toI(z))
-          //       val a: A = p(mXz.pair(unitM, z))
-          //       star ^ a
-          //   }}.asInstanceOf[ZZ > AA] // TODO: fix these casts dammit
-          // ) with ExponentialStar[ZZ, AA] { exponentialStar =>
-          //   val source: STAR[ZZ] = pre
-          //   val target: STAR[AA] = star
-          //   def transpose[RR <: ELEMENT](biQuiver: BiQuiver[RR, ZZ, AA]): QUIVER[RR, ZZ > AA] = 
-          //     biQuiver.product.left.calcTranspose[Z, ZZ, A, AA](
-          //       pre, star, morphisms, possibleMorphisms, exponentialStar, biQuiver
-          //     )}
+          new RightActionStar[P, ExponentialWrapper[Z, ZZ, A, AA]](
+            rightAction(morphisms) {
+              Ɛ.BiQuiver(morphisms x carrier, morphismMultiply)(_,_)
+            },
+            (p: P) => new ExponentialWrapper[Z, ZZ, A, AA](p,
+              (zz: ZZ) => {
+                val z = zz.element
+                val unitM: M = unit(pre.action.actionCarrier.toI(z))
+                val a: A = p(mXz.pair(unitM, z))
+                star ^ a
+              }
+          )) with ExponentialStar[ZZ, AA, ExponentialWrapper[Z, ZZ, A, AA]] { exponentialStar =>
+            val source: STAR[ZZ] = pre
+            val target: STAR[AA] = star
+            def transpose[RR <: ELEMENT](biQuiver: BiQuiver[RR, ZZ, AA]): QUIVER[RR, ExponentialWrapper[Z, ZZ, A, AA]] = 
+              biQuiver.product.left.calcTranspose[Z, ZZ, A, AA](
+                pre, star, morphisms, possibleMorphisms, exponentialStar, biQuiver
+              )
+          }.asInstanceOf[EXPONENTIAL[ZZ, AA]]
+        }
 
-              null.asInstanceOf[EXPONENTIAL[ZZ, AA]]
-            }
-
-        // private def calcTranspose[
-        //   R <: Ɛ.ELEMENT, 
-        //   RR <: ElementWrapper[R], 
-        //   T <: Ɛ.ELEMENT, 
-        //   TT <: ElementWrapper[T] 
-        // ] (
-        //   source: RightActionStar[R, RR],
-        //   target: RightActionStar[T, TT],
-        //   morphisms: Ɛ.EQUALIZER[Ɛ.>[Ɛ.x[M, R], T]],
-        //   possibleMorphisms: Ɛ.EXPONENTIAL[Ɛ.x[M, R], T],
-        //   exponentialStar: RightActionStar[Ɛ.>[Ɛ.x[M, R], T], RR > TT],
-        //   biQuiver: BiQuiver[AA, RR, TT]
-        // ): QUIVER[AA, RR > TT] = {
-        //   type P = Ɛ.>[Ɛ.x[M, R],T]
-        //   val innerQuiver: Ɛ.QUIVER[A, P] =
-        //     morphisms.restrict(possibleMorphisms.transpose(
-        //       (action.actionCarrier x source.pairs).biQuiver(target.action.actionCarrier) {
-        //         case (a, (m, r)) => 
-        //           val aa: AA = star ^ action.actionMultiply(a, m)
-        //           val rr: RR = source ^ r
-        //           target.v(biQuiver(aa, rr))
-        //         }))
-        //   this(exponentialStar) { aa =>
-        //     val p: P = innerQuiver(this v aa)
-        //     exponentialStar ^ p
-        //   }              
-        // }
+        override def calcTranspose[
+          R <: Ɛ.ELEMENT, 
+          RR <: ElementWrapper[R], 
+          T <: Ɛ.ELEMENT, 
+          TT <: ElementWrapper[T] 
+        ] (
+          source: RightActionStar[R, RR],
+          target: RightActionStar[T, TT],
+          morphisms: Ɛ.EQUALIZER[Ɛ.>[Ɛ.x[M, R], T]],
+          possibleMorphisms: Ɛ.EXPONENTIAL[Ɛ.x[M, R], T],
+          exponentialStar: RightActionStar[Ɛ.>[Ɛ.x[M, R], T], ExponentialWrapper[R, RR, T, TT]],
+          biQuiver: BiQuiver[AA, RR, TT]
+        ): QUIVER[AA, ExponentialWrapper[R, RR, T, TT]] = {
+          type P = Ɛ.>[Ɛ.x[M, R],T]
+          val innerQuiver: Ɛ.QUIVER[A, P] =
+            morphisms.restrict(possibleMorphisms.transpose(
+              (action.actionCarrier x source.pairs).biQuiver(target.action.actionCarrier) {
+                case (a, (m, r)) => 
+                  val aa: AA = star ^ action.actionMultiply(a, m)
+                  val rr: RR = source ^ r
+                  target.v(biQuiver(aa, rr))
+                }))
+          this(exponentialStar) { aa =>
+            val p: P = innerQuiver(this v aa)
+            exponentialStar ^ p
+          }              
+        }
 
         override def apply[BB <: ELEMENT](that: STAR[BB])(f: AA => BB): QUIVER[AA, BB] =
           that.preApply(this)(f)
