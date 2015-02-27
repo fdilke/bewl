@@ -733,8 +733,26 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
           ) 
       }
 
-      trait RightActionQuiverFacade[E <: ELEMENT, F <: ELEMENT] extends
-        Quiver[E, F] { facade =>
+      trait RightActionQuiverFacade[AA <: ELEMENT, BB <: ELEMENT] extends
+        Quiver[AA, BB] { 
+        def preBackDivide[Z <: Ɛ.ELEMENT, ZZ <: ElementWrapper[Z]](that: VeiledActionQuiver[Z, ZZ, BB]): QUIVER[ZZ, AA]
+      }
+
+      trait VeiledActionQuiver[
+        A <: Ɛ.ELEMENT, 
+        AA <: ElementWrapper[A], 
+        BB <: ELEMENT
+      ] {
+        val source: RightActionStar[A, AA]
+        def unveilBackDivide[
+          Z <: Ɛ.ELEMENT, 
+          ZZ <: ElementWrapper[Z] 
+        ](that: VeiledActionQuiver[Z, ZZ, BB]): QUIVER[AA, ZZ]
+        def withInnerQuiver[X](receiver: ReceiveInnerQuiver[A, X]): X
+      }
+
+      trait ReceiveInnerQuiver[A <: Ɛ.ELEMENT, X] {
+        def use[B <: Ɛ.ELEMENT](innerQuiver: Ɛ.QUIVER[A, B]): X
       }
 
       class RightActionQuiver[
@@ -746,11 +764,37 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         val source: RightActionStar[A, AA],
         val target: RightActionStar[B, BB],
         val quiver: Ɛ.QUIVER[A, B]
-      ) extends RightActionQuiverFacade[AA, BB] {
+      ) extends RightActionQuiverFacade[AA, BB] 
+        with VeiledActionQuiver[A, AA, BB] {
 
-        override lazy val chi: QUIVER[BB, TRUTH] = null
+        override def withInnerQuiver[X](receiver: ReceiveInnerQuiver[A, X]): X =
+          receiver.use(quiver)
 
-        override def \[UU <: ELEMENT](monic: QUIVER[UU, BB]) = null
+        override lazy val chi: QUIVER[BB, TRUTH] = 
+          new RightActionQuiver(target, omega, 
+            RightIdeals.restrict(target.action.actionCarrier) {
+                (t, m) => quiver.chi(target.action.actionMultiply(t, m)) 
+            })        
+
+        override def \[UU <: ELEMENT](monic: QUIVER[UU, BB]): QUIVER[AA, UU] = 
+          monic.preBackDivide(this)
+
+        override def preBackDivide[
+          Z <: Ɛ.ELEMENT, 
+          ZZ <: ElementWrapper[Z]
+        ] (that: VeiledActionQuiver[Z, ZZ, BB]): QUIVER[ZZ, AA] = 
+          that.unveilBackDivide(this)
+
+        override def unveilBackDivide[
+          Z <: Ɛ.ELEMENT, 
+          ZZ <: ElementWrapper[Z] 
+        ](that: VeiledActionQuiver[Z, ZZ, BB]): QUIVER[AA, ZZ] =
+          that.withInnerQuiver(new ReceiveInnerQuiver[Z, QUIVER[AA, ZZ]] {
+            def use[BBB <: Ɛ.ELEMENT](innerQuiver: Ɛ.QUIVER[Z, BBB]) = {
+              val quotient = quiver \ (innerQuiver.asInstanceOf[Ɛ.QUIVER[Z, B]])
+              new RightActionQuiver(source, that.source, quotient)
+            }
+          })
 
         override def sanityTest = {
           quiver.sanityTest
