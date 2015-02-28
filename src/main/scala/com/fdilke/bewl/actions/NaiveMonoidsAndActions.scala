@@ -778,18 +778,24 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
           Z <: Ɛ.ELEMENT, 
           ZZ <: ELEMENT
         ] (
-          that: RightActionQuiver[Z, ZZ, B, BB]
+          pre: RightActionQuiver[Z, ZZ, B, BB]
         ): QUIVER[ZZ, AA]
 
         def preEqualizer[
           A <: Ɛ.ELEMENT, 
           B <: Ɛ.ELEMENT
-        ] (that: RightActionQuiver[A, AA, B, BB]): EQUALIZER[AA]
+        ] (pre: RightActionQuiver[A, AA, B, BB]): EQUALIZER[AA]
 
         def preRestrict[B <: Ɛ.ELEMENT](
           equalizingStar: EQUALIZER[BB],
           thunkedEqualizer: Ɛ.EQUALIZER[B]
         ): QUIVER[AA, BB]
+
+        def preCompose[
+          B <: Ɛ.ELEMENT, 
+          C <: Ɛ.ELEMENT, 
+          CC <: ELEMENT
+        ] (pre: RightActionQuiver[B, BB, C, CC]): QUIVER[AA, CC]
       }
 
       class RightActionQuiver[
@@ -849,18 +855,34 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
           equalizingStar: EQUALIZER[BB],
           thunkedEqualizer: Ɛ.EQUALIZER[BBB]
         ): QUIVER[AA, BB] =
-          equalizingStar.crossPreRestrict( // TODO: fill in generics
+          equalizingStar.crossPreRestrict[A, AA, B]( 
             source, 
             thunkedEqualizer.asInstanceOf[Ɛ.EQUALIZER[B]].restrict(quiver)
           )
 
-        override def apply(e: AA) = null.asInstanceOf[BB]
+        override def apply(a: AA): BB = target.↔ / quiver(source.↔ \ a)
 
-        override def o[ZZ <: ELEMENT](that: QUIVER[ZZ, AA]): QUIVER[ZZ, BB] = null
+        override def o[ZZ <: ELEMENT](that: QUIVER[ZZ, AA]): QUIVER[ZZ, BB] = 
+          that.preCompose[A, B, BB](this)
+
+        override def preCompose[
+          BBB <: Ɛ.ELEMENT, 
+          C <: Ɛ.ELEMENT, 
+          CC <: ELEMENT
+        ] (pre: RightActionQuiver[BBB, BB, C, CC]): QUIVER[AA, CC] = {
+          val hackedPre = pre.asInstanceOf[RightActionQuiver[B, BB, C, CC]]
+          new RightActionQuiver(source, hackedPre.target, hackedPre.quiver o quiver)
+        }
 
         override def toString = "RightActionQuiver[" + quiver + "]"
 
-        override def equals(other: Any): Boolean = false
+        override def equals(other: Any): Boolean = other match {
+          case that: RightActionQuiver[A, AA, B, BB] =>
+            that.source == source &&
+            that.target == target &&
+            that.quiver == quiver
+        }
+        
         override def hashCode = 0
       }
 
