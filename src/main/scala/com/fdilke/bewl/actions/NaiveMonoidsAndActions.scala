@@ -593,7 +593,16 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
           possibleMorphisms: Ɛ.EXPONENTIAL[Ɛ.x[M, R], T],
           exponentialStar: RightActionStar[Ɛ.>[Ɛ.x[M, R], T], ExponentialWrapper[R, RR, T, TT]],
           biQuiver: BiQuiver[AA, RR, TT]
-        ): QUIVER[AA, ExponentialWrapper[R, RR, T, TT]] 
+        ): QUIVER[AA, ExponentialWrapper[R, RR, T, TT]]
+
+        def crossPreRestrict[
+          Z <: Ɛ.ELEMENT,
+          ZZ <: ELEMENT,
+          A <: Ɛ.ELEMENT
+        ] (
+          source: RightActionStar[Z, ZZ],
+          restrictedQuiver: Ɛ.QUIVER[Z, A]
+        ): QUIVER[ZZ, AA]
       }
 
       class RightActionStar[A <: Ɛ.ELEMENT, AA <: ELEMENT](
@@ -734,6 +743,20 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
               star v aa    // TODO: condense
             })
 
+        override def crossPreRestrict[
+          Z <: Ɛ.ELEMENT,
+          ZZ <: ELEMENT,
+          AAA <: Ɛ.ELEMENT
+        ] (
+          source: RightActionStar[Z, ZZ],
+          restrictedQuiver: Ɛ.QUIVER[Z, AAA]
+        ): QUIVER[ZZ, AA] = 
+          new RightActionQuiver[Z, ZZ, A, AA](
+            source, 
+            star,
+            restrictedQuiver.asInstanceOf[Ɛ.QUIVER[Z, A]]
+          )
+
         override def toString = "RightActionStar[" + action.actionCarrier + "]"
       }
 
@@ -745,11 +768,28 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
           ) 
       }
 
-      trait RightActionQuiverFacade[AA <: ELEMENT, BB <: ELEMENT] extends
-        Quiver[AA, BB] { 
-        def preBackDivide[B <: Ɛ.ELEMENT, Z <: Ɛ.ELEMENT, ZZ <: ELEMENT](
+      trait RightActionQuiverFacade[
+        AA <: ELEMENT, 
+        BB <: ELEMENT
+      ] extends Quiver[AA, BB] { 
+
+        def preBackDivide[
+          B <: Ɛ.ELEMENT, 
+          Z <: Ɛ.ELEMENT, 
+          ZZ <: ELEMENT
+        ] (
           that: RightActionQuiver[Z, ZZ, B, BB]
         ): QUIVER[ZZ, AA]
+
+        def preEqualizer[
+          A <: Ɛ.ELEMENT, 
+          B <: Ɛ.ELEMENT
+        ] (that: RightActionQuiver[A, AA, B, BB]): EQUALIZER[AA]
+
+        def preRestrict[B <: Ɛ.ELEMENT](
+          equalizingStar: EQUALIZER[BB],
+          thunkedEqualizer: Ɛ.EQUALIZER[B]
+        ): QUIVER[AA, BB]
       }
 
       class RightActionQuiver[
@@ -786,7 +826,33 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
           assert(source.action.isMorphism(target.action, quiver))
         }
 
-        override def ?=(that: QUIVER[AA, BB]): EQUALIZER[AA] = null
+        override def ?=(that: QUIVER[AA, BB]): EQUALIZER[AA] = 
+          that.preEqualizer[A, B](this)
+
+        override def preEqualizer[
+          AAA <: Ɛ.ELEMENT, 
+          BBB <: Ɛ.ELEMENT
+        ] (that: RightActionQuiver[AAA, AA, BBB, BB]): EQUALIZER[AA] = {
+          val thunkedEqualizer = quiver ?= that.asInstanceOf[RightActionQuiver[A, AA, B, BB]].quiver
+          new RightActionStar[A, AA](
+            rightAction(thunkedEqualizer)(source.action.actionMultiply(_, _)),
+            source.↔
+          ) with EqualizingStar[AA] { equalizingStar =>
+            override val equalizerTarget = source
+            override val inclusion: QUIVER[AA, AA] = new RightActionQuiver(equalizingStar, source, thunkedEqualizer.inclusion)
+            override def restrict[RR <: ELEMENT](quiver: QUIVER[RR, AA]): QUIVER[RR, AA] =
+              quiver.preRestrict[A](equalizingStar, thunkedEqualizer)
+          }
+        }
+
+        override def preRestrict[BBB <: Ɛ.ELEMENT](
+          equalizingStar: EQUALIZER[BB],
+          thunkedEqualizer: Ɛ.EQUALIZER[BBB]
+        ): QUIVER[AA, BB] =
+          equalizingStar.crossPreRestrict( // TODO: fill in generics
+            source, 
+            thunkedEqualizer.asInstanceOf[Ɛ.EQUALIZER[B]].restrict(quiver)
+          )
 
         override def apply(e: AA) = null.asInstanceOf[BB]
 
