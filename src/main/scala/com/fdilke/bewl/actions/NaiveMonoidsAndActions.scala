@@ -479,9 +479,11 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
 
       object VanillaWrapper {
         def ↔[A <: Ɛ.ELEMENT] = new ↔[A, VanillaWrapper[A]](
-          a => new VanillaWrapper(a),
+          a => VanillaWrapper(a),
           aa => aa.element
         )
+        def apply[A <: Ɛ.ELEMENT](a: A) =
+          new VanillaWrapper(a)
       }
       class VanillaWrapper[A <: Ɛ.ELEMENT](val element: A) extends ElementWrapper[A] 
 
@@ -762,8 +764,11 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
 
       object RightActionStar {
         def apply[A <: Ɛ.ELEMENT](actionCarrier: Ɛ.STAR[A])(actionMultiply: (A, M) => A) =
+          wrap(rightAction(actionCarrier)(actionMultiply))
+
+        def wrap[A <: Ɛ.ELEMENT](action: RightAction[A]) =
           new RightActionStar[A, VanillaWrapper[A]](
-            rightAction(actionCarrier)(actionMultiply),
+            action,
             VanillaWrapper.↔[A]
           ) 
       }
@@ -888,15 +893,17 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
 
       override type WRAPPER[T <: Ɛ.ELEMENT] = VanillaWrapper[T]
 
-      private val memoizedStarWrapper = {
-        type STAR_WRAPPER[T <: Ɛ.ELEMENT] = STAR[WRAPPER[T]]
-        def wrap[T <: Ɛ.ELEMENT](input: RightAction[T]): STAR_WRAPPER[T] =
-          null
-        Memoize.generic.withLowerBound[RightAction, STAR_WRAPPER, Ɛ.ELEMENT](wrap)
-      }
+      private val memoizedStarWrapper = 
+        Memoize.generic.withLowerBound[
+          RightAction, 
+          ({ type λ[T <: Ɛ.ELEMENT] = STAR[WRAPPER[T]]})#λ, 
+          Ɛ.ELEMENT
+        ](
+          RightActionStar.wrap
+        )
 
       override def star[T <: Ɛ.ELEMENT](input: RightAction[T]): STAR[WRAPPER[T]] =
-        null 
+        memoizedStarWrapper(input) 
 
       override def quiver[S <: Ɛ.ELEMENT, T <: Ɛ.ELEMENT](
         prequiver: RightActionPrequiver[S, T]
@@ -911,8 +918,13 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         target: STAR[WRAPPER[T]], 
         f: S => T
       ): QUIVER[WRAPPER[S], WRAPPER[T]] = {
-        null
-      }
+        val src = source.asInstanceOf[RightActionStar[S, WRAPPER[S]]]
+        val tgt = target.asInstanceOf[RightActionStar[T, WRAPPER[T]]]
+        new RightActionQuiver[S, WRAPPER[S], T, WRAPPER[T]](
+          src, 
+          tgt, 
+          src.action.actionCarrier(tgt.action.actionCarrier) { f }
+        )}
 
       override def bifunctionAsBiQuiver[
         L <: Ɛ.ELEMENT, 
@@ -925,7 +937,12 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
       ) (
         bifunc: (L, R) => T
       ): BiQuiver[WRAPPER[L], WRAPPER[R], WRAPPER[T]] = {
-        null
+        val l =   left.asInstanceOf[RightActionStar[L, WRAPPER[L]]]
+        val r =   left.asInstanceOf[RightActionStar[R, WRAPPER[R]]]
+        val t = target.asInstanceOf[RightActionStar[T, WRAPPER[T]]]
+        (l x r).biQuiver(t) { (a, b) =>
+          VanillaWrapper(bifunc(a.element, b.element))
+        }
       }
     }
   }
