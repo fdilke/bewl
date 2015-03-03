@@ -214,6 +214,16 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
       val char = monicBar2baz.chi
       char.source shouldBe baz
       char.target shouldBe omega
+
+//      {
+//        val com = char o monicBar2baz
+//        val b2t = bar.toTrue
+//
+//        com.source shouldBe b2t.source
+//        com.target shouldBe b2t.target
+//        println("Glory be")
+//      }
+
       char o monicBar2baz shouldBe bar.toTrue
 
       val restriction = foo2ImageOfBar \ monicBar2baz
@@ -223,43 +233,14 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
 
       // TODO: contruct a non-monic arrow, have chi throw a NotMonicException
       // TODO: try backdividing by a monic when we can't
-      // TODO: refactor with quiver.subStar = Option[SubStar] ?
     }
 
 /*
-    it("can construct integer powers") {
-      foo ^ 0 shouldBe I
-
-      foo ^ 1 shouldBe foo
-
-      val square = foo ^ 2
-
-      val twist: ARROW[Power[FOO], Power[FOO]] = (projection(foo, 2, 1) x projection(foo, 2, 0)).
-        asInstanceOf[ARROW[Power[FOO], Power[FOO]]]
-      twist.source shouldBe square
-      twist.target shouldBe square
-      twist should not be square.identity
-      twist(twist) shouldBe square.identity
-    }
-
-    it("can multiply arrows of the same type in the context of an integer powers") {
-      IntegerPower.multiply(foo) shouldBe foo.toI
-      IntegerPower.multiply(foo, foo2bar) shouldBe foo2bar
-      IntegerPower.multiply(foo, foo2bar, foo2bar) shouldBe (foo2bar x foo2bar)
-    }
-
-    it("has standardized integer powers") {
-      val foo3: DOT[Power[FOO]] = foo ^ 3
-      foo3 shouldBe (foo ^ 3)
-    }
-
     ignore("has a Heyting algebra structure for the truth object") {
       omegaHeyting.isInstanceOf[HeytingAlgebra[OMEGA]] shouldBe true
       //      omegaHeyting.verify
     }
-
  */
-
     // TODO: make the commented-out tests work
   }
 }

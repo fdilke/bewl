@@ -535,12 +535,23 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
 
       private object RightIdeals {
         private val possibleIdeals = carrier.power
-        private val isIdeal = (carrier x carrier).forAll(possibleIdeals) {
-          case (f, (m, n)) => Ɛ.OmegaEnrichments(f(m)) > f(multiply(m, n))
+        // private val isIdeal = (carrier x carrier).forAll(possibleIdeals) {
+        //   case (f, (m, n)) => Ɛ.OmegaEnrichments(f(m)) > f(multiply(m, n))
+        // }
+
+        private val isIdeal = carrier.forAll(possibleIdeals) {
+          case (f, m) => carrier.forAll(carrier) {
+              case (m, n) => Ɛ.OmegaEnrichments(f(m)) > f(multiply(m, n))
+            }(m)
         }
+
         private val ideals = possibleIdeals.toTrue ?= isIdeal
 
-        def restrict[H <: Ɛ.ELEMENT](that: Ɛ.STAR[H])(bifunc: (H, M) => Ɛ.TRUTH): Ɛ.QUIVER[H, RIGHT_IDEAL] = 
+        def restrict[H <: Ɛ.ELEMENT](
+          that: Ɛ.STAR[H]
+        ) (
+          bifunc: (H, M) => Ɛ.TRUTH
+        ): Ɛ.QUIVER[H, RIGHT_IDEAL] = 
           ideals.restrict(possibleIdeals.transpose(
             (that x carrier).biQuiver(Ɛ.omega)(bifunc)
           ))
@@ -663,13 +674,25 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         ): EXPONENTIAL[ZZ, AA] = {
           val mXz = pre.pairs
           val possibleMorphisms = mXz > action.actionCarrier
-          val isMorphism = (mXz x carrier).forAll(possibleMorphisms) {
-            case (f, ((m, z), n)) =>
-              action.actionCarrier.diagonal(
-                f(mXz.pair(multiply(m, n), pre.action.actionMultiply(z, n))),
-                action.actionMultiply(f(mXz.pair(m, z)), n)
-              )
+          // val isMorphism = (mXz x carrier).forAll(possibleMorphisms) {
+          //   case (f, ((m, z), n)) =>
+          //     action.actionCarrier.diagonal(
+          //       f(mXz.pair(multiply(m, n), pre.action.actionMultiply(z, n))),
+          //       action.actionMultiply(f(mXz.pair(m, z)), n)
+          //     )
+          // }
+          // TODO: variadic version of forAll() with arguments the right way round
+
+          val isMorphism = carrier.forAll(possibleMorphisms) {
+            (f, n) => mXz.forAll(carrier) {
+                case (n, (m, z)) => 
+                  action.actionCarrier.diagonal(
+                    f(mXz.pair(multiply(m, n), pre.action.actionMultiply(z, n))),
+                    action.actionMultiply(f(mXz.pair(m, z)), n)
+                  )
+              }(n)
           }
+
           type P = Ɛ.>[Ɛ.x[M, Z],A]
           val morphisms: Ɛ.EQUALIZER[P] = possibleMorphisms.toTrue ?= isMorphism
           val morphismMultiply = morphisms.restrict(possibleMorphisms.transpose(
@@ -938,7 +961,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         bifunc: (L, R) => T
       ): BiQuiver[WRAPPER[L], WRAPPER[R], WRAPPER[T]] = {
         val l =   left.asInstanceOf[RightActionStar[L, WRAPPER[L]]]
-        val r =   left.asInstanceOf[RightActionStar[R, WRAPPER[R]]]
+        val r =  right.asInstanceOf[RightActionStar[R, WRAPPER[R]]]
         val t = target.asInstanceOf[RightActionStar[T, WRAPPER[T]]]
         (l x r).biQuiver(t) { (a, b) =>
           VanillaWrapper(bifunc(a.element, b.element))

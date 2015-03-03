@@ -42,6 +42,7 @@ abstract class RightActionsToposTest extends GenericToposTests(new ToposWithFixt
       case `x` => 1
       case `y` => 2
     }
+
   val bazAction = monoidOf3.rightAction(bazStar)(bazMultiply)
 
   override val baz = star(bazAction)
