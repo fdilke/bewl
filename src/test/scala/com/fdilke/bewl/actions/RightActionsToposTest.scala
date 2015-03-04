@@ -5,7 +5,7 @@ import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsUtilities}
 import com.fdilke.bewl.topos.{ToposWithFixtures, GenericToposTests}
 
-abstract class RightActionsToposTest extends GenericToposTests(new ToposWithFixtures {
+class RightActionsToposTest extends GenericToposTests(new ToposWithFixtures {
 
   private val (i, x, y) = ('i, 'x, 'y)
 
@@ -14,7 +14,7 @@ abstract class RightActionsToposTest extends GenericToposTests(new ToposWithFixt
       i, x, y,
       x, x, y,
       y, x, y
-    )
+    ) // right-dominant on two generators
 
   override val topos = monoidOf3.rightActions
 

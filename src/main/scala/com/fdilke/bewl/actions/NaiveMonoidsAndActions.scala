@@ -73,17 +73,25 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
       }
     }
 
-    case class RightActionPrequiver[S <: ELEMENT, T <: ELEMENT](
+    case class RightActionPrequiver[
+      S <: ELEMENT, 
+      T <: ELEMENT
+    ] (
       source: RightAction[S],
       target: RightAction[T],
       function: S => T
     )
 
-    class RightMonoidActions extends Topos with 
-      Wrappings[Ɛ.ELEMENT, RightAction, RightActionPrequiver] {
+    class RightMonoidActions extends Topos with Wrappings[
+      Ɛ.ELEMENT, 
+      RightAction, 
+      RightActionPrequiver
+    ] {
 
       trait AbstractElementWrapper
-      trait ElementWrapper[A <: Ɛ.ELEMENT] extends AbstractElementWrapper {
+      trait ElementWrapper[
+        A <: Ɛ.ELEMENT
+      ] extends AbstractElementWrapper {
         val element: A
       }
 
@@ -145,9 +153,6 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
 
       private object RightIdeals {
         private val possibleIdeals = carrier.power
-        // private val isIdeal = (carrier x carrier).forAll(possibleIdeals) {
-        //   case (f, (m, n)) => Ɛ.OmegaEnrichments(f(m)) > f(multiply(m, n))
-        // }
 
         private val isIdeal = carrier.forAll(possibleIdeals) {
           case (f, m) => carrier.forAll(carrier) {
@@ -169,16 +174,19 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         private val idealMultiply = restrict(ideals x carrier) {
             case ((i, s), t) => ideals.inclusion(i)(multiply(s, t))
           }
+
         val omega = RightActionStar[RIGHT_IDEAL](ideals)(
             Ɛ.BiQuiver[RIGHT_IDEAL, M, RIGHT_IDEAL](ideals x carrier, idealMultiply)(_, _)
           )
       }
+
       override lazy val omega = RightIdeals.omega
+
       override lazy val truth: QUIVER[UNIT, TRUTH] = 
-        new RightActionQuiver[Ɛ.UNIT, UNIT, RIGHT_IDEAL, TRUTH](I, omega, // TODO: need generics?
-          carrier.power.transpose((Ɛ.I x carrier).biQuiver(Ɛ.omega) {
-            case (x, m) => Ɛ.truth(x)
-        }))
+        new RightActionQuiver(I, omega,
+          RightIdeals.restrict(Ɛ.I) {
+            (i, m) => Ɛ truth i
+          })
 
       trait ActionStarFacade[AA <: ELEMENT] extends Star[AA] {
         def preMultiplyUncached[
@@ -284,14 +292,6 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         ): EXPONENTIAL[ZZ, AA] = {
           val mXz = pre.pairs
           val possibleMorphisms = mXz > action.actionCarrier
-          // val isMorphism = (mXz x carrier).forAll(possibleMorphisms) {
-          //   case (f, ((m, z), n)) =>
-          //     action.actionCarrier.diagonal(
-          //       f(mXz.pair(multiply(m, n), pre.action.actionMultiply(z, n))),
-          //       action.actionMultiply(f(mXz.pair(m, z)), n)
-          //     )
-          // }
-          // TODO: variadic version of forAll() with arguments the right way round
 
           val isMorphism = carrier.forAll(possibleMorphisms) {
             (f, n) => mXz.forAll(carrier) {
