@@ -9,8 +9,6 @@ import com.fdilke.bewl.helper.↔
 
 trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with LogicalOperations =>
 
-  case class ElementProxy0[A <: ELEMENT](element: A)
-
   case class NaiveMonoid[M <: ELEMENT](carrier: STAR[M], unit: NullaryOp[M], multiply: BinaryOp[M]) {
     def sanityTest {
       // check the left unit law
@@ -87,8 +85,8 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
       RightAction, 
       RightActionPrequiver
     ] {
-
       trait AbstractElementWrapper
+      
       trait ElementWrapper[
         A <: Ɛ.ELEMENT
       ] extends AbstractElementWrapper {
@@ -103,7 +101,12 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         def apply[A <: Ɛ.ELEMENT](a: A) =
           new VanillaWrapper(a)
       }
-      class VanillaWrapper[A <: Ɛ.ELEMENT](val element: A) extends ElementWrapper[A] 
+
+      class VanillaWrapper[
+        A <: Ɛ.ELEMENT
+      ] (
+        val element: A
+      ) extends ElementWrapper[A] 
 
       class BiproductWrapper[
         A <: Ɛ.ELEMENT,
@@ -142,9 +145,8 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
       override type QUIVER[AA <: ELEMENT, BB <: ELEMENT] = RightActionQuiverFacade[AA, BB]
       override type UNIT = VanillaWrapper[Ɛ.UNIT]
 
-      // TODO: nothing's being overridden: simplify this. OR sort it out properly!
+      // TODO: nothing's being overridden: simplify these. OR sort them out properly!
       override type x[SS <: ELEMENT, TT <: ELEMENT] = (SS, TT) with ELEMENT
-
       override type >[SS <: ELEMENT, TT <: ELEMENT] = (SS => TT) with ELEMENT
 
       type RIGHT_IDEAL = Ɛ.>[M, Ɛ.TRUTH]
@@ -154,15 +156,18 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
       private object RightIdeals {
         private val possibleIdeals = carrier.power
 
-        private val isIdeal = carrier.forAll(possibleIdeals) {
-          case (f, m) => carrier.forAll(carrier) {
+        private val isIdeal = 
+          carrier.forAll(possibleIdeals) {
+            case (f, m) => carrier.forAll(carrier) {
               case (m, n) => Ɛ.OmegaEnrichments(f(m)) > f(multiply(m, n))
             }(m)
-        }
+          }
 
         private val ideals = possibleIdeals.toTrue ?= isIdeal
 
-        def restrict[H <: Ɛ.ELEMENT](
+        def restrict[
+          H <: Ɛ.ELEMENT
+        ] (
           that: Ɛ.STAR[H]
         ) (
           bifunc: (H, M) => Ɛ.TRUTH
@@ -171,7 +176,8 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
             (that x carrier).biQuiver(Ɛ.omega)(bifunc)
           ))
 
-        private val idealMultiply = restrict(ideals x carrier) {
+        private val idealMultiply = 
+          restrict(ideals x carrier) {
             case ((i, s), t) => ideals.inclusion(i)(multiply(s, t))
           }
 
@@ -222,7 +228,10 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
           target: RightActionStar[T, TT],
           morphisms: Ɛ.EQUALIZER[Ɛ.>[Ɛ.x[M, R], T]],
           possibleMorphisms: Ɛ.EXPONENTIAL[Ɛ.x[M, R], T],
-          exponentialStar: RightActionStar[Ɛ.>[Ɛ.x[M, R], T], ExponentialWrapper[R, RR, T, TT]],
+          exponentialStar: RightActionStar[
+            Ɛ.>[Ɛ.x[M, R], T], 
+            ExponentialWrapper[R, RR, T, TT]
+          ],
           biQuiver: BiQuiver[AA, RR, TT]
         ): QUIVER[AA, ExponentialWrapper[R, RR, T, TT]]
 
@@ -240,7 +249,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         val action: RightAction[A],
         val ↔ : A ↔ AA
       ) extends ActionStarFacade[AA] { star =>
-        def v(aa: AA): A = ↔ \ aa // TODO: inline / optimize away?
+        // def v(aa: AA): A = ↔ \ aa // TODO: inline / optimize away?
         private lazy val pairs: Ɛ.BIPRODUCT[M, A] = carrier x action.actionCarrier 
 
         override val toI: QUIVER[AA, UNIT] = 
@@ -353,29 +362,35 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
             morphisms.restrict(possibleMorphisms.transpose(
               (action.actionCarrier x source.pairs).biQuiver(target.action.actionCarrier) {
                 case (a, (m, r)) => 
-                  val aa: AA = star.↔ / action.actionMultiply(a, m)
-                  val rr: RR = source.↔ / r
-                  target.v(biQuiver(aa, rr))
-                }))
+                  target.↔.\(biQuiver(
+                    star.↔ / action.actionMultiply(a, m), 
+                    source.↔ / r
+                  ))}))
           this(exponentialStar) { aa =>
-            val p: P = innerQuiver(this v aa)
-            exponentialStar.↔ / p
+            exponentialStar.↔ / innerQuiver(↔ \ aa)
           }              
         }
 
-        override def apply[BB <: ELEMENT](that: STAR[BB])(f: AA => BB): QUIVER[AA, BB] =
+        override def apply[
+          BB <: ELEMENT
+        ] (
+          that: STAR[BB]
+        ) (
+          f: AA => BB
+        ): QUIVER[AA, BB] =
           that.preApply(this)(f)
 
-        override def preApply[Z <: Ɛ.ELEMENT, ZZ <: ELEMENT](
+        override def preApply[
+          Z <: Ɛ.ELEMENT, 
+          ZZ <: ELEMENT
+        ] (
           pre: RightActionStar[Z, ZZ]
-        )(
+        ) (
           f: ZZ => AA
         ): QUIVER[ZZ, AA] = 
-          new RightActionQuiver[Z, ZZ, A, AA](pre, star, // TODO: need generics?
+          new RightActionQuiver(pre, star, 
             pre.action.actionCarrier(star.action.actionCarrier) { z =>
-              val zz = pre.↔ / z
-              val aa = f(zz)
-              star v aa    // TODO: condense
+              star.↔ \ f(pre.↔ / z)
             })
 
         override def crossPreRestrict[
@@ -386,7 +401,7 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
           source: RightActionStar[Z, ZZ],
           restrictedQuiver: Ɛ.QUIVER[Z, AAA]
         ): QUIVER[ZZ, AA] = 
-          new RightActionQuiver[Z, ZZ, A, AA](
+          new RightActionQuiver(
             source, 
             star,
             restrictedQuiver.asInstanceOf[Ɛ.QUIVER[Z, A]]
@@ -396,10 +411,20 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
       }
 
       object RightActionStar {
-        def apply[A <: Ɛ.ELEMENT](actionCarrier: Ɛ.STAR[A])(actionMultiply: (A, M) => A) =
+        def apply[
+          A <: Ɛ.ELEMENT
+        ] (
+          actionCarrier: Ɛ.STAR[A]
+        ) (
+          actionMultiply: (A, M) => A
+        ) =
           wrap(rightAction(actionCarrier)(actionMultiply))
 
-        def wrap[A <: Ɛ.ELEMENT](action: RightAction[A]) =
+        def wrap[
+          A <: Ɛ.ELEMENT
+        ] (
+          action: RightAction[A]
+        ) =
           new RightActionStar[A, VanillaWrapper[A]](
             action,
             VanillaWrapper.↔[A]
@@ -424,7 +449,9 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
           B <: Ɛ.ELEMENT
         ] (pre: RightActionQuiver[A, AA, B, BB]): EQUALIZER[AA]
 
-        def preRestrict[B <: Ɛ.ELEMENT](
+        def preRestrict[
+          B <: Ɛ.ELEMENT
+        ] (
           equalizingStar: EQUALIZER[BB],
           thunkedEqualizer: Ɛ.EQUALIZER[B]
         ): QUIVER[AA, BB]
@@ -524,21 +551,27 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         override def hashCode = 0
       }
 
-      override type WRAPPER[T <: Ɛ.ELEMENT] = VanillaWrapper[T]
+      override type WRAPPER[
+        T <: Ɛ.ELEMENT
+      ] = VanillaWrapper[T]
 
       private val memoizedStarWrapper = 
-        Memoize.generic.withLowerBound[
+        Memoize.generic withLowerBound[
           RightAction, 
           ({ type λ[T <: Ɛ.ELEMENT] = STAR[WRAPPER[T]]})#λ, 
           Ɛ.ELEMENT
-        ](
-          RightActionStar.wrap
-        )
+        ] RightActionStar.wrap
+        
 
-      override def star[T <: Ɛ.ELEMENT](input: RightAction[T]): STAR[WRAPPER[T]] =
+      override def star[
+        T <: Ɛ.ELEMENT
+      ] (input: RightAction[T]): STAR[WRAPPER[T]] =
         memoizedStarWrapper(input) 
 
-      override def quiver[S <: Ɛ.ELEMENT, T <: Ɛ.ELEMENT](
+      override def quiver[
+        S <: Ɛ.ELEMENT, 
+        T <: Ɛ.ELEMENT
+      ] (
         prequiver: RightActionPrequiver[S, T]
       ) = functionAsQuiver(
         star(prequiver.source), 
@@ -546,7 +579,10 @@ trait NaiveMonoidsAndActions { Ɛ: BaseTopos with AlgebraicMachinery with Logica
         prequiver.function
       )
 
-      override def functionAsQuiver[S <: Ɛ.ELEMENT, T <: Ɛ.ELEMENT](
+      override def functionAsQuiver[
+        S <: Ɛ.ELEMENT, 
+        T <: Ɛ.ELEMENT
+      ] (
         source: STAR[WRAPPER[S]], 
         target: STAR[WRAPPER[T]], 
         f: S => T
