@@ -16,8 +16,7 @@ try 'lazy me' experiment with pairs
 # Questions
 
 - Can there be a Scala equivalent to the Clojure 'deflaw' to make it easier to specify algebraic laws?
-- How to add 'parameterized operations' without doing even more violence to the type system? Shapeless?
-- Can generalize IntegerPower and make it type safe?
+YES: upcoming trait for theories/models/algebras
 
 # Possibly useful for algebraic operations:
 
@@ -36,6 +35,8 @@ Quivers wrap functions A => B (A,B elements) and also:
     can test equality        
 
 Elements are conceptually new - they represent what the stars can parameterize over. 
+Note they don't have to be arrows from a specified 'root' object, only something whose nominal
+manipulations can be used to construct quivers.
 
 Instead of DIAGRAMS for product/equalizer/exponential/subobject classifier, we have subtypes of star
 and element types already baked in to the language (functions, tuples) so it's all inherent. 
@@ -79,16 +80,36 @@ f: R -> X factors through g: S -> X means:
 (1) for each r, there exists s with f(r) = g(s)
 (2) there exists h: R -> S with f = gh
 
-# Monoid limitations
+# idea: Linkages as metatypes for monoid actions
+Encapsulate the fundamental unit:
+  [  A and a RightAction[A]
+  [  AA and an equivalence A <-> AA
+Potentially enables a typesafe version of the (existing horrible) quiver code
 
-Here's why we can't currently construct the triadic topos.
-The monoid T has order 8, and to construct the right ideals over it,
-we have to construct "isIdeal" which tests for f: M -> Ω that:
-∀ (s, t) in T x T, f(s) => f(st)
-This involves ∀ing over T x T, i.e. constructing an arrow from Ω ^ (T x T) to Ω.
-But the left hand star has 2 ^ 64 elements!
+# Possible DSL extensions
+  Better to throw an exception if the function is ever called?
+  Should we have ELEMENT[X] instead of ELEMENT? in the mapping functions, for example?
+  Require OmegaElement as a "convenience" trait for truth values
+  For next DSL: 'metatypes' which include stars, elements and any special constructions
 
-# Fixing the exponential problem for monoid actions
+# Rewrapping: a rejected idea
+
+  Should the 'rewrapping' methods in ElementProxy be part of the topos API?
+  Corollary: Should an ELEMENT type always be an interface? (cosmic typing)
+  Finessed this: For the action exponentials to work, we need there to be an underlying object
+  which can be wrapped and rewrapped in multiple interfaces.
+  Not an issue: Does it matter that when an element of M x A -> B is regarded as an A -> B,
+  its function is no longer M-preserving? This seems acceptable only if the
+  function is only there for show, and the user doesn't have access to it.
+  Thankfully not needed: Can we arrange for a FiniteSet[X] to still ultimately be a Traversable[X], even if its
+  interface makes it look like a STAR[NEW_LAYER[X]] where NEW_LAYER has the rewrapper methods?
+
+# Integer powers: a rejected construction
+involved too much violence to the type system
+Can't see how to do these type safely. Maybe if I used typelevel Peano arithmetic for the integers?
+Ultimately not needed - we can work quite happily with biproducts and adhoc variadic operators
+
+# Loosening biproducts and exponentials: (for typesafe actions) : Still WIP
 
 Currently: a > b has to be an EXPONENTIAL{A, B] = STAR[A > B] with ExponentialStar[A, B]
 where A > B ::== (A => B) with ELEMENT
@@ -99,26 +120,11 @@ We still have to fix up real evaluation (somehow)
 and we have to have built into every topos, a class like:
 class RewiredExponential[X, A, B](x:X, f: A => B): A > B
 
-This might work, but it seems definitely something to try on a branch.
+# Why I had to unroll the loops when computing action ideals
 
-# 'Laxifying' monoid actions
-Perhaps the fundamental unit is:
-  [  A and a RightAction[A]
-  [  AA and an equivalence A <-> AA
-If that works (and enables us to get rid of the LaxRightActionStar machinery),
-do the same for quivers.
-
-# Possible DSL extensions
-  Should an ELEMENT type always be an interface?
-  For the action exponentials to work, we need there to be an underlying object
-  which can be wrapped and rewrapped in multiple interfaces.
-  Does it matter that when an element of M x A -> B is regarded as an A -> B,
-  its function is no longer M-preserving? This seems acceptable only if the
-  function is only there for show, and the user doesn't have access to it.
-  Better to throw an exception if the function is ever called?
-  Should we have ELEMENT[X] instead of ELEMENT? in the mapping functions, for example?
-  Should the 'rewrapping' methods in ElementProxy be part of the topos API?
-  Can we arrange for a FiniteSet[X] to still ultimately be a Traversable[X], even if its
-  interface makes it look like a STAR[NEW_LAYER[X]] where NEW_LAYER has the rewrapper methods?
-
-  
+Here's why we can't currently construct the triadic topos.
+The monoid T has order 8, and to construct the right ideals over it,
+we have to construct "isIdeal" which tests for f: M -> Ω that:
+∀ (s, t) in T x T, f(s) => f(st)
+This involves ∀ing over T x T, i.e. constructing an arrow from Ω ^ (T x T) to Ω.
+But the left hand star has 2 ^ 64 elements!

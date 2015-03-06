@@ -34,6 +34,7 @@ I've implemented this in Java, Clojure and now Scala. Really it should be in Has
 - Adapter that makes a dots-and-arrows topos look like a stars-and-quivers one
 - Implementation of FiniteSets using new DSL
 - Defined quantifiers in new DSL
+- Implemented the topos of actions for a monoid
 
 # Tech tasks done
 - cleaner memoization; optionally uses generics and lower bound types; works with structural types 
@@ -47,7 +48,5 @@ I've implemented this in Java, Clojure and now Scala. Really it should be in Has
 
 # Questions
 
-- How to add 'parameterized operations' without doing even more violence to the type system
- than I already did with IntegerPower?
 - How would the powers work if they absolutely had to be typesafe? How would they work in Haskell? Would this
 work if we could construct and dissect product binding types like (A, B, C) properly? Would 'dependent types' help?
