@@ -199,7 +199,14 @@ abstract class GenericDiagrammaticToposTests[TOPOS <: DiagrammaticTopos](
       foo3 shouldBe (foo ^ 3)
     }
 
-    // TODO: should be able to do this with new algebra layer
+    it("has enumeration of globals and arrows") {
+      I.globals shouldBe Seq(I.identity)
+      (foo x baz).globals.size shouldBe foo.globals.size * baz.globals.size
+      (I << foo) shouldBe Seq(foo.toI)
+      (bar << foo) should contain(foo2bar)
+    }
+
+    // should be able to do this, motivates new algebra layer
 //    ignore("has a Heyting algebra structure for the truth object") {
 //      omegaHeyting.isInstanceOf[HeytingAlgebra[OMEGA]] shouldBe true
 //      //      omegaHeyting.verify

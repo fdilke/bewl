@@ -63,6 +63,20 @@ trait BaseDiagrammaticTopos {
         )
     }
 
+    final def <<[S](source: DOT[S]): Traversable[ARROW[S, X]] = {
+      val exponential = this A source
+      exponential.exponentDot.globals.map { global => {
+//        val g2i: ARROW[S, S => X] = global(source.toI)
+//        val ii: ARROW[S, S] = source.identity
+//        val eva: ARROW[(S => X, S), X] = exponential.evaluation.arrow
+//        val times = g2i x ii
+//        eva(times)
+        exponential.evaluation.arrow(
+          (global(source.toI) x source.identity)
+        )
+      }}
+    }
+
     def sanityTest: Unit
   }
 

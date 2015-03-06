@@ -32,12 +32,11 @@ class DiagrammaticFiniteSetsTest extends GenericDiagrammaticToposTests(new Diagr
     arrow[BAR, BAZ](bar, baz, "X" -> 1, "Y" -> 2, "Z" -> 1)
   )
 }) {
-  describe("Enumeration for global elements") {
-    import fixtures._
-    import fixtures.topos._
+  import fixtures._
+  import fixtures.topos._
 
+  describe("Global element enumeration") {
     it("works on the built-ins") {
-      I.globals shouldBe Seq(I.identity)
       omega.globals should have('size(2))
     }
 
@@ -45,10 +44,6 @@ class DiagrammaticFiniteSetsTest extends GenericDiagrammaticToposTests(new Diagr
       foo.globals should have('size(2))
       bar.globals should have('size(2))
       baz.globals should have('size(3))
-    }
-
-    it("works on derived structures") {
-      (foo x baz).globals should have('size(6))
     }
   }
 }
