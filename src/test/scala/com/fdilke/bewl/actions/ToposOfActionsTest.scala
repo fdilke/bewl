@@ -99,7 +99,11 @@ class ToposOfActionsTest extends GenericToposTests(new ToposWithFixtures {
 
   describe("Arrow enumeration") {
     // too slow! Belongs in a worksheet or app (pending optimization)
-    ignore("also works on the fixtures") {
+    it("also works on the fixtures") {
+      (omega >> omega).size shouldBe 6
+    }
+
+    ignore("...optional extras") {
       foo >> foo should have('size(3))
       foo >> bar should have('size(3))
       foo >> baz should have('size(4))
