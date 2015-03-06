@@ -23,7 +23,7 @@ trait BaseDiagrammaticTopos {
 
   type Operator[X] = ARROW[Power[X], X]
 
-  trait Dot[X] {
+  trait Dot[X] { dot: DOT[X] =>
     def identity: ARROW[X, X]
     def toI: ARROW[X, TERMINAL]
     def multiply[Y](that: DOT[Y]): Biproduct[X, Y]
@@ -63,19 +63,12 @@ trait BaseDiagrammaticTopos {
         )
     }
 
-    final def <<[S](source: DOT[S]): Traversable[ARROW[S, X]] = {
-      val exponential = this A source
-      exponential.exponentDot.globals.map { global => {
-//        val g2i: ARROW[S, S => X] = global(source.toI)
-//        val ii: ARROW[S, S] = source.identity
-//        val eva: ARROW[(S => X, S), X] = exponential.evaluation.arrow
-//        val times = g2i x ii
-//        eva(times)
+    final def >>[T](target: DOT[T]): Traversable[ARROW[X, T]] = {
+      val exponential = target.A(this)
+      exponential.exponentDot.globals.map { global =>
         exponential.evaluation.arrow(
-          (global(source.toI) x source.identity)
-        )
-      }}
-    }
+          global(toI) x identity
+        )}}
 
     def sanityTest: Unit
   }

@@ -202,8 +202,10 @@ abstract class GenericDiagrammaticToposTests[TOPOS <: DiagrammaticTopos](
     it("has enumeration of globals and arrows") {
       I.globals shouldBe Seq(I.identity)
       (foo x baz).globals.size shouldBe foo.globals.size * baz.globals.size
-      (I << foo) shouldBe Seq(foo.toI)
-      (bar << foo) should contain(foo2bar)
+      foo >> I shouldBe Seq(foo.toI)
+      foo >> bar should contain(foo2bar)
+      foo >> baz should contain(foo2ImageOfBar)
+      bar >> baz should contain(monicBar2baz)
     }
 
     // should be able to do this, motivates new algebra layer

@@ -48,7 +48,7 @@ trait BaseTopos { self: LogicalOperations =>
     final lazy val π0 = star(left) { _._1 }
     final lazy val π1 = star(right) { _._2 }
 
-    private val hackedThis: BIPRODUCT[L, R] = this.asInstanceOf[BIPRODUCT[L, R]]
+    final private val hackedThis: BIPRODUCT[L, R] = this.asInstanceOf[BIPRODUCT[L, R]]
 
     final def biQuiver[T <: ~](
       target: STAR[T]
@@ -72,7 +72,6 @@ trait BaseTopos { self: LogicalOperations =>
   }
 
   trait BaseStar[S <: ~] { self: STAR[S] =>
-    final lazy val identity: QUIVER[S, S] = this(self) { s => s }
     val toI: QUIVER[S, UNIT]
     def xUncached[T <: ~](that: STAR[T]): BIPRODUCT[S, T]
     def `>Uncached`[T <: ~](that: STAR[T]): EXPONENTIAL[S, T]
@@ -82,7 +81,8 @@ trait BaseTopos { self: LogicalOperations =>
 
   trait Star[S <: ~] extends BaseStar[S] { self: STAR[S] =>
 
-    private val memoizedProduct =
+    final lazy val identity: QUIVER[S, S] = this(self) { s => s }
+    final private val memoizedProduct =
       Memoize.generic.withLowerBound[
         STAR,
         ({ type λ[U <: ~] = BIPRODUCT[S, U]})#λ,
@@ -91,7 +91,7 @@ trait BaseTopos { self: LogicalOperations =>
 
     final def x[U <: ~](that: STAR[U]): BIPRODUCT[S, U] = memoizedProduct(that)
 
-    private val memoizedExponential =
+    final private val memoizedExponential =
       Memoize.generic.withLowerBound[
         STAR,
         ({ type λ[T <: ~] = EXPONENTIAL[S, T]})#λ,
@@ -100,33 +100,33 @@ trait BaseTopos { self: LogicalOperations =>
 
     final def >[T <: ~](that: STAR[T]): EXPONENTIAL[S, T] = memoizedExponential(that)
 
-    lazy val toTrue = truth o toI
-    lazy val power = this > omega
-    lazy val ∀ = toTrue.name.chi
-    lazy val squared = this x this
+    final lazy val toTrue = truth o toI
+    final lazy val power = this > omega
+    final lazy val ∀ = toTrue.name.chi
+    final lazy val squared = this x this
 
-    def map(f: S => S) = this(this)(f)
-    def flatMap(f2: S => QUIVER[S, S]) =
+    final def map(f: S => S) = this(this)(f)
+    final def flatMap(f2: S => QUIVER[S, S]) =
       (this x this).biQuiver(this) { f2(_)(_) }
 
-    lazy val ∃ =
+    final lazy val ∃ =
       omega.forAll(power) { (f, w) =>
           (power x omega).universally(this) {
             case ((f, w), x) => f(x) > w
           }(f, w) > w
       }
 
-    def forAll[R <: ~](source: STAR[R])(g: (R, S) => TRUTH): QUIVER[R, TRUTH] =
+    final def forAll[R <: ~](source: STAR[R])(g: (R, S) => TRUTH): QUIVER[R, TRUTH] =
       ∀ o power.transpose(
         (source x this).biQuiver(omega)(g)
       )
 
-    def exists[R <: ~](source: STAR[R])(g: (R, S) => TRUTH): QUIVER[R, TRUTH] =
+    final def exists[R <: ~](source: STAR[R])(g: (R, S) => TRUTH): QUIVER[R, TRUTH] =
       ∃ o power.transpose(
         (source x this).biQuiver(omega)(g)
       )
 
-    lazy val diagonal: BiQuiver[S, S, TRUTH] = 
+    final lazy val diagonal: BiQuiver[S, S, TRUTH] =
       BiQuiver(squared, this(squared) { x => squared.pair(x, x) }.chi)
   }
 
@@ -142,13 +142,13 @@ trait BaseTopos { self: LogicalOperations =>
     def sanityTest
   }
 
-  trait Quiver[X <: ~, Y <: ~] extends BaseQuiver[X, Y] {
-    def name =
+  trait Quiver[S <: ~, T <: ~] extends BaseQuiver[S, T] { self: QUIVER[S, T] =>
+    final def name =
       (source > target).transpose(
         (I x source).biQuiver(target) {
           (i, x) => this(x)
         })
-    def x[Z <: ~](that: QUIVER[X, Z]): QUIVER[X, Y x Z] = {
+    final def x[U <: ~](that: QUIVER[S, U]): QUIVER[S, T x U] = {
       val product = target x that.target
       source(product) {
         s => product.pair(this(s), that(s))
