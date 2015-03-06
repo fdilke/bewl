@@ -12,7 +12,11 @@ trait NaiveMonoidsAndActions {
 
   Ɛ: BaseTopos with AlgebraicMachinery with LogicalOperations =>
 
-  case class NaiveMonoid[M <: ~](carrier: STAR[M], unit: NullaryOp[M], multiply: BinaryOp[M]) { 
+  case class NaiveMonoid[M <: ~](
+    carrier: STAR[M], 
+    unit: NullaryOp[M], 
+    multiply: BinaryOp[M]
+  ) { 
 
     monoid =>
 
@@ -38,8 +42,17 @@ trait NaiveMonoidsAndActions {
         throw new IllegalArgumentException("Associative law for *")
     }
 
-    def action[A <: ~](actionCarrier: STAR[A])(actionMultiply: (A, M) => A) =
-      new Action[A](actionCarrier, actionMultiply)
+    def action[
+      A <: ~
+    ] (
+      actionCarrier: STAR[A]
+    ) (
+      actionMultiply: (A, M) => A
+    ) =
+      new Action[A](
+        actionCarrier, 
+        actionMultiply
+      )
 
     lazy val regularAction = 
       action(carrier) { multiply(_, _) }
@@ -198,7 +211,9 @@ trait NaiveMonoidsAndActions {
             (i, m) => Ɛ truth i
           })
 
-      trait ActionStarFacade[AA <: ~] extends Star[AA] {
+      trait ActionStarFacade[
+        AA <: ~
+      ] extends Star[AA] {
         def preMultiplyUncached[
           Z <: Ɛ.~,
           ZZ <: ~
@@ -249,12 +264,16 @@ trait NaiveMonoidsAndActions {
         ): QUIVER[ZZ, AA]
       }
 
-      class ActionStar[A <: Ɛ.~, AA <: ~](
+      class ActionStar[
+        A <: Ɛ.~, 
+        AA <: ~
+      ] (
         val action: Action[A],
         val ↔ : A ↔ AA
       ) extends ActionStarFacade[AA] { star =>
-        // def v(aa: AA): A = ↔ \ aa // TODO: inline / optimize away?
-        private lazy val pairs: Ɛ.BIPRODUCT[M, A] = carrier x action.actionCarrier 
+
+        private lazy val pairs: Ɛ.BIPRODUCT[M, A] = 
+          carrier x action.actionCarrier 
 
         override val toI: QUIVER[AA, UNIT] = 
           new ActionQuiver[A, AA, Ɛ.UNIT, UNIT](this, I, action.actionCarrier.toI) // TODO: need generics?
@@ -264,7 +283,9 @@ trait NaiveMonoidsAndActions {
           action.sanityTest
         }
 
-        override def xUncached[BB <: ~](that: STAR[BB]) = that.preMultiplyUncached(this)
+        override def xUncached[BB <: ~](
+          that: STAR[BB]
+        ) = that.preMultiplyUncached(this)
 
         override def preMultiplyUncached[Z <: Ɛ.~, ZZ <: ~](
           pre: ActionStar[Z, ZZ]
@@ -318,11 +339,12 @@ trait NaiveMonoidsAndActions {
 
           type P = Ɛ.>[Ɛ.x[M, Z],A]
           val morphisms: Ɛ.EQUALIZER[P] = possibleMorphisms.toTrue ?= isMorphism
-          val morphismMultiply = morphisms.restrict(possibleMorphisms.transpose(
-            (morphisms x carrier x mXz).biQuiver(action.actionCarrier) {
-              case ((f, m), (n, z)) => morphisms.inclusion(f)(
-                mXz.pair(multiply(m, n), z)
-            )}))
+          val morphismMultiply = morphisms.restrict(
+            possibleMorphisms.transpose(
+              (morphisms x carrier x mXz).biQuiver(action.actionCarrier) {
+                case ((f, m), (n, z)) => morphisms.inclusion(f)(
+                  mXz.pair(multiply(m, n), z)
+              )}))
 
           new ActionStar[P, ExponentialWrapper[Z, ZZ, A, AA]](
             monoid.action(morphisms) {
@@ -338,14 +360,18 @@ trait NaiveMonoidsAndActions {
                 }
               ),
               zz2aa => zz2aa.element
-            )) with ExponentialStar[ZZ, AA, ExponentialWrapper[Z, ZZ, A, AA]] { exponentialStar =>
-            val source: STAR[ZZ] = pre
-            val target: STAR[AA] = star
-            def transpose[RR <: ~](biQuiver: BiQuiver[RR, ZZ, AA]): QUIVER[RR, ExponentialWrapper[Z, ZZ, A, AA]] =
-              biQuiver.product.left.calcTranspose[Z, ZZ, A, AA](
-                pre, star, morphisms, possibleMorphisms, exponentialStar, biQuiver
-              )
-          }.asInstanceOf[EXPONENTIAL[ZZ, AA]]
+            )) with ExponentialStar[
+              ZZ, 
+              AA, 
+              ExponentialWrapper[Z, ZZ, A, AA]
+            ] { exponentialStar =>
+              val source: STAR[ZZ] = pre
+              val target: STAR[AA] = star
+              def transpose[RR <: ~](biQuiver: BiQuiver[RR, ZZ, AA]): QUIVER[RR, ExponentialWrapper[Z, ZZ, A, AA]] =
+                biQuiver.product.left.calcTranspose[Z, ZZ, A, AA](
+                  pre, star, morphisms, possibleMorphisms, exponentialStar, biQuiver
+                )
+            }.asInstanceOf[EXPONENTIAL[ZZ, AA]]
         }
 
         override def calcTranspose[
@@ -358,7 +384,10 @@ trait NaiveMonoidsAndActions {
           target: ActionStar[T, TT],
           morphisms: Ɛ.EQUALIZER[Ɛ.>[Ɛ.x[M, R], T]],
           possibleMorphisms: Ɛ.EXPONENTIAL[Ɛ.x[M, R], T],
-          exponentialStar: ActionStar[Ɛ.>[Ɛ.x[M, R], T], ExponentialWrapper[R, RR, T, TT]],
+          exponentialStar: ActionStar[
+            Ɛ.>[Ɛ.x[M, R], T], 
+            ExponentialWrapper[R, RR, T, TT]
+          ],
           biQuiver: BiQuiver[AA, RR, TT]
         ): QUIVER[AA, ExponentialWrapper[R, RR, T, TT]] = {
           type P = Ɛ.>[Ɛ.x[M, R],T]
@@ -429,7 +458,10 @@ trait NaiveMonoidsAndActions {
         ] (
           action: Action[A]
         ) =
-          new ActionStar[A, VanillaWrapper[A]](
+          new ActionStar[
+            A, 
+            VanillaWrapper[A]
+          ](
             action,
             VanillaWrapper.↔[A]
           ) 
@@ -493,7 +525,9 @@ trait NaiveMonoidsAndActions {
           BBB <: Ɛ.~,
           Z <: Ɛ.~,
           ZZ <: ~
-        ] (that: ActionQuiver[Z, ZZ, BBB, BB]): QUIVER[ZZ, AA] = {
+        ] (
+          that: ActionQuiver[Z, ZZ, BBB, BB]
+        ): QUIVER[ZZ, AA] = {
           val hackedThat = that.asInstanceOf[ActionQuiver[Z, ZZ, B, BB]]
           new ActionQuiver(hackedThat.source, source, hackedThat.quiver \ quiver)
         }
@@ -509,7 +543,9 @@ trait NaiveMonoidsAndActions {
         override def preEqualizer[
           AAA <: Ɛ.~,
           BBB <: Ɛ.~
-        ] (that: ActionQuiver[AAA, AA, BBB, BB]): EQUALIZER[AA] = {
+        ] (
+          that: ActionQuiver[AAA, AA, BBB, BB]
+        ): EQUALIZER[AA] = {
           val thunkedEqualizer = quiver ?= that.asInstanceOf[ActionQuiver[A, AA, B, BB]].quiver
           new ActionStar[A, AA](
             monoid.action(thunkedEqualizer)(source.action.actionMultiply(_, _)),
