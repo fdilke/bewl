@@ -7,21 +7,21 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   // Multiproducts. TODO: split out as separate trait?
 
-  case class TypedStar[X <: ELEMENT](star: STAR[X]) {
+  case class TypedStar[X <: ~](star: STAR[X]) {
     type TYPE = X
   }
 
-  abstract class OtherRichStar[X <: ELEMENT] {
+  abstract class OtherRichStar[X <: ~] {
     def typed: TypedStar[X]
   }
 
-  implicit def enrichOther[X <: ELEMENT](star: STAR[X]) = new OtherRichStar[X] {
+  implicit def enrichOther[X <: ~](star: STAR[X]) = new OtherRichStar[X] {
     override def typed = new TypedStar[X](star)
   }
 
   object MultiProduct {
 
-    def apply(components: STAR[_ <: ELEMENT]*): MultiProduct[_] = components map { _.typed } match {
+    def apply(components: STAR[_ <: ~]*): MultiProduct[_] = components map { _.typed } match {
       case Seq() =>
         new MultiProduct[UNIT] {
           val root = I
@@ -45,7 +45,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     }
   }
 
-  abstract class MultiProduct[A <: ELEMENT] {
+  abstract class MultiProduct[A <: ~] {
     type TYPE = A
     val root: STAR[A]
     val projections: Seq[QUIVER[A, _]]
@@ -53,10 +53,10 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   // Multiproducts. end
 
-  type NullaryOp[X <: ELEMENT] = QUIVER[UNIT, X]
-  type UnaryOp[X <: ELEMENT] = QUIVER[X, X]
-  type BinaryOp[X <: ELEMENT] = BiQuiver[X, X, X]
-  type RightScalarBinaryOp[X <: ELEMENT, S <: ELEMENT] = BiQuiver[X, S, X]
+  type NullaryOp[X <: ~] = QUIVER[UNIT, X]
+  type UnaryOp[X <: ~] = QUIVER[X, X]
+  type BinaryOp[X <: ~] = BiQuiver[X, X, X]
+  type RightScalarBinaryOp[X <: ~, S <: ~] = BiQuiver[X, S, X]
 
   object AbstractOp {
     def unit: AbstractNullaryOp[Principal] = abstractNullaryOp("unit")
@@ -88,9 +88,9 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   class AbstractNullaryOp[A: TypeTag](name: String, starTag: StarTag[A]) extends
     AbstractOp[Unit, A](name, Arity(), starTag)
     with Variable[A] {
-    def :=[X <: ELEMENT](op: NullaryOp[X]): OpAssignment[X] =
+    def :=[X <: ~](op: NullaryOp[X]): OpAssignment[X] =
       NullaryOpAssignment(this, op)
-    def evaluate[X <: ELEMENT](context: EvaluationContext[X]): QUIVER[context.ROOT, X] =
+    def evaluate[X <: ~](context: EvaluationContext[X]): QUIVER[context.ROOT, X] =
       context.assignments.lookup(this) o context.root.toI
   }
 
@@ -98,10 +98,10 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     extends AbstractOp[A, A](
       name,
       Arity(starTag), starTag) {
-    def :=[X <: ELEMENT](op: UnaryOp[X]): OpAssignment[X] =
+    def :=[X <: ~](op: UnaryOp[X]): OpAssignment[X] =
       UnaryOpAssignment(this, op)
     def apply(argument: Term[A]) = new Term[A] {
-      override def evaluate[X <: ELEMENT](context: EvaluationContext[X]): QUIVER[context.ROOT, X] =
+      override def evaluate[X <: ~](context: EvaluationContext[X]): QUIVER[context.ROOT, X] =
         context.assignments.lookup(AbstractUnaryOp.this) o argument.evaluate(context)
     }
   }
@@ -110,10 +110,10 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     extends AbstractOp[(A, A), A](
       name,
       Arity(starTag, starTag), starTag) {
-    def :=[X <: ELEMENT](op: BinaryOp[X]): OpAssignment[X] =
+    def :=[X <: ~](op: BinaryOp[X]): OpAssignment[X] =
       BinaryOpAssignment(this, op)
     def apply(left: Term[A], right: Term[A]) = new Term[A] {
-      override def evaluate[X <: ELEMENT](context: EvaluationContext[X]): QUIVER[context.ROOT, X] = {
+      override def evaluate[X <: ~](context: EvaluationContext[X]): QUIVER[context.ROOT, X] = {
         val q = context.assignments.lookup(AbstractBinaryOp.this)
         q(
           left.evaluate(context),
@@ -129,10 +129,10 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       Arity(starTagA, starTagR),
       starTagA
   ) {
-    def :=[X <: ELEMENT, S <: ELEMENT](op: RightScalarBinaryOp[X, S]): OpAssignment[X] =
+    def :=[X <: ~, S <: ~](op: RightScalarBinaryOp[X, S]): OpAssignment[X] =
       RightScalarBinaryOpAssignment(this, op)
     def apply(left: Term[Principal], right: Term[RightScalar]) = new Term[Principal] {
-      override def evaluate[X <: ELEMENT](context: EvaluationContext[X]): QUIVER[context.type#ROOT, X] =
+      override def evaluate[X <: ~](context: EvaluationContext[X]): QUIVER[context.type#ROOT, X] =
         ??? // TODO: add more machinery to make this paragraoh work
 //        context.assignments.lookup(AbstractRightScalarBinaryOp.this)(
 //          left.evaluate(context),
@@ -143,7 +143,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   trait Term[A] {
     def ::== (rightSide: Term[A]) = Equation[A](this, rightSide)
-    def evaluate[X <: ELEMENT](context: EvaluationContext[X]): QUIVER[context.ROOT, X]
+    def evaluate[X <: ~](context: EvaluationContext[X]): QUIVER[context.ROOT, X]
   }
   trait Variable[A] extends Term[A]
   case class Equation[A](left: Term[A], right: Term[A])
@@ -154,27 +154,27 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   }
 
   class Law[A](arity: Arity[A]) {
-    def verify[X <: ELEMENT](algebra: Algebra[X]) = {
+    def verify[X <: ~](algebra: Algebra[X]) = {
 //      val context = new RootContext(algebra, arity)
       // ... add verification stuff here
       // TDD RootContext??
     }
   }
 
-  abstract trait EvaluationContext[X <: ELEMENT] {
-    type ROOT <: ELEMENT
+  abstract trait EvaluationContext[X <: ~] {
+    type ROOT <: ~
     val root: STAR[ROOT]
     val assignments: OpAssignments[X]
     def evaluate(term: Term[Principal]) : Quiver[ROOT, X]
   }
 
-  abstract class RootContext[A, X <: ELEMENT](algebra: Algebra[X], arity: Arity[A]) extends EvaluationContext[X] {
+  abstract class RootContext[A, X <: ~](algebra: Algebra[X], arity: Arity[A]) extends EvaluationContext[X] {
     val assignments = algebra.assignments
     val variables: Array[Variable[A]]
   }
 
   object RootContext {
-    def forNullary[X <: ELEMENT](algebra: Algebra[X]) =
+    def forNullary[X <: ~](algebra: Algebra[X]) =
       new RootContext[Unit, X](algebra, Arity()) {
         override type ROOT = UNIT
         override val root = I
@@ -182,49 +182,49 @@ trait AlgebraicMachinery { topos: BaseTopos =>
           term.evaluate(this)
         override val variables: Array[Variable[Unit]] = Array.empty
       }
-    def forUnary[X <: ELEMENT](algebra: Algebra[X]) =
+    def forUnary[X <: ~](algebra: Algebra[X]) =
       new RootContext[Principal, X](algebra, Arity(principal)) {
         override type ROOT = X
         override val root = algebra.carrier
         override def evaluate(term: Term[Principal]) : Quiver[ROOT, X] =
           term.evaluate(this)
         override val variables: Array[Variable[Principal]] = Array(new Variable[Principal] {
-          override def evaluate[X <: ELEMENT](context: EvaluationContext[X]): QUIVER[context.type#ROOT, X] =
+          override def evaluate[X <: ~](context: EvaluationContext[X]): QUIVER[context.type#ROOT, X] =
             ??? // TODO: fill in!
         })
       }
   }
 
-  trait OpAssignment[X <: ELEMENT] {
+  trait OpAssignment[X <: ~] {
     def get[A: TypeTag](abOp: AbstractNullaryOp[A]): Option[NullaryOp[X]] = None
     def get[A: TypeTag](abOp: AbstractUnaryOp[A]): Option[UnaryOp[X]] = None
     def get[A: TypeTag](abOp: AbstractBinaryOp[A]): Option[BinaryOp[X]] = None
     def get[A: TypeTag, R](abOp: AbstractRightScalarBinaryOp[A, R]): Option[RightScalarBinaryOp[X, _]] = None
   }
-  case class NullaryOpAssignment[X <: ELEMENT, A: TypeTag](abstractOp: AbstractNullaryOp[A], op: NullaryOp[X]) extends OpAssignment[X] {
+  case class NullaryOpAssignment[X <: ~, A: TypeTag](abstractOp: AbstractNullaryOp[A], op: NullaryOp[X]) extends OpAssignment[X] {
     override def get[B: TypeTag](abOp: AbstractNullaryOp[B]) =
       if (typeOf[B] =:= typeOf[A])
         Some(op)
       else None
   }
-  case class UnaryOpAssignment[X <: ELEMENT, A: TypeTag](abstractOp: AbstractUnaryOp[A], op: UnaryOp[X]) extends OpAssignment[X] {
+  case class UnaryOpAssignment[X <: ~, A: TypeTag](abstractOp: AbstractUnaryOp[A], op: UnaryOp[X]) extends OpAssignment[X] {
     override def get[B: TypeTag](abOp: AbstractUnaryOp[B]) =
       if (typeOf[B] =:= typeOf[A])
         Some(op)
       else None
   }
-  case class BinaryOpAssignment[X <: ELEMENT, A: TypeTag](abstractOp: AbstractBinaryOp[A], op: BinaryOp[X]) extends OpAssignment[X] {
+  case class BinaryOpAssignment[X <: ~, A: TypeTag](abstractOp: AbstractBinaryOp[A], op: BinaryOp[X]) extends OpAssignment[X] {
     override def get[B: TypeTag](abOp: AbstractBinaryOp[B]) =
       if (typeOf[B] =:= typeOf[A])
         Some(op)
       else None
   }
-  case class RightScalarBinaryOpAssignment[X <: ELEMENT, S <: ELEMENT, A, R](
+  case class RightScalarBinaryOpAssignment[X <: ~, S <: ~, A, R](
     abstractOp: AbstractRightScalarBinaryOp[A, R], op: RightScalarBinaryOp[X, S]) extends OpAssignment[X] {
     override def get[A: TypeTag, R](abOp: AbstractRightScalarBinaryOp[A, R]): Option[RightScalarBinaryOp[X, _]] =
         Some(op)
   }
-  case class OpAssignments[X <: ELEMENT](assignments: OpAssignment[X]*) {
+  case class OpAssignments[X <: ~](assignments: OpAssignment[X]*) {
     // TODO: fix these up with some mechanism like A#TYPE where A = e.g. Principal??
     def lookup[A: TypeTag](op0: AbstractNullaryOp[A]): NullaryOp[X] =
       assignments.iterator.map { _.get(op0) }.collectFirst { case Some(x) => x }.get
@@ -237,11 +237,11 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   }
 
   case class AlgebraicTheory(operators: Seq[AbstractOp[_, _]], val laws: Seq[Law[_]]) {
-    def apply[X <: ELEMENT](carrier: STAR[X], assignments: OpAssignment[X]*) =
+    def apply[X <: ~](carrier: STAR[X], assignments: OpAssignment[X]*) =
       Algebra(this, carrier, OpAssignments(assignments :_*))
   }
 
-  case class Algebra[X <: ELEMENT](theory: AlgebraicTheory, carrier: STAR[X], assignments: OpAssignments[X]) {
+  case class Algebra[X <: ~](theory: AlgebraicTheory, carrier: STAR[X], assignments: OpAssignments[X]) {
     def sanityTest = theory.laws.foreach { _.verify(Algebra.this)}
   }
 

@@ -42,17 +42,17 @@ abstract class ToposFixtureSanityTests[T <: BaseTopos](fixtures: ToposWithFixtur
 abstract class ToposWithFixtures {
   val topos : Topos
 
-  import topos.ELEMENT
+  import topos.~
 
-  type FOO <: ELEMENT
-  type BAR <: ELEMENT
-  type BAZ <: ELEMENT
-  type SUB_BAR <: ELEMENT
+  type FOO <: ~
+  type BAR <: ~
+  type BAZ <: ~
+  type SUB_BAR <: ~
 
   import topos._
 
-  def makeSampleStar(): STAR[_ <: ELEMENT]
-  def makeSampleQuiver(): QUIVER[_ <: ELEMENT, _ <: ELEMENT]
+  def makeSampleStar(): STAR[_ <: ~]
+  def makeSampleQuiver(): QUIVER[_ <: ~, _ <: ~]
 
   val foo : STAR[FOO]
   val bar : STAR[BAR]
@@ -63,9 +63,9 @@ abstract class ToposWithFixtures {
   val foobar2baz : BiQuiver[FOO, BAR, BAZ]
   val monicBar2baz: QUIVER[BAR, BAZ]
 
-  val equalizerSituation: EqualizerSituation[_ <: ELEMENT, _ <: ELEMENT, _ <: ELEMENT]
+  val equalizerSituation: EqualizerSituation[_ <: ~, _ <: ~, _ <: ~]
 
-  case class EqualizerSituation[S <: ELEMENT, M <: ELEMENT, T <: ELEMENT](
+  case class EqualizerSituation[S <: ~, M <: ~, T <: ~](
     r: QUIVER[S, M],
     s: QUIVER[M, T],
     t: QUIVER[M, T]) {
@@ -196,7 +196,7 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
 
     it("has equalizers", Tag("eq")) {
       // minor hackery required to extract the types
-      def runTest[S <: ELEMENT, M <: ELEMENT, T <: ELEMENT](situation: EqualizerSituation[S, M, T]) {
+      def runTest[S <: ~, M <: ~, T <: ~](situation: EqualizerSituation[S, M, T]) {
           import situation._
           val equalizer = s ?= t
           val e = equalizer.inclusion

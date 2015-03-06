@@ -8,17 +8,17 @@ import scala.Function.tupled
 trait Topos extends BaseTopos with NaiveMonoidsAndActions with AlgebraicMachinery with LogicalOperations
 
 trait BaseTopos { self: LogicalOperations =>
-  type ELEMENT
-  type STAR[S <: ELEMENT] <: Star[S]
-  type QUIVER[S <: ELEMENT, T <: ELEMENT] <: Quiver[S, T]
+  type ~
+  type STAR[S <: ~] <: Star[S]
+  type QUIVER[S <: ~, T <: ~] <: Quiver[S, T]
 
-  type >[T <: ELEMENT, U <: ELEMENT] <: (T => U) with ELEMENT
-  type x[T <: ELEMENT, U <: ELEMENT] <: (T, U) with ELEMENT
+  type >[T <: ~, U <: ~] <: (T => U) with ~
+  type x[T <: ~, U <: ~] <: (T, U) with ~
 
-  type UNIT <: ELEMENT
+  type UNIT <: ~
   val I : STAR[UNIT]
 
-  type TRUTH <: ELEMENT
+  type TRUTH <: ~
   val omega: STAR[TRUTH]
   val truth: QUIVER[UNIT, TRUTH]
 
@@ -28,19 +28,19 @@ trait BaseTopos { self: LogicalOperations =>
     def v(that: TRUTH) = TruthObject.or(truthValue, that)
   }
 
-  type EXPONENTIAL[S <: ELEMENT, T <: ELEMENT] = ExponentialStar[S, T, S > T] with STAR[S > T]
-  trait ExponentialStar[S <: ELEMENT, T <: ELEMENT, S_T <: (S => T) with ELEMENT] { star: STAR[S_T] =>
+  type EXPONENTIAL[S <: ~, T <: ~] = ExponentialStar[S, T, S > T] with STAR[S > T]
+  trait ExponentialStar[S <: ~, T <: ~, S_T <: (S => T) with ~] { star: STAR[S_T] =>
     val source: STAR[S]
     val target: STAR[T]
 
-    def transpose[R <: ELEMENT](biQuiver: BiQuiver[R, S, T]): QUIVER[R, S_T]
+    def transpose[R <: ~](biQuiver: BiQuiver[R, S, T]): QUIVER[R, S_T]
     final def evaluation: BiQuiver[S_T, S, T] =
       (this x source).biQuiver(target) { (f, s) => f(s) }
   }
 
-  type BIPRODUCT[L <: ELEMENT, R <: ELEMENT] = BiproductStar[L, R, L x R] with STAR[L x R]
+  type BIPRODUCT[L <: ~, R <: ~] = BiproductStar[L, R, L x R] with STAR[L x R]
 
-  trait BiproductStar[L <: ELEMENT, R <: ELEMENT, LxR <: (L, R) with ELEMENT] { star: STAR[LxR] =>
+  trait BiproductStar[L <: ~, R <: ~, LxR <: (L, R) with ~] { star: STAR[LxR] =>
     val left: STAR[L]
     val right: STAR[R]
     def pair(l: L, r: R): LxR
@@ -49,7 +49,7 @@ trait BaseTopos { self: LogicalOperations =>
 
     private val hackedThis: BIPRODUCT[L, R] = this.asInstanceOf[BIPRODUCT[L, R]]
 
-    final def biQuiver[T <: ELEMENT](
+    final def biQuiver[T <: ~](
       target: STAR[T]
       ) (
       bifunc: (L, R) => T
@@ -57,41 +57,41 @@ trait BaseTopos { self: LogicalOperations =>
       BiQuiver(hackedThis, hackedThis(target) (
         tupled[L,R,T](bifunc)
       ))
-      final def universally[T <: ELEMENT](target: STAR[T])(bifunc: ((L x R), T) => TRUTH) =
+      final def universally[T <: ~](target: STAR[T])(bifunc: ((L x R), T) => TRUTH) =
         BiQuiver(hackedThis, target.forAll(hackedThis)(bifunc))
-      final def existentially[T <: ELEMENT](target: STAR[T])(bifunc: ((L x R), T) => TRUTH) =
+      final def existentially[T <: ~](target: STAR[T])(bifunc: ((L x R), T) => TRUTH) =
         BiQuiver(hackedThis, target.exists(hackedThis)(bifunc))
     }
 
-  type EQUALIZER[S <: ELEMENT] = EqualizingStar[S] with STAR[S]
-  trait EqualizingStar[S <: ELEMENT] { star: STAR[S] =>
+  type EQUALIZER[S <: ~] = EqualizingStar[S] with STAR[S]
+  trait EqualizingStar[S <: ~] { star: STAR[S] =>
     val equalizerTarget: STAR[S]
     val inclusion: QUIVER[S, S]
-    def restrict[R <: ELEMENT](quiver: QUIVER[R, S]): QUIVER[R, S]
+    def restrict[R <: ~](quiver: QUIVER[R, S]): QUIVER[R, S]
   }
 
-  trait BaseStar[S <: ELEMENT] { self: STAR[S] =>
+  trait BaseStar[S <: ~] { self: STAR[S] =>
     final lazy val identity: QUIVER[S, S] = this(self) { s => s }
     val toI: QUIVER[S, UNIT]
-    def xUncached[T <: ELEMENT](that: STAR[T]): BIPRODUCT[S, T]
-    def `>Uncached`[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[S, T]
-    def apply[T <: ELEMENT](target: STAR[T])(f: S => T) : QUIVER[S, T]
+    def xUncached[T <: ~](that: STAR[T]): BIPRODUCT[S, T]
+    def `>Uncached`[T <: ~](that: STAR[T]): EXPONENTIAL[S, T]
+    def apply[T <: ~](target: STAR[T])(f: S => T) : QUIVER[S, T]
     def sanityTest
   }
 
-  trait Star[S <: ELEMENT] extends BaseStar[S] { self: STAR[S] =>
+  trait Star[S <: ~] extends BaseStar[S] { self: STAR[S] =>
 
     private val memoizedProduct = {
-      type CURRIED_BIPRODUCT[U <: ELEMENT] = BIPRODUCT[S, U]
-      Memoize.generic.withLowerBound[STAR, CURRIED_BIPRODUCT, ELEMENT](xUncached)
+      type CURRIED_BIPRODUCT[U <: ~] = BIPRODUCT[S, U]
+      Memoize.generic.withLowerBound[STAR, CURRIED_BIPRODUCT, ~](xUncached)
     }
-    final def x[U <: ELEMENT](that: STAR[U]): BIPRODUCT[S, U] = memoizedProduct(that)
+    final def x[U <: ~](that: STAR[U]): BIPRODUCT[S, U] = memoizedProduct(that)
 
     private val memoizedExponential = {
-      type CURRIED_EXPONENTIAL[T <: ELEMENT] = EXPONENTIAL[S, T]
-      Memoize.generic.withLowerBound[STAR, CURRIED_EXPONENTIAL, ELEMENT](`>Uncached`)
+      type CURRIED_EXPONENTIAL[T <: ~] = EXPONENTIAL[S, T]
+      Memoize.generic.withLowerBound[STAR, CURRIED_EXPONENTIAL, ~](`>Uncached`)
     }
-    final def >[T <: ELEMENT](that: STAR[T]): EXPONENTIAL[S, T] = memoizedExponential(that)
+    final def >[T <: ~](that: STAR[T]): EXPONENTIAL[S, T] = memoizedExponential(that)
 
     lazy val toTrue = truth o toI
     lazy val power = this > omega
@@ -109,12 +109,12 @@ trait BaseTopos { self: LogicalOperations =>
           }(f, w) > w
       }
 
-    def forAll[R <: ELEMENT](source: STAR[R])(g: (R, S) => TRUTH): QUIVER[R, TRUTH] =
+    def forAll[R <: ~](source: STAR[R])(g: (R, S) => TRUTH): QUIVER[R, TRUTH] =
       ∀ o power.transpose(
         (source x this).biQuiver(omega)(g)
       )
 
-    def exists[R <: ELEMENT](source: STAR[R])(g: (R, S) => TRUTH): QUIVER[R, TRUTH] =
+    def exists[R <: ~](source: STAR[R])(g: (R, S) => TRUTH): QUIVER[R, TRUTH] =
       ∃ o power.transpose(
         (source x this).biQuiver(omega)(g)
       )
@@ -123,25 +123,25 @@ trait BaseTopos { self: LogicalOperations =>
       BiQuiver(squared, this(squared) { x => squared.pair(x, x) }.chi)
   }
 
-  trait BaseQuiver[S <: ELEMENT, T <: ELEMENT] {
+  trait BaseQuiver[S <: ~, T <: ~] {
     val source: STAR[S]
     val target: STAR[T]
     val chi: QUIVER[T, TRUTH]
 
     def apply(s: S): T
     def ?=(that: QUIVER[S, T]): EQUALIZER[S]
-    def o[R <: ELEMENT](that: QUIVER[R, S]) : QUIVER[R, T]
-    def \[U <: ELEMENT](monic: QUIVER[U, T]) : QUIVER[S, U]
+    def o[R <: ~](that: QUIVER[R, S]) : QUIVER[R, T]
+    def \[U <: ~](monic: QUIVER[U, T]) : QUIVER[S, U]
     def sanityTest
   }
 
-  trait Quiver[X <: ELEMENT, Y <: ELEMENT] extends BaseQuiver[X, Y] {
+  trait Quiver[X <: ~, Y <: ~] extends BaseQuiver[X, Y] {
     def name =
       (source > target).transpose(
         (I x source).biQuiver(target) {
           (i, x) => this(x)
         })
-    def x[Z <: ELEMENT](that: QUIVER[X, Z]): QUIVER[X, Y x Z] = {
+    def x[Z <: ~](that: QUIVER[X, Z]): QUIVER[X, Y x Z] = {
       val product = target x that.target
       source(product) {
         s => product.pair(this(s), that(s))
@@ -149,34 +149,34 @@ trait BaseTopos { self: LogicalOperations =>
   }
 
   case class BiQuiver[
-    L <: ELEMENT,
-    R <: ELEMENT,
-    T <: ELEMENT](
+    L <: ~,
+    R <: ~,
+    T <: ~](
     product: BIPRODUCT[L, R],
     quiver: QUIVER[L x R, T]) {
     def apply(l: L, r: R): T = quiver(product.pair(l, r))
-    def apply[S <: ELEMENT](l: QUIVER[S, L], r: QUIVER[S, R]): QUIVER[S, T] = quiver o (l x r)
+    def apply[S <: ~](l: QUIVER[S, L], r: QUIVER[S, R]): QUIVER[S, T] = quiver o (l x r)
   }
 
   // Helper methods for triproducts (this could obviously be extended).
-  def leftProjection[X <: ELEMENT, Y <: ELEMENT, Z <: ELEMENT](
+  def leftProjection[X <: ~, Y <: ~, Z <: ~](
     x: STAR[X], y: STAR[Y], z: STAR[Z]
   ) : QUIVER[X x Y x Z, X] =
     (x x y).π0 o (x x y x z).π0
 
-  def midProjection[X <: ELEMENT, Y <: ELEMENT, Z <: ELEMENT](
+  def midProjection[X <: ~, Y <: ~, Z <: ~](
    x: STAR[X], y: STAR[Y], z: STAR[Z]
   ) : QUIVER[X x Y x Z, Y] =
     (x x y).π1 o (x x y x z).π0
 
-  def rightProjection[X <: ELEMENT, Y <: ELEMENT, Z <: ELEMENT](
+  def rightProjection[X <: ~, Y <: ~, Z <: ~](
    x: STAR[X], y: STAR[Y], z: STAR[Z]
   ) : QUIVER[X x Y x Z, Z] =
     (x x y x z).π1
 }
 
 trait Wrappings[BASE, PRESTAR[_ <: BASE], PREQUIVER[_ <: BASE, _ <: BASE]] { topos: BaseTopos =>
-  type WRAPPER[T <: BASE] <: ELEMENT
+  type WRAPPER[T <: BASE] <: ~
 
   def star[T <: BASE](input: PRESTAR[T]) : STAR[WRAPPER[T]]
   def quiver[S <: BASE, T <: BASE](connector: PREQUIVER[S, T]) : QUIVER[WRAPPER[S], WRAPPER[T]]

@@ -71,7 +71,7 @@ class NaiveMonoidsAndActionsTests extends FunSpec {
         (a, i) -> a, (a, x) -> a, (a, y) -> a,
         (b, i) -> b, (b, x) -> b, (b, y) -> b
       )
-      monoid4.rightAction(actionCarrier)(actionMultiply.apply).sanityTest
+      monoid4.action(actionCarrier)(actionMultiply.apply).sanityTest
     }
 
     it("checks the right unit law for a right monoid action") {
@@ -81,7 +81,7 @@ class NaiveMonoidsAndActionsTests extends FunSpec {
         (b, i) -> a, (b, x) -> b, (b, y) -> b
       )
       intercept[IllegalArgumentException] {
-        monoid4.rightAction(actionCarrier)(actionMultiply.apply).sanityTest
+        monoid4.action(actionCarrier)(actionMultiply.apply).sanityTest
       }.
         getMessage shouldBe "Right unit law for * with unit 1"
     }
@@ -93,7 +93,7 @@ class NaiveMonoidsAndActionsTests extends FunSpec {
         (b, i) -> b, (b, x) -> b, (b, y) -> a
       )
       intercept[IllegalArgumentException] {
-        monoid4.rightAction(actionCarrier)(actionMultiply.apply).sanityTest
+        monoid4.action(actionCarrier)(actionMultiply.apply).sanityTest
       }.
         getMessage shouldBe "Associative law for monoid action *"
     }
@@ -116,7 +116,7 @@ class NaiveMonoidsAndActionsTests extends FunSpec {
           (a, i) -> a, (a, x) -> a,
           (b, i) -> b, (b, x) -> a
         )
-        monoid1x.rightAction(actionCarrier)(actionMultiply.apply)
+        monoid1x.action(actionCarrier)(actionMultiply.apply)
       }  
       rightAction.sanityTest
       val rightAction2 = {
@@ -126,7 +126,7 @@ class NaiveMonoidsAndActionsTests extends FunSpec {
           (d, i) -> d, (d, x) -> d,
           (e, i) -> e, (e, x) -> e
         )
-        monoid1x.rightAction(actionCarrier)(actionMultiply.apply)
+        monoid1x.action(actionCarrier)(actionMultiply.apply)
       }  
       rightAction2.sanityTest
       val actionMorphism = makeQuiver(rightAction.actionCarrier, rightAction2.actionCarrier, 

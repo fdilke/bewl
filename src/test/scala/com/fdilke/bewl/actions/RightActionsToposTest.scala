@@ -16,7 +16,7 @@ class RightActionsToposTest extends GenericToposTests(new ToposWithFixtures {
       y, x, y
     ) // right-dominant on two generators
 
-  override val topos = monoidOf3.rightActions
+  override val topos = monoidOf3.actions
 
   import topos._
 
@@ -24,13 +24,13 @@ class RightActionsToposTest extends GenericToposTests(new ToposWithFixtures {
   override type BAR = WRAPPER[String]
   override type BAZ = WRAPPER[Int]
 
-  override val foo = star(monoidOf3.rightRegularAction)
+  override val foo = star(monoidOf3.regularAction)
 
   private val barStar: FiniteSets.STAR[String] = FiniteSetsUtilities.makeStar("i", "x", "y")
 
   private val scalarMultiply: (String, Symbol) => String = (s, m) =>
     monoidOf3.multiply(Symbol(s), m).name
-  override val bar = star(monoidOf3.rightAction(barStar)(scalarMultiply))
+  override val bar = star(monoidOf3.action(barStar)(scalarMultiply))
 
   private val bazStar: FiniteSets.STAR[Int] = FiniteSetsUtilities.makeStar(0, 1, 2, 3)
 
@@ -43,7 +43,7 @@ class RightActionsToposTest extends GenericToposTests(new ToposWithFixtures {
       case `y` => 2
     }
 
-  val bazAction = monoidOf3.rightAction(bazStar)(bazMultiply)
+  val bazAction = monoidOf3.action(bazStar)(bazMultiply)
 
   override val baz = star(bazAction)
   override val foo2ImageOfBar = functionAsQuiver(foo, baz, Map('i -> 1, 'x -> 1, 'y -> 2))
@@ -66,7 +66,7 @@ class RightActionsToposTest extends GenericToposTests(new ToposWithFixtures {
     type BINARY = WRAPPER[Boolean]
     val binaryStar : FiniteSets.STAR[Boolean] = FiniteSetsUtilities.makeStar(true, false)
     def binaryMultiply(b: Boolean, r: Symbol) : Boolean = b
-    val binary = star(monoidOf3.rightAction(binaryStar)(binaryMultiply))
+    val binary = star(monoidOf3.action(binaryStar)(binaryMultiply))
     new EqualizerSituation[FOO, BAZ, BINARY](
       foo2baz,
       functionAsQuiver(baz, binary, Map(0 -> true, 1 -> true, 2 -> true, 3 -> true)),
