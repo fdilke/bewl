@@ -2,6 +2,9 @@ package com.fdilke.bewl.diagrammatic
 
 import com.fdilke.bewl.diagrammatic.algebra.{DiagrammaticAlgebra, DiagrammaticAlgebraicLaws, DiagrammaticAlgebraicStructures, TruthObject}
 import com.fdilke.bewl.helper.Memoize
+import scala.language.higherKinds
+import scala.language.postfixOps
+import scala.language.existentials
 
 trait DiagrammaticTopos extends BaseDiagrammaticTopos with DiagrammaticAlgebra with DiagrammaticAlgebraicLaws with
   DiagrammaticAlgebraicStructures with TruthObject

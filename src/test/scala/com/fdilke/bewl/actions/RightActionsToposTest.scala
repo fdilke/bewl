@@ -28,8 +28,8 @@ class RightActionsToposTest extends GenericToposTests(new ToposWithFixtures {
 
   private val barStar: FiniteSets.STAR[String] = FiniteSetsUtilities.makeStar("i", "x", "y")
 
-  private val scalarMultiply: (String, Symbol) => String = (s, m) =>
-    monoidOf3.multiply(Symbol(s), m).name
+  private val scalarMultiply: (String, Symbol) => String =
+    (s, m) => monoidOf3.multiply(Symbol(s), m).name
   override val bar = star(monoidOf3.action(barStar)(scalarMultiply))
 
   private val bazStar: FiniteSets.STAR[Int] = FiniteSetsUtilities.makeStar(0, 1, 2, 3)

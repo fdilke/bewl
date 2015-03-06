@@ -2,6 +2,7 @@ package com.fdilke.bewl.helper
 
 import org.scalatest.{Matchers, FunSpec}
 import Matchers._
+import scala.language.higherKinds
 
 class MemoizeTest extends FunSpec {
 

@@ -45,7 +45,7 @@ object DiagrammaticFiniteSets extends DiagrammaticTopos {
       }
 
 
-    override def toI = DiagrammaticFiniteSetsArrow[X, TERMINAL](this, I, const () _)
+    override def toI = DiagrammaticFiniteSetsArrow[X, TERMINAL](this, I, _ => ())
 
     override def sanityTest =
       for (x <- elements ; y <- elements)

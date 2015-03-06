@@ -52,8 +52,8 @@ class BindingTests  extends FunSpec {
       val name = foo2bar.name
       name.source shouldBe I
       name.target shouldBe bar ^ foo
-      val unitFunction = name.function.asInstanceOf[Unit => Int => Symbol]
-      val namedFunction: Int => Symbol = unitFunction()
+      val unitFunction: Unit => Int => Symbol = name.function
+      val namedFunction: Int => Symbol = unitFunction(())
       Seq(1,2,3).map(namedFunction) shouldBe Seq('a, 'c, 'a)
     }
   }

@@ -2,6 +2,7 @@ package com.fdilke.bewl.topos
 
 import com.fdilke.bewl.topos.StarTag._
 import scala.reflect.runtime.universe._
+import scala.language.implicitConversions
 
 trait AlgebraicMachinery { topos: BaseTopos =>
 
