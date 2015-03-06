@@ -82,16 +82,22 @@ trait BaseTopos { self: LogicalOperations =>
 
   trait Star[S <: ~] extends BaseStar[S] { self: STAR[S] =>
 
-    private val memoizedProduct = {
-      type CURRIED_BIPRODUCT[U <: ~] = BIPRODUCT[S, U]
-      Memoize.generic.withLowerBound[STAR, CURRIED_BIPRODUCT, ~](xUncached)
-    }
+    private val memoizedProduct =
+      Memoize.generic.withLowerBound[
+        STAR,
+        ({ type λ[U <: ~] = BIPRODUCT[S, U]})#λ,
+        ~
+      ] (xUncached)
+
     final def x[U <: ~](that: STAR[U]): BIPRODUCT[S, U] = memoizedProduct(that)
 
-    private val memoizedExponential = {
-      type CURRIED_EXPONENTIAL[T <: ~] = EXPONENTIAL[S, T]
-      Memoize.generic.withLowerBound[STAR, CURRIED_EXPONENTIAL, ~](`>Uncached`)
-    }
+    private val memoizedExponential =
+      Memoize.generic.withLowerBound[
+        STAR,
+        ({ type λ[T <: ~] = EXPONENTIAL[S, T]})#λ,
+        ~
+      ] (`>Uncached`)
+
     final def >[T <: ~](that: STAR[T]): EXPONENTIAL[S, T] = memoizedExponential(that)
 
     lazy val toTrue = truth o toI

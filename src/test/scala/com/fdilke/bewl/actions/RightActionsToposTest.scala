@@ -4,6 +4,7 @@ package com.fdilke.bewl.actions
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsUtilities}
 import com.fdilke.bewl.topos.{ToposWithFixtures, GenericToposTests}
+import scala.Function.untupled
 
 class RightActionsToposTest extends GenericToposTests(new ToposWithFixtures {
 
@@ -48,12 +49,12 @@ class RightActionsToposTest extends GenericToposTests(new ToposWithFixtures {
   override val baz = star(bazAction)
   override val foo2ImageOfBar = functionAsQuiver(foo, baz, Map('i -> 1, 'x -> 1, 'y -> 2))
   override val foo2bar = functionAsQuiver(foo, bar, Map('i -> "x", 'x -> "x", 'y -> "y"))
-  private def foobar2BazFunc(a: Symbol, b : String) = Map[(Symbol, String), Int](
+  private val foobar2BazMap = Map[(Symbol, String), Int](
     (i, "i") -> 1, (x, "i") -> 2, (y, "i") -> 1,
     (i, "x") -> 2, (x, "x") -> 1, (y, "x") -> 1,
     (i, "y") -> 1, (x, "y") -> 2, (y, "y") -> 2
-  )((a, b))
-  override val foobar2baz = bifunctionAsBiQuiver(foo, bar, baz)(foobar2BazFunc)
+  )
+  override val foobar2baz = bifunctionAsBiQuiver(foo, bar, baz)(untupled (foobar2BazMap))
   override val monicBar2baz = functionAsQuiver(bar, baz, Map("i" -> 3, "x" -> 1, "y" -> 2))
 
   override def makeSampleStar() =

@@ -3,7 +3,7 @@ package com.fdilke.bewl.fsets
 import com.fdilke.bewl.diagrammatic.DiagrammaticTopos
 import com.fdilke.bewl.fsets.DiagrammaticFiniteSetsUtilities.allMaps
 import com.fdilke.bewl.helper.FunctionWithEquality
-import scala.Function.{const, tupled}
+import scala.Function.tupled
 
 object DiagrammaticFiniteSets extends DiagrammaticTopos {
   case class DiagrammaticFiniteSetsDot[X](elements: Traversable[X]) extends Dot[X] with Traversable[X] {
@@ -126,7 +126,7 @@ object DiagrammaticFiniteSets extends DiagrammaticTopos {
 
   override val I = DiagrammaticFiniteSetsDot[Unit](Traversable(()))
   override val omega = DiagrammaticFiniteSetsDot[Boolean](Traversable(true, false))
-  override val truth = DiagrammaticFiniteSetsArrow[Unit, Boolean](I, omega, const (true) _)
+  override val truth = DiagrammaticFiniteSetsArrow[Unit, Boolean](I, omega, _ => true)
 
   override def buildArrow[S, T](
     source: DiagrammaticFiniteSetsDot[S],
