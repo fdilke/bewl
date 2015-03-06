@@ -4,9 +4,12 @@ package com.fdilke.bewl.actions
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsUtilities}
 import com.fdilke.bewl.topos.{ToposWithFixtures, GenericToposTests}
+
+import org.scalatest.Matchers._
+
 import scala.Function.untupled
 
-class RightActionsToposTest extends GenericToposTests(new ToposWithFixtures {
+class ToposOfActionsTest extends GenericToposTests(new ToposWithFixtures {
 
   private val (i, x, y) = ('i, 'x, 'y)
 
@@ -61,7 +64,11 @@ class RightActionsToposTest extends GenericToposTests(new ToposWithFixtures {
     star(bazAction)
 
   override def makeSampleQuiver() =
-    functionAsQuiver(foo, bar, Map(i -> "x", x -> "x", y -> "x"))
+    functionAsQuiver(foo, bar, Map(
+      i -> "x", 
+      x -> "x", 
+      y -> "x"
+    ))
 
   override val equalizerSituation = {
     type BINARY = WRAPPER[Boolean]
@@ -74,4 +81,31 @@ class RightActionsToposTest extends GenericToposTests(new ToposWithFixtures {
       functionAsQuiver(baz, binary, Map(0 -> false, 1 -> true, 2 -> true, 3 -> true))
     )
   }
-})
+}) {
+  import fixtures._
+  import fixtures.topos._
+
+  describe("Global element enumeration") {
+    it("works on the built-ins") {
+      omega.globals should have('size(2))
+    }
+
+    it("works on the fixtures") {
+      foo.globals should have('size(0))
+      bar.globals should have('size(0))
+      baz.globals should have('size(1))
+    }
+  }
+
+  describe("Arrow enumeration") {
+    // too slow! Belongs in a worksheet or app (pending optimization)
+    ignore("also works on the fixtures") {
+      foo >> foo should have('size(3))
+      foo >> bar should have('size(3))
+      foo >> baz should have('size(4))
+
+      // probably not - that would be if we were only counting isomorphisms
+      (foo >> (omega > omega)) should have ('size(2))
+    }
+  }
+}

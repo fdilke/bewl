@@ -87,8 +87,8 @@ abstract class ToposWithFixtures {
 }
 
 abstract class GenericToposTests[TOPOS <: BaseTopos](
-                                fixtures: ToposWithFixtures
-) extends ToposFixtureSanityTests(fixtures) {
+  val fixtures: ToposWithFixtures
+  ) extends ToposFixtureSanityTests(fixtures) {
 
   import fixtures._
   import fixtures.topos._
@@ -229,10 +229,10 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
     it("has enumeration of globals and arrows") {
       I.globals shouldBe Seq(I.identity)
       (foo x baz).globals.size shouldBe foo.globals.size * baz.globals.size
-//      foo >> I shouldBe Seq(foo.toI)
-//      foo >> bar should contain(foo2bar)
-//      foo >> baz should contain(foo2ImageOfBar)
-//      bar >> baz should contain(monicBar2baz)
+      foo >> I shouldBe Seq(foo.toI)
+      foo >> bar should contain(foo2bar)
+      foo >> baz should contain(foo2ImageOfBar)
+      bar >> baz should contain(monicBar2baz)
     }
 
 /*

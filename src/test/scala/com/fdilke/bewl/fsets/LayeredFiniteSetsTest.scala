@@ -2,6 +2,7 @@ package com.fdilke.bewl.fsets
 
 import com.fdilke.bewl.fsets.DiagrammaticFiniteSets.{ARROW, DOT}
 import com.fdilke.bewl.topos.{Wrappings, Topos, GenericToposTests, ToposWithFixtures}
+import org.scalatest.Matchers._
 
 class LayeredFiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
   val topos = LayeredFiniteSets
@@ -56,7 +57,19 @@ class LayeredFiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
     makeQuiver(bar, baz, "X" -> 1, "Y" -> 2, "Z" -> 3),
     makeQuiver(bar, baz, "X" -> 1, "Y" -> 2, "Z" -> 1)
   )
-})
+}) {
+  import fixtures._
+  import fixtures.topos._
 
+  describe("Global element enumeration") {
+    it("works on the built-ins") {
+      omega.globals should have('size(2))
+    }
 
-
+    it("works on the fixtures") {
+      foo.globals should have('size(2))
+      bar.globals should have('size(3))
+      baz.globals should have('size(3))
+    }
+  }
+}

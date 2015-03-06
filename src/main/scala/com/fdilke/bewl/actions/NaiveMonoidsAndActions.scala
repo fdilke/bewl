@@ -175,8 +175,8 @@ trait NaiveMonoidsAndActions {
 
         private val isIdeal = 
           carrier.forAll(possibleIdeals) {
-            case (f, m) => carrier.forAll(carrier) {
-              case (m, n) => Ɛ.OmegaEnrichments(f(m)) > f(multiply(m, n))
+            (f, m) => carrier.forAll(carrier) {
+              (m, n) => Ɛ.OmegaEnrichments(f(m)) > f(multiply(m, n))
             }(m)
           }
 
@@ -276,13 +276,12 @@ trait NaiveMonoidsAndActions {
           carrier x action.actionCarrier 
 
         override lazy val globals: Traversable[QUIVER[UNIT, AA]] = { // TODO: refactor
-          val isFixed = carrier.forAll(action.actionCarrier) {
+          val fixedPoints = (carrier.forAll(action.actionCarrier) {
             (a, m) => action.actionCarrier.diagonal(
               a, 
               action.actionMultiply(a, m)
             )
-          }
-          val fixedPoints = isFixed ?= action.actionCarrier.toTrue
+          } ?= action.actionCarrier.toTrue)
           fixedPoints.globals.map { global =>
             new ActionQuiver(I, star, fixedPoints.inclusion o global)
           }

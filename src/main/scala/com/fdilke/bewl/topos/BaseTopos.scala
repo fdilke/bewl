@@ -80,9 +80,9 @@ trait BaseTopos { self: LogicalOperations =>
     def sanityTest
   }
 
-  trait Star[S <: ~] extends BaseStar[S] { self: STAR[S] =>
+  trait Star[S <: ~] extends BaseStar[S] { star: STAR[S] =>
 
-    final lazy val identity: QUIVER[S, S] = this(self) { s => s }
+    final lazy val identity: QUIVER[S, S] = this(star) { s => s }
     final private val memoizedProduct =
       Memoize.generic.withLowerBound[
         STAR,
@@ -129,6 +129,16 @@ trait BaseTopos { self: LogicalOperations =>
 
     final lazy val diagonal: BiQuiver[S, S, TRUTH] =
       BiQuiver(squared, this(squared) { x => squared.pair(x, x) }.chi)
+
+    final def >>[T <: ~](
+      target: STAR[T]
+    ): Traversable[
+      QUIVER[S, T]
+    ] =
+      (this > target).globals map { global =>
+        star(target) { s =>
+          global(star.toI(s))(s)
+        }}
   }
 
   trait BaseQuiver[S <: ~, T <: ~] {
