@@ -32,8 +32,15 @@ object StarsAndQuiversLayer {
       trait AdapterTruth extends Element
 
       trait AdapterStar[T <: Element] extends Star[T] { self =>
+        private[StarsAndQuiversLayer] val dot: DOT[Any]
+
         override lazy val toI: QUIVER[T, UNIT] =
           quiver(dot.toI).asInstanceOf[QUIVER[T, UNIT]]
+
+        override lazy val globals: Traversable[QUIVER[UNIT, T]] =
+          dot.globals.map { global =>
+            AdapterQuiver.fromArrow(I, this, global)
+          }
 
         override def xUncached[U <: ~](that: STAR[U]) =
           new AdapterStar[T x U] with BiproductStar[T, U, T x U] {
@@ -81,8 +88,6 @@ object StarsAndQuiversLayer {
 
         override def apply[U <: ~](target: STAR[U])(f: T => U) =
           AdapterQuiver[T, U](this, target, f)
-
-        private[StarsAndQuiversLayer] val dot: DOT[Any]
 
         private[StarsAndQuiversLayer] def asElement(arrow: ARROW[_, _]): T
       }

@@ -275,6 +275,19 @@ trait NaiveMonoidsAndActions {
         private lazy val pairs: Ɛ.BIPRODUCT[M, A] = 
           carrier x action.actionCarrier 
 
+        override lazy val globals: Traversable[QUIVER[UNIT, AA]] = { // TODO: refactor
+          val isFixed = carrier.forAll(action.actionCarrier) {
+            (a, m) => action.actionCarrier.diagonal(
+              a, 
+              action.actionMultiply(a, m)
+            )
+          }
+          val fixedPoints = isFixed ?= action.actionCarrier.toTrue
+          fixedPoints.globals.map { global =>
+            new ActionQuiver(I, star, fixedPoints.inclusion o global)
+          }
+        }
+
         override val toI: QUIVER[AA, UNIT] = 
           new ActionQuiver[A, AA, Ɛ.UNIT, UNIT](this, I, action.actionCarrier.toI) // TODO: need generics?
 

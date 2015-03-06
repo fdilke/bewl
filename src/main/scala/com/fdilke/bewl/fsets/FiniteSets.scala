@@ -20,6 +20,11 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreQu
     extends Star[S] { self =>
     override lazy val toI = this(I) { _ => () }
 
+    override lazy val globals: Traversable[QUIVER[UNIT, S]] =
+      elements map { s =>
+        new FiniteSetsQuiver(I, this, (_: UNIT) => s)
+      }
+
     override def `>Uncached`[T <: ~](that: FiniteSetsStar[T]) = {
       case class FunctionElement(function: S => T) extends (S => T) {
         override def equals(that: scala.Any): Boolean = that match {

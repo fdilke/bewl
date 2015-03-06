@@ -73,6 +73,7 @@ trait BaseTopos { self: LogicalOperations =>
 
   trait BaseStar[S <: ~] { self: STAR[S] =>
     val toI: QUIVER[S, UNIT]
+    val globals: Traversable[QUIVER[UNIT, S]]
     def xUncached[T <: ~](that: STAR[T]): BIPRODUCT[S, T]
     def `>Uncached`[T <: ~](that: STAR[T]): EXPONENTIAL[S, T]
     def apply[T <: ~](target: STAR[T])(f: S => T) : QUIVER[S, T]

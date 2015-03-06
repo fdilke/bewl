@@ -226,6 +226,15 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
       // TODO: try backdividing by a monic when we can't
     }
 
+    it("has enumeration of globals and arrows") {
+      I.globals shouldBe Seq(I.identity)
+      (foo x baz).globals.size shouldBe foo.globals.size * baz.globals.size
+//      foo >> I shouldBe Seq(foo.toI)
+//      foo >> bar should contain(foo2bar)
+//      foo >> baz should contain(foo2ImageOfBar)
+//      bar >> baz should contain(monicBar2baz)
+    }
+
 /*
     ignore("has a Heyting algebra structure for the truth object") {
       omegaHeyting.isInstanceOf[HeytingAlgebra[OMEGA]] shouldBe true
