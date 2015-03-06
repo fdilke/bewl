@@ -2,6 +2,7 @@ package com.fdilke.bewl.fsets
 
 import com.fdilke.bewl.diagrammatic.{DiagrammaticToposWithFixtures, GenericDiagrammaticToposTests}
 import com.fdilke.bewl.fsets.DiagrammaticFiniteSetsUtilities.{arrow, set}
+import org.scalatest.Matchers._
 
 class DiagrammaticFiniteSetsTest extends GenericDiagrammaticToposTests(new DiagrammaticToposWithFixtures {
   val topos = DiagrammaticFiniteSets
@@ -30,5 +31,25 @@ class DiagrammaticFiniteSetsTest extends GenericDiagrammaticToposTests(new Diagr
     arrow[BAR, BAZ](bar, baz, "X" -> 1, "Y" -> 2, "Z" -> 3),
     arrow[BAR, BAZ](bar, baz, "X" -> 1, "Y" -> 2, "Z" -> 1)
   )
-})
+}) {
+  describe("Enumeration for global elements") {
+    import fixtures._
+    import fixtures.topos._
+
+    it("works on the built-ins") {
+      I.globals shouldBe Seq(I.identity)
+      omega.globals should have('size(2))
+    }
+
+    it("works on the fixtures") {
+      foo.globals should have('size(2))
+      bar.globals should have('size(2))
+      baz.globals should have('size(3))
+    }
+
+    it("works on derived structures") {
+      (foo x baz).globals should have('size(6))
+    }
+  }
+}
 

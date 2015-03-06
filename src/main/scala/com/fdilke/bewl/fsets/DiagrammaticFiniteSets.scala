@@ -13,6 +13,10 @@ object DiagrammaticFiniteSets extends DiagrammaticTopos {
 
     override def identity: DiagrammaticFiniteSetsArrow[X, X] = DiagrammaticFiniteSetsArrow(this, this, x => x)
 
+    override lazy val globals: Traversable[ARROW[TERMINAL, X]] = elements map {
+      x => DiagrammaticFiniteSetsArrow(I, this, (_: TERMINAL) => x)
+    }
+
     override def multiply[Y](that: DiagrammaticFiniteSetsDot[Y]) =
       new Biproduct[X, Y] {
         override val product = DiagrammaticFiniteSetsDot[(X, Y)](for (x <- DiagrammaticFiniteSetsDot.this; y <- that) yield (x, y))

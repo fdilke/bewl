@@ -27,6 +27,7 @@ trait BaseDiagrammaticTopos {
     def identity: ARROW[X, X]
     def toI: ARROW[X, TERMINAL]
     def multiply[Y](that: DOT[Y]): Biproduct[X, Y]
+    val globals: Traversable[ARROW[TERMINAL, X]]
 
     private val memoizedBiproduct = {
       type BIPRODUCT[Y] = Biproduct[X, Y]

@@ -72,7 +72,7 @@ abstract class DiagrammaticToposWithFixtures {
 }
 
 abstract class GenericDiagrammaticToposTests[TOPOS <: DiagrammaticTopos](
-    fixtures: DiagrammaticToposWithFixtures
+    val fixtures: DiagrammaticToposWithFixtures
   ) extends DiagrammaticToposFixtureSanityTests(fixtures) {
 
   import fixtures._
