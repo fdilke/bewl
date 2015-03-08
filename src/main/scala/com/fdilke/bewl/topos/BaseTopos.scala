@@ -59,9 +59,9 @@ trait BaseTopos { self: LogicalOperations =>
         tupled[L,R,T](bifunc)
       ))
       final def universally[T <: ~](target: STAR[T])(bifunc: ((L x R), T) => TRUTH) =
-        BiQuiver(hackedThis, target.forAll(hackedThis)(bifunc))
+        BiQuiver(hackedThis, hackedThis.forAll(target)(bifunc))
       final def existentially[T <: ~](target: STAR[T])(bifunc: ((L x R), T) => TRUTH) =
-        BiQuiver(hackedThis, target.exists(hackedThis)(bifunc))
+        BiQuiver(hackedThis, hackedThis.exists(target)(bifunc))
     }
 
   type EQUALIZER[S <: ~] = EqualizingStar[S] with STAR[S]
@@ -111,21 +111,42 @@ trait BaseTopos { self: LogicalOperations =>
       (this x this).biQuiver(this) { f2(_)(_) }
 
     final lazy val ∃ =
-      omega.forAll(power) { (f, w) =>
+      power.forAll(omega) { (f, w) =>
           (power x omega).universally(this) {
             case ((f, w), x) => f(x) > w
           }(f, w) > w
       }
 
-    final def forAll[R <: ~](source: STAR[R])(g: (R, S) => TRUTH): QUIVER[R, TRUTH] =
+    final def preForAll[R <: ~](source: STAR[R])(g: (R, S) => TRUTH): QUIVER[R, TRUTH] =
       ∀ o power.transpose(
         (source x this).biQuiver(omega)(g)
       )
 
-    final def exists[R <: ~](source: STAR[R])(g: (R, S) => TRUTH): QUIVER[R, TRUTH] =
+    final def forAll[T <: ~](target: STAR[T])(g: (S, T) => TRUTH): QUIVER[S, TRUTH] =
+      target.preForAll(this)(g)
+
+    final def forAll[
+      T <: ~, 
+      U <: ~
+    ] (
+      target: STAR[T], 
+      target2: STAR[U]
+    ) (
+      g: (S, T, U) => TRUTH
+    ): QUIVER[S, TRUTH] =
+      forAll(target) { (x, t) =>
+        target.forAll(target2) {
+            (t, u) => g(x, t, u)
+          }(t)
+      }
+
+    final def preExists[R <: ~](source: STAR[R])(g: (R, S) => TRUTH): QUIVER[R, TRUTH] =
       ∃ o power.transpose(
         (source x this).biQuiver(omega)(g)
       )
+
+    final def exists[T <: ~](target: STAR[T])(g: (S, T) => TRUTH): QUIVER[S, TRUTH] =
+      target.preExists(this)(g)
 
     final lazy val diagonal: BiQuiver[S, S, TRUTH] =
       BiQuiver(squared, this(squared) { x => squared.pair(x, x) }.chi)

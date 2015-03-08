@@ -64,7 +64,7 @@ trait NaiveMonoidsAndActions {
       def isMorphism[B <: ~](that: Action[B], quiver: QUIVER[A, B]) =
         (quiver.source == this.actionCarrier) &&
         (quiver.target == that.actionCarrier) && (
-          carrier.forAll(actionCarrier) { (x, m) =>
+          actionCarrier.forAll(carrier) { (x, m) =>
             that.actionCarrier.diagonal(
               quiver(this.actionMultiply(x, m)),
               that.actionMultiply(quiver(x), m)
@@ -174,10 +174,8 @@ trait NaiveMonoidsAndActions {
         private val possibleIdeals = carrier.power
 
         private val isIdeal = 
-          carrier.forAll(possibleIdeals) {
-            (f, m) => carrier.forAll(carrier) {
-              (m, n) => Ɛ.OmegaEnrichments(f(m)) > f(multiply(m, n))
-            }(m)
+          possibleIdeals.forAll(carrier, carrier) {
+            (f, m, n) => Ɛ.OmegaEnrichments(f(m)) > f(multiply(m, n))
           }
 
         private val ideals = possibleIdeals.toTrue ?= isIdeal
@@ -276,7 +274,7 @@ trait NaiveMonoidsAndActions {
           carrier x action.actionCarrier 
 
         override lazy val globals: Traversable[QUIVER[UNIT, AA]] = { // TODO: refactor
-          val fixedPoints = (carrier.forAll(action.actionCarrier) {
+          val fixedPoints = (action.actionCarrier.forAll(carrier) {
             (a, m) => action.actionCarrier.diagonal(
               a, 
               action.actionMultiply(a, m)
@@ -339,14 +337,12 @@ trait NaiveMonoidsAndActions {
           val mXz = pre.pairs
           val possibleMorphisms = mXz > action.actionCarrier
 
-          val isMorphism = carrier.forAll(possibleMorphisms) {
-            (f, n) => mXz.forAll(carrier) {
-                case (n, (m, z)) => 
-                  action.actionCarrier.diagonal(
-                    f(mXz.pair(multiply(m, n), pre.action.actionMultiply(z, n))),
-                    action.actionMultiply(f(mXz.pair(m, z)), n)
-                  )
-              }(n)
+          val isMorphism = possibleMorphisms.forAll(carrier, mXz) {
+            case (f, n, (m, z)) => 
+              action.actionCarrier.diagonal(
+                f(mXz.pair(multiply(m, n), pre.action.actionMultiply(z, n))),
+                action.actionMultiply(f(mXz.pair(m, z)), n)
+              )
           }
 
           type P = Ɛ.>[Ɛ.x[M, Z],A]
