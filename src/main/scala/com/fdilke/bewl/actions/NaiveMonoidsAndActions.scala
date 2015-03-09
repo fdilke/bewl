@@ -337,8 +337,8 @@ trait NaiveMonoidsAndActions {
           val mXz = pre.pairs
           val possibleMorphisms = mXz > action.actionCarrier
 
-          val isMorphism = possibleMorphisms.forAll(carrier, mXz) {
-            case (f, n, (m, z)) => 
+          val isMorphism = possibleMorphisms.forAll(carrier, carrier, pre.action.actionCarrier) {
+            case (f, n, m, z) => 
               action.actionCarrier.diagonal(
                 f(mXz.pair(multiply(m, n), pre.action.actionMultiply(z, n))),
                 action.actionMultiply(f(mXz.pair(m, z)), n)

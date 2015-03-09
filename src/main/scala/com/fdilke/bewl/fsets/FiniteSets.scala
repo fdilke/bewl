@@ -26,6 +26,7 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreQu
       }
 
     override def `>Uncached`[T <: ~](that: FiniteSetsStar[T]) = {
+      // println(s"exponentiating: ${that.elements.size} ^ ${this.elements.size}")
       case class FunctionElement(function: S => T) extends (S => T) {
         override def equals(that: scala.Any): Boolean = that match {
           case that: FunctionElement => elements.forall {

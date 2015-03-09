@@ -6,6 +6,7 @@ import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsUtilities}
 import com.fdilke.bewl.topos.{ToposWithFixtures, GenericToposTests}
 
 import org.scalatest.Matchers._
+import org.scalatest.Tag
 
 import scala.Function.untupled
 
@@ -112,4 +113,26 @@ class ToposOfActionsTest extends GenericToposTests(new ToposWithFixtures {
       (foo >> (omega > omega)) should have ('size(2))
     }
   }
+
+  // describe("DeleteTheseTests") {
+  //   it("did I mention you should delete these?", Tag("wip")) {
+  //     val evaluation = (bar > baz).evaluation
+  //     evaluation.product.left shouldBe (bar > baz)
+  //     evaluation.product.right shouldBe bar
+  //     evaluation.quiver.target shouldBe baz
+  //     evaluation.quiver.sanityTest
+
+  //     val foo2bar2baz: QUIVER[FOO, BAR > BAZ] = (bar > baz).transpose(foobar2baz)
+  //     foo2bar2baz.sanityTest
+  //     foo2bar2baz should have(
+  //       'source(foo),
+  //       'target(bar > baz)
+  //     )
+
+  //     (foo x bar)(baz) {
+  //       case (f, b) =>
+  //         foo2bar2baz(f)(b)
+  //     } shouldBe foobar2baz.quiver
+  //   }
+  // }
 }

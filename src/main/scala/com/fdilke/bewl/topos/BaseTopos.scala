@@ -135,10 +135,30 @@ trait BaseTopos { self: LogicalOperations =>
       g: (S, T, U) => TRUTH
     ): QUIVER[S, TRUTH] =
       forAll(target) { (x, t) =>
-        target.forAll(target2) {
-            (t, u) => g(x, t, u)
+        target.forAll(target2) { (t, u) => 
+            g(x, t, u)
           }(t)
       }
+
+    // TODO refactor to be properly variadic
+    final def forAll[
+      T <: ~, 
+      U <: ~,
+      V <: ~
+    ] (
+      target: STAR[T], 
+      target2: STAR[U],
+      target3: STAR[V]
+    ) (
+      g: (S, T, U, V) => TRUTH
+    ): QUIVER[S, TRUTH] =
+      forAll(target) { (x, t) =>
+        target.forAll(target2) { (t, u) => 
+          target2.forAll(target3) { (u, v) =>
+              g(x, t, u, v)
+            }(u)
+          }(t)
+        }
 
     final def preExists[R <: ~](source: STAR[R])(g: (R, S) => TRUTH): QUIVER[R, TRUTH] =
       ∃ o power.transpose(
