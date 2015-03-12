@@ -65,7 +65,7 @@ trait NaiveMonoidsAndActions {
         (quiver.source == this.actionCarrier) &&
         (quiver.target == that.actionCarrier) && (
           actionCarrier.forAll(carrier) { (x, m) =>
-            that.actionCarrier.diagonal(
+            that.actionCarrier.=?=(
               quiver(this.actionMultiply(x, m)),
               that.actionMultiply(quiver(x), m)
             )
@@ -275,7 +275,7 @@ trait NaiveMonoidsAndActions {
 
         override lazy val globals: Traversable[QUIVER[UNIT, AA]] = { // TODO: refactor
           val fixedPoints = (action.actionCarrier.forAll(carrier) {
-            (a, m) => action.actionCarrier.diagonal(
+            (a, m) => action.actionCarrier.=?=(
               a, 
               action.actionMultiply(a, m)
             )
@@ -339,7 +339,7 @@ trait NaiveMonoidsAndActions {
 
           val isMorphism = possibleMorphisms.forAll(carrier, carrier, pre.action.actionCarrier) {
             case (f, n, m, z) => 
-              action.actionCarrier.diagonal(
+              action.actionCarrier.=?=(
                 f(mXz.pair(multiply(m, n), pre.action.actionMultiply(z, n))),
                 action.actionMultiply(f(mXz.pair(m, z)), n)
               )

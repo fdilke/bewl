@@ -1,7 +1,10 @@
 package com.fdilke.bewl.topos
 
+import com.fdilke.bewl.fsets.FiniteSets
 import org.scalatest.Matchers._
 import org.scalatest._
+import org.scalatest.matchers.{BeMatcher, MatchResult}
+import com.fdilke.bewl.actions.NaiveMonoidsAndActions
 
 abstract class ToposFixtureSanityTests[T <: BaseTopos](fixtures: ToposWithFixtures) extends FunSpec {
   import fixtures._
@@ -241,6 +244,37 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
       //      omegaHeyting.verify
     }
  */
-    // TODO: make the commented-out tests work
+    it("can tell if a quiver is monic") {
+      val monic =
+        new BeMatcher[QUIVER[_ <: ~, _ <: _]] {
+          def apply(quiver: QUIVER[_ <: ~, _ <: _]) =
+            MatchResult(
+              quiver.isMonic,
+              s"$quiver not monic",
+              s"$quiver is monic"
+            )
+        }
+
+      if (!topos.isInstanceOf[NaiveMonoidsAndActions#NaiveMonoid[t]#Actions forSome {
+        type t <: ~
+      }]) { // reluctantly skip, too slow with current technology
+        monicBar2baz shouldBe monic
+
+        (foo x foo).π0 should not be monic
+        foo.=?=.quiver should not be monic
+      }
+
+      I.identity shouldBe monic
+      // Heyting false shouldBe monic
+      truth shouldBe monic
+      foo.diagonal shouldBe monic
+      foo.singleton shouldBe monic
+
+      foo.toI should not be monic
+
+      // foo.fromO should not be monic
+    }
+
+    // TODO: put this somewhere more sensible
   }
 }

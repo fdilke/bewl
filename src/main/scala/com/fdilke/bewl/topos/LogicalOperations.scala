@@ -5,7 +5,7 @@ trait LogicalOperations { topos: BaseTopos =>
   object TruthObject { // TODO: This should eventually express omega as a complete Heyting algebra
     lazy val and = BiQuiver(omega.squared, (truth x truth).chi)
     lazy val implies = BiQuiver(omega.squared, 
-    	omega.diagonal(
+    	omega.=?=(
     		and.quiver, 
     		omega.squared.π0
     	))

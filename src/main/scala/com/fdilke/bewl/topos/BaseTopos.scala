@@ -168,8 +168,14 @@ trait BaseTopos { self: LogicalOperations =>
     final def exists[T <: ~](target: STAR[T])(g: (S, T) => TRUTH): QUIVER[S, TRUTH] =
       target.preExists(this)(g)
 
-    final lazy val diagonal: BiQuiver[S, S, TRUTH] =
-      BiQuiver(squared, this(squared) { x => squared.pair(x, x) }.chi)
+    final lazy val diagonal: QUIVER[S, S x S] =
+      this(squared) { x => squared.pair(x, x) }
+
+    final lazy val =?= : BiQuiver[S, S, TRUTH] =
+      BiQuiver(squared, diagonal.chi)
+
+    final lazy val singleton: QUIVER[S, S > TRUTH] =
+      power transpose =?=
 
     final def >>[T <: ~](
       target: STAR[T]
@@ -205,6 +211,12 @@ trait BaseTopos { self: LogicalOperations =>
       source(product) {
         s => product.pair(this(s), that(s))
       }}
+    final def isMonic: Boolean =
+      source.forAll(source) {
+        (s, t) => target.=?=(
+          this(s), this(t)
+        ) > source.=?=(s, t)
+      } == source.toTrue
   }
 
   case class BiQuiver[

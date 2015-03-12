@@ -79,10 +79,10 @@ class RichStarsAndQuiversTests extends FunSpec {
     }
   }
 
-  describe("The diagonal quiver") {
+  describe("The equality comparison quiver") {
     it("should have the correct value for finite sets") {
       val set = makeStar(0, 1)
-      set.diagonal shouldBe makeBiQuiver(set, set, omega,
+      set.=?= shouldBe makeBiQuiver(set, set, omega,
         (0,0) -> true, (0, 1) -> false,
         (1,0) -> false,(1,1) -> true
       )
