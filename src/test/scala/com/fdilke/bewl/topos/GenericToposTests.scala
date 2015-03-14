@@ -96,6 +96,11 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
   import fixtures._
   import fixtures.topos._
 
+  private lazy val inActionTopos =
+    topos.isInstanceOf[NaiveMonoidsAndActions#NaiveMonoid[t]#Actions forSome {
+      type t <: ~
+    }]
+
   describe(s"The topos ${topos.getClass.getName}") {
 
     it("has sane built-in objects") {
@@ -255,9 +260,7 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
             )
         }
 
-      if (!topos.isInstanceOf[NaiveMonoidsAndActions#NaiveMonoid[t]#Actions forSome {
-        type t <: ~
-      }]) { // reluctantly skip, too slow with current technology
+      if (!inActionTopos) { // reluctantly skip, too slow with current technology
         monicBar2baz shouldBe monic
 
         (foo x foo).π0 should not be monic
@@ -275,6 +278,31 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
       // foo.fromO should not be monic
     }
 
-    // TODO: put this somewhere more sensible
+    it("can tell if a quiver is epic") {
+      val epic =
+        new BeMatcher[QUIVER[_ <: ~, _ <: _]] {
+          def apply(quiver: QUIVER[_ <: ~, _ <: _]) =
+            MatchResult(
+              quiver.isEpic,
+              s"$quiver not epic",
+              s"$quiver is epic"
+            )
+        }
+
+        foo.toI shouldBe epic
+        I.identity shouldBe epic
+        // O.identity should be epic
+        foo.identity shouldBe epic
+        I.diagonal shouldBe epic
+        truth should not be epic
+
+        if (!inActionTopos) { // reluctantly skip, too slow with current technology
+          (foo x foo).π0 shouldBe epic
+          foo.diagonal should not be epic
+          omega.diagonal should not be epic
+
+          monicBar2baz should not be epic
+        }
+    }
   }
 }

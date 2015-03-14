@@ -211,12 +211,20 @@ trait BaseTopos { self: LogicalOperations =>
       source(product) {
         s => product.pair(this(s), that(s))
       }}
+    final def toBool(implicit eq: =:=[T, TRUTH]) =
+      this == target.toTrue
     final def isMonic: Boolean =
       source.forAll(source) {
         (s, t) => target.=?=(
           this(s), this(t)
         ) > source.=?=(s, t)
-      } == source.toTrue
+      } == source.toTrue // TODO factor out pattern, toBool with =:=
+    final def isEpic: Boolean =
+      target.exists(source) {
+        (t, s) => target.=?=(
+          t, this(s)
+        )
+      } == target.toTrue // TODO as above
   }
 
   case class BiQuiver[

@@ -16,7 +16,7 @@ class FiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
   override val foo = makeStar(true, false)
   override val bar = makeStar("X", "Y", "Z")
   override val foo2bar = makeQuiver(foo, bar, true -> "X", false -> "Y")
-  override val baz = makeStar(1, 2, 3)
+  override val baz = makeStar(1, 2, 3, 4)
   override val foo2ImageOfBar = makeQuiver(foo, baz, true -> 3, false -> 2)
 
   override val foobar2baz = makeBiQuiver(
@@ -54,7 +54,7 @@ class FiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
     it("works on the fixtures") {
       foo.globals should have('size(2))
       bar.globals should have('size(3))
-      baz.globals should have('size(3))
+      baz.globals should have('size(4))
     }
   }
 }
