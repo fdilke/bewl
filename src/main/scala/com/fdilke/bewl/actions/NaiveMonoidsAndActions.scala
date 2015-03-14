@@ -69,7 +69,7 @@ trait NaiveMonoidsAndActions {
               quiver(this.actionMultiply(x, m)),
               that.actionMultiply(quiver(x), m)
             )
-          } == actionCarrier.toTrue
+          } toBool
         )
       def sanityTest = {
         // check the right unit law
@@ -173,12 +173,10 @@ trait NaiveMonoidsAndActions {
       private object Ideals {
         private val possibleIdeals = carrier.power
 
-        private val isIdeal = 
+        private val ideals = 
           possibleIdeals.forAll(carrier, carrier) {
             (f, m, n) => Ɛ.OmegaEnrichments(f(m)) > f(multiply(m, n))
-          }
-
-        private val ideals = possibleIdeals.toTrue ?= isIdeal
+          }.whereTrue
 
         def restrict[
           H <: Ɛ.~
@@ -273,13 +271,14 @@ trait NaiveMonoidsAndActions {
         private lazy val pairs: Ɛ.BIPRODUCT[M, A] = 
           carrier x action.actionCarrier 
 
-        override lazy val globals: Traversable[QUIVER[UNIT, AA]] = { // TODO: refactor
-          val fixedPoints = (action.actionCarrier.forAll(carrier) {
+        override lazy val globals: Traversable[QUIVER[UNIT, AA]] = { 
+          val fixedPoints = action.actionCarrier.forAll(carrier) {
             (a, m) => action.actionCarrier.=?=(
               a, 
               action.actionMultiply(a, m)
             )
-          } ?= action.actionCarrier.toTrue)
+          }.whereTrue
+
           fixedPoints.globals.map { global =>
             new ActionQuiver(I, star, fixedPoints.inclusion o global)
           }
@@ -337,16 +336,17 @@ trait NaiveMonoidsAndActions {
           val mXz = pre.pairs
           val possibleMorphisms = mXz > action.actionCarrier
 
-          val isMorphism = possibleMorphisms.forAll(carrier, carrier, pre.action.actionCarrier) {
-            case (f, n, m, z) => 
-              action.actionCarrier.=?=(
-                f(mXz.pair(multiply(m, n), pre.action.actionMultiply(z, n))),
-                action.actionMultiply(f(mXz.pair(m, z)), n)
-              )
-          }
-
           type P = Ɛ.>[Ɛ.x[M, Z],A]
-          val morphisms: Ɛ.EQUALIZER[P] = possibleMorphisms.toTrue ?= isMorphism
+
+          val morphisms: Ɛ.EQUALIZER[P] = 
+            possibleMorphisms.forAll(carrier, carrier, pre.action.actionCarrier) {
+              case (f, n, m, z) => 
+                action.actionCarrier.=?=(
+                  f(mXz.pair(multiply(m, n), pre.action.actionMultiply(z, n))),
+                  action.actionMultiply(f(mXz.pair(m, z)), n)
+                )
+            }.whereTrue
+
           val morphismMultiply = morphisms.restrict(
             possibleMorphisms.transpose(
               (morphisms x carrier x mXz).biQuiver(action.actionCarrier) {
