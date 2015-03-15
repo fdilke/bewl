@@ -201,38 +201,54 @@ trait BaseTopos { self: LogicalOperations =>
   }
 
   trait Quiver[S <: ~, T <: ~] extends BaseQuiver[S, T] { self: QUIVER[S, T] =>
-    final def name =
+    final lazy val name =
       (source > target).transpose(
         (I x source).biQuiver(target) {
           (i, x) => this(x)
         })
+
     final def x[U <: ~](that: QUIVER[S, U]): QUIVER[S, T x U] = {
       val product = target x that.target
       source(product) {
         s => product.pair(this(s), that(s))
       }}
+
     final def toBool(implicit eq: =:=[T, TRUTH]): Boolean =
       this == source.toTrue
+
     final def whereTrue(implicit eq: =:=[T, TRUTH]): EQUALIZER[S] =
       this.asInstanceOf[QUIVER[S, TRUTH]] ?= source.toTrue
-    final def isMonic: Boolean =
+
+    final lazy val isMonic: Boolean =
       source.forAll(source) {
         (s, t) => target.=?=(
           this(s), this(t)
         ) > source.=?=(s, t)
       } toBool
-    final def isEpic: Boolean =
+
+    final lazy val isEpic: Boolean =
       target.exists(source) {
         (t, s) => target.=?=(
           t, this(s)
         )
       } toBool
+
+    final lazy val isIso: Boolean =
+      isMonic && isEpic
+      
+    final lazy val inverse: QUIVER[T, S] = 
+      source.power.transpose(
+        (target x source).biQuiver(omega) {
+          (t, s) => target.=?=(t, this(s))  
+        }
+      ) \ source.singleton
   }
 
   case class BiQuiver[
     L <: ~,
     R <: ~,
-    T <: ~](
+    T <: ~
+  ] (
     product: BIPRODUCT[L, R],
     quiver: QUIVER[L x R, T]) {
     def apply(l: L, r: R): T = quiver(product.pair(l, r))

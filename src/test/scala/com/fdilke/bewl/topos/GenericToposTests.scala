@@ -101,6 +101,22 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
       type t <: ~
     }]
 
+  type UNTYPED_QUIVER = QUIVER[_ <: ~, _ <: _]
+
+  private def matchQuiver(property: String, predicate: UNTYPED_QUIVER => Boolean) =
+    new BeMatcher[UNTYPED_QUIVER] {
+      def apply(quiver: UNTYPED_QUIVER) =
+        MatchResult(
+          predicate(quiver),
+          s"$quiver not $property",
+          s"$quiver is $property"
+        )
+    }
+
+  private val monic = matchQuiver("monic", _.isMonic)
+  private val iso = matchQuiver("iso", _.isIso)
+  private val epic = matchQuiver("epic", _.isEpic)
+
   describe(s"The topos ${topos.getClass.getName}") {
 
     it("has sane built-in objects") {
@@ -250,28 +266,20 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
     }
  */
     it("can tell if a quiver is monic") {
-      val monic =
-        new BeMatcher[QUIVER[_ <: ~, _ <: _]] {
-          def apply(quiver: QUIVER[_ <: ~, _ <: _]) =
-            MatchResult(
-              quiver.isMonic,
-              s"$quiver not monic",
-              s"$quiver is monic"
-            )
-        }
 
       if (!inActionTopos) { // reluctantly skip, too slow with current technology
         monicBar2baz shouldBe monic
 
         (foo x foo).π0 should not be monic
         foo.=?=.quiver should not be monic
+
+        foo.diagonal shouldBe monic
+        foo.singleton shouldBe monic
       }
 
       I.identity shouldBe monic
       // Heyting false shouldBe monic
       truth shouldBe monic
-      foo.diagonal shouldBe monic
-      foo.singleton shouldBe monic
 
       foo.toI should not be monic
 
@@ -279,30 +287,42 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
     }
 
     it("can tell if a quiver is epic") {
-      val epic =
-        new BeMatcher[QUIVER[_ <: ~, _ <: _]] {
-          def apply(quiver: QUIVER[_ <: ~, _ <: _]) =
-            MatchResult(
-              quiver.isEpic,
-              s"$quiver not epic",
-              s"$quiver is epic"
-            )
-        }
+  
+      I.identity shouldBe epic
+      // O.identity should be epic
+      I.diagonal shouldBe epic
+      truth should not be epic
+      foo.toI shouldBe epic
 
-        foo.toI shouldBe epic
-        I.identity shouldBe epic
-        // O.identity should be epic
+      if (!inActionTopos) { // reluctantly skip, too slow with current technology
+
         foo.identity shouldBe epic
-        I.diagonal shouldBe epic
-        truth should not be epic
+        (foo x foo).π0 shouldBe epic
+        foo.diagonal should not be epic
+        omega.diagonal should not be epic
 
-        if (!inActionTopos) { // reluctantly skip, too slow with current technology
-          (foo x foo).π0 shouldBe epic
-          foo.diagonal should not be epic
-          omega.diagonal should not be epic
+        monicBar2baz should not be epic
+      }
+    }
 
-          monicBar2baz should not be epic
-        }
+    it("can tell if an arrow is iso and if so, calculate the inverse") {
+      val iI = I.identity
+      iI shouldBe iso      
+      iI.inverse shouldBe iI
+
+      val fooI = foo.identity
+      fooI shouldBe iso      
+      fooI.inverse shouldBe fooI
+
+      if (!inActionTopos) { // reluctantly skip, too slow with current technology
+        def twist[A <: ~, B <: ~](a: STAR[A], b: STAR[B]) =
+          (a x b)(b x a) {
+            case (α, β) => (b x a).pair(β, α)
+          }
+
+        twist(foo, bar) shouldBe iso
+        twist(foo, bar).inverse shouldBe twist(bar, foo)
+      }
     }
   }
 }
