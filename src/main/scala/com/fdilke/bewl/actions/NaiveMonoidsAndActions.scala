@@ -158,8 +158,8 @@ trait NaiveMonoidsAndActions {
 
       override type ~ = ElementWrapper[_ <: Ɛ.~]
       
-      override type DOT[AA <: ~] = ActionStarFacade[AA]
-      override type ARROW[AA <: ~, BB <: ~] = ActionQuiverFacade[AA, BB]
+      override type DOT[AA <: ~] = ActionDotFacade[AA]
+      override type ARROW[AA <: ~, BB <: ~] = ActionArrowFacade[AA, BB]
       override type UNIT = VanillaWrapper[Ɛ.UNIT]
 
       // TODO: nothing's being overridden: simplify these. OR sort them out properly!
@@ -168,7 +168,7 @@ trait NaiveMonoidsAndActions {
 
       type IDEAL = Ɛ.>[M, Ɛ.TRUTH]
       override type TRUTH = VanillaWrapper[IDEAL]
-      override val I: ActionStar[Ɛ.UNIT, UNIT] = ActionStar(Ɛ.I) { (i, m) => i }
+      override val I: ActionDot[Ɛ.UNIT, UNIT] = ActionDot(Ɛ.I) { (i, m) => i }
 
       private object Ideals {
         private val possibleIdeals = carrier.power
@@ -194,7 +194,7 @@ trait NaiveMonoidsAndActions {
             case ((i, s), t) => ideals.inclusion(i)(multiply(s, t))
           }
 
-        val omega = ActionStar[IDEAL](ideals)(
+        val omega = ActionDot[IDEAL](ideals)(
             Ɛ.BiQuiver[IDEAL, M, IDEAL](ideals x carrier, idealMultiply)(_, _)
           )
       }
@@ -202,33 +202,33 @@ trait NaiveMonoidsAndActions {
       override lazy val omega = Ideals.omega
 
       override lazy val truth: ARROW[UNIT, TRUTH] = 
-        new ActionQuiver(I, omega,
+        new ActionArrow(I, omega,
           Ideals.restrict(Ɛ.I) {
             (i, m) => Ɛ truth i
           })
 
-      trait ActionStarFacade[
+      trait ActionDotFacade[
         AA <: ~
-      ] extends Star[AA] {
+      ] extends Dot[AA] {
         def preMultiplyUncached[
           Z <: Ɛ.~,
           ZZ <: ~
         ] (
-          pre: ActionStar[Z, ZZ]
+          pre: ActionDot[Z, ZZ]
         ): BIPRODUCT[ZZ, AA]
 
         def preExponentiateUncached[
           Z <: Ɛ.~,
           ZZ <: ~
         ] (
-          pre: ActionStar[Z, ZZ]
+          pre: ActionDot[Z, ZZ]
         ): EXPONENTIAL[ZZ, AA]
 
         def preApply[
           Z <: Ɛ.~,
           ZZ <: ~
         ] (
-          pre: ActionStar[Z, ZZ]
+          pre: ActionDot[Z, ZZ]
         )(
           f: ZZ => AA
         ): ARROW[ZZ, AA]
@@ -239,11 +239,11 @@ trait NaiveMonoidsAndActions {
           T <: Ɛ.~,
           TT <: ~
         ] (
-          source: ActionStar[R, RR],
-          target: ActionStar[T, TT],
+          source: ActionDot[R, RR],
+          target: ActionDot[T, TT],
           morphisms: Ɛ.EQUALIZER[Ɛ.>[Ɛ.x[M, R], T]],
           possibleMorphisms: Ɛ.EXPONENTIAL[Ɛ.x[M, R], T],
-          exponentialStar: ActionStar[
+          exponentialDot: ActionDot[
             Ɛ.>[Ɛ.x[M, R], T], 
             ExponentialWrapper[R, RR, T, TT]
           ],
@@ -255,18 +255,18 @@ trait NaiveMonoidsAndActions {
           ZZ <: ~,
           A <: Ɛ.~
         ] (
-          source: ActionStar[Z, ZZ],
-          restrictedQuiver: Ɛ.ARROW[Z, A]
+          source: ActionDot[Z, ZZ],
+          restrictedArrow: Ɛ.ARROW[Z, A]
         ): ARROW[ZZ, AA]
       }
 
-      class ActionStar[
+      class ActionDot[
         A <: Ɛ.~, 
         AA <: ~
       ] (
         val action: Action[A],
         val ↔ : A ↔ AA
-      ) extends ActionStarFacade[AA] { star =>
+      ) extends ActionDotFacade[AA] { star =>
 
         private lazy val pairs: Ɛ.BIPRODUCT[M, A] = 
           carrier x action.actionCarrier 
@@ -280,12 +280,12 @@ trait NaiveMonoidsAndActions {
           }.whereTrue
 
           fixedPoints.globals.map { global =>
-            new ActionQuiver(I, star, fixedPoints.inclusion o global)
+            new ActionArrow(I, star, fixedPoints.inclusion o global)
           }
         }
 
         override val toI: ARROW[AA, UNIT] = 
-          new ActionQuiver[A, AA, Ɛ.UNIT, UNIT](this, I, action.actionCarrier.toI) // TODO: need generics?
+          new ActionArrow[A, AA, Ɛ.UNIT, UNIT](this, I, action.actionCarrier.toI) // TODO: need generics?
 
         override def sanityTest = {
           action.actionCarrier.sanityTest
@@ -297,10 +297,10 @@ trait NaiveMonoidsAndActions {
         ) = that.preMultiplyUncached(this)
 
         override def preMultiplyUncached[Z <: Ɛ.~, ZZ <: ~](
-          pre: ActionStar[Z, ZZ]
+          pre: ActionDot[Z, ZZ]
         ): BIPRODUCT[ZZ, AA] = {
           val product: Ɛ.BIPRODUCT[Z, A] = pre.action.actionCarrier x action.actionCarrier           
-          new ActionStar[
+          new ActionDot[
               Ɛ.x[Z, A],
               BiproductWrapper[Z, ZZ, A, AA]
             ] (
@@ -317,7 +317,7 @@ trait NaiveMonoidsAndActions {
                   },
                   zzXaa => zzXaa.element
                 )
-            ) with BiproductStar[ZZ, AA, BiproductWrapper[Z, ZZ, A, AA]] {               
+            ) with BiproductDot[ZZ, AA, BiproductWrapper[Z, ZZ, A, AA]] {               
               override val left: DOT[ZZ] = pre
               override val right: DOT[AA] = star
               override def pair(zz: ZZ, aa: AA) = { 
@@ -331,7 +331,7 @@ trait NaiveMonoidsAndActions {
           that.preExponentiateUncached(this)
 
         override def preExponentiateUncached[Z <: Ɛ.~, ZZ <: ~](
-          pre: ActionStar[Z, ZZ]
+          pre: ActionDot[Z, ZZ]
         ): EXPONENTIAL[ZZ, AA] = {
           val mXz = pre.pairs
           val possibleMorphisms = mXz > action.actionCarrier
@@ -354,7 +354,7 @@ trait NaiveMonoidsAndActions {
                   mXz.pair(multiply(m, n), z)
               )}))
 
-          new ActionStar[P, ExponentialWrapper[Z, ZZ, A, AA]](
+          new ActionDot[P, ExponentialWrapper[Z, ZZ, A, AA]](
             monoid.action(morphisms) {
               Ɛ.BiQuiver(morphisms x carrier, morphismMultiply)(_,_)
             },
@@ -368,16 +368,16 @@ trait NaiveMonoidsAndActions {
                 }
               ),
               zz2aa => zz2aa.element
-            )) with ExponentialStar[
+            )) with ExponentialDot[
               ZZ, 
               AA, 
               ExponentialWrapper[Z, ZZ, A, AA]
-            ] { exponentialStar =>
+            ] { exponentialDot =>
               val source: DOT[ZZ] = pre
               val target: DOT[AA] = star
               def transpose[RR <: ~](biQuiver: BiQuiver[RR, ZZ, AA]): ARROW[RR, ExponentialWrapper[Z, ZZ, A, AA]] =
                 biQuiver.product.left.calcTranspose[Z, ZZ, A, AA](
-                  pre, star, morphisms, possibleMorphisms, exponentialStar, biQuiver
+                  pre, star, morphisms, possibleMorphisms, exponentialDot, biQuiver
                 )
             }.asInstanceOf[EXPONENTIAL[ZZ, AA]]
         }
@@ -388,11 +388,11 @@ trait NaiveMonoidsAndActions {
           T <: Ɛ.~,
           TT <: ~
         ] (
-          source: ActionStar[R, RR],
-          target: ActionStar[T, TT],
+          source: ActionDot[R, RR],
+          target: ActionDot[T, TT],
           morphisms: Ɛ.EQUALIZER[Ɛ.>[Ɛ.x[M, R], T]],
           possibleMorphisms: Ɛ.EXPONENTIAL[Ɛ.x[M, R], T],
-          exponentialStar: ActionStar[
+          exponentialDot: ActionDot[
             Ɛ.>[Ɛ.x[M, R], T], 
             ExponentialWrapper[R, RR, T, TT]
           ],
@@ -407,8 +407,8 @@ trait NaiveMonoidsAndActions {
                     star.↔ / action.actionMultiply(a, m), 
                     source.↔ / r
                   ))}))
-          this(exponentialStar) { aa =>
-            exponentialStar.↔ / innerQuiver(↔ \ aa)
+          this(exponentialDot) { aa =>
+            exponentialDot.↔ / innerQuiver(↔ \ aa)
           }              
         }
 
@@ -425,11 +425,11 @@ trait NaiveMonoidsAndActions {
           Z <: Ɛ.~,
           ZZ <: ~
         ] (
-          pre: ActionStar[Z, ZZ]
+          pre: ActionDot[Z, ZZ]
         ) (
           f: ZZ => AA
         ): ARROW[ZZ, AA] = 
-          new ActionQuiver(pre, star, 
+          new ActionArrow(pre, star, 
             pre.action.actionCarrier(star.action.actionCarrier) { z =>
               star.↔ \ f(pre.↔ / z)
             })
@@ -439,19 +439,19 @@ trait NaiveMonoidsAndActions {
           ZZ <: ~,
           AAA <: Ɛ.~
         ] (
-          source: ActionStar[Z, ZZ],
+          source: ActionDot[Z, ZZ],
           restrictedQuiver: Ɛ.ARROW[Z, AAA]
         ): ARROW[ZZ, AA] = 
-          new ActionQuiver(
+          new ActionArrow(
             source, 
             star,
             restrictedQuiver.asInstanceOf[Ɛ.ARROW[Z, A]]
           )
 
-        override def toString = "ActionStar[" + action.actionCarrier + "]"
+        override def toString = "ActionDot[" + action.actionCarrier + "]"
       }
 
-      object ActionStar {
+      object ActionDot {
         def apply[
           A <: Ɛ.~
         ] (
@@ -466,7 +466,7 @@ trait NaiveMonoidsAndActions {
         ] (
           action: Action[A]
         ) =
-          new ActionStar[
+          new ActionDot[
             A, 
             VanillaWrapper[A]
           ](
@@ -475,28 +475,28 @@ trait NaiveMonoidsAndActions {
           ) 
       }
 
-      trait ActionQuiverFacade[
+      trait ActionArrowFacade[
         AA <: ~,
         BB <: ~
-      ] extends Quiver[AA, BB] { 
+      ] extends Arrow[AA, BB] { 
 
         def preBackDivide[
           B <: Ɛ.~,
           Z <: Ɛ.~,
           ZZ <: ~
         ] (
-          pre: ActionQuiver[Z, ZZ, B, BB]
+          pre: ActionArrow[Z, ZZ, B, BB]
         ): ARROW[ZZ, AA]
 
         def preEqualizer[
           A <: Ɛ.~,
           B <: Ɛ.~
-        ] (pre: ActionQuiver[A, AA, B, BB]): EQUALIZER[AA]
+        ] (pre: ActionArrow[A, AA, B, BB]): EQUALIZER[AA]
 
         def preRestrict[
           B <: Ɛ.~
         ] (
-          equalizingStar: EQUALIZER[BB],
+          equalizingDot: EQUALIZER[BB],
           thunkedEqualizer: Ɛ.EQUALIZER[B]
         ): ARROW[AA, BB]
 
@@ -505,23 +505,23 @@ trait NaiveMonoidsAndActions {
           C <: Ɛ.~,
           CC <: ~
         ] (
-          pre: ActionQuiver[B, BB, C, CC]
+          pre: ActionArrow[B, BB, C, CC]
         ): ARROW[AA, CC]
       }
 
-      class ActionQuiver[
+      class ActionArrow[
         A <: Ɛ.~,
         AA <: ~,
         B <: Ɛ.~,
         BB <: ~
       ] (
-        val source: ActionStar[A, AA],
-        val target: ActionStar[B, BB],
+        val source: ActionDot[A, AA],
+        val target: ActionDot[B, BB],
         val quiver: Ɛ.ARROW[A, B]
-      ) extends ActionQuiverFacade[AA, BB] {
+      ) extends ActionArrowFacade[AA, BB] {
 
         override lazy val chi: ARROW[BB, TRUTH] = 
-          new ActionQuiver(target, omega, 
+          new ActionArrow(target, omega, 
             Ideals.restrict(target.action.actionCarrier) {
                 (t, m) => quiver.chi(target.action.actionMultiply(t, m)) 
             })        
@@ -534,10 +534,10 @@ trait NaiveMonoidsAndActions {
           Z <: Ɛ.~,
           ZZ <: ~
         ] (
-          that: ActionQuiver[Z, ZZ, BBB, BB]
+          that: ActionArrow[Z, ZZ, BBB, BB]
         ): ARROW[ZZ, AA] = {
-          val hackedThat = that.asInstanceOf[ActionQuiver[Z, ZZ, B, BB]]
-          new ActionQuiver(hackedThat.source, source, hackedThat.quiver \ quiver)
+          val hackedThat = that.asInstanceOf[ActionArrow[Z, ZZ, B, BB]]
+          new ActionArrow(hackedThat.source, source, hackedThat.quiver \ quiver)
         }
 
         override def sanityTest = {
@@ -552,25 +552,25 @@ trait NaiveMonoidsAndActions {
           AAA <: Ɛ.~,
           BBB <: Ɛ.~
         ] (
-          that: ActionQuiver[AAA, AA, BBB, BB]
+          that: ActionArrow[AAA, AA, BBB, BB]
         ): EQUALIZER[AA] = {
-          val thunkedEqualizer = quiver ?= that.asInstanceOf[ActionQuiver[A, AA, B, BB]].quiver
-          new ActionStar[A, AA](
+          val thunkedEqualizer = quiver ?= that.asInstanceOf[ActionArrow[A, AA, B, BB]].quiver
+          new ActionDot[A, AA](
             monoid.action(thunkedEqualizer)(source.action.actionMultiply(_, _)),
             source.↔
-          ) with EqualizingStar[AA] { equalizingStar =>
+          ) with EqualizingDot[AA] { equalizingDot =>
             override val equalizerTarget = source
-            override val inclusion: ARROW[AA, AA] = new ActionQuiver(equalizingStar, source, thunkedEqualizer.inclusion)
+            override val inclusion: ARROW[AA, AA] = new ActionArrow(equalizingDot, source, thunkedEqualizer.inclusion)
             override def restrict[RR <: ~](quiver: ARROW[RR, AA]): ARROW[RR, AA] =
-              quiver.preRestrict[A](equalizingStar, thunkedEqualizer)
+              quiver.preRestrict[A](equalizingDot, thunkedEqualizer)
           }
         }
 
         override def preRestrict[BBB <: Ɛ.~](
-          equalizingStar: EQUALIZER[BB],
+          equalizingDot: EQUALIZER[BB],
           thunkedEqualizer: Ɛ.EQUALIZER[BBB]
         ): ARROW[AA, BB] =
-          equalizingStar.crossPreRestrict[A, AA, B]( 
+          equalizingDot.crossPreRestrict[A, AA, B]( 
             source, 
             thunkedEqualizer.asInstanceOf[Ɛ.EQUALIZER[B]].restrict(quiver)
           )
@@ -584,15 +584,15 @@ trait NaiveMonoidsAndActions {
           BBB <: Ɛ.~,
           C <: Ɛ.~,
           CC <: ~
-        ] (pre: ActionQuiver[BBB, BB, C, CC]): ARROW[AA, CC] = {
-          val hackedPre = pre.asInstanceOf[ActionQuiver[B, BB, C, CC]]
-          new ActionQuiver(source, hackedPre.target, hackedPre.quiver o quiver)
+        ] (pre: ActionArrow[BBB, BB, C, CC]): ARROW[AA, CC] = {
+          val hackedPre = pre.asInstanceOf[ActionArrow[B, BB, C, CC]]
+          new ActionArrow(source, hackedPre.target, hackedPre.quiver o quiver)
         }
 
-        override def toString = "ActionQuiver[" + quiver + "]"
+        override def toString = "ActionArrow[" + quiver + "]"
 
         override def equals(other: Any): Boolean = other match {
-          case that: ActionQuiver[A, AA, B, BB] =>
+          case that: ActionArrow[A, AA, B, BB] =>
             that.source == source &&
             that.target == target &&
             that.quiver == quiver
@@ -610,7 +610,7 @@ trait NaiveMonoidsAndActions {
           Action, 
           ({ type λ[T <: Ɛ.~] = DOT[WRAPPER[T]]})#λ,
           Ɛ.~
-        ] ActionStar.wrap
+        ] ActionDot.wrap
         
 
       override def star[
@@ -637,9 +637,9 @@ trait NaiveMonoidsAndActions {
         target: DOT[WRAPPER[T]], 
         f: S => T
       ): ARROW[WRAPPER[S], WRAPPER[T]] = {
-        val src = source.asInstanceOf[ActionStar[S, WRAPPER[S]]]
-        val tgt = target.asInstanceOf[ActionStar[T, WRAPPER[T]]]
-        new ActionQuiver[S, WRAPPER[S], T, WRAPPER[T]](
+        val src = source.asInstanceOf[ActionDot[S, WRAPPER[S]]]
+        val tgt = target.asInstanceOf[ActionDot[T, WRAPPER[T]]]
+        new ActionArrow[S, WRAPPER[S], T, WRAPPER[T]](
           src, 
           tgt, 
           src.action.actionCarrier(tgt.action.actionCarrier) { f }
@@ -656,9 +656,9 @@ trait NaiveMonoidsAndActions {
       ) (
         bifunc: (L, R) => T
       ): BiQuiver[WRAPPER[L], WRAPPER[R], WRAPPER[T]] = {
-        val l =   left.asInstanceOf[ActionStar[L, WRAPPER[L]]]
-        val r =  right.asInstanceOf[ActionStar[R, WRAPPER[R]]]
-        val t = target.asInstanceOf[ActionStar[T, WRAPPER[T]]]
+        val l =   left.asInstanceOf[ActionDot[L, WRAPPER[L]]]
+        val r =  right.asInstanceOf[ActionDot[R, WRAPPER[R]]]
+        val t = target.asInstanceOf[ActionDot[T, WRAPPER[T]]]
         (l x r).biQuiver(t) { (a, b) =>
           VanillaWrapper(bifunc(a.element, b.element))
         }

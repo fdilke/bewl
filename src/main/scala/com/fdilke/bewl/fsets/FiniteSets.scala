@@ -6,8 +6,8 @@ import com.fdilke.bewl.topos.{Wrappings, Topos}
 
 object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreQuiver] {
   override type ~ = Any
-  override type DOT[S <: ~] = FiniteSetsStar[S]
-  override type ARROW[S <: ~, T <: ~] = FiniteSetsQuiver[S, T]
+  override type DOT[S <: ~] = FiniteSetsDot[S]
+  override type ARROW[S <: ~, T <: ~] = FiniteSetsArrow[S, T]
   override type UNIT = Unit
   override type TRUTH = Boolean
   override lazy val I = star(Traversable(()))
@@ -16,16 +16,16 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreQu
   override type >[T <: ~, U <: ~] = (T => U) with ~
   override type x[T <: ~, U <: ~] = (T, U) with ~
 
-  class FiniteSetsStar[S](private[FiniteSets] val elements: Traversable[S])
-    extends Star[S] { self =>
+  class FiniteSetsDot[S](private[FiniteSets] val elements: Traversable[S])
+    extends Dot[S] { self =>
     override lazy val toI = this(I) { _ => () }
 
     override lazy val globals: Traversable[ARROW[UNIT, S]] =
       elements map { s =>
-        new FiniteSetsQuiver(I, this, (_: UNIT) => s)
+        new FiniteSetsArrow(I, this, (_: UNIT) => s)
       }
 
-    override def `>Uncached`[T <: ~](that: FiniteSetsStar[T]) = {
+    override def `>Uncached`[T <: ~](that: FiniteSetsDot[T]) = {
       // println(s"exponentiating: ${that.elements.size} ^ ${this.elements.size}")
       case class FunctionElement(function: S => T) extends (S => T) {
         override def equals(that: scala.Any): Boolean = that match {
@@ -35,9 +35,9 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreQu
         override def hashCode = 0
         def apply(s: S): T = function(s)
       }
-      new FiniteSetsStar[S > T](
+      new FiniteSetsDot[S > T](
         allMaps(self.elements, that.elements).map { FunctionElement } // TODO: coalesce
-      ) with ExponentialStar[S, T, S > T] { exponentialStar =>
+      ) with ExponentialDot[S, T, S > T] { exponentialStar =>
         override val source: DOT[S] = self
         override val target: DOT[T] = that
 
@@ -48,31 +48,31 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreQu
             }}}}
 
     override def xUncached[T <: ~](that: DOT[T]) =
-      new FiniteSetsStar[S x T](
+      new FiniteSetsDot[S x T](
         for(s <- this.elements ; t <- that.elements)
         yield (s, t)
-      ) with BiproductStar[S, T, S x T] {
+      ) with BiproductDot[S, T, S x T] {
         override val left: DOT[S] = self
         override val right: DOT[T] = that
         override def pair(l: S, r: T): x[S, T] = (l, r)
       }
 
     override def apply[T <: ~](target: DOT[T])(f: S => T) =
-      new FiniteSetsQuiver(this, target, f)
+      new FiniteSetsArrow(this, target, f)
 
     override def toString =
-      s"FiniteSetsStar[$elements]"
+      s"FiniteSetsDot[$elements]"
 
     override def sanityTest =
       for (x <- elements ; y <- elements)
         x == y
   }
 
-  class FiniteSetsQuiver[S, T](
-    val source: FiniteSetsStar[S],
-    val target: FiniteSetsStar[T],
+  class FiniteSetsArrow[S, T](
+    val source: FiniteSetsDot[S],
+    val target: FiniteSetsDot[T],
     private[FiniteSets] val function: S => T
-  ) extends Quiver[S, T] { self =>
+  ) extends Arrow[S, T] { self =>
     override def \[U <: ~](monic: ARROW[U, T]) =
       source(monic.source) { s =>
         val quarry: T = function(s)
@@ -86,9 +86,9 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreQu
         throw new IllegalArgumentException("Map values not in target")
       }
     override def ?=(that: ARROW[S, T]) =
-      new FiniteSetsStar[S] (
+      new FiniteSetsDot[S] (
         source.elements.filter { s => function(s) == that.function(s) }
-      ) with EqualizingStar[S] { equalizer =>
+      ) with EqualizingDot[S] { equalizer =>
         override val equalizerTarget = source
         override def restrict[R](substar: ARROW[R, S]) =
           substar.source(this) { substar(_) }
@@ -108,7 +108,7 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreQu
       }}
 
     override def equals(other: Any): Boolean = other match {
-      case that: FiniteSetsQuiver[S, T] =>
+      case that: FiniteSetsArrow[S, T] =>
         source == that.source && target == that.target &&
           source.elements.forall(x => function(x) == that.function(x))
       case _ => false
@@ -116,7 +116,7 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreQu
     override def hashCode = 0
 
     override def toString =
-      s"FiniteSetsQuiver[$source -> $target : ${
+      s"FiniteSetsArrow[$source -> $target : ${
         for(s <- source.elements)
           yield s -> this(s)
       }]"
@@ -124,7 +124,7 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreQu
 
   private val memoizedStarWrapper = {
     def wrap[T](elements: Traversable[T]) =
-      new FiniteSetsStar(elements)
+      new FiniteSetsDot(elements)
     Memoize.generic(wrap)
   }
 

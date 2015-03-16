@@ -12,7 +12,7 @@ object Worksheet {
   val topos = monoid.actions
   import topos._
 
-  val regular = star(monoid.regularAction)
+  val regular = dot(monoid.regularAction)
 
 //  (regular >> (omega > omega)) size
 

@@ -10,8 +10,8 @@ trait Topos extends BaseTopos with NaiveMonoidsAndActions with AlgebraicMachiner
 
 trait BaseTopos { self: LogicalOperations =>
   type ~
-  type DOT[S <: ~] <: Star[S]
-  type ARROW[S <: ~, T <: ~] <: Quiver[S, T]
+  type DOT[S <: ~] <: Dot[S]
+  type ARROW[S <: ~, T <: ~] <: Arrow[S, T]
 
   type >[T <: ~, U <: ~] <: (T => U) with ~
   type x[T <: ~, U <: ~] <: (T, U) with ~
@@ -29,8 +29,8 @@ trait BaseTopos { self: LogicalOperations =>
     def v(that: TRUTH) = TruthObject.or(truthValue, that)
   }
 
-  type EXPONENTIAL[S <: ~, T <: ~] = ExponentialStar[S, T, S > T] with DOT[S > T]
-  trait ExponentialStar[S <: ~, T <: ~, S_T <: (S => T) with ~] { star: DOT[S_T] =>
+  type EXPONENTIAL[S <: ~, T <: ~] = ExponentialDot[S, T, S > T] with DOT[S > T]
+  trait ExponentialDot[S <: ~, T <: ~, S_T <: (S => T) with ~] { star: DOT[S_T] =>
     val source: DOT[S]
     val target: DOT[T]
 
@@ -39,9 +39,9 @@ trait BaseTopos { self: LogicalOperations =>
       (this x source).biQuiver(target) { (f, s) => f(s) }
   }
 
-  type BIPRODUCT[L <: ~, R <: ~] = BiproductStar[L, R, L x R] with DOT[L x R]
+  type BIPRODUCT[L <: ~, R <: ~] = BiproductDot[L, R, L x R] with DOT[L x R]
 
-  trait BiproductStar[L <: ~, R <: ~, LxR <: (L, R) with ~] { star: DOT[LxR] =>
+  trait BiproductDot[L <: ~, R <: ~, LxR <: (L, R) with ~] { star: DOT[LxR] =>
     val left: DOT[L]
     val right: DOT[R]
     def pair(l: L, r: R): LxR
@@ -64,14 +64,14 @@ trait BaseTopos { self: LogicalOperations =>
         BiQuiver(hackedThis, hackedThis.exists(target)(bifunc))
     }
 
-  type EQUALIZER[S <: ~] = EqualizingStar[S] with DOT[S]
-  trait EqualizingStar[S <: ~] { star: DOT[S] =>
+  type EQUALIZER[S <: ~] = EqualizingDot[S] with DOT[S]
+  trait EqualizingDot[S <: ~] { star: DOT[S] =>
     val equalizerTarget: DOT[S]
     val inclusion: ARROW[S, S]
     def restrict[R <: ~](quiver: ARROW[R, S]): ARROW[R, S]
   }
 
-  trait BaseStar[S <: ~] { self: DOT[S] =>
+  trait BaseDot[S <: ~] { self: DOT[S] =>
     val toI: ARROW[S, UNIT]
     val globals: Traversable[ARROW[UNIT, S]]
     def xUncached[T <: ~](that: DOT[T]): BIPRODUCT[S, T]
@@ -80,7 +80,7 @@ trait BaseTopos { self: LogicalOperations =>
     def sanityTest
   }
 
-  trait Star[S <: ~] extends BaseStar[S] { star: DOT[S] =>
+  trait Dot[S <: ~] extends BaseDot[S] { star: DOT[S] =>
 
     final lazy val identity: ARROW[S, S] = this(star) { s => s }
     final private val memoizedProduct =
@@ -200,7 +200,7 @@ trait BaseTopos { self: LogicalOperations =>
     def sanityTest
   }
 
-  trait Quiver[S <: ~, T <: ~] extends BaseQuiver[S, T] { self: ARROW[S, T] =>
+  trait Arrow[S <: ~, T <: ~] extends BaseQuiver[S, T] { self: ARROW[S, T] =>
     final lazy val name =
       (source > target).transpose(
         (I x source).biQuiver(target) {

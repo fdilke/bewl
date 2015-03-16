@@ -107,7 +107,7 @@ trait BaseDiagrammaticTopos {
     def transpose[W](multiArrow: BiArrow[W, S, T]): ARROW[W, S => T]
   }
 
-  // Should this really be part of the base API? Needed for StarsAndQuivers/Wrapping
+  // Should this really be part of the base API? Needed for Elemental/Wrapping
   def buildArrow[S, T](source: DOT[S], target: DOT[T], f: S => T): ARROW[S, T]
 
   case class BiArrow[L, R, T](left: DOT[L], right: DOT[R], arrow: ARROW[(L, R), T]) {

@@ -1,7 +1,7 @@
 package com.fdilke.bewl
 
-import com.fdilke.bewl.topos.StarsAndQuiversLayer
+import com.fdilke.bewl.topos.ElementalToposLayer
 
 package object fsets {
-  def LayeredFiniteSets = StarsAndQuiversLayer(DiagrammaticFiniteSets)
+  def LayeredFiniteSets = ElementalToposLayer(DiagrammaticFiniteSets)
 }
