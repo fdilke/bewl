@@ -55,23 +55,23 @@ abstract class ToposWithFixtures {
   import topos._
 
   def makeSampleStar(): DOT[_ <: ~]
-  def makeSampleQuiver(): QUIVER[_ <: ~, _ <: ~]
+  def makeSampleQuiver(): ARROW[_ <: ~, _ <: ~]
 
   val foo : DOT[FOO]
   val bar : DOT[BAR]
   val baz : DOT[BAZ]
 
-  val foo2bar : QUIVER[FOO, BAR]
-  val foo2ImageOfBar : QUIVER[FOO, BAZ]
+  val foo2bar : ARROW[FOO, BAR]
+  val foo2ImageOfBar : ARROW[FOO, BAZ]
   val foobar2baz : BiQuiver[FOO, BAR, BAZ]
-  val monicBar2baz: QUIVER[BAR, BAZ]
+  val monicBar2baz: ARROW[BAR, BAZ]
 
   val equalizerSituation: EqualizerSituation[_ <: ~, _ <: ~, _ <: ~]
 
   case class EqualizerSituation[S <: ~, M <: ~, T <: ~](
-    r: QUIVER[S, M],
-    s: QUIVER[M, T],
-    t: QUIVER[M, T]) {
+    r: ARROW[S, M],
+    s: ARROW[M, T],
+    t: ARROW[M, T]) {
 
     def sanityTest {
       r.sanityTest
@@ -101,7 +101,7 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
       type t <: ~
     }]
 
-  type UNTYPED_QUIVER = QUIVER[_ <: ~, _ <: _]
+  type UNTYPED_QUIVER = ARROW[_ <: ~, _ <: _]
 
   private def matchQuiver(property: String, predicate: UNTYPED_QUIVER => Boolean) =
     new BeMatcher[UNTYPED_QUIVER] {
@@ -201,7 +201,7 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
       evaluation.quiver.target shouldBe baz
       evaluation.quiver.sanityTest
 
-      val foo2bar2baz: QUIVER[FOO, BAR > BAZ] = (bar > baz).transpose(foobar2baz)
+      val foo2bar2baz: ARROW[FOO, BAR > BAZ] = (bar > baz).transpose(foobar2baz)
       foo2bar2baz.sanityTest
       foo2bar2baz should have(
         'source(foo),

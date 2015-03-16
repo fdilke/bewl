@@ -39,7 +39,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 //        val prevProduct = MultiProduct(prevStars map { _.star } :_*)
 //        new MultiProduct[prevProduct.TYPE x star.TYPE]  {
 //          val root = prevProduct.root x star.star
-//          val projections = prevProduct.projections map { (p: QUIVER[prevProduct.TYPE, _]) =>
+//          val projections = prevProduct.projections map { (p: ARROW[prevProduct.TYPE, _]) =>
 //            p o root.π0
 //          } :+  root.π1
 //        }
@@ -49,13 +49,13 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   abstract class MultiProduct[A <: ~] {
     type TYPE = A
     val root: DOT[A]
-    val projections: Seq[QUIVER[A, _]]
+    val projections: Seq[ARROW[A, _]]
   }
 
   // Multiproducts. end
 
-  type NullaryOp[X <: ~] = QUIVER[UNIT, X]
-  type UnaryOp[X <: ~] = QUIVER[X, X]
+  type NullaryOp[X <: ~] = ARROW[UNIT, X]
+  type UnaryOp[X <: ~] = ARROW[X, X]
   type BinaryOp[X <: ~] = BiQuiver[X, X, X]
   type RightScalarBinaryOp[X <: ~, S <: ~] = BiQuiver[X, S, X]
 
@@ -91,7 +91,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     with Variable[A] {
     def :=[X <: ~](op: NullaryOp[X]): OpAssignment[X] =
       NullaryOpAssignment(this, op)
-    def evaluate[X <: ~](context: EvaluationContext[X]): QUIVER[context.ROOT, X] =
+    def evaluate[X <: ~](context: EvaluationContext[X]): ARROW[context.ROOT, X] =
       context.assignments.lookup(this) o context.root.toI
   }
 
@@ -102,7 +102,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     def :=[X <: ~](op: UnaryOp[X]): OpAssignment[X] =
       UnaryOpAssignment(this, op)
     def apply(argument: Term[A]) = new Term[A] {
-      override def evaluate[X <: ~](context: EvaluationContext[X]): QUIVER[context.ROOT, X] =
+      override def evaluate[X <: ~](context: EvaluationContext[X]): ARROW[context.ROOT, X] =
         context.assignments.lookup(AbstractUnaryOp.this) o argument.evaluate(context)
     }
   }
@@ -114,7 +114,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     def :=[X <: ~](op: BinaryOp[X]): OpAssignment[X] =
       BinaryOpAssignment(this, op)
     def apply(left: Term[A], right: Term[A]) = new Term[A] {
-      override def evaluate[X <: ~](context: EvaluationContext[X]): QUIVER[context.ROOT, X] = {
+      override def evaluate[X <: ~](context: EvaluationContext[X]): ARROW[context.ROOT, X] = {
         val q = context.assignments.lookup(AbstractBinaryOp.this)
         q(
           left.evaluate(context),
@@ -133,7 +133,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     def :=[X <: ~, S <: ~](op: RightScalarBinaryOp[X, S]): OpAssignment[X] =
       RightScalarBinaryOpAssignment(this, op)
     def apply(left: Term[Principal], right: Term[RightScalar]) = new Term[Principal] {
-      override def evaluate[X <: ~](context: EvaluationContext[X]): QUIVER[context.type#ROOT, X] =
+      override def evaluate[X <: ~](context: EvaluationContext[X]): ARROW[context.type#ROOT, X] =
         ??? // TODO: add more machinery to make this paragraoh work
 //        context.assignments.lookup(AbstractRightScalarBinaryOp.this)(
 //          left.evaluate(context),
@@ -144,7 +144,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   trait Term[A] {
     def ::== (rightSide: Term[A]) = Equation[A](this, rightSide)
-    def evaluate[X <: ~](context: EvaluationContext[X]): QUIVER[context.ROOT, X]
+    def evaluate[X <: ~](context: EvaluationContext[X]): ARROW[context.ROOT, X]
   }
   trait Variable[A] extends Term[A]
   case class Equation[A](left: Term[A], right: Term[A])
@@ -190,7 +190,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
         override def evaluate(term: Term[Principal]) : Quiver[ROOT, X] =
           term.evaluate(this)
         override val variables: Array[Variable[Principal]] = Array(new Variable[Principal] {
-          override def evaluate[X <: ~](context: EvaluationContext[X]): QUIVER[context.type#ROOT, X] =
+          override def evaluate[X <: ~](context: EvaluationContext[X]): ARROW[context.type#ROOT, X] =
             ??? // TODO: fill in!
         })
       }
@@ -295,9 +295,9 @@ trait AlgebraicMachinery { topos: BaseTopos =>
         val root: DOT[ROOT]
         abstract class Projection {
           type COMPONENT <: ELEMENT
-          val projection: QUIVER[ROOT, COMPONENT]
+          val projection: ARROW[ROOT, COMPONENT]
         }
-        def projection[COMPONENT_TYPE <: ELEMENT](projectionQuiver: QUIVER[ROOT, COMPONENT_TYPE]) =
+        def projection[COMPONENT_TYPE <: ELEMENT](projectionQuiver: ARROW[ROOT, COMPONENT_TYPE]) =
           new Projection {
             override type COMPONENT = COMPONENT_TYPE
             override val projection = projectionQuiver

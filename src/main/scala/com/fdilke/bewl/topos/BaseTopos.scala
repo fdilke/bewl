@@ -11,7 +11,7 @@ trait Topos extends BaseTopos with NaiveMonoidsAndActions with AlgebraicMachiner
 trait BaseTopos { self: LogicalOperations =>
   type ~
   type DOT[S <: ~] <: Star[S]
-  type QUIVER[S <: ~, T <: ~] <: Quiver[S, T]
+  type ARROW[S <: ~, T <: ~] <: Quiver[S, T]
 
   type >[T <: ~, U <: ~] <: (T => U) with ~
   type x[T <: ~, U <: ~] <: (T, U) with ~
@@ -21,7 +21,7 @@ trait BaseTopos { self: LogicalOperations =>
 
   type TRUTH <: ~
   val omega: DOT[TRUTH]
-  val truth: QUIVER[UNIT, TRUTH]
+  val truth: ARROW[UNIT, TRUTH]
 
   implicit class OmegaEnrichments(truthValue: TRUTH) {
     def >(that: TRUTH) = TruthObject.implies(truthValue, that)
@@ -34,7 +34,7 @@ trait BaseTopos { self: LogicalOperations =>
     val source: DOT[S]
     val target: DOT[T]
 
-    def transpose[R <: ~](biQuiver: BiQuiver[R, S, T]): QUIVER[R, S_T]
+    def transpose[R <: ~](biQuiver: BiQuiver[R, S, T]): ARROW[R, S_T]
     final def evaluation: BiQuiver[S_T, S, T] =
       (this x source).biQuiver(target) { (f, s) => f(s) }
   }
@@ -67,22 +67,22 @@ trait BaseTopos { self: LogicalOperations =>
   type EQUALIZER[S <: ~] = EqualizingStar[S] with DOT[S]
   trait EqualizingStar[S <: ~] { star: DOT[S] =>
     val equalizerTarget: DOT[S]
-    val inclusion: QUIVER[S, S]
-    def restrict[R <: ~](quiver: QUIVER[R, S]): QUIVER[R, S]
+    val inclusion: ARROW[S, S]
+    def restrict[R <: ~](quiver: ARROW[R, S]): ARROW[R, S]
   }
 
   trait BaseStar[S <: ~] { self: DOT[S] =>
-    val toI: QUIVER[S, UNIT]
-    val globals: Traversable[QUIVER[UNIT, S]]
+    val toI: ARROW[S, UNIT]
+    val globals: Traversable[ARROW[UNIT, S]]
     def xUncached[T <: ~](that: DOT[T]): BIPRODUCT[S, T]
     def `>Uncached`[T <: ~](that: DOT[T]): EXPONENTIAL[S, T]
-    def apply[T <: ~](target: DOT[T])(f: S => T) : QUIVER[S, T]
+    def apply[T <: ~](target: DOT[T])(f: S => T) : ARROW[S, T]
     def sanityTest
   }
 
   trait Star[S <: ~] extends BaseStar[S] { star: DOT[S] =>
 
-    final lazy val identity: QUIVER[S, S] = this(star) { s => s }
+    final lazy val identity: ARROW[S, S] = this(star) { s => s }
     final private val memoizedProduct =
       Memoize.generic.withLowerBound[
         DOT,
@@ -107,7 +107,7 @@ trait BaseTopos { self: LogicalOperations =>
     final lazy val squared = this x this
 
     final def map(f: S => S) = this(this)(f)
-    final def flatMap(f2: S => QUIVER[S, S]) =
+    final def flatMap(f2: S => ARROW[S, S]) =
       (this x this).biQuiver(this) { f2(_)(_) }
 
     final lazy val ∃ =
@@ -117,12 +117,12 @@ trait BaseTopos { self: LogicalOperations =>
           }(f, w) > w
       }
 
-    final def preForAll[R <: ~](source: DOT[R])(g: (R, S) => TRUTH): QUIVER[R, TRUTH] =
+    final def preForAll[R <: ~](source: DOT[R])(g: (R, S) => TRUTH): ARROW[R, TRUTH] =
       ∀ o power.transpose(
         (source x this).biQuiver(omega)(g)
       )
 
-    final def forAll[T <: ~](target: DOT[T])(g: (S, T) => TRUTH): QUIVER[S, TRUTH] =
+    final def forAll[T <: ~](target: DOT[T])(g: (S, T) => TRUTH): ARROW[S, TRUTH] =
       target.preForAll(this)(g)
 
     final def forAll[
@@ -133,7 +133,7 @@ trait BaseTopos { self: LogicalOperations =>
       target2: DOT[U]
     ) (
       g: (S, T, U) => TRUTH
-    ): QUIVER[S, TRUTH] =
+    ): ARROW[S, TRUTH] =
       forAll(target) { (x, t) =>
         target.forAll(target2) { (t, u) => 
             g(x, t, u)
@@ -151,7 +151,7 @@ trait BaseTopos { self: LogicalOperations =>
       target3: DOT[V]
     ) (
       g: (S, T, U, V) => TRUTH
-    ): QUIVER[S, TRUTH] =
+    ): ARROW[S, TRUTH] =
       forAll(target) { (x, t) =>
         target.forAll(target2) { (t, u) => 
           target2.forAll(target3) { (u, v) =>
@@ -160,27 +160,27 @@ trait BaseTopos { self: LogicalOperations =>
           }(t)
         }
 
-    final def preExists[R <: ~](source: DOT[R])(g: (R, S) => TRUTH): QUIVER[R, TRUTH] =
+    final def preExists[R <: ~](source: DOT[R])(g: (R, S) => TRUTH): ARROW[R, TRUTH] =
       ∃ o power.transpose(
         (source x this).biQuiver(omega)(g)
       )
 
-    final def exists[T <: ~](target: DOT[T])(g: (S, T) => TRUTH): QUIVER[S, TRUTH] =
+    final def exists[T <: ~](target: DOT[T])(g: (S, T) => TRUTH): ARROW[S, TRUTH] =
       target.preExists(this)(g)
 
-    final lazy val diagonal: QUIVER[S, S x S] =
+    final lazy val diagonal: ARROW[S, S x S] =
       this(squared) { x => squared.pair(x, x) }
 
     final lazy val =?= : BiQuiver[S, S, TRUTH] =
       BiQuiver(squared, diagonal.chi)
 
-    final lazy val singleton: QUIVER[S, S > TRUTH] =
+    final lazy val singleton: ARROW[S, S > TRUTH] =
       power transpose =?=
 
     final def >>[T <: ~](
       target: DOT[T]
     ): Traversable[
-      QUIVER[S, T]
+      ARROW[S, T]
     ] =
       (this > target).globals map { global =>
         star(target) { s =>
@@ -191,23 +191,23 @@ trait BaseTopos { self: LogicalOperations =>
   trait BaseQuiver[S <: ~, T <: ~] {
     val source: DOT[S]
     val target: DOT[T]
-    val chi: QUIVER[T, TRUTH]
+    val chi: ARROW[T, TRUTH]
 
     def apply(s: S): T
-    def ?=(that: QUIVER[S, T]): EQUALIZER[S]
-    def o[R <: ~](that: QUIVER[R, S]) : QUIVER[R, T]
-    def \[U <: ~](monic: QUIVER[U, T]) : QUIVER[S, U]
+    def ?=(that: ARROW[S, T]): EQUALIZER[S]
+    def o[R <: ~](that: ARROW[R, S]) : ARROW[R, T]
+    def \[U <: ~](monic: ARROW[U, T]) : ARROW[S, U]
     def sanityTest
   }
 
-  trait Quiver[S <: ~, T <: ~] extends BaseQuiver[S, T] { self: QUIVER[S, T] =>
+  trait Quiver[S <: ~, T <: ~] extends BaseQuiver[S, T] { self: ARROW[S, T] =>
     final lazy val name =
       (source > target).transpose(
         (I x source).biQuiver(target) {
           (i, x) => this(x)
         })
 
-    final def x[U <: ~](that: QUIVER[S, U]): QUIVER[S, T x U] = {
+    final def x[U <: ~](that: ARROW[S, U]): ARROW[S, T x U] = {
       val product = target x that.target
       source(product) {
         s => product.pair(this(s), that(s))
@@ -217,7 +217,7 @@ trait BaseTopos { self: LogicalOperations =>
       this == source.toTrue
 
     final def whereTrue(implicit eq: =:=[T, TRUTH]): EQUALIZER[S] =
-      this.asInstanceOf[QUIVER[S, TRUTH]] ?= source.toTrue
+      this.asInstanceOf[ARROW[S, TRUTH]] ?= source.toTrue
 
     final lazy val isMonic: Boolean =
       source.forAll(source) {
@@ -236,7 +236,7 @@ trait BaseTopos { self: LogicalOperations =>
     final lazy val isIso: Boolean =
       isMonic && isEpic
 
-    final lazy val inverse: QUIVER[T, S] = 
+    final lazy val inverse: ARROW[T, S] = 
       source.power.transpose(
         (target x source).biQuiver(omega) {
           (t, s) => target.=?=(t, this(s))  
@@ -250,25 +250,25 @@ trait BaseTopos { self: LogicalOperations =>
     T <: ~
   ] (
     product: BIPRODUCT[L, R],
-    quiver: QUIVER[L x R, T]) {
+    quiver: ARROW[L x R, T]) {
     def apply(l: L, r: R): T = quiver(product.pair(l, r))
-    def apply[S <: ~](l: QUIVER[S, L], r: QUIVER[S, R]): QUIVER[S, T] = quiver o (l x r)
+    def apply[S <: ~](l: ARROW[S, L], r: ARROW[S, R]): ARROW[S, T] = quiver o (l x r)
   }
 
   // Helper methods for triproducts (this could obviously be extended).
   def leftProjection[X <: ~, Y <: ~, Z <: ~](
     x: DOT[X], y: DOT[Y], z: DOT[Z]
-  ) : QUIVER[X x Y x Z, X] =
+  ) : ARROW[X x Y x Z, X] =
     (x x y).π0 o (x x y x z).π0
 
   def midProjection[X <: ~, Y <: ~, Z <: ~](
    x: DOT[X], y: DOT[Y], z: DOT[Z]
-  ) : QUIVER[X x Y x Z, Y] =
+  ) : ARROW[X x Y x Z, Y] =
     (x x y).π1 o (x x y x z).π0
 
   def rightProjection[X <: ~, Y <: ~, Z <: ~](
    x: DOT[X], y: DOT[Y], z: DOT[Z]
-  ) : QUIVER[X x Y x Z, Z] =
+  ) : ARROW[X x Y x Z, Z] =
     (x x y x z).π1
 }
 
@@ -276,8 +276,8 @@ trait Wrappings[BASE, PREDOT[_ <: BASE], PREQUIVER[_ <: BASE, _ <: BASE]] { topo
   type WRAPPER[T <: BASE] <: ~
 
   def star[T <: BASE](input: PREDOT[T]) : DOT[WRAPPER[T]]
-  def quiver[S <: BASE, T <: BASE](connector: PREQUIVER[S, T]) : QUIVER[WRAPPER[S], WRAPPER[T]]
-  def functionAsQuiver[S <: BASE, T <: BASE](source: DOT[WRAPPER[S]], target: DOT[WRAPPER[T]], f: S => T): QUIVER[WRAPPER[S], WRAPPER[T]]
+  def quiver[S <: BASE, T <: BASE](connector: PREQUIVER[S, T]) : ARROW[WRAPPER[S], WRAPPER[T]]
+  def functionAsQuiver[S <: BASE, T <: BASE](source: DOT[WRAPPER[S]], target: DOT[WRAPPER[T]], f: S => T): ARROW[WRAPPER[S], WRAPPER[T]]
   def bifunctionAsBiQuiver[L <: BASE, R <: BASE, T <: BASE] (
     left: DOT[WRAPPER[L]],
     right: DOT[WRAPPER[R]],

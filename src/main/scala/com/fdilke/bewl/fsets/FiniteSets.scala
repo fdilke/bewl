@@ -7,7 +7,7 @@ import com.fdilke.bewl.topos.{Wrappings, Topos}
 object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreQuiver] {
   override type ~ = Any
   override type DOT[S <: ~] = FiniteSetsStar[S]
-  override type QUIVER[S <: ~, T <: ~] = FiniteSetsQuiver[S, T]
+  override type ARROW[S <: ~, T <: ~] = FiniteSetsQuiver[S, T]
   override type UNIT = Unit
   override type TRUTH = Boolean
   override lazy val I = star(Traversable(()))
@@ -20,7 +20,7 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreQu
     extends Star[S] { self =>
     override lazy val toI = this(I) { _ => () }
 
-    override lazy val globals: Traversable[QUIVER[UNIT, S]] =
+    override lazy val globals: Traversable[ARROW[UNIT, S]] =
       elements map { s =>
         new FiniteSetsQuiver(I, this, (_: UNIT) => s)
       }
@@ -73,7 +73,7 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreQu
     val target: FiniteSetsStar[T],
     private[FiniteSets] val function: S => T
   ) extends Quiver[S, T] { self =>
-    override def \[U <: ~](monic: QUIVER[U, T]) =
+    override def \[U <: ~](monic: ARROW[U, T]) =
       source(monic.source) { s =>
         val quarry: T = function(s)
         monic.source.elements.find { u =>
@@ -85,20 +85,20 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreQu
       if (!source.elements.map(function).forall(x => target.elements.exists(_ == x))) {
         throw new IllegalArgumentException("Map values not in target")
       }
-    override def ?=(that: QUIVER[S, T]) =
+    override def ?=(that: ARROW[S, T]) =
       new FiniteSetsStar[S] (
         source.elements.filter { s => function(s) == that.function(s) }
       ) with EqualizingStar[S] { equalizer =>
         override val equalizerTarget = source
-        override def restrict[R](substar: QUIVER[R, S]) =
+        override def restrict[R](substar: ARROW[R, S]) =
           substar.source(this) { substar(_) }
-        override val inclusion: QUIVER[S, S] = equalizer(source) { s => s }
+        override val inclusion: ARROW[S, S] = equalizer(source) { s => s }
       }
 
     override def apply(s: S) =
       function(s)
 
-    override def o[R <: ~](that: QUIVER[R, S]) =
+    override def o[R <: ~](that: ARROW[R, S]) =
       that.source(target)(function compose that.function)
 
     override lazy val chi =
