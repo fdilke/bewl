@@ -18,17 +18,17 @@ object StarsAndQuiversLayer {
         protected[StarsAndQuiversLayer] val arrow: Δ.ARROW[Any, Any]
       }
 
-      override type STAR[S <: ~] = AdapterStar[S]
+      override type DOT[S <: ~] = AdapterStar[S]
       override type QUIVER[S <: ~, T <: ~] = AdapterQuiver[S, T]
 
       override type UNIT = WrappedArrow[Unit]
-      lazy val I: STAR[UNIT] = star(Δ.I).asInstanceOf[STAR[UNIT]]
+      lazy val I: DOT[UNIT] = star(Δ.I).asInstanceOf[DOT[UNIT]]
 
       override type TRUTH = AdapterTruth
       type >[T <: ~, U <: ~] = (T => U) with ~
       type x[T <: ~, U <: ~] = (T, U) with ~
 
-      override lazy val omega = star(Δ.omega).asInstanceOf[STAR[TRUTH]]
+      override lazy val omega = star(Δ.omega).asInstanceOf[DOT[TRUTH]]
       override lazy val truth = quiver(Δ.truth).asInstanceOf[QUIVER[UNIT, TRUTH]]
 
       trait AdapterTruth extends Element
@@ -44,7 +44,7 @@ object StarsAndQuiversLayer {
             AdapterQuiver.fromArrow(I, this, global)
           }
 
-        override def xUncached[U <: ~](that: STAR[U]) =
+        override def xUncached[U <: ~](that: DOT[U]) =
           new AdapterStar[T x U] with BiproductStar[T, U, T x U] {
             override val left = self
             override val right = that
@@ -62,7 +62,7 @@ object StarsAndQuiversLayer {
               }
           }
 
-        override def `>Uncached`[U <: ~](that: STAR[U]) =
+        override def `>Uncached`[U <: ~](that: DOT[U]) =
           new AdapterStar[T > U] with ExponentialStar[T, U, T > U] {
             override val source = AdapterStar.this
             override val target = that
@@ -88,20 +88,20 @@ object StarsAndQuiversLayer {
 
         override def sanityTest = dot.sanityTest
 
-        override def apply[U <: ~](target: STAR[U])(f: T => U) =
+        override def apply[U <: ~](target: DOT[U])(f: T => U) =
           AdapterQuiver[T, U](this, target, f)
 
         private[StarsAndQuiversLayer] def asElement(arrow: Δ.ARROW[_, _]): T
       }
 
       object AdapterQuiver {
-        def apply[S <: ~, T <: ~](source: STAR[S], target: STAR[T], function:  S => T) =
+        def apply[S <: ~, T <: ~](source: DOT[S], target: DOT[T], function:  S => T) =
           new AdapterQuiver[S, T](source, target,
             () => function,
             () => function(source.asElement(source.dot.identity)).arrow
           )
 
-        def fromArrow[S <: ~, T <: ~](source: STAR[S], target: STAR[T], arrow: Δ.ARROW[_, _]) =
+        def fromArrow[S <: ~, T <: ~](source: DOT[S], target: DOT[T], arrow: Δ.ARROW[_, _]) =
           new AdapterQuiver[S, T](source, target,
             () => t => target.asElement(fletch(arrow)(t.arrow)),
             () => fletch(arrow)
@@ -109,8 +109,8 @@ object StarsAndQuiversLayer {
       }
 
       class AdapterQuiver[S <: ~, T <: ~](
-        val source: STAR[S],
-        val target: STAR[T],
+        val source: DOT[S],
+        val target: DOT[T],
         _function: () => S => T,
         _arrow: () => Δ.ARROW[Any, Any]
       ) extends Quiver[S, T] {
@@ -159,7 +159,7 @@ object StarsAndQuiversLayer {
         override def toString: String = s"WrappedArrow($arrow)"
       }
 
-      private class WrappedDot[X](innerDot: Δ.DOT[X]) extends STAR[WrappedArrow[X]] {
+      private class WrappedDot[X](innerDot: Δ.DOT[X]) extends DOT[WrappedArrow[X]] {
         override private[StarsAndQuiversLayer] val dot: Δ.DOT[Any] = innerDot.asInstanceOf[Δ.DOT[Any]]
 
         override private[StarsAndQuiversLayer] def asElement(arrow: Δ.ARROW[_, _]) =
@@ -178,15 +178,15 @@ object StarsAndQuiversLayer {
 
       override type WRAPPER[S] = WrappedArrow[S]
 
-      override def star[S](dot: Δ.DOT[S]): STAR[WrappedArrow[S]] =
+      override def star[S](dot: Δ.DOT[S]): DOT[WrappedArrow[S]] =
         memoizedWrappedDot(dot)
 
       override def quiver[S, T](arrow: Δ.ARROW[S, T]): QUIVER[WRAPPER[S], WRAPPER[T]] =
         AdapterQuiver.fromArrow(star(arrow.source), star(arrow.target), arrow)
 
       override def functionAsQuiver[S, T](
-        source: STAR[WrappedArrow[S]],
-        target: STAR[WrappedArrow[T]],
+        source: DOT[WrappedArrow[S]],
+        target: DOT[WrappedArrow[T]],
         f: S => T
       ) = quiver(Δ.buildArrow[S, T](
         source.dot.asInstanceOf[Δ.DOT[S]],
@@ -196,9 +196,9 @@ object StarsAndQuiversLayer {
       ).asInstanceOf[QUIVER[WRAPPER[S], WRAPPER[T]]]
 
       override def bifunctionAsBiQuiver[L, R, T](
-        left: STAR[WRAPPER[L]],
-        right: STAR[WRAPPER[R]],
-        target: STAR[WRAPPER[T]]
+        left: DOT[WRAPPER[L]],
+        right: DOT[WRAPPER[R]],
+        target: DOT[WRAPPER[T]]
       ) (
         bifunc: (L, R) => T
       ) = {

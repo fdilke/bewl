@@ -31,13 +31,13 @@ class ToposOfActionsTest extends GenericToposTests(new ToposWithFixtures {
 
   override val foo = star(monoidOf3.regularAction)
 
-  private val barStar: FiniteSets.STAR[String] = FiniteSetsUtilities.makeStar("i", "x", "y")
+  private val barStar: FiniteSets.DOT[String] = FiniteSetsUtilities.makeStar("i", "x", "y")
 
   private val scalarMultiply: (String, Symbol) => String =
     (s, m) => monoidOf3.multiply(Symbol(s), m).name
   override val bar = star(monoidOf3.action(barStar)(scalarMultiply))
 
-  private val bazStar: FiniteSets.STAR[Int] = FiniteSetsUtilities.makeStar(0, 1, 2, 3)
+  private val bazStar: FiniteSets.DOT[Int] = FiniteSetsUtilities.makeStar(0, 1, 2, 3)
 
   private def bazMultiply(n: Int, r: Symbol) : Int =
     if (n == 0)
@@ -73,7 +73,7 @@ class ToposOfActionsTest extends GenericToposTests(new ToposWithFixtures {
 
   override val equalizerSituation = {
     type BINARY = WRAPPER[Boolean]
-    val binaryStar : FiniteSets.STAR[Boolean] = FiniteSetsUtilities.makeStar(true, false)
+    val binaryStar : FiniteSets.DOT[Boolean] = FiniteSetsUtilities.makeStar(true, false)
     def binaryMultiply(b: Boolean, r: Symbol) : Boolean = b
     val binary = star(monoidOf3.action(binaryStar)(binaryMultiply))
     new EqualizerSituation[FOO, BAZ, BINARY](

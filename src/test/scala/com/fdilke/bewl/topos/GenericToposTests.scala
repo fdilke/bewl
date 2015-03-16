@@ -54,12 +54,12 @@ abstract class ToposWithFixtures {
 
   import topos._
 
-  def makeSampleStar(): STAR[_ <: ~]
+  def makeSampleStar(): DOT[_ <: ~]
   def makeSampleQuiver(): QUIVER[_ <: ~, _ <: ~]
 
-  val foo : STAR[FOO]
-  val bar : STAR[BAR]
-  val baz : STAR[BAZ]
+  val foo : DOT[FOO]
+  val bar : DOT[BAR]
+  val baz : DOT[BAZ]
 
   val foo2bar : QUIVER[FOO, BAR]
   val foo2ImageOfBar : QUIVER[FOO, BAZ]
@@ -315,7 +315,7 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
       fooI.inverse shouldBe fooI
 
       if (!inActionTopos) { // reluctantly skip, too slow with current technology
-        def twist[A <: ~, B <: ~](a: STAR[A], b: STAR[B]) =
+        def twist[A <: ~, B <: ~](a: DOT[A], b: DOT[B]) =
           (a x b)(b x a) {
             case (α, β) => (b x a).pair(β, α)
           }

@@ -13,7 +13,7 @@ trait NaiveMonoidsAndActions {
   Ɛ: BaseTopos with AlgebraicMachinery with LogicalOperations =>
 
   case class NaiveMonoid[M <: ~](
-    carrier: STAR[M], 
+    carrier: DOT[M], 
     unit: NullaryOp[M], 
     multiply: BinaryOp[M]
   ) { 
@@ -45,7 +45,7 @@ trait NaiveMonoidsAndActions {
     def action[
       A <: ~
     ] (
-      actionCarrier: STAR[A]
+      actionCarrier: DOT[A]
     ) (
       actionMultiply: (A, M) => A
     ) =
@@ -58,7 +58,7 @@ trait NaiveMonoidsAndActions {
       action(carrier) { multiply(_, _) }
 
     case class Action[A <: ~] (
-      actionCarrier: STAR[A],
+      actionCarrier: DOT[A],
       actionMultiply: (A, M) => A
     ) {
       def isMorphism[B <: ~](that: Action[B], quiver: QUIVER[A, B]) =
@@ -158,7 +158,7 @@ trait NaiveMonoidsAndActions {
 
       override type ~ = ElementWrapper[_ <: Ɛ.~]
       
-      override type STAR[AA <: ~] = ActionStarFacade[AA]
+      override type DOT[AA <: ~] = ActionStarFacade[AA]
       override type QUIVER[AA <: ~, BB <: ~] = ActionQuiverFacade[AA, BB]
       override type UNIT = VanillaWrapper[Ɛ.UNIT]
 
@@ -181,7 +181,7 @@ trait NaiveMonoidsAndActions {
         def restrict[
           H <: Ɛ.~
         ] (
-          that: Ɛ.STAR[H]
+          that: Ɛ.DOT[H]
         ) (
           bifunc: (H, M) => Ɛ.TRUTH
         ): Ɛ.QUIVER[H, IDEAL] = 
@@ -293,7 +293,7 @@ trait NaiveMonoidsAndActions {
         }
 
         override def xUncached[BB <: ~](
-          that: STAR[BB]
+          that: DOT[BB]
         ) = that.preMultiplyUncached(this)
 
         override def preMultiplyUncached[Z <: Ɛ.~, ZZ <: ~](
@@ -318,8 +318,8 @@ trait NaiveMonoidsAndActions {
                   zzXaa => zzXaa.element
                 )
             ) with BiproductStar[ZZ, AA, BiproductWrapper[Z, ZZ, A, AA]] {               
-              override val left: STAR[ZZ] = pre
-              override val right: STAR[AA] = star
+              override val left: DOT[ZZ] = pre
+              override val right: DOT[AA] = star
               override def pair(zz: ZZ, aa: AA) = { 
                 val z: Z = pre.↔ \ zz
                 val a: A = star.↔ \ aa
@@ -327,7 +327,7 @@ trait NaiveMonoidsAndActions {
             }}.asInstanceOf[BIPRODUCT[ZZ, AA]]
           }
 
-        override def `>Uncached`[BB <: ~](that: STAR[BB]): EXPONENTIAL[AA, BB] =
+        override def `>Uncached`[BB <: ~](that: DOT[BB]): EXPONENTIAL[AA, BB] =
           that.preExponentiateUncached(this)
 
         override def preExponentiateUncached[Z <: Ɛ.~, ZZ <: ~](
@@ -373,8 +373,8 @@ trait NaiveMonoidsAndActions {
               AA, 
               ExponentialWrapper[Z, ZZ, A, AA]
             ] { exponentialStar =>
-              val source: STAR[ZZ] = pre
-              val target: STAR[AA] = star
+              val source: DOT[ZZ] = pre
+              val target: DOT[AA] = star
               def transpose[RR <: ~](biQuiver: BiQuiver[RR, ZZ, AA]): QUIVER[RR, ExponentialWrapper[Z, ZZ, A, AA]] =
                 biQuiver.product.left.calcTranspose[Z, ZZ, A, AA](
                   pre, star, morphisms, possibleMorphisms, exponentialStar, biQuiver
@@ -415,7 +415,7 @@ trait NaiveMonoidsAndActions {
         override def apply[
           BB <: ~
         ] (
-          that: STAR[BB]
+          that: DOT[BB]
         ) (
           f: AA => BB
         ): QUIVER[AA, BB] =
@@ -455,7 +455,7 @@ trait NaiveMonoidsAndActions {
         def apply[
           A <: Ɛ.~
         ] (
-          actionCarrier: Ɛ.STAR[A]
+          actionCarrier: Ɛ.DOT[A]
         ) (
           actionMultiply: (A, M) => A
         ) =
@@ -608,14 +608,14 @@ trait NaiveMonoidsAndActions {
       private val memoizedStarWrapper = 
         Memoize.generic withLowerBound[
           Action, 
-          ({ type λ[T <: Ɛ.~] = STAR[WRAPPER[T]]})#λ,
+          ({ type λ[T <: Ɛ.~] = DOT[WRAPPER[T]]})#λ,
           Ɛ.~
         ] ActionStar.wrap
         
 
       override def star[
         T <: Ɛ.~
-      ] (input: Action[T]): STAR[WRAPPER[T]] =
+      ] (input: Action[T]): DOT[WRAPPER[T]] =
         memoizedStarWrapper(input) 
 
       override def quiver[
@@ -633,8 +633,8 @@ trait NaiveMonoidsAndActions {
         S <: Ɛ.~,
         T <: Ɛ.~
       ] (
-        source: STAR[WRAPPER[S]], 
-        target: STAR[WRAPPER[T]], 
+        source: DOT[WRAPPER[S]], 
+        target: DOT[WRAPPER[T]], 
         f: S => T
       ): QUIVER[WRAPPER[S], WRAPPER[T]] = {
         val src = source.asInstanceOf[ActionStar[S, WRAPPER[S]]]
@@ -650,9 +650,9 @@ trait NaiveMonoidsAndActions {
         R <: Ɛ.~,
         T <: Ɛ.~
       ] (
-        left: STAR[WRAPPER[L]],
-        right: STAR[WRAPPER[R]],
-        target: STAR[WRAPPER[T]]
+        left: DOT[WRAPPER[L]],
+        right: DOT[WRAPPER[R]],
+        target: DOT[WRAPPER[T]]
       ) (
         bifunc: (L, R) => T
       ): BiQuiver[WRAPPER[L], WRAPPER[R], WRAPPER[T]] = {

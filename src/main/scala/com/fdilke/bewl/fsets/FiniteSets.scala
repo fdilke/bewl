@@ -6,7 +6,7 @@ import com.fdilke.bewl.topos.{Wrappings, Topos}
 
 object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreQuiver] {
   override type ~ = Any
-  override type STAR[S <: ~] = FiniteSetsStar[S]
+  override type DOT[S <: ~] = FiniteSetsStar[S]
   override type QUIVER[S <: ~, T <: ~] = FiniteSetsQuiver[S, T]
   override type UNIT = Unit
   override type TRUTH = Boolean
@@ -38,8 +38,8 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreQu
       new FiniteSetsStar[S > T](
         allMaps(self.elements, that.elements).map { FunctionElement } // TODO: coalesce
       ) with ExponentialStar[S, T, S > T] { exponentialStar =>
-        override val source: STAR[S] = self
-        override val target: STAR[T] = that
+        override val source: DOT[S] = self
+        override val target: DOT[T] = that
 
         override def transpose[R <: ~](biQuiver: BiQuiver[R, S, T]) =
           biQuiver.product.left(exponentialStar) {
@@ -47,17 +47,17 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreQu
               s => biQuiver(r, s)
             }}}}
 
-    override def xUncached[T <: ~](that: STAR[T]) =
+    override def xUncached[T <: ~](that: DOT[T]) =
       new FiniteSetsStar[S x T](
         for(s <- this.elements ; t <- that.elements)
         yield (s, t)
       ) with BiproductStar[S, T, S x T] {
-        override val left: STAR[S] = self
-        override val right: STAR[T] = that
+        override val left: DOT[S] = self
+        override val right: DOT[T] = that
         override def pair(l: S, r: T): x[S, T] = (l, r)
       }
 
-    override def apply[T <: ~](target: STAR[T])(f: S => T) =
+    override def apply[T <: ~](target: DOT[T])(f: S => T) =
       new FiniteSetsQuiver(this, target, f)
 
     override def toString =
@@ -132,7 +132,7 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreQu
 
   override type WRAPPER[T] = T
 
-  override def functionAsQuiver[S, T](source: STAR[S], target: STAR[T], f: S => T) =
+  override def functionAsQuiver[S, T](source: DOT[S], target: DOT[T], f: S => T) =
     source(target)(f)
 
   override def quiver[S, T](prequiver: FiniteSetsPreQuiver[S, T]) =
@@ -143,9 +143,9 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreQu
 
   // unusually simple generic definition for this topos because WRAPPER is trivial
   override def bifunctionAsBiQuiver[L, R, T](
-    left: STAR[L],
-    right: STAR[R],
-    target: STAR[T]
+    left: DOT[L],
+    right: DOT[R],
+    target: DOT[T]
   ) (
     bifunc: (L, R) => T
   ): BiQuiver[L, R, T] =
@@ -163,22 +163,22 @@ object FiniteSetsUtilities {
 
   def makeStar[T](elements: T*) = star(elements)
 
-  def makeQuiver[S, T](source: STAR[S], target: STAR[T], map: (S, T)*) =
+  def makeQuiver[S, T](source: DOT[S], target: DOT[T], map: (S, T)*) =
     functionAsQuiver(source, target, Map(map: _*))
 
   def makeBiQuiver[L, R, T](
-                             left: STAR[L],
-                             right: STAR[R],
-                             target: STAR[T],
+                             left: DOT[L],
+                             right: DOT[R],
+                             target: DOT[T],
                              mappings: ((L, R), T)*
                              ) =
     bifunctionAsBiQuiver[L, R, T](left, right, target) { (l, r) => Map(mappings:_*)((l, r)) }
 
-  def makeNullaryOperator[X](carrier: STAR[X], value: X) =
+  def makeNullaryOperator[X](carrier: DOT[X], value: X) =
     functionAsQuiver(I, carrier, (_: UNIT) => value)
 
   def makeBinaryOperator[X](
-    carrier: STAR[X],
+    carrier: DOT[X],
     mappings: ((X, X), X)*
   ) =
     bifunctionAsBiQuiver[X](carrier) { (x, y) => Map(mappings:_*)((x, y)) }

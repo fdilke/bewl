@@ -15,15 +15,15 @@ class LayeredFiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
   def buildDot[T](elements: Seq[T]) =
     DiagrammaticFiniteSets.DiagrammaticFiniteSetsDot(elements)
 
-  def makeStar[T](elements: T*): STAR[WRAPPER[T]] = star(buildDot(elements))
+  def makeStar[T](elements: T*): topos.DOT[WRAPPER[T]] = star(buildDot(elements))
 
-  def makeQuiver[S, T](source: STAR[WRAPPER[S]], target: STAR[WRAPPER[T]], map: (S, T)*) =
+  def makeQuiver[S, T](source: topos.DOT[WRAPPER[S]], target: topos.DOT[WRAPPER[T]], map: (S, T)*) =
     functionAsQuiver(source, target, Map(map: _*))
 
   def makeBiQuiver[L, R, T](
-    left: STAR[WRAPPER[L]],
-    right: STAR[WRAPPER[R]],
-    target: STAR[WRAPPER[T]],
+    left: topos.DOT[WRAPPER[L]],
+    right: topos.DOT[WRAPPER[R]],
+    target: topos.DOT[WRAPPER[T]],
     mappings: ((L, R), T)*) =
     bifunctionAsBiQuiver(left, right, target) { (l, r) => Map(mappings:_*)((l, r)) }
 

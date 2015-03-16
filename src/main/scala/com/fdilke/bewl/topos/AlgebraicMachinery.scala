@@ -8,7 +8,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   // Multiproducts. TODO: split out as separate trait?
 
-  case class TypedStar[X <: ~](star: STAR[X]) {
+  case class TypedStar[X <: ~](star: DOT[X]) {
     type TYPE = X
   }
 
@@ -16,13 +16,13 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     def typed: TypedStar[X]
   }
 
-  implicit def enrichOther[X <: ~](star: STAR[X]) = new OtherRichStar[X] {
+  implicit def enrichOther[X <: ~](star: DOT[X]) = new OtherRichStar[X] {
     override def typed = new TypedStar[X](star)
   }
 
   object MultiProduct {
 
-    def apply(components: STAR[_ <: ~]*): MultiProduct[_] = components map { _.typed } match {
+    def apply(components: DOT[_ <: ~]*): MultiProduct[_] = components map { _.typed } match {
       case Seq() =>
         new MultiProduct[UNIT] {
           val root = I
@@ -48,7 +48,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   abstract class MultiProduct[A <: ~] {
     type TYPE = A
-    val root: STAR[A]
+    val root: DOT[A]
     val projections: Seq[QUIVER[A, _]]
   }
 
@@ -164,7 +164,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   abstract trait EvaluationContext[X <: ~] {
     type ROOT <: ~
-    val root: STAR[ROOT]
+    val root: DOT[ROOT]
     val assignments: OpAssignments[X]
     def evaluate(term: Term[Principal]) : Quiver[ROOT, X]
   }
@@ -238,11 +238,11 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   }
 
   case class AlgebraicTheory(operators: Seq[AbstractOp[_, _]], val laws: Seq[Law[_]]) {
-    def apply[X <: ~](carrier: STAR[X], assignments: OpAssignment[X]*) =
+    def apply[X <: ~](carrier: DOT[X], assignments: OpAssignment[X]*) =
       Algebra(this, carrier, OpAssignments(assignments :_*))
   }
 
-  case class Algebra[X <: ~](theory: AlgebraicTheory, carrier: STAR[X], assignments: OpAssignments[X]) {
+  case class Algebra[X <: ~](theory: AlgebraicTheory, carrier: DOT[X], assignments: OpAssignments[X]) {
     def sanityTest = theory.laws.foreach { _.verify(Algebra.this)}
   }
 
@@ -292,7 +292,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
       abstract class RootContext {
         type ROOT <: ELEMENT
-        val root: STAR[ROOT]
+        val root: DOT[ROOT]
         abstract class Projection {
           type COMPONENT <: ELEMENT
           val projection: QUIVER[ROOT, COMPONENT]
@@ -329,11 +329,11 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       class OperatorAssignments[X <: ELEMENT](assignments:  Seq[OperatorAssignment[X]])
 
       class AlgebraicTheory(operators: Set[AbstractOp], val laws: Seq[Law]) {
-        def apply[X <: ELEMENT](carrier: STAR[X], assignments: OperatorAssignment[X]*) =
+        def apply[X <: ELEMENT](carrier: DOT[X], assignments: OperatorAssignment[X]*) =
           Algebra(this, carrier, new OperatorAssignments(assignments))
       }
 
-      case class Algebra[X <: ELEMENT](theory: AlgebraicTheory, carrier: STAR[X], assignments: OperatorAssignments[X]) {
+      case class Algebra[X <: ELEMENT](theory: AlgebraicTheory, carrier: DOT[X], assignments: OperatorAssignments[X]) {
         def sanityTest = theory.laws.foreach { _.verify(this)}
       }
     */
