@@ -11,6 +11,8 @@ I've implemented this in Java, Clojure and now Scala. Really it should be in Has
 [This presentation](http://prezi.com/dwrz2mft3y-g/?utm_campaign=share&utm_medium=copy&rc=ex0share) explains the new "intrinsic" Bewl 2.0 DSL and why it's
  better than the previous "diagrammatic" 1.0 one.
 
+If you want to use Bewl as a learning aid to study category theory, [start here](https://github.com/fdilke/bewl/raw/master/CommandLine.md)
+
 # Intended applications
 
 - Explore the topos of graphs. Bewl will let us talk about graphs as if they were sets
