@@ -39,7 +39,7 @@ class AlgebraTests extends FunSpec with RunTimeCompilation {
     }
 
     it("are computed sensibly for a product of 1") {
-      val star = makeStar(1, 2)
+      val star = dot(1, 2)
       val multiProduct = MultiProduct(star)
       multiProduct.root shouldBe star
       multiProduct.projections shouldBe Seq(star.identity)
@@ -69,8 +69,8 @@ class AlgebraTests extends FunSpec with RunTimeCompilation {
     }
 
     it("can be used as keys to a map of operator assignments") {
-      val carrier = makeStar(true, false)
-      val scalars = makeStar(1, 2, 3)
+      val carrier = dot(true, false)
+      val scalars = dot(1, 2, 3)
       val op0 = makeNullaryOperator(carrier, true)
       val op1 = carrier.identity
       val op2 = bifunctionAsBiQuiver(carrier) {
@@ -86,7 +86,7 @@ class AlgebraTests extends FunSpec with RunTimeCompilation {
 
     it("can construct terms which can be evaluated in a root context") {
 
-      val carrier = makeStar(0, 1, 2, 3)
+      val carrier = dot(0, 1, 2, 3)
       val product = bifunctionAsBiQuiver(carrier) { (x, y) => (x + y) % 4}
       def constant(i: Int) = makeNullaryOperator(carrier, i)
       val myUnit = constant(0)
@@ -140,7 +140,7 @@ class AlgebraTests extends FunSpec with RunTimeCompilation {
 
   describe("Algebraic laws") {
     it("can be verified for particular algebras") {
-      val carrier = makeStar(1, -1)
+      val carrier = dot(1, -1)
       val product = makeBinaryOperator(carrier,
         (1, 1) -> 1, (1, -1) -> -1, (-1, 1) -> -1, (-1, -1) -> 1
       )

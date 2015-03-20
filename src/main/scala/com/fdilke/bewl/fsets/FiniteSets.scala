@@ -161,12 +161,12 @@ case class FiniteSetsPreQuiver[S, T](
 object FiniteSetsUtilities {
   import FiniteSets._
 
-  def makeStar[T](elements: T*) = star(elements)
+  def dot[T](elements: T*) = star(elements)
 
-  def makeQuiver[S, T](source: DOT[S], target: DOT[T], map: (S, T)*) =
+  def arrow[S, T](source: DOT[S], target: DOT[T], map: (S, T)*) =
     functionAsQuiver(source, target, Map(map: _*))
 
-  def makeBiQuiver[L, R, T](
+  def biArrow[L, R, T](
                              left: DOT[L],
                              right: DOT[R],
                              target: DOT[T],
@@ -193,7 +193,7 @@ object FiniteSetsUtilities {
   def monoidFromTable[M](table: M*): NaiveMonoid[M] = {
     val carrierSize = intSqrt(table.size)
     val carrierAsList = table.take(carrierSize)
-    val carrier = makeStar(carrierAsList :_*)
+    val carrier = dot(carrierAsList :_*)
     val mappings = for (i <- 0 until carrierSize ; j <- 0 until carrierSize)
       yield (carrierAsList(i), carrierAsList(j)) -> table(i * carrierSize + j)
     val product = makeBinaryOperator(carrier, mappings:_ *)

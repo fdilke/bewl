@@ -47,9 +47,9 @@ class LayeredFiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
   private val sampleDotSource = buildDot(Seq(1, 2))
   private val sampleDotTarget = buildDot(Seq(true, false))
 
-  override def makeSampleStar() = star(sampleDotSource)
+  override def makeSampleDot() = star(sampleDotSource)
 
-  override def makeSampleQuiver() = makeQuiver(star(sampleDotSource),
+  override def makeSampleArrow() = makeQuiver(star(sampleDotSource),
     star(sampleDotTarget), 1 -> true, 2 -> false)
 
   override val equalizerSituation = new EqualizerSituation[FOO, BAR, BAZ](

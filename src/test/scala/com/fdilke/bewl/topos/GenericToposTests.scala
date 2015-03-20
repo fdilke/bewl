@@ -54,8 +54,8 @@ abstract class ToposWithFixtures {
 
   import topos._
 
-  def makeSampleStar(): DOT[_ <: ~]
-  def makeSampleQuiver(): ARROW[_ <: ~, _ <: ~]
+  def makeSampleDot(): DOT[_ <: ~]
+  def makeSampleArrow(): ARROW[_ <: ~, _ <: ~]
 
   val foo : DOT[FOO]
   val bar : DOT[BAR]
@@ -125,11 +125,11 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
     }
 
     it("wraps dots and arrows with relatively sane equality semantics") {
-      makeSampleStar() shouldBe makeSampleStar()
-      (makeSampleStar() eq makeSampleStar()) shouldBe true
+      makeSampleDot() shouldBe makeSampleDot()
+      (makeSampleDot() eq makeSampleDot()) shouldBe true
 
-      makeSampleQuiver() shouldBe makeSampleQuiver()
-      (makeSampleQuiver() eq makeSampleQuiver()) shouldBe false
+      makeSampleArrow() shouldBe makeSampleArrow()
+      (makeSampleArrow() eq makeSampleArrow()) shouldBe false
     }
 
     it("has identity arrows which can be composed") {

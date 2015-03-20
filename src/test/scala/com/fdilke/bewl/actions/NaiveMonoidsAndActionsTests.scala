@@ -12,7 +12,7 @@ class NaiveMonoidsAndActionsTests extends FunSpec {
 
   describe("The topos algebra machinery") {
     it("can define a monoid with carrier, unit and multiplication") {
-        val carrier = makeStar(i, x, y)
+        val carrier = dot(i, x, y)
         val unit = makeNullaryOperator(carrier, i)
         val product = makeBinaryOperator(carrier,
           (i, i) -> i, (i, x) -> x, (i, y) -> y,
@@ -66,8 +66,8 @@ class NaiveMonoidsAndActionsTests extends FunSpec {
       )
 
     it("can define a right action for a monoid") {
-      val actionCarrier = makeStar(a, b)
-      val actionMultiply = makeBiQuiver(actionCarrier, monoid4.carrier, actionCarrier,
+      val actionCarrier = dot(a, b)
+      val actionMultiply = biArrow(actionCarrier, monoid4.carrier, actionCarrier,
         (a, i) -> a, (a, x) -> a, (a, y) -> a,
         (b, i) -> b, (b, x) -> b, (b, y) -> b
       )
@@ -75,8 +75,8 @@ class NaiveMonoidsAndActionsTests extends FunSpec {
     }
 
     it("checks the right unit law for a right monoid action") {
-      val actionCarrier = makeStar(a, b)
-      val actionMultiply = makeBiQuiver(actionCarrier, monoid4.carrier, actionCarrier,
+      val actionCarrier = dot(a, b)
+      val actionMultiply = biArrow(actionCarrier, monoid4.carrier, actionCarrier,
         (a, i) -> b, (a, x) -> a, (a, y) -> a,
         (b, i) -> a, (b, x) -> b, (b, y) -> b
       )
@@ -87,8 +87,8 @@ class NaiveMonoidsAndActionsTests extends FunSpec {
     }
 
     it("checks the associative law for a right monoid action") {
-      val actionCarrier = makeStar(a, b)
-      val actionMultiply = makeBiQuiver(actionCarrier, monoid4.carrier, actionCarrier,
+      val actionCarrier = dot(a, b)
+      val actionMultiply = biArrow(actionCarrier, monoid4.carrier, actionCarrier,
         (a, i) -> a, (a, x) -> b, (a, y) -> a,
         (b, i) -> b, (b, x) -> b, (b, y) -> a
       )
@@ -101,7 +101,7 @@ class NaiveMonoidsAndActionsTests extends FunSpec {
     it("can verify if a quiver is an action morphism") {
       val monoid1x = {
         val (i, x) = ('i, 'x)
-        val carrier = makeStar(i, x)
+        val carrier = dot(i, x)
         val unit = makeNullaryOperator(carrier, i)
         val product = makeBinaryOperator(carrier,
           (i, i) -> i, (i, x) -> x,
@@ -111,8 +111,8 @@ class NaiveMonoidsAndActionsTests extends FunSpec {
       }
       monoid1x.sanityTest
       val rightAction = {
-        val actionCarrier = makeStar(a, b)
-        val actionMultiply = makeBiQuiver(actionCarrier, monoid1x.carrier, actionCarrier,
+        val actionCarrier = dot(a, b)
+        val actionMultiply = biArrow(actionCarrier, monoid1x.carrier, actionCarrier,
           (a, i) -> a, (a, x) -> a,
           (b, i) -> b, (b, x) -> a
         )
@@ -120,8 +120,8 @@ class NaiveMonoidsAndActionsTests extends FunSpec {
       }  
       rightAction.sanityTest
       val rightAction2 = {
-        val actionCarrier = makeStar(c, d, e)
-        val actionMultiply = makeBiQuiver(actionCarrier, monoid1x.carrier, actionCarrier,
+        val actionCarrier = dot(c, d, e)
+        val actionMultiply = biArrow(actionCarrier, monoid1x.carrier, actionCarrier,
           (c, i) -> c, (c, x) -> d,
           (d, i) -> d, (d, x) -> d,
           (e, i) -> e, (e, x) -> e
@@ -129,11 +129,11 @@ class NaiveMonoidsAndActionsTests extends FunSpec {
         monoid1x.action(actionCarrier)(actionMultiply.apply)
       }  
       rightAction2.sanityTest
-      val actionMorphism = makeQuiver(rightAction.actionCarrier, rightAction2.actionCarrier, 
+      val actionMorphism = arrow(rightAction.actionCarrier, rightAction2.actionCarrier,
         'a -> 'd, 'b -> 'c
       )
       rightAction.isMorphism(rightAction2, actionMorphism) shouldBe true
-      val nonActionMorphism = makeQuiver(rightAction.actionCarrier, rightAction2.actionCarrier, 
+      val nonActionMorphism = arrow(rightAction.actionCarrier, rightAction2.actionCarrier,
         'a -> 'c, 'b -> 'c
       )
       rightAction.isMorphism(rightAction2, nonActionMorphism) shouldBe false

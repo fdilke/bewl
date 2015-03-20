@@ -9,8 +9,8 @@ class RichStarsAndQuiversTests extends FunSpec {
 
   describe("The universal quantifier") {
     it("detects whether a subobject is the whole object") {
-      val totalSet = makeStar(1, 2, 3, 4)
-      val subset = makeStar(1, 3)
+      val totalSet = dot(1, 2, 3, 4)
+      val subset = dot(1, 3)
 
       val embed = subset(totalSet) { x => x}
       val ∀ = totalSet.∀
@@ -25,9 +25,9 @@ class RichStarsAndQuiversTests extends FunSpec {
 
   describe("The existential quantifier") {
     it("detects whether a subobject is NOT empty") {
-      val totalSet = makeStar(1, 2, 3, 4)
-      val subset = makeStar(1, 3)
-      val emptySet = makeStar[Int]()
+      val totalSet = dot(1, 2, 3, 4)
+      val subset = dot(1, 3)
+      val emptySet = dot[Int]()
 
       val embed = subset(totalSet) { x => x}
       val embedEmpty = emptySet(totalSet) { x => x}
@@ -44,15 +44,15 @@ class RichStarsAndQuiversTests extends FunSpec {
 
   describe("Sequence comprehensions for operators") {
     it("can define unary operators") {
-      val set = makeStar(-1, 0, 1)
+      val set = dot(-1, 0, 1)
       val unaryMinus = for (x <- set) yield -x
-      unaryMinus shouldBe makeQuiver(set, set,
+      unaryMinus shouldBe arrow(set, set,
         -1 -> 1, 0 -> 0, 1 -> -1
       )
     }
 
     it("can define binary operators") {
-      val three = makeStar(0, 1, 2)
+      val three = dot(0, 1, 2)
       val subtract = for (x <- three ; y <- three) yield (x - y + 3) % 3;
       subtract shouldBe makeBinaryOperator(three,
         (0, 0) -> 0, (0, 1) -> 2, (0, 2) -> 1,
@@ -81,8 +81,8 @@ class RichStarsAndQuiversTests extends FunSpec {
 
   describe("The equality comparison quiver") {
     it("should have the correct value for finite sets") {
-      val set = makeStar(0, 1)
-      set.=?= shouldBe makeBiQuiver(set, set, omega,
+      val set = dot(0, 1)
+      set.=?= shouldBe biArrow(set, set, omega,
         (0,0) -> true, (0, 1) -> false,
         (1,0) -> false,(1,1) -> true
       )
