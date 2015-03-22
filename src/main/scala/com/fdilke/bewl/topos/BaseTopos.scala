@@ -275,9 +275,13 @@ trait BaseTopos { self: LogicalOperations =>
 trait Wrappings[BASE, PREDOT[_ <: BASE], PREQUIVER[_ <: BASE, _ <: BASE]] { topos: BaseTopos =>
   type WRAPPER[T <: BASE] <: ~
 
-  def star[T <: BASE](input: PREDOT[T]) : DOT[WRAPPER[T]]
-  def quiver[S <: BASE, T <: BASE](connector: PREQUIVER[S, T]) : ARROW[WRAPPER[S], WRAPPER[T]]
-  def functionAsQuiver[S <: BASE, T <: BASE](source: DOT[WRAPPER[S]], target: DOT[WRAPPER[T]], f: S => T): ARROW[WRAPPER[S], WRAPPER[T]]
+  def makeDot[T <: BASE](input: PREDOT[T]) : DOT[WRAPPER[T]]
+  def makeArrow[S <: BASE, T <: BASE](connector: PREQUIVER[S, T]) : ARROW[WRAPPER[S], WRAPPER[T]]
+  def functionAsQuiver[S <: BASE, T <: BASE](
+    source: DOT[WRAPPER[S]], 
+    target: DOT[WRAPPER[T]], 
+    f: S => T
+  ): ARROW[WRAPPER[S], WRAPPER[T]]
   def bifunctionAsBiQuiver[L <: BASE, R <: BASE, T <: BASE] (
     left: DOT[WRAPPER[L]],
     right: DOT[WRAPPER[R]],

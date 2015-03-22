@@ -29,13 +29,13 @@ class ToposOfActionsTest extends GenericToposTests(new ToposWithFixtures {
   override type BAR = WRAPPER[String]
   override type BAZ = WRAPPER[Int]
 
-  override val foo = star(monoidOf3.regularAction)
+  override val foo = makeDot(monoidOf3.regularAction)
 
   private val barStar: FiniteSets.DOT[String] = FiniteSetsUtilities.dot("i", "x", "y")
 
   private val scalarMultiply: (String, Symbol) => String =
     (s, m) => monoidOf3.multiply(Symbol(s), m).name
-  override val bar = star(monoidOf3.action(barStar)(scalarMultiply))
+  override val bar = makeDot(monoidOf3.action(barStar)(scalarMultiply))
 
   private val bazStar: FiniteSets.DOT[Int] = FiniteSetsUtilities.dot(0, 1, 2, 3)
 
@@ -50,7 +50,7 @@ class ToposOfActionsTest extends GenericToposTests(new ToposWithFixtures {
 
   val bazAction = monoidOf3.action(bazStar)(bazMultiply)
 
-  override val baz = star(bazAction)
+  override val baz = makeDot(bazAction)
   override val foo2ImageOfBar = functionAsQuiver(foo, baz, Map('i -> 1, 'x -> 1, 'y -> 2))
   override val foo2bar = functionAsQuiver(foo, bar, Map('i -> "x", 'x -> "x", 'y -> "y"))
   private val foobar2BazMap = Map[(Symbol, String), Int](
@@ -62,7 +62,7 @@ class ToposOfActionsTest extends GenericToposTests(new ToposWithFixtures {
   override val monicBar2baz = functionAsQuiver(bar, baz, Map("i" -> 3, "x" -> 1, "y" -> 2))
 
   override def makeSampleDot() =
-    star(bazAction)
+    makeDot(bazAction)
 
   override def makeSampleArrow() =
     functionAsQuiver(foo, bar, Map(
@@ -75,7 +75,7 @@ class ToposOfActionsTest extends GenericToposTests(new ToposWithFixtures {
     type BINARY = WRAPPER[Boolean]
     val binaryStar : FiniteSets.DOT[Boolean] = FiniteSetsUtilities.dot(true, false)
     def binaryMultiply(b: Boolean, r: Symbol) : Boolean = b
-    val binary = star(monoidOf3.action(binaryStar)(binaryMultiply))
+    val binary = makeDot(monoidOf3.action(binaryStar)(binaryMultiply))
     new EqualizerSituation[FOO, BAZ, BINARY](
       foo2baz,
       functionAsQuiver(baz, binary, Map(0 -> true, 1 -> true, 2 -> true, 3 -> true)),

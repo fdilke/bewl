@@ -61,13 +61,13 @@ trait NaiveMonoidsAndActions {
       actionCarrier: DOT[A],
       actionMultiply: (A, M) => A
     ) {
-      def isMorphism[B <: ~](that: Action[B], quiver: ARROW[A, B]) =
-        (quiver.source == this.actionCarrier) &&
-        (quiver.target == that.actionCarrier) && (
+      def isMorphism[B <: ~](that: Action[B], arrow: ARROW[A, B]) =
+        (arrow.source == this.actionCarrier) &&
+        (arrow.target == that.actionCarrier) && (
           actionCarrier.forAll(carrier) { (x, m) =>
             that.actionCarrier.=?=(
-              quiver(this.actionMultiply(x, m)),
-              that.actionMultiply(quiver(x), m)
+              arrow(this.actionMultiply(x, m)),
+              that.actionMultiply(arrow(x), m)
             )
           } toBool
         )
@@ -88,7 +88,7 @@ trait NaiveMonoidsAndActions {
       }
     }
 
-    case class ActionPrequiver[
+    case class ActionPreArrow[
       S <: ~,
       T <: ~
     ] (
@@ -102,7 +102,7 @@ trait NaiveMonoidsAndActions {
     class Actions extends Topos with Wrappings[
       Ɛ.~,
       Action, 
-      ActionPrequiver
+      ActionPreArrow
     ] {
       trait ElementWrapper[
         A <: Ɛ.~
@@ -517,13 +517,13 @@ trait NaiveMonoidsAndActions {
       ] (
         val source: ActionDot[A, AA],
         val target: ActionDot[B, BB],
-        val quiver: Ɛ.ARROW[A, B]
+        val arrow: Ɛ.ARROW[A, B]
       ) extends ActionArrowFacade[AA, BB] {
 
         override lazy val chi: ARROW[BB, TRUTH] = 
           new ActionArrow(target, omega, 
             Ideals.restrict(target.action.actionCarrier) {
-                (t, m) => quiver.chi(target.action.actionMultiply(t, m)) 
+                (t, m) => arrow.chi(target.action.actionMultiply(t, m)) 
             })        
 
         override def \[UU <: ~](monic: ARROW[UU, BB]): ARROW[AA, UU] =
@@ -537,12 +537,12 @@ trait NaiveMonoidsAndActions {
           that: ActionArrow[Z, ZZ, BBB, BB]
         ): ARROW[ZZ, AA] = {
           val hackedThat = that.asInstanceOf[ActionArrow[Z, ZZ, B, BB]]
-          new ActionArrow(hackedThat.source, source, hackedThat.quiver \ quiver)
+          new ActionArrow(hackedThat.source, source, hackedThat.arrow \ arrow)
         }
 
         override def sanityTest = {
-          quiver.sanityTest
-          assert(source.action.isMorphism(target.action, quiver))
+          arrow.sanityTest
+          assert(source.action.isMorphism(target.action, arrow))
         }
 
         override def ?=(that: ARROW[AA, BB]): EQUALIZER[AA] = 
@@ -554,15 +554,15 @@ trait NaiveMonoidsAndActions {
         ] (
           that: ActionArrow[AAA, AA, BBB, BB]
         ): EQUALIZER[AA] = {
-          val thunkedEqualizer = quiver ?= that.asInstanceOf[ActionArrow[A, AA, B, BB]].quiver
+          val thunkedEqualizer = arrow ?= that.asInstanceOf[ActionArrow[A, AA, B, BB]].arrow
           new ActionDot[A, AA](
             monoid.action(thunkedEqualizer)(source.action.actionMultiply(_, _)),
             source.↔
           ) with EqualizingDot[AA] { equalizingDot =>
             override val equalizerTarget = source
             override val inclusion: ARROW[AA, AA] = new ActionArrow(equalizingDot, source, thunkedEqualizer.inclusion)
-            override def restrict[RR <: ~](quiver: ARROW[RR, AA]): ARROW[RR, AA] =
-              quiver.preRestrict[A](equalizingDot, thunkedEqualizer)
+            override def restrict[RR <: ~](arrow: ARROW[RR, AA]): ARROW[RR, AA] =
+              arrow.preRestrict[A](equalizingDot, thunkedEqualizer)
           }
         }
 
@@ -572,10 +572,10 @@ trait NaiveMonoidsAndActions {
         ): ARROW[AA, BB] =
           equalizingDot.crossPreRestrict[A, AA, B]( 
             source, 
-            thunkedEqualizer.asInstanceOf[Ɛ.EQUALIZER[B]].restrict(quiver)
+            thunkedEqualizer.asInstanceOf[Ɛ.EQUALIZER[B]].restrict(arrow)
           )
 
-        override def apply(a: AA): BB = target.↔ / quiver(source.↔ \ a)
+        override def apply(a: AA): BB = target.↔ / arrow(source.↔ \ a)
 
         override def o[ZZ <: ~](that: ARROW[ZZ, AA]): ARROW[ZZ, BB] =
           that.preCompose[A, B, BB](this)
@@ -586,16 +586,16 @@ trait NaiveMonoidsAndActions {
           CC <: ~
         ] (pre: ActionArrow[BBB, BB, C, CC]): ARROW[AA, CC] = {
           val hackedPre = pre.asInstanceOf[ActionArrow[B, BB, C, CC]]
-          new ActionArrow(source, hackedPre.target, hackedPre.quiver o quiver)
+          new ActionArrow(source, hackedPre.target, hackedPre.arrow o arrow)
         }
 
-        override def toString = "ActionArrow[" + quiver + "]"
+        override def toString = "ActionArrow[" + arrow + "]"
 
         override def equals(other: Any): Boolean = other match {
           case that: ActionArrow[A, AA, B, BB] =>
             that.source == source &&
             that.target == target &&
-            that.quiver == quiver
+            that.arrow == arrow
         }
         
         override def hashCode = 0
@@ -613,20 +613,20 @@ trait NaiveMonoidsAndActions {
         ] ActionDot.wrap
         
 
-      override def star[
+      override def makeDot[
         T <: Ɛ.~
       ] (input: Action[T]): DOT[WRAPPER[T]] =
         memoizedStarWrapper(input) 
 
-      override def quiver[
+      override def makeArrow[
         S <: Ɛ.~,
         T <: Ɛ.~
       ] (
-        prequiver: ActionPrequiver[S, T]
+        prearrow: ActionPreArrow[S, T]
       ) = functionAsQuiver(
-        star(prequiver.source), 
-        star(prequiver.target), 
-        prequiver.function
+        makeDot(prearrow.source), 
+        makeDot(prearrow.target), 
+        prearrow.function
       )
 
       override def functionAsQuiver[

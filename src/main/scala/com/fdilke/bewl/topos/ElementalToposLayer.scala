@@ -10,7 +10,6 @@ object ElementalToposLayer {
     Δ: BaseDiagrammaticTopos
   ): Topos with Wrappings[Any, Δ.DOT, Δ.ARROW] = {
     class FancyTopos extends Topos with Wrappings[Any, Δ.DOT, Δ.ARROW] {
-      // import Δ.{ARROW, DOT, BiArrow, buildArrow}
 
       override type ~ = Element
 
@@ -22,14 +21,14 @@ object ElementalToposLayer {
       override type ARROW[S <: ~, T <: ~] = AdapterArrow[S, T]
 
       override type UNIT = WrappedArrow[Unit]
-      lazy val I: DOT[UNIT] = star(Δ.I).asInstanceOf[DOT[UNIT]]
+      lazy val I: DOT[UNIT] = makeDot(Δ.I).asInstanceOf[DOT[UNIT]]
 
       override type TRUTH = AdapterTruth
       type >[T <: ~, U <: ~] = (T => U) with ~
       type x[T <: ~, U <: ~] = (T, U) with ~
 
-      override lazy val omega = star(Δ.omega).asInstanceOf[DOT[TRUTH]]
-      override lazy val truth = quiver(Δ.truth).asInstanceOf[ARROW[UNIT, TRUTH]]
+      override lazy val omega = makeDot(Δ.omega).asInstanceOf[DOT[TRUTH]]
+      override lazy val truth = makeArrow(Δ.truth).asInstanceOf[ARROW[UNIT, TRUTH]]
 
       trait AdapterTruth extends Element
 
@@ -37,7 +36,7 @@ object ElementalToposLayer {
         private[ElementalToposLayer] val dot: Δ.DOT[Any]
 
         override lazy val toI: ARROW[T, UNIT] =
-          quiver(dot.toI).asInstanceOf[ARROW[T, UNIT]]
+          makeArrow(dot.toI).asInstanceOf[ARROW[T, UNIT]]
 
         override lazy val globals: Traversable[ARROW[UNIT, T]] =
           dot.globals.map { global =>
@@ -133,8 +132,8 @@ object ElementalToposLayer {
             override private[ElementalToposLayer] def asElement(anArrow: Δ.ARROW[_, _]): S =
               equalizerTarget.asElement(fletch(equalizer.equalizer)(fletch(anArrow)))
 
-            override def restrict[R <: ~](quiver: ARROW[R, S]) =
-              AdapterArrow.fromArrow(quiver.source, this, equalizer.restrict(quiver.arrow))
+            override def restrict[R <: ~](arrow: ARROW[R, S]) =
+              AdapterArrow.fromArrow(arrow.source, this, equalizer.restrict(arrow.arrow))
 
             val inclusion: ARROW[S, S] =
               this(source) { s => s}
@@ -178,17 +177,17 @@ object ElementalToposLayer {
 
       override type WRAPPER[S] = WrappedArrow[S]
 
-      override def star[S](dot: Δ.DOT[S]): DOT[WrappedArrow[S]] =
+      override def makeDot[S](dot: Δ.DOT[S]): DOT[WrappedArrow[S]] =
         memoizedWrappedDot(dot)
 
-      override def quiver[S, T](arrow: Δ.ARROW[S, T]): ARROW[WRAPPER[S], WRAPPER[T]] =
-        AdapterArrow.fromArrow(star(arrow.source), star(arrow.target), arrow)
+      override def makeArrow[S, T](arrow: Δ.ARROW[S, T]): ARROW[WRAPPER[S], WRAPPER[T]] =
+        AdapterArrow.fromArrow(makeDot(arrow.source), makeDot(arrow.target), arrow)
 
       override def functionAsQuiver[S, T](
         source: DOT[WrappedArrow[S]],
         target: DOT[WrappedArrow[T]],
         f: S => T
-      ) = quiver(Δ.buildArrow[S, T](
+      ) = makeArrow(Δ.buildArrow[S, T](
         source.dot.asInstanceOf[Δ.DOT[S]],
         target.dot.asInstanceOf[Δ.DOT[T]],
         f
@@ -202,7 +201,7 @@ object ElementalToposLayer {
       ) (
         bifunc: (L, R) => T
       ) = {
-        val targetProduct = star[(L, R)](
+        val targetProduct = makeDot[(L, R)](
           left.dot.asInstanceOf[Δ.DOT[L]] x
             right.dot.asInstanceOf[Δ.DOT[R]]
         )

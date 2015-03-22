@@ -15,7 +15,7 @@ class LayeredFiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
   def buildDot[T](elements: Seq[T]) =
     DiagrammaticFiniteSets.DiagrammaticFiniteSetsDot(elements)
 
-  def makeStar[T](elements: T*): topos.DOT[WRAPPER[T]] = star(buildDot(elements))
+  def makeStar[T](elements: T*): topos.DOT[WRAPPER[T]] = makeDot(buildDot(elements))
 
   def makeQuiver[S, T](source: topos.DOT[WRAPPER[S]], target: topos.DOT[WRAPPER[T]], map: (S, T)*) =
     functionAsQuiver(source, target, Map(map: _*))
@@ -47,10 +47,10 @@ class LayeredFiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
   private val sampleDotSource = buildDot(Seq(1, 2))
   private val sampleDotTarget = buildDot(Seq(true, false))
 
-  override def makeSampleDot() = star(sampleDotSource)
+  override def makeSampleDot() = makeDot(sampleDotSource)
 
-  override def makeSampleArrow() = makeQuiver(star(sampleDotSource),
-    star(sampleDotTarget), 1 -> true, 2 -> false)
+  override def makeSampleArrow() = makeQuiver(makeDot(sampleDotSource),
+    makeDot(sampleDotTarget), 1 -> true, 2 -> false)
 
   override val equalizerSituation = new EqualizerSituation[FOO, BAR, BAZ](
     foo2bar,

@@ -10,8 +10,8 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreQu
   override type ARROW[S <: ~, T <: ~] = FiniteSetsArrow[S, T]
   override type UNIT = Unit
   override type TRUTH = Boolean
-  override lazy val I = star(Traversable(()))
-  override lazy val omega = star(Traversable(true, false))
+  override lazy val I = makeDot(Traversable(()))
+  override lazy val omega = makeDot(Traversable(true, false))
   override lazy val truth = I(omega) { _ => true }
   override type >[T <: ~, U <: ~] = (T => U) with ~
   override type x[T <: ~, U <: ~] = (T, U) with ~
@@ -135,10 +135,10 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreQu
   override def functionAsQuiver[S, T](source: DOT[S], target: DOT[T], f: S => T) =
     source(target)(f)
 
-  override def quiver[S, T](prequiver: FiniteSetsPreQuiver[S, T]) =
-    star(prequiver.source)(star(prequiver.target))(prequiver.function)
+  override def makeArrow[S, T](prearrow: FiniteSetsPreQuiver[S, T]) =
+    makeDot(prearrow.source)(makeDot(prearrow.target))(prearrow.function)
 
-  override def star[T](input: Traversable[T]) =
+  override def makeDot[T](input: Traversable[T]) =
     memoizedStarWrapper(input)
 
   // unusually simple generic definition for this topos because WRAPPER is trivial
@@ -161,7 +161,7 @@ case class FiniteSetsPreQuiver[S, T](
 object FiniteSetsUtilities {
   import FiniteSets._
 
-  def dot[T](elements: T*) = star(elements)
+  def dot[T](elements: T*) = makeDot(elements)
 
   def arrow[S, T](source: DOT[S], target: DOT[T], map: (S, T)*) =
     functionAsQuiver(source, target, Map(map: _*))
