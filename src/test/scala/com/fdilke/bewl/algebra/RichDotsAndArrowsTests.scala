@@ -5,7 +5,7 @@ import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.Matchers._
 
-class RichStarsAndQuiversTests extends FunSpec {
+class RichDotsAndArrowsTests extends FunSpec {
 
   describe("The universal quantifier") {
     it("detects whether a subobject is the whole object") {
@@ -18,8 +18,8 @@ class RichStarsAndQuiversTests extends FunSpec {
         'source(totalSet > omega),
         'target(omega)
       )
-      ∀ o (embed.chi.name) should not be(truth)
-      ∀ o (totalSet.identity.chi.name) shouldBe truth
+      ∀ o embed.chi.name should not be truth
+      ∀ o totalSet.identity.chi.name shouldBe truth
     }
   }
 
@@ -36,9 +36,9 @@ class RichStarsAndQuiversTests extends FunSpec {
         'source(totalSet > omega),
         'target(omega)
       )
-      exists o (embed.chi.name) should be(truth)
-      exists o (embedEmpty.chi.name) should not be(truth)
-      exists o (totalSet.identity.chi.name) shouldBe truth
+      exists o embed.chi.name shouldBe truth
+      exists o embedEmpty.chi.name should not be truth
+      exists o totalSet.identity.chi.name shouldBe truth
     }
   }
 
@@ -79,7 +79,7 @@ class RichStarsAndQuiversTests extends FunSpec {
     }
   }
 
-  describe("The equality comparison quiver") {
+  describe("The equality comparison arrow") {
     it("should have the correct value for finite sets") {
       val set = dot(0, 1)
       set.=?= shouldBe biArrow(set, set, omega,

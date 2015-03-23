@@ -9,7 +9,7 @@ object ElementalToposLayer {
   def apply(
     Δ: BaseDiagrammaticTopos
   ): Topos with Wrappings[Any, Δ.DOT, Δ.ARROW] = {
-    class FancyTopos extends Topos with Wrappings[Any, Δ.DOT, Δ.ARROW] {
+    class ElementalToposLayer extends Topos with Wrappings[Any, Δ.DOT, Δ.ARROW] { layer =>
 
       override type ~ = Element
 
@@ -67,10 +67,15 @@ object ElementalToposLayer {
             override val target = that
 
             private val exponential = target.dot A source.dot
-            override private[ElementalToposLayer] val dot = exponential.exponentDot.asInstanceOf[Δ.DOT[Any]]
+            override private[ElementalToposLayer] val dot = 
+              exponential.exponentDot.asInstanceOf[Δ.DOT[Any]]
 
-            override def transpose[R <: ~](biQuiver: BiQuiver[R, T, U]) =
-              AdapterArrow.fromArrow(biQuiver.product.left, this, exponential.transpose(biArrow(biQuiver)))
+            override def transpose[R <: ~](biArrow: BiArrow[R, T, U]) =
+              AdapterArrow.fromArrow(
+                biArrow.product.left, 
+                this, 
+                exponential.transpose(layer.biArrow(biArrow))
+              )
 
             override private[ElementalToposLayer] def asElement(anArrow: Δ.ARROW[_, _]) =
               new (T => U) with Element {
@@ -183,7 +188,7 @@ object ElementalToposLayer {
       override def makeArrow[S, T](arrow: Δ.ARROW[S, T]): ARROW[WRAPPER[S], WRAPPER[T]] =
         AdapterArrow.fromArrow(makeDot(arrow.source), makeDot(arrow.target), arrow)
 
-      override def functionAsQuiver[S, T](
+      override def functionAsArrow[S, T](
         source: DOT[WrappedArrow[S]],
         target: DOT[WrappedArrow[T]],
         f: S => T
@@ -194,7 +199,7 @@ object ElementalToposLayer {
       ).asInstanceOf[Δ.ARROW[WRAPPER[S], WRAPPER[T]]]
       ).asInstanceOf[ARROW[WRAPPER[S], WRAPPER[T]]]
 
-      override def bifunctionAsBiQuiver[L, R, T](
+      override def bifunctionAsBiArrow[L, R, T](
         left: DOT[WRAPPER[L]],
         right: DOT[WRAPPER[R]],
         target: DOT[WRAPPER[T]]
@@ -205,20 +210,20 @@ object ElementalToposLayer {
           left.dot.asInstanceOf[Δ.DOT[L]] x
             right.dot.asInstanceOf[Δ.DOT[R]]
         )
-        BiQuiver(left x right, functionAsQuiver[(L, R), T](targetProduct, target, {
+        BiArrow(left x right, functionAsArrow[(L, R), T](targetProduct, target, {
           case (l, r) => bifunc(l, r)
         }) o
           AdapterArrow.fromArrow(left x right, targetProduct, targetProduct.dot.identity)
         )
       }
 
-      private def biArrow[L <: ~, R <: ~, T <: ~](biQuiver: BiQuiver[L, R, T]) =
+      private def biArrow[L <: ~, R <: ~, T <: ~](biArrow: BiArrow[L, R, T]) =
         Δ.BiArrow(
-          biQuiver.product.left.dot,
-          biQuiver.product.right.dot,
-          biQuiver.quiver.arrow.asInstanceOf[Δ.ARROW[(Any, Any), Any]]
+          biArrow.product.left.dot,
+          biArrow.product.right.dot,
+          biArrow.arrow.arrow.asInstanceOf[Δ.ARROW[(Any, Any), Any]]
         )
     }
-    new FancyTopos
+    new ElementalToposLayer
   }
 }

@@ -29,9 +29,9 @@ abstract class ToposFixtureSanityTests[T <: BaseTopos](fixtures: ToposWithFixtur
 
       foobar2baz.product.left shouldBe foo
       foobar2baz.product.right shouldBe bar
-      foobar2baz.quiver.source shouldBe (foo x bar)
-      foobar2baz.quiver.target shouldBe baz
-      foobar2baz.quiver.sanityTest
+      foobar2baz.arrow.source shouldBe (foo x bar)
+      foobar2baz.arrow.target shouldBe baz
+      foobar2baz.arrow.sanityTest
 
       monicBar2baz.source shouldBe bar
       monicBar2baz.target shouldBe baz
@@ -63,7 +63,7 @@ abstract class ToposWithFixtures {
 
   val foo2bar : ARROW[FOO, BAR]
   val foo2ImageOfBar : ARROW[FOO, BAZ]
-  val foobar2baz : BiQuiver[FOO, BAR, BAZ]
+  val foobar2baz : BiArrow[FOO, BAR, BAZ]
   val monicBar2baz: ARROW[BAR, BAZ]
 
   val equalizerSituation: EqualizerSituation[_ <: ~, _ <: ~, _ <: ~]
@@ -80,7 +80,7 @@ abstract class ToposWithFixtures {
     }
 
     if (s == t) {
-      throw new IllegalArgumentException("equalizing two quivers that are already equal!")
+      throw new IllegalArgumentException("equalizing two arrows that are already equal!")
     }
 
     (s o r) shouldBe (t o r)
@@ -101,21 +101,21 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
       type t <: ~
     }]
 
-  type UNTYPED_QUIVER = ARROW[_ <: ~, _ <: _]
+  type UNTYPED_ARROW = ARROW[_ <: ~, _ <: _]
 
-  private def matchQuiver(property: String, predicate: UNTYPED_QUIVER => Boolean) =
-    new BeMatcher[UNTYPED_QUIVER] {
-      def apply(quiver: UNTYPED_QUIVER) =
+  private def matchArrow(property: String, predicate: UNTYPED_ARROW => Boolean) =
+    new BeMatcher[UNTYPED_ARROW] {
+      def apply(arrow: UNTYPED_ARROW) =
         MatchResult(
-          predicate(quiver),
-          s"$quiver not $property",
-          s"$quiver is $property"
+          predicate(arrow),
+          s"$arrow not $property",
+          s"$arrow is $property"
         )
     }
 
-  private val monic = matchQuiver("monic", _.isMonic)
-  private val iso = matchQuiver("iso", _.isIso)
-  private val epic = matchQuiver("epic", _.isEpic)
+  private val monic = matchArrow("monic", _.isMonic)
+  private val iso = matchArrow("iso", _.isIso)
+  private val epic = matchArrow("epic", _.isEpic)
 
   describe(s"The topos ${topos.getClass.getName}") {
 
@@ -143,9 +143,9 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
         'left (bar),
         'right (baz)
       )
-      val productQuiver = foo2bar x foo2baz
+      val productArrow = foo2bar x foo2baz
 
-      productQuiver should have (
+      productArrow should have (
         'source (foo),
         'target (bar x baz),
         'sanityTest (null)
@@ -155,11 +155,11 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
       (bar x baz).π1.sanityTest
 
       foo(bar) {
-        x => productQuiver(x)._1
+        x => productArrow(x)._1
       } shouldBe foo2bar
 
       foo(baz) {
-        x => productQuiver(x)._2
+        x => productArrow(x)._2
       } shouldBe foo2baz
 
       val fooXbar = foo x bar
@@ -183,14 +183,14 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
 
     it("can chain products") {
       val barXfooXbaz = bar x foo x baz
-      val productQuiver = foo2bar x foo.identity x foo2baz
-      productQuiver.source shouldBe foo
-      productQuiver.target shouldBe barXfooXbaz
-      productQuiver.sanityTest
+      val productArrow = foo2bar x foo.identity x foo2baz
+      productArrow.source shouldBe foo
+      productArrow.target shouldBe barXfooXbaz
+      productArrow.sanityTest
 
-      leftProjection(bar, foo, baz) o productQuiver shouldBe foo2bar
-      midProjection(bar, foo, baz) o productQuiver shouldBe foo.identity
-      rightProjection(bar, foo, baz) o productQuiver shouldBe foo2baz
+      leftProjection(bar, foo, baz) o productArrow shouldBe foo2bar
+      midProjection(bar, foo, baz) o productArrow shouldBe foo.identity
+      rightProjection(bar, foo, baz) o productArrow shouldBe foo2baz
     }
 
     it("can construct exponential diagrams") {
@@ -198,8 +198,8 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
       val evaluation = (bar > baz).evaluation
       evaluation.product.left shouldBe (bar > baz)
       evaluation.product.right shouldBe bar
-      evaluation.quiver.target shouldBe baz
-      evaluation.quiver.sanityTest
+      evaluation.arrow.target shouldBe baz
+      evaluation.arrow.sanityTest
 
       val foo2bar2baz: ARROW[FOO, BAR > BAZ] = (bar > baz).transpose(foobar2baz)
       foo2bar2baz.sanityTest
@@ -211,7 +211,7 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
       (foo x bar)(baz) {
         case (f, b) =>
           foo2bar2baz(f)(b)
-      } shouldBe foobar2baz.quiver
+      } shouldBe foobar2baz.arrow
     }
 
     it("has standardized exponentials") {
@@ -265,13 +265,13 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
       //      omegaHeyting.verify
     }
  */
-    it("can tell if a quiver is monic") {
+    it("can tell if an arrow is monic") {
 
       if (!inActionTopos) { // reluctantly skip, too slow with current technology
         monicBar2baz shouldBe monic
 
         (foo x foo).π0 should not be monic
-        foo.=?=.quiver should not be monic
+        foo.=?=.arrow should not be monic
 
         foo.diagonal shouldBe monic
         foo.singleton shouldBe monic
@@ -286,7 +286,7 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
       // foo.fromO should not be monic
     }
 
-    it("can tell if a quiver is epic") {
+    it("can tell if a arrow is epic") {
   
       I.identity shouldBe epic
       // O.identity should be epic

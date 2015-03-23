@@ -56,8 +56,8 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   type NullaryOp[X <: ~] = ARROW[UNIT, X]
   type UnaryOp[X <: ~] = ARROW[X, X]
-  type BinaryOp[X <: ~] = BiQuiver[X, X, X]
-  type RightScalarBinaryOp[X <: ~, S <: ~] = BiQuiver[X, S, X]
+  type BinaryOp[X <: ~] = BiArrow[X, X, X]
+  type RightScalarBinaryOp[X <: ~, S <: ~] = BiArrow[X, S, X]
 
   object AbstractOp {
     def unit: AbstractNullaryOp[Principal] = abstractNullaryOp("unit")
@@ -245,98 +245,6 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   case class Algebra[X <: ~](theory: AlgebraicTheory, carrier: DOT[X], assignments: OpAssignments[X]) {
     def sanityTest = theory.laws.foreach { _.verify(Algebra.this)}
   }
-
-    /*
-
-      trait Variable extends Expression {
-
-      }
-      trait Expression {
-        def evaluate[X <: ELEMENT](algebra: Algebra[X]): X
-        def ::== (other: Expression) = new Equation(this, other)
-      }
-      class Equation(leftSide: Expression, rightSide: Expression) {
-        def holds[X <: ELEMENT](algebra: Algebra[X]) =
-          leftSide.evaluate(algebra) == rightSide.evaluate(algebra)
-      }
-
-      class Law(assigner: VariableAssigner, makeEquation: Array[Variable] => Equation, message: String) {
-        def verify[X <: ELEMENT](algebra: Algebra[X]) = {
-          val equation = makeEquation(assigner.assign(algebra))
-          if (!equation.holds(algebra))
-            throw new IllegalArgumentException(message)
-        }
-      }
-      object Law {
-        def leftUnit(unit: AbstractNullaryOp, multiply: AbstractBinaryOp): Law = Law("not a left unit", x =>
-          multiply(unit, x) ::== x
-        )
-        def rightUnit(unit: AbstractNullaryOp, multiply: AbstractBinaryOp): Law = Law("not a right unit", x =>
-          multiply(x, unit) ::== x
-        )
-        def associative(multiply: AbstractBinaryOp): Law = Law("not associative", (x, y, z) =>
-          multiply(x, multiply(y, z)) ::== multiply(multiply(x, y), z)
-        )
-
-        // TODO refactor so that the function takes an array and we don't have to overload
-        def apply(message: String, f: Variable => Equation): Law = {
-          val assigner = new VariableAssigner(principal)
-          new Law(assigner, assignments => f(assignments(0)), message)
-        }
-    //    def apply(message: String)(f: (Variable, Variable) => Equation): Law = ???
-        def apply(message: String, f: (Variable, Variable, Variable) => Equation): Law = {
-          val assigner = new VariableAssigner(principal, principal, principal)
-          new Law(assigner, assignments => f(assignments(0), assignments(1), assignments(2)), message)
-        }
-      }
-
-      abstract class RootContext {
-        type ROOT <: ELEMENT
-        val root: DOT[ROOT]
-        abstract class Projection {
-          type COMPONENT <: ELEMENT
-          val projection: ARROW[ROOT, COMPONENT]
-        }
-        def projection[COMPONENT_TYPE <: ELEMENT](projectionQuiver: ARROW[ROOT, COMPONENT_TYPE]) =
-          new Projection {
-            override type COMPONENT = COMPONENT_TYPE
-            override val projection = projectionQuiver
-          }
-        def variables(projections: Projection*): Array[Variable] =
-          Array(new Variable {
-            // wrap root.identity somehow
-            override def evaluate[X <: ELEMENT](algebra: Algebra[X]) = ???
-          })
-      }
-
-      class VariableAssigner(arity: StarTag*) {
-        def assign[X <: ELEMENT](algebra: Algebra[X]): Array[Variable] = arity match {
-          case Seq() => Array()
-          case Seq(tag) =>
-            import algebra.carrier
-            val rootContext = new RootContext {
-              override type ROOT = X
-              override val root = carrier
-            }
-            rootContext.variables(rootContext.projection[X](carrier.identity))
-          case _ => throw new IllegalArgumentException(s"Can't handle this many tags: ${arity.size}")
-            // TODO: recursive function that can handle any number of them?
-            // TODO: handle the tags properly (don't assume they are all principal)
-        }
-      }
-
-      trait OperatorAssignment[X <: ELEMENT]
-      class OperatorAssignments[X <: ELEMENT](assignments:  Seq[OperatorAssignment[X]])
-
-      class AlgebraicTheory(operators: Set[AbstractOp], val laws: Seq[Law]) {
-        def apply[X <: ELEMENT](carrier: DOT[X], assignments: OperatorAssignment[X]*) =
-          Algebra(this, carrier, new OperatorAssignments(assignments))
-      }
-
-      case class Algebra[X <: ELEMENT](theory: AlgebraicTheory, carrier: DOT[X], assignments: OperatorAssignments[X]) {
-        def sanityTest = theory.laws.foreach { _.verify(this)}
-      }
-    */
 }
 
 

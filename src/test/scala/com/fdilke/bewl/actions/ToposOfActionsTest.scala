@@ -51,21 +51,21 @@ class ToposOfActionsTest extends GenericToposTests(new ToposWithFixtures {
   val bazAction = monoidOf3.action(bazStar)(bazMultiply)
 
   override val baz = makeDot(bazAction)
-  override val foo2ImageOfBar = functionAsQuiver(foo, baz, Map('i -> 1, 'x -> 1, 'y -> 2))
-  override val foo2bar = functionAsQuiver(foo, bar, Map('i -> "x", 'x -> "x", 'y -> "y"))
+  override val foo2ImageOfBar = functionAsArrow(foo, baz, Map('i -> 1, 'x -> 1, 'y -> 2))
+  override val foo2bar = functionAsArrow(foo, bar, Map('i -> "x", 'x -> "x", 'y -> "y"))
   private val foobar2BazMap = Map[(Symbol, String), Int](
     (i, "i") -> 1, (x, "i") -> 2, (y, "i") -> 1,
     (i, "x") -> 2, (x, "x") -> 1, (y, "x") -> 1,
     (i, "y") -> 1, (x, "y") -> 2, (y, "y") -> 2
   )
-  override val foobar2baz = bifunctionAsBiQuiver(foo, bar, baz)(untupled (foobar2BazMap))
-  override val monicBar2baz = functionAsQuiver(bar, baz, Map("i" -> 3, "x" -> 1, "y" -> 2))
+  override val foobar2baz = bifunctionAsBiArrow(foo, bar, baz)(untupled (foobar2BazMap))
+  override val monicBar2baz = functionAsArrow(bar, baz, Map("i" -> 3, "x" -> 1, "y" -> 2))
 
   override def makeSampleDot() =
     makeDot(bazAction)
 
   override def makeSampleArrow() =
-    functionAsQuiver(foo, bar, Map(
+    functionAsArrow(foo, bar, Map(
       i -> "x", 
       x -> "x", 
       y -> "x"
@@ -78,8 +78,8 @@ class ToposOfActionsTest extends GenericToposTests(new ToposWithFixtures {
     val binary = makeDot(monoidOf3.action(binaryStar)(binaryMultiply))
     new EqualizerSituation[FOO, BAZ, BINARY](
       foo2baz,
-      functionAsQuiver(baz, binary, Map(0 -> true, 1 -> true, 2 -> true, 3 -> true)),
-      functionAsQuiver(baz, binary, Map(0 -> false, 1 -> true, 2 -> true, 3 -> true))
+      functionAsArrow(baz, binary, Map(0 -> true, 1 -> true, 2 -> true, 3 -> true)),
+      functionAsArrow(baz, binary, Map(0 -> false, 1 -> true, 2 -> true, 3 -> true))
     )
   }
 }) {

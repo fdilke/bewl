@@ -186,7 +186,7 @@ trait NaiveMonoidsAndActions {
           bifunc: (H, M) => Ɛ.TRUTH
         ): Ɛ.ARROW[H, IDEAL] = 
           ideals.restrict(possibleIdeals.transpose(
-            (that x carrier).biQuiver(Ɛ.omega)(bifunc)
+            (that x carrier).biArrow(Ɛ.omega)(bifunc)
           ))
 
         private val idealMultiply = 
@@ -195,7 +195,7 @@ trait NaiveMonoidsAndActions {
           }
 
         val omega = ActionDot[IDEAL](ideals)(
-            Ɛ.BiQuiver[IDEAL, M, IDEAL](ideals x carrier, idealMultiply)(_, _)
+            Ɛ.BiArrow[IDEAL, M, IDEAL](ideals x carrier, idealMultiply)(_, _)
           )
       }
 
@@ -247,7 +247,7 @@ trait NaiveMonoidsAndActions {
             Ɛ.>[Ɛ.x[M, R], T], 
             ExponentialWrapper[R, RR, T, TT]
           ],
-          biQuiver: BiQuiver[AA, RR, TT]
+          biArrow: BiArrow[AA, RR, TT]
         ): ARROW[AA, ExponentialWrapper[R, RR, T, TT]]
 
         def crossPreRestrict[
@@ -266,7 +266,7 @@ trait NaiveMonoidsAndActions {
       ] (
         val action: Action[A],
         val ↔ : A ↔ AA
-      ) extends ActionDotFacade[AA] { star =>
+      ) extends ActionDotFacade[AA] { dot =>
 
         private lazy val pairs: Ɛ.BIPRODUCT[M, A] = 
           carrier x action.actionCarrier 
@@ -280,7 +280,7 @@ trait NaiveMonoidsAndActions {
           }.whereTrue
 
           fixedPoints.globals.map { global =>
-            new ActionArrow(I, star, fixedPoints.inclusion o global)
+            new ActionArrow(I, dot, fixedPoints.inclusion o global)
           }
         }
 
@@ -312,17 +312,17 @@ trait NaiveMonoidsAndActions {
                 new ↔[Ɛ.x[Z, A], BiproductWrapper[Z, ZZ, A, AA]] (
                   zxa => zxa match { case (z, a) =>
                     val zz: ZZ = pre.↔ / z
-                    val aa: AA = star.↔ / a
+                    val aa: AA = dot.↔ / a
                     new BiproductWrapper[Z, ZZ, A, AA](zz, aa, zxa)
                   },
                   zzXaa => zzXaa.element
                 )
             ) with BiproductDot[ZZ, AA, BiproductWrapper[Z, ZZ, A, AA]] {               
               override val left: DOT[ZZ] = pre
-              override val right: DOT[AA] = star
+              override val right: DOT[AA] = dot
               override def pair(zz: ZZ, aa: AA) = { 
                 val z: Z = pre.↔ \ zz
-                val a: A = star.↔ \ aa
+                val a: A = dot.↔ \ aa
                 new BiproductWrapper[Z, ZZ, A, AA](zz, aa, product.pair(z, a))
             }}.asInstanceOf[BIPRODUCT[ZZ, AA]]
           }
@@ -349,14 +349,14 @@ trait NaiveMonoidsAndActions {
 
           val morphismMultiply = morphisms.restrict(
             possibleMorphisms.transpose(
-              (morphisms x carrier x mXz).biQuiver(action.actionCarrier) {
+              (morphisms x carrier x mXz).biArrow(action.actionCarrier) {
                 case ((f, m), (n, z)) => morphisms.inclusion(f)(
                   mXz.pair(multiply(m, n), z)
               )}))
 
           new ActionDot[P, ExponentialWrapper[Z, ZZ, A, AA]](
             monoid.action(morphisms) {
-              Ɛ.BiQuiver(morphisms x carrier, morphismMultiply)(_,_)
+              Ɛ.BiArrow(morphisms x carrier, morphismMultiply)(_,_)
             },
             new ↔[P, ExponentialWrapper[Z, ZZ, A, AA]](
               p => new ExponentialWrapper[Z, ZZ, A, AA](p,
@@ -364,7 +364,7 @@ trait NaiveMonoidsAndActions {
                   val z = pre.↔ \ zz
                   val unitM: M = unit(pre.action.actionCarrier.toI(z))
                   val a: A = p(mXz.pair(unitM, z))
-                  star.↔ / a
+                  dot.↔ / a
                 }
               ),
               zz2aa => zz2aa.element
@@ -374,10 +374,12 @@ trait NaiveMonoidsAndActions {
               ExponentialWrapper[Z, ZZ, A, AA]
             ] { exponentialDot =>
               val source: DOT[ZZ] = pre
-              val target: DOT[AA] = star
-              def transpose[RR <: ~](biQuiver: BiQuiver[RR, ZZ, AA]): ARROW[RR, ExponentialWrapper[Z, ZZ, A, AA]] =
-                biQuiver.product.left.calcTranspose[Z, ZZ, A, AA](
-                  pre, star, morphisms, possibleMorphisms, exponentialDot, biQuiver
+              val target: DOT[AA] = dot
+              def transpose[RR <: ~](
+                biArrow: BiArrow[RR, ZZ, AA]
+              ): ARROW[RR, ExponentialWrapper[Z, ZZ, A, AA]] =
+                biArrow.product.left.calcTranspose[Z, ZZ, A, AA](
+                  pre, dot, morphisms, possibleMorphisms, exponentialDot, biArrow
                 )
             }.asInstanceOf[EXPONENTIAL[ZZ, AA]]
         }
@@ -396,19 +398,19 @@ trait NaiveMonoidsAndActions {
             Ɛ.>[Ɛ.x[M, R], T], 
             ExponentialWrapper[R, RR, T, TT]
           ],
-          biQuiver: BiQuiver[AA, RR, TT]
+          biArrow: BiArrow[AA, RR, TT]
         ): ARROW[AA, ExponentialWrapper[R, RR, T, TT]] = {
           type P = Ɛ.>[Ɛ.x[M, R],T]
-          val innerQuiver: Ɛ.ARROW[A, P] =
+          val innerArrow: Ɛ.ARROW[A, P] =
             morphisms.restrict(possibleMorphisms.transpose(
-              (action.actionCarrier x source.pairs).biQuiver(target.action.actionCarrier) {
+              (action.actionCarrier x source.pairs).biArrow(target.action.actionCarrier) {
                 case (a, (m, r)) => 
-                  target.↔.\(biQuiver(
-                    star.↔ / action.actionMultiply(a, m), 
+                  target.↔.\(biArrow(
+                    dot.↔ / action.actionMultiply(a, m), 
                     source.↔ / r
                   ))}))
           this(exponentialDot) { aa =>
-            exponentialDot.↔ / innerQuiver(↔ \ aa)
+            exponentialDot.↔ / innerArrow(↔ \ aa)
           }              
         }
 
@@ -429,9 +431,9 @@ trait NaiveMonoidsAndActions {
         ) (
           f: ZZ => AA
         ): ARROW[ZZ, AA] = 
-          new ActionArrow(pre, star, 
-            pre.action.actionCarrier(star.action.actionCarrier) { z =>
-              star.↔ \ f(pre.↔ / z)
+          new ActionArrow(pre, dot, 
+            pre.action.actionCarrier(dot.action.actionCarrier) { z =>
+              dot.↔ \ f(pre.↔ / z)
             })
 
         override def crossPreRestrict[
@@ -440,12 +442,12 @@ trait NaiveMonoidsAndActions {
           AAA <: Ɛ.~
         ] (
           source: ActionDot[Z, ZZ],
-          restrictedQuiver: Ɛ.ARROW[Z, AAA]
+          restrictedArrow: Ɛ.ARROW[Z, AAA]
         ): ARROW[ZZ, AA] = 
           new ActionArrow(
             source, 
-            star,
-            restrictedQuiver.asInstanceOf[Ɛ.ARROW[Z, A]]
+            dot,
+            restrictedArrow.asInstanceOf[Ɛ.ARROW[Z, A]]
           )
 
         override def toString = "ActionDot[" + action.actionCarrier + "]"
@@ -605,7 +607,7 @@ trait NaiveMonoidsAndActions {
         T <: Ɛ.~
       ] = VanillaWrapper[T]
 
-      private val memoizedStarWrapper = 
+      private val memoizedDotWrapper = 
         Memoize.generic withLowerBound[
           Action, 
           ({ type λ[T <: Ɛ.~] = DOT[WRAPPER[T]]})#λ,
@@ -616,20 +618,20 @@ trait NaiveMonoidsAndActions {
       override def makeDot[
         T <: Ɛ.~
       ] (input: Action[T]): DOT[WRAPPER[T]] =
-        memoizedStarWrapper(input) 
+        memoizedDotWrapper(input) 
 
       override def makeArrow[
         S <: Ɛ.~,
         T <: Ɛ.~
       ] (
         prearrow: ActionPreArrow[S, T]
-      ) = functionAsQuiver(
+      ) = functionAsArrow(
         makeDot(prearrow.source), 
         makeDot(prearrow.target), 
         prearrow.function
       )
 
-      override def functionAsQuiver[
+      override def functionAsArrow[
         S <: Ɛ.~,
         T <: Ɛ.~
       ] (
@@ -645,7 +647,7 @@ trait NaiveMonoidsAndActions {
           src.action.actionCarrier(tgt.action.actionCarrier) { f }
         )}
 
-      override def bifunctionAsBiQuiver[
+      override def bifunctionAsBiArrow[
         L <: Ɛ.~,
         R <: Ɛ.~,
         T <: Ɛ.~
@@ -655,11 +657,11 @@ trait NaiveMonoidsAndActions {
         target: DOT[WRAPPER[T]]
       ) (
         bifunc: (L, R) => T
-      ): BiQuiver[WRAPPER[L], WRAPPER[R], WRAPPER[T]] = {
+      ): BiArrow[WRAPPER[L], WRAPPER[R], WRAPPER[T]] = {
         val l =   left.asInstanceOf[ActionDot[L, WRAPPER[L]]]
         val r =  right.asInstanceOf[ActionDot[R, WRAPPER[R]]]
         val t = target.asInstanceOf[ActionDot[T, WRAPPER[T]]]
-        (l x r).biQuiver(t) { (a, b) =>
+        (l x r).biArrow(t) { (a, b) =>
           VanillaWrapper(bifunc(a.element, b.element))
         }
       }

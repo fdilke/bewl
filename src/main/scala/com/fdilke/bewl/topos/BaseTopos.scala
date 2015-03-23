@@ -34,9 +34,9 @@ trait BaseTopos { self: LogicalOperations =>
     val source: DOT[S]
     val target: DOT[T]
 
-    def transpose[R <: ~](biQuiver: BiQuiver[R, S, T]): ARROW[R, S_T]
-    final def evaluation: BiQuiver[S_T, S, T] =
-      (this x source).biQuiver(target) { (f, s) => f(s) }
+    def transpose[R <: ~](biArrow: BiArrow[R, S, T]): ARROW[R, S_T]
+    final def evaluation: BiArrow[S_T, S, T] =
+      (this x source).biArrow(target) { (f, s) => f(s) }
   }
 
   type BIPRODUCT[L <: ~, R <: ~] = BiproductDot[L, R, L x R] with DOT[L x R]
@@ -50,25 +50,25 @@ trait BaseTopos { self: LogicalOperations =>
 
     final private val hackedThis: BIPRODUCT[L, R] = this.asInstanceOf[BIPRODUCT[L, R]]
 
-    final def biQuiver[T <: ~](
+    final def biArrow[T <: ~](
       target: DOT[T]
       ) (
       bifunc: (L, R) => T
-      ) : BiQuiver[L, R, T] =
-      BiQuiver(hackedThis, hackedThis(target) (
+      ) : BiArrow[L, R, T] =
+      BiArrow(hackedThis, hackedThis(target) (
         tupled[L,R,T](bifunc)
       ))
       final def universally[T <: ~](target: DOT[T])(bifunc: ((L x R), T) => TRUTH) =
-        BiQuiver(hackedThis, hackedThis.forAll(target)(bifunc))
+        BiArrow(hackedThis, hackedThis.forAll(target)(bifunc))
       final def existentially[T <: ~](target: DOT[T])(bifunc: ((L x R), T) => TRUTH) =
-        BiQuiver(hackedThis, hackedThis.exists(target)(bifunc))
+        BiArrow(hackedThis, hackedThis.exists(target)(bifunc))
     }
 
   type EQUALIZER[S <: ~] = EqualizingDot[S] with DOT[S]
   trait EqualizingDot[S <: ~] { star: DOT[S] =>
     val equalizerTarget: DOT[S]
     val inclusion: ARROW[S, S]
-    def restrict[R <: ~](quiver: ARROW[R, S]): ARROW[R, S]
+    def restrict[R <: ~](arrow: ARROW[R, S]): ARROW[R, S]
   }
 
   trait BaseDot[S <: ~] { self: DOT[S] =>
@@ -108,7 +108,7 @@ trait BaseTopos { self: LogicalOperations =>
 
     final def map(f: S => S) = this(this)(f)
     final def flatMap(f2: S => ARROW[S, S]) =
-      (this x this).biQuiver(this) { f2(_)(_) }
+      (this x this).biArrow(this) { f2(_)(_) }
 
     final lazy val ∃ =
       power.forAll(omega) { (f, w) =>
@@ -119,7 +119,7 @@ trait BaseTopos { self: LogicalOperations =>
 
     final def preForAll[R <: ~](source: DOT[R])(g: (R, S) => TRUTH): ARROW[R, TRUTH] =
       ∀ o power.transpose(
-        (source x this).biQuiver(omega)(g)
+        (source x this).biArrow(omega)(g)
       )
 
     final def forAll[T <: ~](target: DOT[T])(g: (S, T) => TRUTH): ARROW[S, TRUTH] =
@@ -162,7 +162,7 @@ trait BaseTopos { self: LogicalOperations =>
 
     final def preExists[R <: ~](source: DOT[R])(g: (R, S) => TRUTH): ARROW[R, TRUTH] =
       ∃ o power.transpose(
-        (source x this).biQuiver(omega)(g)
+        (source x this).biArrow(omega)(g)
       )
 
     final def exists[T <: ~](target: DOT[T])(g: (S, T) => TRUTH): ARROW[S, TRUTH] =
@@ -171,8 +171,8 @@ trait BaseTopos { self: LogicalOperations =>
     final lazy val diagonal: ARROW[S, S x S] =
       this(squared) { x => squared.pair(x, x) }
 
-    final lazy val =?= : BiQuiver[S, S, TRUTH] =
-      BiQuiver(squared, diagonal.chi)
+    final lazy val =?= : BiArrow[S, S, TRUTH] =
+      BiArrow(squared, diagonal.chi)
 
     final lazy val singleton: ARROW[S, S > TRUTH] =
       power transpose =?=
@@ -188,7 +188,7 @@ trait BaseTopos { self: LogicalOperations =>
         }}
   }
 
-  trait BaseQuiver[S <: ~, T <: ~] {
+  trait BaseArrow[S <: ~, T <: ~] {
     val source: DOT[S]
     val target: DOT[T]
     val chi: ARROW[T, TRUTH]
@@ -200,10 +200,10 @@ trait BaseTopos { self: LogicalOperations =>
     def sanityTest
   }
 
-  trait Arrow[S <: ~, T <: ~] extends BaseQuiver[S, T] { self: ARROW[S, T] =>
+  trait Arrow[S <: ~, T <: ~] extends BaseArrow[S, T] { self: ARROW[S, T] =>
     final lazy val name =
       (source > target).transpose(
-        (I x source).biQuiver(target) {
+        (I x source).biArrow(target) {
           (i, x) => this(x)
         })
 
@@ -238,21 +238,21 @@ trait BaseTopos { self: LogicalOperations =>
 
     final lazy val inverse: ARROW[T, S] = 
       source.power.transpose(
-        (target x source).biQuiver(omega) {
+        (target x source).biArrow(omega) {
           (t, s) => target.=?=(t, this(s))  
         }
       ) \ source.singleton
   }
 
-  case class BiQuiver[
+  case class BiArrow[
     L <: ~,
     R <: ~,
     T <: ~
   ] (
     product: BIPRODUCT[L, R],
-    quiver: ARROW[L x R, T]) {
-    def apply(l: L, r: R): T = quiver(product.pair(l, r))
-    def apply[S <: ~](l: ARROW[S, L], r: ARROW[S, R]): ARROW[S, T] = quiver o (l x r)
+    arrow: ARROW[L x R, T]) {
+    def apply(l: L, r: R): T = arrow(product.pair(l, r))
+    def apply[S <: ~](l: ARROW[S, L], r: ARROW[S, R]): ARROW[S, T] = arrow o (l x r)
   }
 
   // Helper methods for triproducts (this could obviously be extended).
@@ -272,30 +272,30 @@ trait BaseTopos { self: LogicalOperations =>
     (x x y x z).π1
 }
 
-trait Wrappings[BASE, PREDOT[_ <: BASE], PREQUIVER[_ <: BASE, _ <: BASE]] { topos: BaseTopos =>
+trait Wrappings[BASE, PREDOT[_ <: BASE], PREARROW[_ <: BASE, _ <: BASE]] { topos: BaseTopos =>
   type WRAPPER[T <: BASE] <: ~
 
   def makeDot[T <: BASE](input: PREDOT[T]) : DOT[WRAPPER[T]]
-  def makeArrow[S <: BASE, T <: BASE](connector: PREQUIVER[S, T]) : ARROW[WRAPPER[S], WRAPPER[T]]
-  def functionAsQuiver[S <: BASE, T <: BASE](
+  def makeArrow[S <: BASE, T <: BASE](connector: PREARROW[S, T]) : ARROW[WRAPPER[S], WRAPPER[T]]
+  def functionAsArrow[S <: BASE, T <: BASE](
     source: DOT[WRAPPER[S]], 
     target: DOT[WRAPPER[T]], 
     f: S => T
   ): ARROW[WRAPPER[S], WRAPPER[T]]
-  def bifunctionAsBiQuiver[L <: BASE, R <: BASE, T <: BASE] (
+  def bifunctionAsBiArrow[L <: BASE, R <: BASE, T <: BASE] (
     left: DOT[WRAPPER[L]],
     right: DOT[WRAPPER[R]],
     target: DOT[WRAPPER[T]]
   ) (
     bifunc: (L, R) => T
-  ): BiQuiver[WRAPPER[L], WRAPPER[R], WRAPPER[T]]
+  ): BiArrow[WRAPPER[L], WRAPPER[R], WRAPPER[T]]
 
-  def bifunctionAsBiQuiver[X <: BASE] (
+  def bifunctionAsBiArrow[X <: BASE] (
     star: DOT[WRAPPER[X]]
   ) (
      bifunc: (X, X) => X
-  ): BiQuiver[WRAPPER[X], WRAPPER[X], WRAPPER[X]] =
-    bifunctionAsBiQuiver[X, X, X](star, star, star) { bifunc }
+  ): BiArrow[WRAPPER[X], WRAPPER[X], WRAPPER[X]] =
+    bifunctionAsBiArrow[X, X, X](star, star, star) { bifunc }
 }
 
 

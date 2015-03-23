@@ -98,7 +98,7 @@ class NaiveMonoidsAndActionsTests extends FunSpec {
         getMessage shouldBe "Associative law for monoid action *"
     }
 
-    it("can verify if a quiver is an action morphism") {
+    it("can verify if an arrow is an action morphism") {
       val monoid1x = {
         val (i, x) = ('i, 'x)
         val carrier = dot(i, x)

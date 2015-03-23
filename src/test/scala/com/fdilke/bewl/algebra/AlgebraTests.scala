@@ -73,10 +73,10 @@ class AlgebraTests extends FunSpec with RunTimeCompilation {
       val scalars = dot(1, 2, 3)
       val op0 = makeNullaryOperator(carrier, true)
       val op1 = carrier.identity
-      val op2 = bifunctionAsBiQuiver(carrier) {
+      val op2 = bifunctionAsBiArrow(carrier) {
         _ & _
       }
-      val opRSM = bifunctionAsBiQuiver(carrier, scalars, carrier) { (b, n) => if (b) (n > 1) else true}
+      val opRSM = bifunctionAsBiArrow(carrier, scalars, carrier) { (b, n) => if (b) (n > 1) else true}
       val assignments = new OpAssignments[Boolean](unit := op0, unaryOperator := op1, multiply := op2, rightScalarMultiply := opRSM)
       assignments.lookup(unit) shouldBe op0
       assignments.lookup(unaryOperator) shouldBe op1
@@ -87,7 +87,7 @@ class AlgebraTests extends FunSpec with RunTimeCompilation {
     it("can construct terms which can be evaluated in a root context") {
 
       val carrier = dot(0, 1, 2, 3)
-      val product = bifunctionAsBiQuiver(carrier) { (x, y) => (x + y) % 4}
+      val product = bifunctionAsBiArrow(carrier) { (x, y) => (x + y) % 4}
       def constant(i: Int) = makeNullaryOperator(carrier, i)
       val myUnit = constant(0)
       val myUnaryOperator = carrier(carrier) { x => 3 - x}

@@ -4,7 +4,7 @@ import com.fdilke.bewl.fsets.DiagrammaticFiniteSetsUtilities._
 import com.fdilke.bewl.helper.Memoize
 import com.fdilke.bewl.topos.{Wrappings, Topos}
 
-object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreQuiver] {
+object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreArrow] {
   override type ~ = Any
   override type DOT[S <: ~] = FiniteSetsDot[S]
   override type ARROW[S <: ~, T <: ~] = FiniteSetsArrow[S, T]
@@ -41,10 +41,10 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreQu
         override val source: DOT[S] = self
         override val target: DOT[T] = that
 
-        override def transpose[R <: ~](biQuiver: BiQuiver[R, S, T]) =
-          biQuiver.product.left(exponentialStar) {
+        override def transpose[R <: ~](biArrow: BiArrow[R, S, T]) =
+          biArrow.product.left(exponentialStar) {
             r => FunctionElement {
-              s => biQuiver(r, s)
+              s => biArrow(r, s)
             }}}}
 
     override def xUncached[T <: ~](that: DOT[T]) =
@@ -132,27 +132,27 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreQu
 
   override type WRAPPER[T] = T
 
-  override def functionAsQuiver[S, T](source: DOT[S], target: DOT[T], f: S => T) =
+  override def functionAsArrow[S, T](source: DOT[S], target: DOT[T], f: S => T) =
     source(target)(f)
 
-  override def makeArrow[S, T](prearrow: FiniteSetsPreQuiver[S, T]) =
+  override def makeArrow[S, T](prearrow: FiniteSetsPreArrow[S, T]) =
     makeDot(prearrow.source)(makeDot(prearrow.target))(prearrow.function)
 
   override def makeDot[T](input: Traversable[T]) =
     memoizedStarWrapper(input)
 
   // unusually simple generic definition for this topos because WRAPPER is trivial
-  override def bifunctionAsBiQuiver[L, R, T](
+  override def bifunctionAsBiArrow[L, R, T](
     left: DOT[L],
     right: DOT[R],
     target: DOT[T]
   ) (
     bifunc: (L, R) => T
-  ): BiQuiver[L, R, T] =
-    (left x right).biQuiver(target) { bifunc }
+  ): BiArrow[L, R, T] =
+    (left x right).biArrow(target) { bifunc }
 }
 
-case class FiniteSetsPreQuiver[S, T](
+case class FiniteSetsPreArrow[S, T](
   source: Traversable[S],
   target: Traversable[T],
   function: S => T
@@ -164,24 +164,24 @@ object FiniteSetsUtilities {
   def dot[T](elements: T*) = makeDot(elements)
 
   def arrow[S, T](source: DOT[S], target: DOT[T], map: (S, T)*) =
-    functionAsQuiver(source, target, Map(map: _*))
+    functionAsArrow(source, target, Map(map: _*))
 
   def biArrow[L, R, T](
-                             left: DOT[L],
-                             right: DOT[R],
-                             target: DOT[T],
-                             mappings: ((L, R), T)*
-                             ) =
-    bifunctionAsBiQuiver[L, R, T](left, right, target) { (l, r) => Map(mappings:_*)((l, r)) }
+   left: DOT[L],
+   right: DOT[R],
+   target: DOT[T],
+   mappings: ((L, R), T)*
+ ) =
+    bifunctionAsBiArrow[L, R, T](left, right, target) { (l, r) => Map(mappings:_*)((l, r)) }
 
   def makeNullaryOperator[X](carrier: DOT[X], value: X) =
-    functionAsQuiver(I, carrier, (_: UNIT) => value)
+    functionAsArrow(I, carrier, (_: UNIT) => value)
 
   def makeBinaryOperator[X](
     carrier: DOT[X],
     mappings: ((X, X), X)*
   ) =
-    bifunctionAsBiQuiver[X](carrier) { (x, y) => Map(mappings:_*)((x, y)) }
+    bifunctionAsBiArrow[X](carrier) { (x, y) => Map(mappings:_*)((x, y)) }
 
   private def intSqrt(square: Int) =
     (1 until square).find { n =>

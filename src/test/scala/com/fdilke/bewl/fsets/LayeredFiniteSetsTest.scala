@@ -15,32 +15,33 @@ class LayeredFiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
   def buildDot[T](elements: Seq[T]) =
     DiagrammaticFiniteSets.DiagrammaticFiniteSetsDot(elements)
 
-  def makeStar[T](elements: T*): topos.DOT[WRAPPER[T]] = makeDot(buildDot(elements))
+  def dot[T](elements: T*): topos.DOT[WRAPPER[T]] = makeDot(buildDot(elements))
 
-  def makeQuiver[S, T](source: topos.DOT[WRAPPER[S]], target: topos.DOT[WRAPPER[T]], map: (S, T)*) =
-    functionAsQuiver(source, target, Map(map: _*))
+  def arrow[S, T](source: topos.DOT[WRAPPER[S]], target: topos.DOT[WRAPPER[T]], map: (S, T)*) =
+    functionAsArrow(source, target, Map(map: _*))
 
-  def makeBiQuiver[L, R, T](
+  def makeBiArrow[L, R, T](
     left: topos.DOT[WRAPPER[L]],
     right: topos.DOT[WRAPPER[R]],
     target: topos.DOT[WRAPPER[T]],
-    mappings: ((L, R), T)*) =
-    bifunctionAsBiQuiver(left, right, target) { (l, r) => Map(mappings:_*)((l, r)) }
+    mappings: ((L, R), T)*
+  ) =
+    bifunctionAsBiArrow(left, right, target) { (l, r) => Map(mappings:_*)((l, r)) }
 
-  override val foo = makeStar(true, false)
-  override val bar = makeStar("X", "Y", "Z")
-  override val foo2bar = makeQuiver(foo, bar, true -> "X", false -> "Y")
-  override val baz = makeStar(1, 2, 3, 4)
-  override val foo2ImageOfBar = makeQuiver(foo, baz, true -> 3, false -> 2)
+  override val foo = dot(true, false)
+  override val bar = dot("X", "Y", "Z")
+  override val foo2bar = arrow(foo, bar, true -> "X", false -> "Y")
+  override val baz = dot(1, 2, 3, 4)
+  override val foo2ImageOfBar = arrow(foo, baz, true -> 3, false -> 2)
 
-  override val foobar2baz = makeBiQuiver(
+  override val foobar2baz = makeBiArrow(
     foo, bar, baz,
     (true, "X") -> 2, (false, "X") -> 3,
     (true, "Y") -> 1, (false, "Y") -> 2,
     (true, "Z") -> 2, (false, "Z") -> 3
   )
 
-  override val monicBar2baz = makeQuiver(
+  override val monicBar2baz = arrow(
     bar, baz, "X" -> 2, "Y" -> 3, "Z" -> 1
   )
 
@@ -49,13 +50,13 @@ class LayeredFiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
 
   override def makeSampleDot() = makeDot(sampleDotSource)
 
-  override def makeSampleArrow() = makeQuiver(makeDot(sampleDotSource),
+  override def makeSampleArrow() = arrow(makeDot(sampleDotSource),
     makeDot(sampleDotTarget), 1 -> true, 2 -> false)
 
   override val equalizerSituation = new EqualizerSituation[FOO, BAR, BAZ](
     foo2bar,
-    makeQuiver(bar, baz, "X" -> 1, "Y" -> 2, "Z" -> 3),
-    makeQuiver(bar, baz, "X" -> 1, "Y" -> 2, "Z" -> 1)
+    arrow(bar, baz, "X" -> 1, "Y" -> 2, "Z" -> 3),
+    arrow(bar, baz, "X" -> 1, "Y" -> 2, "Z" -> 1)
   )
 }) {
   import fixtures._
