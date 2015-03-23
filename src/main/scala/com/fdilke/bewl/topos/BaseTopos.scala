@@ -30,7 +30,7 @@ trait BaseTopos { self: LogicalOperations =>
   }
 
   type EXPONENTIAL[S <: ~, T <: ~] = ExponentialDot[S, T, S > T] with DOT[S > T]
-  trait ExponentialDot[S <: ~, T <: ~, S_T <: (S => T) with ~] { star: DOT[S_T] =>
+  trait ExponentialDot[S <: ~, T <: ~, S_T <: (S => T) with ~] { dot: DOT[S_T] =>
     val source: DOT[S]
     val target: DOT[T]
 
@@ -41,12 +41,12 @@ trait BaseTopos { self: LogicalOperations =>
 
   type BIPRODUCT[L <: ~, R <: ~] = BiproductDot[L, R, L x R] with DOT[L x R]
 
-  trait BiproductDot[L <: ~, R <: ~, LxR <: (L, R) with ~] { star: DOT[LxR] =>
+  trait BiproductDot[L <: ~, R <: ~, LxR <: (L, R) with ~] { dot: DOT[LxR] =>
     val left: DOT[L]
     val right: DOT[R]
     def pair(l: L, r: R): LxR
-    final lazy val π0 = star(left) { _._1 }
-    final lazy val π1 = star(right) { _._2 }
+    final lazy val π0 = dot(left) { _._1 }
+    final lazy val π1 = dot(right) { _._2 }
 
     final private val hackedThis: BIPRODUCT[L, R] = this.asInstanceOf[BIPRODUCT[L, R]]
 
@@ -65,7 +65,7 @@ trait BaseTopos { self: LogicalOperations =>
     }
 
   type EQUALIZER[S <: ~] = EqualizingDot[S] with DOT[S]
-  trait EqualizingDot[S <: ~] { star: DOT[S] =>
+  trait EqualizingDot[S <: ~] { dot: DOT[S] =>
     val equalizerTarget: DOT[S]
     val inclusion: ARROW[S, S]
     def restrict[R <: ~](arrow: ARROW[R, S]): ARROW[R, S]
@@ -80,9 +80,9 @@ trait BaseTopos { self: LogicalOperations =>
     def sanityTest
   }
 
-  trait Dot[S <: ~] extends BaseDot[S] { star: DOT[S] =>
+  trait Dot[S <: ~] extends BaseDot[S] { dot: DOT[S] =>
 
-    final lazy val identity: ARROW[S, S] = this(star) { s => s }
+    final lazy val identity: ARROW[S, S] = this(dot) { s => s }
     final private val memoizedProduct =
       Memoize.generic.withLowerBound[
         DOT,
@@ -183,8 +183,8 @@ trait BaseTopos { self: LogicalOperations =>
       ARROW[S, T]
     ] =
       (this > target).globals map { global =>
-        star(target) { s =>
-          global(star.toI(s))(s)
+        dot(target) { s =>
+          global(dot.toI(s))(s)
         }}
   }
 
@@ -291,11 +291,11 @@ trait Wrappings[BASE, PREDOT[_ <: BASE], PREARROW[_ <: BASE, _ <: BASE]] { topos
   ): BiArrow[WRAPPER[L], WRAPPER[R], WRAPPER[T]]
 
   def bifunctionAsBiArrow[X <: BASE] (
-    star: DOT[WRAPPER[X]]
+    dot: DOT[WRAPPER[X]]
   ) (
      bifunc: (X, X) => X
   ): BiArrow[WRAPPER[X], WRAPPER[X], WRAPPER[X]] =
-    bifunctionAsBiArrow[X, X, X](star, star, star) { bifunc }
+    bifunctionAsBiArrow[X, X, X](dot, dot, dot) { bifunc }
 }
 
 

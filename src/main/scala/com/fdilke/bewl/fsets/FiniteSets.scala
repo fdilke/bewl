@@ -37,12 +37,12 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreAr
       }
       new FiniteSetsDot[S > T](
         allMaps(self.elements, that.elements).map { FunctionElement } // TODO: coalesce
-      ) with ExponentialDot[S, T, S > T] { exponentialStar =>
+      ) with ExponentialDot[S, T, S > T] { exponentialDot =>
         override val source: DOT[S] = self
         override val target: DOT[T] = that
 
         override def transpose[R <: ~](biArrow: BiArrow[R, S, T]) =
-          biArrow.product.left(exponentialStar) {
+          biArrow.product.left(exponentialDot) {
             r => FunctionElement {
               s => biArrow(r, s)
             }}}}
@@ -90,8 +90,8 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreAr
         source.elements.filter { s => function(s) == that.function(s) }
       ) with EqualizingDot[S] { equalizer =>
         override val equalizerTarget = source
-        override def restrict[R](substar: ARROW[R, S]) =
-          substar.source(this) { substar(_) }
+        override def restrict[R](subdot: ARROW[R, S]) =
+          subdot.source(this) { subdot(_) }
         override val inclusion: ARROW[S, S] = equalizer(source) { s => s }
       }
 
@@ -122,7 +122,7 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreAr
       }]"
   }
 
-  private val memoizedStarWrapper = {
+  private val memoizedDotWrapper = {
     def wrap[T](elements: Traversable[T]) =
       new FiniteSetsDot(elements)
     Memoize.generic(wrap)
@@ -139,7 +139,7 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreAr
     makeDot(prearrow.source)(makeDot(prearrow.target))(prearrow.function)
 
   override def makeDot[T](input: Traversable[T]) =
-    memoizedStarWrapper(input)
+    memoizedDotWrapper(input)
 
   // unusually simple generic definition for this topos because WRAPPER is trivial
   override def bifunctionAsBiArrow[L, R, T](
