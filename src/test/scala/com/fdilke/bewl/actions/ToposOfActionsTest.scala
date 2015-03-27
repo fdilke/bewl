@@ -27,42 +27,32 @@ class ToposOfActionsTest extends GenericToposTests(new ToposWithFixtures {
 
   override type FOO = WRAPPER[Symbol]
   override type BAR = WRAPPER[String]
-  override type BAZ = WRAPPER[Int]
+  override type BAZ = WRAPPER[String]
 
   override val foo = makeDot(monoidOf3.regularAction)
 
-  private val barDot: FiniteSets.DOT[String] = FiniteSetsUtilities.dot("i", "x", "y")
+  // private val barDot: FiniteSets.DOT[String] = FiniteSetsUtilities.dot("i", "x", "y")
+  private val barDot: FiniteSets.DOT[String] = FiniteSetsUtilities.dot("x", "y")
+  private val bazDot: FiniteSets.DOT[String] = FiniteSetsUtilities.dot("i", "x", "y")
 
   private val scalarMultiply: (String, Symbol) => String =
     (s, m) => monoidOf3.multiply(Symbol(s), m).name
+
+
   override val bar = makeDot(monoidOf3.action(barDot)(scalarMultiply))
+  override val baz = makeDot(monoidOf3.action(bazDot)(scalarMultiply))
 
-  private val bazDot: FiniteSets.DOT[Int] = FiniteSetsUtilities.dot(0, 1, 2, 3)
-
-  private def bazMultiply(n: Int, r: Symbol) : Int =
-    if (n == 0)
-      0
-    else r match {
-      case `i` => n
-      case `x` => 1
-      case `y` => 2
-    }
-
-  val bazAction = monoidOf3.action(bazDot)(bazMultiply)
-
-  override val baz = makeDot(bazAction)
-  override val foo2ImageOfBar = functionAsArrow(foo, baz, Map('i -> 1, 'x -> 1, 'y -> 2))
-  override val foo2bar = functionAsArrow(foo, bar, Map('i -> "x", 'x -> "x", 'y -> "y"))
-  private val foobar2BazMap = Map[(Symbol, String), Int](
-    (i, "i") -> 1, (x, "i") -> 2, (y, "i") -> 1,
-    (i, "x") -> 2, (x, "x") -> 1, (y, "x") -> 1,
-    (i, "y") -> 1, (x, "y") -> 2, (y, "y") -> 2
+  override val foo2ImageOfBar = functionAsArrow(foo, baz, Map(i -> "y", x -> "x", y -> "y"))
+  override val foo2bar = functionAsArrow(foo, bar, Map(i -> "x", x -> "x", y -> "y"))
+  private val foobar2BazMap = Map[(Symbol, String), String]( // TODO: lose generic
+    (i, "x") -> "x", (x, "x") -> "x", (y, "x") -> "y",
+    (i, "y") -> "y", (x, "y") -> "x", (y, "y") -> "y"
   )
   override val foobar2baz = bifunctionAsBiArrow(foo, bar, baz)(untupled (foobar2BazMap))
-  override val monicBar2baz = functionAsArrow(bar, baz, Map("i" -> 3, "x" -> 1, "y" -> 2))
+  override val monicBar2baz = functionAsArrow(bar, baz, Map("x" -> "x", "y" -> "y"))
 
   override def makeSampleDot() =
-    makeDot(bazAction)
+    makeDot(monoidOf3.action(barDot)(scalarMultiply))
 
   override def makeSampleArrow() =
     functionAsArrow(foo, bar, Map(
@@ -72,14 +62,32 @@ class ToposOfActionsTest extends GenericToposTests(new ToposWithFixtures {
     ))
 
   override val equalizerSituation = {
+    val wizDot: FiniteSets.DOT[Int] = FiniteSetsUtilities.dot(0, 1, 2, 3)
+
+    def wizMultiply(n: Int, r: Symbol) : Int =
+      if (n == 0)
+        0
+      else r match {
+        case `i` => n
+        case `x` => 1
+        case `y` => 2
+      }
+
+    val wizAction = monoidOf3.action(wizDot)(wizMultiply)
+
+    val wiz = makeDot(wizAction)
+
+    val foo2wiz = functionAsArrow(foo, wiz, Map('i -> 1, 'x -> 1, 'y -> 2))
+
+    type WIZ = WRAPPER[Int]
     type BINARY = WRAPPER[Boolean]
     val binaryDot : FiniteSets.DOT[Boolean] = FiniteSetsUtilities.dot(true, false)
     def binaryMultiply(b: Boolean, r: Symbol) : Boolean = b
     val binary = makeDot(monoidOf3.action(binaryDot)(binaryMultiply))
-    new EqualizerSituation[FOO, BAZ, BINARY](
-      foo2baz,
-      functionAsArrow(baz, binary, Map(0 -> true, 1 -> true, 2 -> true, 3 -> true)),
-      functionAsArrow(baz, binary, Map(0 -> false, 1 -> true, 2 -> true, 3 -> true))
+    new EqualizerSituation[FOO, WIZ, BINARY](
+      foo2wiz,
+      functionAsArrow(wiz, binary, Map(0 -> true, 1 -> true, 2 -> true, 3 -> true)),
+      functionAsArrow(wiz, binary, Map(0 -> false, 1 -> true, 2 -> true, 3 -> true))
     )
   }
 }) {
@@ -92,25 +100,25 @@ class ToposOfActionsTest extends GenericToposTests(new ToposWithFixtures {
     }
 
     it("works on the fixtures") {
-      foo.globals should have('size(0))
-      bar.globals should have('size(0))
-      baz.globals should have('size(1))
+      foo.globals should have size 0
+      bar.globals should have size 0
+      baz.globals should have size 0
     }
   }
 
   describe("Arrow enumeration") {
     // too slow! Belongs in a worksheet or app (pending optimization)
     it("also works on the fixtures") {
-      (omega >> omega).size shouldBe 6
+      (omega >> omega) should have size 6
     }
 
     ignore("...optional extras") {
-      foo >> foo should have('size(3))
-      foo >> bar should have('size(3))
-      foo >> baz should have('size(4))
+      foo >> foo should have size 3
+      foo >> bar should have size 2
+      foo >> baz should have size 3
 
       // probably not - that would be if we were only counting isomorphisms
-      (foo >> (omega > omega)) should have ('size(2))
+      (foo >> (omega > omega)) should have size 2
     }
   }
 }
