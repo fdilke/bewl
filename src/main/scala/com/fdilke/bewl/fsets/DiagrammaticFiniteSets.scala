@@ -11,7 +11,8 @@ object DiagrammaticFiniteSets extends DiagrammaticTopos {
 
     override def foreach[U](f: (X) => U) { elements.foreach(f) }
 
-    override def identity: DiagrammaticFiniteSetsArrow[X, X] = DiagrammaticFiniteSetsArrow(this, this, x => x)
+    override def identity: DiagrammaticFiniteSetsArrow[X, X] =
+      DiagrammaticFiniteSetsArrow(this, this, x => x)
 
     override lazy val globals: Traversable[ARROW[TERMINAL, X]] = elements map {
       x => DiagrammaticFiniteSetsArrow(I, this, (_: TERMINAL) => x)
@@ -68,7 +69,7 @@ object DiagrammaticFiniteSets extends DiagrammaticTopos {
       if (arrow.target == source) {
         DiagrammaticFiniteSetsArrow(arrow.source, target,  function.compose(arrow.function))
       } else {
-        throw new IllegalArgumentException("Target does not match source")
+        throw new IllegalArgumentException(s"Target does not match source: ${arrow.target} vs $source")
       }
 
     override def ?=(that: DiagrammaticFiniteSetsArrow[X, Y]) =

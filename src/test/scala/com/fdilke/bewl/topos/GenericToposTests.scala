@@ -169,12 +169,27 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
     }
 
     it("has a terminator") {
+      I.sanityTest
       val fooToI = foo.toI
       fooToI.source shouldBe foo
       fooToI.target shouldBe topos.I
       fooToI.sanityTest
 
       bar.toI o foo2bar shouldBe fooToI
+    }
+
+    it("has a (derived) initial object") {
+      O.sanityTest
+      val fooFromO = foo.fromO
+      fooFromO.source shouldBe O
+      fooFromO.target shouldBe foo
+
+      foo2bar o fooFromO shouldBe bar.fromO
+      O >> foo shouldBe Seq(fooFromO)
+    }
+
+    it("consistently calculates arrows from the initial to the terminal") {
+      O.toI shouldBe (I.fromO)
     }
 
     it("has standardized products") {

@@ -11,7 +11,10 @@ trait LogicalOperations { topos: BaseTopos =>
     	))
     lazy val or = BiArrow(omega.squared, 
     	omega.squared.forAll(omega) {
-      		case ((a, b), w) => ((a > w) ^ (b > w)) > w
+      		case ((a, b), ω) => ((a > ω) ^ (b > ω)) > ω
     })
+    lazy val falsity = I.forAll(omega) {
+      (_, ω) => ω
+    }
   }
 }

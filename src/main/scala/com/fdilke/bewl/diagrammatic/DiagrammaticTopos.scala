@@ -79,8 +79,10 @@ trait BaseDiagrammaticTopos {
 
     def apply[W](arrow: ARROW[W, X]): ARROW[W, Y]
 
-    final def x[Z](that: ARROW[X, Z]): ARROW[X, (Y, Z)] = (this.target * that.target).
-      multiply(this.asInstanceOf[ARROW[X, Y]], that)
+    final def x[Z](that: ARROW[X, Z]): ARROW[X, (Y, Z)] =
+      (this.target * that.target).multiply(
+        this.asInstanceOf[ARROW[X, Y]], that
+      )
 
     def ?=(that: ARROW[X, Y]): Equalizer[X]
 

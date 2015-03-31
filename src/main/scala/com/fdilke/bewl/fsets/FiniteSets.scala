@@ -92,7 +92,8 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreAr
         override val equalizerTarget = source
         override def restrict[R](subdot: ARROW[R, S]) =
           subdot.source(this) { subdot(_) }
-        override val inclusion: ARROW[S, S] = equalizer(source) { s => s }
+        override val inclusion: ARROW[S, S] = 
+          equalizer(source) { s => s }
       }
 
     override def apply(s: S) =
@@ -127,8 +128,6 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreAr
       new FiniteSetsDot(elements)
     Memoize.generic(wrap)
   }
-
-  // wrapping API: TODO build this comment into the structure
 
   override type WRAPPER[T] = T
 

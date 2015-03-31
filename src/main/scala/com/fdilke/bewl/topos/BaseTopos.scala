@@ -71,6 +71,17 @@ trait BaseTopos { self: LogicalOperations =>
     def restrict[R <: ~](arrow: ARROW[R, S]): ARROW[R, S]
   }
 
+  private object InitialDot {
+    lazy val O = TruthObject.falsity.whereTrue
+    def fromO[X <: ~](dot: DOT[X]) = {
+      val xO = dot.toTrue ?= (TruthObject.falsity o dot.toI)
+      val xOtoO = O.restrict(xO.toI) 
+      xO.inclusion o xOtoO.inverse
+    }
+  }
+  type VOID = UNIT // TODO: fix with strict equalizers
+  lazy val O: DOT[VOID] = InitialDot.O
+
   trait BaseDot[S <: ~] { self: DOT[S] =>
     val toI: ARROW[S, UNIT]
     val globals: Traversable[ARROW[UNIT, S]]
@@ -186,6 +197,9 @@ trait BaseTopos { self: LogicalOperations =>
         dot(target) { s =>
           global(dot.toI(s))(s)
         }}
+
+    final lazy val fromO: ARROW[VOID, S] = 
+      InitialDot.fromO(this)
   }
 
   trait BaseArrow[S <: ~, T <: ~] {
@@ -216,8 +230,8 @@ trait BaseTopos { self: LogicalOperations =>
     final def toBool(implicit eq: =:=[T, TRUTH]): Boolean =
       this == source.toTrue
 
-    final def whereTrue(implicit eq: =:=[T, TRUTH]): EQUALIZER[S] =
-      this.asInstanceOf[ARROW[S, TRUTH]] ?= source.toTrue
+    final def whereTrue(implicit eq: T =:= TRUTH): EQUALIZER[S] =
+      self.asInstanceOf[ARROW[S, TRUTH]] ?= source.toTrue
 
     final lazy val isMonic: Boolean =
       source.forAll(source) {

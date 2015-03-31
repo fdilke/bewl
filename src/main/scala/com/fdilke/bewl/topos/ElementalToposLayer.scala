@@ -3,13 +3,15 @@ package com.fdilke.bewl.topos
 import com.fdilke.bewl.diagrammatic.BaseDiagrammaticTopos
 import com.fdilke.bewl.helper.Memoize
 
-import scala.Function._
-
 object ElementalToposLayer {
   def apply(
     Δ: BaseDiagrammaticTopos
   ): Topos with Wrappings[Any, Δ.DOT, Δ.ARROW] = {
-    class ElementalToposLayer extends Topos with Wrappings[Any, Δ.DOT, Δ.ARROW] { layer =>
+    class ElementalToposLayer extends Topos with Wrappings[
+      Any,
+      Δ.DOT,
+      Δ.ARROW
+    ] { layer =>
 
       override type ~ = Element
 
@@ -36,11 +38,11 @@ object ElementalToposLayer {
         private[ElementalToposLayer] val dot: Δ.DOT[Any]
 
         override lazy val toI: ARROW[T, UNIT] =
-          makeArrow(dot.toI).asInstanceOf[ARROW[T, UNIT]]
+          AdapterArrow.fromArrow(self, I, dot.toI)
 
         override lazy val globals: Traversable[ARROW[UNIT, T]] =
           dot.globals.map { global =>
-            AdapterArrow.fromArrow(I, this, global)
+            AdapterArrow.fromArrow(I, self, global)
           }
 
         override def xUncached[U <: ~](that: DOT[U]) =
@@ -48,9 +50,11 @@ object ElementalToposLayer {
             override val left = self
             override val right = that
 
-            override def pair(t: T, u: U) = asElement(t.arrow x u.arrow)
+            override def pair(t: T, u: U) =
+              asElement(t.arrow x u.arrow)
 
-            override private[ElementalToposLayer] val dot = (self.dot x that.dot).asInstanceOf[Δ.DOT[Any]]
+            override private[ElementalToposLayer] val dot =
+              (self.dot x that.dot).asInstanceOf[Δ.DOT[Any]]
 
             override private[ElementalToposLayer] def asElement(anArrow: Δ.ARROW[_, _]) =
               new (T, U)(
@@ -62,8 +66,8 @@ object ElementalToposLayer {
           }
 
         override def `>Uncached`[U <: ~](that: DOT[U]) =
-          new AdapterDot[T > U] with ExponentialDot[T, U, T > U] {
-            override val source = AdapterDot.this
+          new AdapterDot[T > U] with ExponentialDot[T, U, T > U] { exponentialAdapter =>
+            override val source = self
             override val target = that
 
             private val exponential = target.dot A source.dot
@@ -73,7 +77,7 @@ object ElementalToposLayer {
             override def transpose[R <: ~](biArrow: BiArrow[R, T, U]) =
               AdapterArrow.fromArrow(
                 biArrow.product.left, 
-                this, 
+                exponentialAdapter,
                 exponential.transpose(layer.biArrow(biArrow))
               )
 
@@ -96,6 +100,8 @@ object ElementalToposLayer {
           AdapterArrow[T, U](this, target, f)
 
         private[ElementalToposLayer] def asElement(arrow: Δ.ARROW[_, _]): T
+
+        override def toString: String = s"AdapterDot[$dot]"
       }
 
       object AdapterArrow {
@@ -105,7 +111,11 @@ object ElementalToposLayer {
             () => function(source.asElement(source.dot.identity)).arrow
           )
 
-        def fromArrow[S <: ~, T <: ~](source: DOT[S], target: DOT[T], arrow: Δ.ARROW[_, _]) =
+        def fromArrow[S <: ~, T <: ~](
+          source: DOT[S],
+          target: DOT[T],
+          arrow: Δ.ARROW[_, _]
+        ) =
           new AdapterArrow[S, T](source, target,
             () => t => target.asElement(fletch(arrow)(t.arrow)),
             () => fletch(arrow)
@@ -117,7 +127,7 @@ object ElementalToposLayer {
         val target: DOT[T],
         _function: () => S => T,
         _arrow: () => Δ.ARROW[Any, Any]
-      ) extends Arrow[S, T] {
+      ) extends Arrow[S, T] { adapter =>
 
         private[ElementalToposLayer] lazy val arrow = _arrow()
         private[ElementalToposLayer] lazy val function = _function()
@@ -128,20 +138,32 @@ object ElementalToposLayer {
           that.source(target)(function compose that.function)
 
         def ?=(that: ARROW[S, T]) =
-          new AdapterDot[S] with EqualizingDot[S] {
+          new AdapterDot[S] with EqualizingDot[S] { equalizingDot =>
             private val equalizer = arrow ?= that.arrow
-            override val equalizerTarget = AdapterArrow.this.source
 
-            override private[ElementalToposLayer] val dot = equalizer.equalizerSource.asInstanceOf[Δ.DOT[Any]]
+            override val equalizerTarget = adapter.source
 
-            override private[ElementalToposLayer] def asElement(anArrow: Δ.ARROW[_, _]): S =
-              equalizerTarget.asElement(fletch(equalizer.equalizer)(fletch(anArrow)))
+            override private[ElementalToposLayer] val dot = 
+              equalizer.equalizerSource.asInstanceOf[Δ.DOT[Any]]
+
+            override private[ElementalToposLayer] def asElement(
+              anArrow: Δ.ARROW[_, _]
+            ): S =
+              new WrappedArrow(fletch(anArrow)).asInstanceOf[S]
 
             override def restrict[R <: ~](arrow: ARROW[R, S]) =
-              AdapterArrow.fromArrow(arrow.source, this, equalizer.restrict(arrow.arrow))
+              AdapterArrow.fromArrow(
+                arrow.source,
+                equalizingDot,
+                equalizer.restrict(arrow.arrow)
+              )
 
             val inclusion: ARROW[S, S] =
-              this(source) { s => s}
+              AdapterArrow.fromArrow(
+                equalizingDot,
+                source,
+                equalizer.equalizer
+              )
           }
 
         override def equals(other: Any) = other match {
@@ -154,7 +176,17 @@ object ElementalToposLayer {
         override def \[U <: ~](monic: ARROW[U, T]) =
           AdapterArrow.fromArrow(source, monic.source, monic.arrowChi.restrict(arrow))
 
-        override def sanityTest = arrow.sanityTest
+        override def sanityTest = {
+          if (source.dot != arrow.source) {
+            throw new IllegalArgumentException("Source inconsistent")
+          }
+          if (target.dot != arrow.target) {
+            throw new IllegalArgumentException("Source inconsistent")
+          }
+          arrow.sanityTest
+        }
+
+        override def toString: String = s"AdapterArrow[$arrow]"
 
         private lazy val arrowChi = arrow.chi
       }
@@ -217,7 +249,13 @@ object ElementalToposLayer {
         )
       }
 
-      private def biArrow[L <: ~, R <: ~, T <: ~](biArrow: BiArrow[L, R, T]) =
+      private def biArrow[
+        L <: ~,
+        R <: ~,
+        T <: ~
+      ] (
+        biArrow: BiArrow[L, R, T]
+      ) =
         Δ.BiArrow(
           biArrow.product.left.dot,
           biArrow.product.right.dot,

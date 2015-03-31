@@ -50,7 +50,7 @@ class DiagrammaticFiniteSetsArrowTest extends FunSpec {
     it("should compose with other appropriately conditioned arrows") {
       intercept[IllegalArgumentException] {
         dot2dash(dot2dash)
-      }.getMessage shouldBe "Target does not match source"
+      }.getMessage should startWith("Target does not match source")
 
       dot2dash(doodah2dot) shouldBe
         arrow(doodah, dash, 1->"X", 2->"Y", 3->"X")

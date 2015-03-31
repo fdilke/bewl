@@ -76,6 +76,11 @@ class RichDotsAndArrowsTests extends FunSpec {
         for(i <- omega ; j <- omega)
           yield !i | j
         )
+      TruthObject.falsity shouldBe (
+        I(omega) {
+          _ => false
+        }
+      )
     }
   }
 
