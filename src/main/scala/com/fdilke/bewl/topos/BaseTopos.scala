@@ -200,6 +200,8 @@ trait BaseTopos { self: LogicalOperations =>
 
     final lazy val fromO: ARROW[VOID, S] = 
       InitialDot.fromO(this)
+
+    final lazy val pac = new PartialArrowClassifier(dot)
   }
 
   trait BaseArrow[S <: ~, T <: ~] {
@@ -284,6 +286,41 @@ trait BaseTopos { self: LogicalOperations =>
    x: DOT[X], y: DOT[Y], z: DOT[Z]
   ) : ARROW[X x Y x Z, Z] =
     (x x y x z).π1
+
+  class PartialArrowClassifier[A <: ~](dot: DOT[A]) {
+    val classifier = dot.power.forAll(dot, dot) {
+      (f, a, b) =>
+        (f(a) ^ f(b)) > dot.=?=(a, b)
+    }.whereTrue
+
+    val include = classifier.restrict(dot.singleton)
+
+    val ∟ = classifier.restrict(
+      dot.power.transpose(
+        (I x dot).biArrow(omega) {
+          (i, x) => TruthObject.falsity(i)
+        }
+      )
+    )
+
+    def extend[S <: ~, B <: ~](
+      monic: ARROW[S, B],
+      arrowOnSub: ARROW[S, A]
+    ) =
+      classifier.restrict(
+        dot.power.transpose(
+          (monic.target x dot).biArrow(omega) {
+            (t, d) => monic.target.exists(monic.source) {
+              (t, s) =>
+                dot.=?=(
+                  d,
+                  arrowOnSub(s)
+                )
+            }(t)
+          }
+        )
+    )
+  }
 }
 
 trait Wrappings[BASE, PREDOT[_ <: BASE], PREARROW[_ <: BASE, _ <: BASE]] { topos: BaseTopos =>

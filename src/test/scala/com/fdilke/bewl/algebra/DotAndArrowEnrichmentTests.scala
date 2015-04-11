@@ -5,7 +5,7 @@ import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.Matchers._
 
-class RichDotsAndArrowsTests extends FunSpec {
+class DotAndArrowEnrichmentTests extends FunSpec {
 
   describe("The universal quantifier") {
     it("detects whether a subobject is the whole object") {
@@ -76,11 +76,9 @@ class RichDotsAndArrowsTests extends FunSpec {
         for(i <- omega ; j <- omega)
           yield !i | j
         )
-      TruthObject.falsity shouldBe (
-        I(omega) {
-          _ => false
-        }
-      )
+      TruthObject.falsity shouldBe I(omega) {
+        _ => false
+      }
     }
   }
 
@@ -91,6 +89,53 @@ class RichDotsAndArrowsTests extends FunSpec {
         (0,0) -> true, (0, 1) -> false,
         (1,0) -> false,(1,1) -> true
       )
+    }
+  }
+
+  describe("The partial arrow classifier") {
+    it("should have the correct attributes for finite sets") {
+      val set = dot(0, 1)
+      val pac = set.pac
+      pac.classifier.globals should have size 3
+      pac.include should have (
+        'source(set),
+        'target(pac.classifier)
+      )
+      pac.include shouldBe 'monic
+      pac.∟ should have (
+        'source(I),
+        'target(pac.classifier)
+      )
+      pac.∟ shouldBe pac.extend(O.toI, set.fromO)
+      Seq(0, 1) map pac.∟(()) shouldBe Seq(false, false)
+
+      val foo = dot('a, 'b)
+      val subFoo = dot(true)
+      val inclusion = arrow(subFoo, foo, true -> 'a)
+      val subFoo2set = arrow(subFoo, set, true -> 1)
+
+//      TODO: not quite sorted out yet...
+//      val foo2setStar = pac.extend(inclusion, subFoo2set)
+//      foo2setStar should have (
+//        'source(foo),
+//        'target(pac.classifier)
+//      )
+//      val imageOf0 = pac.include(0)
+//      val imageOf1 = pac.include(1)
+//      foo2setStar('a) shouldBe imageOf1
+//
+//      {
+//        val h: >[Int, TRUTH] = foo2setStar('b)
+//        val peet: Seq[TRUTH] = (Seq(0, 1) map h)
+//        val bubadub: String = "Seq(0,1) map h = " + peet.toString
+//        println(bubadub)
+//
+//        println("hubadub = " + (Seq(0,1) map pac.∟(()) ) )
+//      }
+//
+//      foo2setStar('b) shouldBe pac.∟(())
+//      foo2setStar('b) should not be imageOf0
+//      foo2setStar('b) should not be imageOf1
     }
   }
 }
