@@ -103,20 +103,6 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
 
   type UNTYPED_ARROW = ARROW[_ <: ~, _ <: _]
 
-  private def matchArrow(property: String, predicate: UNTYPED_ARROW => Boolean) =
-    new BeMatcher[UNTYPED_ARROW] {
-      def apply(arrow: UNTYPED_ARROW) =
-        MatchResult(
-          predicate(arrow),
-          s"$arrow not $property",
-          s"$arrow is $property"
-        )
-    }
-
-  private val monic = matchArrow("monic", _.isMonic)
-  private val iso = matchArrow("iso", _.isIso)
-  private val epic = matchArrow("epic", _.isEpic)
-
   describe(s"The topos ${topos.getClass.getName}") {
 
     it("has sane built-in objects") {
@@ -283,50 +269,49 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
     it("can tell if an arrow is monic") {
 
       if (!inActionTopos) { // reluctantly skip, too slow with current technology
-        monicBar2baz shouldBe monic
+        monicBar2baz shouldBe 'monic
 
-        (foo x foo).π0 should not be monic
-        foo.=?=.arrow should not be monic
+        (foo x foo).π0 should not be 'monic
+        foo.=?=.arrow should not be 'monic
 
-        foo.diagonal shouldBe monic
-        foo.singleton shouldBe monic
+        foo.diagonal shouldBe 'monic
+        foo.singleton shouldBe 'monic
       }
 
-      I.identity shouldBe monic
+      I.identity shouldBe 'monic
       // Heyting false shouldBe monic
-      truth shouldBe monic
+      truth shouldBe 'monic
+      TruthObject.falsity shouldBe 'monic
 
-      foo.toI should not be monic
-
-      // foo.fromO should not be monic
+      foo.toI should not be 'monic
+      foo.fromO shouldBe 'monic
     }
 
     it("can tell if a arrow is epic") {
   
-      I.identity shouldBe epic
-      // O.identity should be epic
-      I.diagonal shouldBe epic
-      truth should not be epic
-      foo.toI shouldBe epic
+      I.identity shouldBe 'epic
+      O.identity shouldBe 'epic
+      I.diagonal shouldBe 'epic
+      truth should not be 'epic
+      foo.toI shouldBe 'epic
 
       if (!inActionTopos) { // reluctantly skip, too slow with current technology
+        foo.identity shouldBe 'epic
+        (foo x foo).π0 shouldBe 'epic
+        foo.diagonal should not be 'epic
+        omega.diagonal should not be 'epic
 
-        foo.identity shouldBe epic
-        (foo x foo).π0 shouldBe epic
-        foo.diagonal should not be epic
-        omega.diagonal should not be epic
-
-        monicBar2baz should not be epic
+        monicBar2baz should not be 'epic
       }
     }
 
     it("can tell if an arrow is iso and if so, calculate the inverse") {
       val iI = I.identity
-      iI shouldBe iso      
+      iI shouldBe 'iso
       iI.inverse shouldBe iI
 
       val fooI = foo.identity
-      fooI shouldBe iso      
+      fooI shouldBe 'iso
       fooI.inverse shouldBe fooI
 
       if (!inActionTopos) { // reluctantly skip, too slow with current technology
@@ -335,7 +320,7 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
             case (α, β) => (b x a).pair(β, α)
           }
 
-        twist(foo, bar) shouldBe iso
+        twist(foo, bar) shouldBe 'iso
         twist(foo, bar).inverse shouldBe twist(bar, foo)
       }
     }
