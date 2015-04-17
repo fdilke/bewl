@@ -133,7 +133,7 @@ class DotAndArrowEnrichmentTests extends FunSpec {
     it("should give the expected construction for sets") {
       val foo = dot(0, 1)
       val bar = dot('a, 'b, 'c)
-      val coproduct = foo.`+Uncached`(bar)
+      val coproduct = foo ⊔ bar
 
       coproduct.coproduct.globals should have size 5
       coproduct.injectLeft should have (

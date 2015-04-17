@@ -112,6 +112,14 @@ trait BaseTopos { self: LogicalOperations =>
 
     final def >[T <: ~](that: DOT[T]): EXPONENTIAL[S, T] = memoizedExponential(that)
 
+    final private val memoizedCoproduct =
+      Memoize.generic.withLowerBound[
+        DOT,
+        ({ type λ[T <: ~] = Coproduct[S, T]})#λ,
+        ~
+      ] (`+Uncached`)
+    final def ⊔[T <: ~](that: DOT[T]): Coproduct[S, T] = memoizedCoproduct(that)
+
     final lazy val toTrue = truth o toI
     final lazy val power = this > omega
     final lazy val ∀ = toTrue.name.chi
