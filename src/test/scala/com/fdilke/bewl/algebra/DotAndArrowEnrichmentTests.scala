@@ -128,4 +128,24 @@ class DotAndArrowEnrichmentTests extends FunSpec {
       foo2setStar('b) should not be imageOf1
     }
   }
+
+  describe("Coproducts") {
+    it("should give the expected construction for sets") {
+      val foo = dot(0, 1)
+      val bar = dot('a, 'b, 'c)
+      val coproduct = foo.`+Uncached`(bar)
+
+      coproduct.coproduct.globals should have size 5
+      coproduct.injectLeft should have (
+        'source(foo),
+        'target(coproduct.coproduct),
+        'monic(true)
+      )
+      coproduct.injectRight should have (
+        'source(bar),
+        'target(coproduct.coproduct),
+        'monic(true)
+      )
+    }
+  }
 }

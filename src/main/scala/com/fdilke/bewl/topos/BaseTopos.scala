@@ -93,7 +93,7 @@ trait BaseTopos { self: LogicalOperations =>
 
   trait Dot[S <: ~] extends BaseDot[S] { dot: DOT[S] =>
 
-    final lazy val identity: ARROW[S, S] = this(dot) { s => s }
+    final lazy val identity: ARROW[S, S] =  dot(dot) { s => s }
     final private val memoizedProduct =
       Memoize.generic.withLowerBound[
         DOT,
@@ -115,26 +115,26 @@ trait BaseTopos { self: LogicalOperations =>
     final lazy val toTrue = truth o toI
     final lazy val power = this > omega
     final lazy val ∀ = toTrue.name.chi
-    final lazy val squared = this x this
+    final lazy val squared = dot x dot
 
-    final def map(f: S => S) = this(this)(f)
+    final def map(f: S => S) = dot(dot)(f)
     final def flatMap(f2: S => ARROW[S, S]) =
       (this x this).biArrow(this) { f2(_)(_) }
 
     final lazy val ∃ =
       power.forAll(omega) { (f, w) =>
-          (power x omega).universally(this) {
+          (power x omega).universally(dot) {
             case ((f, w), x) => f(x) > w
           }(f, w) > w
       }
 
     final def preForAll[R <: ~](source: DOT[R])(g: (R, S) => TRUTH): ARROW[R, TRUTH] =
       ∀ o power.transpose(
-        (source x this).biArrow(omega)(g)
+        (source x dot).biArrow(omega)(g)
       )
 
     final def forAll[T <: ~](target: DOT[T])(g: (S, T) => TRUTH): ARROW[S, TRUTH] =
-      target.preForAll(this)(g)
+      target.preForAll(dot)(g)
 
     final def forAll[
       T <: ~, 
@@ -173,7 +173,7 @@ trait BaseTopos { self: LogicalOperations =>
 
     final def preExists[R <: ~](source: DOT[R])(g: (R, S) => TRUTH): ARROW[R, TRUTH] =
       ∃ o power.transpose(
-        (source x this).biArrow(omega)(g)
+        (source x dot).biArrow(omega)(g)
       )
 
     final def exists[T <: ~](target: DOT[T])(g: (S, T) => TRUTH): ARROW[S, TRUTH] =
@@ -193,15 +193,18 @@ trait BaseTopos { self: LogicalOperations =>
     ): Traversable[
       ARROW[S, T]
     ] =
-      (this > target).globals map { global =>
+      (dot > target).globals map { global =>
         dot(target) { s =>
           global(dot.toI(s))(s)
         }}
 
     final lazy val fromO: ARROW[VOID, S] = 
-      InitialDot.fromO(this)
+      InitialDot.fromO(dot)
 
     final lazy val pac = new PartialArrowClassifier(dot)
+
+    final def `+Uncached`[T <: ~](that: DOT[T]) =
+      new Coproduct(this, that)
   }
 
   trait BaseArrow[S <: ~, T <: ~] {
@@ -322,6 +325,23 @@ trait BaseTopos { self: LogicalOperations =>
           }
         )
       )
+  }
+
+  class Coproduct[A <: ~, B <: ~](left: DOT[A], right: DOT[B]) {
+    private val fullProduct = left.pac.classifier x right.pac.classifier
+
+    private val injectLeftFull = left.pac.include x (right.pac.⏊ o left.toI)
+    private val injectRightFull = (left.pac.⏊ o right.toI) x right.pac.include
+
+    private val sumChi = fullProduct(omega) { x =>
+      injectLeftFull.chi(x) v injectRightFull.chi(x)
+    }
+
+    val coproduct = sumChi.whereTrue
+    val injectLeft = coproduct.restrict(injectLeftFull)
+    val injectRight = coproduct.restrict(injectRightFull)
+
+//    def addArrows[X <: ~](leftArrow: ARROW[A, X], rightArrow: ARROW[B, X]) =
   }
 }
 
