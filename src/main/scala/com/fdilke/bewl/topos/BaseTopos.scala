@@ -295,7 +295,7 @@ trait BaseTopos { self: LogicalOperations =>
 
     val include = classifier.restrict(dot.singleton)
 
-    val ∟ = classifier.restrict(
+    val ⏊ = classifier.restrict(
       dot.power.transpose(
         (I x dot).biArrow(omega) {
           (i, x) => TruthObject.falsity(i)
@@ -310,16 +310,18 @@ trait BaseTopos { self: LogicalOperations =>
       classifier.restrict(
         dot.power.transpose(
           (monic.target x dot).biArrow(omega) {
-            (t, d) => monic.target.exists(monic.source) {
+            (t, a) => monic.target.exists(monic.source) {
               (t, s) =>
                 dot.=?=(
-                  d,
-                  arrowOnSub(s)
+                  arrowOnSub(s), a
+                ) ^
+                monic.target.=?=(
+                  monic(s), t
                 )
             }(t)
           }
         )
-    )
+      )
   }
 }
 
