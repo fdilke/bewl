@@ -17,4 +17,19 @@ trait LogicalOperations { topos: BaseTopos =>
       (_, ω) => ω
     }
   }
+
+  object Arrow {
+    def fromFunctionalRelation[A <: ~, B <: ~](
+      source: DOT[A],
+      target: DOT[B]
+    )(
+      predicate: (A, B) => TRUTH
+    ): ARROW[A, B] = {
+      val product = source x target
+      val graph = product(omega) {
+        case (a, b) => predicate(a, b)
+      }.whereTrue.inclusion
+      (product.π1 o graph) / (product.π0 o graph)
+    }
+  }
 }

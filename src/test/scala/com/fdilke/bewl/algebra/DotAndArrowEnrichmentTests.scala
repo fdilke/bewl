@@ -1,9 +1,11 @@
 package com.fdilke.bewl.algebra
 
-import org.scalatest.FunSpec
 import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
+import org.scalatest.FunSpec
 import org.scalatest.Matchers._
+
+import scala.Function.untupled
 
 class DotAndArrowEnrichmentTests extends FunSpec {
 
@@ -89,6 +91,21 @@ class DotAndArrowEnrichmentTests extends FunSpec {
         (0,0) -> true, (0, 1) -> false,
         (1,0) -> false,(1,1) -> true
       )
+    }
+  }
+
+  describe("Functional relations") {
+    it("can be converted to arrows") {
+      val symbols = dot('A, 'B, 'C)
+      val numbers = dot(1, 2, 3)
+      Arrow.fromFunctionalRelation(symbols, numbers)(untupled(Map(
+        ('A, 1) -> false, ('A, 2) -> true,  ('A, 3) -> false,
+        ('B, 1) -> true,  ('B, 2) -> false, ('B, 3) -> false,
+        ('C, 1) -> true,  ('C, 2) -> false, ('C, 3) -> false
+      ))) shouldBe
+        arrow(symbols, numbers,
+          'A -> 2, 'B -> 1, 'C -> 1
+        )
     }
   }
 

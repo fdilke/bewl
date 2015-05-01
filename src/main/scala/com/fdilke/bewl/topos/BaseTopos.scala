@@ -269,6 +269,9 @@ trait BaseTopos { self: LogicalOperations =>
           (t, s) => target.=?=(t, this(s))  
         }
       ) \ source.singleton
+
+    def /[R <: ~](iso: ARROW[S, R]) : ARROW[R, T] =
+      self o iso.inverse
   }
 
   case class BiArrow[
