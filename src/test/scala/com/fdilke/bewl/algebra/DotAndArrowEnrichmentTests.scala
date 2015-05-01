@@ -150,33 +150,31 @@ class DotAndArrowEnrichmentTests extends FunSpec {
     it("should give the expected construction for sets") {
       val foo = dot(0, 1)
       val bar = dot('a, 'b, 'c)
-      val coproduct = foo ⊔ bar
+      val coproduct = foo + bar
 
-      coproduct.coproduct.globals should have size 5
-      coproduct.injectLeft should have (
+      coproduct.globals should have size 5
+      foo +- bar should have (
         'source(foo),
-        'target(coproduct.coproduct),
+        'target(coproduct),
         'monic(true)
       )
-      coproduct.injectRight should have (
+      foo -+ bar should have (
         'source(bar),
-        'target(coproduct.coproduct),
+        'target(coproduct),
         'monic(true)
       )
 
       val target = dot("P", "Q", "R")
       val foo2target = arrow(foo, target, 0 -> "Q", 1 -> "P")
       val bar2target = arrow(bar, target, 'a -> "R", 'b -> "P", 'c -> "Q")
-      val sum = coproduct.sum(
-        foo2target,
-        bar2target
-      )
+      val sum = foo2target + bar2target
+
       sum should have (
-        'source(coproduct.coproduct),
+        'source(coproduct),
         'target(target)
       )
-      foo2target shouldBe (sum o coproduct.injectLeft)
-      bar2target shouldBe (sum o coproduct.injectRight)
+      foo2target shouldBe (sum o (foo +- bar))
+      bar2target shouldBe (sum o (foo -+ bar))
     }
   }
 }

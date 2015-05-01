@@ -213,6 +213,15 @@ trait BaseTopos { self: LogicalOperations =>
 
     final def `+Uncached`[T <: ~](that: DOT[T]) =
       new Coproduct(this, that)
+
+    final def +- [T <: ~](that: DOT[T]) =
+      (this ⊔ that).injectLeft
+
+    final def -+ [T <: ~](that: DOT[T]) =
+      (this ⊔ that).injectRight
+
+    def +[U <: ~](dash: DOT[U]) =
+      (dot ⊔ dash).coproduct
   }
 
   trait BaseArrow[S <: ~, T <: ~] {
@@ -272,6 +281,9 @@ trait BaseTopos { self: LogicalOperations =>
 
     def /[R <: ~](iso: ARROW[S, R]) : ARROW[R, T] =
       self o iso.inverse
+
+    def +[U <: ~](that: ARROW[U, T]) =
+      (source ⊔ that.source).sum(this, that)
   }
 
   case class BiArrow[
