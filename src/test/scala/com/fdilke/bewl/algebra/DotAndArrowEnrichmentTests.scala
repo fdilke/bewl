@@ -163,6 +163,20 @@ class DotAndArrowEnrichmentTests extends FunSpec {
         'target(coproduct.coproduct),
         'monic(true)
       )
+
+      val target = dot("P", "Q", "R")
+      val foo2target = arrow(foo, target, 0 -> "Q", 1 -> "P")
+      val bar2target = arrow(bar, target, 'a -> "R", 'b -> "P", 'c -> "Q")
+      val sum = coproduct.sum(
+        foo2target,
+        bar2target
+      )
+      sum should have (
+        'source(coproduct.coproduct),
+        'target(target)
+      )
+      foo2target shouldBe (sum o coproduct.injectLeft)
+      bar2target shouldBe (sum o coproduct.injectRight)
     }
   }
 }

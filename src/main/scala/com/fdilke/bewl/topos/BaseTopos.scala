@@ -117,7 +117,7 @@ trait BaseTopos { self: LogicalOperations =>
         DOT,
         ({ type λ[T <: ~] = Coproduct[S, T]})#λ,
         ~
-      ] (`+Uncached`)
+      ](`+Uncached`)
     final def ⊔[T <: ~](that: DOT[T]): Coproduct[S, T] = memoizedCoproduct(that)
 
     final lazy val toTrue = truth o toI
@@ -344,15 +344,24 @@ trait BaseTopos { self: LogicalOperations =>
     private val injectLeftFull = left.pac.include x (right.pac.⏊ o left.toI)
     private val injectRightFull = (left.pac.⏊ o right.toI) x right.pac.include
 
-    private val sumChi = fullProduct(omega) { x =>
+    val coproduct = fullProduct(omega) { x =>
       injectLeftFull.chi(x) v injectRightFull.chi(x)
-    }
-
-    val coproduct = sumChi.whereTrue
+    } whereTrue
     val injectLeft = coproduct.restrict(injectLeftFull)
     val injectRight = coproduct.restrict(injectRightFull)
 
-//    def addArrows[X <: ~](leftArrow: ARROW[A, X], rightArrow: ARROW[B, X]) =
+    def sum[X <: ~](leftArrow: ARROW[A, X], rightArrow: ARROW[B, X]) = {
+      val target = leftArrow.target
+      Arrow.fromFunctionalRelation(coproduct, target) {
+        (αβ, x) =>
+          coproduct.exists(left) {
+            (αβ, a) => coproduct.=?=(αβ, injectLeft(a)) ^ target.=?=(x, leftArrow(a))
+          }(αβ) v
+          coproduct.exists(right) {
+            (αβ, b) => coproduct.=?=(αβ, injectRight(b)) ^ target.=?=(x, rightArrow(b))
+          }(αβ)
+      }
+    }
   }
 }
 
