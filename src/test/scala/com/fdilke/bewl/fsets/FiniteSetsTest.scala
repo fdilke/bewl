@@ -7,8 +7,6 @@ import org.scalatest.Matchers._
 class FiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
   val topos = FiniteSets
 
-  import topos._
-
   type FOO = Boolean
   type BAR = String
   type BAZ = Int
@@ -42,17 +40,23 @@ class FiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
   )
 }) {
   import fixtures._
-  import fixtures.topos._
+  import topos._
+
+  describe("The Boolean property") {
+    it("holds") {
+      topos should be('boolean)
+    }
+  }
 
   describe("Global element enumeration") {
     it("works on the built-ins") {
-      omega.globals should have('size(2))
+      omega.globals should have size 2
     }
 
     it("works on the fixtures") {
-      foo.globals should have('size(2))
-      bar.globals should have('size(3))
-      baz.globals should have('size(4))
+      foo.globals should have size 2
+      bar.globals should have size 3
+      baz.globals should have size 4
     }
   }
 }

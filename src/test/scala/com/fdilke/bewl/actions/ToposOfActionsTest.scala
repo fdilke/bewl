@@ -31,13 +31,11 @@ class ToposOfActionsTest extends GenericToposTests(new ToposWithFixtures {
 
   override val foo = makeDot(monoidOf3.regularAction)
 
-  // private val barDot: FiniteSets.DOT[String] = FiniteSetsUtilities.dot("i", "x", "y")
   private val barDot: FiniteSets.DOT[String] = FiniteSetsUtilities.dot("x", "y")
   private val bazDot: FiniteSets.DOT[String] = FiniteSetsUtilities.dot("i", "x", "y")
 
   private val scalarMultiply: (String, Symbol) => String =
     (s, m) => monoidOf3.multiply(Symbol(s), m).name
-
 
   override val bar = makeDot(monoidOf3.action(barDot)(scalarMultiply))
   override val baz = makeDot(monoidOf3.action(bazDot)(scalarMultiply))
@@ -92,11 +90,17 @@ class ToposOfActionsTest extends GenericToposTests(new ToposWithFixtures {
   }
 }) {
   import fixtures._
-  import fixtures.topos._
+  import topos._
+
+  describe("The Boolean property") {
+    ignore("fails") { // too slow :( :( :(
+      topos should not be ('boolean)
+    }
+  }
 
   describe("Global element enumeration") {
     it("works on the built-ins") {
-      omega.globals should have('size(2))
+      omega.globals should have size 2
     }
 
     it("works on the fixtures") {

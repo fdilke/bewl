@@ -10,7 +10,7 @@ import org.scalatest.Tag
 
 import scala.Function.untupled
 
-private class TooSlowToposOfActionsTest extends GenericToposTests(new ToposWithFixtures {
+abstract class TooSlowToposOfActionsTest extends GenericToposTests(new ToposWithFixtures {
 
   private val (i, x, y) = ('i, 'x, 'y)
 

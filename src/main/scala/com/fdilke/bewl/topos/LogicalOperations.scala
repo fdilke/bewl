@@ -32,4 +32,9 @@ trait LogicalOperations { topos: BaseTopos =>
       (product.π1 o graph) / (product.π0 o graph)
     }
   }
+
+  import TruthObject.falsity
+  
+  def isBoolean =
+    (truth + falsity).isIso
 }
