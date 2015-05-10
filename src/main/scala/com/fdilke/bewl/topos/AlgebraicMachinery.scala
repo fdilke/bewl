@@ -1,11 +1,53 @@
 package com.fdilke.bewl.topos
 
-import com.fdilke.bewl.topos.StarTag._
-import scala.reflect.runtime.universe._
 import scala.language.implicitConversions
+import scala.language.dynamics
 
 trait AlgebraicMachinery { topos: BaseTopos =>
 
+  // TODO: refactor
+  type NullaryOp[X <: ~] = ARROW[UNIT, X]
+  type UnaryOp[X <: ~] = ARROW[X, X]
+  type BinaryOp[X <: ~] = BiArrow[X, X, X]
+  type RightScalarBinaryOp[X <: ~, S <: ~] = BiArrow[X, S, X]
+  // TODO: refactor... end
+
+  case class Law(left: Term, right: Term)
+
+  trait Term extends Dynamic {
+    def applyDynamic(name: String)(that: Term) =
+      CompoundTerm(this, StandardTermsAndOperators.operatorFrom(name), that)
+    def :=(that: Term) = Law(this, that)
+  }
+
+  sealed trait Sort
+  class Principal extends Sort
+  class Scalar extends Sort
+
+  case class Operator(name: String, arity: Int)
+
+  case class SimpleTerm[S <: Sort](symbol: String) extends Term {
+
+  }
+
+  case class CompoundTerm(left: Term, op: Operator, right: Term) extends Term {
+
+  }
+
+  object StandardTermsAndOperators {
+    val α = SimpleTerm[Principal]("α")
+    val β = SimpleTerm[Principal]("β")
+    val * = Operator("*", 2)
+    private val operators = Map[String, Operator](
+      "*" -> *
+    )
+    def operatorFrom(name: String) =
+      operators.getOrElse(name,
+        throw new IllegalArgumentException("Unknown binary operator: ")
+      )
+  }
+
+/*
   // Multiproducts. TODO: split out as separate trait?
 
   case class TypedStar[X <: ~](star: DOT[X]) {
@@ -34,15 +76,6 @@ trait AlgebraicMachinery { topos: BaseTopos =>
           val root = star.star
           val projections = Seq(root.identity)
         }
-
-//      case prevStars :+ star =>
-//        val prevProduct = MultiProduct(prevStars map { _.star } :_*)
-//        new MultiProduct[prevProduct.TYPE x star.TYPE]  {
-//          val root = prevProduct.root x star.star
-//          val projections = prevProduct.projections map { (p: ARROW[prevProduct.TYPE, _]) =>
-//            p o root.π0
-//          } :+  root.π1
-//        }
     }
   }
 
@@ -83,7 +116,6 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     def apply[A, B](tagA: StarTag[A], tagB: StarTag[B]) = new Arity[(A, B)](tagA, tagB)
   }
 
-//  trait Signature[RETURN_TYPE]
   class AbstractOp[A, R](name: String, arity: Arity[A], returnTag: StarTag[R])
 
   class AbstractNullaryOp[A: TypeTag](name: String, starTag: StarTag[A]) extends
@@ -156,9 +188,6 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   class Law[A](arity: Arity[A]) {
     def verify[X <: ~](algebra: Algebra[X]) = {
-//      val context = new RootContext(algebra, arity)
-      // ... add verification stuff here
-      // TDD RootContext??
     }
   }
 
@@ -245,6 +274,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   case class Algebra[X <: ~](theory: AlgebraicTheory, carrier: DOT[X], assignments: OpAssignments[X]) {
     def sanityTest = theory.laws.foreach { _.verify(Algebra.this)}
   }
+  */
 }
 
 

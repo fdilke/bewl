@@ -1,16 +1,19 @@
 package com.fdilke.bewl.algebra
 
-import com.fdilke.bewl.fsets.FiniteSets.AbstractOp._
 import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import com.fdilke.bewl.testutil.RunTimeCompilation
-import com.fdilke.bewl.topos.StarTag.Principal
-import com.fdilke.bewl.topos.StarTag.principal
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
-class AlgebraTests extends FunSpec with RunTimeCompilation {
+class AlgebraTests extends FunSpec {
 
+  private val topos = com.fdilke.bewl.fsets.FiniteSets
+  import topos.StandardTermsAndOperators._
+
+  private val commutativeLaw = (α * β) := (β * α) 
+
+/*
   private val leftUnitLaw = Law("not a left unit", (x: Variable[Principal]) =>
     multiply(unit, x) ::== x
   )
@@ -159,4 +162,5 @@ class AlgebraTests extends FunSpec with RunTimeCompilation {
     it("can be verified in the context of an algebraic theory, for a specified algebra") {
     }
   }
+*/  
 }
