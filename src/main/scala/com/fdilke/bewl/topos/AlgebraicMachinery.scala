@@ -34,10 +34,17 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   }
 
+  case class OperatorAssignment[T <: ~](op: Operator)
+
+  class AbstractBinaryOp(name: String) extends Operator(name, 2) {
+    def :=[T <: ~](binaryOp: BinaryOp[T]) =
+      OperatorAssignment[T](this) // TODO: do things with binaryOp
+  }
+
   object StandardTermsAndOperators {
     val α = SimpleTerm[Principal]("α")
     val β = SimpleTerm[Principal]("β")
-    val * = Operator("*", 2)
+    val * = new AbstractBinaryOp("*")
     private val operators = Map[String, Operator](
       "*" -> *
     )
@@ -45,6 +52,21 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       operators.getOrElse(name,
         throw new IllegalArgumentException("Unknown binary operator: ")
       )
+  }
+
+  trait Constant
+
+  class AlgebraicTheory(constants: Seq[Constant], operators: Seq[Operator], laws: Seq[Law]) {
+    class Algebra[T <: ~](carrier: DOT[T])(assignments: OperatorAssignment[T]*) {
+      def sanityTest {
+
+      }
+    }
+  }
+
+  object AlgebraicTheory {
+    def apply(constants: Constant*)(operators: Operator*)(laws: Law*) =
+      new AlgebraicTheory(constants, operators, laws)
   }
 
 /*
