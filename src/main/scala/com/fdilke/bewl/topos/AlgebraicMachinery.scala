@@ -51,8 +51,10 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     val α = SimpleTerm[Principal]("α")
     val β = SimpleTerm[Principal]("β")
     val * = new AbstractBinaryOp("*")
+    val + = new AbstractBinaryOp("+")
     private val operators = Map[String, Operator](
-      "*" -> *
+      "*" -> *,
+      "+" -> $plus
     )
     def operatorFrom(name: String) =
       operators.getOrElse(name,

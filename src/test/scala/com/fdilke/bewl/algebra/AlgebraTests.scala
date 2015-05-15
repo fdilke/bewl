@@ -25,6 +25,9 @@ class AlgebraTests extends FunSpec {
      intercept[IllegalArgumentException] {
         new commutativeMagmas.Algebra[Boolean](carrier)().sanityTest
      }
+     intercept[IllegalArgumentException] {
+        new commutativeMagmas.Algebra[Boolean](carrier)($plus := commutativeOp).sanityTest
+     }
 
       CommutativeMagma(carrier, commutativeOp).sanityTest
 // TODO: make this work
