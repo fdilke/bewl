@@ -20,13 +20,13 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     def :=(that: Term) = Law(this, that)
   }
 
-  sealed trait Sort
-  class Principal extends Sort
-  class Scalar extends Sort
+  sealed trait AlgebraicSort
+  class Principal extends AlgebraicSort
+  class Scalar extends AlgebraicSort
 
   case class Operator(name: String, arity: Int)
 
-  case class SimpleTerm[S <: Sort](symbol: String) extends Term {
+  case class SimpleTerm[S <: AlgebraicSort](symbol: String) extends Term {
 
   }
 
@@ -35,6 +35,12 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   }
 
   case class OperatorAssignment[T <: ~](op: Operator)
+
+  case class OperatorAssignments[T <: ~](assignments: Seq[OperatorAssignment[T]]) {
+      def hasPrecisely(constants: Seq[Constant], operators: Seq[Operator]): Boolean =
+        assignments.map { _.op }.toSet ==
+          (operators ++ constants).toSet
+  }
 
   class AbstractBinaryOp(name: String) extends Operator(name, 2) {
     def :=[T <: ~](binaryOp: BinaryOp[T]) =
@@ -54,12 +60,15 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       )
   }
 
-  trait Constant
+  class Constant(name: String) extends Operator(name, 0)
 
   class AlgebraicTheory(constants: Seq[Constant], operators: Seq[Operator], laws: Seq[Law]) {
     class Algebra[T <: ~](carrier: DOT[T])(assignments: OperatorAssignment[T]*) {
+      val operatorAssignments = OperatorAssignments(assignments)
       def sanityTest {
-
+        if (!operatorAssignments.hasPrecisely(constants, operators)) {
+          throw new IllegalArgumentException("Assignments do not match signature of theory")
+        }
       }
     }
   }

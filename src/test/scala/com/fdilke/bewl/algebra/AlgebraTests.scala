@@ -11,7 +11,7 @@ class AlgebraTests extends FunSpec {
   private val topos = com.fdilke.bewl.fsets.FiniteSets
   import topos.StandardTermsAndOperators._
 
-  describe("The universal algebra trait") {
+  describe("The universal algebra classes") {
     it("can express the theory of commutative magmas") {
       val commutativeMagmas = AlgebraicTheory()(*)((α * β) := (β * α))
       case class CommutativeMagma[T <: ~](
@@ -21,6 +21,10 @@ class AlgebraTests extends FunSpec {
       val carrier = dot(true, false)
       val commutativeOp = bifunctionAsBiArrow(carrier) { _ & _}
       val nonCommutativeOp = bifunctionAsBiArrow(carrier) { _ & !_ }
+
+     intercept[IllegalArgumentException] {
+        new commutativeMagmas.Algebra[Boolean](carrier)().sanityTest
+     }
 
       CommutativeMagma(carrier, commutativeOp).sanityTest
 // TODO: make this work
