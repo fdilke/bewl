@@ -13,7 +13,7 @@ class AlgebraTests extends FunSpec {
 
   describe("The universal algebra classes") {
     it("can express the theory of commutative magmas") {
-      val commutativeMagmas = AlgebraicTheory()(*)((α * β) := (β * α))
+      val commutativeMagmas = AlgebraicTheory()(*)(α * β := (β * α))
       case class CommutativeMagma[T <: ~](
         carrier: DOT[T], op: BinaryOp[T]
       ) extends commutativeMagmas.Algebra[T](carrier)(* := op)
@@ -26,7 +26,7 @@ class AlgebraTests extends FunSpec {
         new commutativeMagmas.Algebra[Boolean](carrier)().sanityTest
      }
      intercept[IllegalArgumentException] {
-        new commutativeMagmas.Algebra[Boolean](carrier)($plus := commutativeOp).sanityTest
+        new commutativeMagmas.Algebra[Boolean](carrier)(⊕ := commutativeOp).sanityTest
      }
 
       CommutativeMagma(carrier, commutativeOp).sanityTest

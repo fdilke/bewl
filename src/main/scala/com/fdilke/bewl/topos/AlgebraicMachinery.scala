@@ -3,6 +3,10 @@ package com.fdilke.bewl.topos
 import scala.language.implicitConversions
 import scala.language.dynamics
 
+sealed trait AlgebraicSort
+class Principal extends AlgebraicSort
+class Scalar extends AlgebraicSort
+
 trait AlgebraicMachinery { topos: BaseTopos =>
 
   // TODO: refactor
@@ -12,26 +16,26 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   type RightScalarBinaryOp[X <: ~, S <: ~] = BiArrow[X, S, X]
   // TODO: refactor... end
 
-  case class Law(left: Term, right: Term)
+  case class Law(left: Term, right: Term) {
+    val freeVariables = 
+      (left.freeVariables ++ right.freeVariables) distinct
+  }
 
-  trait Term extends Dynamic {
+  sealed trait Term extends Dynamic {
     def applyDynamic(name: String)(that: Term) =
       CompoundTerm(this, StandardTermsAndOperators.operatorFrom(name), that)
+    val freeVariables : Seq[SimpleTerm[_ <: AlgebraicSort]]
     def :=(that: Term) = Law(this, that)
   }
 
-  sealed trait AlgebraicSort
-  class Principal extends AlgebraicSort
-  class Scalar extends AlgebraicSort
-
   case class Operator(name: String, arity: Int)
 
-  case class SimpleTerm[S <: AlgebraicSort](symbol: String) extends Term {
-
+  case class SimpleTerm[S <: AlgebraicSort](symbol: String) extends Term { term =>
+    override val freeVariables = Seq(term)
   }
 
   case class CompoundTerm(left: Term, op: Operator, right: Term) extends Term {
-
+    override val freeVariables = (left.freeVariables ++ right.freeVariables).distinct
   }
 
   case class OperatorAssignment[T <: ~](op: Operator)
@@ -52,9 +56,11 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     val β = SimpleTerm[Principal]("β")
     val * = new AbstractBinaryOp("*")
     val + = new AbstractBinaryOp("+")
+    val ⊕ = new AbstractBinaryOp("⊕")
     private val operators = Map[String, Operator](
       "*" -> *,
-      "+" -> $plus
+      "+" -> $plus,
+      "⊕" -> ⊕
     )
     def operatorFrom(name: String) =
       operators.getOrElse(name,
@@ -64,13 +70,21 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   class Constant(name: String) extends Operator(name, 0)
 
+  class EvaluationContext[T <: ~](carrier: DOT[T], variables: Seq[SimpleTerm[_ <: AlgebraicSort]])
+
   class AlgebraicTheory(constants: Seq[Constant], operators: Seq[Operator], laws: Seq[Law]) {
-    class Algebra[T <: ~](carrier: DOT[T])(assignments: OperatorAssignment[T]*) {
+    class Algebra[T <: ~](carrier: DOT[T])(assignments: OperatorAssignment[T]*) { algebra =>
       val operatorAssignments = OperatorAssignments(assignments)
       def sanityTest {
         if (!operatorAssignments.hasPrecisely(constants, operators)) {
           throw new IllegalArgumentException("Assignments do not match signature of theory")
         }
+        def verify(law: Law) {
+          val freeVariables = law.freeVariables
+          val context = new EvaluationContext(carrier, freeVariables)
+          println(">>> Verify law here")
+        }
+        laws foreach verify
       }
     }
   }
