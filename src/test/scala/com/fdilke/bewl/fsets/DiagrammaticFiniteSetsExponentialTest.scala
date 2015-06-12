@@ -6,7 +6,7 @@ import org.scalatest.Matchers._
 
 class DiagrammaticFiniteSetsExponentialTest extends FunSpec {
   describe("The exponential") {
-    describe("has the correct number of values, all distinct") {
+    it("has the correct number of values, all distinct") {
       val source = set('a, 'b, 'c)
       val target = set(1, 2, 3, 4)
       target ^ source should have ('size (64))

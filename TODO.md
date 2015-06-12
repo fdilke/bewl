@@ -11,7 +11,6 @@ try 'lazy me' experiment with pairs
 - Is the remapping of operators a hack that should be done some other way?
 - check arities of operators in a law? Can't currently because they are just arrows. Is that fixable?
 - add tests based on these: we can verify that Aut(2) is commutative but Aut(3) isn't
-- Construct coproducts and colimits (how does McLarty do this?)
 
 # Questions
 
@@ -65,7 +64,7 @@ Having spiked, work out a way to test-drive this from the bottom up. Some concep
  So we can be passing elements around by the time we are dealing with Variables.
 
 Then maybe a Variable wraps an ELEMENT of the given type. How to make it all type safe??
-Or better to have a sanity test on the operators as we build expressions? [MUCH better done at compile time] 
+Or better to have a sanity test on the operators as we build expressions? (MUCH better done at compile time) 
  
 Can we easily associate a type with each StarTag? Maybe they should actually be types, or have types?
 Could now do type-safe products? Would these be useful inside RootContext, or as a dress rehearsal for it?
@@ -82,13 +81,13 @@ f: R -> X factors through g: S -> X means:
 
 # idea: Linkages as metatypes for monoid actions
 Encapsulate the fundamental unit:
-  [  A and a RightAction[A]
-  [  AA and an equivalence A <-> AA
+  -  A and a RightAction\[A\]
+  -  AA and an equivalence A \<-\> AA
 Potentially enables a typesafe version of the (existing horrible) quiver code
 
 # Possible DSL extensions
   Better to throw an exception if the function is ever called?
-  Should we have ELEMENT[X] instead of ELEMENT? in the mapping functions, for example?
+  Should we have ELEMENT\[X\] instead of ELEMENT? in the mapping functions, for example?
   Require OmegaElement as a "convenience" trait for truth values
   For next DSL: 'metatypes' which include stars, elements and any special constructions
 
@@ -101,8 +100,8 @@ Potentially enables a typesafe version of the (existing horrible) quiver code
   Not an issue: Does it matter that when an element of M x A -> B is regarded as an A -> B,
   its function is no longer M-preserving? This seems acceptable only if the
   function is only there for show, and the user doesn't have access to it.
-  Thankfully not needed: Can we arrange for a FiniteSet[X] to still ultimately be a Traversable[X], even if its
-  interface makes it look like a STAR[NEW_LAYER[X]] where NEW_LAYER has the rewrapper methods?
+  Thankfully not needed: Can we arrange for a FiniteSet\[X\] to still ultimately be a Traversable\[X\], even if its
+  interface makes it look like a STAR\[NEW_LAYER\[X\]\] where NEW_LAYER has the rewrapper methods?
 
 # Integer powers: a rejected construction
 involved too much violence to the type system
@@ -111,7 +110,7 @@ Ultimately not needed - we can work quite happily with biproducts and adhoc vari
 
 # Loosening biproducts and exponentials: (for typesafe actions) : Still WIP
 
-Currently: a > b has to be an EXPONENTIAL{A, B] = STAR[A > B] with ExponentialStar[A, B]
+Currently: a > b has to be an EXPONENTIAL{A, B] = STAR\[A > B\] with ExponentialStar\[A, B\]
 where A > B ::== (A => B) with ELEMENT
 
 If > was user-defined, we could have:
@@ -128,3 +127,17 @@ we have to construct "isIdeal" which tests for f: M -> Ω that:
 ∀ (s, t) in T x T, f(s) => f(st)
 This involves ∀ing over T x T, i.e. constructing an arrow from Ω ^ (T x T) to Ω.
 But the left hand star has 2 ^ 64 elements!
+
+# structures for universal algebra  
+Example: AlgebraicTheory()(*)(α * β := β * α)
+This says: for the theory we're defining (commutative magmas) there are no constants, 1 binary operation \*, and one law.
+How are the laws constructed/verified? A law is an equality between terms:
+     α * β := β * α
+All of these are Term\[Principal\] which means: they ultimately boil down to maps into the carrier 
+
+# Going multivariate
+We now assume our algebra A has various "supporting algebras" B, C, ... in its definition.
+So we can express: an action of a monoid, a module over a ring.
+
+# Evaluation contexts
+An EC somehow keep

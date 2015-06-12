@@ -16,25 +16,25 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   type RightScalarBinaryOp[X <: ~, S <: ~] = BiArrow[X, S, X]
   // TODO: refactor... end
 
-  case class Law(left: Term, right: Term) {
+  case class Law[S <: AlgebraicSort](left: Term[S], right: Term[S]) {
     val freeVariables = 
       (left.freeVariables ++ right.freeVariables) distinct
   }
 
-  sealed trait Term extends Dynamic {
-    def applyDynamic(name: String)(that: Term) =
+  sealed trait Term[S <: AlgebraicSort] extends Dynamic {
+    def applyDynamic(name: String)(that: Term[S]) =
       CompoundTerm(this, StandardTermsAndOperators.operatorFrom(name), that)
     val freeVariables : Seq[SimpleTerm[_ <: AlgebraicSort]]
-    def :=(that: Term) = Law(this, that)
+    def :=(that: Term[S]) = Law(this, that)
   }
 
   case class Operator(name: String, arity: Int)
 
-  case class SimpleTerm[S <: AlgebraicSort](symbol: String) extends Term { term =>
+  case class SimpleTerm[S <: AlgebraicSort](symbol: String) extends Term[S] { term =>
     override val freeVariables = Seq(term)
   }
 
-  case class CompoundTerm(left: Term, op: Operator, right: Term) extends Term {
+  case class CompoundTerm[S <: AlgebraicSort](left: Term[S], op: Operator, right: Term[S]) extends Term[S] {
     override val freeVariables = (left.freeVariables ++ right.freeVariables).distinct
   }
 
@@ -70,27 +70,30 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   class Constant(name: String) extends Operator(name, 0)
 
-  class EvaluationContext[T <: ~](carrier: DOT[T], variables: Seq[SimpleTerm[_ <: AlgebraicSort]])
+  class EvaluationContext[T <: ~](carrier: DOT[T], variables: Seq[SimpleTerm[_ <: AlgebraicSort]]) {
+    val root: DOT[VOID] = O
 
-  class AlgebraicTheory(constants: Seq[Constant], operators: Seq[Operator], laws: Seq[Law]) {
+    def evaluate(term: Term[Principal]): ARROW[VOID, T] =
+      carrier.fromO
+  }
+
+  class AlgebraicTheory(constants: Seq[Constant], operators: Seq[Operator], laws: Seq[Law[_ <: AlgebraicSort]]) {
     class Algebra[T <: ~](carrier: DOT[T])(assignments: OperatorAssignment[T]*) { algebra =>
       val operatorAssignments = OperatorAssignments(assignments)
-      def sanityTest {
-        if (!operatorAssignments.hasPrecisely(constants, operators)) {
+
+      def sanityTest =
+        if (!operatorAssignments.hasPrecisely(constants, operators))
           throw new IllegalArgumentException("Assignments do not match signature of theory")
-        }
-        def verify(law: Law) {
-          val freeVariables = law.freeVariables
-          val context = new EvaluationContext(carrier, freeVariables)
-          println(">>> Verify law here")
-        }
-        laws foreach verify
+        else
+          laws foreach { law =>
+            val context = new EvaluationContext(carrier, law.freeVariables)
+            println(">>> Verify law here")
       }
     }
   }
 
   object AlgebraicTheory {
-    def apply(constants: Constant*)(operators: Operator*)(laws: Law*) =
+    def apply(constants: Constant*)(operators: Operator*)(laws: Law[_ <: AlgebraicSort]*) =
       new AlgebraicTheory(constants, operators, laws)
   }
 

@@ -46,7 +46,7 @@ If you want to use Bewl as a learning aid to study category theory, [start here]
 - Broaden definition of algebraic structures to include models and parameterized operations
 - Formalize constructions like: automorphism group, endomorphism ring, group of invertible elements of a monoid
 - Extract the Heyting algebra structure of the subobject classifier
-- Construct coproducts and colimits
+- Construct 0, coproducts and colimits
 
 # Questions
 

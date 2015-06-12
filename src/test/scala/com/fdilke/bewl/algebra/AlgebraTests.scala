@@ -2,7 +2,6 @@ package com.fdilke.bewl.algebra
 
 import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
-import com.fdilke.bewl.testutil.RunTimeCompilation
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
@@ -11,8 +10,30 @@ class AlgebraTests extends FunSpec {
   private val topos = com.fdilke.bewl.fsets.FiniteSets
   import topos.StandardTermsAndOperators._
 
-  describe("The universal algebra classes") {
-    it("can express the theory of commutative magmas") {
+  describe("Simple and compound terms") {
+    it("can describe their own free variables") {
+      α.freeVariables shouldBe Seq(α)
+      (α * β).freeVariables shouldBe Seq(α, β)
+    }
+  }
+  describe("An evaluation context") {
+    it("can evaluate terms, mapping types correctly") {
+      val carrier = dot(true, false)
+      val context = new EvaluationContext[Boolean](carrier, Seq(α, β))
+      context.evaluate(α) should have (
+        'source(context.root),
+        'target(carrier)
+      )
+      context.evaluate(β) should have (
+        'source(context.root),
+        'target(carrier)
+      )
+//      context.evaluate(α) x context.evaluate(β) shouldBe context.root.identity
+    }
+  }
+
+  describe("Algebraic theories") {
+    it("can encapsulate commutative magmas") {
       val commutativeMagmas = AlgebraicTheory()(*)(α * β := β * α)
       case class CommutativeMagma[T <: ~](
         carrier: DOT[T], op: BinaryOp[T]
