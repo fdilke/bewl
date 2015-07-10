@@ -2,6 +2,7 @@ package com.fdilke.bewl.topos
 
 import scala.language.implicitConversions
 import scala.language.dynamics
+import scala.reflect._
 
 sealed trait AlgebraicSort
 class Principal extends AlgebraicSort
@@ -30,8 +31,9 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   case class Operator(name: String, arity: Int)
 
-  case class SimpleTerm[S <: AlgebraicSort](symbol: String) extends Term[S] { term =>
+  case class SimpleTerm[S <: AlgebraicSort : ClassTag](symbol: String) extends Term[S] { term =>
     override val freeVariables = Seq(term)
+    val tag = classTag[S]
   }
 
   case class CompoundTerm[S <: AlgebraicSort](left: Term[S], op: Operator, right: Term[S]) extends Term[S] {
@@ -70,23 +72,59 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   class Constant(name: String) extends Operator(name, 0)
 
-  class EvaluationContext[T <: ~](carrier: DOT[T], variables: Seq[SimpleTerm[_ <: AlgebraicSort]]) {
-    val root: DOT[VOID] = O
-
-    def evaluate(term: Term[Principal]): ARROW[VOID, T] =
-      carrier.fromO
-  }
+//  class EvaluationContext[T <: ~](carrier: DOT[T], variables: Seq[SimpleTerm[_ <: AlgebraicSort]]) {
+//    val root: DOT[VOID] = O
+//
+//    def evaluate(term: Term[Principal]): ARROW[VOID, T] =
+//      carrier.fromO
+//  }
 
   class AlgebraicTheory(constants: Seq[Constant], operators: Seq[Operator], laws: Seq[Law[_ <: AlgebraicSort]]) {
     class Algebra[T <: ~](carrier: DOT[T])(assignments: OperatorAssignment[T]*) { algebra =>
       val operatorAssignments = OperatorAssignments(assignments)
+
+      object EvaluationContext {
+        def apply[T <: ~](variables: Seq[SimpleTerm[_ <: AlgebraicSort]]): EvaluationContext[_ <: ~] =
+          variables match {
+            case Nil => new SimpleEvaluationContext
+            case head :: tail =>
+              new CompoundEvaluationContext(carrierFor(head.tag), EvaluationContext(tail))
+              // TODO: store the variables in context
+              // TODO: refactor as fold
+          }
+      }
+
+      sealed trait EvaluationContext[R <: ~] {
+        val source: DOT[R]
+        def evaluate(term: Term[Principal]): ARROW[R, T]
+      }
+
+      class SimpleEvaluationContext extends EvaluationContext[UNIT] {
+        val source: DOT[UNIT] = I
+
+        override def evaluate(term: Term[Principal]): ARROW[UNIT, T] =
+          carrier.fromO
+      }
+
+      class CompoundEvaluationContext[HEAD <: ~, TAIL <: ~](
+        head: DOT[HEAD],
+        tail: EvaluationContext[TAIL]
+      ) extends EvaluationContext[HEAD x TAIL] {
+        val source: DOT[HEAD x TAIL] = head x tail.source
+
+        override def evaluate(term: Term[Principal]): ARROW[HEAD x TAIL, T] =
+          carrier.fromO o source.toI
+      }
+
+      def carrierFor[S <: AlgebraicSort](tag: ClassTag[S]): DOT[T] =
+        carrier // TODO: support other type lookups later
 
       def sanityTest =
         if (!operatorAssignments.hasPrecisely(constants, operators))
           throw new IllegalArgumentException("Assignments do not match signature of theory")
         else
           laws foreach { law =>
-            val context = new EvaluationContext(carrier, law.freeVariables)
+            val context = EvaluationContext(law.freeVariables)
             println(">>> Verify law here")
       }
     }

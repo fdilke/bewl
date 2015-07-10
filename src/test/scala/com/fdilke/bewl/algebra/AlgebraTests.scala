@@ -18,14 +18,16 @@ class AlgebraTests extends FunSpec {
   }
   describe("An evaluation context") {
     it("can evaluate terms, mapping types correctly") {
-      val carrier = dot(true, false)
-      val context = new EvaluationContext[Boolean](carrier, Seq(α, β))
+      val carrier = dot[Boolean](true, false)
+      val minimalTheory = new AlgebraicTheory(Nil, Nil, Nil)
+      val minimalAlgebra = new minimalTheory.Algebra[Boolean](carrier)()
+      val context = minimalAlgebra.EvaluationContext[Boolean](Seq(α, β))
       context.evaluate(α) should have (
-        'source(context.root),
+        'source(context.source),
         'target(carrier)
       )
       context.evaluate(β) should have (
-        'source(context.root),
+        'source(context.source),
         'target(carrier)
       )
 //      context.evaluate(α) x context.evaluate(β) shouldBe context.root.identity

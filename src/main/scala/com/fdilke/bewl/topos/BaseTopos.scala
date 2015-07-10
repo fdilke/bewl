@@ -326,9 +326,9 @@ trait BaseTopos { self: LogicalOperations =>
       }
 
     def extend[S <: ~, B <: ~](
-                                monic: ARROW[S, B],
-                                arrowOnSub: ARROW[S, A]
-                                ) =
+      monic: ARROW[S, B],
+      arrowOnSub: ARROW[S, A]
+    ) =
       classifier.restrict(
         dot.power.transpose(monic.target) {
           (t, a) => monic.target.exists(monic.source) {
