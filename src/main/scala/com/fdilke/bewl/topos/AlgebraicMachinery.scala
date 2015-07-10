@@ -23,13 +23,13 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   sealed trait Term[S <: AlgebraicSort] extends Dynamic {
     def applyDynamic(name: String)(that: Term[S]) =
       CompoundTerm(this, StandardTermsAndOperators.operatorFrom(name), that)
-    val freeVariables : Seq[SimpleTerm[_ <: AlgebraicSort]]
+    val freeVariables : Seq[VariableTerm[_ <: AlgebraicSort]]
     def :=(that: Term[S]) = Law(this, that)
   }
 
   case class Operator(name: String, arity: Int)
 
-  case class SimpleTerm[S <: AlgebraicSort : ClassTag](symbol: String) extends Term[S] { term =>
+  case class VariableTerm[S <: AlgebraicSort : ClassTag](symbol: String) extends Term[S] { term =>
     override val freeVariables = Seq(term)
     val tag = classTag[S]
   }
@@ -38,11 +38,26 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     override val freeVariables = (left.freeVariables ++ right.freeVariables).distinct
   }
 
-  case class OperatorAssignment[T <: ~](op: Operator)
+  class Constant(name: String) extends Operator(name, 0) with Term[Principal] {
+    override val freeVariables = Nil
+    def :=[T <: ~](nullaryOp: NullaryOp[T]) =
+      new OperatorAssignment[T](this) {
+        override def lookupConstant = Some(nullaryOp)
+      }
+  }
+
+  case class OperatorAssignment[T <: ~](operator: Operator) {
+    def lookupConstant: Option[NullaryOp[T]] = None
+  }
 
   case class OperatorAssignments[T <: ~](assignments: Seq[OperatorAssignment[T]]) {
-      def hasPrecisely(constants: Seq[Constant], operators: Seq[Operator]): Boolean =
-        assignments.map { _.op }.toSet ==
+    def lookup(term: Constant): Option[NullaryOp[T]] = (
+      for (assignment <- assignments if assignment.operator == term)
+        yield assignment.lookupConstant
+    ).headOption.flatten
+
+    def hasPrecisely(constants: Seq[Constant], operators: Seq[Operator]): Boolean =
+        assignments.map { _.operator }.toSet ==
           (operators ++ constants).toSet
   }
 
@@ -52,11 +67,15 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   }
 
   object StandardTermsAndOperators {
-    val α = SimpleTerm[Principal]("α")
-    val β = SimpleTerm[Principal]("β")
+    val o = new Constant("o")
+
+    val α = VariableTerm[Principal]("α")
+    val β = VariableTerm[Principal]("β")
+
     val * = new AbstractBinaryOp("*")
     val + = new AbstractBinaryOp("+")
     val ⊕ = new AbstractBinaryOp("⊕")
+
     private val operators = Map[String, Operator](
       "*" -> *,
       "+" -> $plus,
@@ -68,14 +87,12 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       )
   }
 
-  class Constant(name: String) extends Operator(name, 0)
-
   class AlgebraicTheory(constants: Seq[Constant], operators: Seq[Operator], laws: Seq[Law[_ <: AlgebraicSort]]) {
     class Algebra[T <: ~](carrier: DOT[T])(assignments: OperatorAssignment[T]*) { algebra =>
       val operatorAssignments = OperatorAssignments(assignments)
 
       object EvaluationContext {
-        def apply[T <: ~](variables: Seq[SimpleTerm[_ <: AlgebraicSort]]): EvaluationContext[_ <: ~] =
+        def apply[T <: ~](variables: Seq[VariableTerm[_ <: AlgebraicSort]]): EvaluationContext[_ <: ~] =
           variables match {
             case Nil => new SimpleEvaluationContext
             case head :: tail =>
@@ -107,11 +124,17 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
         override def evaluate(term: Term[Principal]): ARROW[HEAD x TAIL, T] =
           term match {
-            case SimpleTerm(symbol) =>
+            case VariableTerm(symbol) =>
               if (symbol == name)
-                realRoot.π0.asInstanceOf[ARROW[HEAD x TAIL, T]] // TODO: use =:= here to vaoid cast?
+                realRoot.π0.asInstanceOf[ARROW[HEAD x TAIL, T]] // TODO: use =:= here to avoid cast?
               else
                 tail.evaluate(term) o realRoot.π1
+            case term: Constant =>
+              operatorAssignments.lookup(term).map { constant =>
+                constant o root.toI
+              }.getOrElse {
+                throw new IllegalArgumentException("Unknown constant in expression: " + term.name)
+              }
             case _ => ???
           }
       }

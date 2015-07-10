@@ -45,6 +45,18 @@ class AlgebraTests extends FunSpec {
       context.evaluate(α) x context.evaluate(β) shouldBe 'iso
     }
 
+    it("for one term can evaluate constants") {
+      val carrier = dot[Boolean](true, false)
+      val theO = makeNullaryOperator(carrier, false)
+
+      val oneConstantTheory = new AlgebraicTheory(Seq(o), Nil, Nil)
+      val minimalAlgebra = new oneConstantTheory.Algebra[Boolean](carrier)(o := theO)
+      val context = minimalAlgebra.EvaluationContext[Boolean](Seq(α))
+      context.evaluate(o) shouldBe (
+          theO o context.root.toI
+        )
+    }
+
     it("can evaluate terms...") {
       // ...
     }
