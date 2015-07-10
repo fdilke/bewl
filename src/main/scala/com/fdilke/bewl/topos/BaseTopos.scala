@@ -35,6 +35,12 @@ trait BaseTopos { self: LogicalOperations =>
     val target: DOT[T]
 
     def transpose[R <: ~](biArrow: BiArrow[R, S, T]): ARROW[R, S_T]
+
+    final def transpose[R <: ~](index: DOT[R])(bifunc: (R, S) => T): ARROW[R, S_T] =
+      transpose(
+        (index x source).biArrow(target)(bifunc)
+      )
+
     final def evaluation: BiArrow[S_T, S, T] =
       (this x source).biArrow(target) { (f, s) => f(s) }
   }
@@ -136,10 +142,8 @@ trait BaseTopos { self: LogicalOperations =>
           }(f, w) > w
       }
 
-    final def preForAll[R <: ~](source: DOT[R])(g: (R, S) => TRUTH): ARROW[R, TRUTH] =
-      ∀ o power.transpose(
-        (source x dot).biArrow(omega)(g)
-      )
+    final def preForAll[R <: ~](source: DOT[R])(bifunc: (R, S) => TRUTH): ARROW[R, TRUTH] =
+      ∀ o power.transpose(source)(bifunc)
 
     final def forAll[T <: ~](target: DOT[T])(g: (S, T) => TRUTH): ARROW[S, TRUTH] =
       target.preForAll(dot)(g)
@@ -179,10 +183,8 @@ trait BaseTopos { self: LogicalOperations =>
           }(t)
         }
 
-    final def preExists[R <: ~](source: DOT[R])(g: (R, S) => TRUTH): ARROW[R, TRUTH] =
-      ∃ o power.transpose(
-        (source x dot).biArrow(omega)(g)
-      )
+    final def preExists[R <: ~](source: DOT[R])(bifunc: (R, S) => TRUTH): ARROW[R, TRUTH] =
+      ∃ o power.transpose(source)(bifunc)
 
     final def exists[T <: ~](target: DOT[T])(g: (S, T) => TRUTH): ARROW[S, TRUTH] =
       target.preExists(this)(g)
@@ -238,10 +240,9 @@ trait BaseTopos { self: LogicalOperations =>
 
   trait Arrow[S <: ~, T <: ~] extends BaseArrow[S, T] { self: ARROW[S, T] =>
     final lazy val name =
-      (source > target).transpose(
-        (I x source).biArrow(target) {
+      (source > target).transpose(I) {
           (i, x) => this(x)
-        })
+        }
 
     final def x[U <: ~](that: ARROW[S, U]): ARROW[S, T x U] = {
       val product = target x that.target
@@ -273,11 +274,9 @@ trait BaseTopos { self: LogicalOperations =>
       isMonic && isEpic
 
     final lazy val inverse: ARROW[T, S] = 
-      source.power.transpose(
-        (target x source).biArrow(omega) {
+      source.power.transpose(target) {
           (t, s) => target.=?=(t, this(s))  
-        }
-      ) \ source.singleton
+        } \ source.singleton
 
     def /[R <: ~](iso: ARROW[S, R]) : ARROW[R, T] =
       self o iso.inverse
@@ -319,35 +318,29 @@ trait BaseTopos { self: LogicalOperations =>
         (f(a) ^ f(b)) > dot.=?=(a, b)
     }.whereTrue
 
-    val include = classifier.restrict(dot.singleton)
+    val include = classifier restrict dot.singleton
 
-    val ⏊ = classifier.restrict(
-      dot.power.transpose(
-        (I x dot).biArrow(omega) {
-          (i, x) => TruthObject.falsity(i)
-        }
-      )
-    )
+    val ⏊ = classifier restrict
+      dot.power.transpose(I) {
+        (i, x) => TruthObject.falsity(i)
+      }
 
     def extend[S <: ~, B <: ~](
-      monic: ARROW[S, B],
-      arrowOnSub: ARROW[S, A]
-    ) =
+                                monic: ARROW[S, B],
+                                arrowOnSub: ARROW[S, A]
+                                ) =
       classifier.restrict(
-        dot.power.transpose(
-          (monic.target x dot).biArrow(omega) {
-            (t, a) => monic.target.exists(monic.source) {
-              (t, s) =>
-                dot.=?=(
-                  arrowOnSub(s), a
-                ) ^
+        dot.power.transpose(monic.target) {
+          (t, a) => monic.target.exists(monic.source) {
+            (t, s) =>
+              dot.=?=(
+                arrowOnSub(s), a
+              ) ^
                 monic.target.=?=(
                   monic(s), t
                 )
-            }(t)
-          }
-        )
-      )
+          }(t)
+        })
   }
 
   class Coproduct[A <: ~, B <: ~](left: DOT[A], right: DOT[B]) {

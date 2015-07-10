@@ -9,7 +9,7 @@ class DiagrammaticFiniteSetsExponentialTest extends FunSpec {
     it("has the correct number of values, all distinct") {
       val source = set('a, 'b, 'c)
       val target = set(1, 2, 3, 4)
-      target ^ source should have ('size (64))
+      target ^ source should have size 64
     }
   }
 }

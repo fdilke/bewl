@@ -185,9 +185,7 @@ trait NaiveMonoidsAndActions {
         ) (
           bifunc: (H, M) => Ɛ.TRUTH
         ): Ɛ.ARROW[H, IDEAL] = 
-          ideals.restrict(possibleIdeals.transpose(
-            (that x carrier).biArrow(Ɛ.omega)(bifunc)
-          ))
+          ideals.restrict(possibleIdeals.transpose(that)(bifunc))
 
         private val idealMultiply = 
           restrict(ideals x carrier) {
@@ -348,11 +346,11 @@ trait NaiveMonoidsAndActions {
             }.whereTrue
 
           val morphismMultiply = morphisms.restrict(
-            possibleMorphisms.transpose(
-              (morphisms x carrier x mXz).biArrow(action.actionCarrier) {
+              possibleMorphisms.transpose(morphisms x carrier) {
                 case ((f, m), (n, z)) => morphisms.inclusion(f)(
                   mXz.pair(multiply(m, n), z)
-              )}))
+                )}
+            )
 
           new ActionDot[P, ExponentialWrapper[Z, ZZ, A, AA]](
             monoid.action(morphisms) {
@@ -402,13 +400,12 @@ trait NaiveMonoidsAndActions {
         ): ARROW[AA, ExponentialWrapper[R, RR, T, TT]] = {
           type P = Ɛ.>[Ɛ.x[M, R],T]
           val innerArrow: Ɛ.ARROW[A, P] =
-            morphisms.restrict(possibleMorphisms.transpose(
-              (action.actionCarrier x source.pairs).biArrow(target.action.actionCarrier) {
+            morphisms.restrict(possibleMorphisms.transpose(action.actionCarrier) {
                 case (a, (m, r)) => 
                   target.↔.\(biArrow(
                     dot.↔ / action.actionMultiply(a, m), 
                     source.↔ / r
-                  ))}))
+            ))})
           this(exponentialDot) { aa =>
             exponentialDot.↔ / innerArrow(↔ \ aa)
           }              
