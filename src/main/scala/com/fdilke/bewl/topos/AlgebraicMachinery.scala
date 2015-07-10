@@ -10,12 +10,10 @@ class Scalar extends AlgebraicSort
 
 trait AlgebraicMachinery { topos: BaseTopos =>
 
-  // TODO: refactor
   type NullaryOp[X <: ~] = ARROW[UNIT, X]
   type UnaryOp[X <: ~] = ARROW[X, X]
   type BinaryOp[X <: ~] = BiArrow[X, X, X]
   type RightScalarBinaryOp[X <: ~, S <: ~] = BiArrow[X, S, X]
-  // TODO: refactor... end
 
   case class Law[S <: AlgebraicSort](left: Term[S], right: Term[S]) {
     val freeVariables = 
@@ -72,13 +70,6 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   class Constant(name: String) extends Operator(name, 0)
 
-//  class EvaluationContext[T <: ~](carrier: DOT[T], variables: Seq[SimpleTerm[_ <: AlgebraicSort]]) {
-//    val root: DOT[VOID] = O
-//
-//    def evaluate(term: Term[Principal]): ARROW[VOID, T] =
-//      carrier.fromO
-//  }
-
   class AlgebraicTheory(constants: Seq[Constant], operators: Seq[Operator], laws: Seq[Law[_ <: AlgebraicSort]]) {
     class Algebra[T <: ~](carrier: DOT[T])(assignments: OperatorAssignment[T]*) { algebra =>
       val operatorAssignments = OperatorAssignments(assignments)
@@ -88,32 +79,41 @@ trait AlgebraicMachinery { topos: BaseTopos =>
           variables match {
             case Nil => new SimpleEvaluationContext
             case head :: tail =>
-              new CompoundEvaluationContext(carrierFor(head.tag), EvaluationContext(tail))
+              new CompoundEvaluationContext(head.symbol, carrierFor(head.tag), EvaluationContext(tail))
               // TODO: store the variables in context
               // TODO: refactor as fold
           }
       }
 
       sealed trait EvaluationContext[R <: ~] {
-        val source: DOT[R]
+        val root: DOT[R]
         def evaluate(term: Term[Principal]): ARROW[R, T]
       }
 
       class SimpleEvaluationContext extends EvaluationContext[UNIT] {
-        val source: DOT[UNIT] = I
+        override val root: DOT[UNIT] = I
 
         override def evaluate(term: Term[Principal]): ARROW[UNIT, T] =
-          carrier.fromO
+          ??? // carrier.fromO
       }
 
       class CompoundEvaluationContext[HEAD <: ~, TAIL <: ~](
+        name: String,
         head: DOT[HEAD],
         tail: EvaluationContext[TAIL]
       ) extends EvaluationContext[HEAD x TAIL] {
-        val source: DOT[HEAD x TAIL] = head x tail.source
+        val realRoot : BIPRODUCT[HEAD, TAIL] = head x tail.root
+        override val root : DOT[HEAD x TAIL] = realRoot
 
         override def evaluate(term: Term[Principal]): ARROW[HEAD x TAIL, T] =
-          carrier.fromO o source.toI
+          term match {
+            case SimpleTerm(symbol) =>
+              if (symbol == name)
+                realRoot.π0.asInstanceOf[ARROW[HEAD x TAIL, T]] // TODO: use =:= here to vaoid cast?
+              else
+                tail.evaluate(term) o realRoot.π1
+            case _ => ???
+          }
       }
 
       def carrierFor[S <: AlgebraicSort](tag: ClassTag[S]): DOT[T] =

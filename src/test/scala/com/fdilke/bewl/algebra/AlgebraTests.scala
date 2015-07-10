@@ -17,20 +17,36 @@ class AlgebraTests extends FunSpec {
     }
   }
   describe("An evaluation context") {
-    it("can evaluate terms, mapping types correctly") {
+    it("for one term over an empty theory is just a uniproduct") {
+      val carrier = dot[Boolean](true, false)
+      val minimalTheory = new AlgebraicTheory(Nil, Nil, Nil)
+      val minimalAlgebra = new minimalTheory.Algebra[Boolean](carrier)()
+      val context = minimalAlgebra.EvaluationContext[Boolean](Seq(α))
+      context.evaluate(α) should have (
+        'source(context.root),
+        'target(carrier),
+        'iso(true)
+      )
+    }
+
+    it("for two terms over an empty theory is just a biproduct") {
       val carrier = dot[Boolean](true, false)
       val minimalTheory = new AlgebraicTheory(Nil, Nil, Nil)
       val minimalAlgebra = new minimalTheory.Algebra[Boolean](carrier)()
       val context = minimalAlgebra.EvaluationContext[Boolean](Seq(α, β))
       context.evaluate(α) should have (
-        'source(context.source),
+        'source(context.root),
         'target(carrier)
       )
       context.evaluate(β) should have (
-        'source(context.source),
+        'source(context.root),
         'target(carrier)
       )
-//      context.evaluate(α) x context.evaluate(β) shouldBe context.root.identity
+      context.evaluate(α) x context.evaluate(β) shouldBe 'iso
+    }
+
+    it("can evaluate terms...") {
+      // ...
     }
   }
 
