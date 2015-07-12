@@ -5,9 +5,6 @@ import com.fdilke.bewl.fsets.LayeredFiniteSets._
 
 object ExploringLayeredFiniteSets extends App {
 
-//  O.fromO
-
-
   val blank = makeDot(DiagrammaticFiniteSetsDot[Symbol](Seq()))
   val one = makeDot(DiagrammaticFiniteSetsDot(Seq(1)))
   val blank2one = functionAsArrow(blank, one, (_: Symbol) => 1)

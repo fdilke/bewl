@@ -2,6 +2,7 @@ package com.fdilke.bewl.topos
 
 import scala.language.implicitConversions
 import scala.language.dynamics
+import scala.language.postfixOps
 import scala.reflect._
 
 sealed trait AlgebraicSort
@@ -22,7 +23,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   sealed trait Term[S <: AlgebraicSort] extends Dynamic {
     def applyDynamic(name: String)(that: Term[S]) =
-      CompoundTerm(this, StandardTermsAndOperators.operatorFrom(name), that)
+      CompoundTerm(this, StandardTermsAndOperators.binaryOpFrom(name), that)
     val freeVariables : Seq[VariableTerm[_ <: AlgebraicSort]]
     def :=(that: Term[S]) = Law(this, that)
   }
@@ -34,7 +35,11 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     val tag = classTag[S]
   }
 
-  case class CompoundTerm[S <: AlgebraicSort](left: Term[S], op: Operator, right: Term[S]) extends Term[S] {
+  case class CompoundTerm[S <: AlgebraicSort](
+    left: Term[S],
+    op: AbstractBinaryOp,
+    right: Term[S]
+  ) extends Term[S] {
     override val freeVariables = (left.freeVariables ++ right.freeVariables).distinct
   }
 
@@ -48,12 +53,18 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   case class OperatorAssignment[T <: ~](operator: Operator) {
     def lookupConstant: Option[NullaryOp[T]] = None
+    def lookupBinaryOp: Option[BinaryOp[T]] = None
   }
 
   case class OperatorAssignments[T <: ~](assignments: Seq[OperatorAssignment[T]]) {
-    def lookup(term: Constant): Option[NullaryOp[T]] = (
-      for (assignment <- assignments if assignment.operator == term)
+    def lookup(constant: Constant): Option[NullaryOp[T]] = (
+      for (assignment <- assignments if assignment.operator == constant)
         yield assignment.lookupConstant
+    ).headOption.flatten
+
+    def lookup(op: AbstractBinaryOp): Option[BinaryOp[T]] = (
+      for (assignment <- assignments if assignment.operator == op)
+        yield assignment.lookupBinaryOp
     ).headOption.flatten
 
     def hasPrecisely(constants: Seq[Constant], operators: Seq[Operator]): Boolean =
@@ -63,11 +74,13 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   class AbstractBinaryOp(name: String) extends Operator(name, 2) {
     def :=[T <: ~](binaryOp: BinaryOp[T]) =
-      OperatorAssignment[T](this) // TODO: do things with binaryOp
+      new OperatorAssignment[T](this){
+        override def lookupBinaryOp = Some(binaryOp)
+      }
   }
 
   object StandardTermsAndOperators {
-    val o = new Constant("o")
+    val O = new Constant("o")
 
     val α = VariableTerm[Principal]("α")
     val β = VariableTerm[Principal]("β")
@@ -76,12 +89,12 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     val + = new AbstractBinaryOp("+")
     val ⊕ = new AbstractBinaryOp("⊕")
 
-    private val operators = Map[String, Operator](
+    private val operators = Map[String, AbstractBinaryOp](
       "*" -> *,
       "+" -> $plus,
       "⊕" -> ⊕
     )
-    def operatorFrom(name: String) =
+    def binaryOpFrom(name: String) =
       operators.getOrElse(name,
         throw new IllegalArgumentException("Unknown binary operator: ")
       )
@@ -134,6 +147,17 @@ trait AlgebraicMachinery { topos: BaseTopos =>
                 constant o root.toI
               }.getOrElse {
                 throw new IllegalArgumentException("Unknown constant in expression: " + term.name)
+              }
+            case term @ CompoundTerm(left, op, right) =>
+              operatorAssignments.lookup(op).map { op =>
+                root(carrier) { r =>
+                  op(
+                    evaluate(left)(r),
+                    evaluate(right)(r)
+                  )
+                }
+              }.getOrElse {
+                throw new IllegalArgumentException("Unknown operator in expression: " + op)
               }
             case _ => ???
           }

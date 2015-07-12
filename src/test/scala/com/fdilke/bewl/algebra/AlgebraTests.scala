@@ -49,16 +49,36 @@ class AlgebraTests extends FunSpec {
       val carrier = dot[Boolean](true, false)
       val theO = makeNullaryOperator(carrier, false)
 
-      val oneConstantTheory = new AlgebraicTheory(Seq(o), Nil, Nil)
-      val minimalAlgebra = new oneConstantTheory.Algebra[Boolean](carrier)(o := theO)
+      val oneConstantTheory = new AlgebraicTheory(Seq(O), Nil, Nil)
+      val minimalAlgebra = new oneConstantTheory.Algebra[Boolean](carrier)(O := theO)
       val context = minimalAlgebra.EvaluationContext[Boolean](Seq(α))
-      context.evaluate(o) shouldBe (
+      context.evaluate(O) shouldBe (
           theO o context.root.toI
         )
     }
 
-    it("can evaluate terms...") {
-      // ...
+    it("can evaluate compound terms with binary operators") {
+      val carrier = dot[String]("unit", "x")
+      val theO = makeNullaryOperator(carrier, "unit")
+      val plus = makeBinaryOperator(carrier,
+        (("unit", "unit"), "unit"),
+        (("x", "unit"), "x"),
+        (("unit", "x"), "x"),
+        (("x", "x"), "x")
+      )
+
+      val oneConstantTheory = new AlgebraicTheory(Seq(O), Seq(⊕), Nil)
+      val minimalAlgebra = new oneConstantTheory.Algebra[String](carrier)(O := theO, ⊕ := plus)
+      val context = minimalAlgebra.EvaluationContext(Seq(α))
+      val interpretO = theO o context.root.toI
+      val interpretα = context.evaluate(α)
+
+      interpretα should not be interpretO
+      context.evaluate(O) shouldBe interpretO
+      context.evaluate(O ⊕ O) shouldBe interpretO
+      context.evaluate(O ⊕ α) shouldBe interpretα
+      context.evaluate(α ⊕ O) shouldBe interpretα
+      context.evaluate(α ⊕ O) shouldBe interpretα
     }
   }
 
