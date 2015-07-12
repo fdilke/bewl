@@ -125,9 +125,9 @@ class AlgebraTests extends FunSpec {
 
       CommutativeMagma(carrier, commutativeOp).sanityTest
 // TODO: make this work
-//      intercept[IllegalArgumentException] {
+      intercept[IllegalArgumentException] {
         CommutativeMagma(carrier, nonCommutativeOp).sanityTest
-//      }
+      }
     }
   }
 
