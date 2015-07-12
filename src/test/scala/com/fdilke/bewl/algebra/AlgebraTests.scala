@@ -16,12 +16,14 @@ class AlgebraTests extends FunSpec {
       (α * β).freeVariables shouldBe Seq(α, β)
     }
   }
+
+  private val unstructuredSets = new AlgebraicTheory(Nil, Nil, Nil)
+
   describe("An evaluation context") {
     it("for one term over an empty theory is just a uniproduct") {
       val carrier = dot[Boolean](true, false)
-      val minimalTheory = new AlgebraicTheory(Nil, Nil, Nil)
-      val minimalAlgebra = new minimalTheory.Algebra[Boolean](carrier)()
-      val context = minimalAlgebra.EvaluationContext[Boolean](Seq(α))
+      val algebra = new unstructuredSets.Algebra[Boolean](carrier)()
+      val context = algebra.EvaluationContext[Boolean](Seq(α))
       context.evaluate(α) should have (
         'source(context.root),
         'target(carrier),
@@ -31,9 +33,8 @@ class AlgebraTests extends FunSpec {
 
     it("for two terms over an empty theory is just a biproduct") {
       val carrier = dot[Boolean](true, false)
-      val minimalTheory = new AlgebraicTheory(Nil, Nil, Nil)
-      val minimalAlgebra = new minimalTheory.Algebra[Boolean](carrier)()
-      val context = minimalAlgebra.EvaluationContext[Boolean](Seq(α, β))
+      val algebra = new unstructuredSets.Algebra[Boolean](carrier)()
+      val context = algebra.EvaluationContext[Boolean](Seq(α, β))
       context.evaluate(α) should have (
         'source(context.root),
         'target(carrier)
@@ -49,12 +50,34 @@ class AlgebraTests extends FunSpec {
       val carrier = dot[Boolean](true, false)
       val theO = makeNullaryOperator(carrier, false)
 
-      val oneConstantTheory = new AlgebraicTheory(Seq(O), Nil, Nil)
-      val minimalAlgebra = new oneConstantTheory.Algebra[Boolean](carrier)(O := theO)
-      val context = minimalAlgebra.EvaluationContext[Boolean](Seq(α))
+      val pointedSets = new AlgebraicTheory(Seq(O), Nil, Nil)
+      val algebra = new pointedSets.Algebra[Boolean](carrier)(O := theO)
+      val context = algebra.EvaluationContext[Boolean](Seq(α))
       context.evaluate(O) shouldBe (
           theO o context.root.toI
         )
+    }
+
+    it("can evaluate compound terms with unary operators") {
+      val carrier = dot[Int](0, 1, 2)
+      val theO = makeNullaryOperator(carrier, 0)
+      val twiddle = makeUnaryOperator(carrier,
+        (0, 0),
+        (1, 2),
+        (2, 1)
+      )
+
+      val pointedSetsWithOp = new AlgebraicTheory(Seq(O), Seq($minus), Nil)
+      val algebra = new pointedSetsWithOp.Algebra[Int](carrier)(O := theO, $minus := twiddle)
+      val context = algebra.EvaluationContext(Seq(α))
+      val interpretO = theO o context.root.toI
+      val interpretα = context.evaluate(α)
+
+      interpretα should not be interpretO
+      context.evaluate(O) shouldBe interpretO
+      val minusO = -O
+      context.evaluate(-O) shouldBe interpretO
+      context.evaluate(-(-α)) shouldBe interpretα
     }
 
     it("can evaluate compound terms with binary operators") {
@@ -67,8 +90,8 @@ class AlgebraTests extends FunSpec {
         (("x", "x"), "x")
       )
 
-      val oneConstantTheory = new AlgebraicTheory(Seq(O), Seq(⊕), Nil)
-      val minimalAlgebra = new oneConstantTheory.Algebra[String](carrier)(O := theO, ⊕ := plus)
+      val pointedMagmas = new AlgebraicTheory(Seq(O), Seq(⊕), Nil)
+      val minimalAlgebra = new pointedMagmas.Algebra[String](carrier)(O := theO, ⊕ := plus)
       val context = minimalAlgebra.EvaluationContext(Seq(α))
       val interpretO = theO o context.root.toI
       val interpretα = context.evaluate(α)

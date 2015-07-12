@@ -176,6 +176,12 @@ object FiniteSetsUtilities {
   def makeNullaryOperator[X](carrier: DOT[X], value: X) =
     functionAsArrow(I, carrier, (_: UNIT) => value)
 
+  def makeUnaryOperator[X](
+    carrier: DOT[X],
+    mappings: (X, X)*
+  ) =
+    functionAsArrow(carrier, carrier, Map(mappings:_*))
+
   def makeBinaryOperator[X](
     carrier: DOT[X],
     mappings: ((X, X), X)*
