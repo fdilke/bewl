@@ -27,9 +27,9 @@ If you want to use Bewl as a learning aid to study category theory, [start here]
 - Implemented FiniteSets as a topos
 - Added 'generic topos tests' which use fixtures for the given topos
 - Can define and verify algebraic laws. Only 'monotyped' laws as yet - can't define monoid and ring actions 
+- compact notation for elements / lambdas / uniform operators
+- adapter for diagrammatic layer
 - Separated BaseTopos from its extra layers (Algebra, AlgebraicStructures) which are now traits
-- Structure definitions for monoid, group, abelian group, ring with their respective algebraic laws
-- Can extend and remap algebraic structures, e.g. ring extends abelian group remaps group with an extra law
 - Universal and existential quantifiers
 - Strong binding: a new layer with stars/quivers concreting over dots/arrows ; stars bound to classes ; quivers/functions interchangeable
 - Specialized element types: e.g. product has left, right ; exponential can apply
@@ -37,16 +37,24 @@ If you want to use Bewl as a learning aid to study category theory, [start here]
 - Implementation of FiniteSets using new DSL
 - Defined quantifiers in new DSL
 - Implemented the topos of actions for a monoid
+- Construct the initial object 0
+- Coproducts
+- predicates isMonic, isEpic, isIso
+- enumerate morphisms / global elements
+- Partial arrow classifier
 
 # Tech tasks done
 - cleaner memoization; optionally uses generics and lower bound types; works with structural types 
 
 # To do
 
+- Structure definitions for monoid, group, abelian group, ring with their respective algebraic laws
+- Can extend and remap algebraic structures, e.g. ring extends abelian group remaps group with an extra law
 - Broaden definition of algebraic structures to include models and parameterized operations
 - Formalize constructions like: automorphism group, endomorphism ring, group of invertible elements of a monoid
 - Extract the Heyting algebra structure of the subobject classifier
-- Construct 0, coproducts and colimits
+- colimits
+- Optimize algorithm enough to construct triadic topos and its topologies
 
 # Questions
 
