@@ -90,18 +90,18 @@ class AlgebraTests extends FunSpec {
         (("x", "x"), "x")
       )
 
-      val pointedMagmas = new AlgebraicTheory(Seq(O), Seq(⊕), Nil)
-      val minimalAlgebra = new pointedMagmas.Algebra[String](carrier)(O := theO, ⊕ := plus)
+      val pointedMagmas = new AlgebraicTheory(Seq(O), Seq($plus), Nil)
+      val minimalAlgebra = new pointedMagmas.Algebra[String](carrier)(O := theO, $plus := plus)
       val context = minimalAlgebra.EvaluationContext(Seq(α))
       val interpretO = theO o context.root.toI
       val interpretα = context.evaluate(α)
 
       interpretα should not be interpretO
       context.evaluate(O) shouldBe interpretO
-      context.evaluate(O ⊕ O) shouldBe interpretO
-      context.evaluate(O ⊕ α) shouldBe interpretα
-      context.evaluate(α ⊕ O) shouldBe interpretα
-      context.evaluate(α ⊕ O) shouldBe interpretα
+      context.evaluate(O + O) shouldBe interpretO
+      context.evaluate(O + α) shouldBe interpretα
+      context.evaluate(α + O) shouldBe interpretα
+      context.evaluate(α + O) shouldBe interpretα
     }
   }
 
@@ -120,11 +120,10 @@ class AlgebraTests extends FunSpec {
         new commutativeMagmas.Algebra[Boolean](carrier)().sanityTest
      }
      intercept[IllegalArgumentException] {
-        new commutativeMagmas.Algebra[Boolean](carrier)(⊕ := commutativeOp).sanityTest
+        new commutativeMagmas.Algebra[Boolean](carrier)($plus := commutativeOp).sanityTest
      }
 
       CommutativeMagma(carrier, commutativeOp).sanityTest
-// TODO: make this work
       intercept[IllegalArgumentException] {
         CommutativeMagma(carrier, nonCommutativeOp).sanityTest
       }

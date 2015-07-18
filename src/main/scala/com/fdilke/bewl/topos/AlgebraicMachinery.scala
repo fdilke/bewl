@@ -24,6 +24,10 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   sealed trait Term[S <: AlgebraicSort] extends Dynamic {
     def applyDynamic(name: String)(that: Term[S]) =
       BinaryOpTerm(this, StandardTermsAndOperators.binaryOpFrom(name), that)
+
+    def +(other: Term[S]) =
+      applyDynamic("+")(other)
+
     def unary_- : Term[S] =
       UnaryOpTerm(StandardTermsAndOperators.-, this)
     val freeVariables : Seq[VariableTerm[_ <: AlgebraicSort]]
@@ -112,12 +116,10 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
     val * = new AbstractBinaryOp("*")
     val + = new AbstractBinaryOp("+")
-    val ⊕ = new AbstractBinaryOp("⊕")
 
     private val binaryOperators = Map[String, AbstractBinaryOp](
       "*" -> *,
-      "+" -> $plus,
-      "⊕" -> ⊕
+      "+" -> $plus
     )
     def binaryOpFrom(name: String) =
       binaryOperators.getOrElse(name,
