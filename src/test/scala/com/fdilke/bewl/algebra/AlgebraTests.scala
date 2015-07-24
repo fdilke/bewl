@@ -2,6 +2,7 @@ package com.fdilke.bewl.algebra
 
 import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
+import com.fdilke.bewl.topos.Principal
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
@@ -17,12 +18,27 @@ class AlgebraTests extends FunSpec {
     }
   }
 
-  private val unstructuredSets = new AlgebraicTheory(Nil, Nil, Nil)
+  private val unstructuredSets = new AlgebraicTheory[~](Nil, Nil, Nil)
 
   describe("An evaluation context") {
+    it("for no terms can evaluate constants, not veriables") {
+      val carrier = dot[Boolean](true, false)
+      val theO = makeNullaryOperator(carrier, false)
+      val pointedSets = new AlgebraicTheory[~](Seq(O), Nil, Nil)
+      val algebra = new pointedSets.Algebra[Boolean](carrier)(O := theO)
+      val context = algebra.EvaluationContext[Boolean](Seq())
+      intercept[IllegalArgumentException] {
+        context.evaluate(α)
+      }
+      intercept[IllegalArgumentException] {
+        context.evaluateScalar(II)
+      }
+      context.evaluate(O) shouldBe theO
+    }
+
     it("for one term over an empty theory is just a uniproduct") {
       val carrier = dot[Boolean](true, false)
-      val algebra = new unstructuredSets.Algebra[Boolean](carrier)()
+      val algebra = new unstructuredSets.Algebra[Boolean](carrier)() // TODO: need type args?
       val context = algebra.EvaluationContext[Boolean](Seq(α))
       context.evaluate(α) should have (
         'source(context.root),
@@ -33,7 +49,7 @@ class AlgebraTests extends FunSpec {
 
     it("for two terms over an empty theory is just a biproduct") {
       val carrier = dot[Boolean](true, false)
-      val algebra = new unstructuredSets.Algebra[Boolean](carrier)()
+      val algebra = new unstructuredSets.Algebra[Boolean](carrier)() // TODO: need type args?
       val context = algebra.EvaluationContext[Boolean](Seq(α, β))
       context.evaluate(α) should have (
         'source(context.root),
@@ -50,12 +66,12 @@ class AlgebraTests extends FunSpec {
       val carrier = dot[Boolean](true, false)
       val theO = makeNullaryOperator(carrier, false)
 
-      val pointedSets = new AlgebraicTheory(Seq(O), Nil, Nil)
-      val algebra = new pointedSets.Algebra[Boolean](carrier)(O := theO)
+      val pointedSets = new AlgebraicTheory[~](Seq(O), Nil, Nil)
+      val algebra = new pointedSets.Algebra[Boolean](carrier)(O := theO) // TODO: need type args?
       val context = algebra.EvaluationContext[Boolean](Seq(α))
       context.evaluate(O) shouldBe (
           theO o context.root.toI
-        )
+      )
     }
 
     it("can evaluate compound terms with unary operators") {
@@ -67,8 +83,8 @@ class AlgebraTests extends FunSpec {
         (2, 1)
       )
 
-      val pointedSetsWithOp = new AlgebraicTheory(Seq(O), Seq($minus), Nil)
-      val algebra = new pointedSetsWithOp.Algebra[Int](carrier)(O := theO, $minus := twiddle)
+      val pointedSetsWithOp = new AlgebraicTheory[~](Seq(O), Seq($minus), Nil)
+      val algebra = new pointedSetsWithOp.Algebra[Int](carrier)(O := theO, $minus := twiddle) // TODO: need type args?
       val context = algebra.EvaluationContext(Seq(α))
       val interpretO = theO o context.root.toI
       val interpretα = context.evaluate(α)
@@ -90,9 +106,9 @@ class AlgebraTests extends FunSpec {
         (("x", "x"), "x")
       )
 
-      val pointedMagmas = new AlgebraicTheory(Seq(O), Seq($plus), Nil)
-      val minimalAlgebra = new pointedMagmas.Algebra[String](carrier)(O := theO, $plus := plus)
-      val context = minimalAlgebra.EvaluationContext(Seq(α))
+      val pointedMagmas = new AlgebraicTheory[~](Seq(O), Seq($plus), Nil)
+      val algebra = new pointedMagmas.Algebra[String](carrier)(O := theO, $plus := plus)
+      val context = algebra.EvaluationContext(Seq(α))
       val interpretO = theO o context.root.toI
       val interpretα = context.evaluate(α)
 
@@ -102,6 +118,36 @@ class AlgebraTests extends FunSpec {
       context.evaluate(O + α) shouldBe interpretα
       context.evaluate(α + O) shouldBe interpretα
       context.evaluate(α + O) shouldBe interpretα
+    }
+
+    it("can evaluate compound terms with mixed binary operators") {
+      val scalars = dot[Int](0, 1, 2)
+
+      val carrier = dot[String]("o", "i")
+      val theO = makeNullaryOperator(carrier, "o")
+      val scalar1 = makeNullaryOperator(scalars, 2)
+      val table = Map(
+        ("o", 0) -> "o",
+        ("i", 0) -> "o",
+        ("o", 1) -> "i",
+        ("i", 1) -> "i",
+        ("o", 2) -> "i",
+        ("i", 2) -> "o"
+      )
+      val rightMultiply = bifunctionAsBiArrow(carrier, scalars, carrier)(
+        (x, y) => table((x, y))
+      ) // TODO: fix: "untupled", or something ::> Function untupled map ;; same in FiniteSetsUtilities
+
+      val pointedWeakActs = new AlgebraicTheory[Int](Seq(O, II), Seq(**), Nil, scalars)
+      val minimalAlgebra = new pointedWeakActs.Algebra[String](carrier)(
+        O := theO, ** := rightMultiply, II := scalar1
+      )
+      val context = minimalAlgebra.EvaluationContext(Seq(α))
+      val interpretO = theO o context.root.toI
+      val interpretI = makeNullaryOperator(carrier, "i") o context.root.toI
+
+      context.evaluate(O ** II) shouldBe interpretI
+      context.evaluate((α ** II) ** II) shouldBe context.evaluate(α)
     }
   }
 
