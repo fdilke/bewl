@@ -182,6 +182,8 @@ trait AlgebraicMachinery { topos: BaseTopos =>
    )(
       constants: GeneralConstant[_ <: AlgebraicSort]*
    )(
+      preassignments: OperatorAssignment[_ <: ~, _ <: ~]*
+   )(
       operators: Operator*
    )(
     laws: Law*
@@ -189,7 +191,8 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     class Algebra[T <: ~](
       carrier: DOT[T]
     )(assignments: OperatorAssignment[_ <: ~, _ <: ~]*) { algebra =>
-      val operatorAssignments = OperatorAssignments(assignments map {
+      val operatorAssignments = OperatorAssignments(
+        (preassignments ++ assignments) map {
         _.asInstanceOf[OperatorAssignment[T, S]]
       })
 
@@ -309,18 +312,22 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   object AlgebraicTheory {
     def apply(constants: GeneralConstant[_ <: AlgebraicSort]*)(operators: Operator*)(laws: Law*) =
-      new AlgebraicTheory[UNIT](I)(constants :_*)(operators :_*)(laws:_*)
+      new AlgebraicTheory[UNIT](I)(constants :_*)()(operators :_*)(laws:_*)
   }
 
   object AlgebraicTheoryWithScalars {
-    def apply[S <: ~](scalars: DOT[S])(
+    def apply[S <: ~](
+      scalars: DOT[S]
+    )(
       constants: GeneralConstant[_ <: AlgebraicSort]*
+    )(
+      preassignments: OperatorAssignment[_ <: ~, _ <: ~]*
     )(
       operators: Operator*
     )(
       laws: Law*
     ) =
-      new AlgebraicTheory[S](scalars)(constants :_*)(operators :_*)(laws:_*)
+      new AlgebraicTheory[S](scalars)(constants :_*)(preassignments :_*)(operators :_*)(laws:_*)
   }
 }
 

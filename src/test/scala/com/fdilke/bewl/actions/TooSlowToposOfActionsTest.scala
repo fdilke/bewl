@@ -88,13 +88,13 @@ abstract class TooSlowToposOfActionsTest extends GenericToposTests(new ToposWith
 
   describe("Global element enumeration") {
     it("works on the built-ins") {
-      omega.globals should have('size(2))
+      omega.globals should have size 2
     }
 
     it("works on the fixtures") {
-      foo.globals should have('size(0))
-      bar.globals should have('size(0))
-      baz.globals should have('size(1))
+      foo.globals should have size 0
+      bar.globals should have size 0
+      baz.globals should have size 1
     }
   }
 
@@ -105,12 +105,12 @@ abstract class TooSlowToposOfActionsTest extends GenericToposTests(new ToposWith
     }
 
     ignore("...optional extras") {
-      foo >> foo should have('size(3))
-      foo >> bar should have('size(3))
-      foo >> baz should have('size(4))
+      foo >> foo should have size 3
+      foo >> bar should have size 3
+      foo >> baz should have size 4
 
       // probably not - that would be if we were only counting isomorphisms
-      (foo >> (omega > omega)) should have ('size(2))
+      (foo >> (omega > omega)) should have size 2
     }
   }
 }

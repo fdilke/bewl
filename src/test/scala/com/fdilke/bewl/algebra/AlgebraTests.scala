@@ -138,9 +138,9 @@ class AlgebraTests extends FunSpec {
         Function untupled table // (x, y) => table((x, y))
       ) // TODO: fix: "untupled", or something ::> Function untupled map ;; same in FiniteSetsUtilities
 
-      val pointedWeakActs = AlgebraicTheoryWithScalars(scalars)(O, II)(**)()
+      val pointedWeakActs = AlgebraicTheoryWithScalars(scalars)(O, II)(II := scalar1)(**)()
       val minimalAlgebra = new pointedWeakActs.Algebra[String](carrier)(
-        O := theO, ** := rightMultiply, II := scalar1
+        O := theO, ** := rightMultiply
       )
       val context = minimalAlgebra.EvaluationContext(Seq(α))
       val interpretO = theO o context.root.toI
