@@ -171,7 +171,9 @@ object FiniteSetsUtilities {
    target: DOT[T],
    mappings: ((L, R), T)*
  ) =
-    bifunctionAsBiArrow[L, R, T](left, right, target) { (l, r) => Map(mappings:_*)((l, r)) }
+    bifunctionAsBiArrow[L, R, T](left, right, target)(
+      Function untupled Map(mappings:_*)
+    )
 
   def makeNullaryOperator[X](carrier: DOT[X], value: X) =
     functionAsArrow(I, carrier, (_: UNIT) => value)
@@ -186,7 +188,9 @@ object FiniteSetsUtilities {
     carrier: DOT[X],
     mappings: ((X, X), X)*
   ) =
-    bifunctionAsBiArrow[X](carrier) { (x, y) => Map(mappings:_*)((x, y)) }
+    bifunctionAsBiArrow[X](carrier) (
+      Function untupled Map(mappings:_*)
+    )
 
   private def intSqrt(square: Int) =
     (1 until square).find { n =>

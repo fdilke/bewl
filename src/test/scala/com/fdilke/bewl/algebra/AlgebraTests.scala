@@ -135,10 +135,10 @@ class AlgebraTests extends FunSpec {
         ("i", 2) -> "o"
       )
       val rightMultiply = bifunctionAsBiArrow(carrier, scalars, carrier)(
-        (x, y) => table((x, y))
+        Function untupled table // (x, y) => table((x, y))
       ) // TODO: fix: "untupled", or something ::> Function untupled map ;; same in FiniteSetsUtilities
 
-      val pointedWeakActs = AlgebraicTheoryWithScalars(O, II)(**)()(scalars)
+      val pointedWeakActs = AlgebraicTheoryWithScalars(scalars)(O, II)(**)()
       val minimalAlgebra = new pointedWeakActs.Algebra[String](carrier)(
         O := theO, ** := rightMultiply, II := scalar1
       )

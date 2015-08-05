@@ -42,7 +42,7 @@ class ToposOfActionsTest extends GenericToposTests(new ToposWithFixtures {
 
   override val foo2ImageOfBar = functionAsArrow(foo, baz, Map(i -> "y", x -> "x", y -> "y"))
   override val foo2bar = functionAsArrow(foo, bar, Map(i -> "x", x -> "x", y -> "y"))
-  private val foobar2BazMap = Map[(Symbol, String), String]( // TODO: lose generic
+  private val foobar2BazMap = Map(
     (i, "x") -> "x", (x, "x") -> "x", (y, "x") -> "y",
     (i, "y") -> "y", (x, "y") -> "x", (y, "y") -> "y"
   )

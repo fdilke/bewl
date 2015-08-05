@@ -142,7 +142,8 @@ Evaluation contexts: An EC keeps track of a multiproduct in a recursive typesafe
 
 - fix TODOs
 - put optional scalars dot arg in a sensible place
-- include optional symbol defs in an algebraic theory (e.g.for monoids)
 - curry the constructor for AlgebraicTheory in tests... need an object helper?
+- include optional symbol defs in an algebraic theory (e.g.for monoids)
 - TDD a NonNaiveMonoids
+- sort out realRoot
 
