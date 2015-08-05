@@ -178,11 +178,14 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   // TODO: try a curried constructor here, with the scalars at the beginning
   class AlgebraicTheory[S <: ~](
-    constants: Seq[GeneralConstant[_ <: AlgebraicSort]],
-    operators: Seq[Operator],
-    laws: Seq[Law],
-    scalars: DOT[S] = I.asInstanceOf[DOT[~]]
-  ) {
+      constants: GeneralConstant[_ <: AlgebraicSort]*
+   )(
+      operators: Operator*
+   )(
+    laws: Law*
+   )(
+    scalars: DOT[S]
+   ){
     class Algebra[T <: ~](
       carrier: DOT[T]
     )(assignments: OperatorAssignment[_ <: ~, _ <: ~]*) { algebra =>
@@ -306,7 +309,14 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   object AlgebraicTheory {
     def apply(constants: GeneralConstant[_ <: AlgebraicSort]*)(operators: Operator*)(laws: Law*) =
-      new AlgebraicTheory(constants, operators, laws)
+      new AlgebraicTheory[UNIT](constants :_*)(operators :_*)(laws:_*)(I)
+  }
+
+  object AlgebraicTheoryWithScalars {
+    def apply[S <: ~](constants: GeneralConstant[_ <: AlgebraicSort]*)(operators: Operator*)(
+      laws: Law*
+    )(scalars: DOT[S]) =
+      new AlgebraicTheory[S](constants :_*)(operators :_*)(laws:_*)(scalars)
   }
 }
 

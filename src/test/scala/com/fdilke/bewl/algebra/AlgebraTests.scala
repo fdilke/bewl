@@ -18,13 +18,13 @@ class AlgebraTests extends FunSpec {
     }
   }
 
-  private val unstructuredSets = new AlgebraicTheory[~](Nil, Nil, Nil)
+  private val unstructuredSets = AlgebraicTheory()()()
 
   describe("An evaluation context") {
     it("for no terms can evaluate constants, not veriables") {
       val carrier = dot[Boolean](true, false)
       val theO = makeNullaryOperator(carrier, false)
-      val pointedSets = new AlgebraicTheory[~](Seq(O), Nil, Nil)
+      val pointedSets = AlgebraicTheory(O)()()
       val algebra = new pointedSets.Algebra[Boolean](carrier)(O := theO)
       val context = algebra.EvaluationContext[Boolean](Seq())
       intercept[IllegalArgumentException] {
@@ -66,7 +66,7 @@ class AlgebraTests extends FunSpec {
       val carrier = dot[Boolean](true, false)
       val theO = makeNullaryOperator(carrier, false)
 
-      val pointedSets = new AlgebraicTheory[~](Seq(O), Nil, Nil)
+      val pointedSets = AlgebraicTheory(O)()()
       val algebra = new pointedSets.Algebra[Boolean](carrier)(O := theO) // TODO: need type args?
       val context = algebra.EvaluationContext[Boolean](Seq(α))
       context.evaluate(O) shouldBe (
@@ -83,7 +83,7 @@ class AlgebraTests extends FunSpec {
         (2, 1)
       )
 
-      val pointedSetsWithOp = new AlgebraicTheory[~](Seq(O), Seq($minus), Nil)
+      val pointedSetsWithOp = AlgebraicTheory(O)($minus)()
       val algebra = new pointedSetsWithOp.Algebra[Int](carrier)(O := theO, $minus := twiddle) // TODO: need type args?
       val context = algebra.EvaluationContext(Seq(α))
       val interpretO = theO o context.root.toI
@@ -106,7 +106,7 @@ class AlgebraTests extends FunSpec {
         (("x", "x"), "x")
       )
 
-      val pointedMagmas = new AlgebraicTheory[~](Seq(O), Seq($plus), Nil)
+      val pointedMagmas = AlgebraicTheory(O)($plus)()
       val algebra = new pointedMagmas.Algebra[String](carrier)(O := theO, $plus := plus)
       val context = algebra.EvaluationContext(Seq(α))
       val interpretO = theO o context.root.toI
@@ -138,7 +138,7 @@ class AlgebraTests extends FunSpec {
         (x, y) => table((x, y))
       ) // TODO: fix: "untupled", or something ::> Function untupled map ;; same in FiniteSetsUtilities
 
-      val pointedWeakActs = new AlgebraicTheory[Int](Seq(O, II), Seq(**), Nil, scalars)
+      val pointedWeakActs = AlgebraicTheoryWithScalars(O, II)(**)()(scalars)
       val minimalAlgebra = new pointedWeakActs.Algebra[String](carrier)(
         O := theO, ** := rightMultiply, II := scalar1
       )

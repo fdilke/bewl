@@ -138,6 +138,11 @@ All of these are Term\[Principal\] which means: they ultimately boil down to map
 # Going multivariate
 We now assume our algebra A has various "supporting algebras" B, C, ... in its definition.
 So we can express: an action of a monoid, a module over a ring.
+Evaluation contexts: An EC keeps track of a multiproduct in a recursive typesafe way
 
-# Evaluation contexts
-An EC somehow keep
+- fix TODOs
+- put optional scalars dot arg in a sensible place
+- include optional symbol defs in an algebraic theory (e.g.for monoids)
+- curry the constructor for AlgebraicTheory in tests... need an object helper?
+- TDD a NonNaiveMonoids
+
