@@ -1,10 +1,6 @@
 package com.fdilke.bewl.topos
 
-import com.fdilke.bewl.fsets.FiniteSets.FiniteSetsArrow
-
-import scala.language.implicitConversions
-import scala.language.dynamics
-import scala.language.postfixOps
+import scala.language.{dynamics, implicitConversions, postfixOps}
 import scala.reflect._
 
 sealed trait AlgebraicSort
@@ -243,24 +239,22 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       })
 
       object EvaluationContext {
-        def apply[T <: ~](variables: Seq[VariableTerm[_ <: AlgebraicSort]]): EvaluationContext[_ <: ~] =
-          variables match {
-            case Nil => new SimpleEvaluationContext
-            case head :: tail =>
-              new CompoundEvaluationContext(head.symbol, carrier, EvaluationContext(tail))
-              // TODO: store the variables in context
-              // TODO: refactor as fold
+        def apply[T <: ~](variables: Seq[VariableTerm[_ <: AlgebraicSort]]): EvaluationContext =
+          variables.foldRight(new SimpleEvaluationContext : EvaluationContext) {
+            (variable, context) => new CompoundEvaluationContext(variable.symbol, carrier, context)
           }
       }
 
-      sealed trait EvaluationContext[R <: ~] {
-        def root: DOT[R]
-        def evaluate(term: Term[Principal]): ARROW[R, T]
-        def evaluateScalar(term: Term[Scalar]): ARROW[R, S]
+      sealed trait EvaluationContext {
+        type ROOT <: ~
+        def root: DOT[ROOT]
+        def evaluate(term: Term[Principal]): ARROW[ROOT, T]
+        def evaluateScalar(term: Term[Scalar]): ARROW[ROOT, S]
       }
 
-      class SimpleEvaluationContext extends EvaluationContext[UNIT] {
-        override def root: DOT[UNIT] = I
+      class SimpleEvaluationContext extends EvaluationContext {
+        override type ROOT = UNIT
+        override def root = I
 
         override def evaluate(term: Term[Principal]): ARROW[UNIT, T] =
           term match {
@@ -278,11 +272,13 @@ trait AlgebraicMachinery { topos: BaseTopos =>
           throw new IllegalArgumentException("No variables available")
       }
 
-      class CompoundEvaluationContext[HEAD <: ~, TAIL <: ~](
+      class CompoundEvaluationContext[HEAD <: ~](
         name: String,
         head: DOT[HEAD],
-        tail: EvaluationContext[TAIL]
-      ) extends EvaluationContext[HEAD x TAIL] {
+        val tail: EvaluationContext
+      ) extends EvaluationContext {
+        private type TAIL = tail.ROOT
+        override type ROOT = HEAD x TAIL
         override def root : BIPRODUCT[HEAD, TAIL] = head x tail.root
 
         override def evaluate(term: Term[Principal]): ARROW[HEAD x TAIL, T] =
