@@ -208,7 +208,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       }
 
       sealed trait EvaluationContext[R <: ~] {
-        val root: DOT[R]
+        def root: DOT[R]
         def evaluate(term: Term[Principal]): ARROW[R, T]
         def evaluateScalar(term: Term[Scalar]): ARROW[R, S]
       }
@@ -237,14 +237,12 @@ trait AlgebraicMachinery { topos: BaseTopos =>
         head: DOT[HEAD],
         tail: EvaluationContext[TAIL]
       ) extends EvaluationContext[HEAD x TAIL] {
-        // TODO: fix; use def instead of val?
-        val realRoot : BIPRODUCT[HEAD, TAIL] = head x tail.root
-        override val root : DOT[HEAD x TAIL] = realRoot
+        override def root : BIPRODUCT[HEAD, TAIL] = head x tail.root
 
         override def evaluate(term: Term[Principal]): ARROW[HEAD x TAIL, T] =
           term match {
             case VariableTerm(symbol) if symbol == name =>
-              realRoot.π0.asInstanceOf[ARROW[HEAD x TAIL, T]] // TODO: use =:= here to avoid cast?
+              root.π0.asInstanceOf[ARROW[HEAD x TAIL, T]] // TODO: use TAIL =:= T here to validate cast?
 
             case term @ BinaryOpTerm(left, op, right) =>
               operatorAssignments.lookup(op).map { op =>
@@ -278,7 +276,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
                 throw new IllegalArgumentException("Unknown operator in expression: " + op)
               }
             case _ =>
-              tail.evaluate(term) o realRoot.π1
+              tail.evaluate(term) o root.π1
           }
 
         override def evaluateScalar(term: Term[Scalar]): ARROW[HEAD x TAIL, S] =
