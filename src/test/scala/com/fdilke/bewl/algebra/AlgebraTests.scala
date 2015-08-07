@@ -2,7 +2,6 @@ package com.fdilke.bewl.algebra
 
 import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
-import com.fdilke.bewl.topos.Principal
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
@@ -38,7 +37,7 @@ class AlgebraTests extends FunSpec {
 
     it("for one term over an empty theory is just a uniproduct") {
       val carrier = dot[Boolean](true, false)
-      val algebra = new unstructuredSets.Algebra[Boolean](carrier)() // TODO: need type args?
+      val algebra = new unstructuredSets.Algebra[Boolean](carrier)()
       val context = algebra.EvaluationContext[Boolean](Seq(α))
       context.evaluate(α) should have (
         'source(context.root),
@@ -49,7 +48,7 @@ class AlgebraTests extends FunSpec {
 
     it("for two terms over an empty theory is just a biproduct") {
       val carrier = dot[Boolean](true, false)
-      val algebra = new unstructuredSets.Algebra[Boolean](carrier)() // TODO: need type args?
+      val algebra = new unstructuredSets.Algebra[Boolean](carrier)()
       val context = algebra.EvaluationContext[Boolean](Seq(α, β))
       context.evaluate(α) should have (
         'source(context.root),
@@ -67,7 +66,7 @@ class AlgebraTests extends FunSpec {
       val theO = makeNullaryOperator(carrier, false)
 
       val pointedSets = AlgebraicTheory(O)()()
-      val algebra = new pointedSets.Algebra[Boolean](carrier)(O := theO) // TODO: need type args?
+      val algebra = new pointedSets.Algebra[Boolean](carrier)(O := theO)
       val context = algebra.EvaluationContext[Boolean](Seq(α))
       context.evaluate(O) shouldBe (
           theO o context.root.toI
@@ -78,13 +77,13 @@ class AlgebraTests extends FunSpec {
       val carrier = dot[Int](0, 1, 2)
       val theO = makeNullaryOperator(carrier, 0)
       val twiddle = makeUnaryOperator(carrier,
-        (0, 0),
-        (1, 2),
-        (2, 1)
+        0 -> 0,
+        1 -> 2,
+        2 -> 1
       )
 
       val pointedSetsWithOp = AlgebraicTheory(O)($minus)()
-      val algebra = new pointedSetsWithOp.Algebra[Int](carrier)(O := theO, $minus := twiddle) // TODO: need type args?
+      val algebra = new pointedSetsWithOp.Algebra[Int](carrier)(O := theO, $minus := twiddle)
       val context = algebra.EvaluationContext(Seq(α))
       val interpretO = theO o context.root.toI
       val interpretα = context.evaluate(α)
@@ -100,10 +99,10 @@ class AlgebraTests extends FunSpec {
       val carrier = dot[String]("unit", "x")
       val theO = makeNullaryOperator(carrier, "unit")
       val plus = makeBinaryOperator(carrier,
-        (("unit", "unit"), "unit"),
-        (("x", "unit"), "x"),
-        (("unit", "x"), "x"),
-        (("x", "x"), "x")
+        ("unit", "unit") -> "unit",
+        ("x", "unit") -> "x",
+        ("unit", "x") -> "x",
+        ("x", "x") -> "x"
       )
 
       val pointedMagmas = AlgebraicTheory(O)($plus)()
@@ -135,8 +134,8 @@ class AlgebraTests extends FunSpec {
         ("i", 2) -> "o"
       )
       val rightMultiply = bifunctionAsBiArrow(carrier, scalars, carrier)(
-        Function untupled table // (x, y) => table((x, y))
-      ) // TODO: fix: "untupled", or something ::> Function untupled map ;; same in FiniteSetsUtilities
+        Function untupled table
+      )
 
       val pointedWeakActs = AlgebraicTheoryWithScalars(scalars)(O, II)(II := scalar1)(**)()
       val minimalAlgebra = new pointedWeakActs.Algebra[String](carrier)(
@@ -173,6 +172,41 @@ class AlgebraTests extends FunSpec {
       intercept[IllegalArgumentException] {
         CommutativeMagma(carrier, nonCommutativeOp).sanityTest
       }
+    }
+
+    it("can validate morphisms between their algebras") {
+      val carrierStrings = dot[String]("+", "-")
+      val minusStrings = makeUnaryOperator(carrierStrings,
+        "+" -> "-",
+        "-" -> "+"
+      )
+      val carrierInts = dot[Int](1, -1)
+      val minusInts = makeUnaryOperator(carrierInts,
+        1 -> -1,
+        -1 -> 1
+      )
+      val wrongSource = dot[String]("*")
+      val wrongTarget = dot[Int](0)
+
+      val setsWithInvolution = AlgebraicTheory()($minus)(-(-α) := α)
+      val algebraStrings = new setsWithInvolution.Algebra[String](carrierStrings)($minus := minusStrings)
+      val algebraInts = new setsWithInvolution.Algebra[Int](carrierInts)($minus := minusInts)
+      algebraStrings.sanityTest
+      algebraInts.sanityTest
+      val morphism = arrow(carrierStrings, carrierInts, "+" -> 1, "-" -> -1)
+      val morphismWithWrongSource = arrow(wrongSource, carrierInts, "*" -> 1)
+      morphismWithWrongSource.sanityTest
+      val morphismWithWrongTarget = arrow(carrierStrings, wrongTarget, "+" -> 0, "-" -> 0)
+      morphismWithWrongTarget.sanityTest
+      setsWithInvolution.isMorphism(algebraStrings, algebraInts, morphism) shouldBe true
+      intercept[IllegalArgumentException] {
+        setsWithInvolution.isMorphism(algebraStrings, algebraInts, morphismWithWrongSource);
+      }
+      intercept[IllegalArgumentException] {
+        setsWithInvolution.isMorphism(algebraStrings, algebraInts, morphismWithWrongTarget);
+      }
+      val notAMorphism = arrow(carrierStrings, carrierInts, "+" -> 1, "-" -> 1)
+      setsWithInvolution.isMorphism(algebraStrings, algebraInts, notAMorphism) shouldBe true // TODO fix!!
     }
   }
 }

@@ -1,5 +1,7 @@
 package com.fdilke.bewl.topos
 
+import com.fdilke.bewl.fsets.FiniteSets.FiniteSetsArrow
+
 import scala.language.implicitConversions
 import scala.language.dynamics
 import scala.language.postfixOps
@@ -39,7 +41,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       UnaryOpTerm(StandardTermsAndOperators.-, this)
     val freeVariables : Seq[VariableTerm[_ <: AlgebraicSort]]
     def :=(that: Term[Principal])(implicit eq: =:=[X, Principal]) =
-      Law(this.asInstanceOf[Term[Principal]], that)
+      Law(this.asInstanceOf[Term[Principal]], that) // cast justified by =:=
   }
 
   case class Operator(name: String, arity: Int)
@@ -188,6 +190,18 @@ trait AlgebraicMachinery { topos: BaseTopos =>
    )(
     laws: Law*
    ){
+    def isMorphism[A <: ~, B <: ~](
+      sourceAlgebra: Algebra[A],
+      targetAlgebra: Algebra[B],
+      arrow: ARROW[A, B]
+    ) = {
+      if (sourceAlgebra.carrierFor(classTag[Principal]) != arrow.source ||
+          targetAlgebra.carrierFor(classTag[Principal]) != arrow.target) {
+        throw new IllegalArgumentException("Source/target of arrow do not match algebra carriers")
+      }
+      true
+    }
+
     class Algebra[T <: ~](
       carrier: DOT[T]
     )(assignments: OperatorAssignment[_ <: ~, _ <: ~]*) { algebra =>
@@ -214,7 +228,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       }
 
       class SimpleEvaluationContext extends EvaluationContext[UNIT] {
-        override val root: DOT[UNIT] = I
+        override def root: DOT[UNIT] = I
 
         override def evaluate(term: Term[Principal]): ARROW[UNIT, T] =
           term match {
@@ -242,7 +256,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
         override def evaluate(term: Term[Principal]): ARROW[HEAD x TAIL, T] =
           term match {
             case VariableTerm(symbol) if symbol == name =>
-              root.π0.asInstanceOf[ARROW[HEAD x TAIL, T]] // TODO: use TAIL =:= T here to validate cast?
+              root.π0.asInstanceOf[ARROW[HEAD x TAIL, T]]
 
             case term @ BinaryOpTerm(left, op, right) =>
               operatorAssignments.lookup(op).map { op =>
