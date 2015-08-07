@@ -174,7 +174,7 @@ class AlgebraTests extends FunSpec {
       }
     }
 
-    it("can validate morphisms between their algebras") {
+    it("can validate morphisms preserving unary operations") {
       val carrierStrings = dot[String]("+", "-")
       val minusStrings = makeUnaryOperator(carrierStrings,
         "+" -> "-",
@@ -209,6 +209,23 @@ class AlgebraTests extends FunSpec {
 
       val notAMorphism = arrow(carrierStrings, carrierInts, "+" -> 1, "-" -> 1)
       setsWithInvolution.isMorphism(algebraStrings, algebraInts, notAMorphism) shouldBe false
+    }
+
+    it("can validate morphisms preserving constants") {
+      val carrierInts = dot[Int](0, 1, 2)
+      val pointInts = makeNullaryOperator(carrierInts, 0);
+      val carrierStrings = dot[String]("samson", "delilah")
+      val pointStrings = makeNullaryOperator(carrierStrings, "delilah");
+
+      val pointedSets = AlgebraicTheory(O)()()
+      val algebraStrings = new pointedSets.Algebra[String](carrierStrings)(O := pointStrings)
+      val algebraInts = new pointedSets.Algebra[Int](carrierInts)(O := pointInts)
+
+      val morphism = arrow(carrierStrings, carrierInts, "samson" -> 1, "delilah" -> 0)
+      val notAMorphism = arrow(carrierStrings, carrierInts, "samson" -> 1, "delilah" -> 1)
+
+      pointedSets.isMorphism(algebraStrings, algebraInts, morphism) shouldBe true
+      pointedSets.isMorphism(algebraStrings, algebraInts, notAMorphism) shouldBe false
     }
   }
 }

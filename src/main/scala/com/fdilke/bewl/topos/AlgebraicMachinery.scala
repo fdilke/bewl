@@ -194,20 +194,29 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       sourceAlgebra: Algebra[A],
       targetAlgebra: Algebra[B],
       arrow: ARROW[A, B]
-    ) = {
+    ): Boolean = {
       if (sourceAlgebra.carrierFor(classTag[Principal]) != arrow.source ||
-          targetAlgebra.carrierFor(classTag[Principal]) != arrow.target) {
+          targetAlgebra.carrierFor(classTag[Principal]) != arrow.target)
         throw new IllegalArgumentException("Source/target of arrow do not match algebra carriers")
-      }
-      operators forall {
-        case op: AbstractUnaryOp => (
-          for (srcOp <- sourceAlgebra.operatorAssignments.lookup(op);
-               tgtOp <- targetAlgebra.operatorAssignments.lookup(op))
-            yield (tgtOp o arrow) == (arrow o srcOp)
-          ).getOrElse {
-          throw new IllegalArgumentException("Not found in source algebra: " + op.name)
+      else
+        (constants ++ operators) forall {
+          case op: PrincipalConstant =>
+            (
+              for (srcConstant <- sourceAlgebra.operatorAssignments.lookup(op);
+                   tgtConstant <- targetAlgebra.operatorAssignments.lookup(op))
+                yield tgtConstant == (arrow o srcConstant)
+              ).getOrElse {
+                throw new IllegalArgumentException("Not found in source algebra: " + op.name)
+              }
+
+          case op: AbstractUnaryOp => (
+            for (srcOp <- sourceAlgebra.operatorAssignments.lookup(op);
+                 tgtOp <- targetAlgebra.operatorAssignments.lookup(op))
+              yield (tgtOp o arrow) == (arrow o srcOp)
+            ).getOrElse {
+              throw new IllegalArgumentException("Not found in source algebra: " + op.name)
+            }
         }
-      }
     }
 
     class Algebra[T <: ~](
