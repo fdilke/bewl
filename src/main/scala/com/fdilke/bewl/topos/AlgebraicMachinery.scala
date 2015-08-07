@@ -213,17 +213,29 @@ trait AlgebraicMachinery { topos: BaseTopos =>
               throw new IllegalArgumentException("Not found in source algebra: " + op.name)
             }
 
-          case op: AbstractBinaryOp => {
+          case op: AbstractBinaryOp =>
             val square = sourceAlgebra.carrier.squared
             (for (
-              srcOp: BinaryOp[A] <- sourceAlgebra.operatorAssignments.lookup(op);
-              tgtOp: BinaryOp[B] <- targetAlgebra.operatorAssignments.lookup(op)
+              srcOp <- sourceAlgebra.operatorAssignments.lookup(op);
+              tgtOp <- targetAlgebra.operatorAssignments.lookup(op)
             ) yield {
                 (arrow o srcOp.arrow) == tgtOp(arrow o square.π0, arrow o square.π1)
               }).getOrElse {
               throw new IllegalArgumentException("Not found in source algebra: " + op.name)
             }
-          }
+
+          case op: AbstractRightScalarBinaryOp =>
+            val carrierScalars = sourceAlgebra.carrier x scalars
+            (for (
+              srcOp0 <- sourceAlgebra.operatorAssignments.lookup(op);
+              tgtOp0 <- targetAlgebra.operatorAssignments.lookup(op)
+            ) yield {
+                val srcOp = srcOp0.asInstanceOf[RightScalarBinaryOp[A, S]]
+                val tgtOp = tgtOp0.asInstanceOf[RightScalarBinaryOp[B, S]]
+                (arrow o srcOp.arrow) == tgtOp(arrow o carrierScalars.π0, carrierScalars.π1)
+            }).getOrElse {
+              throw new IllegalArgumentException("Not found in source algebra: " + op.name)
+            }
 
           case op =>
             throw new IllegalArgumentException(s"Unknown type of operator, can't verify: ${op.name}")

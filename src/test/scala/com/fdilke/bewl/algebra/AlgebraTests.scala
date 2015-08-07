@@ -126,16 +126,15 @@ class AlgebraTests extends FunSpec {
       val carrier = dot[String]("o", "i")
       val theO = makeNullaryOperator(carrier, "o")
       val scalar1 = makeNullaryOperator(scalars, 2)
-      val table = Map(
-        ("o", 0) -> "o",
-        ("i", 0) -> "o",
-        ("o", 1) -> "i",
-        ("i", 1) -> "i",
-        ("o", 2) -> "i",
-        ("i", 2) -> "o"
-      )
       val rightMultiply = bifunctionAsBiArrow(carrier, scalars, carrier)(
-        Function untupled table
+        Function untupled Map(
+          ("o", 0) -> "o",
+          ("i", 0) -> "o",
+          ("o", 1) -> "i",
+          ("i", 1) -> "i",
+          ("o", 2) -> "i",
+          ("i", 2) -> "o"
+        )
       )
 
       val pointedWeakActs = AlgebraicTheoryWithScalars(scalars)(O, II)(II := scalar1)(**)()
@@ -244,6 +243,26 @@ class AlgebraTests extends FunSpec {
 
       magmas.isMorphism(algebra, algebra, morphism) shouldBe true
       magmas.isMorphism(algebra, algebra, notAMorphism) shouldBe false
+    }
+
+    it("can validate morphisms preserving mixed operations with scalars") {
+      val scalars = dot[Symbol]('q)
+      val carrier = dot[Boolean](true, false)
+      val multiplication = bifunctionAsBiArrow(carrier, scalars, carrier) {
+        Function untupled Map(
+          (true, 'q) -> false,
+          (false, 'q) -> true
+        )
+      }
+
+      val weakActs = AlgebraicTheoryWithScalars(scalars)(/* II */)()(**)()
+      val algebra = new weakActs.Algebra[Boolean](carrier)(** := multiplication)
+
+      val morphism = arrow(carrier, carrier, true -> false, false -> true)
+      val notAMorphism = arrow(carrier, carrier, true -> true, false -> true)
+
+      weakActs.isMorphism(algebra, algebra, morphism) shouldBe true
+      weakActs.isMorphism(algebra, algebra, notAMorphism) shouldBe false
     }
   }
 }
