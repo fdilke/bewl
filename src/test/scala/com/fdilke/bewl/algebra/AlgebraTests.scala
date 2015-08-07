@@ -1,5 +1,6 @@
 package com.fdilke.bewl.algebra
 
+import com.fdilke.bewl.fsets.{FiniteSetsUtilities, FiniteSets}
 import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.FunSpec
@@ -154,7 +155,8 @@ class AlgebraTests extends FunSpec {
     it("can encapsulate commutative magmas") {
       val commutativeMagmas = AlgebraicTheory()(*)(α * β := β * α)
       case class CommutativeMagma[T <: ~](
-        carrier: DOT[T], op: BinaryOp[T]
+        override val carrier: DOT[T],
+        op: BinaryOp[T]
       ) extends commutativeMagmas.Algebra[T](carrier)(* := op)
 
       val carrier = dot(true, false)
@@ -226,6 +228,22 @@ class AlgebraTests extends FunSpec {
 
       pointedSets.isMorphism(algebraStrings, algebraInts, morphism) shouldBe true
       pointedSets.isMorphism(algebraStrings, algebraInts, notAMorphism) shouldBe false
+    }
+
+    it("can validate morphisms preserving binary operations") {
+      val carrier = dot[Int](0, 1, 2, 3)
+      val multiplication = bifunctionAsBiArrow(carrier) {
+        (x, y) => (x + y) % 4
+      }
+
+      val magmas = AlgebraicTheory()(*)()
+      val algebra = new magmas.Algebra[Int](carrier)(* := multiplication)
+
+      val morphism = arrow(carrier, carrier, 0 -> 0, 1 -> 2, 2 -> 0, 3 -> 2)
+      val notAMorphism = arrow(carrier, carrier, 0 -> 1, 1 -> 2, 2 -> 3, 3 -> 0)
+
+      magmas.isMorphism(algebra, algebra, morphism) shouldBe true
+      magmas.isMorphism(algebra, algebra, notAMorphism) shouldBe false
     }
   }
 }

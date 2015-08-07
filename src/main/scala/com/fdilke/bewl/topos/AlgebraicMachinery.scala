@@ -195,32 +195,47 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       targetAlgebra: Algebra[B],
       arrow: ARROW[A, B]
     ): Boolean = {
-      if (sourceAlgebra.carrierFor(classTag[Principal]) != arrow.source ||
-          targetAlgebra.carrierFor(classTag[Principal]) != arrow.target)
+      if (sourceAlgebra.carrier != arrow.source ||
+          targetAlgebra.carrier != arrow.target)
         throw new IllegalArgumentException("Source/target of arrow do not match algebra carriers")
       else
         (constants ++ operators) forall {
           case op: PrincipalConstant =>
             (
               for (srcConstant <- sourceAlgebra.operatorAssignments.lookup(op);
-                   tgtConstant <- targetAlgebra.operatorAssignments.lookup(op))
-                yield tgtConstant == (arrow o srcConstant)
-              ).getOrElse {
+                   tgtConstant <- targetAlgebra.operatorAssignments.lookup(op)) yield {
+                (arrow o srcConstant) == tgtConstant
+              }).getOrElse {
                 throw new IllegalArgumentException("Not found in source algebra: " + op.name)
               }
 
           case op: AbstractUnaryOp => (
             for (srcOp <- sourceAlgebra.operatorAssignments.lookup(op);
-                 tgtOp <- targetAlgebra.operatorAssignments.lookup(op))
-              yield (tgtOp o arrow) == (arrow o srcOp)
-            ).getOrElse {
+                 tgtOp <- targetAlgebra.operatorAssignments.lookup(op)) yield {
+              (arrow o srcOp) == (tgtOp o arrow)
+            }).getOrElse {
               throw new IllegalArgumentException("Not found in source algebra: " + op.name)
             }
+
+          case op: AbstractBinaryOp => {
+            val square = sourceAlgebra.carrier.squared
+            (for (
+              srcOp: BinaryOp[A] <- sourceAlgebra.operatorAssignments.lookup(op);
+              tgtOp: BinaryOp[B] <- targetAlgebra.operatorAssignments.lookup(op)
+            ) yield {
+                (arrow o srcOp.arrow) == tgtOp(arrow o square.π0, arrow o square.π1)
+              }).getOrElse {
+              throw new IllegalArgumentException("Not found in source algebra: " + op.name)
+            }
+          }
+
+          case op =>
+            throw new IllegalArgumentException(s"Unknown type of operator, can't verify: ${op.name}")
         }
     }
 
     class Algebra[T <: ~](
-      carrier: DOT[T]
+      val carrier: DOT[T]
     )(assignments: OperatorAssignment[_ <: ~, _ <: ~]*) { algebra =>
       val operatorAssignments = OperatorAssignments(
         (preassignments ++ assignments) map {
@@ -232,7 +247,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
           variables match {
             case Nil => new SimpleEvaluationContext
             case head :: tail =>
-              new CompoundEvaluationContext(head.symbol, carrierFor(head.tag), EvaluationContext(tail))
+              new CompoundEvaluationContext(head.symbol, carrier, EvaluationContext(tail))
               // TODO: store the variables in context
               // TODO: refactor as fold
           }
@@ -322,9 +337,6 @@ trait AlgebraicMachinery { topos: BaseTopos =>
             case _ => ???
           }
       }
-
-      def carrierFor[S <: AlgebraicSort](tag: ClassTag[S]): DOT[T] =
-        carrier // TODO: support other type lookups later
 
       def sanityTest =
         if (!operatorAssignments.hasPrecisely(constants, operators))
