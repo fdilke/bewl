@@ -193,6 +193,7 @@ class AlgebraTests extends FunSpec {
       val algebraInts = new setsWithInvolution.Algebra[Int](carrierInts)($minus := minusInts)
       algebraStrings.sanityTest
       algebraInts.sanityTest
+
       val morphism = arrow(carrierStrings, carrierInts, "+" -> 1, "-" -> -1)
       val morphismWithWrongSource = arrow(wrongSource, carrierInts, "*" -> 1)
       morphismWithWrongSource.sanityTest
@@ -205,8 +206,9 @@ class AlgebraTests extends FunSpec {
       intercept[IllegalArgumentException] {
         setsWithInvolution.isMorphism(algebraStrings, algebraInts, morphismWithWrongTarget);
       }
+
       val notAMorphism = arrow(carrierStrings, carrierInts, "+" -> 1, "-" -> 1)
-      setsWithInvolution.isMorphism(algebraStrings, algebraInts, notAMorphism) shouldBe true // TODO fix!!
+      setsWithInvolution.isMorphism(algebraStrings, algebraInts, notAMorphism) shouldBe false
     }
   }
 }

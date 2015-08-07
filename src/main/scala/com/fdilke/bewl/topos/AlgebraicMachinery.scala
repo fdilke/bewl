@@ -199,7 +199,15 @@ trait AlgebraicMachinery { topos: BaseTopos =>
           targetAlgebra.carrierFor(classTag[Principal]) != arrow.target) {
         throw new IllegalArgumentException("Source/target of arrow do not match algebra carriers")
       }
-      true
+      operators forall {
+        case op: AbstractUnaryOp => (
+          for (srcOp <- sourceAlgebra.operatorAssignments.lookup(op);
+               tgtOp <- targetAlgebra.operatorAssignments.lookup(op))
+            yield (tgtOp o arrow) == (arrow o srcOp)
+          ).getOrElse {
+          throw new IllegalArgumentException("Not found in source algebra: " + op.name)
+        }
+      }
     }
 
     class Algebra[T <: ~](
