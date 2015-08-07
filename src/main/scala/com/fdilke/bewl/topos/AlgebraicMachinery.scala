@@ -196,18 +196,24 @@ trait AlgebraicMachinery { topos: BaseTopos =>
         throw new IllegalArgumentException("Source/target of arrow do not match algebra carriers")
       else
         (constants ++ operators) forall {
+          case op: ScalarConstant => true
+
           case op: PrincipalConstant =>
             (
-              for (srcConstant <- sourceAlgebra.operatorAssignments.lookup(op);
-                   tgtConstant <- targetAlgebra.operatorAssignments.lookup(op)) yield {
+              for (
+                srcConstant <- sourceAlgebra.operatorAssignments.lookup(op);
+                tgtConstant <- targetAlgebra.operatorAssignments.lookup(op)
+              ) yield {
                 (arrow o srcConstant) == tgtConstant
               }).getOrElse {
                 throw new IllegalArgumentException("Not found in source algebra: " + op.name)
               }
 
           case op: AbstractUnaryOp => (
-            for (srcOp <- sourceAlgebra.operatorAssignments.lookup(op);
-                 tgtOp <- targetAlgebra.operatorAssignments.lookup(op)) yield {
+            for (
+              srcOp <- sourceAlgebra.operatorAssignments.lookup(op);
+              tgtOp <- targetAlgebra.operatorAssignments.lookup(op)
+            ) yield {
               (arrow o srcOp) == (tgtOp o arrow)
             }).getOrElse {
               throw new IllegalArgumentException("Not found in source algebra: " + op.name)
@@ -230,9 +236,9 @@ trait AlgebraicMachinery { topos: BaseTopos =>
               srcOp0 <- sourceAlgebra.operatorAssignments.lookup(op);
               tgtOp0 <- targetAlgebra.operatorAssignments.lookup(op)
             ) yield {
-                val srcOp = srcOp0.asInstanceOf[RightScalarBinaryOp[A, S]]
-                val tgtOp = tgtOp0.asInstanceOf[RightScalarBinaryOp[B, S]]
-                (arrow o srcOp.arrow) == tgtOp(arrow o carrierScalars.π0, carrierScalars.π1)
+              val srcOp = srcOp0.asInstanceOf[RightScalarBinaryOp[A, S]]
+              val tgtOp = tgtOp0.asInstanceOf[RightScalarBinaryOp[B, S]]
+              (arrow o srcOp.arrow) == tgtOp(arrow o carrierScalars.π0, carrierScalars.π1)
             }).getOrElse {
               throw new IllegalArgumentException("Not found in source algebra: " + op.name)
             }

@@ -247,6 +247,7 @@ class AlgebraTests extends FunSpec {
 
     it("can validate morphisms preserving mixed operations with scalars") {
       val scalars = dot[Symbol]('q)
+      val pointScalar = makeNullaryOperator(scalars, 'q)
       val carrier = dot[Boolean](true, false)
       val multiplication = bifunctionAsBiArrow(carrier, scalars, carrier) {
         Function untupled Map(
@@ -255,14 +256,15 @@ class AlgebraTests extends FunSpec {
         )
       }
 
-      val weakActs = AlgebraicTheoryWithScalars(scalars)(/* II */)()(**)()
-      val algebra = new weakActs.Algebra[Boolean](carrier)(** := multiplication)
+      val weakActsOverAPointedMagma = AlgebraicTheoryWithScalars(scalars)(II)(II := pointScalar)(**)()
+      val algebra = new weakActsOverAPointedMagma.Algebra[Boolean](carrier)(** := multiplication)
+      algebra.sanityTest
 
       val morphism = arrow(carrier, carrier, true -> false, false -> true)
       val notAMorphism = arrow(carrier, carrier, true -> true, false -> true)
 
-      weakActs.isMorphism(algebra, algebra, morphism) shouldBe true
-      weakActs.isMorphism(algebra, algebra, notAMorphism) shouldBe false
+      weakActsOverAPointedMagma.isMorphism(algebra, algebra, morphism) shouldBe true
+      weakActsOverAPointedMagma.isMorphism(algebra, algebra, notAMorphism) shouldBe false
     }
   }
 }
