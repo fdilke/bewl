@@ -287,5 +287,27 @@ class AlgebraTests extends FunSpec {
         new setsWithInvolution.Algebra[Int](carrier)($minus := minusBad).sanityTest
       }.getMessage should include("involutive")
     }
+
+    it("can verify additional laws once an algebra is constructed") {
+      import NamedLaws._
+      val carrier = dot[Int](1, -1)
+      val minus = makeUnaryOperator(carrier,
+        1 -> -1,
+        -1 -> 1
+      )
+
+      val setsWithInvolution = AlgebraicTheory()($minus)(
+        "involutive" law (-(-α) := α)
+      )
+      val algebra = new setsWithInvolution.Algebra[Int](carrier)($minus := minus)
+      algebra.sanityTest
+
+      algebra.satisfies(
+        -α := α
+      ) shouldBe false
+      algebra.satisfies(
+        -α := -(-(-α))
+      ) shouldBe true
+    }
   }
 }

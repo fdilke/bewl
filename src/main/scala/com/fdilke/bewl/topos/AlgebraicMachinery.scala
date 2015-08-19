@@ -15,10 +15,11 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   type RightScalarBinaryOp[X <: ~, S <: ~] = BiArrow[X, S, X]
 
   case class Law(left: Term[Principal], right: Term[Principal], name:Option[String] = None) {
-    def verifyIn[S <: ~, T <: ~](context: AlgebraicTheory[S]#Algebra[T]#EvaluationContext) =
-      if (context.evaluate(left) != context.evaluate(right)) {
-        throw new IllegalArgumentException(name.getOrElse("Unnamed") + " law failed")
-      }
+    def isSatisfiedIn[S <: ~, T <: ~](context: AlgebraicTheory[S]#Algebra[T]#EvaluationContext) =
+      context.evaluate(left) == context.evaluate(right)
+
+    def fails =
+      throw new IllegalArgumentException(name.getOrElse("Unnamed") + " law failed")
 
     val freeVariables = 
       (left.freeVariables ++ right.freeVariables) distinct
@@ -375,8 +376,14 @@ trait AlgebraicMachinery { topos: BaseTopos =>
         else
           laws foreach { law =>
             val context = EvaluationContext(law.freeVariables)
-            law.verifyIn(context)
+            if (!law.isSatisfiedIn(context))
+              law.fails
         }
+
+      def satisfies(law: Law) = {
+        val context = EvaluationContext(law.freeVariables)
+        law.isSatisfiedIn(context)
+      }
     }
   }
 
