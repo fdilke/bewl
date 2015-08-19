@@ -14,10 +14,27 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   type BinaryOp[X <: ~] = BiArrow[X, X, X]
   type RightScalarBinaryOp[X <: ~, S <: ~] = BiArrow[X, S, X]
 
-  case class Law(left: Term[Principal], right: Term[Principal]) {
+  case class Law(left: Term[Principal], right: Term[Principal], name:Option[String] = None) {
+    def verifyIn[S <: ~, T <: ~](context: AlgebraicTheory[S]#Algebra[T]#EvaluationContext) =
+      if (context.evaluate(left) != context.evaluate(right)) {
+        throw new IllegalArgumentException(name.getOrElse("Unnamed") + " law failed")
+      }
+
     val freeVariables = 
       (left.freeVariables ++ right.freeVariables) distinct
+
+    def named(name: String) =
+      Law(left, right, Some(name))
   }
+
+  object NamedLaws {
+    case class Widget(n: Int)
+
+    implicit class NamedLaw(name: String) {
+      def law(unnamedLaw: Law) = unnamedLaw.named(name)
+    }
+  }
+
 
   sealed trait Term[X <: AlgebraicSort] extends Dynamic {
     def applyDynamic(name: String)(other: Term[X]) =
@@ -263,7 +280,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
           }
       }
 
-      sealed trait EvaluationContext {
+      trait EvaluationContext {
         type ROOT <: ~
         def root: DOT[ROOT]
         def evaluate(term: Term[Principal]): ARROW[ROOT, T]
@@ -358,9 +375,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
         else
           laws foreach { law =>
             val context = EvaluationContext(law.freeVariables)
-            if (context.evaluate(law.left) != context.evaluate(law.right)) {
-              throw new IllegalArgumentException("Unnamed law failed")
-            }
+            law.verifyIn(context)
         }
     }
   }

@@ -266,5 +266,26 @@ class AlgebraTests extends FunSpec {
       weakActsOverAPointedMagma.isMorphism(algebra, algebra, morphism) shouldBe true
       weakActsOverAPointedMagma.isMorphism(algebra, algebra, notAMorphism) shouldBe false
     }
+
+    it("support named laws with error reporting when they fail") {
+      import NamedLaws._
+      val carrier = dot[Int](1, -1)
+      val minusGood = makeUnaryOperator(carrier,
+        1 -> -1,
+        -1 -> 1
+      )
+      val minusBad = makeUnaryOperator(carrier,
+        1 -> 1,
+        -1 -> 1
+      )
+
+      val setsWithInvolution = AlgebraicTheory()($minus)(
+        "involutive" law (-(-α) := α)
+      )
+      new setsWithInvolution.Algebra[Int](carrier)($minus := minusGood).sanityTest
+      intercept[IllegalArgumentException] {
+        new setsWithInvolution.Algebra[Int](carrier)($minus := minusBad).sanityTest
+      }.getMessage should include("involutive")
+    }
   }
 }
