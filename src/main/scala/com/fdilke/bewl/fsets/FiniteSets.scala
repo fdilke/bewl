@@ -193,7 +193,7 @@ object FiniteSetsUtilities {
     )
 
   private def intSqrt(square: Int) =
-    (1 until square).find { n =>
+    (1 to square).find { n =>
       n * n == square
     }.getOrElse {
       throw new IllegalArgumentException("Not a valid monoid multiplication table: size " + square)

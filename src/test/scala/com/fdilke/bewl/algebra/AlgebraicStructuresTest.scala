@@ -9,8 +9,8 @@ class AlgebraicStructuresTest extends FunSpec {
   private val topos = com.fdilke.bewl.fsets.FiniteSets
   import topos._
 
-  private val (i, x, y, a, b, c, d, e, f, f2, g, g2) =
-    ('i,'x,'y,'a,'b,'c,'d,'e,'f,'f2,'g,'g2)
+  private val (i, x, y, a, b, c, d, e, f, f2, g, g2, r, s) =
+    ('i,'x,'y,'a,'b,'c,'d,'e,'f,'f2,'g,'g2, 'r, 's)
 
   describe("Monoids") {
     it("can be constructed and verified") {
@@ -110,6 +110,35 @@ class AlgebraicStructuresTest extends FunSpec {
       intercept[IllegalArgumentException] {
         Group(carrier, unit, product, inverse).sanityTest
       }.getMessage shouldBe "left inverse law failed"
+    }
+
+    it("can tell if a group is commutative") {
+      val carrier = dot(i, x, y)
+      val unit = makeNullaryOperator(carrier, i)
+      val inverse = makeUnaryOperator(carrier,
+        i -> i, x -> y, y -> x
+      )
+      val product = makeBinaryOperator(carrier,
+        (i, i) -> i, (i, x) -> x, (i, y) -> y,
+        (x, i) -> x, (x, x) -> y, (x, y) -> i,
+        (y, i) -> y, (y, x) -> i, (y, y) -> x
+      )
+      val group = Group(carrier, unit, product, inverse)
+      group shouldBe 'commutative
+    }
+
+    it("can tell if a group is not commutative") {
+      val group = groupOfUnits(monoidFromTable(
+        i, a, b, c, r, s,
+        a, i, s, r, c, b,
+        b, r, i, s, a, c,
+        c, s, r, i, b, a,
+        r, b, c, a, s, i,
+        s, c, a, b, i, r
+      ))
+      group.sanityTest
+      group.carrier.globals.size shouldBe 6
+      group should not be('commutative)
     }
   }
 }

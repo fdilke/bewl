@@ -12,6 +12,12 @@ trait AlgebraicStructures { topos: BaseTopos with AlgebraicMachinery  =>
     "associative" law ( (α * β) * γ := α * (β * γ ) )
   )
 
+  trait CommutativityCriterion { algebra: Algebra =>
+    def isCommutative = satisfies(
+      α * β := β * α
+    )
+  }
+
   case class Monoid[M <: ~](
     override val carrier: DOT[M],
     unit: NullaryOp[M],
@@ -19,11 +25,7 @@ trait AlgebraicStructures { topos: BaseTopos with AlgebraicMachinery  =>
   ) extends monoids.Algebra[M](carrier)(
     ι := unit,
     * := multiply
-  ) {
-    def isCommutative = satisfies(
-      α * β := β * α
-    )
-  }
+  ) with CommutativityCriterion
 
   lazy val groups = AlgebraicTheory(ι)($minus, *)( // TODO try ~
     "left unit" law ( ι * α := α ),
@@ -41,5 +43,5 @@ trait AlgebraicStructures { topos: BaseTopos with AlgebraicMachinery  =>
     ι := unit,
     * := multiply,
     $minus := inverse
-  )
+  ) with CommutativityCriterion
 }

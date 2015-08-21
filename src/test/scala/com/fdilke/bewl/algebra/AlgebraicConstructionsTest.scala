@@ -12,6 +12,7 @@ class AlgebraicConstructionsTest extends FunSpec {
   describe("The monoid of endomorphisms can be constructed") {
     it("for the empty set") {
       val endosOf0 = endomorphismMonoid(dot())
+      endosOf0 shouldBe an[Monoid[_]]
       endosOf0.sanityTest
       endosOf0.carrier.globals.size shouldBe 1
       endosOf0 should be('commutative)
@@ -36,6 +37,42 @@ class AlgebraicConstructionsTest extends FunSpec {
       endosOf3.sanityTest
       endosOf3.carrier.globals.size shouldBe 27
       endosOf3 should not be('commutative)
+    }
+  }
+
+  describe("The group of units for a monoid can be constructed") {
+    it("for the trivial monoid") {
+      val group = groupOfUnits(monoidFromTable('o))
+      group shouldBe an[Group[_]]
+      group.sanityTest
+      group.carrier.globals.size shouldBe 1
+    }
+
+    it("for a deliberately not very invertible monoid") {
+      val group = groupOfUnits(monoidFromTable(
+        'o, 'x,
+        'x, 'x
+      ))
+      group.sanityTest
+      group.carrier.globals.size shouldBe 1
+      group shouldBe 'commutative
+    }
+
+    it("for a monoid that is a group already") {
+      val group = groupOfUnits(monoidFromTable(
+        'o, 'x,
+        'x, 'o
+      ))
+      group.sanityTest
+      group.carrier.globals.size shouldBe 2
+      group shouldBe 'commutative
+    }
+
+    it("for a larger endomorphism monoid") {
+      val group = groupOfUnits(endomorphismMonoid(dot(1,2,3)))
+      group.sanityTest
+      group.carrier.globals.size shouldBe 6
+      group should not be('commutative)
     }
   }
 }

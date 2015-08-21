@@ -411,6 +411,8 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     ) =
       new AlgebraicTheory[S](scalars)(constants :_*)(preassignments :_*)(operators :_*)(laws:_*)
   }
+
+  type Algebra = AlgebraicTheory[_ <: ~]#Algebra[_ <: ~]
 }
 
 
