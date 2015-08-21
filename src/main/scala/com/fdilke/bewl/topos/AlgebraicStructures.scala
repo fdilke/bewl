@@ -20,4 +20,22 @@ trait AlgebraicStructures { topos: BaseTopos with AlgebraicMachinery  =>
     ι := unit,
     * := multiply
   )
+
+  lazy val groups = AlgebraicTheory(ι)($minus, *)( // TODO try ~
+    "left unit" law ( ι * α := α ),
+    "right unit" law ( α * ι := α ),
+    "left inverse" law ( (-α) * α := ι ),
+    "associative" law ( (α * β) * γ := α * (β * γ ) )
+  )
+
+  case class Group[G <: ~](
+    override val carrier: DOT[G],
+    unit: NullaryOp[G],
+    multiply: BinaryOp[G],
+    inverse: UnaryOp[G]
+  ) extends groups.Algebra[G](carrier)(
+    ι := unit,
+    * := multiply,
+    $minus := inverse
+  )
 }
