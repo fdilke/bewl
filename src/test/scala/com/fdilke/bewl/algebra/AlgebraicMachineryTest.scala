@@ -1,6 +1,5 @@
 package com.fdilke.bewl.algebra
 
-import com.fdilke.bewl.fsets.{FiniteSetsUtilities, FiniteSets}
 import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.FunSpec
