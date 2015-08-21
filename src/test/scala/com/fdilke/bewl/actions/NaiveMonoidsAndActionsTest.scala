@@ -6,7 +6,7 @@ import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsUtilities}
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
-class NaiveMonoidsAndActionsTests extends FunSpec {
+class NaiveMonoidsAndActionsTest extends FunSpec {
   private val (i, x, y, a, b, c, d, e, f, f2, g, g2) =
              ('i,'x,'y,'a,'b,'c,'d,'e,'f,'f2,'g,'g2)
 

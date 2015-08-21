@@ -5,7 +5,7 @@ import com.fdilke.bewl.fsets.DiagrammaticFiniteSetsUtilities._
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
-class BindingTests  extends FunSpec {
+class BindingTest  extends FunSpec {
   import DiagrammaticFiniteSets._
 
   describe("Algebraic operators") {

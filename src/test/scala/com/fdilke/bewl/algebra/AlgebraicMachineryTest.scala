@@ -6,7 +6,7 @@ import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
-class AlgebraTests extends FunSpec {
+class AlgebraicMachineryTest extends FunSpec {
 
   private val topos = com.fdilke.bewl.fsets.FiniteSets
   import topos.StandardTermsAndOperators._

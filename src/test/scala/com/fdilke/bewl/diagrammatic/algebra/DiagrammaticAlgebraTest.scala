@@ -5,7 +5,7 @@ import com.fdilke.bewl.fsets.DiagrammaticFiniteSetsUtilities._
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
-class DiagrammaticAlgebraTests extends FunSpec {
+class DiagrammaticAlgebraTest extends FunSpec {
   import DiagrammaticFiniteSets._
   import DiagrammaticAbstractOperator._
 
@@ -51,21 +51,6 @@ class DiagrammaticAlgebraTests extends FunSpec {
       }.
         getMessage shouldBe "Commutative law for *"
     }
-
-// TODO: aspirational: should be able to do this with new algebra layer
-//    ignore("automatically verify the arities of supplied operations - can't currently, as they are just arrows") {
-//      val (o, x) = ('o, 'x)
-//      val dot = set(o, x)
-//      val flip = unaryOperator(dot,
-//        o -> x, x -> o
-//      )
-//
-//      def invalidAlgebra = Magma(dot, flip)
-//        intercept[IllegalArgumentException] {
-//        invalidAlgebra.verify
-//      }.
-//        getMessage shouldBe "Operator * should have arity 2"
-//    }
   }
 
   describe("Monoids") {

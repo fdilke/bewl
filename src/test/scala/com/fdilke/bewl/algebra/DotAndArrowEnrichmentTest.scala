@@ -7,7 +7,7 @@ import org.scalatest.Matchers._
 
 import scala.Function.untupled
 
-class DotAndArrowEnrichmentTests extends FunSpec {
+class DotAndArrowEnrichmentTest extends FunSpec {
 
   describe("The universal quantifier") {
     it("detects whether a subobject is the whole object") {

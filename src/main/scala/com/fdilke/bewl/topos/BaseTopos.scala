@@ -6,7 +6,7 @@ import com.fdilke.bewl.helper.Memoize
 import scala.Function.tupled
 import scala.language.higherKinds
 
-trait Topos extends BaseTopos with NaiveMonoidsAndActions with AlgebraicMachinery with LogicalOperations
+trait Topos extends BaseTopos with NaiveMonoidsAndActions with AlgebraicMachinery with AlgebraicStructures with LogicalOperations
 
 trait BaseTopos { self: LogicalOperations =>
   type ~
@@ -42,7 +42,7 @@ trait BaseTopos { self: LogicalOperations =>
       )
 
     final def evaluation: BiArrow[S_T, S, T] =
-      (this x source).biArrow(target) { (f, s) => f(s) }
+      (this x source).biArrow(target) { _(_) }
   }
 
   type BIPRODUCT[L <: ~, R <: ~] = BiproductDot[L, R, L x R] with DOT[L x R]
