@@ -6,7 +6,9 @@ import com.fdilke.bewl.helper.Memoize
 import scala.Function.tupled
 import scala.language.higherKinds
 
-trait Topos extends BaseTopos with NaiveMonoidsAndActions with AlgebraicMachinery with AlgebraicStructures with LogicalOperations
+trait Topos extends BaseTopos with NaiveMonoidsAndActions
+  with AlgebraicMachinery with AlgebraicStructures with AlgebraicConstructions
+  with LogicalOperations
 
 trait BaseTopos { self: LogicalOperations =>
   type ~

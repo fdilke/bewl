@@ -66,6 +66,19 @@ class AlgebraicStructuresTest extends FunSpec {
         g2,a, c, c, c, c, g,g2
       ).sanityTest
     }
+
+    it("can tell if a monoid is commutative") {
+      monoidFromTable(
+        i, a, b,
+        a, a, b,
+        b, b, b
+      ) should be('commutative)
+      monoidFromTable(
+        i, a, b,
+        a, a, a,
+        b, b, b
+      ) should not be('commutative)
+    }
   }
 
   describe("Groups") {

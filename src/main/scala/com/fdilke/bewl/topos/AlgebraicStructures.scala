@@ -19,7 +19,11 @@ trait AlgebraicStructures { topos: BaseTopos with AlgebraicMachinery  =>
   ) extends monoids.Algebra[M](carrier)(
     ι := unit,
     * := multiply
-  )
+  ) {
+    def isCommutative = satisfies(
+      α * β := β * α
+    )
+  }
 
   lazy val groups = AlgebraicTheory(ι)($minus, *)( // TODO try ~
     "left unit" law ( ι * α := α ),
