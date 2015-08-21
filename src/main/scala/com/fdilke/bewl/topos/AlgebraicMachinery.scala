@@ -44,6 +44,9 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     def +(other: Term[X]) =
       applyDynamic("+")(other)
 
+    def *(other: Term[X]) =
+      applyDynamic("*")(other)
+
     def **(other: Term[Scalar])(implicit eq: =:=[X, Principal]) =
       BinaryScalarOpTerm(
         this.asInstanceOf[Term[Principal]],
@@ -170,11 +173,13 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   }
 
   object StandardTermsAndOperators {
-    val O = new PrincipalConstant("O")
+    val o = new PrincipalConstant("o")
+    val ι = new PrincipalConstant("ι")
     val II = new ScalarConstant("II")
 
     val α = VariableTerm[Principal]("α")
     val β = VariableTerm[Principal]("β")
+    val γ = VariableTerm[Principal]("γ")
 
     val - = new AbstractUnaryOp("-")
 

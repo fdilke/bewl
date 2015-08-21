@@ -23,8 +23,8 @@ class AlgebraicMachineryTest extends FunSpec {
     it("for no terms can evaluate constants, not veriables") {
       val carrier = dot[Boolean](true, false)
       val theO = makeNullaryOperator(carrier, false)
-      val pointedSets = AlgebraicTheory(O)()()
-      val algebra = new pointedSets.Algebra[Boolean](carrier)(O := theO)
+      val pointedSets = AlgebraicTheory(o)()()
+      val algebra = new pointedSets.Algebra[Boolean](carrier)(o := theO)
       val context = algebra.EvaluationContext[Boolean](Seq())
       intercept[IllegalArgumentException] {
         context.evaluate(α)
@@ -32,7 +32,7 @@ class AlgebraicMachineryTest extends FunSpec {
       intercept[IllegalArgumentException] {
         context.evaluateScalar(II)
       }
-      context.evaluate(O) shouldBe theO
+      context.evaluate(o) shouldBe theO
     }
 
     it("for one term over an empty theory is just a uniproduct") {
@@ -65,10 +65,10 @@ class AlgebraicMachineryTest extends FunSpec {
       val carrier = dot[Boolean](true, false)
       val theO = makeNullaryOperator(carrier, false)
 
-      val pointedSets = AlgebraicTheory(O)()()
-      val algebra = new pointedSets.Algebra[Boolean](carrier)(O := theO)
+      val pointedSets = AlgebraicTheory(o)()()
+      val algebra = new pointedSets.Algebra[Boolean](carrier)(o := theO)
       val context = algebra.EvaluationContext[Boolean](Seq(α))
-      context.evaluate(O) shouldBe (
+      context.evaluate(o) shouldBe (
           theO o context.root.toI
       )
     }
@@ -82,16 +82,16 @@ class AlgebraicMachineryTest extends FunSpec {
         2 -> 1
       )
 
-      val pointedSetsWithOp = AlgebraicTheory(O)($minus)()
-      val algebra = new pointedSetsWithOp.Algebra[Int](carrier)(O := theO, $minus := twiddle)
+      val pointedSetsWithOp = AlgebraicTheory(o)($minus)()
+      val algebra = new pointedSetsWithOp.Algebra[Int](carrier)(o := theO, $minus := twiddle)
       val context = algebra.EvaluationContext(Seq(α))
       val interpretO = theO o context.root.toI
       val interpretα = context.evaluate(α)
 
       interpretα should not be interpretO
-      context.evaluate(O) shouldBe interpretO
-      val minusO = -O
-      context.evaluate(-O) shouldBe interpretO
+      context.evaluate(o) shouldBe interpretO
+      val minusO = -o
+      context.evaluate(-o) shouldBe interpretO
       context.evaluate(-(-α)) shouldBe interpretα
     }
 
@@ -105,18 +105,18 @@ class AlgebraicMachineryTest extends FunSpec {
         ("x", "x") -> "x"
       )
 
-      val pointedMagmas = AlgebraicTheory(O)($plus)()
-      val algebra = new pointedMagmas.Algebra[String](carrier)(O := theO, $plus := plus)
+      val pointedMagmas = AlgebraicTheory(o)($plus)()
+      val algebra = new pointedMagmas.Algebra[String](carrier)(o := theO, $plus := plus)
       val context = algebra.EvaluationContext(Seq(α))
       val interpretO = theO o context.root.toI
       val interpretα = context.evaluate(α)
 
       interpretα should not be interpretO
-      context.evaluate(O) shouldBe interpretO
-      context.evaluate(O + O) shouldBe interpretO
-      context.evaluate(O + α) shouldBe interpretα
-      context.evaluate(α + O) shouldBe interpretα
-      context.evaluate(α + O) shouldBe interpretα
+      context.evaluate(o) shouldBe interpretO
+      context.evaluate(o + o) shouldBe interpretO
+      context.evaluate(o + α) shouldBe interpretα
+      context.evaluate(α + o) shouldBe interpretα
+      context.evaluate(α + o) shouldBe interpretα
     }
 
     it("can evaluate compound terms with mixed binary operators") {
@@ -136,15 +136,15 @@ class AlgebraicMachineryTest extends FunSpec {
         )
       )
 
-      val pointedWeakActs = AlgebraicTheoryWithScalars(scalars)(O, II)(II := scalar1)(**)()
+      val pointedWeakActs = AlgebraicTheoryWithScalars(scalars)(o, II)(II := scalar1)(**)()
       val minimalAlgebra = new pointedWeakActs.Algebra[String](carrier)(
-        O := theO, ** := rightMultiply
+        o := theO, ** := rightMultiply
       )
       val context = minimalAlgebra.EvaluationContext(Seq(α))
       val interpretO = theO o context.root.toI
       val interpretI = makeNullaryOperator(carrier, "i") o context.root.toI
 
-      context.evaluate(O ** II) shouldBe interpretI
+      context.evaluate(o ** II) shouldBe interpretI
       context.evaluate((α ** II) ** II) shouldBe context.evaluate(α)
     }
   }
@@ -217,9 +217,9 @@ class AlgebraicMachineryTest extends FunSpec {
       val carrierStrings = dot[String]("samson", "delilah")
       val pointStrings = makeNullaryOperator(carrierStrings, "delilah");
 
-      val pointedSets = AlgebraicTheory(O)()()
-      val algebraStrings = new pointedSets.Algebra[String](carrierStrings)(O := pointStrings)
-      val algebraInts = new pointedSets.Algebra[Int](carrierInts)(O := pointInts)
+      val pointedSets = AlgebraicTheory(o)()()
+      val algebraStrings = new pointedSets.Algebra[String](carrierStrings)(o := pointStrings)
+      val algebraInts = new pointedSets.Algebra[Int](carrierInts)(o := pointInts)
 
       val morphism = arrow(carrierStrings, carrierInts, "samson" -> 1, "delilah" -> 0)
       val notAMorphism = arrow(carrierStrings, carrierInts, "samson" -> 1, "delilah" -> 1)
