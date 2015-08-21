@@ -15,7 +15,7 @@ class ToposOfActionsTest extends GenericToposTests(new ToposWithFixtures {
   private val (i, x, y) = ('i, 'x, 'y)
 
   val monoidOf3 =
-    monoidFromTable(
+    naiveMonoidFromTable(
       i, x, y,
       x, x, y,
       y, x, y

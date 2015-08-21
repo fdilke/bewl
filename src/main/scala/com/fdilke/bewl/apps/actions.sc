@@ -4,7 +4,7 @@ import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsUtilities}
 
 object Worksheet {
   private val (i, x, y) = ('i, 'x, 'y)
-  val monoid = monoidFromTable(
+  val monoid = naiveMonoidFromTable(
     i, x, y,
     x, x, y,
     y, x, y

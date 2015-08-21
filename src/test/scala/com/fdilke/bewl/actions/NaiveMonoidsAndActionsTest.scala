@@ -23,7 +23,7 @@ class NaiveMonoidsAndActionsTest extends FunSpec {
     }
 
     it("checks a monoid has a left unit element") {
-        val monoid = monoidFromTable(
+        val monoid = naiveMonoidFromTable(
           i, i, i,
           x, x, x,
           y, y, y
@@ -35,7 +35,7 @@ class NaiveMonoidsAndActionsTest extends FunSpec {
     }
 
     it("checks a monoid has a right unit element") {
-        val monoid = monoidFromTable(
+        val monoid = naiveMonoidFromTable(
           i, x, y,
           i, x, y,
           i, x, y
@@ -47,7 +47,7 @@ class NaiveMonoidsAndActionsTest extends FunSpec {
     }
 
     it("checks a monoid's multiplication is associative") {
-        val monoid = monoidFromTable(
+        val monoid = naiveMonoidFromTable(
           i, x, y,
           x, y, y,
           y, x, y
@@ -59,7 +59,7 @@ class NaiveMonoidsAndActionsTest extends FunSpec {
     }
 
     val monoid4 =
-      monoidFromTable(
+      naiveMonoidFromTable(
         i, x, y,
         x, x, x,
         y, y, y
@@ -140,7 +140,7 @@ class NaiveMonoidsAndActionsTest extends FunSpec {
     }
 
     it("can verify the triadic monoid") { // TODO: remove when triadic monoid is used properly for action tests
-      val triadicMonoid = monoidFromTable(
+      val triadicMonoid = naiveMonoidFromTable(
           i, a, b, c, f,f2, g,g2,
           a, a, a, a, a, a, a, a,
           b, b, b, b, b, b, b, b,
