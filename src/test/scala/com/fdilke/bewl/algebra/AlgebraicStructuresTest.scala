@@ -1,5 +1,6 @@
 package com.fdilke.bewl.algebra
 
+import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
@@ -139,6 +140,14 @@ class AlgebraicStructuresTest extends FunSpec {
       group.sanityTest
       group.carrier.globals.size shouldBe 6
       group should not be('commutative)
+    }
+
+    it("can be regarded as monoids") {
+      val largerMonoid = endomorphismMonoid(dot(1, 2, 3))
+      val (group, inject) = groupOfUnits(largerMonoid)
+      val monoid = group.asMonoid
+      monoid.sanityTest
+      monoids.isMorphism(monoid, largerMonoid, inject)
     }
   }
 }

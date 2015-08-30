@@ -70,6 +70,7 @@ class AlgebraicConstructionsTest extends FunSpec {
         'monic(true),
         'iso(false)
       )
+      monoids.isMorphism(group.asMonoid, monoid, inject)
     }
 
     it("for a monoid that is a group already") {
@@ -86,6 +87,7 @@ class AlgebraicConstructionsTest extends FunSpec {
         'target(monoid.carrier),
         'iso(true)
       )
+      monoids.isMorphism(group.asMonoid, monoid, inject)
     }
 
     it("for a larger endomorphism monoid") {

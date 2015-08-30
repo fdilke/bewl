@@ -43,5 +43,9 @@ trait AlgebraicStructures { topos: BaseTopos with AlgebraicMachinery  =>
     ι := unit,
     * := multiply,
     $minus := inverse
-  ) with CommutativityCriterion
+  ) with CommutativityCriterion {
+
+    lazy val asMonoid = Monoid(carrier, unit, multiply)
+  }
+
 }
