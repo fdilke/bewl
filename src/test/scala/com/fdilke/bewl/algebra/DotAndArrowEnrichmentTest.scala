@@ -98,7 +98,7 @@ class DotAndArrowEnrichmentTest extends FunSpec {
     it("can be converted to arrows") {
       val symbols = dot('A, 'B, 'C)
       val numbers = dot(1, 2, 3)
-      Arrow.fromFunctionalRelation(symbols, numbers)(untupled(Map(
+      symbols.arrowFromFunctionalRelation(numbers)(untupled(Map(
         ('A, 1) -> false, ('A, 2) -> true,  ('A, 3) -> false,
         ('B, 1) -> true,  ('B, 2) -> false, ('B, 3) -> false,
         ('C, 1) -> true,  ('C, 2) -> false, ('C, 3) -> false

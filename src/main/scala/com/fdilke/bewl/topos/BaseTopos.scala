@@ -26,9 +26,10 @@ trait BaseTopos { self: LogicalOperations =>
   val truth: ARROW[UNIT, TRUTH]
 
   implicit class OmegaEnrichments(truthValue: TRUTH) {
-    def >(that: TRUTH) = TruthObject.implies(truthValue, that)
-    def ^(that: TRUTH) = TruthObject.and(truthValue, that)
-    def v(that: TRUTH) = TruthObject.or(truthValue, that)
+    import TruthObject._
+    def >(that: TRUTH) = implies(truthValue, that)
+    def ^(that: TRUTH) = and(truthValue, that)
+    def v(that: TRUTH) = or(truthValue, that)
   }
 
   type EXPONENTIAL[S <: ~, T <: ~] = ExponentialDot[S, T, S > T] with DOT[S > T]
@@ -226,6 +227,18 @@ trait BaseTopos { self: LogicalOperations =>
 
     def +[U <: ~](dash: DOT[U]) =
       (dot ⊔ dash).coproduct
+
+    def arrowFromFunctionalRelation[B <: ~](
+      target: DOT[B]
+    )(
+      predicate: (S, B) => TRUTH
+    ): ARROW[S, B] = {
+      val product = dot x target
+      val graph = product(omega) {
+        case (a, b) => predicate(a, b)
+      }.whereTrue.inclusion
+      (product.π1 o graph) / (product.π0 o graph)
+    }
   }
 
   trait BaseArrow[S <: ~, T <: ~] {
@@ -359,7 +372,7 @@ trait BaseTopos { self: LogicalOperations =>
 
     def sum[X <: ~](leftArrow: ARROW[A, X], rightArrow: ARROW[B, X]) = {
       val target = leftArrow.target
-      Arrow.fromFunctionalRelation(coproduct, target) {
+      coproduct.arrowFromFunctionalRelation(target) {
         (αβ, x) =>
           coproduct.exists(left) {
             (αβ, a) => coproduct.=?=(αβ, injectLeft(a)) ^ target.=?=(x, leftArrow(a))

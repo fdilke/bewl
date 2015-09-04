@@ -20,7 +20,7 @@ class AlgebraicMachineryTest extends FunSpec {
   private val unstructuredSets = AlgebraicTheory()()()
 
   describe("An evaluation context") {
-    it("for no terms can evaluate constants, not veriables") {
+    it("for no terms can evaluate constants, not variables") {
       val carrier = dot[Boolean](true, false)
       val theO = makeNullaryOperator(carrier, false)
       val pointedSets = AlgebraicTheory(o)()()
