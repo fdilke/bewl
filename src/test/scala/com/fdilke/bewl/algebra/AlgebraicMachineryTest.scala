@@ -156,17 +156,11 @@ class AlgebraicMachineryTest extends FunSpec {
       val scalar1 = makeNullaryOperator(scalars, 1)
       val scalar2 = makeNullaryOperator(scalars, 2)
       val setsReferencingAMonoid = AlgebraicTheoryWithScalars(scalars)()(II := scalar1)(***)()
-      val algebra = new setsReferencingAMonoid.Algebra(dot())(*** := multiply)
-      val context = algebra.EvaluationContext(Seq())
-
-      println("context.root = " + context.root)
-
-      context.evaluateScalar(II *** II) shouldBe scalar2
-
-//      FiniteSetsArrow[FiniteSetsDot[List()] -> FiniteSetsDot[WrappedArray(0, 1, 2)] : List()]
-//      was not equal to
-//      FiniteSetsArrow[FiniteSetsDot[List(())] -> FiniteSetsDot[WrappedArray(0, 1, 2)] : List(((),2))]
-
+      new setsReferencingAMonoid.Algebra(dot()) (
+        *** := multiply
+      ).EvaluationContext(Seq()).evaluateScalar(
+          II *** II
+      ) shouldBe scalar2
     }
   }
 

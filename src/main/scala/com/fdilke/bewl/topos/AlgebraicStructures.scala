@@ -1,6 +1,5 @@
 package com.fdilke.bewl.topos
 
-
 trait AlgebraicStructures { topos: BaseTopos with AlgebraicMachinery  =>
 
   import StandardTermsAndOperators._
@@ -55,7 +54,6 @@ trait AlgebraicStructures { topos: BaseTopos with AlgebraicMachinery  =>
     * := multiply,
     $minus := inverse
   ) with CommutativityCriterion {
-
     lazy val asMonoid = Monoid(carrier, unit, multiply)
   }
 }

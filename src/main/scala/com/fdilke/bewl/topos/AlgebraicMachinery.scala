@@ -369,11 +369,6 @@ trait AlgebraicMachinery { topos: BaseTopos =>
         head: DOT[HEAD],
         val tail: EvaluationContext
       ) extends EvaluationContext {
-
-        println("constructing a CompoundEC:")
-        println("name = " + name)
-        println("head = " + head)
-
         private type TAIL = tail.ROOT
         override type ROOT = HEAD x TAIL
         override def root : BIPRODUCT[HEAD, TAIL] = head x tail.root
@@ -420,10 +415,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
           }
 
         override def evaluateScalar(term: Term[Scalar]): ARROW[HEAD x TAIL, S] =
-        {
-          println("evaluating term: " + term)
-          term
-        } match {
+          term match {
             case term: ScalarConstant =>
               operatorAssignments.lookup(term).map { constant =>
                 constant o root.toI
@@ -447,7 +439,6 @@ trait AlgebraicMachinery { topos: BaseTopos =>
               }
 
             case _ =>
-              println("Falling through on " + term)
               tail.evaluateScalar(term) o root.π1
           }
       }
@@ -457,15 +448,12 @@ trait AlgebraicMachinery { topos: BaseTopos =>
           throw new IllegalArgumentException("Assignments do not match signature of theory")
         else
           laws foreach { law =>
-            val context = EvaluationContext(law.freeVariables)
-            if (!law.isSatisfiedIn(context))
+            if (!satisfies(law))
               law.fails
-        }
+          }
 
-      def satisfies(law: Law) = {
-        val context = EvaluationContext(law.freeVariables)
-        law.isSatisfiedIn(context)
-      }
+      def satisfies(law: Law) =
+        law.isSatisfiedIn(EvaluationContext(law.freeVariables))
     }
   }
 
