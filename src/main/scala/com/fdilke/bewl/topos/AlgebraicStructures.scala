@@ -25,7 +25,15 @@ trait AlgebraicStructures { topos: BaseTopos with AlgebraicMachinery  =>
   ) extends monoids.Algebra[M](carrier)(
     ι := unit,
     * := multiply
-  ) with CommutativityCriterion
+  ) with CommutativityCriterion {
+    lazy val actions =
+      AlgebraicTheoryWithScalars(carrier)(II)(II := unit)(**)()
+
+    def action[A <: ~](actionCarrier: DOT[A])(multiply: (A, M) => A) =
+      new actions.Algebra[A](actionCarrier)(** :=
+        (actionCarrier x carrier).biArrow(actionCarrier)(multiply)
+      )
+  }
 
   lazy val groups = AlgebraicTheory(ι)($minus, *)( // TODO try ~
     "left unit" law ( ι * α := α ),

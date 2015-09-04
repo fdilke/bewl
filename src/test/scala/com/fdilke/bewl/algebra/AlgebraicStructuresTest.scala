@@ -82,6 +82,24 @@ class AlgebraicStructuresTest extends FunSpec {
     }
   }
 
+  val monoid4 =
+    monoidFromTable(
+      i, x, y,
+      x, x, x,
+      y, y, y
+    )
+
+  describe("Monoid actions") {
+    it("can be constructed and validated") {
+      val actionCarrier = dot(a, b)
+      val actionMultiply = biArrow(actionCarrier, monoid4.carrier, actionCarrier,
+        (a, i) -> a, (a, x) -> a, (a, y) -> a,
+        (b, i) -> b, (b, x) -> b, (b, y) -> b
+      )
+      monoid4.action(actionCarrier)(actionMultiply.apply).sanityTest
+    }
+  }
+
   describe("Groups") {
     it("can be defined with an appropriate unit, multiplication and inverse") {
       val carrier = dot(i, x, y)
