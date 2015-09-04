@@ -147,6 +147,12 @@ class AlgebraicMachineryTest extends FunSpec {
       context.evaluate(o ** II) shouldBe interpretI
       context.evaluate((α ** II) ** II) shouldBe context.evaluate(α)
     }
+
+    it("can do operations on scalars") {
+//      val scalars = dot[Int](0, 1, 2)
+//
+//      val pointedWeakActs = AlgebraicTheoryWithScalars(scalars)(*)(II := scalar1)(**)()
+    }
   }
 
   describe("Algebraic theories") {

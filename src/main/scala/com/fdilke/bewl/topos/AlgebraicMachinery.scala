@@ -36,7 +36,6 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     }
   }
 
-
   sealed trait Term[X <: AlgebraicSort] extends Dynamic {
     def applyDynamic(name: String)(other: Term[X]) =
       BinaryOpTerm(this, StandardTermsAndOperators.binaryOpFrom(name), other)
@@ -180,6 +179,8 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     val α = VariableTerm[Principal]("α")
     val β = VariableTerm[Principal]("β")
     val γ = VariableTerm[Principal]("γ")
+    val Φ = VariableTerm[Scalar]("Φ")
+    val Ψ = VariableTerm[Scalar]("Ψ")
 
     val - = new AbstractUnaryOp("-")
 
@@ -197,7 +198,6 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       )
   }
 
-  // TODO: try a curried constructor here, with the scalars at the beginning
   class AlgebraicTheory[S <: ~](
       scalars: DOT[S]
    )(
@@ -338,6 +338,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
               }.getOrElse {
                 throw new IllegalArgumentException("Unknown operator in expression: " + op)
               }
+
             case term @ BinaryScalarOpTerm(left, op, right) =>
               operatorAssignments.lookup(op).map { op =>
                 root(carrier) { r =>
@@ -371,7 +372,14 @@ trait AlgebraicMachinery { topos: BaseTopos =>
                 throw new IllegalArgumentException("Unknown constant in expression: " + term.name)
               }
 
-            case _ => ???
+//            case VariableTerm(symbol) if symbol == name =>
+//              root.π0.asInstanceOf[ARROW[HEAD x TAIL, S]]
+//
+//            case _ =>
+//              tail.evaluateScalar(term) o root.π1
+
+            case _ =>
+              ???
           }
       }
 

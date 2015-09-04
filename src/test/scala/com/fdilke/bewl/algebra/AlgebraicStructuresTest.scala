@@ -105,6 +105,15 @@ class AlgebraicStructuresTest extends FunSpec {
         )).sanityTest
       }.getMessage shouldBe "right unit law failed"
     }
+
+    ignore("enforce the associative law") {
+      intercept[IllegalArgumentException] {
+        monoid4.action(dot(a, b))(Function untupled Map(
+          (a, i) -> a, (a, x) -> b, (a, y) -> a,
+          (b, i) -> b, (b, x) -> b, (b, y) -> a
+        )).sanityTest
+      }.getMessage shouldBe "Associative law for monoid action *"
+    }
   }
 
   describe("Groups") {
