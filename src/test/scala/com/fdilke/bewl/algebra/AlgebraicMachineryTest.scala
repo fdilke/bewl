@@ -149,9 +149,24 @@ class AlgebraicMachineryTest extends FunSpec {
     }
 
     it("can do operations on scalars") {
-//      val scalars = dot[Int](0, 1, 2)
-//
-//      val pointedWeakActs = AlgebraicTheoryWithScalars(scalars)(*)(II := scalar1)(**)()
+      val scalars = dot(0, 1, 2)
+      val multiply = bifunctionAsBiArrow(scalars) {
+        (x, y) => (x + y) % 3
+      }
+      val scalar1 = makeNullaryOperator(scalars, 1)
+      val scalar2 = makeNullaryOperator(scalars, 2)
+      val setsReferencingAMonoid = AlgebraicTheoryWithScalars(scalars)()(II := scalar1)(***)()
+      val algebra = new setsReferencingAMonoid.Algebra(dot())(*** := multiply)
+      val context = algebra.EvaluationContext(Seq())
+
+      println("context.root = " + context.root)
+
+      context.evaluateScalar(II *** II) shouldBe scalar2
+
+//      FiniteSetsArrow[FiniteSetsDot[List()] -> FiniteSetsDot[WrappedArray(0, 1, 2)] : List()]
+//      was not equal to
+//      FiniteSetsArrow[FiniteSetsDot[List(())] -> FiniteSetsDot[WrappedArray(0, 1, 2)] : List(((),2))]
+
     }
   }
 

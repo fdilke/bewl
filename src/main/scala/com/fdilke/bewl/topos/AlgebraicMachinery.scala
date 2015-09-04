@@ -53,6 +53,13 @@ trait AlgebraicMachinery { topos: BaseTopos =>
         other
       )
 
+    def ***(other: Term[Scalar])(implicit eq: =:=[X, Scalar]) =
+      BinaryBiscalarOpTerm(
+        this.asInstanceOf[Term[Scalar]],
+        StandardTermsAndOperators.***,
+        other
+      )
+
     def unary_- : Term[X] =
       UnaryOpTerm(StandardTermsAndOperators.-, this)
     val freeVariables : Seq[VariableTerm[_ <: AlgebraicSort]]
@@ -80,6 +87,14 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     op: AbstractRightScalarBinaryOp,
     right: Term[Scalar]
   ) extends Term[Principal] {
+    override val freeVariables = (left.freeVariables ++ right.freeVariables).distinct
+  }
+
+  case class BinaryBiscalarOpTerm(
+    left: Term[Scalar],
+    op: AbstractScalarBinaryOp,
+    right: Term[Scalar]
+  ) extends Term[Scalar] {
     override val freeVariables = (left.freeVariables ++ right.freeVariables).distinct
   }
 
@@ -113,7 +128,8 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     def lookupScalarConstant: Option[NullaryOp[S]] = None
     def lookupUnaryOp: Option[UnaryOp[T]] = None
     def lookupBinaryOp: Option[BinaryOp[T]] = None
-    def lookupRightScalarBinaryOp: Option[RightScalarBinaryOp[T, _ <: ~]] = None
+    def lookupRightScalarBinaryOp: Option[RightScalarBinaryOp[T, S]] = None
+    def lookupScalarBinaryOp: Option[BinaryOp[S]] = None
   }
 
   case class OperatorAssignments[T <: ~, S <: ~](assignments: Seq[OperatorAssignment[T, S]]) {
@@ -142,6 +158,11 @@ trait AlgebraicMachinery { topos: BaseTopos =>
         yield assignment.lookupRightScalarBinaryOp
       ).headOption.flatten
 
+    def lookup(op: AbstractScalarBinaryOp): Option[BinaryOp[S]] = (
+      for (assignment <- assignments if assignment.operator == op)
+        yield assignment.lookupScalarBinaryOp
+      ).headOption.flatten
+
     def hasPrecisely(
       constants: Seq[GeneralConstant[_ <: AlgebraicSort]],
       operators: Seq[Operator]
@@ -161,6 +182,13 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     def :=[T <: ~, S <: ~](binaryOp: RightScalarBinaryOp[T, S]) =
       new OperatorAssignment[T, S](this){
         override def lookupRightScalarBinaryOp = Some(binaryOp)
+      }
+  }
+
+  class AbstractScalarBinaryOp(name: String) extends Operator(name, 2) {
+    def :=[S <: ~](binaryOp: BinaryOp[S]) =
+      new OperatorAssignment[~, S](this){
+        override def lookupScalarBinaryOp = Some(binaryOp)
       }
   }
 
@@ -187,6 +215,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     val * = new AbstractBinaryOp("*")
     val + = new AbstractBinaryOp("+")
     val ** = new AbstractRightScalarBinaryOp("**")
+    val *** = new AbstractScalarBinaryOp("**")
 
     private val binaryOperators = Map[String, AbstractBinaryOp](
       "*" -> *,
@@ -194,7 +223,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     )
     def binaryOpFrom(name: String) =
       binaryOperators.getOrElse(name,
-        throw new IllegalArgumentException("Unknown binary operator: ")
+        throw new IllegalArgumentException("Unknown binary operator: " + name)
       )
   }
 
@@ -306,11 +335,33 @@ trait AlgebraicMachinery { topos: BaseTopos =>
                 throw new IllegalArgumentException("Unknown constant in expression: " + term.name)
               }
             case _ =>
-              throw new IllegalArgumentException("No variables available")
+              throw new IllegalArgumentException("No variables available for principal term: " + term)
           }
 
         override def evaluateScalar(term: Term[Scalar]): ARROW[UNIT, S] =
-          throw new IllegalArgumentException("No variables available")
+          term match {
+            case term: ScalarConstant =>
+              operatorAssignments.lookup(term).map { constant =>
+                constant o root.toI
+              }.getOrElse {
+                throw new IllegalArgumentException("Unknown constant in expression: " + term.name)
+              }
+
+            case term @ BinaryBiscalarOpTerm(left, op, right) =>
+              operatorAssignments.lookup(op).map { op =>
+                root(scalars) { r =>
+                  op(
+                    evaluateScalar(left)(r),
+                    evaluateScalar(right)(r)
+                  )
+                }
+              }.getOrElse {
+                throw new IllegalArgumentException("Unknown operator in expression: " + op)
+              }
+
+            case _ =>
+              throw new IllegalArgumentException("No variables available for scalar term: " + term)
+          }
       }
 
       class CompoundEvaluationContext[HEAD <: ~](
@@ -318,6 +369,11 @@ trait AlgebraicMachinery { topos: BaseTopos =>
         head: DOT[HEAD],
         val tail: EvaluationContext
       ) extends EvaluationContext {
+
+        println("constructing a CompoundEC:")
+        println("name = " + name)
+        println("head = " + head)
+
         private type TAIL = tail.ROOT
         override type ROOT = HEAD x TAIL
         override def root : BIPRODUCT[HEAD, TAIL] = head x tail.root
@@ -364,7 +420,10 @@ trait AlgebraicMachinery { topos: BaseTopos =>
           }
 
         override def evaluateScalar(term: Term[Scalar]): ARROW[HEAD x TAIL, S] =
-          term match {
+        {
+          println("evaluating term: " + term)
+          term
+        } match {
             case term: ScalarConstant =>
               operatorAssignments.lookup(term).map { constant =>
                 constant o root.toI
@@ -372,14 +431,24 @@ trait AlgebraicMachinery { topos: BaseTopos =>
                 throw new IllegalArgumentException("Unknown constant in expression: " + term.name)
               }
 
-//            case VariableTerm(symbol) if symbol == name =>
-//              root.π0.asInstanceOf[ARROW[HEAD x TAIL, S]]
-//
-//            case _ =>
-//              tail.evaluateScalar(term) o root.π1
+            case VariableTerm(symbol) if symbol == name =>
+              root.π0.asInstanceOf[ARROW[HEAD x TAIL, S]]
+
+            case term @ BinaryBiscalarOpTerm(left, op, right) =>
+              operatorAssignments.lookup(op).map { op =>
+                root(scalars) { r =>
+                  op(
+                    evaluateScalar(left)(r),
+                    evaluateScalar(right)(r)
+                  )
+                }
+              }.getOrElse {
+                throw new IllegalArgumentException("Unknown operator in expression: " + op)
+              }
 
             case _ =>
-              ???
+              println("Falling through on " + term)
+              tail.evaluateScalar(term) o root.π1
           }
       }
 
