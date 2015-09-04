@@ -91,12 +91,19 @@ class AlgebraicStructuresTest extends FunSpec {
 
   describe("Monoid actions") {
     it("can be constructed and validated") {
-      val actionCarrier = dot(a, b)
-      val actionMultiply = biArrow(actionCarrier, monoid4.carrier, actionCarrier,
+      monoid4.action(dot(a, b))(Function untupled Map(
         (a, i) -> a, (a, x) -> a, (a, y) -> a,
         (b, i) -> b, (b, x) -> b, (b, y) -> b
-      )
-      monoid4.action(actionCarrier)(actionMultiply.apply).sanityTest
+      )).sanityTest
+    }
+
+    it("enforce the right unit law") {
+      intercept[IllegalArgumentException] {
+        monoid4.action(dot(a, b))(Function untupled Map(
+          (a, i) -> b, (a, x) -> a, (a, y) -> a,
+          (b, i) -> a, (b, x) -> b, (b, y) -> b
+        )).sanityTest
+      }.getMessage shouldBe "right unit law failed"
     }
   }
 

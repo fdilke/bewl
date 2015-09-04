@@ -27,7 +27,9 @@ trait AlgebraicStructures { topos: BaseTopos with AlgebraicMachinery  =>
     * := multiply
   ) with CommutativityCriterion {
     lazy val actions =
-      AlgebraicTheoryWithScalars(carrier)(II)(II := unit)(**)()
+      AlgebraicTheoryWithScalars(carrier)(II)(II := unit)(**)(
+        "right unit" law ( α ** II := α )
+      )
 
     def action[A <: ~](actionCarrier: DOT[A])(multiply: (A, M) => A) =
       new actions.Algebra[A](actionCarrier)(** :=
