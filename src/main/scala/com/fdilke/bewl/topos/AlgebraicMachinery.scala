@@ -15,7 +15,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   type RightScalarBinaryOp[X <: ~, S <: ~] = BiArrow[X, S, X]
 
   case class Law(left: Term[Principal], right: Term[Principal], name:Option[String] = None) {
-    def isSatisfiedIn[S <: ~, T <: ~](context: AlgebraicTheory[S]#Algebra[T]#EvaluationContext) =
+    def isSatisfiedIn(context: Algebra#EvaluationContext) =
       context.evaluate(left) == context.evaluate(right)
 
     def fails =
@@ -48,14 +48,14 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
     def **(other: Term[Scalar])(implicit eq: =:=[X, Principal]) =
       BinaryScalarOpTerm(
-        this.asInstanceOf[Term[Principal]],
+        this.asInstanceOf[Term[Principal]], // cast justified by =:=
         StandardTermsAndOperators.**,
         other
       )
 
     def ***(other: Term[Scalar])(implicit eq: =:=[X, Scalar]) =
       BinaryBiscalarOpTerm(
-        this.asInstanceOf[Term[Scalar]],
+        this.asInstanceOf[Term[Scalar]], // cast justified by =:=
         StandardTermsAndOperators.***,
         other
       )
@@ -153,7 +153,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
         yield assignment.lookupBinaryOp
     ).headOption.flatten
 
-    def lookup(op: AbstractRightScalarBinaryOp): Option[RightScalarBinaryOp[T, _ <: ~]] = (
+    def lookup(op: AbstractRightScalarBinaryOp): Option[RightScalarBinaryOp[T, S]] = (
       for (assignment <- assignments if assignment.operator == op)
         yield assignment.lookupRightScalarBinaryOp
       ).headOption.flatten
@@ -285,11 +285,9 @@ trait AlgebraicMachinery { topos: BaseTopos =>
           case op: AbstractRightScalarBinaryOp =>
             val carrierScalars = sourceAlgebra.carrier x scalars
             (for (
-              srcOp0 <- sourceAlgebra.operatorAssignments.lookup(op);
-              tgtOp0 <- targetAlgebra.operatorAssignments.lookup(op)
+              srcOp <- sourceAlgebra.operatorAssignments.lookup(op);
+              tgtOp <- targetAlgebra.operatorAssignments.lookup(op)
             ) yield {
-              val srcOp = srcOp0.asInstanceOf[RightScalarBinaryOp[A, S]]
-              val tgtOp = tgtOp0.asInstanceOf[RightScalarBinaryOp[B, S]]
               (arrow o srcOp.arrow) == tgtOp(arrow o carrierScalars.π0, carrierScalars.π1)
             }).getOrElse {
               throw new IllegalArgumentException("Not found in source algebra: " + op.name)
