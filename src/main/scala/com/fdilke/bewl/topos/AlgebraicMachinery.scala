@@ -215,7 +215,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     val * = new AbstractBinaryOp("*")
     val + = new AbstractBinaryOp("+")
     val ** = new AbstractRightScalarBinaryOp("**")
-    val *** = new AbstractScalarBinaryOp("**")
+    val *** = new AbstractScalarBinaryOp("***")
 
     private val binaryOperators = Map[String, AbstractBinaryOp](
       "*" -> *,

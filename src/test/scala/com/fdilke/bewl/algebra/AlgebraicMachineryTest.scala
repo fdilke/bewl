@@ -1,5 +1,6 @@
 package com.fdilke.bewl.algebra
 
+import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.FunSpec
@@ -155,12 +156,23 @@ class AlgebraicMachineryTest extends FunSpec {
       }
       val scalar1 = makeNullaryOperator(scalars, 1)
       val scalar2 = makeNullaryOperator(scalars, 2)
-      val setsReferencingAMonoid = AlgebraicTheoryWithScalars(scalars)()(II := scalar1)(***)()
-      new setsReferencingAMonoid.Algebra(dot()) (
+      val weakActsReferencingAMonoid = AlgebraicTheoryWithScalars(scalars)()(II := scalar1)(**, ***)()
+      val act = dot('a)
+      val rightMultiply = (act x scalars).biArrow(act) { (_, _) => 'a }
+      val algebra = new weakActsReferencingAMonoid.Algebra[Symbol](act)(
+        ** := rightMultiply,
         *** := multiply
-      ).EvaluationContext(Seq()).evaluateScalar(
+      )
+      algebra.EvaluationContext(Seq()).evaluateScalar(
           II *** II
       ) shouldBe scalar2
+
+      algebra.EvaluationContext(Seq(α)).evaluate(
+        α ** II
+      ) shouldBe (act x I).π0
+
+// TODO add more tests for complex expressions with **/***
+
     }
   }
 
