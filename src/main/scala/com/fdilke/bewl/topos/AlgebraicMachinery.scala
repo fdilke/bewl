@@ -29,8 +29,6 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   }
 
   object NamedLaws {
-    case class Widget(n: Int)
-
     implicit class NamedLaw(name: String) {
       def law(unnamedLaw: Law) = unnamedLaw.named(name)
     }
@@ -47,14 +45,14 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       applyDynamic("*")(other)
 
     def **(other: Term[Scalar])(implicit eq: =:=[X, Principal]) =
-      BinaryScalarOpTerm(
+      BinaryRightScalarOpTerm(
         this.asInstanceOf[Term[Principal]], // cast justified by =:=
         StandardTermsAndOperators.**,
         other
       )
 
     def ***(other: Term[Scalar])(implicit eq: =:=[X, Scalar]) =
-      BinaryBiscalarOpTerm(
+      BinaryScalarOpTerm(
         this.asInstanceOf[Term[Scalar]], // cast justified by =:=
         StandardTermsAndOperators.***,
         other
@@ -69,9 +67,8 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   case class Operator(name: String, arity: Int)
 
-  case class VariableTerm[S <: AlgebraicSort : ClassTag](symbol: String) extends Term[S] { term =>
+  case class VariableTerm[S <: AlgebraicSort](symbol: String, isScalar : Boolean) extends Term[S] { term =>
     override val freeVariables = Seq(term)
-    val tag = classTag[S]
   }
 
   case class BinaryOpTerm[S <: AlgebraicSort](
@@ -82,7 +79,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     override val freeVariables = (left.freeVariables ++ right.freeVariables).distinct
   }
 
-  case class BinaryScalarOpTerm(
+  case class BinaryRightScalarOpTerm(
     left: Term[Principal],
     op: AbstractRightScalarBinaryOp,
     right: Term[Scalar]
@@ -90,7 +87,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     override val freeVariables = (left.freeVariables ++ right.freeVariables).distinct
   }
 
-  case class BinaryBiscalarOpTerm(
+  case class BinaryScalarOpTerm(
     left: Term[Scalar],
     op: AbstractScalarBinaryOp,
     right: Term[Scalar]
@@ -204,11 +201,11 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     val ι = new PrincipalConstant("ι")
     val II = new ScalarConstant("II")
 
-    val α = VariableTerm[Principal]("α")
-    val β = VariableTerm[Principal]("β")
-    val γ = VariableTerm[Principal]("γ")
-    val Φ = VariableTerm[Scalar]("Φ")
-    val Ψ = VariableTerm[Scalar]("Ψ")
+    val α = VariableTerm[Principal]("α", false)
+    val β = VariableTerm[Principal]("β", false)
+    val γ = VariableTerm[Principal]("γ", false)
+    val Φ = VariableTerm[Scalar]("Φ", true)
+    val Ψ = VariableTerm[Scalar]("Ψ", true)
 
     val - = new AbstractUnaryOp("-")
 
@@ -307,10 +304,17 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       })
 
       object EvaluationContext {
-        def apply[T <: ~](variables: Seq[VariableTerm[_ <: AlgebraicSort]]): EvaluationContext =
-          variables.foldRight(new SimpleEvaluationContext : EvaluationContext) {
-            (variable, context) => new CompoundEvaluationContext(variable.symbol, carrier, context)
-          }
+        def apply[T <: ~](variables: Seq[VariableTerm[_ <: AlgebraicSort]]) =
+          variables.foldRight(new SimpleEvaluationContext : EvaluationContext)(addVariableToContext)
+
+        private def addVariableToContext(variable: VariableTerm[_ <: AlgebraicSort], context: EvaluationContext) =
+            new CompoundEvaluationContext(variable.symbol, carrierFor(variable), context)
+
+        private def carrierFor(variable: VariableTerm[_ <: AlgebraicSort]) =
+          if (variable.isScalar)
+            scalars
+          else
+            carrier
       }
 
       trait EvaluationContext {
@@ -345,7 +349,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
                 throw new IllegalArgumentException("Unknown constant in expression: " + term.name)
               }
 
-            case term @ BinaryBiscalarOpTerm(left, op, right) =>
+            case term @ BinaryScalarOpTerm(left, op, right) =>
               operatorAssignments.lookup(op).map { op =>
                 root(scalars) { r =>
                   op(
@@ -373,7 +377,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
         override def evaluate(term: Term[Principal]): ARROW[HEAD x TAIL, T] =
           term match {
-            case VariableTerm(symbol) if symbol == name =>
+            case VariableTerm(symbol, _) if symbol == name =>
               root.π0.asInstanceOf[ARROW[HEAD x TAIL, T]]
 
             case term @ BinaryOpTerm(left, op, right) =>
@@ -388,10 +392,10 @@ trait AlgebraicMachinery { topos: BaseTopos =>
                 throw new IllegalArgumentException("Unknown operator in expression: " + op)
               }
 
-            case term @ BinaryScalarOpTerm(left, op, right) =>
+            case term @ BinaryRightScalarOpTerm(left, op, right) =>
               operatorAssignments.lookup(op).map { op =>
                 root(carrier) { r =>
-                  op.asInstanceOf[RightScalarBinaryOp[T, S]](
+                  op(
                     evaluate(left)(r),
                     evaluateScalar(right)(r)
                   )
@@ -421,10 +425,10 @@ trait AlgebraicMachinery { topos: BaseTopos =>
                 throw new IllegalArgumentException("Unknown constant in expression: " + term.name)
               }
 
-            case VariableTerm(symbol) if symbol == name =>
+            case VariableTerm(symbol, _) if symbol == name =>
               root.π0.asInstanceOf[ARROW[HEAD x TAIL, S]]
 
-            case term @ BinaryBiscalarOpTerm(left, op, right) =>
+            case term @ BinaryScalarOpTerm(left, op, right) =>
               operatorAssignments.lookup(op).map { op =>
                 root(scalars) { r =>
                   op(
@@ -457,7 +461,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   object AlgebraicTheory {
     def apply(constants: GeneralConstant[_ <: AlgebraicSort]*)(operators: Operator*)(laws: Law*) =
-      new AlgebraicTheory[UNIT](I)(constants :_*)()(operators :_*)(laws:_*)
+      new AlgebraicTheory[UNIT](I)(constants :_*)()(operators:_*)(laws:_*)
   }
 
   object AlgebraicTheoryWithScalars {

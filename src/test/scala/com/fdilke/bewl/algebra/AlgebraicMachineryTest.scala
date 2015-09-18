@@ -151,28 +151,43 @@ class AlgebraicMachineryTest extends FunSpec {
 
     it("can do operations on scalars") {
       val scalars = dot(0, 1, 2)
-      val multiply = bifunctionAsBiArrow(scalars) {
-        (x, y) => (x + y) % 3
-      }
       val scalar1 = makeNullaryOperator(scalars, 1)
       val scalar2 = makeNullaryOperator(scalars, 2)
       val weakActsReferencingAMonoid = AlgebraicTheoryWithScalars(scalars)()(II := scalar1)(**, ***)()
       val act = dot('a)
-      val rightMultiply = (act x scalars).biArrow(act) { (_, _) => 'a }
       val algebra = new weakActsReferencingAMonoid.Algebra[Symbol](act)(
-        ** := rightMultiply,
-        *** := multiply
+        ** := (act x scalars).biArrow(act) { (_, _) => 'a },
+        *** := bifunctionAsBiArrow(scalars) {
+          (x, y) => (x + y) % 3
+        }
       )
+
+      println("EVAL 1")
       algebra.EvaluationContext(Seq()).evaluateScalar(
-          II *** II
+        II *** II
       ) shouldBe scalar2
 
+      println("EVAL 2")
       algebra.EvaluationContext(Seq(α)).evaluate(
         α ** II
       ) shouldBe (act x I).π0
 
 // TODO add more tests for complex expressions with **/***
 
+      println("EVAL 2.5") // TODO: shouldn't need this
+      algebra.EvaluationContext(Seq(α)).evaluate(
+        α
+      ) shouldBe (act x I).π0
+
+      println("EVAL 3")
+      algebra.EvaluationContext(Seq(Ψ)).evaluateScalar(
+        Ψ
+      ) shouldBe (scalars x I).π0
+
+//      println("EVAL 4")
+//      algebra.EvaluationContext(Seq(Ψ)).evaluateScalar(
+//        Ψ *** II
+//      ) shouldBe (scalars x I).π0
     }
   }
 
