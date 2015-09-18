@@ -26,14 +26,15 @@ trait AlgebraicStructures { topos: BaseTopos with AlgebraicMachinery  =>
     * := multiply
   ) with CommutativityCriterion {
     lazy val actions =
-      AlgebraicTheoryWithScalars(carrier)(II)(II := unit)(**)(
-        "right unit" law ( α ** II := α )
-//        "associative" law ( (α ** Φ) ** Ψ := α ** (Φ * Ψ) )
+      AlgebraicTheoryWithScalars(carrier)(II)(II := unit)(**, ***)(
+        "right unit" law ( α ** II := α ),
+        "mixed associative" law ( (α ** Φ) ** Ψ := α ** (Φ *** Ψ) )
       )
 
-    def action[A <: ~](actionCarrier: DOT[A])(multiply: (A, M) => A) =
-      new actions.Algebra[A](actionCarrier)(** :=
-        (actionCarrier x carrier).biArrow(actionCarrier)(multiply)
+    def action[A <: ~](actionCarrier: DOT[A])(actionMultiply: (A, M) => A) =
+      new actions.Algebra[A](actionCarrier)(
+        ** := (actionCarrier x carrier).biArrow(actionCarrier)(actionMultiply),
+        *** := multiply
       )
   }
 

@@ -1,7 +1,6 @@
 package com.fdilke.bewl.topos
 
 import scala.language.{dynamics, implicitConversions, postfixOps}
-import scala.reflect._
 
 sealed trait AlgebraicSort
 class Principal extends AlgebraicSort

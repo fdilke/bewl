@@ -1,14 +1,12 @@
 package com.fdilke.bewl.algebra
 
-import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
 class AlgebraicStructuresTest extends FunSpec {
 
-  private val topos = com.fdilke.bewl.fsets.FiniteSets
-  import topos._
+  import com.fdilke.bewl.fsets.FiniteSets._
 
   private val (i, x, y, a, b, c, d, e, f, f2, g, g2, r, s) =
     ('i,'x,'y,'a,'b,'c,'d,'e,'f,'f2,'g,'g2, 'r, 's)
@@ -106,13 +104,13 @@ class AlgebraicStructuresTest extends FunSpec {
       }.getMessage shouldBe "right unit law failed"
     }
 
-    ignore("enforce the associative law") {
+    it("enforce the associative law") {
       intercept[IllegalArgumentException] {
         monoid4.action(dot(a, b))(Function untupled Map(
           (a, i) -> a, (a, x) -> b, (a, y) -> a,
           (b, i) -> b, (b, x) -> b, (b, y) -> a
         )).sanityTest
-      }.getMessage shouldBe "Associative law for monoid action *"
+      }.getMessage shouldBe "mixed associative law failed"
     }
   }
 
