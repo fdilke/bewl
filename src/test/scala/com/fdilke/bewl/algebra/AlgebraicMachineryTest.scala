@@ -162,32 +162,25 @@ class AlgebraicMachineryTest extends FunSpec {
         }
       )
 
-      println("EVAL 1")
       algebra.EvaluationContext(Seq()).evaluateScalar(
         II *** II
       ) shouldBe scalar2
 
-      println("EVAL 2")
-      algebra.EvaluationContext(Seq(α)).evaluate(
-        α ** II
-      ) shouldBe (act x I).π0
-
-// TODO add more tests for complex expressions with **/***
-
-      println("EVAL 2.5") // TODO: shouldn't need this
       algebra.EvaluationContext(Seq(α)).evaluate(
         α
       ) shouldBe (act x I).π0
 
-      println("EVAL 3")
+      algebra.EvaluationContext(Seq(α)).evaluate(
+        α ** II
+      ) shouldBe (act x I).π0
+
       algebra.EvaluationContext(Seq(Ψ)).evaluateScalar(
         Ψ
       ) shouldBe (scalars x I).π0
 
-//      println("EVAL 4")
-//      algebra.EvaluationContext(Seq(Ψ)).evaluateScalar(
-//        Ψ *** II
-//      ) shouldBe (scalars x I).π0
+      algebra.EvaluationContext(Seq(Ψ)).evaluateScalar(
+        ((Ψ *** II) *** II) *** II
+      ) shouldBe (scalars x I).π0
     }
   }
 
