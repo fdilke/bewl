@@ -112,6 +112,47 @@ class AlgebraicStructuresTest extends FunSpec {
         )).sanityTest
       }.getMessage shouldBe "mixed associative law failed"
     }
+
+    it("can validate arrows as morphisms") {
+      val monoid1x = {
+        val (i, x) = ('i, 'x)
+        val carrier = dot(i, x)
+        val unit = makeNullaryOperator(carrier, i)
+        val product = makeBinaryOperator(carrier,
+          (i, i) -> i, (i, x) -> x,
+          (x, i) -> x, (x, x) -> x
+        )
+        Monoid[Symbol](carrier, unit, product)
+      }
+      monoid1x.sanityTest
+      val rightAction = {
+        val actionCarrier = dot(a, b)
+        val actionMultiply = biArrow(actionCarrier, monoid1x.carrier, actionCarrier,
+          (a, i) -> a, (a, x) -> a,
+          (b, i) -> b, (b, x) -> a
+        )
+        monoid1x.action(actionCarrier)(actionMultiply.apply)
+      }
+      rightAction.sanityTest
+      val rightAction2 = {
+        val actionCarrier = dot(c, d, e)
+        val actionMultiply = biArrow(actionCarrier, monoid1x.carrier, actionCarrier,
+          (c, i) -> c, (c, x) -> d,
+          (d, i) -> d, (d, x) -> d,
+          (e, i) -> e, (e, x) -> e
+        )
+        monoid1x.action(actionCarrier)(actionMultiply.apply)
+      }
+      rightAction2.sanityTest
+      val actionMorphism = arrow(rightAction.carrier, rightAction2.carrier,
+        'a -> 'd, 'b -> 'c
+      )
+      monoid1x.actions.isMorphism(rightAction, rightAction2, actionMorphism) shouldBe true
+      val nonActionMorphism = arrow(rightAction.carrier, rightAction2.carrier,
+        'a -> 'c, 'b -> 'c
+      )
+      monoid1x.actions.isMorphism(rightAction, rightAction2, nonActionMorphism) shouldBe false
+    }
   }
 
   describe("Groups") {

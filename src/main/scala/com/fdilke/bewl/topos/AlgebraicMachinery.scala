@@ -13,7 +13,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   type BinaryOp[X <: ~] = BiArrow[X, X, X]
   type RightScalarBinaryOp[X <: ~, S <: ~] = BiArrow[X, S, X]
 
-  case class Law(left: Term[Principal], right: Term[Principal], name:Option[String] = None) {
+  case class Law(left: Term[Principal], right: Term[Principal], name: Option[String] = None) {
     def isSatisfiedIn(context: Algebra#EvaluationContext) =
       context.evaluate(left) == context.evaluate(right)
 
@@ -288,6 +288,9 @@ trait AlgebraicMachinery { topos: BaseTopos =>
             }).getOrElse {
               throw new IllegalArgumentException("Not found in source algebra: " + op.name)
             }
+
+          case op: AbstractScalarBinaryOp =>
+            true // free pass, no need to verify these on carrier
 
           case op =>
             throw new IllegalArgumentException(s"Unknown type of operator, can't verify: ${op.name}")
