@@ -10,18 +10,18 @@ import org.scalatest.Tag
 
 import scala.Function.untupled
 
-abstract class TooSlowToposOfActionsTest /* extends GenericToposTests(new ToposWithFixtures {
+abstract class NaiveTooSlowToposOfActionsTest extends GenericToposTests(new ToposWithFixtures {
 
   private val (i, x, y) = ('i, 'x, 'y)
 
   val monoidOf3 =
-    monoidFromTable(
+    naiveMonoidFromTable(
       i, x, y,
       x, x, y,
       y, x, y
     ) // right-dominant on two generators
 
-  override val topos = monoidOf3.toposOfActions
+  override val topos = monoidOf3.actions
 
   import topos._
 
@@ -113,4 +113,4 @@ abstract class TooSlowToposOfActionsTest /* extends GenericToposTests(new ToposW
       (foo >> (omega > omega)) should have size 2
     }
   }
-} */
+}

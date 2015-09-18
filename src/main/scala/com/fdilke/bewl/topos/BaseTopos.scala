@@ -2,13 +2,14 @@ package com.fdilke.bewl.topos
 
 import com.fdilke.bewl.actions.NaiveMonoidsAndActions
 import com.fdilke.bewl.helper.Memoize
+import com.fdilke.bewl.topos.constructions.ToposConstructions
 
 import scala.Function.tupled
 import scala.language.higherKinds
 
 trait Topos extends BaseTopos with NaiveMonoidsAndActions
   with AlgebraicMachinery with AlgebraicStructures with AlgebraicConstructions
-  with LogicalOperations
+  with LogicalOperations with ToposConstructions
 
 trait BaseTopos { self: LogicalOperations =>
   type ~

@@ -1,6 +1,8 @@
 package com.fdilke.bewl.topos
 
-trait AlgebraicStructures { topos: BaseTopos with AlgebraicMachinery  =>
+import com.fdilke.bewl.topos.constructions.ToposConstructions
+
+trait AlgebraicStructures { topos: BaseTopos with AlgebraicMachinery with ToposConstructions  =>
 
   import StandardTermsAndOperators._
   import NamedLaws._
@@ -31,11 +33,23 @@ trait AlgebraicStructures { topos: BaseTopos with AlgebraicMachinery  =>
         "mixed associative" law ( (α ** Φ) ** Ψ := α ** (Φ *** Ψ) )
       )
 
-    def action[A <: ~](actionCarrier: DOT[A])(actionMultiply: (A, M) => A) =
-      new actions.Algebra[A](actionCarrier)(
+    class Action[A <: ~](val actionCarrier: DOT[A], val actionMultiply: (A, M) => A) extends
+      actions.Algebra[A](actionCarrier)(
         ** := (actionCarrier x carrier).biArrow(actionCarrier)(actionMultiply),
         *** := multiply
       )
+
+    def toposOfActions = ToposOfActions.forMonoid(this)
+
+    // TODO: move this class into the topos of actions?
+    case class ActionPreArrow[
+      S <: ~,
+      T <: ~
+    ] (
+      source: Action[S],
+      target: Action[T],
+      function: S => T
+    )
   }
 
   lazy val groups = AlgebraicTheory(ι)($minus, *)( // TODO try ~
