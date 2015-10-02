@@ -6,11 +6,10 @@ import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsUtilities}
 import com.fdilke.bewl.topos.{ToposWithFixtures, GenericToposTests}
 
 import org.scalatest.Matchers._
-import org.scalatest.Tag
 
 import scala.Function.untupled
 
-abstract class TooSlowToposOfActionsTest /* extends GenericToposTests(new ToposWithFixtures {
+abstract class TooSlowToposOfActionsTest extends GenericToposTests(new ToposWithFixtures {
 
   private val (i, x, y) = ('i, 'x, 'y)
 
@@ -53,12 +52,11 @@ abstract class TooSlowToposOfActionsTest /* extends GenericToposTests(new ToposW
   override val baz = makeDot(bazAction)
   override val foo2ImageOfBar = functionAsArrow(foo, baz, Map('i -> 1, 'x -> 1, 'y -> 2))
   override val foo2bar = functionAsArrow(foo, bar, Map('i -> "x", 'x -> "x", 'y -> "y"))
-  private val foobar2BazMap = Map[(Symbol, String), Int](
+  override val foobar2baz = bifunctionAsBiArrow(foo, bar, baz)(untupled (Map[(Symbol, String), Int](
     (i, "i") -> 1, (x, "i") -> 2, (y, "i") -> 1,
     (i, "x") -> 2, (x, "x") -> 1, (y, "x") -> 1,
     (i, "y") -> 1, (x, "y") -> 2, (y, "y") -> 2
-  )
-  override val foobar2baz = bifunctionAsBiArrow(foo, bar, baz)(untupled (foobar2BazMap))
+  )))
   override val monicBar2baz = functionAsArrow(bar, baz, Map("i" -> 3, "x" -> 1, "y" -> 2))
 
   override def makeSampleDot() =
@@ -113,4 +111,4 @@ abstract class TooSlowToposOfActionsTest /* extends GenericToposTests(new ToposW
       (foo >> (omega > omega)) should have size 2
     }
   }
-} */
+}
