@@ -33,6 +33,9 @@ trait AlgebraicStructures extends BaseTopos with LogicalOperations with Algebrai
         "mixed associative" law ( (α ** Φ) ** Ψ := α ** (Φ *** Ψ) )
       )
 
+    def action[A <: ~](actionCarrier: DOT[A])(actionMultiply: (A, M) => A) =
+      Action[A](actionCarrier, actionMultiply)
+
     case class Action[A <: ~](actionCarrier: DOT[A], actionMultiply: (A, M) => A) extends
       actions.Algebra[A](actionCarrier)(
         ** := (actionCarrier x carrier).biArrow(actionCarrier)(actionMultiply),
@@ -40,16 +43,6 @@ trait AlgebraicStructures extends BaseTopos with LogicalOperations with Algebrai
       )
 
     def toposOfActions = ToposOfActions.forMonoid(this)
-
-    // TODO: move this class into the topos of actions?
-    case class ActionPreArrow[
-      S <: ~,
-      T <: ~
-    ] (
-      source: Action[S],
-      target: Action[T],
-      function: S => T
-    )
   }
 
   lazy val groups = AlgebraicTheory(ι)($minus, *)( // TODO try ~
