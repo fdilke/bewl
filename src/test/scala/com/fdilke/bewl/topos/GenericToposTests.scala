@@ -1,6 +1,7 @@
 package com.fdilke.bewl.topos
 
 import com.fdilke.bewl.fsets.FiniteSets
+import com.fdilke.bewl.topos.constructions.ConstructToposOfActions
 import org.scalatest.Matchers._
 import org.scalatest._
 import org.scalatest.matchers.{BeMatcher, MatchResult}
@@ -99,7 +100,8 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
   private lazy val inActionTopos =
     topos.isInstanceOf[NaiveMonoidsAndActions#NaiveMonoid[t]#Actions forSome {
       type t <: ~
-    }]
+    }] ||
+    topos.getClass.getName.contains(classOf[ConstructToposOfActions].getSimpleName)
 
   type UNTYPED_ARROW = ARROW[_ <: ~, _ <: _]
 
@@ -175,7 +177,7 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
     }
 
     it("consistently calculates arrows from the initial to the terminal") {
-      O.toI shouldBe (I.fromO)
+      O.toI shouldBe I.fromO
     }
 
     it("has standardized products") {
@@ -260,12 +262,6 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
       bar >> baz should contain(monicBar2baz)
     }
 
-/*
-    ignore("has a Heyting algebra structure for the truth object") {
-      omegaHeyting.isInstanceOf[HeytingAlgebra[OMEGA]] shouldBe true
-      //      omegaHeyting.verify
-    }
- */
     it("can tell if an arrow is monic") {
 
       if (!inActionTopos) { // reluctantly skip, too slow with current technology
@@ -279,7 +275,6 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
       }
 
       I.identity shouldBe 'monic
-      // Heyting false shouldBe monic
       truth shouldBe 'monic
       TruthObject.falsity shouldBe 'monic
 

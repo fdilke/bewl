@@ -8,16 +8,12 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations with Alge
   Ɛ: AlgebraicStructures =>
 
   object ToposOfActions {
-    def forMonoid[M <: ~](monoid: Ɛ.Monoid[M]) {
-      import monoid.{carrier, multiply, unit, Action}
-      case class ActionPreArrow[
-        S <: ~,
-        T <: ~
-      ] (
-        source: Action[S],
-        target: Action[T],
-        function: S => T
-      )
+    def forMonoid[M <: ~](monoid: Ɛ.Monoid[M]) : Topos with Wrappings[
+      Ɛ.~,
+      ({type λ[X <: Ɛ.~] = monoid.Action[X]})#λ,
+      ({type λ[X <: Ɛ.~, Y <: Ɛ.~] = monoid.ActionPreArrow[X, Y]})#λ
+    ] = {
+      import monoid.{carrier, multiply, unit, Action, ActionPreArrow}
       class TheTopos extends Topos with Wrappings[
         Ɛ.~,
         ({type λ[X <: Ɛ.~] = Action[X]})#λ,

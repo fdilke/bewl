@@ -6,7 +6,6 @@ import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsUtilities}
 import com.fdilke.bewl.topos.{ToposWithFixtures, GenericToposTests}
 
 import org.scalatest.Matchers._
-import org.scalatest.Tag
 
 import scala.Function.untupled
 
@@ -15,13 +14,13 @@ class ToposOfActionsTest extends GenericToposTests(new ToposWithFixtures {
   private val (i, x, y) = ('i, 'x, 'y)
 
   val monoidOf3 =
-    naiveMonoidFromTable(
+    monoidFromTable(
       i, x, y,
       x, x, y,
       y, x, y
     ) // right-dominant on two generators
 
-  override val topos = monoidOf3.actions
+  override val topos = monoidOf3.toposOfActions
 
   import topos._
 
@@ -42,11 +41,10 @@ class ToposOfActionsTest extends GenericToposTests(new ToposWithFixtures {
 
   override val foo2ImageOfBar = functionAsArrow(foo, baz, Map(i -> "y", x -> "x", y -> "y"))
   override val foo2bar = functionAsArrow(foo, bar, Map(i -> "x", x -> "x", y -> "y"))
-  private val foobar2BazMap = Map(
+  override val foobar2baz = bifunctionAsBiArrow(foo, bar, baz)(untupled (Map(
     (i, "x") -> "x", (x, "x") -> "x", (y, "x") -> "y",
     (i, "y") -> "y", (x, "y") -> "x", (y, "y") -> "y"
-  )
-  override val foobar2baz = bifunctionAsBiArrow(foo, bar, baz)(untupled (foobar2BazMap))
+  )))
   override val monicBar2baz = functionAsArrow(bar, baz, Map("x" -> "x", "y" -> "y"))
 
   override def makeSampleDot() =
