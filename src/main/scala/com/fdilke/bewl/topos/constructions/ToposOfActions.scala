@@ -116,7 +116,7 @@ trait ToposOfActions extends BaseTopos with LogicalOperations with AlgebraicMach
         override lazy val omega = Ideals.omega
 
         override lazy val truth: ARROW[UNIT, TRUTH] =
-          new ActionArrow(I, omega,
+          ActionArrow(I, omega,
             Ideals.restrict(Ɛ.I) {
               (i, m) => Ɛ truth i
             })
@@ -194,12 +194,12 @@ trait ToposOfActions extends BaseTopos with LogicalOperations with AlgebraicMach
             }.whereTrue
 
             fixedPoints.globals.map { global =>
-              new ActionArrow(I, dot, fixedPoints.inclusion o global)
+              ActionArrow(I, dot, fixedPoints.inclusion o global)
             }
           }
 
           override val toI: ARROW[AA, UNIT] =
-            new ActionArrow(this, I, action.actionCarrier.toI)
+            ActionArrow(this, I, action.actionCarrier.toI)
 
           override def sanityTest = {
             action.actionCarrier.sanityTest
@@ -351,7 +351,7 @@ trait ToposOfActions extends BaseTopos with LogicalOperations with AlgebraicMach
           )(
             f: ZZ => AA
           ): ARROW[ZZ, AA] =
-            new ActionArrow(pre, dot,
+            ActionArrow(pre, dot,
               pre.action.actionCarrier(dot.action.actionCarrier) { z =>
                 dot.↔ \ f(pre.↔ / z)
               })
@@ -364,7 +364,7 @@ trait ToposOfActions extends BaseTopos with LogicalOperations with AlgebraicMach
             source: ActionDot[Z, ZZ],
             restrictedArrow: Ɛ.ARROW[Z, AAA]
           ): ARROW[ZZ, AA] =
-            new ActionArrow(
+            ActionArrow(
               source,
               dot,
               restrictedArrow.asInstanceOf[Ɛ.ARROW[Z, A]]
@@ -431,19 +431,19 @@ trait ToposOfActions extends BaseTopos with LogicalOperations with AlgebraicMach
           ): ARROW[AA, CC]
         }
 
-        class ActionArrow[
+        case class ActionArrow[
           A <: Ɛ.~,
           AA <: ~,
           B <: Ɛ.~,
           BB <: ~
         ](
-          val source: ActionDot[A, AA],
-          val target: ActionDot[B, BB],
-          val arrow: Ɛ.ARROW[A, B]
+          source: ActionDot[A, AA],
+          target: ActionDot[B, BB],
+          arrow: Ɛ.ARROW[A, B]
         ) extends ActionArrowFacade[AA, BB] {
 
           override lazy val chi: ARROW[BB, TRUTH] =
-            new ActionArrow(target, omega,
+            ActionArrow(target, omega,
               Ideals.restrict(target.action.actionCarrier) {
                 (t, m) => arrow.chi(target.action.actionMultiply(t, m))
               })
@@ -459,7 +459,7 @@ trait ToposOfActions extends BaseTopos with LogicalOperations with AlgebraicMach
             that: ActionArrow[Z, ZZ, BBB, BB]
           ): ARROW[ZZ, AA] = {
             val hackedThat = that.asInstanceOf[ActionArrow[Z, ZZ, B, BB]]
-            new ActionArrow(hackedThat.source, source, hackedThat.arrow \ arrow)
+            ActionArrow(hackedThat.source, source, hackedThat.arrow \ arrow)
           }
 
           override def sanityTest = {
@@ -483,7 +483,7 @@ trait ToposOfActions extends BaseTopos with LogicalOperations with AlgebraicMach
             ) with EqualizingDot[AA] { equalizingDot =>
 
               override val equalizerTarget = source
-              override val inclusion: ARROW[AA, AA] = new ActionArrow(equalizingDot, source, thunkedEqualizer.inclusion)
+              override val inclusion: ARROW[AA, AA] = ActionArrow(equalizingDot, source, thunkedEqualizer.inclusion)
 
               override def restrict[RR <: ~](arrow: ARROW[RR, AA]): ARROW[RR, AA] =
                 arrow.preRestrict[A](equalizingDot, thunkedEqualizer)
@@ -510,7 +510,7 @@ trait ToposOfActions extends BaseTopos with LogicalOperations with AlgebraicMach
             CC <: ~
           ](pre: ActionArrow[BBB, BB, C, CC]): ARROW[AA, CC] = {
             val hackedPre = pre.asInstanceOf[ActionArrow[B, BB, C, CC]]
-            new ActionArrow(source, hackedPre.target, hackedPre.arrow o arrow)
+            ActionArrow(source, hackedPre.target, hackedPre.arrow o arrow)
           }
 
           override def toString = "ActionArrow[" + arrow + "]"
@@ -566,7 +566,7 @@ trait ToposOfActions extends BaseTopos with LogicalOperations with AlgebraicMach
         ): ARROW[WRAPPER[S], WRAPPER[T]] = {
           val src = source.asInstanceOf[ActionDot[S, WRAPPER[S]]]
           val tgt = target.asInstanceOf[ActionDot[T, WRAPPER[T]]]
-          new ActionArrow[S, WRAPPER[S], T, WRAPPER[T]](
+          ActionArrow[S, WRAPPER[S], T, WRAPPER[T]](
             src,
             tgt,
             src.action.carrier(tgt.action.carrier)(f)
