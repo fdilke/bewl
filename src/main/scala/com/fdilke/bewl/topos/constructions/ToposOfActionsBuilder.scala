@@ -4,19 +4,20 @@ import com.fdilke.bewl.topos._
 import com.fdilke.bewl.helper.Memoize
 import com.fdilke.bewl.helper.↔
 
-trait ToposConstructions { Ɛ: BaseTopos with AlgebraicStructures with LogicalOperations =>
+trait ToposOfActionsBuilder extends BaseTopos with LogicalOperations with AlgebraicMachinery {
+  Ɛ: AlgebraicStructures =>
 
   object ToposOfActions {
-    def forMonoid[M <: Ɛ.~](monoid: Monoid[M]) = ???
-    //   new Topos with Wrappings[
-    //     Ɛ.~,
-    //     monoid.Action,
-    //     monoid.ActionPreArrow
-    // ] {
-
-    // }
+    def forMonoid[M <: Ɛ.~](monoid: Ɛ.Monoid[M]) = {
+      ???.asInstanceOf[Topos with Wrappings[
+        Ɛ.~,
+        ({type λ[X <: Ɛ.~] = monoid.Action[X]})#λ,
+        ({type λ[X <: Ɛ.~, Y <: Ɛ.~] = monoid.ActionPreArrow[X, Y]})#λ
+        ]]
+    }
   }
 
+}
 /*
   class ToposOfActions[M <: ~](val monoid: Monoid[M]) extends Topos with Wrappings[
     Ɛ.~,
@@ -587,4 +588,4 @@ trait ToposConstructions { Ɛ: BaseTopos with AlgebraicStructures with LogicalOp
     }
   }
 */  
-}
+//}

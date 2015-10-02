@@ -1,11 +1,11 @@
 package com.fdilke.bewl.topos
 
-import com.fdilke.bewl.topos.constructions.ToposConstructions
+import com.fdilke.bewl.topos.constructions.ToposOfActionsBuilder
 
-trait AlgebraicStructures { topos: BaseTopos with AlgebraicMachinery with ToposConstructions  =>
+trait AlgebraicStructures extends BaseTopos with LogicalOperations with AlgebraicMachinery { builder: ToposOfActionsBuilder =>
 
-  import StandardTermsAndOperators._
   import NamedLaws._
+  import StandardTermsAndOperators._
 
   lazy val monoids = AlgebraicTheory(ι)(*)(
     "left unit" law ( ι * α := α ),
@@ -33,7 +33,7 @@ trait AlgebraicStructures { topos: BaseTopos with AlgebraicMachinery with ToposC
         "mixed associative" law ( (α ** Φ) ** Ψ := α ** (Φ *** Ψ) )
       )
 
-    class Action[A <: ~](val actionCarrier: DOT[A], val actionMultiply: (A, M) => A) extends
+    case class Action[A <: ~](actionCarrier: DOT[A], actionMultiply: (A, M) => A) extends
       actions.Algebra[A](actionCarrier)(
         ** := (actionCarrier x carrier).biArrow(actionCarrier)(actionMultiply),
         *** := multiply
