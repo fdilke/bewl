@@ -2,10 +2,9 @@
 
 A DSL for the internal (Mitchell-Benabou) language of a topos.
 
-This [animated video](http://www.youtube.com/watch/?v=nUwjGBHXKYs) attempts a gentle introduction to Project Bewl (formerly Bile).
-See also [this presentation](https://www.evernote.com/shard/s141/sh/8e6b9d94-bc20-4fde-b2bf-9e844f486f76/d11244bad0729071fa00d19eaad312ce)
+See [this presentation](https://www.evernote.com/shard/s141/sh/8e6b9d94-bc20-4fde-b2bf-9e844f486f76/d11244bad0729071fa00d19eaad312ce)
 
-I've implemented this in Java, Clojure and now Scala. Really it should be in Haskell but I am only partway through
+I've implemented this in Java, Clojure and now Scala. Really it should be in Haskell (or Idris) but I am only partway through
 [learning the language](http://learnyouahaskell.com)
 
 [This presentation](http://prezi.com/dwrz2mft3y-g/?utm_campaign=share&utm_medium=copy&rc=ex0share) explains the new "intrinsic" Bewl 2.0 DSL and why it's
@@ -15,11 +14,14 @@ If you want to use Bewl as a learning aid to study category theory, [start here]
 
 Here's a presentation about Bewl's [universal algebra capabilities](https://github.com/fdilke/bewl/blob/master/notes/BewlUniversalAlgebra.pdf).
 
+This [animated video](http://www.youtube.com/watch/?v=nUwjGBHXKYs) was an initial attempt to explain Bewl (back when it was called Bile)
+
 # Intended applications
 
 - Explore the topos of graphs. Bewl will let us talk about graphs as if they were sets
 - Explore fuzzy sets (using the more careful definition that makes them into a topos)
-- Explore parity in other topoi (as it's so poorly understood for sets)
+- Explore parity in other topoi (as it's so poorly understood for sets). This will be possible when the
+"topos of permutations" is implemented.
 - Explore Lawvere-Tierney topologies (and perhaps save [these](http://www.math.uchicago.edu/~may/VIGRE/VIGRE2007/REUPapers/FINALFULL/Bartlett.pdf) 
 [poor](http://user.cs.tu-berlin.de/~noll/ToposOfTriads.pdf) music theorists from having to calculate them by hand)
 
@@ -44,21 +46,15 @@ Here's a presentation about Bewl's [universal algebra capabilities](https://gith
 - predicates isMonic, isEpic, isIso
 - enumerate morphisms / global elements
 - Partial arrow classifier
-
-# Tech tasks done
-- cleaner memoization; optionally uses generics and lower bound types; works with structural types 
+- walkthrough for using Bewl as a learning aid for studying categpry theory
+- universal algebra: can define algebraic structures, using existing ones as parameter spaces (for monoid actions)
 
 # To do
 
-- Structure definitions for monoid, group, abelian group, ring with their respective algebraic laws
+- Define more algebraic structures
 - Can extend and remap algebraic structures, e.g. ring extends abelian group remaps group with an extra law
-- Broaden definition of algebraic structures to include models and parameterized operations
 - Formalize constructions like: automorphism group, endomorphism ring, group of invertible elements of a monoid
 - Extract the Heyting algebra structure of the subobject classifier
-- colimits
+- coequalizers
 - Optimize algorithm enough to construct triadic topos and its topologies
 
-# Questions
-
-- How would the powers work if they absolutely had to be typesafe? How would they work in Haskell? Would this
-work if we could construct and dissect product binding types like (A, B, C) properly? Would 'dependent types' help?
