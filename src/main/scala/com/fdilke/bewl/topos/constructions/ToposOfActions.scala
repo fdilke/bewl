@@ -4,15 +4,15 @@ import com.fdilke.bewl.topos._
 import com.fdilke.bewl.helper.Memoize
 import com.fdilke.bewl.helper.↔
 
-trait ToposOfActionsBuilder extends BaseTopos with LogicalOperations with AlgebraicMachinery {
+trait ToposOfActions extends BaseTopos with LogicalOperations with AlgebraicMachinery {
   Ɛ: AlgebraicStructures =>
 
   object ToposOfActions {
     def forMonoid[M <: ~](monoid: Ɛ.Monoid[M]) {
       import monoid.{carrier, multiply, unit, Action}
       case class ActionPreArrow[
-      S <: ~,
-      T <: ~
+        S <: ~,
+        T <: ~
       ] (
         source: Action[S],
         target: Action[T],
@@ -22,8 +22,7 @@ trait ToposOfActionsBuilder extends BaseTopos with LogicalOperations with Algebr
         Ɛ.~,
         ({type λ[X <: Ɛ.~] = Action[X]})#λ,
         ({type λ[X <: Ɛ.~, Y <: Ɛ.~] = ActionPreArrow[X, Y]})#λ
-        ] {
-
+      ] {
         trait ElementWrapper[
           A <: Ɛ.~
         ] {
@@ -35,45 +34,41 @@ trait ToposOfActionsBuilder extends BaseTopos with LogicalOperations with Algebr
             a => VanillaWrapper(a),
             aa => aa.element
           )
-
-          def apply[A <: Ɛ.~](a: A) =
-            new VanillaWrapper(a)
         }
 
-        class VanillaWrapper[
-        A <: Ɛ.~
+        case class VanillaWrapper[
+          A <: Ɛ.~
         ](
-           val element: A
+           element: A
          ) extends ElementWrapper[A]
 
         class BiproductWrapper[
-        A <: Ɛ.~,
-        AA <: ~,
-        B <: Ɛ.~,
-        BB <: ~
+          A <: Ɛ.~,
+          AA <: ~,
+          B <: Ɛ.~,
+          BB <: ~
         ](
-           aa: AA,
-           bb: BB,
-           aXb: Ɛ.x[A, B]
-           ) extends (AA, BB)(aa, bb) with ElementWrapper[
+          aa: AA,
+          bb: BB,
+          aXb: Ɛ.x[A, B]
+        ) extends (AA, BB)(aa, bb) with ElementWrapper[
           Ɛ.x[A, B]
-          ] {
+        ] {
           override val element = aXb
         }
 
         class ExponentialWrapper[
-        A <: Ɛ.~,
-        AA <: ~,
-        B <: Ɛ.~,
-        BB <: ~
+          A <: Ɛ.~,
+          AA <: ~,
+          B <: Ɛ.~,
+          BB <: ~
         ](
-           ma2b: Ɛ.>[Ɛ.x[M, A], B],
-           aa2bb: AA => BB
-           ) extends (AA => BB) with ElementWrapper[
+          ma2b: Ɛ.>[Ɛ.x[M, A], B],
+          aa2bb: AA => BB
+        ) extends (AA => BB) with ElementWrapper[
           Ɛ.>[Ɛ.x[M, A], B]
-          ] {
+        ] {
           def apply(aa: AA): BB = aa2bb(aa)
-
           override val element = ma2b
         }
 
@@ -100,12 +95,12 @@ trait ToposOfActionsBuilder extends BaseTopos with LogicalOperations with Algebr
             }.whereTrue
 
           def restrict[
-          H <: Ɛ.~
+            H <: Ɛ.~
           ](
-             that: Ɛ.DOT[H]
-             )(
-             bifunc: (H, M) => Ɛ.TRUTH
-             ): Ɛ.ARROW[H, IDEAL] =
+            that: Ɛ.DOT[H]
+          )(
+            bifunc: (H, M) => Ɛ.TRUTH
+          ): Ɛ.ARROW[H, IDEAL] =
             ideals.restrict(possibleIdeals.transpose(that)(bifunc))
 
           private val idealMultiply =
@@ -121,72 +116,71 @@ trait ToposOfActionsBuilder extends BaseTopos with LogicalOperations with Algebr
         override lazy val omega = Ideals.omega
 
         override lazy val truth: ARROW[UNIT, TRUTH] =
-        new ActionArrow(I, omega,
-          Ideals.restrict(Ɛ.I) {
-            (i, m) => Ɛ truth i
-          })
+          new ActionArrow(I, omega,
+            Ideals.restrict(Ɛ.I) {
+              (i, m) => Ɛ truth i
+            })
 
         trait ActionDotFacade[
-        AA <: ~
+          AA <: ~
         ] extends Dot[AA] {
           def preMultiplyUncached[
-          Z <: Ɛ.~,
-          ZZ <: ~
+            Z <: Ɛ.~,
+            ZZ <: ~
           ](
-             pre: ActionDot[Z, ZZ]
-             ): BIPRODUCT[ZZ, AA]
+            pre: ActionDot[Z, ZZ]
+          ): BIPRODUCT[ZZ, AA]
 
           def preExponentiateUncached[
-          Z <: Ɛ.~,
-          ZZ <: ~
+            Z <: Ɛ.~,
+            ZZ <: ~
           ](
-             pre: ActionDot[Z, ZZ]
-             ): EXPONENTIAL[ZZ, AA]
+            pre: ActionDot[Z, ZZ]
+          ): EXPONENTIAL[ZZ, AA]
 
           def preApply[
-          Z <: Ɛ.~,
-          ZZ <: ~
+            Z <: Ɛ.~,
+            ZZ <: ~
           ](
-             pre: ActionDot[Z, ZZ]
-             )(
-             f: ZZ => AA
-             ): ARROW[ZZ, AA]
+            pre: ActionDot[Z, ZZ]
+          )(
+            f: ZZ => AA
+          ): ARROW[ZZ, AA]
 
           def calcTranspose[
-          R <: Ɛ.~,
-          RR <: ~,
-          T <: Ɛ.~,
-          TT <: ~
+            R <: Ɛ.~,
+            RR <: ~,
+            T <: Ɛ.~,
+            TT <: ~
           ](
-             source: ActionDot[R, RR],
-             target: ActionDot[T, TT],
-             morphisms: Ɛ.EQUALIZER[Ɛ.>[Ɛ.x[M, R], T]],
-             possibleMorphisms: Ɛ.EXPONENTIAL[Ɛ.x[M, R], T],
-             exponentialDot: ActionDot[
-               Ɛ.>[Ɛ.x[M, R], T],
-               ExponentialWrapper[R, RR, T, TT]
-               ],
-             biArrow: BiArrow[AA, RR, TT]
-             ): ARROW[AA, ExponentialWrapper[R, RR, T, TT]]
+            source: ActionDot[R, RR],
+            target: ActionDot[T, TT],
+            morphisms: Ɛ.EQUALIZER[Ɛ.>[Ɛ.x[M, R], T]],
+            possibleMorphisms: Ɛ.EXPONENTIAL[Ɛ.x[M, R], T],
+            exponentialDot: ActionDot[
+              Ɛ.>[Ɛ.x[M, R], T],
+              ExponentialWrapper[R, RR, T, TT]
+            ],
+            biArrow: BiArrow[AA, RR, TT]
+          ): ARROW[AA, ExponentialWrapper[R, RR, T, TT]]
 
           def crossPreRestrict[
-          Z <: Ɛ.~,
-          ZZ <: ~,
-          A <: Ɛ.~
+            Z <: Ɛ.~,
+            ZZ <: ~,
+            A <: Ɛ.~
           ](
-             source: ActionDot[Z, ZZ],
-             restrictedArrow: Ɛ.ARROW[Z, A]
-             ): ARROW[ZZ, AA]
+            source: ActionDot[Z, ZZ],
+            restrictedArrow: Ɛ.ARROW[Z, A]
+          ): ARROW[ZZ, AA]
         }
 
         class ActionDot[
-        A <: Ɛ.~,
-        AA <: ~
+          A <: Ɛ.~,
+          AA <: ~
         ](
-           val action: Action[A],
-           val ↔ : A ↔ AA
-           ) extends ActionDotFacade[AA] {
-          dot =>
+          val action: Action[A],
+          val ↔ : A ↔ AA
+        ) extends ActionDotFacade[AA] { dot =>
 
           private lazy val pairs: Ɛ.BIPRODUCT[M, A] =
             carrier x action.actionCarrier
@@ -222,23 +216,23 @@ trait ToposOfActionsBuilder extends BaseTopos with LogicalOperations with Algebr
             new ActionDot[
               Ɛ.x[Z, A],
               BiproductWrapper[Z, ZZ, A, AA]
-              ](
-                monoid.action(product) {
-                  case ((z, a), m) => product.pair(
-                    pre.action.actionMultiply(z, m),
-                    action.actionMultiply(a, m)
-                  )
-                },
-                new ↔[Ɛ.x[Z, A], BiproductWrapper[Z, ZZ, A, AA]](
-                  zxa => zxa match {
-                    case (z, a) =>
-                      val zz: ZZ = pre.↔ / z
-                      val aa: AA = dot.↔ / a
-                      new BiproductWrapper[Z, ZZ, A, AA](zz, aa, zxa)
-                  },
-                  zzXaa => zzXaa.element
+            ](
+              monoid.action(product) {
+                case ((z, a), m) => product.pair(
+                  pre.action.actionMultiply(z, m),
+                  action.actionMultiply(a, m)
                 )
-              ) with BiproductDot[ZZ, AA, BiproductWrapper[Z, ZZ, A, AA]] {
+              },
+              new ↔[Ɛ.x[Z, A], BiproductWrapper[Z, ZZ, A, AA]](
+                zxa => zxa match {
+                  case (z, a) =>
+                    val zz: ZZ = pre.↔ / z
+                    val aa: AA = dot.↔ / a
+                    new BiproductWrapper[Z, ZZ, A, AA](zz, aa, zxa)
+                },
+                zzXaa => zzXaa.element
+              )
+            ) with BiproductDot[ZZ, AA, BiproductWrapper[Z, ZZ, A, AA]] {
               override val left: DOT[ZZ] = pre
               override val right: DOT[AA] = dot
 
@@ -293,20 +287,20 @@ trait ToposOfActionsBuilder extends BaseTopos with LogicalOperations with Algebr
                 ),
                 zz2aa => zz2aa.element
               )) with ExponentialDot[
-              ZZ,
-              AA,
-              ExponentialWrapper[Z, ZZ, A, AA]
+                ZZ,
+                AA,
+                ExponentialWrapper[Z, ZZ, A, AA]
               ] {
-              exponentialDot =>
-              val source: DOT[ZZ] = pre
-              val target: DOT[AA] = dot
+                exponentialDot =>
+                val source: DOT[ZZ] = pre
+                val target: DOT[AA] = dot
 
-              def transpose[RR <: ~](
-                biArrow: BiArrow[RR, ZZ, AA]
-              ): ARROW[RR, ExponentialWrapper[Z, ZZ, A, AA]] =
-                biArrow.product.left.calcTranspose[Z, ZZ, A, AA](
-                  pre, dot, morphisms, possibleMorphisms, exponentialDot, biArrow
-                )
+                def transpose[RR <: ~](
+                  biArrow: BiArrow[RR, ZZ, AA]
+                ): ARROW[RR, ExponentialWrapper[Z, ZZ, A, AA]] =
+                  biArrow.product.left.calcTranspose[Z, ZZ, A, AA](
+                    pre, dot, morphisms, possibleMorphisms, exponentialDot, biArrow
+                  )
             }.asInstanceOf[EXPONENTIAL[ZZ, AA]]
           }
 

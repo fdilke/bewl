@@ -1,8 +1,8 @@
 package com.fdilke.bewl.topos
 
-import com.fdilke.bewl.topos.constructions.ToposOfActionsBuilder
+import com.fdilke.bewl.topos.constructions.ToposOfActions
 
-trait AlgebraicStructures extends BaseTopos with LogicalOperations with AlgebraicMachinery { builder: ToposOfActionsBuilder =>
+trait AlgebraicStructures extends BaseTopos with LogicalOperations with AlgebraicMachinery { builder: ToposOfActions =>
 
   import NamedLaws._
   import StandardTermsAndOperators._
