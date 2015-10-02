@@ -4,7 +4,7 @@ import com.fdilke.bewl.topos._
 import com.fdilke.bewl.helper.Memoize
 import com.fdilke.bewl.helper.↔
 
-trait ToposOfActions extends BaseTopos with LogicalOperations with AlgebraicMachinery {
+trait ConstructToposOfActions extends BaseTopos with LogicalOperations with AlgebraicMachinery {
   Ɛ: AlgebraicStructures =>
 
   object ToposOfActions {
