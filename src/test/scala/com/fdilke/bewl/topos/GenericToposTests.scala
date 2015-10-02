@@ -1,11 +1,8 @@
 package com.fdilke.bewl.topos
 
-import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.topos.constructions.ConstructToposOfActions
 import org.scalatest.Matchers._
 import org.scalatest._
-import org.scalatest.matchers.{BeMatcher, MatchResult}
-import com.fdilke.bewl.actions.NaiveMonoidsAndActions
 
 abstract class ToposFixtureSanityTests[T <: BaseTopos](fixtures: ToposWithFixtures) extends FunSpec {
   import fixtures._
@@ -98,9 +95,6 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
   import fixtures.topos._
 
   private lazy val inActionTopos =
-    topos.isInstanceOf[NaiveMonoidsAndActions#NaiveMonoid[t]#Actions forSome {
-      type t <: ~
-    }] ||
     topos.getClass.getName.contains(classOf[ConstructToposOfActions].getSimpleName)
 
   type UNTYPED_ARROW = ARROW[_ <: ~, _ <: _]

@@ -212,19 +212,4 @@ object FiniteSetsUtilities {
       product
     )
   }
-
-  // TODO: get rid of this and all else naive
-  def naiveMonoidFromTable[M](table: M*): NaiveMonoid[M] = {
-    val carrierSize = intSqrt(table.size)
-    val carrierAsList = table.take(carrierSize)
-    val carrier = dot(carrierAsList :_*)
-    val mappings = for (i <- 0 until carrierSize ; j <- 0 until carrierSize)
-      yield (carrierAsList(i), carrierAsList(j)) -> table(i * carrierSize + j)
-    val product = makeBinaryOperator(carrier, mappings:_ *)
-    NaiveMonoid[M](
-      carrier,
-      makeNullaryOperator(carrier, carrierAsList.head),
-      product
-    )
-  }
 }
