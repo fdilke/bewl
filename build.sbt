@@ -14,7 +14,5 @@ libraryDependencies ++= Seq(
   "org.scala-lang" % "scala-library" % "2.11.4" % "test"
 ) map { _ withSources() withJavadoc() }
 
-val buildSettings = Defaults.coreDefaultSettings ++ Seq(
-  javaOptions += "-Xmx1G"
-)
+
 

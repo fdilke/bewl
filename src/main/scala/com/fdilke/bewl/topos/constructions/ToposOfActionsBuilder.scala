@@ -575,9 +575,7 @@ trait ToposOfActionsBuilder extends BaseTopos with LogicalOperations with Algebr
           new ActionArrow[S, WRAPPER[S], T, WRAPPER[T]](
             src,
             tgt,
-            src.action.carrier(tgt.action.carrier) {
-              f
-            }
+            src.action.carrier(tgt.action.carrier)(f)
           )
         }
 
