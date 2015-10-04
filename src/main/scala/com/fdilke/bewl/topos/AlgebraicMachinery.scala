@@ -160,11 +160,10 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       ).headOption.flatten
 
     def hasPrecisely(
-      constants: Seq[GeneralConstant[_ <: AlgebraicSort]],
       operators: Seq[Operator]
     ): Boolean =
         assignments.map { _.operator }.toSet ==
-          (operators ++ constants).toSet
+          operators.toSet
   }
 
   class AbstractBinaryOp(name: String) extends Operator(name, 2) {
@@ -226,8 +225,6 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   class AlgebraicTheory[S <: ~](
       scalars: DOT[S]
    )(
-      constants: GeneralConstant[_ <: AlgebraicSort]*
-   )(
       preassignments: OperatorAssignment[_ <: ~, _ <: ~]*
    )(
       operators: Operator*
@@ -243,7 +240,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
           targetAlgebra.carrier != arrow.target)
         throw new IllegalArgumentException("Source/target of arrow do not match algebra carriers")
       else
-        (constants ++ operators) forall {
+        operators forall {
           case op: ScalarConstant => true
 
           case op: PrincipalConstant =>
@@ -448,7 +445,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       }
 
       def sanityTest =
-        if (!operatorAssignments.hasPrecisely(constants, operators))
+        if (!operatorAssignments.hasPrecisely(operators))
           throw new IllegalArgumentException("Assignments do not match signature of theory")
         else
           laws foreach { law =>
@@ -463,7 +460,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   object AlgebraicTheory {
     def apply(constants: GeneralConstant[_ <: AlgebraicSort]*)(operators: Operator*)(laws: Law*) =
-      new AlgebraicTheory[UNIT](I)(constants :_*)()(operators:_*)(laws:_*)
+      new AlgebraicTheory[UNIT](I)()((constants ++ operators):_*)(laws:_*)
   }
 
   object AlgebraicTheoryWithScalars {
@@ -478,7 +475,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     )(
       laws: Law*
     ) =
-      new AlgebraicTheory[S](scalars)(constants :_*)(preassignments :_*)(operators :_*)(laws:_*)
+      new AlgebraicTheory[S](scalars)(preassignments :_*)((constants ++ operators) :_*)(laws:_*)
   }
 
   type Algebra = AlgebraicTheory[_ <: ~]#Algebra[_ <: ~]
