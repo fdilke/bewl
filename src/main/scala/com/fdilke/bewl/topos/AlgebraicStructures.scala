@@ -7,7 +7,7 @@ trait AlgebraicStructures extends BaseTopos with LogicalOperations with Algebrai
   import NamedLaws._
   import StandardTermsAndOperators._
 
-  lazy val monoids = AlgebraicTheory(ι)(*)(
+  lazy val monoids = AlgebraicTheory(ι, *)(
     "left unit" law ( ι * α := α ),
     "right unit" law ( α * ι := α ),
     "associative" law ( (α * β) * γ := α * (β * γ ) )
@@ -28,7 +28,7 @@ trait AlgebraicStructures extends BaseTopos with LogicalOperations with Algebrai
     * := multiply
   ) with CommutativityCriterion {
     lazy val actions =
-      AlgebraicTheoryWithScalars(carrier)(II)(II := unit)(**, ***)(
+      AlgebraicTheoryWithScalars(carrier)(II := unit)(II, **, ***)(
         "right unit" law ( α ** II := α ),
         "mixed associative" law ( (α ** Φ) ** Ψ := α ** (Φ *** Ψ) )
       )
@@ -58,7 +58,7 @@ trait AlgebraicStructures extends BaseTopos with LogicalOperations with Algebrai
     )
   }
 
-  lazy val groups = AlgebraicTheory(ι)($minus, *)( // TODO try ~
+  lazy val groups = AlgebraicTheory(ι, $minus, *)( // TODO try ~
     "left unit" law ( ι * α := α ),
     "right unit" law ( α * ι := α ),
     "left inverse" law ( (-α) * α := ι ),

@@ -18,13 +18,13 @@ class AlgebraicMachineryTest extends FunSpec {
     }
   }
 
-  private val unstructuredSets = AlgebraicTheory()()()
+  private val unstructuredSets = AlgebraicTheory()()
 
   describe("An evaluation context") {
     it("for no terms can evaluate constants, not variables") {
       val carrier = dot[Boolean](true, false)
       val theO = makeNullaryOperator(carrier, false)
-      val pointedSets = AlgebraicTheory(o)()()
+      val pointedSets = AlgebraicTheory(o)()
       val algebra = new pointedSets.Algebra[Boolean](carrier)(o := theO)
       val context = algebra.EvaluationContext[Boolean](Seq())
       intercept[IllegalArgumentException] {
@@ -66,7 +66,7 @@ class AlgebraicMachineryTest extends FunSpec {
       val carrier = dot[Boolean](true, false)
       val theO = makeNullaryOperator(carrier, false)
 
-      val pointedSets = AlgebraicTheory(o)()()
+      val pointedSets = AlgebraicTheory(o)()
       val algebra = new pointedSets.Algebra[Boolean](carrier)(o := theO)
       val context = algebra.EvaluationContext[Boolean](Seq(α))
       context.evaluate(o) shouldBe (
@@ -83,7 +83,7 @@ class AlgebraicMachineryTest extends FunSpec {
         2 -> 1
       )
 
-      val pointedSetsWithOp = AlgebraicTheory(o)($minus)()
+      val pointedSetsWithOp = AlgebraicTheory(o, $minus)()
       val algebra = new pointedSetsWithOp.Algebra[Int](carrier)(o := theO, $minus := twiddle)
       val context = algebra.EvaluationContext(Seq(α))
       val interpretO = theO o context.root.toI
@@ -106,7 +106,7 @@ class AlgebraicMachineryTest extends FunSpec {
         ("x", "x") -> "x"
       )
 
-      val pointedMagmas = AlgebraicTheory(o)($plus)()
+      val pointedMagmas = AlgebraicTheory(o, $plus)()
       val algebra = new pointedMagmas.Algebra[String](carrier)(o := theO, $plus := plus)
       val context = algebra.EvaluationContext(Seq(α))
       val interpretO = theO o context.root.toI
@@ -137,7 +137,7 @@ class AlgebraicMachineryTest extends FunSpec {
         )
       )
 
-      val pointedWeakActs = AlgebraicTheoryWithScalars(scalars)(o, II)(II := scalar1)(**)()
+      val pointedWeakActs = AlgebraicTheoryWithScalars(scalars)(II := scalar1)(o, II, **)()
       val minimalAlgebra = new pointedWeakActs.Algebra[String](carrier)(
         o := theO, ** := rightMultiply
       )
@@ -153,7 +153,7 @@ class AlgebraicMachineryTest extends FunSpec {
       val scalars = dot(0, 1, 2)
       val scalar1 = makeNullaryOperator(scalars, 1)
       val scalar2 = makeNullaryOperator(scalars, 2)
-      val weakActsReferencingAMonoid = AlgebraicTheoryWithScalars(scalars)()(II := scalar1)(**, ***)()
+      val weakActsReferencingAMonoid = AlgebraicTheoryWithScalars(scalars)(II := scalar1)(**, ***)()
       val act = dot('a)
       val algebra = new weakActsReferencingAMonoid.Algebra[Symbol](act)(
         ** := (act x scalars).biArrow(act) { (_, _) => 'a },
@@ -186,7 +186,7 @@ class AlgebraicMachineryTest extends FunSpec {
 
   describe("Algebraic theories") {
     it("can encapsulate commutative magmas") {
-      val commutativeMagmas = AlgebraicTheory()(*)(α * β := β * α)
+      val commutativeMagmas = AlgebraicTheory(*)(α * β := β * α)
       case class CommutativeMagma[T <: ~](
         override val carrier: DOT[T],
         op: BinaryOp[T]
@@ -223,7 +223,7 @@ class AlgebraicMachineryTest extends FunSpec {
       val wrongSource = dot[String]("*")
       val wrongTarget = dot[Int](0)
 
-      val setsWithInvolution = AlgebraicTheory()($minus)(-(-α) := α)
+      val setsWithInvolution = AlgebraicTheory($minus)(-(-α) := α)
       val algebraStrings = new setsWithInvolution.Algebra[String](carrierStrings)($minus := minusStrings)
       val algebraInts = new setsWithInvolution.Algebra[Int](carrierInts)($minus := minusInts)
       algebraStrings.sanityTest
@@ -252,7 +252,7 @@ class AlgebraicMachineryTest extends FunSpec {
       val carrierStrings = dot[String]("samson", "delilah")
       val pointStrings = makeNullaryOperator(carrierStrings, "delilah");
 
-      val pointedSets = AlgebraicTheory(o)()()
+      val pointedSets = AlgebraicTheory(o)()
       val algebraStrings = new pointedSets.Algebra[String](carrierStrings)(o := pointStrings)
       val algebraInts = new pointedSets.Algebra[Int](carrierInts)(o := pointInts)
 
@@ -269,7 +269,7 @@ class AlgebraicMachineryTest extends FunSpec {
         (x, y) => (x + y) % 4
       }
 
-      val magmas = AlgebraicTheory()(*)()
+      val magmas = AlgebraicTheory(*)()
       val algebra = new magmas.Algebra[Int](carrier)(* := multiplication)
 
       val morphism = arrow(carrier, carrier, 0 -> 0, 1 -> 2, 2 -> 0, 3 -> 2)
@@ -290,7 +290,7 @@ class AlgebraicMachineryTest extends FunSpec {
         )
       }
 
-      val weakActsOverAPointedMagma = AlgebraicTheoryWithScalars(scalars)(II)(II := pointScalar)(**)()
+      val weakActsOverAPointedMagma = AlgebraicTheoryWithScalars(scalars)(II := pointScalar)(II, **)()
       val algebra = new weakActsOverAPointedMagma.Algebra[Boolean](carrier)(** := multiplication)
       algebra.sanityTest
 
@@ -313,7 +313,7 @@ class AlgebraicMachineryTest extends FunSpec {
         -1 -> 1
       )
 
-      val setsWithInvolution = AlgebraicTheory()($minus)(
+      val setsWithInvolution = AlgebraicTheory($minus)(
         "involutive" law (-(-α) := α)
       )
       new setsWithInvolution.Algebra[Int](carrier)($minus := minusGood).sanityTest
@@ -330,7 +330,7 @@ class AlgebraicMachineryTest extends FunSpec {
         -1 -> 1
       )
 
-      val setsWithInvolution = AlgebraicTheory()($minus)(
+      val setsWithInvolution = AlgebraicTheory($minus)(
         "involutive" law (-(-α) := α)
       )
       val algebra = new setsWithInvolution.Algebra[Int](carrier)($minus := minus)
