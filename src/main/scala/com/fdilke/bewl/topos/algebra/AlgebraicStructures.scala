@@ -3,7 +3,7 @@ package com.fdilke.bewl.topos.algebra
 import com.fdilke.bewl.topos.constructions.ConstructToposOfActions
 import com.fdilke.bewl.topos.{BaseTopos, LogicalOperations}
 
-trait AlgebraicStructures extends BaseTopos with LogicalOperations with AlgebraicMachinery { builder: ConstructToposOfActions =>
+trait AlgebraicStructures extends BaseTopos with LogicalOperations with AlgebraicMachinery { builder =>
 
   import NamedLaws._
   import StandardTermsAndOperators._
@@ -46,9 +46,7 @@ trait AlgebraicStructures extends BaseTopos with LogicalOperations with Algebrai
         *** := multiply
       )
 
-    def toposOfActions = ToposOfActions.forMonoid(this)
-
-    // TODO: can move this class back into the topos of actions?
+    // TODO: can move this class into the topos of actions?
     case class ActionPreArrow[
       S <: ~,
       T <: ~

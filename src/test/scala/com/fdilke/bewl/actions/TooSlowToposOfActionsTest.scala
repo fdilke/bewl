@@ -20,7 +20,7 @@ abstract class TooSlowToposOfActionsTest extends GenericToposTests(new ToposWith
       y, x, y
     ) // right-dominant on two generators
 
-  override val topos = monoidOf3.toposOfActions
+  override val topos = FiniteSets.ToposOfActions.forMonoid(monoidOf3)
 
   import topos._
 
