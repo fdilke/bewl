@@ -1,4 +1,6 @@
-package com.fdilke.bewl.topos
+package com.fdilke.bewl.topos.algebra
+
+import com.fdilke.bewl.topos.BaseTopos
 
 trait AlgebraicConstructions { topos: BaseTopos with AlgebraicMachinery with AlgebraicStructures  =>
   def endomorphismMonoid[T <: ~](dot: DOT[T]) = {

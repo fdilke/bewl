@@ -1,4 +1,4 @@
-package com.fdilke.bewl.algebra
+package com.fdilke.bewl.topos.algebra
 
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.FunSpec

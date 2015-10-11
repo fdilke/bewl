@@ -1,4 +1,4 @@
-package com.fdilke.bewl.algebra
+package com.fdilke.bewl.topos
 
 import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
