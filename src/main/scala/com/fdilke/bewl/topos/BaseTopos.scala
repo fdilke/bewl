@@ -403,7 +403,7 @@ trait Wrappings[BASE, PREDOT[_ <: BASE], PREARROW[_ <: BASE, _ <: BASE]] { topos
     bifunc: (L, R) => T
   ): BiArrow[WRAPPER[L], WRAPPER[R], WRAPPER[T]]
 
-  def bifunctionAsBiArrow[X <: BASE] (
+  final def bifunctionAsBiArrow[X <: BASE] (
     dot: DOT[WRAPPER[X]]
   ) (
      bifunc: (X, X) => X
