@@ -1,10 +1,9 @@
 
-package com.fdilke.bewl.actions
+package com.fdilke.bewl.topos.algebra.constructions
 
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsUtilities}
-import com.fdilke.bewl.topos.{ToposWithFixtures, GenericToposTests}
-
+import com.fdilke.bewl.topos.{GenericToposTests, ToposWithFixtures}
 import org.scalatest.Matchers._
 
 import scala.Function.untupled
