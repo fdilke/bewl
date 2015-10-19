@@ -75,10 +75,6 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
         override type ARROW[AA <: ~, BB <: ~] = ActionArrowFacade[AA, BB]
         override type UNIT = VanillaWrapper[Ɛ.UNIT]
 
-        // TODO: nothing's being overridden: simplify these. OR sort them out properly!
-        override type x[SS <: ~, TT <: ~] = (SS, TT) with ~
-        override type >[SS <: ~, TT <: ~] = (SS => TT) with ~
-
         type IDEAL = Ɛ.>[M, Ɛ.TRUTH]
         override type TRUTH = VanillaWrapper[IDEAL]
         override val I: ActionDot[Ɛ.UNIT, UNIT] = ActionDot(Ɛ.I) { (i, m) => i }

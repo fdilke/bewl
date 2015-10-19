@@ -13,8 +13,6 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreAr
   override lazy val I = makeDot(Traversable(()))
   override lazy val omega = makeDot(Traversable(true, false))
   override lazy val truth = I(omega) { _ => true }
-  override type >[T <: ~, U <: ~] = (T => U) with ~
-  override type x[T <: ~, U <: ~] = (T, U) with ~
 
   class FiniteSetsDot[S](private[FiniteSets] val elements: Traversable[S])
     extends Dot[S] { self =>

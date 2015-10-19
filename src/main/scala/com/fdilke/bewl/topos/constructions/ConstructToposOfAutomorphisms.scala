@@ -19,10 +19,6 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
 
       override type ~ = Ɛ.~
 
-      // TODO: nothing's being overridden: simplify these. OR sort them out properly!
-      override type x[S <: ~, T <: ~] = (S, T) with ~
-      override type >[S <: ~, T <: ~] = (S => T) with ~
-
       override type UNIT = Ɛ.UNIT
       override type DOT[X <: ~] = Automorphism[X]
       override type ARROW[S <: ~, T <: ~] = AutomorphismArrow[S, T]

@@ -15,8 +15,8 @@ trait BaseTopos { self: LogicalOperations =>
   type DOT[S <: ~] <: Dot[S]
   type ARROW[S <: ~, T <: ~] <: Arrow[S, T]
 
-  type >[T <: ~, U <: ~] <: (T => U) with ~
-  type x[T <: ~, U <: ~] <: (T, U) with ~
+  type >[T <: ~, U <: ~] = (T => U) with ~
+  type x[T <: ~, U <: ~] = (T, U) with ~
 
   type UNIT <: ~
   val I : DOT[UNIT]

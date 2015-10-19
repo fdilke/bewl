@@ -26,8 +26,6 @@ object ElementalToposLayer {
       lazy val I: DOT[UNIT] = makeDot(Δ.I).asInstanceOf[DOT[UNIT]]
 
       override type TRUTH = AdapterTruth
-      type >[T <: ~, U <: ~] = (T => U) with ~
-      type x[T <: ~, U <: ~] = (T, U) with ~
 
       override lazy val omega = makeDot(Δ.omega).asInstanceOf[DOT[TRUTH]]
       override lazy val truth = makeArrow(Δ.truth).asInstanceOf[ARROW[UNIT, TRUTH]]
