@@ -8,7 +8,12 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
   Ɛ: AlgebraicStructures with AlgebraicMachinery =>
 
   object ToposOfAutomorphisms {
-    lazy val topos: Topos = new ToposOfAutomorphisms
+    lazy val build: Topos with Wrappings[
+      Ɛ.~,
+      ({type λ[X <: Ɛ.~] = Ɛ.ARROW[X, X]})#λ,
+      ({type λ[X <: Ɛ.~, Y <: Ɛ.~] = AutomorphismPreArrow[X, Y]})#λ
+    ] =
+      new ToposOfAutomorphisms
 
     case class AutomorphismPreArrow[
       S <: Ɛ.~,

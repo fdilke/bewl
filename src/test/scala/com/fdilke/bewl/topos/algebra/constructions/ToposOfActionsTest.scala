@@ -91,7 +91,7 @@ class ToposOfActionsTest extends GenericToposTests(new ToposWithFixtures {
 
   describe("The Boolean property") {
     ignore("fails") { // too slow :( :( :(
-      topos should not be ('boolean)
+      topos should not be 'boolean
     }
   }
 
@@ -101,9 +101,9 @@ class ToposOfActionsTest extends GenericToposTests(new ToposWithFixtures {
     }
 
     it("works on the fixtures") {
-      foo.globals should have size 0
-      bar.globals should have size 0
-      baz.globals should have size 0
+      foo.globals shouldBe 'empty
+      bar.globals shouldBe 'empty
+      baz.globals shouldBe 'empty
     }
   }
 
