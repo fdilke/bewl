@@ -535,8 +535,8 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
 
         override def makeDot[
           T <: Ɛ.~
-        ](input: Action[T]): DOT[WRAPPER[T]] =
-        memoizedDotWrapper(input)
+        ](predot: Action[T]): DOT[WRAPPER[T]] =
+        memoizedDotWrapper(predot)
 
         override def makeArrow[
           S <: Ɛ.~,

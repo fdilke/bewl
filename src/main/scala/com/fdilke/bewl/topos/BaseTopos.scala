@@ -388,8 +388,8 @@ trait BaseTopos { self: LogicalOperations =>
 trait Wrappings[BASE, PREDOT[_ <: BASE], PREARROW[_ <: BASE, _ <: BASE]] { topos: BaseTopos =>
   type WRAPPER[T <: BASE] <: ~
 
-  def makeDot[T <: BASE](input: PREDOT[T]) : DOT[WRAPPER[T]]
-  def makeArrow[S <: BASE, T <: BASE](connector: PREARROW[S, T]) : ARROW[WRAPPER[S], WRAPPER[T]]
+  def makeDot[T <: BASE](predot: PREDOT[T]) : DOT[WRAPPER[T]]
+  def makeArrow[S <: BASE, T <: BASE](prearrow: PREARROW[S, T]) : ARROW[WRAPPER[S], WRAPPER[T]]
   def functionAsArrow[S <: BASE, T <: BASE](
     source: DOT[WRAPPER[S]], 
     target: DOT[WRAPPER[T]], 

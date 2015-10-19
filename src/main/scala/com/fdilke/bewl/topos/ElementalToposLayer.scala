@@ -212,11 +212,11 @@ object ElementalToposLayer {
 
       override type WRAPPER[S] = WrappedArrow[S]
 
-      override def makeDot[S](dot: Δ.DOT[S]): DOT[WrappedArrow[S]] =
-        memoizedWrappedDot(dot)
+      override def makeDot[S](predot: Δ.DOT[S]): DOT[WrappedArrow[S]] =
+        memoizedWrappedDot(predot)
 
-      override def makeArrow[S, T](arrow: Δ.ARROW[S, T]): ARROW[WRAPPER[S], WRAPPER[T]] =
-        AdapterArrow.fromArrow(makeDot(arrow.source), makeDot(arrow.target), arrow)
+      override def makeArrow[S, T](prearrow: Δ.ARROW[S, T]): ARROW[WRAPPER[S], WRAPPER[T]] =
+        AdapterArrow.fromArrow(makeDot(prearrow.source), makeDot(prearrow.target), prearrow)
 
       override def functionAsArrow[S, T](
         source: DOT[WrappedArrow[S]],

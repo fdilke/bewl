@@ -135,8 +135,8 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreAr
   override def makeArrow[S, T](prearrow: FiniteSetsPreArrow[S, T]) =
     makeDot(prearrow.source)(makeDot(prearrow.target))(prearrow.function)
 
-  override def makeDot[T](input: Traversable[T]) =
-    memoizedDotWrapper(input)
+  override def makeDot[T](predot: Traversable[T]) =
+    memoizedDotWrapper(predot)
 
   // unusually simple generic definition for this topos because WRAPPER is trivial
   override def bifunctionAsBiArrow[L, R, T](
