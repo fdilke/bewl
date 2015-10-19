@@ -523,20 +523,20 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
         ] = VanillaWrapper[T]
 
         private val memoizedDotWrapper =
-        Memoize.generic withLowerBound[
-        ({
-          type λ[T <: Ɛ.~] = Action[T]
-        })#λ,
-        ({
-          type λ[T <: Ɛ.~] = DOT[WRAPPER[T]]
-        })#λ,
-        Ɛ.~
-        ] ActionDot.wrap
+          Memoize.generic withLowerBound[
+          ({
+            type λ[T <: Ɛ.~] = Action[T]
+          })#λ,
+          ({
+            type λ[T <: Ɛ.~] = DOT[WRAPPER[T]]
+          })#λ,
+            Ɛ.~
+          ] ActionDot.wrap
 
         override def makeDot[
           T <: Ɛ.~
         ](predot: Action[T]): DOT[WRAPPER[T]] =
-        memoizedDotWrapper(predot)
+          memoizedDotWrapper(predot)
 
         override def makeArrow[
           S <: Ɛ.~,

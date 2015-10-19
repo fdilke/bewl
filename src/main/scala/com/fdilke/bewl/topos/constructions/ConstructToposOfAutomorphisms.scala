@@ -10,12 +10,20 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
   object ToposOfAutomorphisms {
     lazy val topos: Topos = new ToposOfAutomorphisms
 
+    case class AutomorphismPreArrow[
+      S <: Ɛ.~,
+      T <: Ɛ.~
+    ](
+      source: ARROW[S, S],
+      target: ARROW[T, T],
+      arrow:  ARROW[S, T]
+    )
 
-    class ToposOfAutomorphisms extends Topos /* with Wrappings[
+    class ToposOfAutomorphisms extends Topos with Wrappings[
         Ɛ.~,
-        ({type λ[X <: Ɛ.~] = monoid.Action[X]})#λ,
-        ({type λ[X <: Ɛ.~, Y <: Ɛ.~] = monoid.ActionPreArrow[X, Y]})#λ
-    ] */ {
+        ({type λ[X <: Ɛ.~] = Ɛ.ARROW[X, X]})#λ,
+        ({type λ[X <: Ɛ.~, Y <: Ɛ.~] = AutomorphismPreArrow[X, Y]})#λ
+    ] {
 
       override type ~ = Ɛ.~
 
@@ -63,6 +71,43 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
         override def o[R <: ~](that: ARROW[R, S]): ARROW[R, T] = ???
         override val chi: ARROW[T, TRUTH] = ???
       }
+
+      override type WRAPPER[T <: Ɛ.~] = T
+
+      override def functionAsArrow[
+        S <: ~,
+        T <: ~
+      ] (
+        source: Automorphism[S],
+        target: Automorphism[T],
+        f: S => T
+      ): AutomorphismArrow[S, T] =
+        ???
+
+      override def makeArrow[
+        S <: ~,
+        T <: ~
+      ] (
+        prearrow: AutomorphismPreArrow[S, T]
+      ): AutomorphismArrow[S, T] = ???
+
+      override def makeDot[
+        T <: ~
+      ] (
+        predot: Ɛ.ARROW[T, T]
+      ): Automorphism[T] =
+        ???
+
+      override def bifunctionAsBiArrow[
+        L <: ~,
+        R <: ~,
+        T <: ~
+      ] (
+        left: Automorphism[L],
+        right: Automorphism[R],
+        target: Automorphism[T])(bifunc: (L, R) => T
+      ): BiArrow[L, R, T] =
+        ???
     }
   }
 }
