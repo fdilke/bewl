@@ -15,7 +15,8 @@ Here's a presentation about Bewl's [universal algebra capabilities](https://gith
 
 This [animated video](http://www.youtube.com/watch/?v=nUwjGBHXKYs) was an initial attempt to explain Bewl (back when it was called Bile)
 
-To see the current to-do list and state of play, you can view this [Trello board](https://trello.com/b/PfdnsRNl/bewl)  
+To see the current to-do list and state of play, you can view this [Trello board](https://trello.com/b/PfdnsRNl/bewl). There's also a 
+[continuous integration setup](https://snap-ci.com/fdilke/bewl/branch/master) which runs all the tests on each commit.
 
 # Intended applications
 
