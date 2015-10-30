@@ -1,6 +1,6 @@
 package com.fdilke.bewl.topos.constructions
 
-import com.fdilke.bewl.helper.{Memoize, ↔}
+import com.fdilke.bewl.helper.Memoize
 import com.fdilke.bewl.topos._
 import com.fdilke.bewl.topos.algebra.{AlgebraicMachinery, AlgebraicStructures}
 
@@ -63,7 +63,6 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
             throw new IllegalArgumentException("Incorrect inverse")
         }
 
-        override def `>Uncached`[Y <: ~](that: DOT[Y]): EXPONENTIAL[X, Y] = ???
         override def apply[Y <: ~](target: DOT[Y])(f: X => Y): ARROW[X, Y] =
           AutomorphismArrow(automorphism, target, carrier(target.carrier)(f))
         override def xUncached[Y <: ~](that: DOT[Y]): BIPRODUCT[X, Y] = {
@@ -77,6 +76,34 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
             override def pair(l: X, r: Y): x[X, Y] = productCarrier.pair(l, r)
           }
         }
+        override def `>Uncached`[Y <: ~](that: DOT[Y]): EXPONENTIAL[X, Y] = {
+          val exponentialCarrier = carrier > that.carrier
+          new Automorphism(
+            exponentialCarrier.transpose(exponentialCarrier) {
+              (e, x) => that.arrow(e(inverse(x)))
+            },
+            exponentialCarrier.transpose(exponentialCarrier) {
+              (e, x) => that.inverse(e(arrow(x)))
+            }
+          ) with ExponentialDot[X, Y, X > Y] {
+            exponentialAutomorphism =>
+
+            override val source = automorphism
+            override val target = that
+            override def transpose[R <: ~](biArrow: BiArrow[R, X, Y]): ARROW[R, X > Y] = 
+              AutomorphismArrow(
+                biArrow.product.left,
+                exponentialAutomorphism,
+                exponentialCarrier.transpose(
+                  (biArrow.product.left.carrier x biArrow.product.right.carrier).biArrow(
+                    biArrow.arrow.arrow.target
+                  ){ 
+                    biArrow(_, _) 
+                  }
+                )
+              )
+          }
+        }
         override val globals: Traversable[ARROW[UNIT, X]] =
           (Ɛ.I >> carrier) filter { global =>
             (arrow o global) == global
@@ -88,7 +115,7 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
       case class AutomorphismArrow[S <: ~, T <: ~](
         override val source: DOT[S],
         override val target: DOT[T],
-        private val arrow: Ɛ.ARROW[S, T]
+        private[ToposOfAutomorphisms] val arrow: Ɛ.ARROW[S, T]
      ) extends Arrow[S, T] {
         override def \[U <: ~](monic: ARROW[U, T]): ARROW[S, U] = ???
         override def sanityTest: Unit = {
@@ -99,7 +126,7 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
             throw new IllegalArgumentException("Arrow does not respect automorphisms")
         }
         override def ?=(that: ARROW[S, T]): EQUALIZER[S] = ???
-        override def apply(s: S) : T = ???
+        override def apply(s: S) : T = arrow(s)
         override def o[R <: ~](that: ARROW[R, S]): ARROW[R, T] =
           AutomorphismArrow(that.source, target, arrow o that.arrow)
         override lazy val chi: ARROW[T, TRUTH] =
@@ -128,12 +155,25 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
         prearrow: AutomorphismPreArrow[S, T]
       ): AutomorphismArrow[S, T] = ???
 
+      private val memoizedDotWrapper =
+        Memoize.generic withLowerBound[
+        ({
+          type λ[T <: Ɛ.~] = Ɛ.ARROW[T, T]
+        })#λ,
+        ({
+          type λ[T <: Ɛ.~] = Automorphism[T]
+        })#λ,
+          Ɛ.~
+        ] { predot =>
+          Automorphism(predot, predot.inverse)
+        }
+
       override def makeDot[
         T <: ~
       ] (
         predot: Ɛ.ARROW[T, T]
       ): Automorphism[T] = // TODO: memoize AND check iso
-        Automorphism(predot, predot.inverse)
+        memoizedDotWrapper(predot)
 
       override def bifunctionAsBiArrow[
         L <: ~,

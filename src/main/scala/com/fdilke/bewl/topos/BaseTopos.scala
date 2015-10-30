@@ -68,9 +68,9 @@ trait BaseTopos { self: LogicalOperations =>
       BiArrow(hackedThis, hackedThis(target) (
         tupled[L,R,T](bifunc)
       ))
-      final def universally[T <: ~](target: DOT[T])(bifunc: ((L x R), T) => TRUTH) =
+      final def universally[T <: ~](target: DOT[T])(bifunc: (L x R, T) => TRUTH) =
         BiArrow(hackedThis, hackedThis.forAll(target)(bifunc))
-      final def existentially[T <: ~](target: DOT[T])(bifunc: ((L x R), T) => TRUTH) =
+      final def existentially[T <: ~](target: DOT[T])(bifunc: (L x R, T) => TRUTH) =
         BiArrow(hackedThis, hackedThis.exists(target)(bifunc))
     }
 

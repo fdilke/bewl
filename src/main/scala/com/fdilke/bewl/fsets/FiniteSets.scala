@@ -23,6 +23,16 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreAr
         new FiniteSetsArrow(I, this, (_: UNIT) => s)
       }
 
+    override def xUncached[T <: ~](that: DOT[T]) =
+      new FiniteSetsDot[S x T](
+        for(s <- this.elements ; t <- that.elements)
+          yield (s, t)
+      ) with BiproductDot[S, T, S x T] {
+        override val left: DOT[S] = self
+        override val right: DOT[T] = that
+        override def pair(l: S, r: T): x[S, T] = (l, r)
+      }
+
     override def `>Uncached`[T <: ~](that: FiniteSetsDot[T]) = {
       // println(s"exponentiating: ${that.elements.size} ^ ${this.elements.size}")
       case class FunctionElement(function: S => T) extends (S => T) {
@@ -44,16 +54,6 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreAr
             r => FunctionElement {
               s => biArrow(r, s)
             }}}}
-
-    override def xUncached[T <: ~](that: DOT[T]) =
-      new FiniteSetsDot[S x T](
-        for(s <- this.elements ; t <- that.elements)
-        yield (s, t)
-      ) with BiproductDot[S, T, S x T] {
-        override val left: DOT[S] = self
-        override val right: DOT[T] = that
-        override def pair(l: S, r: T): x[S, T] = (l, r)
-      }
 
     override def apply[T <: ~](target: DOT[T])(f: S => T) =
       new FiniteSetsArrow(this, target, f)
