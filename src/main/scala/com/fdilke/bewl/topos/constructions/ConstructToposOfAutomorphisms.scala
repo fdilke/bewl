@@ -85,9 +85,7 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
             exponentialCarrier.transpose(exponentialCarrier) {
               (e, x) => that.inverse(e(arrow(x)))
             }
-          ) with ExponentialDot[X, Y, X > Y] {
-            exponentialAutomorphism =>
-
+          ) with ExponentialDot[X, Y, X > Y] { exponentialAutomorphism =>
             override val source = automorphism
             override val target = that
             override def transpose[R <: ~](biArrow: BiArrow[R, X, Y]): ARROW[R, X > Y] = 
@@ -125,7 +123,21 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
           if ((arrow o source.arrow) != (target.arrow o arrow))
             throw new IllegalArgumentException("Arrow does not respect automorphisms")
         }
-        override def ?=(that: ARROW[S, T]): EQUALIZER[S] = ???
+        override def ?=(that: ARROW[S, T]): EQUALIZER[S] = {
+          val equalizerCarrier = this.arrow ?= that.arrow
+          val equalizerArrow = (source.arrow o equalizerCarrier.inclusion) \ (equalizerCarrier.inclusion)
+          val equalizerInverse = (source.inverse o equalizerCarrier.inclusion) \ (equalizerCarrier.inclusion)
+          new Automorphism[S](
+            equalizerArrow, 
+            equalizerInverse
+          ) with EqualizingDot[S] { equalizer =>
+            override val equalizerTarget: DOT[S] = source
+            override val inclusion: ARROW[S, S] = 
+              equalizer(source){ s => s } // TODO: _ ? Build in as default?
+            override def restrict[R <: ~](anArrow: ARROW[R, S]): ARROW[R, S] = 
+              AutomorphismArrow(anArrow.source, equalizer, equalizerCarrier.restrict(anArrow.arrow))
+          }
+        }
         override def apply(s: S) : T = arrow(s)
         override def o[R <: ~](that: ARROW[R, S]): ARROW[R, T] =
           AutomorphismArrow(that.source, target, arrow o that.arrow)
