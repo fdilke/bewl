@@ -1,10 +1,9 @@
 # Project Bewl
 
-A DSL for the internal (Mitchell-Benabou) language of a topos.
+A DSL for the internal (Mitchell-Benabou) language of a topos. See [this presentation](https://www.evernote.com/shard/s141/sh/8e6b9d94-bc20-4fde-b2bf-9e844f486f76/d11244bad0729071fa00d19eaad312ce)
 
-See [this presentation](https://www.evernote.com/shard/s141/sh/8e6b9d94-bc20-4fde-b2bf-9e844f486f76/d11244bad0729071fa00d19eaad312ce)
-
-I've implemented this in Java, Clojure and now Scala. Really it should be in Haskell (or Idris) but I am only partway through
+I've had to keep re-implementing Bewl in successively more powerful programming languages (Java, Clojure and now Scala). 
+Really it should be in Haskell or Idris but I am only partway through
 [learning the language](http://learnyouahaskell.com)
 
 [This presentation](http://prezi.com/dwrz2mft3y-g/?utm_campaign=share&utm_medium=copy&rc=ex0share) explains the new "intrinsic" Bewl 2.0 DSL and why it's
@@ -15,6 +14,8 @@ If you want to use Bewl as a learning aid to study category theory, [start here]
 Here's a presentation about Bewl's [universal algebra capabilities](https://github.com/fdilke/bewl/blob/master/notes/BewlUniversalAlgebra.pdf).
 
 This [animated video](http://www.youtube.com/watch/?v=nUwjGBHXKYs) was an initial attempt to explain Bewl (back when it was called Bile)
+
+To see the current to-do list and state of play, you can view this [Trello board](https://trello.com/b/PfdnsRNl/bewl)  
 
 # Intended applications
 
