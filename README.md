@@ -13,6 +13,9 @@ If you want to use Bewl as a learning aid to study category theory, [start here]
 
 Here's a presentation about Bewl's [universal algebra capabilities](https://github.com/fdilke/bewl/blob/master/notes/BewlUniversalAlgebra.pdf).
 
+And here's one about the [topos of automorphisms](https://github.com/fdilke/bewl/blob/master/notes/ToposOfAutomorphisms.pdf), 
+another chapter in the ongoing quest for a decent explanation of permutation parity.
+
 This [animated video](http://www.youtube.com/watch/?v=nUwjGBHXKYs) was an initial attempt to explain Bewl (back when it was called Bile)
 
 To see the current to-do list and state of play, you can view this [Trello board](https://trello.com/b/PfdnsRNl/bewl). There's also a 
