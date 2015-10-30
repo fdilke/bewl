@@ -5,7 +5,7 @@ import com.fdilke.bewl.topos.{GenericToposTests, ToposWithFixtures}
 
 import scala.Function._
 
-abstract class ToposOfAutomorphismsTest extends GenericToposTests(new ToposWithFixtures {
+class ToposOfAutomorphismsTest extends GenericToposTests(new ToposWithFixtures {
 
   override val topos = FiniteSets.ToposOfAutomorphisms.build
 
