@@ -135,9 +135,11 @@ trait BaseTopos { self: LogicalOperations =>
     final lazy val ∀ = toTrue.name.chi
     final lazy val squared = dot x dot
 
-    final def map(f: S => S) = dot(dot)(f)
-    final def flatMap(f2: S => ARROW[S, S]) =
-      (this x this).biArrow(this) { f2(_)(_) }
+    final def map(f: S => S) = dot(dot) { f }
+    final def flatMap(bifunc: S => ARROW[S, S]) =
+      (this x this).biArrow(this) {
+        bifunc(_)(_)
+      }
 
     final lazy val ∃ =
       power.forAll(omega) { (f, w) =>
@@ -258,13 +260,14 @@ trait BaseTopos { self: LogicalOperations =>
     final lazy val name =
       (source > target).transpose(I) {
           (i, x) => this(x)
-        }
+      }
 
     final def x[U <: ~](that: ARROW[S, U]): ARROW[S, T x U] = {
       val product = target x that.target
       source(product) {
         s => product.pair(this(s), that(s))
-      }}
+      }
+    }
 
     final def toBool(implicit eq: =:=[T, TRUTH]): Boolean =
       this == source.toTrue
