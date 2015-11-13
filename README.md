@@ -63,4 +63,5 @@ To see the current to-do list and state of play, you can view this [Trello board
 - coequalizers
 - tell if an object has an injective hull
 - Optimize algorithm enough to construct triadic topos and its topologies
-
+- Construct the slice topos. Use McLarty's construction, NOT the one in Moerdijk/Maclane which
+requires you to first construct the power object for exponentials

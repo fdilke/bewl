@@ -88,8 +88,6 @@ Potentially enables a typesafe version of the (existing horrible) quiver code
 # Possible DSL extensions
   Better to throw an exception if the function is ever called?
   Should we have ELEMENT\[X\] instead of ELEMENT? in the mapping functions, for example?
-  Require OmegaElement as a "convenience" trait for truth values
-  For next DSL: 'metatypes' which include stars, elements and any special constructions
 
 # Rewrapping: a rejected idea
 
@@ -146,4 +144,5 @@ Evaluation contexts: An EC keeps track of a multiproduct in a recursive typesafe
 - include optional "preassignment" symbol defs in an algebraic theory (e.g. II=x for monoids)
 - TDD a NonNaiveMonoids
 - sort out realRoot
+
 
