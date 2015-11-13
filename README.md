@@ -3,8 +3,7 @@
 A DSL for the internal (Mitchell-Benabou) language of a topos. See [this presentation](https://www.evernote.com/shard/s141/sh/8e6b9d94-bc20-4fde-b2bf-9e844f486f76/d11244bad0729071fa00d19eaad312ce)
 
 I've had to keep re-implementing Bewl in successively more powerful programming languages (Java, Clojure and now Scala). 
-Really it should be in Haskell or Idris but I am only partway through
-[learning the language](http://learnyouahaskell.com)
+Really it should be in Haskell or Idris but I'm not ready for those yet.
 
 [This presentation](http://prezi.com/dwrz2mft3y-g/?utm_campaign=share&utm_medium=copy&rc=ex0share) explains the new "intrinsic" Bewl 2.0 DSL and why it's
  better than the previous "diagrammatic" 1.0 one.
@@ -25,7 +24,7 @@ To see the current to-do list and state of play, you can view this [Trello board
 
 - Explore the topos of graphs. Bewl will let us talk about graphs as if they were sets
 - Explore fuzzy sets (using the more careful definition that makes them into a topos)
-- Explore parity in other topoi (as it's so poorly understood for sets). This will be possible when the
+- Explore parity in other topoi (as it's so poorly understood for sets). Easier now that the
 "topos of permutations" is implemented.
 - Explore Lawvere-Tierney topologies (and perhaps save [these](http://www.math.uchicago.edu/~may/VIGRE/VIGRE2007/REUPapers/FINALFULL/Bartlett.pdf) 
 [poor](http://user.cs.tu-berlin.de/~noll/ToposOfTriads.pdf) music theorists from having to calculate them by hand)
@@ -51,15 +50,17 @@ To see the current to-do list and state of play, you can view this [Trello board
 - predicates isMonic, isEpic, isIso
 - enumerate morphisms / global elements
 - Partial arrow classifier
-- walkthrough for using Bewl as a learning aid for studying categpry theory
+- walkthrough for using Bewl as a learning aid for studying category theory
 - universal algebra: can define algebraic structures, using existing ones as parameter spaces (for monoid actions)
+- implemented topos of automorphisms
 
 # To do
 
 - Define more algebraic structures
 - Can extend and remap algebraic structures, e.g. ring extends abelian group remaps group with an extra law
-- Formalize constructions like: automorphism group, endomorphism ring, group of invertible elements of a monoid
+- More algebraic constructions: endomorphism ring, transfer
 - Extract the Heyting algebra structure of the subobject classifier
 - coequalizers
+- tell if an object has an injective hull
 - Optimize algorithm enough to construct triadic topos and its topologies
 
