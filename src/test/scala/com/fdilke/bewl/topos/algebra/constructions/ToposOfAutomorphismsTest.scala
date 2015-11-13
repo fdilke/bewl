@@ -4,6 +4,7 @@ import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsPreArrow}
 import com.fdilke.bewl.topos.{GenericToposTests, ToposWithFixtures}
 
 import scala.Function._
+import org.scalatest.Matchers._
 
 class ToposOfAutomorphismsTest extends GenericToposTests(new ToposWithFixtures {
 
@@ -67,5 +68,39 @@ class ToposOfAutomorphismsTest extends GenericToposTests(new ToposWithFixtures {
     monicBar2baz o foo2bar
   )
 }) {
-  // TODO: add tests for booleanness, globals
+  import fixtures._
+
+  describe("The Boolean property") {
+    it("holds") { // too slow :( :( :(
+      topos shouldBe 'boolean
+    }
+  }
+
+  import topos._
+
+  describe("Global element enumeration") {
+    it("works on the built-ins") {
+      omega.globals should have size 2
+    }
+
+    it("works on the fixtures") {
+      foo.globals shouldBe 'empty
+      bar.globals shouldBe 'empty
+      baz.globals should have size 2
+    }
+  }
+
+  describe("Arrow enumeration") {
+    it("also works on the fixtures") {
+      (omega >> omega) should have size 4
+    }
+
+    it("confirms our intuitions") {
+      foo >> foo should have size 16
+      foo >> bar should have size 4
+      foo >> baz should have size 16
+
+      (foo >> (omega > omega)) should have size 16
+    }
+  }
 }
