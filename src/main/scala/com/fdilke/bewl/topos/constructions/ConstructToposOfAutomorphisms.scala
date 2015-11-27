@@ -85,10 +85,10 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
             exponentialCarrier.transpose(exponentialCarrier) {
               (e, x) => that.inverse(e(arrow(x)))
             }
-          ) with ExponentialDot[X, Y, X > Y] { exponentialAutomorphism =>
+          ) with ExponentialDot[X, Y, X → Y] { exponentialAutomorphism =>
             override val source = automorphism
             override val target = that
-            override def transpose[R <: ~](biArrow: BiArrow[R, X, Y]): ARROW[R, X > Y] = 
+            override def transpose[R <: ~](biArrow: BiArrow[R, X, Y]): ARROW[R, X → Y] =
               AutomorphismArrow(
                 biArrow.product.left,
                 exponentialAutomorphism,

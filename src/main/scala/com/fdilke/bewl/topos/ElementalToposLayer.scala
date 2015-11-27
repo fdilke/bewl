@@ -1,6 +1,7 @@
 package com.fdilke.bewl.topos
 
 import com.fdilke.bewl.diagrammatic.BaseDiagrammaticTopos
+import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.helper.Memoize
 
 object ElementalToposLayer {
@@ -64,7 +65,7 @@ object ElementalToposLayer {
           }
 
         override def `>Uncached`[U <: ~](that: DOT[U]) =
-          new AdapterDot[T > U] with ExponentialDot[T, U, T > U] { exponentialAdapter =>
+          new AdapterDot[T → U] with ExponentialDot[T, U, T → U] { exponentialAdapter =>
             override val source = self
             override val target = that
 

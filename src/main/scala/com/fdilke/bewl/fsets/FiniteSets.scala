@@ -43,9 +43,9 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreAr
         override def hashCode = 0
         def apply(s: S): T = function(s)
       }
-      new FiniteSetsDot[S > T](
+      new FiniteSetsDot[S → T](
         allMaps(self.elements, that.elements).map { FunctionElement } // TODO: coalesce
-      ) with ExponentialDot[S, T, S > T] { exponentialDot =>
+      ) with ExponentialDot[S, T, S → T] { exponentialDot =>
         override val source: DOT[S] = self
         override val target: DOT[T] = that
 

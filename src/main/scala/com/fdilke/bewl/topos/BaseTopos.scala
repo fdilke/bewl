@@ -16,7 +16,7 @@ trait BaseTopos { self: LogicalOperations =>
   type DOT[S <: ~] <: Dot[S]
   type ARROW[S <: ~, T <: ~] <: Arrow[S, T]
 
-  type >[T <: ~, U <: ~] = (T => U) with ~
+  type →[T <: ~, U <: ~] = (T => U) with ~
   type x[T <: ~, U <: ~] = (T, U) with ~
 
   type UNIT <: ~
@@ -33,7 +33,7 @@ trait BaseTopos { self: LogicalOperations =>
     def v(that: TRUTH) = or(truthValue, that)
   }
 
-  type EXPONENTIAL[S <: ~, T <: ~] = ExponentialDot[S, T, S > T] with DOT[S > T]
+  type EXPONENTIAL[S <: ~, T <: ~] = ExponentialDot[S, T, S → T] with DOT[S → T]
   trait ExponentialDot[S <: ~, T <: ~, S_T <: (S => T) with ~] { dot: DOT[S_T] =>
     val source: DOT[S]
     val target: DOT[T]
@@ -201,7 +201,7 @@ trait BaseTopos { self: LogicalOperations =>
     final lazy val =?= : BiArrow[S, S, TRUTH] =
       BiArrow(squared, diagonal.chi)
 
-    final lazy val singleton: ARROW[S, S > TRUTH] =
+    final lazy val singleton: ARROW[S, S → TRUTH] =
       power transpose =?=
 
     final def >>[T <: ~](

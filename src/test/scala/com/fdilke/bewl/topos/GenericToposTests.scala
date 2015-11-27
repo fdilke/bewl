@@ -13,7 +13,7 @@ abstract class ToposFixtureSanityTests[T <: BaseTopos](fixtures: ToposWithFixtur
 
       objects should have size 3
 
-      objects map { _.sanityTest }
+      objects foreach { _.sanityTest }
     }
 
     it("include sane arrows whose sources and targets match their names") {
@@ -198,7 +198,7 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
       evaluation.arrow.target shouldBe baz
       evaluation.arrow.sanityTest
 
-      val foo2bar2baz: ARROW[FOO, BAR > BAZ] = (bar > baz).transpose(foobar2baz)
+      val foo2bar2baz: ARROW[FOO, BAR → BAZ] = (bar > baz).transpose(foobar2baz)
       foo2bar2baz.sanityTest
       foo2bar2baz should have(
         'source(foo),

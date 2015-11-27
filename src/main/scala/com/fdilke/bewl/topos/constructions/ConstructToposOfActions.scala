@@ -60,10 +60,10 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
           B <: Ɛ.~,
           BB <: ~
         ](
-          ma2b: Ɛ.>[Ɛ.x[M, A], B],
+          ma2b: Ɛ.→[Ɛ.x[M, A], B],
           aa2bb: AA => BB
         ) extends (AA => BB) with ElementWrapper[
-          Ɛ.>[Ɛ.x[M, A], B]
+          Ɛ.→[Ɛ.x[M, A], B]
         ] {
           def apply(aa: AA): BB = aa2bb(aa)
           override val element = ma2b
@@ -75,7 +75,7 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
         override type ARROW[AA <: ~, BB <: ~] = ActionArrowFacade[AA, BB]
         override type UNIT = VanillaWrapper[Ɛ.UNIT]
 
-        type IDEAL = Ɛ.>[M, Ɛ.TRUTH]
+        type IDEAL = Ɛ.→[M, Ɛ.TRUTH]
         override type TRUTH = VanillaWrapper[IDEAL]
         override val I: ActionDot[Ɛ.UNIT, UNIT] = ActionDot(Ɛ.I) { (i, m) => i }
 
@@ -148,10 +148,10 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
           ](
             source: ActionDot[R, RR],
             target: ActionDot[T, TT],
-            morphisms: Ɛ.EQUALIZER[Ɛ.>[Ɛ.x[M, R], T]],
+            morphisms: Ɛ.EQUALIZER[Ɛ.→[Ɛ.x[M, R], T]],
             possibleMorphisms: Ɛ.EXPONENTIAL[Ɛ.x[M, R], T],
             exponentialDot: ActionDot[
-              Ɛ.>[Ɛ.x[M, R], T],
+              Ɛ.→[Ɛ.x[M, R], T],
               ExponentialWrapper[R, RR, T, TT]
             ],
             biArrow: BiArrow[AA, RR, TT]
@@ -246,7 +246,7 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
             val mXz = pre.pairs
             val possibleMorphisms = mXz > action.actionCarrier
 
-            type P = Ɛ.>[Ɛ.x[M, Z], A]
+            type P = Ɛ.→[Ɛ.x[M, Z], A]
 
             val morphisms: Ɛ.EQUALIZER[P] =
               possibleMorphisms.forAll(carrier, carrier, pre.action.actionCarrier) {
@@ -305,15 +305,15 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
           ](
             source: ActionDot[R, RR],
             target: ActionDot[T, TT],
-            morphisms: Ɛ.EQUALIZER[Ɛ.>[Ɛ.x[M, R], T]],
+            morphisms: Ɛ.EQUALIZER[Ɛ.→[Ɛ.x[M, R], T]],
             possibleMorphisms: Ɛ.EXPONENTIAL[Ɛ.x[M, R], T],
             exponentialDot: ActionDot[
-              Ɛ.>[Ɛ.x[M, R], T],
+              Ɛ.→[Ɛ.x[M, R], T],
               ExponentialWrapper[R, RR, T, TT]
             ],
             biArrow: BiArrow[AA, RR, TT]
           ): ARROW[AA, ExponentialWrapper[R, RR, T, TT]] = {
-            type P = Ɛ.>[Ɛ.x[M, R], T]
+            type P = Ɛ.→[Ɛ.x[M, R], T]
             val innerArrow: Ɛ.ARROW[A, P] =
               morphisms.restrict(possibleMorphisms.transpose(action.actionCarrier) {
                 case (a, (m, r)) =>
