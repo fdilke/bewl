@@ -18,7 +18,7 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreAr
     extends Dot[S] { self =>
     override lazy val toI = this(I) { _ => () }
 
-    override lazy val globals: Traversable[>[UNIT, S]] =
+    override lazy val globals: Traversable[UNIT > S] =
       elements map { s =>
         new FiniteSetsArrow(I, this, (_: UNIT) => s)
       }
@@ -71,7 +71,7 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreAr
     val target: FiniteSetsDot[T],
     private[FiniteSets] val function: S => T
   ) extends Arrow[S, T] { self =>
-    override def \[U <: ~](monic: >[U, T]) =
+    override def \[U <: ~](monic: U > T) =
       source(monic.source) { s =>
         val quarry: T = function(s)
         monic.source.elements.find { u =>
@@ -83,48 +83,50 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreAr
       if (!source.elements.map(function).forall(x => target.elements.exists(_ == x))) {
         throw new IllegalArgumentException("Map values not in target")
       }
-    override def ?=(that: >[S, T]) =
+    override def ?=(that: S > T) =
       new FiniteSetsDot[S] (
         source.elements.filter { s => function(s) == that.function(s) }
       ) with EqualizingDot[S] { equalizer =>
         override val equalizerTarget = source
-        override def restrict[R](subdot: >[R, S]) =
+        override def restrict[R](subdot: R > S) =
           subdot.source(this) { subdot(_) }
-        override val inclusion: >[S, S] = 
+        override val inclusion: S > S =
           equalizer(source) { s => s }
       }
 
     override def apply(s: S) =
       function(s)
 
-    override def o[R <: ~](that: >[R, S]) =
+    override def o[R <: ~](that: R > S) =
       that.source(target)(function compose that.function)
 
     override lazy val chi =
       target(omega) { t =>
-        source.elements.exists { s =>
-          this(s) == t
+        source.elements.exists {
+          this(_) == t
       }}
 
     override def equals(other: Any): Boolean = other match {
       case that: FiniteSetsArrow[S, T] =>
-        source == that.source && target == that.target &&
-          source.elements.forall(x => function(x) == that.function(x))
+        source == that.source &&
+          target == that.target &&
+          source.elements.forall {
+            x => function(x) == that.function(x)
+          }
       case _ => false
     }
     override def hashCode = 0
 
     override def toString =
       s"FiniteSetsArrow[$source -> $target : ${
-        for(s <- source.elements)
-          yield s -> this(s)
+        source.elements map { this(_) }
       }]"
   }
 
   private val memoizedDotWrapper = {
     def wrap[T](elements: Traversable[T]) =
       new FiniteSetsDot(elements)
-    Memoize.generic(wrap)
+    Memoize generic wrap
   }
 
   override type WRAPPER[T] = T

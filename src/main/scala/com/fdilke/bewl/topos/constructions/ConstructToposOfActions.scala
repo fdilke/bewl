@@ -108,7 +108,7 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
 
         override lazy val omega = Ideals.omega
 
-        override lazy val truth: >[UNIT, TRUTH] =
+        override lazy val truth: UNIT > TRUTH =
           ActionArrow(I, omega,
             Ideals.restrict(Ɛ.I) {
               (i, m) => Ɛ truth i
@@ -138,7 +138,7 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
             pre: ActionDot[Z, ZZ]
           )(
             f: ZZ => AA
-          ): >[ZZ, AA]
+          ): ZZ > AA
 
           def calcTranspose[
             R <: Ɛ.~,
@@ -155,7 +155,7 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
               ExponentialWrapper[R, RR, T, TT]
             ],
             biArrow: BiArrow[AA, RR, TT]
-          ): >[AA, ExponentialWrapper[R, RR, T, TT]]
+          ): AA > ExponentialWrapper[R, RR, T, TT]
 
           def crossPreRestrict[
             Z <: Ɛ.~,
@@ -164,7 +164,7 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
           ](
             source: ActionDot[Z, ZZ],
             restrictedArrow: Ɛ.>[Z, A]
-          ): >[ZZ, AA]
+          ): ZZ > AA
         }
 
         class ActionDot[
@@ -178,7 +178,7 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
           private lazy val pairs: Ɛ.BIPRODUCT[M, A] =
             carrier x action.actionCarrier
 
-          override lazy val globals: Traversable[>[UNIT, AA]] = {
+          override lazy val globals: Traversable[UNIT > AA] = {
             val fixedPoints = action.actionCarrier.forAll(carrier) {
               (a, m) => action.actionCarrier.=?=(
                 a,
@@ -191,7 +191,7 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
             }
           }
 
-          override val toI: >[AA, UNIT] =
+          override val toI: AA > UNIT =
             ActionArrow(this, I, action.actionCarrier.toI)
 
           override def sanityTest = {
@@ -290,7 +290,7 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
 
                 def transpose[RR <: ~](
                   biArrow: BiArrow[RR, ZZ, AA]
-                ): >[RR, ExponentialWrapper[Z, ZZ, A, AA]] =
+                ): RR > ExponentialWrapper[Z, ZZ, A, AA] =
                   biArrow.product.left.calcTranspose[Z, ZZ, A, AA](
                     pre, dot, morphisms, possibleMorphisms, exponentialDot, biArrow
                   )
@@ -312,7 +312,7 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
               ExponentialWrapper[R, RR, T, TT]
             ],
             biArrow: BiArrow[AA, RR, TT]
-          ): >[AA, ExponentialWrapper[R, RR, T, TT]] = {
+          ): AA > ExponentialWrapper[R, RR, T, TT] = {
             type P = Ɛ.→[Ɛ.x[M, R], T]
             val innerArrow: Ɛ.>[A, P] =
               morphisms.restrict(possibleMorphisms.transpose(action.actionCarrier) {
@@ -333,7 +333,7 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
             that: DOT[BB]
           )(
             f: AA => BB
-          ): >[AA, BB] =
+          ): AA > BB =
             that.preApply(this)(f)
 
           override def preApply[
@@ -343,7 +343,7 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
             pre: ActionDot[Z, ZZ]
           )(
             f: ZZ => AA
-          ): >[ZZ, AA] =
+          ): ZZ > AA =
             ActionArrow(pre, dot,
               pre.action.actionCarrier(dot.action.actionCarrier) { z =>
                 dot.↔ \ f(pre.↔ / z)
@@ -356,7 +356,7 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
           ](
             source: ActionDot[Z, ZZ],
             restrictedArrow: Ɛ.>[Z, AAA]
-          ): >[ZZ, AA] =
+          ): ZZ > AA =
             ActionArrow(
               source,
               dot,
@@ -401,7 +401,7 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
             ZZ <: ~
           ](
             pre: ActionArrow[Z, ZZ, B, BB]
-          ): >[ZZ, AA]
+          ): ZZ > AA
 
           def preEqualizer[
             A <: Ɛ.~,
@@ -413,7 +413,7 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
           ](
             equalizingDot: EQUALIZER[BB],
             thunkedEqualizer: Ɛ.EQUALIZER[B]
-          ): >[AA, BB]
+          ): AA > BB
 
           def preCompose[
             B <: Ɛ.~,
@@ -421,7 +421,7 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
             CC <: ~
           ](
             pre: ActionArrow[B, BB, C, CC]
-          ): >[AA, CC]
+          ): AA > CC
         }
 
         case class ActionArrow[
@@ -435,13 +435,13 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
           arrow: Ɛ.>[A, B]
         ) extends ActionArrowFacade[AA, BB] {
 
-          override lazy val chi: >[BB, TRUTH] =
+          override lazy val chi: BB > TRUTH =
             ActionArrow(target, omega,
               Ideals.restrict(target.action.actionCarrier) {
                 (t, m) => arrow.chi(target.action.actionMultiply(t, m))
               })
 
-          override def \[UU <: ~](monic: >[UU, BB]): >[AA, UU] =
+          override def \[UU <: ~](monic: UU > BB): AA > UU =
             monic.preBackDivide(this)
 
           override def preBackDivide[
@@ -450,7 +450,7 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
             ZZ <: ~
           ](
             that: ActionArrow[Z, ZZ, BBB, BB]
-          ): >[ZZ, AA] = {
+          ): ZZ > AA = {
             val hackedThat = that.asInstanceOf[ActionArrow[Z, ZZ, B, BB]]
             ActionArrow(hackedThat.source, source, hackedThat.arrow \ arrow)
           }
@@ -460,7 +460,7 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
             assert(monoid.actions.isMorphism(source.action, target.action, arrow))
           }
 
-          override def ?=(that: >[AA, BB]): EQUALIZER[AA] =
+          override def ?=(that: AA > BB): EQUALIZER[AA] =
             that.preEqualizer[A, B](this)
 
           override def preEqualizer[
@@ -476,9 +476,9 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
             ) with EqualizingDot[AA] { equalizingDot =>
 
               override val equalizerTarget = source
-              override val inclusion: >[AA, AA] = ActionArrow(equalizingDot, source, thunkedEqualizer.inclusion)
+              override val inclusion: AA > AA = ActionArrow(equalizingDot, source, thunkedEqualizer.inclusion)
 
-              override def restrict[RR <: ~](arrow: >[RR, AA]): >[RR, AA] =
+              override def restrict[RR <: ~](arrow: RR > AA): RR > AA =
                 arrow.preRestrict[A](equalizingDot, thunkedEqualizer)
             }
           }
@@ -486,7 +486,7 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
           override def preRestrict[BBB <: Ɛ.~](
             equalizingDot: EQUALIZER[BB],
             thunkedEqualizer: Ɛ.EQUALIZER[BBB]
-          ): >[AA, BB] =
+          ): AA > BB =
             equalizingDot.crossPreRestrict[A, AA, B](
               source,
               thunkedEqualizer.asInstanceOf[Ɛ.EQUALIZER[B]].restrict(arrow)
@@ -494,14 +494,14 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
 
           override def apply(a: AA): BB = target.↔ / arrow(source.↔ \ a)
 
-          override def o[ZZ <: ~](that: >[ZZ, AA]): >[ZZ, BB] =
+          override def o[ZZ <: ~](that: ZZ > AA): ZZ > BB =
             that.preCompose[A, B, BB](this)
 
           override def preCompose[
             BBB <: Ɛ.~,
             C <: Ɛ.~,
             CC <: ~
-          ](pre: ActionArrow[BBB, BB, C, CC]): >[AA, CC] = {
+          ](pre: ActionArrow[BBB, BB, C, CC]): AA > CC = {
             val hackedPre = pre.asInstanceOf[ActionArrow[B, BB, C, CC]]
             ActionArrow(source, hackedPre.target, hackedPre.arrow o arrow)
           }
@@ -556,7 +556,7 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
           source: DOT[WRAPPER[S]],
           target: DOT[WRAPPER[T]],
           f: S => T
-        ): >[WRAPPER[S], WRAPPER[T]] = {
+        ): WRAPPER[S] > WRAPPER[T] = {
           val src = source.asInstanceOf[ActionDot[S, WRAPPER[S]]]
           val tgt = target.asInstanceOf[ActionDot[T, WRAPPER[T]]]
           ActionArrow[S, WRAPPER[S], T, WRAPPER[T]](

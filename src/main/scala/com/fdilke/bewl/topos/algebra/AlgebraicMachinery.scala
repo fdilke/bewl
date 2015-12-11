@@ -10,8 +10,8 @@ class Scalar extends AlgebraicSort
 
 trait AlgebraicMachinery { topos: BaseTopos =>
 
-  type NullaryOp[X <: ~] = >[UNIT, X]
-  type UnaryOp[X <: ~] = >[X, X]
+  type NullaryOp[X <: ~] = UNIT > X
+  type UnaryOp[X <: ~] = X > X
   type BinaryOp[X <: ~] = BiArrow[X, X, X]
   type RightScalarBinaryOp[X <: ~, S <: ~] = BiArrow[X, S, X]
 
@@ -236,7 +236,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     def isMorphism[A <: ~, B <: ~](
       sourceAlgebra: Algebra[A],
       targetAlgebra: Algebra[B],
-      arrow: >[A, B]
+      arrow: A > B
     ): Boolean = {
       if (sourceAlgebra.carrier != arrow.source ||
           targetAlgebra.carrier != arrow.target)
@@ -321,15 +321,15 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       trait EvaluationContext {
         type ROOT <: ~
         def root: DOT[ROOT]
-        def evaluate(term: Term[Principal]): >[ROOT, T]
-        def evaluateScalar(term: Term[Scalar]): >[ROOT, S]
+        def evaluate(term: Term[Principal]): ROOT > T
+        def evaluateScalar(term: Term[Scalar]): ROOT > S
       }
 
       class SimpleEvaluationContext extends EvaluationContext {
         override type ROOT = UNIT
         override def root = I
 
-        override def evaluate(term: Term[Principal]): >[UNIT, T] =
+        override def evaluate(term: Term[Principal]): UNIT > T =
           term match {
             case term: PrincipalConstant =>
               operatorAssignments.lookup(term).map { constant =>
@@ -341,7 +341,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
               throw new IllegalArgumentException("No variables available for principal term: " + term)
           }
 
-        override def evaluateScalar(term: Term[Scalar]): >[UNIT, S] =
+        override def evaluateScalar(term: Term[Scalar]): UNIT > S =
           term match {
             case term: ScalarConstant =>
               operatorAssignments.lookup(term).map { constant =>
@@ -376,10 +376,10 @@ trait AlgebraicMachinery { topos: BaseTopos =>
         override type ROOT = HEAD x TAIL
         override def root : BIPRODUCT[HEAD, TAIL] = head x tail.root
 
-        override def evaluate(term: Term[Principal]): >[HEAD x TAIL, T] =
+        override def evaluate(term: Term[Principal]): HEAD x TAIL > T =
           term match {
             case VariableTerm(symbol, _) if symbol == name =>
-              root.π0.asInstanceOf[>[HEAD x TAIL, T]]
+              root.π0.asInstanceOf[HEAD x TAIL > T]
 
             case term @ BinaryOpTerm(left, op, right) =>
               operatorAssignments.lookup(op).map { op =>
@@ -417,7 +417,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
               tail.evaluate(term) o root.π1
           }
 
-        override def evaluateScalar(term: Term[Scalar]): >[HEAD x TAIL, S] =
+        override def evaluateScalar(term: Term[Scalar]): HEAD x TAIL > S =
           term match {
             case term: ScalarConstant =>
               operatorAssignments.lookup(term).map { constant =>
@@ -427,7 +427,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
               }
 
             case VariableTerm(symbol, _) if symbol == name =>
-              root.π0.asInstanceOf[>[HEAD x TAIL, S]]
+              root.π0.asInstanceOf[HEAD x TAIL > S]
 
             case term @ BinaryScalarOpTerm(left, op, right) =>
               operatorAssignments.lookup(op).map { op =>

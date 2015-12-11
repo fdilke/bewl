@@ -59,17 +59,17 @@ abstract class ToposWithFixtures {
   val bar : DOT[BAR]
   val baz : DOT[BAZ]
 
-  val foo2bar : >[FOO, BAR]
-  val foo2ImageOfBar : >[FOO, BAZ]
+  val foo2bar : FOO > BAR
+  val foo2ImageOfBar : FOO > BAZ
   val foobar2baz : BiArrow[FOO, BAR, BAZ]
-  val monicBar2baz: >[BAR, BAZ]
+  val monicBar2baz: BAR > BAZ
 
   val equalizerSituation: EqualizerSituation[_ <: ~, _ <: ~, _ <: ~]
 
   case class EqualizerSituation[S <: ~, M <: ~, T <: ~](
-    r: >[S, M],
-    s: >[M, T],
-    t: >[M, T]) {
+    r: S > M,
+    s: M > T,
+    t: M > T) {
 
     def sanityTest {
       r.sanityTest
@@ -96,8 +96,6 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
 
   private lazy val inActionTopos =
     topos.getClass.getName.contains(classOf[ConstructToposOfActions].getSimpleName)
-
-  type UNTYPED_> = >[_ <: ~, _ <: _]
 
   describe(s"The topos ${topos.getClass.getName}") {
 
@@ -198,7 +196,7 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
       evaluation.arrow.target shouldBe baz
       evaluation.arrow.sanityTest
 
-      val foo2bar2baz: >[FOO, BAR → BAZ] = (bar > baz).transpose(foobar2baz)
+      val foo2bar2baz: FOO > (BAR → BAZ) = (bar > baz) transpose foobar2baz
       foo2bar2baz.sanityTest
       foo2bar2baz should have(
         'source(foo),
@@ -217,7 +215,9 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
 
     it("has equalizers", Tag("eq")) {
       // minor hackery required to extract the types
-      def runTest[S <: ~, M <: ~, T <: ~](situation: EqualizerSituation[S, M, T]) {
+      def runTest[S <: ~, M <: ~, T <: ~](
+        situation: EqualizerSituation[S, M, T]
+      ) {
           import situation._
           val equalizer = s ?= t
           val e = equalizer.inclusion
@@ -298,6 +298,8 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
       val iI = I.identity
       iI shouldBe 'iso
       iI.inverse shouldBe iI
+
+      I.diagonal shouldBe 'iso
 
       val fooI = foo.identity
       fooI shouldBe 'iso

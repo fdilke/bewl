@@ -24,7 +24,7 @@ trait BaseTopos { self: LogicalOperations =>
 
   type TRUTH <: ~
   val omega: DOT[TRUTH]
-  val truth: >[UNIT, TRUTH]
+  val truth: UNIT > TRUTH
 
   implicit class OmegaEnrichments(truthValue: TRUTH) {
     import TruthObject._
@@ -38,9 +38,9 @@ trait BaseTopos { self: LogicalOperations =>
     val source: DOT[S]
     val target: DOT[T]
 
-    def transpose[R <: ~](biArrow: BiArrow[R, S, T]): >[R, S_T]
+    def transpose[R <: ~](biArrow: BiArrow[R, S, T]): R > S_T
 
-    final def transpose[R <: ~](index: DOT[R])(bifunc: (R, S) => T): >[R, S_T] =
+    final def transpose[R <: ~](index: DOT[R])(bifunc: (R, S) => T): R > S_T =
       transpose(
         (index x source).biArrow(target)(bifunc)
       )
@@ -77,15 +77,15 @@ trait BaseTopos { self: LogicalOperations =>
   type EQUALIZER[S <: ~] = EqualizingDot[S] with DOT[S]
   trait EqualizingDot[S <: ~] { dot: DOT[S] =>
     val equalizerTarget: DOT[S]
-    val inclusion: >[S, S]
-    def restrict[R <: ~](arrow: >[R, S]): >[R, S]
+    val inclusion: S > S
+    def restrict[R <: ~](arrow: R > S): R > S
   }
 
   private object InitialDot {
-    lazy val O = TruthObject.falsity.whereTrue
+    lazy val O = TruthObject.falsity whereTrue
     def fromO[X <: ~](dot: DOT[X]) = {
       val xO = dot.toTrue ?= (TruthObject.falsity o dot.toI)
-      val xOtoO = O.restrict(xO.toI) 
+      val xOtoO = O restrict xO.toI
       xO.inclusion o xOtoO.inverse
     }
   }
@@ -93,17 +93,19 @@ trait BaseTopos { self: LogicalOperations =>
   lazy val O: DOT[VOID] = InitialDot.O
 
   trait BaseDot[S <: ~] { self: DOT[S] =>
-    val toI: >[S, UNIT]
-    val globals: Traversable[>[UNIT, S]]
+    val toI: S > UNIT
+    val globals: Traversable[UNIT > S]
     def xUncached[T <: ~](that: DOT[T]): BIPRODUCT[S, T]
     def `>Uncached`[T <: ~](that: DOT[T]): EXPONENTIAL[S, T]
-    def apply[T <: ~](target: DOT[T])(f: S => T) : >[S, T]
+    def apply[T <: ~](target: DOT[T])(f: S => T) : S > T
     def sanityTest
   }
 
   trait Dot[S <: ~] extends BaseDot[S] { dot: DOT[S] =>
 
-    final lazy val identity: >[S, S] =  dot(dot) { s => s }
+    final lazy val identity: S > S =
+      dot(dot) { s => s }
+
     final private val memoizedProduct =
       Memoize.generic.withLowerBound[
         DOT,
@@ -136,7 +138,7 @@ trait BaseTopos { self: LogicalOperations =>
     final lazy val squared = dot x dot
 
     final def map(f: S => S) = dot(dot) { f }
-    final def flatMap(bifunc: S => >[S, S]) =
+    final def flatMap(bifunc: S => S > S) =
       (this x this).biArrow(this) {
         bifunc(_)(_)
       }
@@ -148,10 +150,10 @@ trait BaseTopos { self: LogicalOperations =>
           }(f, w) > w
       }
 
-    final def preForAll[R <: ~](source: DOT[R])(bifunc: (R, S) => TRUTH): >[R, TRUTH] =
+    final def preForAll[R <: ~](source: DOT[R])(bifunc: (R, S) => TRUTH): R > TRUTH =
       ∀ o power.transpose(source)(bifunc)
 
-    final def forAll[T <: ~](target: DOT[T])(g: (S, T) => TRUTH): >[S, TRUTH] =
+    final def forAll[T <: ~](target: DOT[T])(g: (S, T) => TRUTH): S > TRUTH =
       target.preForAll(dot)(g)
 
     final def forAll[
@@ -162,7 +164,7 @@ trait BaseTopos { self: LogicalOperations =>
       target2: DOT[U]
     ) (
       g: (S, T, U) => TRUTH
-    ): >[S, TRUTH] =
+    ): S > TRUTH =
       forAll(target) { (x, t) =>
         target.forAll(target2) { (t, u) => 
             g(x, t, u)
@@ -180,7 +182,7 @@ trait BaseTopos { self: LogicalOperations =>
       target3: DOT[V]
     ) (
       g: (S, T, U, V) => TRUTH
-    ): >[S, TRUTH] =
+    ): S > TRUTH =
       forAll(target) { (x, t) =>
         target.forAll(target2) { (t, u) => 
           target2.forAll(target3) { (u, v) =>
@@ -189,33 +191,33 @@ trait BaseTopos { self: LogicalOperations =>
           }(t)
         }
 
-    final def preExists[R <: ~](source: DOT[R])(bifunc: (R, S) => TRUTH): >[R, TRUTH] =
+    final def preExists[R <: ~](source: DOT[R])(bifunc: (R, S) => TRUTH): R > TRUTH =
       ∃ o power.transpose(source)(bifunc)
 
-    final def exists[T <: ~](target: DOT[T])(g: (S, T) => TRUTH): >[S, TRUTH] =
+    final def exists[T <: ~](target: DOT[T])(g: (S, T) => TRUTH): S > TRUTH =
       target.preExists(this)(g)
 
-    final lazy val diagonal: >[S, S x S] =
+    final lazy val diagonal: S > (S x S) =
       this(squared) { x => squared.pair(x, x) }
 
     final lazy val =?= : BiArrow[S, S, TRUTH] =
       BiArrow(squared, diagonal.chi)
 
-    final lazy val singleton: >[S, S → TRUTH] =
+    final lazy val singleton: S > (S → TRUTH) =
       power transpose =?=
 
     final def >>[T <: ~](
       target: DOT[T]
     ): Traversable[
-      >[S, T]
+      S > T
     ] =
       (dot > target).globals map { global =>
         dot(target) { s =>
-          global(dot.toI(s))(s)
+          global(dot toI s)(s)
         }}
 
-    final lazy val fromO: >[VOID, S] = 
-      InitialDot.fromO(dot)
+    final lazy val fromO: VOID > S =
+      InitialDot fromO dot
 
     final lazy val pac = new PartialArrowClassifier(dot)
 
@@ -235,7 +237,7 @@ trait BaseTopos { self: LogicalOperations =>
       target: DOT[B]
     )(
       predicate: (S, B) => TRUTH
-    ): >[S, B] = {
+    ): S > B = {
       val product = dot x target
       val graph = product(omega) {
         case (a, b) => predicate(a, b)
@@ -247,33 +249,33 @@ trait BaseTopos { self: LogicalOperations =>
   trait BaseArrow[S <: ~, T <: ~] {
     val source: DOT[S]
     val target: DOT[T]
-    val chi: >[T, TRUTH]
+    val chi: T > TRUTH
 
     def apply(s: S): T
-    def ?=(that: >[S, T]): EQUALIZER[S]
-    def o[R <: ~](that: >[R, S]) : >[R, T]
-    def \[U <: ~](monic: >[U, T]) : >[S, U]
+    def ?=(that: S > T): EQUALIZER[S]
+    def o[R <: ~](that: R > S) : R > T
+    def \[U <: ~](monic: U > T) : S > U
     def sanityTest
   }
 
-  trait Arrow[S <: ~, T <: ~] extends BaseArrow[S, T] { self: >[S, T] =>
+  trait Arrow[S <: ~, T <: ~] extends BaseArrow[S, T] { self: S > T =>
     final lazy val name =
       (source > target).transpose(I) {
           (i, x) => this(x)
       }
 
-    final def x[U <: ~](that: >[S, U]): >[S, T x U] = {
+    final def x[U <: ~](that: S > U): S > (T x U) = {
       val product = target x that.target
       source(product) {
         s => product.pair(this(s), that(s))
       }
     }
 
-    final def toBool(implicit eq: =:=[T, TRUTH]): Boolean =
+    final def toBool(implicit eq: T =:= TRUTH): Boolean =
       this == source.toTrue
 
     final def whereTrue(implicit eq: T =:= TRUTH): EQUALIZER[S] =
-      self.asInstanceOf[>[S, TRUTH]] ?= source.toTrue
+      self.asInstanceOf[S > TRUTH] ?= source.toTrue
 
     final lazy val isMonic: Boolean =
       source.forAll(source) {
@@ -292,15 +294,15 @@ trait BaseTopos { self: LogicalOperations =>
     final lazy val isIso: Boolean =
       isMonic && isEpic
 
-    final lazy val inverse: >[T, S] = 
+    final lazy val inverse: T > S =
       source.power.transpose(target) {
           (t, s) => target.=?=(t, this(s))  
         } \ source.singleton
 
-    def /[R <: ~](iso: >[S, R]) : >[R, T] =
+    def /[R <: ~](iso: S > R) : R > T =
       self o iso.inverse
 
-    def +[U <: ~](that: >[U, T]) =
+    def +[U <: ~](that: U > T) =
       (source ⊔ that.source).sum(this, that)
   }
 
@@ -310,25 +312,25 @@ trait BaseTopos { self: LogicalOperations =>
     T <: ~
   ] (
     product: BIPRODUCT[L, R],
-    arrow: >[L x R, T]) {
+    arrow: L x R > T) {
     def apply(l: L, r: R): T = arrow(product.pair(l, r))
-    def apply[S <: ~](l: >[S, L], r: >[S, R]): >[S, T] = arrow o (l x r)
+    def apply[S <: ~](l: S > L, r: S > R): S > T = arrow o (l x r)
   }
 
   // Helper methods for triproducts (this could obviously be extended).
   def leftProjection[X <: ~, Y <: ~, Z <: ~](
     x: DOT[X], y: DOT[Y], z: DOT[Z]
-  ) : >[X x Y x Z, X] =
+  ) : X x Y x Z > X =
     (x x y).π0 o (x x y x z).π0
 
   def midProjection[X <: ~, Y <: ~, Z <: ~](
    x: DOT[X], y: DOT[Y], z: DOT[Z]
-  ) : >[X x Y x Z, Y] =
+  ) : X x Y x Z > Y =
     (x x y).π1 o (x x y x z).π0
 
   def rightProjection[X <: ~, Y <: ~, Z <: ~](
    x: DOT[X], y: DOT[Y], z: DOT[Z]
-  ) : >[X x Y x Z, Z] =
+  ) : X x Y x Z > Z =
     (x x y x z).π1
 
   class PartialArrowClassifier[A <: ~](dot: DOT[A]) {
@@ -345,8 +347,8 @@ trait BaseTopos { self: LogicalOperations =>
       }
 
     def extend[S <: ~, B <: ~](
-      monic: >[S, B],
-      arrowOnSub: >[S, A]
+      monic: S > B,
+      arrowOnSub: S > A
     ) =
       classifier.restrict(
         dot.power.transpose(monic.target) {
@@ -374,7 +376,7 @@ trait BaseTopos { self: LogicalOperations =>
     val injectLeft = coproduct.restrict(injectLeftFull)
     val injectRight = coproduct.restrict(injectRightFull)
 
-    def sum[X <: ~](leftArrow: >[A, X], rightArrow: >[B, X]) = {
+    def sum[X <: ~](leftArrow: A > X, rightArrow: B > X) = {
       val target = leftArrow.target
       coproduct.arrowFromFunctionalRelation(target) {
         (αβ, x) =>
@@ -393,12 +395,12 @@ trait Wrappings[BASE, PREDOT[_ <: BASE], PREARROW[_ <: BASE, _ <: BASE]] { topos
   type WRAPPER[T <: BASE] <: ~
 
   def makeDot[T <: BASE](predot: PREDOT[T]) : DOT[WRAPPER[T]]
-  def makeArrow[S <: BASE, T <: BASE](prearrow: PREARROW[S, T]) : >[WRAPPER[S], WRAPPER[T]]
+  def makeArrow[S <: BASE, T <: BASE](prearrow: PREARROW[S, T]) : WRAPPER[S] > WRAPPER[T]
   def functionAsArrow[S <: BASE, T <: BASE](
     source: DOT[WRAPPER[S]], 
     target: DOT[WRAPPER[T]], 
     f: S => T
-  ): >[WRAPPER[S], WRAPPER[T]]
+  ): WRAPPER[S] > WRAPPER[T]
   def bifunctionAsBiArrow[L <: BASE, R <: BASE, T <: BASE] (
     left: DOT[WRAPPER[L]],
     right: DOT[WRAPPER[R]],
