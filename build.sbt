@@ -2,7 +2,7 @@ name := "bewl"
 
 version := "1.0"
 
-scalaVersion := "2.11.7"
+scalaVersion := "2.12.0-M3"
 
 libraryDependencies ++= Seq(
   "org.scala-lang" % "scala-reflect" % "2.11.4",
