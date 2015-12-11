@@ -21,7 +21,7 @@ object ElementalToposLayer {
       }
 
       override type DOT[S <: ~] = AdapterDot[S]
-      override type ARROW[S <: ~, T <: ~] = AdapterArrow[S, T]
+      override type >[S <: ~, T <: ~] = AdapterArrow[S, T]
 
       override type UNIT = WrappedArrow[Unit]
       lazy val I: DOT[UNIT] = makeDot(Δ.I).asInstanceOf[DOT[UNIT]]
@@ -29,17 +29,17 @@ object ElementalToposLayer {
       override type TRUTH = AdapterTruth
 
       override lazy val omega = makeDot(Δ.omega).asInstanceOf[DOT[TRUTH]]
-      override lazy val truth = makeArrow(Δ.truth).asInstanceOf[ARROW[UNIT, TRUTH]]
+      override lazy val truth = makeArrow(Δ.truth).asInstanceOf[>[UNIT, TRUTH]]
 
       trait AdapterTruth extends Element
 
       trait AdapterDot[T <: Element] extends Dot[T] { self =>
         private[ElementalToposLayer] val dot: Δ.DOT[Any]
 
-        override lazy val toI: ARROW[T, UNIT] =
+        override lazy val toI: >[T, UNIT] =
           AdapterArrow.fromArrow(self, I, dot.toI)
 
-        override lazy val globals: Traversable[ARROW[UNIT, T]] =
+        override lazy val globals: Traversable[>[UNIT, T]] =
           dot.globals.map { global =>
             AdapterArrow.fromArrow(I, self, global)
           }
@@ -133,10 +133,10 @@ object ElementalToposLayer {
 
         override def apply(s: S) = function(s)
 
-        override def o[R <: ~](that: ARROW[R, S]) =
+        override def o[R <: ~](that: >[R, S]) =
           that.source(target)(function compose that.function)
 
-        def ?=(that: ARROW[S, T]) =
+        def ?=(that: >[S, T]) =
           new AdapterDot[S] with EqualizingDot[S] { equalizingDot =>
             private val equalizer = arrow ?= that.arrow
 
@@ -150,14 +150,14 @@ object ElementalToposLayer {
             ): S =
               new WrappedArrow(fletch(anArrow)).asInstanceOf[S]
 
-            override def restrict[R <: ~](arrow: ARROW[R, S]) =
+            override def restrict[R <: ~](arrow: >[R, S]) =
               AdapterArrow.fromArrow(
                 arrow.source,
                 equalizingDot,
                 equalizer.restrict(arrow.arrow)
               )
 
-            val inclusion: ARROW[S, S] =
+            val inclusion: >[S, S] =
               AdapterArrow.fromArrow(
                 equalizingDot,
                 source,
@@ -166,13 +166,13 @@ object ElementalToposLayer {
           }
 
         override def equals(other: Any) = other match {
-          case that: ARROW[S, T] => arrow == that.arrow
+          case that: >[S, T] => arrow == that.arrow
           case _ => false
         }
 
         override lazy val chi = AdapterArrow.fromArrow(target, omega, arrowChi.arrow)
 
-        override def \[U <: ~](monic: ARROW[U, T]) =
+        override def \[U <: ~](monic: >[U, T]) =
           AdapterArrow.fromArrow(source, monic.source, monic.arrowChi.restrict(arrow))
 
         override def sanityTest = {
@@ -216,7 +216,7 @@ object ElementalToposLayer {
       override def makeDot[S](predot: Δ.DOT[S]): DOT[WrappedArrow[S]] =
         memoizedWrappedDot(predot)
 
-      override def makeArrow[S, T](prearrow: Δ.ARROW[S, T]): ARROW[WRAPPER[S], WRAPPER[T]] =
+      override def makeArrow[S, T](prearrow: Δ.ARROW[S, T]): >[WRAPPER[S], WRAPPER[T]] =
         AdapterArrow.fromArrow(makeDot(prearrow.source), makeDot(prearrow.target), prearrow)
 
       override def functionAsArrow[S, T](
@@ -228,7 +228,7 @@ object ElementalToposLayer {
         target.dot.asInstanceOf[Δ.DOT[T]],
         f
       ).asInstanceOf[Δ.ARROW[WRAPPER[S], WRAPPER[T]]]
-      ).asInstanceOf[ARROW[WRAPPER[S], WRAPPER[T]]]
+      ).asInstanceOf[>[WRAPPER[S], WRAPPER[T]]]
 
       override def bifunctionAsBiArrow[L, R, T](
         left: DOT[WRAPPER[L]],

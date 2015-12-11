@@ -53,23 +53,23 @@ abstract class ToposWithFixtures {
   import topos._
 
   def makeSampleDot(): DOT[_ <: ~]
-  def makeSampleArrow(): ARROW[_ <: ~, _ <: ~]
+  def makeSampleArrow(): >[_ <: ~, _ <: ~]
 
   val foo : DOT[FOO]
   val bar : DOT[BAR]
   val baz : DOT[BAZ]
 
-  val foo2bar : ARROW[FOO, BAR]
-  val foo2ImageOfBar : ARROW[FOO, BAZ]
+  val foo2bar : >[FOO, BAR]
+  val foo2ImageOfBar : >[FOO, BAZ]
   val foobar2baz : BiArrow[FOO, BAR, BAZ]
-  val monicBar2baz: ARROW[BAR, BAZ]
+  val monicBar2baz: >[BAR, BAZ]
 
   val equalizerSituation: EqualizerSituation[_ <: ~, _ <: ~, _ <: ~]
 
   case class EqualizerSituation[S <: ~, M <: ~, T <: ~](
-    r: ARROW[S, M],
-    s: ARROW[M, T],
-    t: ARROW[M, T]) {
+    r: >[S, M],
+    s: >[M, T],
+    t: >[M, T]) {
 
     def sanityTest {
       r.sanityTest
@@ -97,7 +97,7 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
   private lazy val inActionTopos =
     topos.getClass.getName.contains(classOf[ConstructToposOfActions].getSimpleName)
 
-  type UNTYPED_ARROW = ARROW[_ <: ~, _ <: _]
+  type UNTYPED_> = >[_ <: ~, _ <: _]
 
   describe(s"The topos ${topos.getClass.getName}") {
 
@@ -198,7 +198,7 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
       evaluation.arrow.target shouldBe baz
       evaluation.arrow.sanityTest
 
-      val foo2bar2baz: ARROW[FOO, BAR → BAZ] = (bar > baz).transpose(foobar2baz)
+      val foo2bar2baz: >[FOO, BAR → BAZ] = (bar > baz).transpose(foobar2baz)
       foo2bar2baz.sanityTest
       foo2bar2baz should have(
         'source(foo),

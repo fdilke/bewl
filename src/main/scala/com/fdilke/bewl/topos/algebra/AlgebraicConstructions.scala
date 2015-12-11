@@ -14,7 +14,7 @@ trait AlgebraicConstructions { topos: BaseTopos with AlgebraicMachinery with Alg
 
   def groupOfUnits[T <: ~](
     monoid: Monoid[T]
-  ) : (Group[T], ARROW[T, T]) = {
+  ) : (Group[T], >[T, T]) = {
     val carrier = monoid.carrier
     val pairs = carrier.squared
     val unit = monoid.unit

@@ -10,7 +10,7 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
   object ToposOfAutomorphisms {
     lazy val build: Topos with Wrappings[
       Ɛ.~,
-      ({type λ[X <: Ɛ.~] = Ɛ.ARROW[X, X]})#λ,
+      ({type λ[X <: Ɛ.~] = Ɛ.>[X, X]})#λ,
       ({type λ[X <: Ɛ.~, Y <: Ɛ.~] = AutomorphismPreArrow[X, Y]})#λ
     ] =
       new ToposOfAutomorphisms
@@ -19,14 +19,14 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
       S <: Ɛ.~,
       T <: Ɛ.~
     ](
-      source: ARROW[S, S],
-      target: ARROW[T, T],
-      arrow:  ARROW[S, T]
+      source: >[S, S],
+      target: >[T, T],
+      arrow:  >[S, T]
     )
 
     class ToposOfAutomorphisms extends Topos with Wrappings[
         Ɛ.~,
-        ({type λ[X <: Ɛ.~] = Ɛ.ARROW[X, X]})#λ,
+        ({type λ[X <: Ɛ.~] = Ɛ.>[X, X]})#λ,
         ({type λ[X <: Ɛ.~, Y <: Ɛ.~] = AutomorphismPreArrow[X, Y]})#λ
     ] {
 
@@ -34,7 +34,7 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
 
       override type UNIT = Ɛ.UNIT
       override type DOT[X <: ~] = Automorphism[X]
-      override type ARROW[S <: ~, T <: ~] = AutomorphismArrow[S, T]
+      override type >[S <: ~, T <: ~] = AutomorphismArrow[S, T]
       override type TRUTH = Ɛ.TRUTH
 
       override val I = trivialAutomorphism(Ɛ.I)
@@ -42,8 +42,8 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
       override val truth = AutomorphismArrow(I, omega, Ɛ.truth)
 
       case class Automorphism[X <: ~](
-        arrow: Ɛ.ARROW[X, X],
-        inverse: Ɛ.ARROW[X, X]
+        arrow: Ɛ.>[X, X],
+        inverse: Ɛ.>[X, X]
       ) extends Dot[X] { automorphism =>
         val carrier = arrow.source
 
@@ -88,7 +88,7 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
           ) with ExponentialDot[X, Y, X → Y] { exponentialAutomorphism =>
             override val source = automorphism
             override val target = that
-            override def transpose[R <: ~](biArrow: BiArrow[R, X, Y]): ARROW[R, X → Y] =
+            override def transpose[R <: ~](biArrow: BiArrow[R, X, Y]): >[R, X → Y] =
               AutomorphismArrow(
                 biArrow.product.left,
                 exponentialAutomorphism,
@@ -113,9 +113,9 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
       case class AutomorphismArrow[S <: ~, T <: ~](
         override val source: DOT[S],
         override val target: DOT[T],
-        private[ToposOfAutomorphisms] val arrow: Ɛ.ARROW[S, T]
+        private[ToposOfAutomorphisms] val arrow: Ɛ.>[S, T]
      ) extends Arrow[S, T] {
-        override def \[U <: ~](monic: ARROW[U, T]): ARROW[S, U] = 
+        override def \[U <: ~](monic: >[U, T]): >[S, U] = 
           AutomorphismArrow(source, monic.source, arrow \ monic.arrow)
 
         override def sanityTest {
@@ -126,7 +126,7 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
             throw new IllegalArgumentException("Arrow does not respect automorphisms")
         }
 
-        override def ?=(that: ARROW[S, T]) = {
+        override def ?=(that: >[S, T]) = {
           val equalizerCarrier = this.arrow ?= that.arrow
           new Automorphism[S](
             (source.arrow o equalizerCarrier.inclusion) \ equalizerCarrier.inclusion, 
@@ -135,12 +135,12 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
             override val equalizerTarget = source
             override val inclusion = 
               equalizer(source){ s => s } // TODO: Build in as default?
-            override def restrict[R <: ~](anArrow: ARROW[R, S]) = 
+            override def restrict[R <: ~](anArrow: >[R, S]) = 
               AutomorphismArrow(anArrow.source, equalizer, equalizerCarrier.restrict(anArrow.arrow))
           }
         }
         override def apply(s: S) = arrow(s)
-        override def o[R <: ~](that: ARROW[R, S]) =
+        override def o[R <: ~](that: >[R, S]) =
           AutomorphismArrow(
             that.source, 
             target, 
@@ -179,7 +179,7 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
       private val memoizedDotWrapper =
         Memoize.generic withLowerBound[
         ({
-          type λ[T <: Ɛ.~] = Ɛ.ARROW[T, T]
+          type λ[T <: Ɛ.~] = Ɛ.>[T, T]
         })#λ,
         ({
           type λ[T <: Ɛ.~] = Automorphism[T]
@@ -195,7 +195,7 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
       override def makeDot[
         T <: ~
       ] (
-        predot: Ɛ.ARROW[T, T]
+        predot: Ɛ.>[T, T]
       ) =
         memoizedDotWrapper(predot)
 
