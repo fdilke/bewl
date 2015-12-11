@@ -6,10 +6,11 @@ import com.fdilke.bewl.topos.constructions.{ConstructToposOfAutomorphisms, Const
 
 import scala.Function.tupled
 import scala.language.higherKinds
+import scala.language.postfixOps
 
 trait Topos extends BaseTopos with LogicalOperations with ToposAlgebra
-with ConstructToposOfActions
-with ConstructToposOfAutomorphisms
+  with ConstructToposOfActions
+  with ConstructToposOfAutomorphisms
 
 trait BaseTopos { self: LogicalOperations =>
   type ~
