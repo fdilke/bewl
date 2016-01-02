@@ -145,4 +145,65 @@ Evaluation contexts: An EC keeps track of a multiproduct in a recursive typesafe
 - TDD a NonNaiveMonoids
 - sort out realRoot
 
+# Wrappings API
+
+Remind me again why this is needed? For ease of use writing tests.
+Could we easily rewrite all the tests to do without it?
+The PREARROW seems an intrinsically stupid idea, because if you
+have an X => Y you should be able to construct an ARROW[X, Y].
+So, start with: rewrite the FiniteSetsTests in a saner way? 
+Is the DOT of FiniteSets a public object? Would it be that hard to
+have tests that just used it directly?
+
+# Deleting the old DiagrammaticTopos stuff and the wrapping layer
+
+Why don't I do this? It has been pretty thoroughly shown to be
+redundant.
+
+# Topoi to implement
+
+Topos of group actions: a useful exercise. Useful for permutations?
+
+Topos of coalgebras: Too difficult for now. 
+Need to understand theory better.
+ 
+Topos of presheaves for an internal category: Too difficult.
+At least the topos of coalgebras is a generalization (M & M explain)
+
+Topos of sheaves for an L-T topology.
+Do I need to implement machinery of Heyting algebras first?
+The space of L-T topologies is a H-algebra ; actually it is the
+nucleus of the H-algebra Omega. This is the same as the lattice of
+congruences on Omega (check Matt F's paper).
+Also understand: factorization of geometric morphisms.
+They are always the composite of a sheaf embedding with... ?
+
+Topos of slices: Useful exercise.
+Use the McLarty construction, not the two-step M & M one.
+
+Effective topos: Need to understand theory better.
+Requires implementing the intuition of 'partial recursive functions'
+
+Bumpables. Or more generally: Types S, T where we can tell if two
+functions S => T are equal by their effect on the 'generic element'
+of S. Is there a way to make this accessible from the type?
+S.genericCompanion, something like that?
+
+# Other ideas
+
+Abstract Stone Duality?
+
+Johnstone's notes on 'the schizophrenic character of 2' ?
+
+Diamond Theory. How geometric is it? Does any of it generalize?
+
+Extract the idea of 'linkage' in the action topos code.
+Get it straight for what pairs of types A, AA there is a linkage
+A <-> AA. Probably not very many examples. Abstract.
+
+
+
+
+
+
 

@@ -374,8 +374,8 @@ trait BaseTopos { self: LogicalOperations =>
     val coproduct = fullProduct(omega) { x =>
       injectLeftFull.chi(x) v injectRightFull.chi(x)
     } whereTrue
-    val injectLeft = coproduct.restrict(injectLeftFull)
-    val injectRight = coproduct.restrict(injectRightFull)
+    val injectLeft = coproduct restrict injectLeftFull
+    val injectRight = coproduct restrict injectRightFull
 
     def sum[X <: ~](leftArrow: A > X, rightArrow: B > X) = {
       val target = leftArrow.target
@@ -392,7 +392,11 @@ trait BaseTopos { self: LogicalOperations =>
   }
 }
 
-trait Wrappings[BASE, PREDOT[_ <: BASE], PREARROW[_ <: BASE, _ <: BASE]] { topos: BaseTopos =>
+trait Wrappings[
+  BASE,
+  PREDOT[_ <: BASE],
+  PREARROW[_ <: BASE, _ <: BASE]
+] { topos: BaseTopos =>
   type WRAPPER[T <: BASE] <: ~
 
   def makeDot[T <: BASE](predot: PREDOT[T]) : DOT[WRAPPER[T]]
