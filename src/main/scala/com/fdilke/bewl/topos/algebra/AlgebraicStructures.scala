@@ -66,15 +66,14 @@ trait AlgebraicStructures extends BaseTopos with LogicalOperations with Algebrai
     )
   }
 
-  case class Monoid[M <: ~](
+  class Monoid[M <: ~](
     override val carrier: DOT[M],
     override val unit: NullaryOp[M],
     override val multiply: BinaryOp[M]
   ) extends monoids.Algebra[M](carrier)(
     ι := unit,
     * := multiply
-  ) with Actions[M] with CommutativityCriterion {
-  }
+  ) with Actions[M] with CommutativityCriterion
 
   lazy val groups = AlgebraicTheory(ι, $minus, *)( // TODO try ~
     "left unit" law ( ι * α := α ),
@@ -83,16 +82,16 @@ trait AlgebraicStructures extends BaseTopos with LogicalOperations with Algebrai
     "associative" law ( (α * β) * γ := α * (β * γ ) )
   )
 
-  case class Group[G <: ~](
+  class Group[G <: ~](
     override val carrier: DOT[G],
-    unit: NullaryOp[G],
-    multiply: BinaryOp[G],
+    override val unit: NullaryOp[G],
+    override val multiply: BinaryOp[G],
     inverse: UnaryOp[G]
   ) extends groups.Algebra[G](carrier)(
     ι := unit,
     * := multiply,
     $minus := inverse
-  ) with CommutativityCriterion {
-    lazy val asMonoid = Monoid(carrier, unit, multiply)
+  ) with Actions[G] with CommutativityCriterion {
+    lazy val asMonoid = new Monoid[G](carrier, unit, multiply)
   }
 }

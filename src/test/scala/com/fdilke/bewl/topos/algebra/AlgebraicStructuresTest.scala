@@ -20,7 +20,7 @@ class AlgebraicStructuresTest extends FunSpec {
         (x, i) -> x, (x, x) -> x, (x, y) -> x,
         (y, i) -> y, (y, x) -> y, (y, y) -> y
       )
-      Monoid(carrier, unit, product).sanityTest
+      new Monoid[Symbol](carrier, unit, product).sanityTest
     }
 
     it("enforce the left unit element") {
@@ -122,7 +122,7 @@ class AlgebraicStructuresTest extends FunSpec {
           (i, i) -> i, (i, x) -> x,
           (x, i) -> x, (x, x) -> x
         )
-        Monoid[Symbol](carrier, unit, product)
+        new Monoid[Symbol](carrier, unit, product)
       }
       monoid1x.sanityTest
       val rightAction = {
@@ -167,7 +167,7 @@ class AlgebraicStructuresTest extends FunSpec {
         (x, i) -> x, (x, x) -> y, (x, y) -> i,
         (y, i) -> y, (y, x) -> i, (y, y) -> x
       )
-      Group(carrier, unit, product, inverse).sanityTest
+      new Group[Symbol](carrier, unit, product, inverse).sanityTest
     }
 
     it("must have inverses for every element") {
@@ -182,7 +182,7 @@ class AlgebraicStructuresTest extends FunSpec {
         (y, i) -> y, (y, x) -> y, (y, y) -> y
       )
       intercept[IllegalArgumentException] {
-        Group(carrier, unit, product, inverse).sanityTest
+        new Group[Symbol](carrier, unit, product, inverse).sanityTest
       }.getMessage shouldBe "left inverse law failed"
     }
 
@@ -197,7 +197,7 @@ class AlgebraicStructuresTest extends FunSpec {
         (x, i) -> x, (x, x) -> y, (x, y) -> i,
         (y, i) -> y, (y, x) -> i, (y, y) -> x
       )
-      val group = Group(carrier, unit, product, inverse)
+      val group = new Group[Symbol](carrier, unit, product, inverse)
       group shouldBe 'commutative
     }
 

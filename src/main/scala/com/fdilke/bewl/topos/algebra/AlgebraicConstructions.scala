@@ -5,7 +5,7 @@ import com.fdilke.bewl.topos.BaseTopos
 trait AlgebraicConstructions { topos: BaseTopos with AlgebraicMachinery with AlgebraicStructures  =>
   def endomorphismMonoid[T <: ~](dot: DOT[T]) = {
     val endos = dot > dot
-    Monoid(endos, dot.identity.name,
+    new Monoid[T → T](endos, dot.identity.name,
       BiArrow(endos x endos, endos.transpose(endos x endos) {
         case ((f, g), x) => g(f(x))
       })
@@ -34,7 +34,7 @@ trait AlgebraicConstructions { topos: BaseTopos with AlgebraicMachinery with Alg
       }))
     val inversion = units.restrict(pairs.π1 o invertiblePairs.inclusion o units2ip)
     (
-      Group(
+      new Group[T](
         units,
         units.restrict(unit),
         mulUnits,

@@ -206,7 +206,7 @@ object FiniteSetsUtilities {
     val mappings = for (i <- 0 until carrierSize ; j <- 0 until carrierSize)
       yield (carrierAsList(i), carrierAsList(j)) -> table(i * carrierSize + j)
     val product = makeBinaryOperator(carrier, mappings:_ *)
-    Monoid(
+    new Monoid[M](
       carrier,
       makeNullaryOperator(carrier, carrierAsList.head),
       product
