@@ -1,6 +1,7 @@
 package com.fdilke.bewl.topos.algebra
 
-import com.fdilke.bewl.topos.constructions.ConstructToposOfMonoidActions
+//import com.fdilke.bewl.topos.algebra.AlgebraicStructures.Monoid.Action
+//import com.fdilke.bewl.topos.constructions.ConstructToposOfMonoidActions
 import com.fdilke.bewl.topos.{BaseTopos, LogicalOperations}
 
 trait AlgebraicStructures extends BaseTopos with LogicalOperations with AlgebraicMachinery { builder =>
@@ -20,33 +21,41 @@ trait AlgebraicStructures extends BaseTopos with LogicalOperations with Algebrai
     )
   }
 
-  case class Monoid[M <: ~](
-    override val carrier: DOT[M],
-    unit: NullaryOp[M],
-    multiply: BinaryOp[M]
-  ) extends monoids.Algebra[M](carrier)(
-    ι := unit,
-    * := multiply
-  ) with CommutativityCriterion {
+  trait Actions[M <: ~] {
+    val carrier: DOT[M]
+    val unit: NullaryOp[M]
+    val multiply: BinaryOp[M]
+
     lazy val actions =
-      AlgebraicTheoryWithScalars(carrier)(II := unit)(II, **, ***)(
+      AlgebraicTheoryWithScalars(
+        carrier
+      ) (
+        II := unit
+      ) (
+        II, **, ***
+      ) (
         "right unit" law ( α ** II := α ),
         "mixed associative" law ( (α ** Φ) ** Ψ := α ** (Φ *** Ψ) )
       )
 
-    def action[A <: ~](actionCarrier: DOT[A])(actionMultiply: (A, M) => A) =
+    def action[A <: ~](
+      actionCarrier: DOT[A]
+    ) (
+      actionMultiply: (A, M) => A
+    ) =
       Action[A](actionCarrier, actionMultiply)
 
     def regularAction =
       action(carrier) { multiply(_, _) }
 
-    case class Action[A <: ~](actionCarrier: DOT[A], actionMultiply: (A, M) => A) extends
-      actions.Algebra[A](actionCarrier)(
-        ** := (actionCarrier x carrier).biArrow(actionCarrier)(actionMultiply),
-        *** := multiply
-      )
+    case class Action[A <: ~](
+      actionCarrier: DOT[A],
+      actionMultiply: (A, M) => A
+    ) extends actions.Algebra[A](actionCarrier)(
+      ** := (actionCarrier x carrier).biArrow(actionCarrier)(actionMultiply),
+      *** := multiply
+    )
 
-    // TODO: can move this class into the topos of actions?
     case class ActionPreArrow[
       S <: ~,
       T <: ~
@@ -55,6 +64,16 @@ trait AlgebraicStructures extends BaseTopos with LogicalOperations with Algebrai
       target: Action[T],
       function: S => T
     )
+  }
+
+  case class Monoid[M <: ~](
+    override val carrier: DOT[M],
+    override val unit: NullaryOp[M],
+    override val multiply: BinaryOp[M]
+  ) extends monoids.Algebra[M](carrier)(
+    ι := unit,
+    * := multiply
+  ) with Actions[M] with CommutativityCriterion {
   }
 
   lazy val groups = AlgebraicTheory(ι, $minus, *)( // TODO try ~
