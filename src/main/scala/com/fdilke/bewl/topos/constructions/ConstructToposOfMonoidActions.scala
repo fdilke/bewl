@@ -5,11 +5,11 @@ import com.fdilke.bewl.helper.Memoize
 import com.fdilke.bewl.helper.↔
 import com.fdilke.bewl.topos.algebra.{AlgebraicStructures, AlgebraicMachinery}
 
-trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
+trait ConstructToposOfMonoidActions extends BaseTopos with LogicalOperations {
   Ɛ: AlgebraicStructures with AlgebraicMachinery =>
 
-  object ToposOfActions {
-    def forMonoid[M <: ~](monoid: Ɛ.Monoid[M]) : Topos with Wrappings[
+  object ToposOfMonoidActions {
+    def of[M <: ~](monoid: Ɛ.Monoid[M]) : Topos with Wrappings[
       Ɛ.~,
       ({type λ[X <: Ɛ.~] = monoid.Action[X]})#λ,
       ({type λ[X <: Ɛ.~, Y <: Ɛ.~] = monoid.ActionPreArrow[X, Y]})#λ

@@ -1,6 +1,6 @@
 package com.fdilke.bewl.topos
 
-import com.fdilke.bewl.topos.constructions.ConstructToposOfActions
+import com.fdilke.bewl.topos.constructions.ConstructToposOfMonoidActions
 import org.scalatest.Matchers._
 import org.scalatest._
 
@@ -95,7 +95,7 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
   import fixtures.topos._
 
   private lazy val inActionTopos =
-    topos.getClass.getName.contains(classOf[ConstructToposOfActions].getSimpleName)
+    topos.getClass.getName.contains(classOf[ConstructToposOfMonoidActions].getSimpleName)
 
   describe(s"The topos ${topos.getClass.getName}") {
 
