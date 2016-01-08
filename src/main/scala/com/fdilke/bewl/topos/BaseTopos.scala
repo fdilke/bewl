@@ -110,7 +110,7 @@ trait BaseTopos { self: LogicalOperations =>
     final private val memoizedProduct =
       Memoize.generic.withLowerBound[
         DOT,
-        ({ type λ[U <: ~] = BIPRODUCT[S, U]})#λ,
+        ({ type λ[U <: ~] = BIPRODUCT[S, U]}) # λ,
         ~
       ] (xUncached)
 
@@ -119,7 +119,7 @@ trait BaseTopos { self: LogicalOperations =>
     final private val memoizedExponential =
       Memoize.generic.withLowerBound[
         DOT,
-        ({ type λ[T <: ~] = EXPONENTIAL[S, T]})#λ,
+        ({ type λ[T <: ~] = EXPONENTIAL[S, T]}) # λ,
         ~
       ] (`>Uncached`)
 
@@ -128,7 +128,7 @@ trait BaseTopos { self: LogicalOperations =>
     final private val memoizedCoproduct =
       Memoize.generic.withLowerBound[
         DOT,
-        ({ type λ[T <: ~] = Coproduct[S, T]})#λ,
+        ({ type λ[T <: ~] = Coproduct[S, T]}) # λ,
         ~
       ](`+Uncached`)
     final def ⊔[T <: ~](that: DOT[T]): Coproduct[S, T] = memoizedCoproduct(that)
@@ -338,7 +338,7 @@ trait BaseTopos { self: LogicalOperations =>
     val classifier = dot.power.forAll(dot, dot) {
       (f, a, b) =>
         (f(a) ^ f(b)) > dot.=?=(a, b)
-    }.whereTrue
+    } whereTrue
 
     val include = classifier restrict dot.singleton
 

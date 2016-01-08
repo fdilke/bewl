@@ -3,6 +3,8 @@ package com.fdilke.bewl.topos.constructions
 import com.fdilke.bewl.helper.Memoize
 import com.fdilke.bewl.topos._
 import com.fdilke.bewl.topos.algebra.{AlgebraicMachinery, AlgebraicStructures}
+import scala.language.higherKinds
+import scala.language.reflectiveCalls
 
 trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
   Ɛ: AlgebraicStructures with AlgebraicMachinery =>
@@ -10,24 +12,24 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
   object ToposOfAutomorphisms {
     lazy val build: Topos with Wrappings[
       Ɛ.~,
-      ({type λ[X <: ~] = X > X})#λ,
-      ({type λ[X <: ~, Y <: ~] = AutomorphismPreArrow[X, Y]})#λ
-      ] =
+      ({type λ[X <: ~] = X > X}) # λ,
+      ({type λ[X <: ~, Y <: ~] = AutomorphismPreArrow[X, Y]}) # λ
+    ] =
       new ToposOfAutomorphisms
 
     case class AutomorphismPreArrow[
       S <: ~,
       T <: ~
-    ](
-       source: S > S,
-       target: T > T,
-       arrow:  S > T
-     )
+    ] (
+      source: S > S,
+      target: T > T,
+      arrow:  S > T
+    )
 
     class ToposOfAutomorphisms extends Topos with Wrappings[
       ~,
-      ({type λ[X <: ~] = X > X})#λ,
-      ({type λ[X <: ~, Y <: ~] = AutomorphismPreArrow[X, Y]})#λ
+      ({type λ[X <: ~] = X > X}) # λ,
+      ({type λ[X <: ~, Y <: ~] = AutomorphismPreArrow[X, Y]}) # λ
     ] {
 
       override type ~ = Ɛ.~

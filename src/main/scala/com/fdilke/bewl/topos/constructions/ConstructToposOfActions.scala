@@ -35,9 +35,9 @@ trait ConstructToposOfActions extends BaseTopos with LogicalOperations {
 
         case class VanillaWrapper[
           A <: Ɛ.~
-        ](
+        ] (
            element: A
-         ) extends ElementWrapper[A]
+        ) extends ElementWrapper[A]
 
         class BiproductWrapper[
           A <: Ɛ.~,
