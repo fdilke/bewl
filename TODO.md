@@ -194,6 +194,7 @@ S.genericCompanion, something like that?
 Abstract Stone Duality?
 
 Johnstone's notes on 'the schizophrenic character of 2' ?
+Does the monad (_)^X help, with its sheaf algebras of n-cuboidal bands?
 
 Diamond Theory. How geometric is it? Does any of it generalize?
 
