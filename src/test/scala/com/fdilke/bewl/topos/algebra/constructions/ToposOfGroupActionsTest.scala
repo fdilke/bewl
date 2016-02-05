@@ -9,10 +9,7 @@ import org.scalatest.Matchers._
 
 import scala.Function.untupled
 
-class ToposOfGroupActionsTest
-
-/*
-class ToposOfGroupActionsTest extends GenericToposTests(
+abstract class ToposOfGroupActionsTest extends GenericToposTests(
   new ToposWithFixtures {
 
     private val (i, x, y, a, b, c, d, e, f, f2, g, g2, r, s) =
@@ -29,24 +26,24 @@ class ToposOfGroupActionsTest extends GenericToposTests(
 
     override type FOO = WRAPPER[Symbol]
     override type BAR = WRAPPER[String]
-    override type BAZ = WRAPPER[String]
+    override type BAZ = WRAPPER[Int]
 
     override val foo = makeDot(group.regularAction)
 
     private val barDot: FiniteSets.DOT[String] = FiniteSetsUtilities.dot("x", "x'", "y")
 
-    private val barFlip: String => String = Map("x" -> "x'", "x'" -> x)
+    private val barFlip: String => String = Map("x" -> "x'", "x'" -> "x", "y" -> "y")
 
     private val barMultiply: (String, Symbol) => String =
       (s, m) => if (m == a) barFlip(s) else s
 
     override val bar = makeDot(group.action(barDot)(barMultiply))
 
-    private val bazDot: FiniteSets.DOT[Int] = FiniteSetsUtilities.dot(1, 2, 3, 4)
+    private val bazDot: FiniteSets.DOT[Int] = FiniteSetsUtilities.dot(1, 2, 3, 4, 5)
 
     // TODO: pack away local private stuff into a scope
 
-    private val bazFlip: Int => Int = Map(1 -> 2, 2 -> 1, 3 -> 4, 4 -> 3)
+    private val bazFlip: Int => Int = Map(1 -> 2, 2 -> 1, 3 -> 4, 4 -> 3, 5 -> 5)
 
     private val bazMultiply: (Int, Symbol) => Int =
       (s, m) => if (m == a) bazFlip(s) else s
@@ -54,15 +51,15 @@ class ToposOfGroupActionsTest extends GenericToposTests(
     override val baz = makeDot(group.action(bazDot)(bazMultiply))
 
     override val foo2bar = functionAsArrow(foo, bar, Map(i -> "x", x -> "x", y -> "y"))
-    override val foo2ImageOfBar = functionAsArrow(foo, baz, Map(i -> "y", x -> "x", y -> "y"))
+    override val foo2ImageOfBar = functionAsArrow(foo, baz, Map(i -> 1, a -> 2))
     override val foobar2baz = bifunctionAsBiArrow(foo, bar, baz)(untupled (Map(
-      (i, "x") -> "x", (x, "x") -> "x", (y, "x") -> "y",
-      (i, "y") -> "y", (x, "y") -> "x", (y, "y") -> "y"
+      (i, "x") -> 1, (i, "x'") -> 3, (i, "u") -> 2,
+      (a, "x") -> 4, (a, "x'") -> 2, (a, "y") -> 1
     )))
-    override val monicBar2baz = functionAsArrow(bar, baz, Map("x" -> "x", "y" -> "y"))
+    override val monicBar2baz = functionAsArrow(bar, baz, Map("x" -> 3, "x'" -> 4, "y" -> 5))
 
     override def makeSampleDot() =
-      makeDot(monoidOf3.action(barDot)(scalarMultiply))
+      makeDot(group.action(barDot)(barMultiply))
 
     override def makeSampleArrow() =
       functionAsArrow(foo, bar, Map(
@@ -72,32 +69,13 @@ class ToposOfGroupActionsTest extends GenericToposTests(
       ))
 
     override val equalizerSituation = {
-      val wizDot: FiniteSets.DOT[Int] = FiniteSetsUtilities.dot(0, 1, 2, 3)
+      val altMonicBar2baz = functionAsArrow(bar, baz, Map("x" -> 2, "x'" -> 1, "y" -> 5))
+      val pickOutY = I(bar) { _ => "y".asInstanceOf[WRAPPER[String]] }
 
-      def wizMultiply(n: Int, r: Symbol) : Int =
-        if (n == 0)
-          0
-        else r match {
-          case `i` => n
-          case `x` => 1
-          case `y` => 2
-        }
-
-      val wizAction = monoidOf3.action(wizDot)(wizMultiply)
-
-      val wiz = makeDot(wizAction)
-
-      val foo2wiz = functionAsArrow(foo, wiz, Map('i -> 1, 'x -> 1, 'y -> 2))
-
-      type WIZ = WRAPPER[Int]
-      type BINARY = WRAPPER[Boolean]
-      val binaryDot : FiniteSets.DOT[Boolean] = FiniteSetsUtilities.dot(true, false)
-      def binaryMultiply(b: Boolean, r: Symbol) : Boolean = b
-      val binary = makeDot(monoidOf3.action(binaryDot)(binaryMultiply))
-      new EqualizerSituation[FOO, WIZ, BINARY](
-        foo2wiz,
-        functionAsArrow(wiz, binary, Map(0 -> true, 1 -> true, 2 -> true, 3 -> true)),
-        functionAsArrow(wiz, binary, Map(0 -> false, 1 -> true, 2 -> true, 3 -> true))
+      new EqualizerSituation[UNIT, WRAPPER[String], WRAPPER[Int]](
+        pickOutY,
+        monicBar2baz,
+        altMonicBar2baz
       )
     }
   }
@@ -139,4 +117,3 @@ class ToposOfGroupActionsTest extends GenericToposTests(
     }
   }
 }
-*/
