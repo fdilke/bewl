@@ -328,7 +328,8 @@ trait BaseTopos { self: LogicalOperations =>
     T <: ~
   ] (
     product: BIPRODUCT[L, R],
-    arrow: L x R > T) {
+    arrow: L x R > T
+  ) {
     def apply(l: L, r: R): T = arrow(product.pair(l, r))
     def apply[S <: ~](l: S > L, r: S > R): S > T = arrow o (l x r)
   }
