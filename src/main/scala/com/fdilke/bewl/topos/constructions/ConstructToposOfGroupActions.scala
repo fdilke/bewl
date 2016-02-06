@@ -1,5 +1,6 @@
 package com.fdilke.bewl.topos.constructions
 
+import com.fdilke.bewl.helper.Memoize
 import com.fdilke.bewl.topos.algebra.{AlgebraicMachinery, AlgebraicStructures}
 import com.fdilke.bewl.topos.{Topos, Wrappings, BaseTopos, LogicalOperations}
 
@@ -25,24 +26,24 @@ trait ConstructToposOfGroupActions extends BaseTopos with LogicalOperations {
         override type TRUTH = Ɛ.TRUTH
 
         override val I: DOT[UNIT] =
-          ActionDot(Ɛ.I) { (i, m) => i }
+          ActionDot(Ɛ.I) { (i, g) => i }
 
         override lazy val omega: DOT[TRUTH] =
-          ???
+          ActionDot(Ɛ.omega) { (ω, g) => ω }
 
         override lazy val truth: >[UNIT, TRUTH] =
-          ???
+          ActionArrow(I, omega, Ɛ.truth)
 
         override type WRAPPER[T <: ~] = T
 
         class ActionDot[
           S <: ~
         ] (
-          private val action: group.Action[S]
+          val action: group.Action[S]
         ) extends Dot[S] { dot =>
 
           override val toI: S > UNIT =
-            new ActionArrow(this, I, action.actionCarrier.toI)
+            ActionArrow(this, I, action.actionCarrier.toI)
 
           override lazy val globals: Traversable[UNIT > S] =
             ???
@@ -69,7 +70,7 @@ trait ConstructToposOfGroupActions extends BaseTopos with LogicalOperations {
             ???
 
           override def apply[T <: ~](target: DOT[T])(f: S => T) : S > T =
-            new ActionArrow(
+            ActionArrow(
               this,
               target,
               action.actionCarrier(
@@ -77,8 +78,10 @@ trait ConstructToposOfGroupActions extends BaseTopos with LogicalOperations {
               ) { f }
             )
 
-          override def sanityTest =
-            ???
+          override def sanityTest = {
+            action.actionCarrier.sanityTest
+            action.sanityTest
+          }
         }
 
         object ActionDot {
@@ -94,13 +97,13 @@ trait ConstructToposOfGroupActions extends BaseTopos with LogicalOperations {
             )
         }
 
-        class ActionArrow[
+        case class ActionArrow[
           S <: ~,
           T <: ~
         ](
-          override val source: DOT[S],
-          override val target: DOT[T],
-          private val arrow: Ɛ.>[S, T]
+          override val source: ActionDot[S],
+          override val target: ActionDot[T],
+          arrow: Ɛ.>[S, T]
         ) extends Arrow[S, T] {
           override lazy val chi: T > TRUTH =
             ???
@@ -109,7 +112,7 @@ trait ConstructToposOfGroupActions extends BaseTopos with LogicalOperations {
           override def ?=(that: S > T): EQUALIZER[S] =
             ???
           override def o[R <: ~](that: R > S) =
-            new ActionArrow(
+            ActionArrow(
               that.source,
               target,
               arrow o that.arrow
@@ -117,8 +120,11 @@ trait ConstructToposOfGroupActions extends BaseTopos with LogicalOperations {
 
           override def \[U <: ~](monic: U > T) : S > U =
             ???
-          override def sanityTest =
-            ???
+
+          override def sanityTest = {
+            arrow.sanityTest
+            assert(group.actions.isMorphism(source.action, target.action, arrow))
+          }
         }
 
         override def functionAsArrow[
@@ -139,12 +145,24 @@ trait ConstructToposOfGroupActions extends BaseTopos with LogicalOperations {
         ): ActionArrow[S, T] =
           ???
 
+        private val memoizedDotWrapper =
+          Memoize.generic withLowerBound[
+            ({
+              type λ[T <: Ɛ.~] = group.Action[T]
+            })#λ,
+            ({
+              type λ[T <: Ɛ.~] = ActionDot[T]
+            })#λ,
+            Ɛ.~
+          ] { predot => new ActionDot(predot) } // TODO: refactor
+
         override def makeDot[
           T <: ~
         ] (
           predot: group.Action[T]
         ) =
-          new ActionDot(predot)
+          memoizedDotWrapper(predot)
+//          new ActionDot(predot)
 
         override def bifunctionAsBiArrow[
           L <: ~,
