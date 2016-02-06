@@ -2,7 +2,7 @@ package com.fdilke.bewl.topos.algebra
 
 import com.fdilke.bewl.topos.BaseTopos
 
-import scala.language.{dynamics, implicitConversions, postfixOps}
+import scala.language.{dynamics, implicitConversions, postfixOps, existentials}
 
 sealed trait AlgebraicSort
 class Principal extends AlgebraicSort
