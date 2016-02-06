@@ -50,15 +50,15 @@ trait ConstructToposOfGroupActions extends BaseTopos with LogicalOperations {
 
           override def xUncached[T <: ~](that: DOT[T]): BIPRODUCT[S, T] = {
             val productDot = this.action.actionCarrier x that.action.actionCarrier
-            val productMultiply: ((S x T), G) => (S x T) = {
-              case ((s, t), g) =>
-                productDot.pair(
-                  this.action.actionMultiply(s, g),
-                  that.action.actionMultiply(t, g)
-                )
-            }
-            val productAction = group.action(productDot)(productMultiply)
-            new ActionDot[S x T](productAction) with BiproductDot[S, T, S x T] {
+            new ActionDot[S x T](
+              group.action(productDot){
+                case ((s, t), g) =>
+                  productDot.pair(
+                    this.action.actionMultiply(s, g),
+                    that.action.actionMultiply(t, g)
+                  )
+              }
+            ) with BiproductDot[S, T, S x T] {
               override val left = dot
               override val right = that
               override def pair(s: S, t: T) =
@@ -108,7 +108,7 @@ trait ConstructToposOfGroupActions extends BaseTopos with LogicalOperations {
           override lazy val chi: T > TRUTH =
             ???
           override def apply(s: S): T =
-            ???
+            arrow(s)
           override def ?=(that: S > T): EQUALIZER[S] =
             ???
           override def o[R <: ~](that: R > S) =
@@ -150,11 +150,11 @@ trait ConstructToposOfGroupActions extends BaseTopos with LogicalOperations {
             ({
               type λ[T <: Ɛ.~] = group.Action[T]
             })#λ,
-            ({
-              type λ[T <: Ɛ.~] = ActionDot[T]
-            })#λ,
+            ActionDot,
             Ɛ.~
-          ] { predot => new ActionDot(predot) } // TODO: refactor
+          ] {
+            new ActionDot(_)
+          }
 
         override def makeDot[
           T <: ~
