@@ -56,7 +56,11 @@ trait BaseTopos { self: LogicalOperations =>
 
     def transpose[R <: ~](biArrow: BiArrow[R, S, T]): R > S_T
 
-    final def transpose[R <: ~](index: DOT[R])(bifunc: (R, S) => T): R > S_T =
+    final def transpose[R <: ~](
+      index: DOT[R]
+    )(
+      bifunc: (R, S) => T
+    ): R > S_T =
       transpose(
         (index x source).biArrow(target)(bifunc)
       )

@@ -86,7 +86,7 @@ trait AlgebraicStructures extends BaseTopos with LogicalOperations with Algebrai
     override val carrier: DOT[G],
     override val unit: NullaryOp[G],
     override val multiply: BinaryOp[G],
-    inverse: UnaryOp[G]
+    val inverse: UnaryOp[G]
   ) extends groups.Algebra[G](carrier)(
     ι := unit,
     * := multiply,

@@ -13,7 +13,7 @@ trait ConstructToposOfGroupActions extends BaseTopos with LogicalOperations {
       ({type λ[X <: Ɛ.~] = group.Action[X]})#λ,
       ({type λ[X <: Ɛ.~, Y <: Ɛ.~] = group.ActionPreArrow[X, Y]})#λ
     ] = {
-      import group.{carrier, multiply, unit, Action, ActionPreArrow}
+      import group.{carrier, multiply, inverse, unit, Action, ActionPreArrow} // TODO: fix imports
       class TheTopos extends Topos with Wrappings[
         Ɛ.~,
         ({type λ[X <: Ɛ.~] = group.Action[X]})#λ,
@@ -66,8 +66,43 @@ trait ConstructToposOfGroupActions extends BaseTopos with LogicalOperations {
             }
           }
 
-          override def `>Uncached`[T <: ~](that: DOT[T]): EXPONENTIAL[S, T] =
-            ???
+          override def `>Uncached`[T <: ~](that: DOT[T]): EXPONENTIAL[S, T] = {
+            val exponentialDot = this.action.actionCarrier > that.action.actionCarrier
+            val exp_x_G = exponentialDot x group.carrier
+            new ActionDot[S → T](
+              group.action(exponentialDot) {
+                case (f, g) => exponentialDot.transpose(exp_x_G) {
+                  case ((f, g), a) => that.action.actionMultiply(
+                    f(
+                      dot.action.actionMultiply(
+                        a,
+                        inverse(g)
+                      )
+                    ),
+                    g
+                  )
+                }(
+                  exp_x_G.pair(f, g)
+                )
+              }
+            ) with ExponentialDot[S, T, S → T] {
+              override val source = dot
+              override val target = that
+
+              override def transpose[R <: ~](
+                biArrow: BiArrow[R, S, T]
+              ): R > (S → T) =
+                ActionArrow[R, Ɛ.→[S, T]](
+                  biArrow.product.left,
+                  this,
+                  exponentialDot.transpose(
+                    biArrow.product.left.action.carrier
+                  ) {
+                    biArrow(_, _)
+                  }
+                )
+            }
+          }
 
           override def apply[T <: ~](target: DOT[T])(f: S => T) : S > T =
             ActionArrow(
