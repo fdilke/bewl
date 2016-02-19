@@ -236,10 +236,10 @@ class AlgebraicMachineryTest extends FunSpec {
       morphismWithWrongTarget.sanityTest
       setsWithInvolution.isMorphism(algebraStrings, algebraInts, morphism) shouldBe true
       intercept[IllegalArgumentException] {
-        setsWithInvolution.isMorphism(algebraStrings, algebraInts, morphismWithWrongSource);
+        setsWithInvolution.isMorphism(algebraStrings, algebraInts, morphismWithWrongSource) shouldBe true
       }
       intercept[IllegalArgumentException] {
-        setsWithInvolution.isMorphism(algebraStrings, algebraInts, morphismWithWrongTarget);
+        setsWithInvolution.isMorphism(algebraStrings, algebraInts, morphismWithWrongTarget) shouldBe true
       }
 
       val notAMorphism = arrow(carrierStrings, carrierInts, "+" -> 1, "-" -> 1)

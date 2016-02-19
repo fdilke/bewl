@@ -16,28 +16,28 @@ class AlgebraicConstructionsTest extends FunSpec {
       endosOf0 shouldBe an[Monoid[_]]
       endosOf0.sanityTest
       endosOf0.carrier.globals.size shouldBe 1
-      endosOf0 should be('commutative)
+      endosOf0 shouldBe 'commutative
     }
 
     it("for a 1-element set") {
       val endosOf1 = endomorphismMonoid(dot('x))
       endosOf1.sanityTest
       endosOf1.carrier.globals.size shouldBe 1
-      endosOf1 should be('commutative)
+      endosOf1 shouldBe 'commutative
     }
 
     it("for a 2-element set") {
       val endosOf2 = endomorphismMonoid(dot('x, 'y))
       endosOf2.sanityTest
       endosOf2.carrier.globals.size shouldBe 4
-      endosOf2 should not be('commutative)
+      endosOf2 should not be 'commutative
     }
 
     it("for a 3-element set") {
       val endosOf3 = endomorphismMonoid(dot('x, 'y, 'z))
       endosOf3.sanityTest
       endosOf3.carrier.globals.size shouldBe 27
-      endosOf3 should not be('commutative)
+      endosOf3 should not be 'commutative
     }
   }
 
@@ -70,7 +70,7 @@ class AlgebraicConstructionsTest extends FunSpec {
         'monic(true),
         'iso(false)
       )
-      monoids.isMorphism(group.asMonoid, monoid, inject)
+      monoids.isMorphism(group.asMonoid, monoid, inject) shouldBe true
     }
 
     it("for a monoid that is a group already") {
@@ -87,7 +87,7 @@ class AlgebraicConstructionsTest extends FunSpec {
         'target(monoid.carrier),
         'iso(true)
       )
-      monoids.isMorphism(group.asMonoid, monoid, inject)
+      monoids.isMorphism(group.asMonoid, monoid, inject) shouldBe true
     }
 
     it("for a larger endomorphism monoid") {

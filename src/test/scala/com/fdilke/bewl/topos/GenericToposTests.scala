@@ -17,23 +17,23 @@ abstract class ToposFixtureSanityTests[T <: BaseTopos](fixtures: ToposWithFixtur
     }
 
     it("include sane arrows whose sources and targets match their names") {
+      foo2bar.sanityTest
       foo2bar.source shouldBe foo
       foo2bar.target shouldBe bar
-      foo2bar.sanityTest
 
+      foo2baz.sanityTest
       foo2baz.source shouldBe foo
       foo2baz.target shouldBe baz
-      foo2baz.sanityTest
 
+      foobar2baz.arrow.sanityTest
       foobar2baz.product.left shouldBe foo
       foobar2baz.product.right shouldBe bar
       foobar2baz.arrow.source shouldBe (foo x bar)
       foobar2baz.arrow.target shouldBe baz
-      foobar2baz.arrow.sanityTest
 
+      monicBar2baz.sanityTest
       monicBar2baz.source shouldBe bar
       monicBar2baz.target shouldBe baz
-      monicBar2baz.sanityTest
 
       equalizerSituation.sanityTest
     }
@@ -99,15 +99,13 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
 
   describe(s"The topos ${topos.getClass.getName}") {
 
-    it("has sane built-in objects") {
-      I.sanityTest
-      omega.sanityTest
-    }
-
     it("wraps dots and arrows with relatively sane equality semantics") {
+      makeSampleDot().sanityTest
       makeSampleDot() shouldBe makeSampleDot()
       (makeSampleDot() eq makeSampleDot()) shouldBe true
 
+      // TODO: restore this once isMorphism() is fixed
+//      makeSampleArrow().sanityTest
       makeSampleArrow() shouldBe makeSampleArrow()
       (makeSampleArrow() eq makeSampleArrow()) shouldBe false
     }
@@ -119,12 +117,14 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
     }
 
     it("can construct biproduct diagrams") {
+      (bar x baz).sanityTest
       (bar x baz) should have(
         'left (bar),
         'right (baz)
       )
       val productArrow = foo2bar x foo2baz
 
+      productArrow.sanityTest
       productArrow should have (
         'source (foo),
         'target (bar x baz),
@@ -151,9 +151,9 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
     it("has a terminator") {
       I.sanityTest
       val fooToI = foo.toI
+      fooToI.sanityTest
       fooToI.source shouldBe foo
       fooToI.target shouldBe topos.I
-      fooToI.sanityTest
 
       bar.toI o foo2bar shouldBe fooToI
     }
@@ -161,6 +161,7 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
     it("has a (derived) initial object") {
       O.sanityTest
       val fooFromO = foo.fromO
+      fooFromO.sanityTest
       fooFromO.source shouldBe O
       fooFromO.target shouldBe foo
 
@@ -179,9 +180,9 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
     it("can chain products") {
       val barXfooXbaz = bar x foo x baz
       val productArrow = foo2bar x foo.identity x foo2baz
+      productArrow.sanityTest
       productArrow.source shouldBe foo
       productArrow.target shouldBe barXfooXbaz
-      productArrow.sanityTest
 
       leftProjection(bar, foo, baz) o productArrow shouldBe foo2bar
       midProjection(bar, foo, baz) o productArrow shouldBe foo.identity
@@ -190,11 +191,14 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
 
     it("can construct exponential diagrams") {
       // Check evaluation maps baz^bar x bar -> baz
-      val evaluation = (bar > baz).evaluation
+      val exponential = bar > baz
+      exponential.sanityTest
+      val evaluation = exponential.evaluation
+      evaluation.product.sanityTest
       evaluation.product.left shouldBe (bar > baz)
       evaluation.product.right shouldBe bar
-      evaluation.arrow.target shouldBe baz
       evaluation.arrow.sanityTest
+      evaluation.arrow.target shouldBe baz
 
       val foo2bar2baz: FOO > (BAR → BAZ) = (bar > baz) transpose foobar2baz
       foo2bar2baz.sanityTest
@@ -229,8 +233,12 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
     }
 
     it("has a truth object (subobject classifier)") {
+      omega.sanityTest
+      truth.sanityTest
       truth.source shouldBe I
       truth.target shouldBe omega
+
+      TruthObject.falsity.sanityTest
 
       val char = monicBar2baz.chi
       char.sanityTest
@@ -315,6 +323,7 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
             case (α, β) => (b x a).pair(β, α)
           }
 
+        twist(foo, bar).sanityTest
         twist(foo, bar) shouldBe 'iso
         twist(foo, bar).inverse shouldBe twist(bar, foo)
       }

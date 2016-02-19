@@ -220,7 +220,7 @@ class AlgebraicStructuresTest extends FunSpec {
       val (group, inject) = groupOfUnits(largerMonoid)
       val monoid = group.asMonoid
       monoid.sanityTest
-      monoids.isMorphism(monoid, largerMonoid, inject)
+      monoids.isMorphism(monoid, largerMonoid, inject) shouldBe true
     }
   }
 }
