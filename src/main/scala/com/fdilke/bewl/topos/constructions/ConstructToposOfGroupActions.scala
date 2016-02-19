@@ -165,8 +165,6 @@ trait ConstructToposOfGroupActions extends BaseTopos with LogicalOperations {
               }
             ) with EqualizingDot[S] { equalizer =>
               override val equalizerTarget = source
-              override val inclusion =
-                equalizer(source){ s => s } // TODO: Build in as default?
               override def restrict[R <: ~](anArrow: R > S) =
                 ActionArrow(
                   anArrow.source,

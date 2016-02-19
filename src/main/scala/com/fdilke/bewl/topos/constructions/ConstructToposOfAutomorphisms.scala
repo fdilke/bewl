@@ -134,8 +134,6 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
               (source.inverse o equalizerCarrier.inclusion) \ equalizerCarrier.inclusion
             ) with EqualizingDot[S] { equalizer =>
               override val equalizerTarget = source
-              override val inclusion =
-                equalizer(source){ s => s } // TODO: Build in as default?
               override def restrict[R <: ~](anArrow: R > S) =
                 AutomorphismArrow(anArrow.source, equalizer, equalizerCarrier.restrict(anArrow.arrow))
             }

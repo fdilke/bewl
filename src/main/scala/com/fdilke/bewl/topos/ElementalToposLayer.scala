@@ -157,7 +157,9 @@ object ElementalToposLayer {
                 equalizer.restrict(arrow.arrow)
               )
 
-            val inclusion: S > S =
+            // TODO: why do we need to override this?
+            // presumably because of the concept of EQUALIZER_SOURCE[_] :(
+            override lazy val inclusion: S > S =
               AdapterArrow.fromArrow(
                 equalizingDot,
                 source,

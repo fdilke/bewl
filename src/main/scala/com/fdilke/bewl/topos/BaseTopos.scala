@@ -97,8 +97,9 @@ trait BaseTopos { self: LogicalOperations =>
   type EQUALIZER[S <: ~] = EqualizingDot[S] with DOT[S]
   trait EqualizingDot[S <: ~] { dot: DOT[S] =>
     val equalizerTarget: DOT[S]
-    val inclusion: S > S
     def restrict[R <: ~](arrow: R > S): R > S
+    lazy val inclusion: S > S =
+      dot(equalizerTarget) { s => s }
   }
 
   private object InitialDot {

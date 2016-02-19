@@ -90,8 +90,6 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreAr
         override val equalizerTarget = source
         override def restrict[R](subdot: R > S) =
           subdot.source(this) { subdot(_) }
-        override val inclusion: S > S =
-          equalizer(source) { s => s }
       }
 
     override def apply(s: S) =

@@ -474,9 +474,7 @@ trait ConstructToposOfMonoidActions extends BaseTopos with LogicalOperations {
               monoid.action(thunkedEqualizer)(source.action.actionMultiply),
               source.↔
             ) with EqualizingDot[AA] { equalizingDot =>
-
               override val equalizerTarget = source
-              override val inclusion: AA > AA = ActionArrow(equalizingDot, source, thunkedEqualizer.inclusion)
 
               override def restrict[RR <: ~](arrow: RR > AA): RR > AA =
                 arrow.preRestrict[A](equalizingDot, thunkedEqualizer)
