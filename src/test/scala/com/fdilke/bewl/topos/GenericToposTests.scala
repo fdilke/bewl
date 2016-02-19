@@ -233,18 +233,22 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
       truth.target shouldBe omega
 
       val char = monicBar2baz.chi
+      char.sanityTest
       char.source shouldBe baz
       char.target shouldBe omega
 
       char o monicBar2baz shouldBe bar.toTrue
 
       val restriction = foo2ImageOfBar \ monicBar2baz
+      restriction.sanityTest
       restriction.source shouldBe foo
       restriction.target shouldBe bar
       monicBar2baz o restriction shouldBe foo2ImageOfBar
 
-      // TODO: contruct a non-monic arrow, have chi throw a NotMonicException
-      // TODO: try backdividing by a monic when we can't
+      // Note behaviour is not defined for these pathological cases:
+      // construct a non-monic arrow, have chi throw a NotMonicException
+      // try backdividing by a monic when we can't
+      // It's up to the caller to check. There could be a safe backdivide
     }
 
     it("has enumeration of globals and arrows") {

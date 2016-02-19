@@ -13,7 +13,6 @@ trait ConstructToposOfGroupActions extends BaseTopos with LogicalOperations {
       ({type λ[X <: Ɛ.~] = group.Action[X]})#λ,
       ({type λ[X <: Ɛ.~, Y <: Ɛ.~] = group.ActionPreArrow[X, Y]})#λ
     ] = {
-      import group.{carrier, multiply, inverse, unit, Action, ActionPreArrow} // TODO: fix imports
       class TheTopos extends Topos with Wrappings[
         Ɛ.~,
         ({type λ[X <: Ɛ.~] = group.Action[X]})#λ,
@@ -42,11 +41,21 @@ trait ConstructToposOfGroupActions extends BaseTopos with LogicalOperations {
           val action: group.Action[S]
         ) extends Dot[S] { dot =>
 
-          override val toI: S > UNIT =
+          override val toI =
             ActionArrow(this, I, action.actionCarrier.toI)
 
-          override lazy val globals: Traversable[UNIT > S] =
-            ???
+          override lazy val globals = {
+            val fixedPoints = action.actionCarrier.forAll(group.carrier) {
+              (a, g) => action.actionCarrier.=?=(
+                a,
+                action.actionMultiply(a, g)
+              )
+            }.whereTrue
+
+            fixedPoints.globals.map { global =>
+              ActionArrow(I, dot, fixedPoints.inclusion o global)
+            }
+          }
 
           override def xUncached[T <: ~](that: DOT[T]): BIPRODUCT[S, T] = {
             val productDot = this.action.actionCarrier x that.action.actionCarrier
@@ -76,7 +85,7 @@ trait ConstructToposOfGroupActions extends BaseTopos with LogicalOperations {
                     f(
                       dot.action.actionMultiply(
                         a,
-                        inverse(g)
+                        group.inverse(g)
                       )
                     ),
                     g
@@ -141,11 +150,32 @@ trait ConstructToposOfGroupActions extends BaseTopos with LogicalOperations {
           arrow: Ɛ.>[S, T]
         ) extends Arrow[S, T] {
           override lazy val chi: T > TRUTH =
-            ???
+            ActionArrow(
+              target,
+              omega,
+              arrow.chi
+            )
           override def apply(s: S): T =
             arrow(s)
-          override def ?=(that: S > T): EQUALIZER[S] =
-            ???
+          override def ?=(that: S > T): EQUALIZER[S] = {
+            val underlyingEqualizer = arrow ?= that.arrow
+            new ActionDot(
+              group.action(underlyingEqualizer) {
+                source.action.actionMultiply
+              }
+            ) with EqualizingDot[S] { equalizer =>
+              override val equalizerTarget = source
+              override val inclusion =
+                equalizer(source){ s => s } // TODO: Build in as default?
+              override def restrict[R <: ~](anArrow: R > S) =
+                ActionArrow(
+                  anArrow.source,
+                  equalizer,
+                  underlyingEqualizer.restrict(anArrow.arrow)
+                )
+            }
+          }
+
           override def o[R <: ~](that: R > S) =
             ActionArrow(
               that.source,
@@ -154,7 +184,11 @@ trait ConstructToposOfGroupActions extends BaseTopos with LogicalOperations {
             )
 
           override def \[U <: ~](monic: U > T) : S > U =
-            ???
+            ActionArrow(
+              source,
+              monic.source,
+              arrow \ monic.arrow
+            )
 
           override def sanityTest = {
             arrow.sanityTest
@@ -177,8 +211,16 @@ trait ConstructToposOfGroupActions extends BaseTopos with LogicalOperations {
           T <: ~
         ] (
           prearrow: group.ActionPreArrow[S, T]
-        ): ActionArrow[S, T] =
-          ???
+        ): ActionArrow[S, T] = {
+          import prearrow.{ source, target, function }
+          new ActionArrow(
+            makeDot(source),
+            makeDot(target),
+            source.actionCarrier(target.actionCarrier) {
+              function
+            }
+          )
+        }
 
         private val memoizedDotWrapper =
           Memoize.generic withLowerBound[
@@ -197,7 +239,6 @@ trait ConstructToposOfGroupActions extends BaseTopos with LogicalOperations {
           predot: group.Action[T]
         ) =
           memoizedDotWrapper(predot)
-//          new ActionDot(predot)
 
         override def bifunctionAsBiArrow[
           L <: ~,

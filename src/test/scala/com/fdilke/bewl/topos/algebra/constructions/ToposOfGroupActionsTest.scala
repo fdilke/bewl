@@ -9,11 +9,11 @@ import org.scalatest.Matchers._
 
 import scala.Function.untupled
 
-abstract class ToposOfGroupActionsTest extends GenericToposTests(
+class ToposOfGroupActionsTest extends GenericToposTests(
   new ToposWithFixtures {
 
-    private val (i, x, y, a, b, c, d, e, f, f2, g, g2, r, s) =
-      ('i,'x,'y,'a,'b,'c,'d,'e,'f,'f2,'g,'g2, 'r, 's)
+    private val (i, a) =
+      ('i, 'a)
 
     val group = groupOfUnits(monoidFromTable(
       i, a,
@@ -50,10 +50,10 @@ abstract class ToposOfGroupActionsTest extends GenericToposTests(
 
     override val baz = makeDot(group.action(bazDot)(bazMultiply))
 
-    override val foo2bar = functionAsArrow(foo, bar, Map(i -> "x", x -> "x", y -> "y"))
-    override val foo2ImageOfBar = functionAsArrow(foo, baz, Map(i -> 1, a -> 2))
+    override val foo2bar = functionAsArrow(foo, bar, Map(i -> "x", a -> "x'"))
+    override val foo2ImageOfBar = functionAsArrow(foo, baz, Map(i -> 4, a -> 3))
     override val foobar2baz = bifunctionAsBiArrow(foo, bar, baz)(untupled (Map(
-      (i, "x") -> 1, (i, "x'") -> 3, (i, "u") -> 2,
+      (i, "x") -> 1, (i, "x'") -> 3, (i, "y") -> 2,
       (a, "x") -> 4, (a, "x'") -> 2, (a, "y") -> 1
     )))
     override val monicBar2baz = functionAsArrow(bar, baz, Map("x" -> 3, "x'" -> 4, "y" -> 5))
@@ -64,8 +64,7 @@ abstract class ToposOfGroupActionsTest extends GenericToposTests(
     override def makeSampleArrow() =
       functionAsArrow(foo, bar, Map(
         i -> "x",
-        x -> "x",
-        y -> "x"
+        a -> "x'"
       ))
 
     override val equalizerSituation = {
@@ -96,24 +95,23 @@ abstract class ToposOfGroupActionsTest extends GenericToposTests(
 
     it("works on the fixtures") {
       foo.globals shouldBe 'empty
-      bar.globals shouldBe 'empty
-      baz.globals shouldBe 'empty
+      bar.globals should have size 1
+      baz.globals should have size 1
     }
   }
 
   describe("Arrow enumeration") {
     // too slow! Belongs in a worksheet or app (pending optimization)
     it("also works on the fixtures") {
-      (omega >> omega) should have size 6
+      (omega >> omega) should have size 4
     }
 
-    ignore("...optional extras") {
-      foo >> foo should have size 3
-      foo >> bar should have size 2
-      foo >> baz should have size 3
+    it("...optional extras") {
+      foo >> foo should have size 2
+      foo >> bar should have size 3
+      foo >> baz should have size 5
 
-      // probably not - that would be if we were only counting isomorphisms
-      (foo >> (omega > omega)) should have size 2
+      (foo >> (omega > omega)) should have size 4
     }
   }
 }
