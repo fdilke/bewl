@@ -13,7 +13,7 @@ trait ConstructToposOfGroupActions extends BaseTopos with LogicalOperations {
       ({type λ[X <: Ɛ.~] = group.Action[X]})#λ,
       ({type λ[X <: Ɛ.~, Y <: Ɛ.~] = group.ActionPreArrow[X, Y]})#λ
     ] = {
-      class TheTopos extends Topos with Wrappings[
+      new Topos with Wrappings[
         Ɛ.~,
         ({type λ[X <: Ɛ.~] = group.Action[X]})#λ,
         ({type λ[X <: Ɛ.~, Y <: Ɛ.~] = group.ActionPreArrow[X, Y]})#λ
@@ -257,7 +257,6 @@ trait ConstructToposOfGroupActions extends BaseTopos with LogicalOperations {
             bifunc
           }
       }
-      new TheTopos
     }
   }
 }

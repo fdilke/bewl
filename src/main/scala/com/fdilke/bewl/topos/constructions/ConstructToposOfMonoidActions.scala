@@ -15,7 +15,7 @@ trait ConstructToposOfMonoidActions extends BaseTopos with LogicalOperations {
       ({type λ[X <: Ɛ.~, Y <: Ɛ.~] = monoid.ActionPreArrow[X, Y]})#λ
     ] = {
       import monoid.{carrier, multiply, unit, Action, ActionPreArrow}
-      class TheTopos extends Topos with Wrappings[
+      new Topos with Wrappings[
         Ɛ.~,
         ({type λ[X <: Ɛ.~] = Action[X]})#λ,
         ({type λ[X <: Ɛ.~, Y <: Ɛ.~] = ActionPreArrow[X, Y]})#λ
@@ -585,7 +585,6 @@ trait ConstructToposOfMonoidActions extends BaseTopos with LogicalOperations {
           }
         }
       }
-      new TheTopos
     }
   }
 }
