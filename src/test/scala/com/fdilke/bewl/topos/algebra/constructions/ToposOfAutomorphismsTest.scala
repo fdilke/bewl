@@ -49,9 +49,17 @@ class ToposOfAutomorphismsTest extends GenericToposTests(new ToposWithFixtures {
     (a, 2) -> "x", (b, 2) -> "x", (c, 2) -> "y", (d, 2) -> "x"
   )))
 
-  private def dot[A](values: A*)(mappings: (A, A)*) = /* : DOT[A] = */ {
+  private def dot[A](values: A*)(mappings: (A, A)*) = {
     val set: Set[A] = Set(values :_*)
-    makeDot(FiniteSets.makeArrow(FiniteSetsPreArrow(set, set, Map(mappings: _*))))
+    makeDot(
+      FiniteSets.makeArrow(
+        FiniteSetsPreArrow(
+          set,
+          set,
+          Map(mappings: _*)
+        )
+      )
+    )
   }
 
   override def makeSampleDot() =
