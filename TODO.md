@@ -202,6 +202,17 @@ Extract the idea of 'linkage' in the action topos code.
 Get it straight for what pairs of types A, AA there is a linkage
 A <-> AA. Probably not very many examples. Abstract.
 
+# Permutation DSL
+
+A bearable notation: val p = π(1,2,3)(4,5).π
+But we then can't calculate p(5). Or can we?
+More importantly, can we map p back to a sequence of cycles?
+Do we need to extend the wrapping layer?
+Or is there a need for interchangeable representations:
+(sequence of cycles) <-> (dot in the topos)?
+Seems there is a need for some kind of enhanced or inverse mapping.
+
+
 
 
 
