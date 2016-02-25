@@ -104,8 +104,7 @@ abstract class GenericToposTests[TOPOS <: BaseTopos](
       makeSampleDot() shouldBe makeSampleDot()
       (makeSampleDot() eq makeSampleDot()) shouldBe true
 
-      // TODO: restore this once isMorphism() is fixed
-//      makeSampleArrow().sanityTest
+      makeSampleArrow().sanityTest
       makeSampleArrow() shouldBe makeSampleArrow()
       (makeSampleArrow() eq makeSampleArrow()) shouldBe false
     }

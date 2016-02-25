@@ -54,28 +54,8 @@ class ToposOfMonoidActionsTest extends GenericToposTests(
       functionAsArrow(foo, bar, Map(
         i -> "x",
         x -> "x",
-        y -> "x"
-      ))
-
-// TODO fix
-//    {
-//      println("VERIFYING...")
-//      val reg3 = monoidOf3.regularAction
-//      val ok = monoidOf3.actions.isMorphism(
-//        reg3,
-//        monoidOf3.action(barDot)(scalarMultiply),
-//        reg3.actionCarrier(barDot) {
-//          Map(
-//            i -> "x",
-//            x -> "x",
-//            y -> "x"
-//          )
-//        }
-//      )
-//      println("VERIFYING...done")
-//      println("ok = " + ok)
-//      System exit -1
-//    }
+        y -> "y"
+      )) // left multiplication by x
 
     override val equalizerSituation = {
       val wizDot: FiniteSets.DOT[Int] = FiniteSetsUtilities.dot(0, 1, 2, 3)
