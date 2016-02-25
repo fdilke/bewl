@@ -177,26 +177,33 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
 
         private val memoizedDotWrapper =
           Memoize.generic withLowerBound[
-        ({
-          type λ[T <: Ɛ.~] = Ɛ.>[T, T]
-        })#λ,
-        ({
-          type λ[T <: Ɛ.~] = Automorphism[T]
-        })#λ,
-        Ɛ.~
-        ] { predot =>
-          if (predot.isIso)
-            Automorphism(predot, predot.inverse)
-          else
-            throw new IllegalArgumentException("Arrow is not iso")
-        }
+            ({
+              type λ[T <: Ɛ.~] = Ɛ.>[T, T]
+            })#λ,
+            ({
+              type λ[T <: Ɛ.~] = Automorphism[T]
+            })#λ,
+            Ɛ.~
+          ] { predot =>
+            if (predot.isIso)
+              Automorphism(predot, predot.inverse)
+            else
+              throw new IllegalArgumentException("Arrow is not iso")
+          }
 
         override def makeDot[
-        T <: ~
+          T <: ~
         ] (
           predot: Ɛ.>[T, T]
         ) =
           memoizedDotWrapper(predot)
+
+        override def unwrap[
+        T <: ~
+        ] (
+          auto: Automorphism[T]
+        ): Ɛ.>[T, T] =
+          auto.arrow
 
         override def bifunctionAsBiArrow[
           L <: ~,
