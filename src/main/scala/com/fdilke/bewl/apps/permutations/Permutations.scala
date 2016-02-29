@@ -3,14 +3,14 @@ package com.fdilke.bewl.apps.permutations
 import com.fdilke.bewl.fsets.{FiniteSetsPreArrow, FiniteSets}
 
 case class Cycle[T](members: T*) {
-  def mappings: Seq[(T, T)] = {
-    val numMembers=  members.size
+  private val numMembers = members.size
+
+  def mappings: Seq[(T, T)] =
     for (i <- 0 until numMembers)
       yield (
         members(i),
         members((i + 1) % numMembers)
-        )
-  }
+      )
 }
 
 class PermutationBuilder[T](
@@ -21,9 +21,17 @@ class PermutationBuilder[T](
       cycles :+ Cycle(cycle :_*)
     )
 
-  private def dot(values: T*)(mappings: (T, T)*) = /* : DOT[A] = */ {
+  private def dot(values: T*)(mappings: (T, T)*) = {
     val set: Set[T] = Set(values :_*)
-    Permutations.topos.makeDot(FiniteSets.makeArrow(FiniteSetsPreArrow(set, set, Map(mappings: _*))))
+    Permutations.topos.makeDot(
+      FiniteSets.makeArrow(
+        FiniteSetsPreArrow(
+          set,
+          set,
+          Map(mappings: _*)
+        )
+      )
+    )
   }
 
   private def allAsSeq: Seq[T] =
