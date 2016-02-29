@@ -21,42 +21,44 @@ class PermutationBuilder[T](
       cycles :+ Cycle(cycle :_*)
     )
 
-  private def dot(values: T*)(mappings: (T, T)*) = {
-    val set: Set[T] = Set(values :_*)
+  private def dot(
+    values: Set[T],
+    mappings: Map[T, T]
+  ) =
     Permutations.topos.makeDot(
       FiniteSets.makeArrow(
         FiniteSetsPreArrow(
-          set,
-          set,
-          Map(mappings: _*)
+          values,
+          values,
+          mappings
         )
       )
     )
-  }
 
-  private def allAsSeq: Seq[T] =
+  private def allAsSet: Set[T] =
     cycles.map {
-      _.members
+      _.members.toSet
     }.fold (
-      Seq.empty
+      Set.empty
     )(
-      _ ++ _
+      _ union _
     )
 
-  private def allMappings: Seq[(T, T)] =
-    cycles.map {
-      _.mappings
-    }.fold (
-      Seq.empty
-    ) (
-      _ ++ _
+  private def allMappings: Map[T, T] =
+    Map(
+      cycles.map {
+        _.mappings
+      }.fold (
+        Seq.empty
+      ) (
+        _ ++ _
+      ) :_*
     )
 
   def π =
     dot(
-      allAsSeq :_*
-    ) (
-      allMappings :_*
+      allAsSet,
+      allMappings
     )
 }
 
