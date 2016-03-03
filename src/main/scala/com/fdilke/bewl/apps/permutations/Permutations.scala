@@ -67,3 +67,19 @@ object Permutations {
 
   def π[T] = new PermutationBuilder[T](Seq.empty)
 }
+
+object Parity {
+  val EVEN = +1
+  val ODD = -1
+
+  def of[T](permutation: Map[T, T]): Int =
+    if (permutation.isEmpty)
+      EVEN
+    else {
+      val (x, px) = permutation.head
+      if (x == px)
+        of(permutation - x)
+      else
+        -of(permutation - px + (x -> permutation(px)))
+    }
+}

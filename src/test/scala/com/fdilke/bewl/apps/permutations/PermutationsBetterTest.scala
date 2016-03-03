@@ -11,7 +11,7 @@ import scala.language.postfixOps
 class PermutationsBetterTest extends FunSpec {
 
   describe("Permutations") {
-    it("can be defined") {
+    it("can be defined and unwrapped") {
       val perm: DOT[WRAPPER[Int]] = π(1,2)(3)π
 
       perm.sanityTest
@@ -23,6 +23,31 @@ class PermutationsBetterTest extends FunSpec {
           1 -> 2, 2 -> 1, 3 -> 3
         )
       }
+    }
+
+    it("can be tested on their parity, as maps") {
+      Parity.of(Map()) shouldBe Parity.EVEN
+      Parity.of(Map(
+        1 -> 2,
+        2 -> 1
+      )) shouldBe Parity.ODD
+      Parity.of(Map(
+        1 -> 2,
+        2 -> 3,
+        3 -> 1
+      )) shouldBe Parity.EVEN
+      Parity.of(Map(
+        1 -> 2,
+        2 -> 1,
+        3 -> 4,
+        4 -> 3
+      )) shouldBe Parity.EVEN
+      Parity.of(Map(
+        1 -> 2,
+        2 -> 3,
+        3 -> 4,
+        4 -> 1
+      )) shouldBe Parity.ODD
     }
   }
 }
