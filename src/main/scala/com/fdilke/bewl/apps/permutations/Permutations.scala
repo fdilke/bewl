@@ -66,6 +66,25 @@ object Permutations {
   val topos = FiniteSets.ToposOfAutomorphisms.build
 
   def π[T] = new PermutationBuilder[T](Seq.empty)
+
+  implicit class SmartPermutation[T](
+    permutation: Permutations.topos.DOT[
+      Permutations.topos.WRAPPER[T]
+    ]
+  ) {
+    lazy val asArrow =
+      Permutations.topos.unwrap(permutation)
+
+    lazy val asMap =
+      asArrow.source.globals.map {
+        _(())
+      }.map { e =>
+        e -> asArrow(e)
+      }.toMap
+
+    lazy val parity =
+      Parity.of(asMap)
+  }
 }
 
 object Parity {
@@ -83,3 +102,4 @@ object Parity {
         -of(permutation - px + (x -> permutation(px)))
     }
 }
+
