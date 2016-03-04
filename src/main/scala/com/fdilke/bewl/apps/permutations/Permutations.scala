@@ -1,6 +1,8 @@
 package com.fdilke.bewl.apps.permutations
 
-import com.fdilke.bewl.fsets.{FiniteSetsPreArrow, FiniteSets}
+import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsPreArrow}
+
+import scala.language.postfixOps
 
 case class Cycle[T](members: T*) {
   private val numMembers = members.size
@@ -73,17 +75,17 @@ object Permutations {
     ]
   ) {
     lazy val asArrow =
-      Permutations.topos.unwrap(permutation)
+      Permutations.topos unwrap permutation
 
     lazy val asMap =
-      asArrow.source.globals.map {
+      asArrow.source.globals map {
         _(())
-      }.map { e =>
+      } map { e =>
         e -> asArrow(e)
-      }.toMap
+      } toMap
 
     lazy val parity =
-      Parity.of(asMap)
+      Parity of asMap
   }
 }
 
@@ -92,14 +94,14 @@ object Parity {
   val ODD = -1
 
   def of[T](permutation: Map[T, T]): Int =
-    if (permutation.isEmpty)
-      EVEN
-    else {
-      val (x, px) = permutation.head
-      if (x == px)
-        of(permutation - x)
-      else
-        -of(permutation - px + (x -> permutation(px)))
+    permutation.toSeq match {
+      case Nil =>
+        EVEN
+      case (x, px) +: rest =>
+        if (x == px)
+          of(permutation - x)
+        else
+          -of(permutation - px + (x -> permutation(px)))
     }
 }
 
