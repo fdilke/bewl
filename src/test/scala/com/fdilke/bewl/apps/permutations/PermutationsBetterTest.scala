@@ -1,8 +1,8 @@
 package com.fdilke.bewl.apps.permutations
 
-import com.fdilke.bewl.apps.permutations.Parity.{ODD, EVEN}
+import com.fdilke.bewl.apps.permutations.Parity.{EVEN, ODD}
 import com.fdilke.bewl.apps.permutations.Permutations.topos.{DOT, WRAPPER}
-import com.fdilke.bewl.apps.permutations.Permutations.{SmartPermutation, π}
+import com.fdilke.bewl.apps.permutations.Permutations.{RichPermutation, π}
 import com.fdilke.bewl.fsets.FiniteSets
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
@@ -36,6 +36,26 @@ class PermutationsBetterTest extends FunSpec {
       (π(1,2,3)π).parity shouldBe EVEN
       (π(1,2)(3,4)π).parity shouldBe EVEN
       (π(1,2,3,4)π).parity shouldBe ODD
+    }
+
+    it("come with extra syntactic sugar") {
+      val permutation = π(1, 2)π
+
+      permutation.carrier shouldBe Set(1, 2)
+
+      permutation.send(1) shouldBe 2
+      permutation.send(2) shouldBe 1
+
+      intercept[NoSuchElementException] {
+        permutation.send(3)
+      }
+    }
+
+    it("can be composed when they're compatible") {
+      intercept[IllegalArgumentException] {
+        (π(1,2)π) * (π(2,3)π)
+      }
+      (π(1,2)(3)π) * (π(1)(2,3)π) shouldBe (π(1,3,2)π)
     }
   }
 }

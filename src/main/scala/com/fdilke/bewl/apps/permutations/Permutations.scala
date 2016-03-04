@@ -1,5 +1,6 @@
 package com.fdilke.bewl.apps.permutations
 
+import com.fdilke.bewl.apps.permutations.Permutations.Permutation
 import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsPreArrow}
 
 import scala.language.postfixOps
@@ -23,28 +24,14 @@ class PermutationBuilder[T](
       cycles :+ Cycle(cycle :_*)
     )
 
-  private def dot(
-    values: Set[T],
-    mappings: Map[T, T]
-  ) =
-    Permutations.topos.makeDot(
-      FiniteSets.makeArrow(
-        FiniteSetsPreArrow(
-          values,
-          values,
-          mappings
-        )
-      )
-    )
-
-  private def allAsSet: Set[T] =
-    cycles.map {
-      _.members.toSet
-    }.fold (
-      Set.empty
-    )(
-      _ union _
-    )
+//  private def allAsSet: Set[T] =
+//    cycles.map {
+//      _.members.toSet
+//    }.fold (
+//      Set.empty
+//    )(
+//      _ union _
+//    )
 
   private def allMappings: Map[T, T] =
     Map(
@@ -57,9 +44,8 @@ class PermutationBuilder[T](
       ) :_*
     )
 
-  def π =
-    dot(
-      allAsSet,
+  def π : Permutation[T] =
+    Permutations.dot(
       allMappings
     )
 }
@@ -67,9 +53,29 @@ class PermutationBuilder[T](
 object Permutations {
   val topos = FiniteSets.ToposOfAutomorphisms.build
 
+  type Permutation[T] = Permutations.topos.DOT[
+    Permutations.topos.WRAPPER[T]
+  ]
+
+  def dot[T](
+    mappings: Map[T, T]
+  ): Permutation[T] = {
+    val values: Set[T] = mappings.keySet
+
+    Permutations.topos.makeDot(
+      FiniteSets.makeArrow(
+        FiniteSetsPreArrow(
+          values,
+          values,
+          mappings
+        )
+      )
+    )
+  }
+
   def π[T] = new PermutationBuilder[T](Seq.empty)
 
-  implicit class SmartPermutation[T](
+  implicit class RichPermutation[T](
     permutation: Permutations.topos.DOT[
       Permutations.topos.WRAPPER[T]
     ]
@@ -77,15 +83,29 @@ object Permutations {
     lazy val asArrow =
       Permutations.topos unwrap permutation
 
-    lazy val asMap =
+    lazy val carrier =
       asArrow.source.globals map {
         _(())
-      } map { e =>
+      } toSet
+
+    lazy val asMap =
+      carrier map { e =>
         e -> asArrow(e)
       } toMap
 
     lazy val parity =
       Parity of asMap
+
+    def send(key: T) =
+      asMap(key)
+
+    def *(that: RichPermutation[T]): Permutation[T] =
+      if (carrier == that.carrier)
+        dot(
+          asMap mapValues that.asMap
+        )
+      else
+        throw new IllegalArgumentException
   }
 }
 
