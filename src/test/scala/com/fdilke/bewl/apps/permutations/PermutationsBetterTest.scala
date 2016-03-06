@@ -1,8 +1,8 @@
 package com.fdilke.bewl.apps.permutations
 
 import com.fdilke.bewl.apps.permutations.Parity.{EVEN, ODD}
+import com.fdilke.bewl.apps.permutations.Permutations._
 import com.fdilke.bewl.apps.permutations.Permutations.topos.{DOT, WRAPPER}
-import com.fdilke.bewl.apps.permutations.Permutations.{RichPermutation, π}
 import com.fdilke.bewl.fsets.FiniteSets
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
@@ -56,6 +56,22 @@ class PermutationsBetterTest extends FunSpec {
         (π(1,2)π) * (π(2,3)π)
       }
       (π(1,2)(3)π) * (π(1)(2,3)π) shouldBe (π(1,3,2)π)
+    }
+
+    it("can compute the automorphism group of 'flip'") {
+      import Permutations.topos._
+      val flip = π(1,2)π
+//      val group: Group[_] = groupOfUnits(endomorphismMonoid(flip))._1
+      val group: Group[WRAPPER[Int] → WRAPPER[Int]] = groupOfUnits(endomorphismMonoid(flip))._1
+      group.sanityTest
+      val groupCarrier_ : DOT[WRAPPER[Int] → WRAPPER[Int]] = group.carrier
+      val groupCarrier = groupCarrier_.asInstanceOf[
+        Permutation[WRAPPER[Int] → WRAPPER[Int]]
+      ]
+      groupCarrier.carrier should have size 2
+      groupCarrier.carrier.foreach { x =>
+        groupCarrier.send(x) shouldBe x
+      }
     }
   }
 }
