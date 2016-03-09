@@ -9,7 +9,7 @@ import org.scalatest.Matchers._
 
 import scala.language.postfixOps
 
-class PermutationsBetterTest extends FunSpec {
+class PermutationsTest extends FunSpec {
 
   describe("Permutations") {
     it("can be defined, unwrapped, and examined as maps") {
@@ -61,7 +61,6 @@ class PermutationsBetterTest extends FunSpec {
     it("can compute the automorphism group of 'flip'") {
       import Permutations.topos._
       val flip = π(1,2)π
-//      val group: Group[_] = groupOfUnits(endomorphismMonoid(flip))._1
       val group: Group[WRAPPER[Int] → WRAPPER[Int]] = groupOfUnits(endomorphismMonoid(flip))._1
       group.sanityTest
       val groupCarrier_ : DOT[WRAPPER[Int] → WRAPPER[Int]] = group.carrier
