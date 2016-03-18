@@ -1,14 +1,13 @@
 package com.fdilke.bewl.topos
 
 import scala.language.higherKinds
+import scala.language.existentials
 
 object ExperimentsInBubbleWrap {
   case class PreWidget[T](t: T) { def asWidget = Widget(t) }
   case class Widget[T](t: T)
   case class PreWidgetArrow[T, U](f: T => U) { def asWidgetArrow = WidgetArrow(f) }
   case class WidgetArrow[T, U](f: T => U)
-  case class PreDoodad[T](t: T) { def asDoodad = Doodad(t) }
-  case class Doodad[T](t: T)
   case class PreDoodadArrow[T, U](f: T => U) { def asDoodadArrow = DoodadArrow(f) }
   case class DoodadArrow[T, U](f: T => U)
 
@@ -32,19 +31,33 @@ object ExperimentsInBubbleWrap {
       predot.asWidget
     override def makeArrow[T <: Any, U <: Any](prearrow: PreWidgetArrow[T, U]) =
       prearrow.asWidgetArrow
+
+    val sampleAuto: ARROW[Int, Int] =
+      WidgetArrow({ x => x })
   }
-  def automorphisms(Ɛ: PseudoTopos) =
-    new PseudoTopos with Wrappings[Ɛ.~, PreDoodad, PreDoodadArrow] {
+  class AutoContext(val Ɛ : PseudoTopos) {
+    case class Doodad[T <: Ɛ.~](t: Ɛ.ARROW[T, T])
+
+    val build = new PseudoTopos with Wrappings[
+      Ɛ.~,
+      ({type λ[X <: Ɛ.~] = Ɛ.ARROW[X, X]})#λ,
+      PreDoodadArrow
+    ] {
       override type ~ = Ɛ.~
-      override type DOT[T] = Doodad[T]
-      override type ARROW[T, U] = DoodadArrow[T, U]
+      override type DOT[T <: Ɛ.~] = Doodad[T]
+      override type ARROW[T <: Ɛ.~, U <: Ɛ.~] = DoodadArrow[T, U]
       override type WRAPPER[T <: Ɛ.~] = T
 
-      override def makeDot[T <: Any](predot: PreDoodad[T]) =
-        predot.asDoodad
+      override def makeDot[T <: Ɛ.~](predot: Ɛ.ARROW[T, T]) =
+        Doodad(predot)
+
       override def makeArrow[T <: Any, U <: Any](prearrow: PreDoodadArrow[T, U]) =
         prearrow.asDoodadArrow
     }
-
-  val permutations = automorphisms(FiniteSets)
+  }
+  val Ɛ = FiniteSets
+  val context: AutoContext = new AutoContext(Ɛ)
+  val permutations = context.build
+//  val sampleAuto: context.Ɛ.ARROW[Int, Int] = FiniteSets.sampleAuto
+//  permutations.makeDot(sampleAuto)
 }
