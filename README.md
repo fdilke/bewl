@@ -1,9 +1,15 @@
 # Project Bewl
 
-A DSL for the internal (Mitchell-Benabou) language of a topos. See [this presentation](https://www.evernote.com/shard/s141/sh/8e6b9d94-bc20-4fde-b2bf-9e844f486f76/d11244bad0729071fa00d19eaad312ce)
+A DSL for the internal (Mitchell-Benabou) language of a topos. 
 
 [This slideshow](https://github.com/fdilke/bewl/blob/master/notes/StateOfTheBewlJan2016.pdf) explains the project and describes
 the overall state of play as of January 2016.
+
+[This one](https://github.com/fdilke/bewl/blob/master/notes/PartyingWithPermutations.pdf) gives the latest on the ongoing
+quest for permutation parity, a "real-life application" of Bewl.
+
+See [this presentation](https://www.evernote.com/shard/s141/sh/8e6b9d94-bc20-4fde-b2bf-9e844f486f76/d11244bad0729071fa00d19eaad312ce)
+for an attempt at "the internal language for dummies"
 
 I've had to keep re-implementing Bewl in successively more powerful programming languages (Java, Clojure and now Scala). 
 Really it should be in Haskell or Idris but I'm not ready for those yet.
