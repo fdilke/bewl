@@ -445,6 +445,26 @@ trait Wrappings[
   // An implementation may have the ability to "unwrap" dots
   def unwrap[T <: BASE](dot: DOT[WRAPPER[T]]): PREDOT[T] =
     ???
+
+  def burst[M[_], T <: BASE](
+    bubble: M[WRAPPER[T]]
+  )(implicit ev: WRAPPER[T] =:= T) : M[T] =
+    bubble.asInstanceOf[M[T]]
 }
 
+// An instance of Wrappings for topoi with no base type ~ with trivial WRAPPER type
+trait SimpleWrappings [
+  PREDOT[_],
+  PREARROW[_, _]
+] extends Wrappings[
+  Any,
+  PREDOT,
+  PREARROW
+] { topos: BaseTopos { type ~ = Any }  =>
+  override type WRAPPER[T] = T
 
+  def burst[M[_], T](
+    bubble: M[WRAPPER[T]]
+  ) : M[T] =
+    bubble
+}

@@ -2,9 +2,9 @@ package com.fdilke.bewl.fsets
 
 import com.fdilke.bewl.fsets.DiagrammaticFiniteSetsUtilities._
 import com.fdilke.bewl.helper.Memoize
-import com.fdilke.bewl.topos.{Wrappings, Topos}
+import com.fdilke.bewl.topos.{SimpleWrappings, Wrappings, Topos}
 
-object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreArrow] {
+object FiniteSets extends Topos with SimpleWrappings[Traversable, FiniteSetsPreArrow] {
   override type ~ = Any
   override type DOT[S <: ~] = FiniteSetsDot[S]
   override type >[S <: ~, T <: ~] = FiniteSetsArrow[S, T]
@@ -126,8 +126,6 @@ object FiniteSets extends Topos with Wrappings[Any, Traversable, FiniteSetsPreAr
       new FiniteSetsDot(elements)
     Memoize generic wrap
   }
-
-  override type WRAPPER[T] = T
 
   override def functionAsArrow[S, T](source: DOT[S], target: DOT[T], f: S => T) =
     source(target)(f)

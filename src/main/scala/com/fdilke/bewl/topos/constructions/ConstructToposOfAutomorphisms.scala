@@ -159,8 +159,8 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
         override type WRAPPER[T <: Ɛ.~] = T
 
         override def functionAsArrow[ // TODO: looks redundant, take out of API?
-        S <: ~,
-        T <: ~
+          S <: ~,
+          T <: ~
         ] (
             source: Automorphism[S],
             target: Automorphism[T],
@@ -169,8 +169,8 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
           ???
 
         override def makeArrow[
-        S <: ~,
-        T <: ~
+          S <: ~,
+          T <: ~
         ] (
             prearrow: AutomorphismPreArrow[S, T]
             ) = ???
@@ -199,7 +199,7 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
           memoizedDotWrapper(predot)
 
         override def unwrap[
-        T <: ~
+          T <: ~
         ] (
           auto: Automorphism[T]
         ): Ɛ.>[T, T] =
