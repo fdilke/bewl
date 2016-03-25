@@ -2,6 +2,7 @@ package com.fdilke.bewl.topos
 
 import scala.language.higherKinds
 import scala.language.existentials
+import scala.language.reflectiveCalls
 
 object ExperimentsInBubbleWrap {
   case class PreWidget[T](t: T) { def asWidget = Widget(t) }
@@ -35,7 +36,9 @@ object ExperimentsInBubbleWrap {
     val sampleAuto: ARROW[Int, Int] =
       WidgetArrow({ x => x })
   }
-  class AutoContext(val Ɛ : PseudoTopos) {
+  class AutoContext[BASE, PREDOT[_ <: BASE], PREARROW[_ <: BASE, _ <: BASE]](
+    val Ɛ : PseudoTopos with Wrappings[BASE, PREDOT, PREARROW]
+  ) {
     case class Doodad[T <: Ɛ.~](t: Ɛ.ARROW[T, T])
 
     val build = new PseudoTopos with Wrappings[
@@ -55,9 +58,12 @@ object ExperimentsInBubbleWrap {
         prearrow.asDoodadArrow
     }
   }
-  val Ɛ = FiniteSets
-  val context: AutoContext = new AutoContext(Ɛ)
+  val context: AutoContext[Any, PreWidget, PreWidgetArrow] =
+    new AutoContext[Any, PreWidget, PreWidgetArrow](FiniteSets)
   val permutations = context.build
-//  val sampleAuto: context.Ɛ.ARROW[Int, Int] = FiniteSets.sampleAuto
+//  val sampleAuto: context.Ɛ.ARROW[Int, Int] = context.Ɛ.sampleAuto
+  val prearrow: PreWidgetArrow[Int, Int] = ???
+//  val sampleAuto: context.Ɛ.ARROW[Int, Int] = context.Ɛ.makeArrow(prearrow)
+//  val hh = context.Ɛ.makeArrow(null)
 //  permutations.makeDot(sampleAuto)
 }
