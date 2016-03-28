@@ -2,7 +2,6 @@ package com.fdilke.bewl.apps.permutations
 
 import com.fdilke.bewl.apps.permutations.Parity.{EVEN, ODD}
 import com.fdilke.bewl.apps.permutations.Permutations._
-import com.fdilke.bewl.apps.permutations.Permutations.topos.{DOT, WRAPPER}
 import com.fdilke.bewl.fsets.FiniteSets
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
@@ -13,7 +12,7 @@ class PermutationsTest extends FunSpec {
 
   describe("Permutations") {
     it("can be defined, unwrapped, and examined as maps") {
-      val perm: DOT[WRAPPER[Int]] = π(1,2)(3)π
+      val perm: Permutation[Int] = π(1,2)(3)π
 
       perm.sanityTest
 
@@ -61,11 +60,11 @@ class PermutationsTest extends FunSpec {
     it("can compute the automorphism group of 'flip'") {
       import Permutations.topos._
       val flip = π(1,2)π
-      val group: Group[WRAPPER[Int] → WRAPPER[Int]] = groupOfUnits(endomorphismMonoid(flip))._1
+      val group: Group[Int → Int] = groupOfUnits(endomorphismMonoid(flip))._1
       group.sanityTest
-      val groupCarrier_ : DOT[WRAPPER[Int] → WRAPPER[Int]] = group.carrier
+      val groupCarrier_ : DOT[Int → Int] = group.carrier
       val groupCarrier = groupCarrier_.asInstanceOf[
-        Permutation[WRAPPER[Int] → WRAPPER[Int]]
+        Permutation[Int → Int]
       ]
       groupCarrier.carrier should have size 2
       groupCarrier.carrier.foreach { x =>

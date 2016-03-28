@@ -169,5 +169,13 @@ trait BaseDiagrammaticTopos {
   // Helper methods for integer powers
   def projection[X](base: DOT[X], exponent: Int, index: Int): Operator[X] =
     (base A exponent).projection(index)
+
+  trait Element {
+    val arrow:ARROW[Any, Any]
+  }
+
+  class WrappedArrow[X](val arrow: ARROW[Any, Any]) extends Element {
+    override def toString: String = s"WrappedArrow($arrow)"
+  }
 }
 

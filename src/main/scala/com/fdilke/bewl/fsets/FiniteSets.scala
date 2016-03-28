@@ -2,12 +2,13 @@ package com.fdilke.bewl.fsets
 
 import com.fdilke.bewl.fsets.DiagrammaticFiniteSetsUtilities._
 import com.fdilke.bewl.helper.Memoize
-import com.fdilke.bewl.topos.{SimpleWrappings, Wrappings, Topos}
+import com.fdilke.bewl.topos.{Wrappings, Topos}
 
-object FiniteSets extends Topos with SimpleWrappings[Traversable, FiniteSetsPreArrow] {
-  override type ~ = Any
-  override type DOT[S <: ~] = FiniteSetsDot[S]
-  override type >[S <: ~, T <: ~] = FiniteSetsArrow[S, T]
+object FiniteSets extends Topos[Any] with Wrappings[
+  Any, Any, Traversable, FiniteSetsPreArrow, Wrappings.NO_WRAPPER
+] {
+  override type DOT[S] = FiniteSetsDot[S]
+  override type >[S, T] = FiniteSetsArrow[S, T]
   override type UNIT = Unit
   override type TRUTH = Boolean
   override lazy val I = makeDot(Traversable(()))
@@ -23,7 +24,7 @@ object FiniteSets extends Topos with SimpleWrappings[Traversable, FiniteSetsPreA
         new FiniteSetsArrow(I, this, (_: UNIT) => s)
       }
 
-    override def xUncached[T <: ~](that: DOT[T]) =
+    override def xUncached[T](that: DOT[T]) =
       new FiniteSetsDot[S x T](
         for(s <- this.elements ; t <- that.elements)
           yield (s, t)
@@ -33,7 +34,7 @@ object FiniteSets extends Topos with SimpleWrappings[Traversable, FiniteSetsPreA
         override def pair(l: S, r: T): x[S, T] = (l, r)
       }
 
-    override def `>Uncached`[T <: ~](that: FiniteSetsDot[T]) = {
+    override def `>Uncached`[T](that: FiniteSetsDot[T]) = {
       // println(s"exponentiating: ${that.elements.size} ^ ${this.elements.size}")
       case class FunctionElement(function: S => T) extends (S => T) {
         override def equals(that: scala.Any): Boolean = that match {
@@ -49,13 +50,13 @@ object FiniteSets extends Topos with SimpleWrappings[Traversable, FiniteSetsPreA
         override val source: DOT[S] = self
         override val target: DOT[T] = that
 
-        override def transpose[R <: ~](biArrow: BiArrow[R, S, T]) =
+        override def transpose[R](biArrow: BiArrow[R, S, T]) =
           biArrow.product.left(exponentialDot) {
             r => FunctionElement {
               s => biArrow(r, s)
             }}}}
 
-    override def apply[T <: ~](target: DOT[T])(f: S => T) =
+    override def apply[T](target: DOT[T])(f: S => T) =
       new FiniteSetsArrow(this, target, f)
 
     override def toString =
@@ -71,7 +72,7 @@ object FiniteSets extends Topos with SimpleWrappings[Traversable, FiniteSetsPreA
     val target: FiniteSetsDot[T],
     private[FiniteSets] val function: S => T
   ) extends Arrow[S, T] { self =>
-    override def \[U <: ~](monic: U > T) =
+    override def \[U](monic: U > T) =
       source(monic.source) { s =>
         val quarry: T = function(s)
         monic.source.elements.find { u =>
@@ -95,7 +96,7 @@ object FiniteSets extends Topos with SimpleWrappings[Traversable, FiniteSetsPreA
     override def apply(s: S) =
       function(s)
 
-    override def o[R <: ~](that: R > S) =
+    override def o[R](that: R > S) =
       that.source(target)(function compose that.function)
 
     override lazy val chi =

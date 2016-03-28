@@ -1,34 +1,33 @@
 package com.fdilke.bewl.topos
 
-import com.fdilke.bewl.helper.Memoize
+import com.fdilke.bewl.helper.{↔, Memoize}
 import com.fdilke.bewl.topos.algebra.{AlgebraicConstructions, AlgebraicMachinery, AlgebraicStructures}
 import com.fdilke.bewl.topos.constructions.{ConstructToposOfAutomorphisms, ConstructToposOfGroupActions, ConstructToposOfMonoidActions}
 
 import scala.Function.tupled
 import scala.language.{higherKinds, postfixOps}
 
-trait ToposAlgebra extends
-  AlgebraicMachinery with
-  AlgebraicConstructions with
-  AlgebraicStructures
+trait ToposAlgebra[~] extends
+  AlgebraicMachinery[~] with
+  AlgebraicConstructions[~] with
+  AlgebraicStructures[~]
 
-trait ToposConstructions extends BaseTopos
-  with ConstructToposOfMonoidActions
-  with ConstructToposOfGroupActions
-  with ConstructToposOfAutomorphisms {
+trait ToposConstructions[~] extends BaseTopos[~]
+  with ConstructToposOfMonoidActions[~]
+  with ConstructToposOfGroupActions[~]
+  with ConstructToposOfAutomorphisms[~] {
 
-  Ɛ: AlgebraicStructures with
-    AlgebraicMachinery with
-    LogicalOperations =>
+  Ɛ: AlgebraicStructures[~] with
+    AlgebraicMachinery[~] with
+    LogicalOperations[~] =>
 }
 
-trait Topos extends BaseTopos with
-  LogicalOperations with
-  ToposAlgebra with
-  ToposConstructions
+trait Topos[~] extends BaseTopos[~] with
+  LogicalOperations[~] with
+  ToposAlgebra[~] with
+  ToposConstructions[~]
 
-trait BaseTopos { self: LogicalOperations =>
-  type ~
+trait BaseTopos[~] { self: LogicalOperations[~] =>
   type DOT[S <: ~] <: Dot[S]
   type >[S <: ~, T <: ~] <: Arrow[S, T]
 
@@ -411,14 +410,35 @@ trait BaseTopos { self: LogicalOperations =>
       }
     }
   }
+
+  // TODO: machineries to help with the topos of monoid actions. Can these go somewhere else?
+  trait ElementWrapper[
+    A <: ~
+  ] {
+    val element: A
+  }
+
+  object VanillaWrapper {
+    def ↔[A <: ~] = new ↔[A, VanillaWrapper[A]](
+      a => VanillaWrapper(a),
+      aa => aa.element
+    )
+  }
+
+  case class VanillaWrapper[
+    A <: ~
+  ] (
+    element: A
+  ) extends ElementWrapper[A]
 }
 
 trait Wrappings[
+  ~,
   BASE,
   PREDOT[_ <: BASE],
-  PREARROW[_ <: BASE, _ <: BASE]
-] { topos: BaseTopos =>
-  type WRAPPER[T <: BASE] <: ~
+  PREARROW[_ <: BASE, _ <: BASE],
+  WRAPPER[T <: BASE] <: ~
+] { topos: BaseTopos[~] =>
 
   def makeDot[T <: BASE](predot: PREDOT[T]) : DOT[WRAPPER[T]]
   def makeArrow[S <: BASE, T <: BASE](prearrow: PREARROW[S, T]) : WRAPPER[S] > WRAPPER[T]
@@ -452,19 +472,6 @@ trait Wrappings[
     bubble.asInstanceOf[M[T]]
 }
 
-// An instance of Wrappings for topoi with no base type ~ with trivial WRAPPER type
-trait SimpleWrappings [
-  PREDOT[_],
-  PREARROW[_, _]
-] extends Wrappings[
-  Any,
-  PREDOT,
-  PREARROW
-] { topos: BaseTopos { type ~ = Any }  =>
-  override type WRAPPER[T] = T
-
-  def burst[M[_], T](
-    bubble: M[WRAPPER[T]]
-  ) : M[T] =
-    bubble
+object Wrappings {
+  type NO_WRAPPER[T] = T
 }

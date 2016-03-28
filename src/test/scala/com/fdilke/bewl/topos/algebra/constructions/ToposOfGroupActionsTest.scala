@@ -9,8 +9,8 @@ import org.scalatest.Matchers._
 
 import scala.Function.untupled
 
-class ToposOfGroupActionsTest extends GenericToposTests(
-  new ToposWithFixtures {
+class ToposOfGroupActionsTest extends GenericToposTests[Any](
+  new ToposWithFixtures[Any] {
 
     private val (i, a) =
       ('i, 'a)
@@ -24,9 +24,9 @@ class ToposOfGroupActionsTest extends GenericToposTests(
 
     import topos._
 
-    override type FOO = WRAPPER[Symbol]
-    override type BAR = WRAPPER[String]
-    override type BAZ = WRAPPER[Int]
+    override type FOO = Symbol
+    override type BAR = String
+    override type BAZ = Int
 
     override val foo = makeDot(group.regularAction)
 
@@ -58,10 +58,10 @@ class ToposOfGroupActionsTest extends GenericToposTests(
     )))
     override val monicBar2baz = functionAsArrow(bar, baz, Map("x" -> 3, "x'" -> 4, "y" -> 5))
 
-    override def makeSampleDot() =
+    override def makeSampleDot(): DOT[String] =
       makeDot(group.action(barDot)(barMultiply))
 
-    override def makeSampleArrow() =
+    override def makeSampleArrow(): Symbol > String =
       functionAsArrow(foo, bar, Map(
         i -> "x",
         a -> "x'"
@@ -69,9 +69,9 @@ class ToposOfGroupActionsTest extends GenericToposTests(
 
     override val equalizerSituation = {
       val altMonicBar2baz = functionAsArrow(bar, baz, Map("x" -> 2, "x'" -> 1, "y" -> 5))
-      val pickOutY = I(bar) { _ => "y".asInstanceOf[WRAPPER[String]] }
+      val pickOutY = I(bar) { _ => "y" }
 
-      new EqualizerSituation[UNIT, WRAPPER[String], WRAPPER[Int]](
+      new EqualizerSituation[UNIT, String, Int](
         pickOutY,
         monicBar2baz,
         altMonicBar2baz

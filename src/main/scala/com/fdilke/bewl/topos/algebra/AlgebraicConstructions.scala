@@ -2,7 +2,7 @@ package com.fdilke.bewl.topos.algebra
 
 import com.fdilke.bewl.topos.BaseTopos
 
-trait AlgebraicConstructions { topos: BaseTopos with AlgebraicMachinery with AlgebraicStructures  =>
+trait AlgebraicConstructions[~] { topos: BaseTopos[~] with AlgebraicMachinery[~] with AlgebraicStructures[~]  =>
   def endomorphismMonoid[T <: ~](dot: DOT[T]) = {
     val endos = dot > dot
     new Monoid[T → T](endos, dot.identity.name,

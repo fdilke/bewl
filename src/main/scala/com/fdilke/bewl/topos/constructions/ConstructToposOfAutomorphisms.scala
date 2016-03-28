@@ -6,8 +6,8 @@ import com.fdilke.bewl.topos.algebra.{AlgebraicMachinery, AlgebraicStructures}
 import scala.language.higherKinds
 import scala.language.reflectiveCalls
 
-trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
-  Ɛ: AlgebraicStructures with AlgebraicMachinery =>
+trait ConstructToposOfAutomorphisms[~] extends BaseTopos[~] with LogicalOperations[~] {
+  Ɛ: AlgebraicStructures[~] with AlgebraicMachinery[~] =>
 
   object ToposOfAutomorphisms {
 
@@ -20,19 +20,20 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
       arrow:  S > T
     )
 
-    lazy val build: Topos with Wrappings[
-      Ɛ.~,
+    lazy val build: Topos[~] with Wrappings[
+      ~,
+      ~,
       ({type λ[X <: ~] = X > X}) # λ,
-      ({type λ[X <: ~, Y <: ~] = AutomorphismPreArrow[X, Y]}) # λ
+      ({type λ[X <: ~, Y <: ~] = AutomorphismPreArrow[X, Y]}) # λ,
+      ({type λ[T <: ~] = T}) # λ
     ] =
-      new Topos with Wrappings[
+      new Topos[~] with Wrappings[
+        ~,
         ~,
         ({type λ[X <: ~] = X > X}) # λ,
-        ({type λ[X <: ~, Y <: ~] = AutomorphismPreArrow[X, Y]}) # λ
+        ({type λ[X <: ~, Y <: ~] = AutomorphismPreArrow[X, Y]}) # λ,
+        ({type λ[T <: ~] = T}) # λ
       ] {
-
-        override type ~ = Ɛ.~
-
         override type UNIT = Ɛ.UNIT
         override type DOT[X <: ~] = Automorphism[X]
         override type >[S <: ~, T <: ~] = AutomorphismArrow[S, T]
@@ -153,10 +154,8 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
             )
         }
 
-        private def trivialAutomorphism[X <: Ɛ.~](dot: Ɛ.DOT[X]) =
+        private def trivialAutomorphism[X <: ~](dot: Ɛ.DOT[X]) =
           Automorphism(dot.identity, dot.identity)
-
-        override type WRAPPER[T <: Ɛ.~] = T
 
         override def functionAsArrow[ // TODO: looks redundant, take out of API?
           S <: ~,
@@ -178,12 +177,12 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with LogicalOperations {
         private val memoizedDotWrapper =
           Memoize.generic withLowerBound[
             ({
-              type λ[T <: Ɛ.~] = Ɛ.>[T, T]
+              type λ[T <: ~] = Ɛ.>[T, T]
             })#λ,
             ({
-              type λ[T <: Ɛ.~] = Automorphism[T]
+              type λ[T <: ~] = Automorphism[T]
             })#λ,
-            Ɛ.~
+            ~
           ] { predot =>
             if (predot.isIso)
               Automorphism(predot, predot.inverse)

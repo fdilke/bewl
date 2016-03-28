@@ -1,29 +1,34 @@
 package com.fdilke.bewl.fsets
 
-import com.fdilke.bewl.fsets.DiagrammaticFiniteSets.{ARROW, DOT}
-import com.fdilke.bewl.topos.{Wrappings, Topos, GenericToposTests, ToposWithFixtures}
+import com.fdilke.bewl.topos.{GenericToposTests, ToposWithFixtures}
 import org.scalatest.Matchers._
 
-class LayeredFiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
+class LayeredFiniteSetsTest extends GenericToposTests[DiagrammaticFiniteSets.Element] (
+  new ToposWithFixtures[DiagrammaticFiniteSets.Element] {
   val topos = LayeredFiniteSets
   import topos._
 
-  type FOO = WRAPPER[Boolean]
-  type BAR = WRAPPER[String]
-  type BAZ = WRAPPER[Int]
+  type FOO = DiagrammaticFiniteSets.WrappedArrow[Boolean]
+  type BAR = DiagrammaticFiniteSets.WrappedArrow[String]
+  type BAZ = DiagrammaticFiniteSets.WrappedArrow[Int]
 
   def buildDot[T](elements: Seq[T]) =
     DiagrammaticFiniteSets.DiagrammaticFiniteSetsDot(elements)
 
-  def dot[T](elements: T*): topos.DOT[WRAPPER[T]] = makeDot(buildDot(elements))
+  def dot[T](elements: T*): DOT[DiagrammaticFiniteSets.WrappedArrow[T]] =
+    makeDot(buildDot(elements))
 
-  def arrow[S, T](source: topos.DOT[WRAPPER[S]], target: topos.DOT[WRAPPER[T]], map: (S, T)*) =
+  def arrow[S, T](
+    source: topos.DOT[DiagrammaticFiniteSets.WrappedArrow[S]],
+    target: topos.DOT[DiagrammaticFiniteSets.WrappedArrow[T]],
+    map: (S, T)*
+  ) =
     functionAsArrow(source, target, Map(map: _*))
 
   def makeBiArrow[L, R, T](
-    left: topos.DOT[WRAPPER[L]],
-    right: topos.DOT[WRAPPER[R]],
-    target: topos.DOT[WRAPPER[T]],
+    left: topos.DOT[DiagrammaticFiniteSets.WrappedArrow[L]],
+    right: topos.DOT[DiagrammaticFiniteSets.WrappedArrow[R]],
+    target: topos.DOT[DiagrammaticFiniteSets.WrappedArrow[T]],
     mappings: ((L, R), T)*
   ) =
     bifunctionAsBiArrow(left, right, target) { (l, r) => Map(mappings:_*)((l, r)) }
@@ -45,13 +50,22 @@ class LayeredFiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
     bar, baz, "X" -> 2, "Y" -> 3, "Z" -> 1
   )
 
-  private val sampleDotSource = buildDot(Seq(1, 2))
-  private val sampleDotTarget = buildDot(Seq(true, false))
+  private val sampleDotSource: DiagrammaticFiniteSets.DOT[Int] = buildDot(Seq(1, 2))
+  private val sampleDotTarget: DiagrammaticFiniteSets.DOT[Boolean] = buildDot(Seq(true, false))
 
-  override def makeSampleDot() = makeDot(sampleDotSource)
+  override def makeSampleDot(): DOT[DiagrammaticFiniteSets.WrappedArrow[Int]] =
+    makeDot[Int](sampleDotSource)
 
-  override def makeSampleArrow() = arrow(makeDot(sampleDotSource),
-    makeDot(sampleDotTarget), 1 -> true, 2 -> false)
+  override def makeSampleArrow():
+    >[
+      DiagrammaticFiniteSets.WrappedArrow[Int],
+      DiagrammaticFiniteSets.WrappedArrow[Boolean]
+    ] = arrow(
+    makeDot(sampleDotSource),
+    makeDot(sampleDotTarget),
+    1 -> true,
+    2 -> false
+  )
 
   override val equalizerSituation = new EqualizerSituation[FOO, BAR, BAZ](
     foo2bar,

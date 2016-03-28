@@ -4,7 +4,10 @@ package com.fdilke.bewl.topos.algebra
 //import com.fdilke.bewl.topos.constructions.ConstructToposOfMonoidActions
 import com.fdilke.bewl.topos.{BaseTopos, LogicalOperations}
 
-trait AlgebraicStructures extends BaseTopos with LogicalOperations with AlgebraicMachinery { builder =>
+trait AlgebraicStructures[~] extends
+  BaseTopos[~] with
+  LogicalOperations[~]
+  with AlgebraicMachinery[~] { builder =>
 
   import NamedLaws._
   import StandardTermsAndOperators._

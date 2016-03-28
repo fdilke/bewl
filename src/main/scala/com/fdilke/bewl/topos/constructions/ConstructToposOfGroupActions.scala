@@ -4,21 +4,24 @@ import com.fdilke.bewl.helper.Memoize
 import com.fdilke.bewl.topos.algebra.{AlgebraicMachinery, AlgebraicStructures}
 import com.fdilke.bewl.topos.{Topos, Wrappings, BaseTopos, LogicalOperations}
 
-trait ConstructToposOfGroupActions extends BaseTopos with LogicalOperations {
-  Ɛ: AlgebraicStructures with AlgebraicMachinery =>
+trait ConstructToposOfGroupActions[~] extends BaseTopos[~] with LogicalOperations[~] {
+  Ɛ: AlgebraicStructures[~] with AlgebraicMachinery[~] =>
 
   object ToposOfGroupActions {
-    def of[G <: ~](group: Ɛ.Group[G]) : Topos with Wrappings[
-      Ɛ.~,
-      ({type λ[X <: Ɛ.~] = group.Action[X]})#λ,
-      ({type λ[X <: Ɛ.~, Y <: Ɛ.~] = group.ActionPreArrow[X, Y]})#λ
+    def of[G <: ~](group: Ɛ.Group[G]) : Topos[~] with Wrappings[
+      ~,
+      ~,
+      ({type λ[X <: ~] = group.Action[X]}) # λ,
+      ({type λ[X <: ~, Y <: ~] = group.ActionPreArrow[X, Y]}) # λ,
+      ({type λ[T <: ~] = T}) # λ
     ] = {
-      new Topos with Wrappings[
-        Ɛ.~,
-        ({type λ[X <: Ɛ.~] = group.Action[X]})#λ,
-        ({type λ[X <: Ɛ.~, Y <: Ɛ.~] = group.ActionPreArrow[X, Y]})#λ
+      new Topos[~] with Wrappings[
+        ~,
+        ~,
+        ({type λ[X <: ~] = group.Action[X]}) # λ,
+        ({type λ[X <: ~, Y <: ~] = group.ActionPreArrow[X, Y]}) # λ,
+        ({type λ[T <: ~] = T}) # λ
       ] {
-        override type ~ = Ɛ.~
         override type DOT[X <: ~] = ActionDot[X]
         override type >[X <: ~, Y <: ~] = ActionArrow[X, Y]
         override type UNIT = Ɛ.UNIT
@@ -32,8 +35,6 @@ trait ConstructToposOfGroupActions extends BaseTopos with LogicalOperations {
 
         override lazy val truth: >[UNIT, TRUTH] =
           ActionArrow(I, omega, Ɛ.truth)
-
-        override type WRAPPER[T <: ~] = T
 
         class ActionDot[
           S <: ~
@@ -130,7 +131,7 @@ trait ConstructToposOfGroupActions extends BaseTopos with LogicalOperations {
 
         object ActionDot {
           def apply[
-            A <: Ɛ.~
+            A <: ~
           ] (
              actionCarrier: Ɛ.DOT[A]
           ) (
@@ -223,10 +224,10 @@ trait ConstructToposOfGroupActions extends BaseTopos with LogicalOperations {
         private val memoizedDotWrapper =
           Memoize.generic withLowerBound[
             ({
-              type λ[T <: Ɛ.~] = group.Action[T]
-            })#λ,
+              type λ[T <: ~] = group.Action[T]
+            }) # λ,
             ActionDot,
-            Ɛ.~
+            ~
           ] {
             new ActionDot(_)
           }

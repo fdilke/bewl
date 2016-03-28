@@ -5,11 +5,12 @@ import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsUtilities}
 import com.fdilke.bewl.topos.{GenericToposTests, ToposWithFixtures}
 import org.scalatest.Matchers._
+import FiniteSets.ToposOfMonoidActions.~~
 
 import scala.Function.untupled
 
-abstract class TooSlowToposOfMonoidActionsTest extends GenericToposTests(
-  new ToposWithFixtures {
+abstract class TooSlowToposOfMonoidActionsTest extends GenericToposTests[~~](
+  new ToposWithFixtures[~~] {
 
     private val (i, x, y) = ('i, 'x, 'y)
 
@@ -24,9 +25,9 @@ abstract class TooSlowToposOfMonoidActionsTest extends GenericToposTests(
 
     import topos._
 
-    override type FOO = WRAPPER[Symbol]
-    override type BAR = WRAPPER[String]
-    override type BAZ = WRAPPER[Int]
+    override type FOO = FiniteSets.VanillaWrapper[Symbol]
+    override type BAR = FiniteSets.VanillaWrapper[String]
+    override type BAZ = FiniteSets.VanillaWrapper[Int]
 
     override val foo = makeDot(monoidOf3.regularAction)
 
@@ -70,7 +71,7 @@ abstract class TooSlowToposOfMonoidActionsTest extends GenericToposTests(
       ))
 
     override val equalizerSituation = {
-      type BINARY = WRAPPER[Boolean]
+      type BINARY = FiniteSets.VanillaWrapper[Boolean]
       val binaryDot : FiniteSets.DOT[Boolean] = FiniteSetsUtilities.dot(true, false)
       def binaryMultiply(b: Boolean, r: Symbol) : Boolean = b
       val binary = makeDot(monoidOf3.action(binaryDot)(binaryMultiply))

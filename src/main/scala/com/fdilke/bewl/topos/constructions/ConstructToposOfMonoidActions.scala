@@ -5,78 +5,63 @@ import com.fdilke.bewl.helper.Memoize
 import com.fdilke.bewl.helper.↔
 import com.fdilke.bewl.topos.algebra.{AlgebraicStructures, AlgebraicMachinery}
 
-trait ConstructToposOfMonoidActions extends BaseTopos with LogicalOperations {
-  Ɛ: AlgebraicStructures with AlgebraicMachinery =>
+trait ConstructToposOfMonoidActions[~] extends BaseTopos[~] with LogicalOperations[~] {
+  Ɛ: AlgebraicStructures[~] with AlgebraicMachinery[~] =>
 
   object ToposOfMonoidActions {
-    def of[M <: ~](monoid: Ɛ.Monoid[M]) : Topos with Wrappings[
-      Ɛ.~,
-      ({type λ[X <: Ɛ.~] = monoid.Action[X]})#λ,
-      ({type λ[X <: Ɛ.~, Y <: Ɛ.~] = monoid.ActionPreArrow[X, Y]})#λ
+    type ~~ = ElementWrapper[_ <: ~]
+
+    def of[M <: ~](monoid: Ɛ.Monoid[M]) : Topos[~~] with Wrappings[
+      ~~,
+      ~,
+      ({type λ[X <: ~] = monoid.Action[X]}) # λ,
+      ({type λ[X <: ~, Y <: ~] = monoid.ActionPreArrow[X, Y]}) # λ,
+      ({type λ[X <: ~] = Ɛ.VanillaWrapper[X]}) # λ
     ] = {
       import monoid.{carrier, multiply, unit, Action, ActionPreArrow}
-      new Topos with Wrappings[
-        Ɛ.~,
-        ({type λ[X <: Ɛ.~] = Action[X]})#λ,
-        ({type λ[X <: Ɛ.~, Y <: Ɛ.~] = ActionPreArrow[X, Y]})#λ
+      new Topos[~~] with Wrappings[
+        ~~,
+        ~,
+        ({type λ[X <: ~] = Action[X]}) # λ,
+        ({type λ[X <: ~, Y <: ~] = ActionPreArrow[X, Y]}) # λ,
+        ({type λ[X <: ~] = Ɛ.VanillaWrapper[X]}) # λ
       ] {
-        trait ElementWrapper[
-          A <: Ɛ.~
-        ] {
-          val element: A
-        }
-
-        object VanillaWrapper {
-          def ↔[A <: Ɛ.~] = new ↔[A, VanillaWrapper[A]](
-            a => VanillaWrapper(a),
-            aa => aa.element
-          )
-        }
-
-        case class VanillaWrapper[
-          A <: Ɛ.~
-        ] (
-           element: A
-        ) extends ElementWrapper[A]
-
         class BiproductWrapper[
-          A <: Ɛ.~,
-          AA <: ~,
-          B <: Ɛ.~,
-          BB <: ~
+          A <: ~,
+          AA <: ~~,
+          B <: ~,
+          BB <: ~~
         ](
           aa: AA,
           bb: BB,
           aXb: Ɛ.x[A, B]
-        ) extends (AA, BB)(aa, bb) with ElementWrapper[
+        ) extends (AA, BB)(aa, bb) with Ɛ.ElementWrapper[
           Ɛ.x[A, B]
         ] {
           override val element = aXb
         }
 
         class ExponentialWrapper[
-          A <: Ɛ.~,
-          AA <: ~,
-          B <: Ɛ.~,
-          BB <: ~
+          A <: ~,
+          AA <: ~~,
+          B <: ~,
+          BB <: ~~
         ](
           ma2b: Ɛ.→[Ɛ.x[M, A], B],
           aa2bb: AA => BB
-        ) extends (AA => BB) with ElementWrapper[
+        ) extends (AA => BB) with Ɛ.ElementWrapper[
           Ɛ.→[Ɛ.x[M, A], B]
         ] {
           def apply(aa: AA): BB = aa2bb(aa)
           override val element = ma2b
         }
 
-        override type ~ = ElementWrapper[_ <: Ɛ.~]
-
-        override type DOT[AA <: ~] = ActionDotFacade[AA]
-        override type >[AA <: ~, BB <: ~] = ActionArrowFacade[AA, BB]
-        override type UNIT = VanillaWrapper[Ɛ.UNIT]
+        override type DOT[AA <: ~~] = ActionDotFacade[AA]
+        override type >[AA <: ~~, BB <: ~~] = ActionArrowFacade[AA, BB]
+        override type UNIT = Ɛ.VanillaWrapper[Ɛ.UNIT]
 
         type IDEAL = Ɛ.→[M, Ɛ.TRUTH]
-        override type TRUTH = VanillaWrapper[IDEAL]
+        override type TRUTH = Ɛ.VanillaWrapper[IDEAL]
         override val I: ActionDot[Ɛ.UNIT, UNIT] = ActionDot(Ɛ.I) { (i, m) => i }
 
         private object Ideals {
@@ -88,7 +73,7 @@ trait ConstructToposOfMonoidActions extends BaseTopos with LogicalOperations {
             }.whereTrue
 
           def restrict[
-            H <: Ɛ.~
+            H <: ~
           ](
             that: Ɛ.DOT[H]
           )(
@@ -108,32 +93,32 @@ trait ConstructToposOfMonoidActions extends BaseTopos with LogicalOperations {
 
         override lazy val omega = Ideals.omega
 
-        override lazy val truth: UNIT > TRUTH =
-          ActionArrow(I, omega,
+        override lazy val truth: UNIT > TRUTH = // TODO: don't need generics in next line
+          ActionArrow[Ɛ.UNIT, UNIT, IDEAL, Ɛ.VanillaWrapper[IDEAL]](I, omega,
             Ideals.restrict(Ɛ.I) {
               (i, m) => Ɛ truth i
             })
 
         trait ActionDotFacade[
-          AA <: ~
+          AA <: ~~
         ] extends Dot[AA] {
           def preMultiplyUncached[
-            Z <: Ɛ.~,
-            ZZ <: ~
+            Z <: ~,
+            ZZ <: ~~
           ](
             pre: ActionDot[Z, ZZ]
           ): BIPRODUCT[ZZ, AA]
 
           def preExponentiateUncached[
-            Z <: Ɛ.~,
-            ZZ <: ~
+            Z <: ~,
+            ZZ <: ~~
           ](
             pre: ActionDot[Z, ZZ]
           ): EXPONENTIAL[ZZ, AA]
 
           def preApply[
-            Z <: Ɛ.~,
-            ZZ <: ~
+            Z <: ~,
+            ZZ <: ~~
           ](
             pre: ActionDot[Z, ZZ]
           )(
@@ -141,10 +126,10 @@ trait ConstructToposOfMonoidActions extends BaseTopos with LogicalOperations {
           ): ZZ > AA
 
           def calcTranspose[
-            R <: Ɛ.~,
-            RR <: ~,
-            T <: Ɛ.~,
-            TT <: ~
+            R <: ~,
+            RR <: ~~,
+            T <: ~,
+            TT <: ~~
           ](
             source: ActionDot[R, RR],
             target: ActionDot[T, TT],
@@ -158,9 +143,9 @@ trait ConstructToposOfMonoidActions extends BaseTopos with LogicalOperations {
           ): AA > ExponentialWrapper[R, RR, T, TT]
 
           def crossPreRestrict[
-            Z <: Ɛ.~,
-            ZZ <: ~,
-            A <: Ɛ.~
+            Z <: ~,
+            ZZ <: ~~,
+            A <: ~
           ](
             source: ActionDot[Z, ZZ],
             restrictedArrow: Ɛ.>[Z, A]
@@ -168,8 +153,8 @@ trait ConstructToposOfMonoidActions extends BaseTopos with LogicalOperations {
         }
 
         class ActionDot[
-          A <: Ɛ.~,
-          AA <: ~
+          A <: ~,
+          AA <: ~~
         ](
           val action: Action[A],
           val ↔ : A ↔ AA
@@ -199,10 +184,13 @@ trait ConstructToposOfMonoidActions extends BaseTopos with LogicalOperations {
             action.sanityTest
           }
 
-          override def xUncached[BB <: ~](that: DOT[BB]) =
+          override def xUncached[BB <: ~~](that: DOT[BB]) =
             that.preMultiplyUncached(this)
 
-          override def preMultiplyUncached[Z <: Ɛ.~, ZZ <: ~](
+          override def preMultiplyUncached[
+            Z <: ~, 
+            ZZ <: ~~
+          ](
             pre: ActionDot[Z, ZZ]
           ): BIPRODUCT[ZZ, AA] = {
             val product: Ɛ.BIPRODUCT[Z, A] = pre.action.actionCarrier x action.actionCarrier
@@ -237,10 +225,10 @@ trait ConstructToposOfMonoidActions extends BaseTopos with LogicalOperations {
             }.asInstanceOf[BIPRODUCT[ZZ, AA]]
           }
 
-          override def `>Uncached`[BB <: ~](that: DOT[BB]): EXPONENTIAL[AA, BB] =
+          override def `>Uncached`[BB <: ~~](that: DOT[BB]): EXPONENTIAL[AA, BB] =
             that.preExponentiateUncached(this)
 
-          override def preExponentiateUncached[Z <: Ɛ.~, ZZ <: ~](
+          override def preExponentiateUncached[Z <: ~, ZZ <: ~~](
             pre: ActionDot[Z, ZZ]
           ): EXPONENTIAL[ZZ, AA] = {
             val mXz = pre.pairs
@@ -288,7 +276,7 @@ trait ConstructToposOfMonoidActions extends BaseTopos with LogicalOperations {
                 val source: DOT[ZZ] = pre
                 val target: DOT[AA] = dot
 
-                def transpose[RR <: ~](
+                def transpose[RR <: ~~](
                   biArrow: BiArrow[RR, ZZ, AA]
                 ): RR > ExponentialWrapper[Z, ZZ, A, AA] =
                   biArrow.product.left.calcTranspose[Z, ZZ, A, AA](
@@ -298,10 +286,10 @@ trait ConstructToposOfMonoidActions extends BaseTopos with LogicalOperations {
           }
 
           override def calcTranspose[
-            R <: Ɛ.~,
-            RR <: ~,
-            T <: Ɛ.~,
-            TT <: ~
+            R <: ~,
+            RR <: ~~,
+            T <: ~,
+            TT <: ~~
           ](
             source: ActionDot[R, RR],
             target: ActionDot[T, TT],
@@ -328,7 +316,7 @@ trait ConstructToposOfMonoidActions extends BaseTopos with LogicalOperations {
           }
 
           override def apply[
-            BB <: ~
+            BB <: ~~
           ](
             that: DOT[BB]
           )(
@@ -337,8 +325,8 @@ trait ConstructToposOfMonoidActions extends BaseTopos with LogicalOperations {
             that.preApply(this)(f)
 
           override def preApply[
-            Z <: Ɛ.~,
-            ZZ <: ~
+            Z <: ~,
+            ZZ <: ~~
           ](
             pre: ActionDot[Z, ZZ]
           )(
@@ -350,9 +338,9 @@ trait ConstructToposOfMonoidActions extends BaseTopos with LogicalOperations {
               })
 
           override def crossPreRestrict[
-            Z <: Ɛ.~,
-            ZZ <: ~,
-            AAA <: Ɛ.~
+            Z <: ~,
+            ZZ <: ~~,
+            AAA <: ~
           ](
             source: ActionDot[Z, ZZ],
             restrictedArrow: Ɛ.>[Z, AAA]
@@ -368,67 +356,70 @@ trait ConstructToposOfMonoidActions extends BaseTopos with LogicalOperations {
 
         object ActionDot {
           def apply[
-            A <: Ɛ.~
+            A <: ~
           ](
             actionCarrier: Ɛ.DOT[A]
           )(
             actionMultiply: (A, M) => A
-          ) =
+          ): ActionDot[
+            A,
+            Ɛ.VanillaWrapper[A]
+          ] =
             wrap(monoid.action(actionCarrier)(actionMultiply))
 
           def wrap[
-            A <: Ɛ.~
+            A <: ~
           ](
             action: Action[A]
           ) =
             new ActionDot[
               A,
-              VanillaWrapper[A]
+              Ɛ.VanillaWrapper[A]
               ](
                 action,
-                VanillaWrapper.↔[A]
+                Ɛ.VanillaWrapper.↔[A]
               )
         }
 
         trait ActionArrowFacade[
-          AA <: ~,
-          BB <: ~
+          AA <: ~~,
+          BB <: ~~
         ] extends Arrow[AA, BB] {
 
           def preBackDivide[
-            B <: Ɛ.~,
-            Z <: Ɛ.~,
-            ZZ <: ~
+            B <: ~,
+            Z <: ~,
+            ZZ <: ~~
           ](
             pre: ActionArrow[Z, ZZ, B, BB]
           ): ZZ > AA
 
           def preEqualizer[
-            A <: Ɛ.~,
-            B <: Ɛ.~
+            A <: ~,
+            B <: ~
           ](pre: ActionArrow[A, AA, B, BB]): EQUALIZER[AA]
 
           def preRestrict[
-            B <: Ɛ.~
+            B <: ~
           ](
             equalizingDot: EQUALIZER[BB],
             thunkedEqualizer: Ɛ.EQUALIZER[B]
           ): AA > BB
 
           def preCompose[
-            B <: Ɛ.~,
-            C <: Ɛ.~,
-            CC <: ~
+            B <: ~,
+            C <: ~,
+            CC <: ~~
           ](
             pre: ActionArrow[B, BB, C, CC]
           ): AA > CC
         }
 
         case class ActionArrow[
-          A <: Ɛ.~,
-          AA <: ~,
-          B <: Ɛ.~,
-          BB <: ~
+          A <: ~,
+          AA <: ~~,
+          B <: ~,
+          BB <: ~~
         ](
           source: ActionDot[A, AA],
           target: ActionDot[B, BB],
@@ -441,13 +432,13 @@ trait ConstructToposOfMonoidActions extends BaseTopos with LogicalOperations {
                 (t, m) => arrow.chi(target.action.actionMultiply(t, m))
               })
 
-          override def \[UU <: ~](monic: UU > BB): AA > UU =
+          override def \[UU <: ~~](monic: UU > BB): AA > UU =
             monic.preBackDivide(this)
 
           override def preBackDivide[
-            BBB <: Ɛ.~,
-            Z <: Ɛ.~,
-            ZZ <: ~
+            BBB <: ~,
+            Z <: ~,
+            ZZ <: ~~
           ](
             that: ActionArrow[Z, ZZ, BBB, BB]
           ): ZZ > AA = {
@@ -464,8 +455,8 @@ trait ConstructToposOfMonoidActions extends BaseTopos with LogicalOperations {
             that.preEqualizer[A, B](this)
 
           override def preEqualizer[
-            AAA <: Ɛ.~,
-            BBB <: Ɛ.~
+            AAA <: ~,
+            BBB <: ~
           ](
            that: ActionArrow[AAA, AA, BBB, BB]
           ): EQUALIZER[AA] = {
@@ -476,12 +467,12 @@ trait ConstructToposOfMonoidActions extends BaseTopos with LogicalOperations {
             ) with EqualizingDot[AA] { equalizingDot =>
               override val equalizerTarget = source
 
-              override def restrict[RR <: ~](arrow: RR > AA): RR > AA =
+              override def restrict[RR <: ~~](arrow: RR > AA): RR > AA =
                 arrow.preRestrict[A](equalizingDot, thunkedEqualizer)
             }
           }
 
-          override def preRestrict[BBB <: Ɛ.~](
+          override def preRestrict[BBB <: ~](
             equalizingDot: EQUALIZER[BB],
             thunkedEqualizer: Ɛ.EQUALIZER[BBB]
           ): AA > BB =
@@ -492,13 +483,13 @@ trait ConstructToposOfMonoidActions extends BaseTopos with LogicalOperations {
 
           override def apply(a: AA): BB = target.↔ / arrow(source.↔ \ a)
 
-          override def o[ZZ <: ~](that: ZZ > AA): ZZ > BB =
+          override def o[ZZ <: ~~](that: ZZ > AA): ZZ > BB =
             that.preCompose[A, B, BB](this)
 
           override def preCompose[
-            BBB <: Ɛ.~,
-            C <: Ɛ.~,
-            CC <: ~
+            BBB <: ~,
+            C <: ~,
+            CC <: ~~
           ](pre: ActionArrow[BBB, BB, C, CC]): AA > CC = {
             val hackedPre = pre.asInstanceOf[ActionArrow[B, BB, C, CC]]
             ActionArrow(source, hackedPre.target, hackedPre.arrow o arrow)
@@ -516,29 +507,25 @@ trait ConstructToposOfMonoidActions extends BaseTopos with LogicalOperations {
           override def hashCode = 0
         }
 
-        override type WRAPPER[
-          T <: Ɛ.~
-        ] = VanillaWrapper[T]
-
         private val memoizedDotWrapper =
           Memoize.generic withLowerBound[
           ({
-            type λ[T <: Ɛ.~] = Action[T]
-          })#λ,
+            type λ[T <: ~] = Action[T]
+          }) # λ,
           ({
-            type λ[T <: Ɛ.~] = DOT[WRAPPER[T]]
-          })#λ,
-            Ɛ.~
+            type λ[T <: ~] = DOT[Ɛ.VanillaWrapper[T]]
+          }) # λ,
+          ~
           ] ActionDot.wrap
 
         override def makeDot[
-          T <: Ɛ.~
-        ](predot: Action[T]): DOT[WRAPPER[T]] =
+          T <: ~
+        ](predot: Action[T]): DOT[Ɛ.VanillaWrapper[T]] =
           memoizedDotWrapper(predot)
 
         override def makeArrow[
-          S <: Ɛ.~,
-          T <: Ɛ.~
+          S <: ~,
+          T <: ~
         ](
           prearrow: ActionPreArrow[S, T]
         ) = functionAsArrow(
@@ -548,16 +535,16 @@ trait ConstructToposOfMonoidActions extends BaseTopos with LogicalOperations {
         )
 
         override def functionAsArrow[
-          S <: Ɛ.~,
-          T <: Ɛ.~
+          S <: ~,
+          T <: ~
         ](
-          source: DOT[WRAPPER[S]],
-          target: DOT[WRAPPER[T]],
+          source: DOT[Ɛ.VanillaWrapper[S]],
+          target: DOT[Ɛ.VanillaWrapper[T]],
           f: S => T
-        ): WRAPPER[S] > WRAPPER[T] = {
-          val src = source.asInstanceOf[ActionDot[S, WRAPPER[S]]]
-          val tgt = target.asInstanceOf[ActionDot[T, WRAPPER[T]]]
-          ActionArrow[S, WRAPPER[S], T, WRAPPER[T]](
+        ): Ɛ.VanillaWrapper[S] > Ɛ.VanillaWrapper[T] = {
+          val src = source.asInstanceOf[ActionDot[S, Ɛ.VanillaWrapper[S]]]
+          val tgt = target.asInstanceOf[ActionDot[T, Ɛ.VanillaWrapper[T]]]
+          ActionArrow[S, Ɛ.VanillaWrapper[S], T, Ɛ.VanillaWrapper[T]](
             src,
             tgt,
             src.action.carrier(tgt.action.carrier)(f)
@@ -565,21 +552,21 @@ trait ConstructToposOfMonoidActions extends BaseTopos with LogicalOperations {
         }
 
         override def bifunctionAsBiArrow[
-          L <: Ɛ.~,
-          RIGHT <: Ɛ.~,
-          T <: Ɛ.~
+          L <: ~,
+          RIGHT <: ~,
+          T <: ~
         ](
-          left: DOT[WRAPPER[L]],
-          right: DOT[WRAPPER[RIGHT]],
-          target: DOT[WRAPPER[T]]
+          left: DOT[Ɛ.VanillaWrapper[L]],
+          right: DOT[Ɛ.VanillaWrapper[RIGHT]],
+          target: DOT[Ɛ.VanillaWrapper[T]]
         )(
           bifunc: (L, RIGHT) => T
-        ): BiArrow[WRAPPER[L], WRAPPER[RIGHT], WRAPPER[T]] = {
-          val l = left.asInstanceOf[ActionDot[L, WRAPPER[L]]]
-          val r = right.asInstanceOf[ActionDot[RIGHT, WRAPPER[RIGHT]]]
-          val t = target.asInstanceOf[ActionDot[T, WRAPPER[T]]]
+        ): BiArrow[Ɛ.VanillaWrapper[L], Ɛ.VanillaWrapper[RIGHT], Ɛ.VanillaWrapper[T]] = {
+          val l = left.asInstanceOf[ActionDot[L, Ɛ.VanillaWrapper[L]]]
+          val r = right.asInstanceOf[ActionDot[RIGHT, Ɛ.VanillaWrapper[RIGHT]]]
+          val t = target.asInstanceOf[ActionDot[T, Ɛ.VanillaWrapper[T]]]
           (l x r).biArrow(t) { (a, b) =>
-            VanillaWrapper(bifunc(a.element, b.element))
+            Ɛ.VanillaWrapper(bifunc(a.element, b.element))
           }
         }
       }

@@ -1,6 +1,6 @@
 package com.fdilke.bewl.apps.permutations
 
-import com.fdilke.bewl.apps.permutations.Permutations.topos.{DOT, WRAPPER}
+import com.fdilke.bewl.apps.permutations.Permutations.topos.DOT
 import com.fdilke.bewl.apps.permutations.Permutations.{RichPermutation, π}
 import com.fdilke.bewl.fsets.FiniteSets
 import org.scalatest.FunSpec

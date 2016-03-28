@@ -5,11 +5,12 @@ import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsUtilities}
 import com.fdilke.bewl.topos.{GenericToposTests, ToposWithFixtures}
 import org.scalatest.Matchers._
+import FiniteSets.ToposOfMonoidActions.~~
 
 import scala.Function.untupled
 
-class ToposOfMonoidActionsTest extends GenericToposTests(
-  new ToposWithFixtures {
+class ToposOfMonoidActionsTest extends GenericToposTests[~~](
+  new ToposWithFixtures[~~] {
 
     private val (i, x, y) = ('i, 'x, 'y)
 
@@ -24,9 +25,9 @@ class ToposOfMonoidActionsTest extends GenericToposTests(
 
     import topos._
 
-    override type FOO = WRAPPER[Symbol]
-    override type BAR = WRAPPER[String]
-    override type BAZ = WRAPPER[String]
+    override type FOO = FiniteSets.VanillaWrapper[Symbol]
+    override type BAR = FiniteSets.VanillaWrapper[String]
+    override type BAZ = FiniteSets.VanillaWrapper[String]
 
     override val foo = makeDot(monoidOf3.regularAction)
 
@@ -47,10 +48,11 @@ class ToposOfMonoidActionsTest extends GenericToposTests(
     )))
     override val monicBar2baz = functionAsArrow(bar, baz, Map("x" -> "x", "y" -> "y"))
 
-    override def makeSampleDot() =
+    override def makeSampleDot(): DOT[FiniteSets.VanillaWrapper[String]] =
       makeDot(monoidOf3.action(barDot)(scalarMultiply))
 
-    override def makeSampleArrow() =
+    override def makeSampleArrow():
+      FiniteSets.VanillaWrapper[Symbol] > FiniteSets.VanillaWrapper[String] =
       functionAsArrow(foo, bar, Map(
         i -> "x",
         x -> "x",
@@ -75,8 +77,8 @@ class ToposOfMonoidActionsTest extends GenericToposTests(
 
       val foo2wiz = functionAsArrow(foo, wiz, Map('i -> 1, 'x -> 1, 'y -> 2))
 
-      type WIZ = WRAPPER[Int]
-      type BINARY = WRAPPER[Boolean]
+      type WIZ = FiniteSets.VanillaWrapper[Int]
+      type BINARY = FiniteSets.VanillaWrapper[Boolean]
       val binaryDot : FiniteSets.DOT[Boolean] = FiniteSetsUtilities.dot(true, false)
       def binaryMultiply(b: Boolean, r: Symbol) : Boolean = b
       val binary = makeDot(monoidOf3.action(binaryDot)(binaryMultiply))

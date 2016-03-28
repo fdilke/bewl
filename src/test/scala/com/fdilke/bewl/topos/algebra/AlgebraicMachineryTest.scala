@@ -187,7 +187,7 @@ class AlgebraicMachineryTest extends FunSpec {
   describe("Algebraic theories") {
     it("can encapsulate commutative magmas") {
       val commutativeMagmas = AlgebraicTheory(*)(α * β := β * α)
-      case class CommutativeMagma[T <: ~](
+      case class CommutativeMagma[T](
         override val carrier: DOT[T],
         op: BinaryOp[T]
       ) extends commutativeMagmas.Algebra[T](carrier)(* := op)

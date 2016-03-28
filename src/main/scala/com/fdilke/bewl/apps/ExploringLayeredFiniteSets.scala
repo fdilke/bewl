@@ -1,5 +1,6 @@
 package com.fdilke.bewl.apps
 
+import com.fdilke.bewl.fsets.DiagrammaticFiniteSets
 import com.fdilke.bewl.fsets.DiagrammaticFiniteSets.DiagrammaticFiniteSetsDot
 import com.fdilke.bewl.fsets.LayeredFiniteSets._
 
@@ -15,7 +16,7 @@ object ExploringLayeredFiniteSets extends App {
 
   println(s"-1.5: falsity.isMonic = ${TruthObject.falsity.isMonic}")
 
-  def fromO[X <: ~](dot: DOT[X]) = {
+  def fromO[X <: DiagrammaticFiniteSets.Element](dot: DOT[X]) = {
 
     TruthObject.falsity.sanityTest
     dot.toI.sanityTest

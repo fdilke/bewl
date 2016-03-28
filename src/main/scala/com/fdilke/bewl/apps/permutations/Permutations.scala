@@ -53,9 +53,7 @@ class PermutationBuilder[T](
 object Permutations {
   val topos = FiniteSets.ToposOfAutomorphisms.build
 
-  type Permutation[T] = Permutations.topos.DOT[
-    Permutations.topos.WRAPPER[T]
-  ]
+  type Permutation[T] = Permutations.topos.DOT[T]
 
   def dot[T](
     mappings: Map[T, T]
@@ -76,9 +74,7 @@ object Permutations {
   def π[T] = new PermutationBuilder[T](Seq.empty)
 
   implicit class RichPermutation[T](
-    permutation: Permutations.topos.DOT[
-      Permutations.topos.WRAPPER[T]
-    ]
+    permutation: Permutation[T]
   ) {
     lazy val asArrow =
       Permutations.topos unwrap permutation

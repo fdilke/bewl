@@ -1,6 +1,6 @@
 package com.fdilke.bewl.topos
 
-trait LogicalOperations { topos: BaseTopos =>
+trait LogicalOperations[~] { topos: BaseTopos[~] =>
 
   object TruthObject { // TODO: This should eventually express omega as a complete Heyting algebra
     lazy val and = BiArrow(omega.squared, (truth x truth).chi)

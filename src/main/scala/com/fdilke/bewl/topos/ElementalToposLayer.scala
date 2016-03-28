@@ -7,23 +7,19 @@ import com.fdilke.bewl.helper.Memoize
 object ElementalToposLayer {
   def apply(
     Δ: BaseDiagrammaticTopos
-  ): Topos with Wrappings[Any, Δ.DOT, Δ.ARROW] = {
-    class ElementalToposLayer extends Topos with Wrappings[
+  ): Topos[Δ.Element] with Wrappings[Δ.Element, Any, Δ.DOT, Δ.ARROW, Δ.WrappedArrow] = {
+    class ElementalToposLayer extends Topos[Δ.Element] with Wrappings[
+      Δ.Element,
       Any,
       Δ.DOT,
-      Δ.ARROW
+      Δ.ARROW,
+      Δ.WrappedArrow
     ] { layer =>
 
-      override type ~ = Element
+      override type DOT[S <: Δ.Element] = AdapterDot[S]
+      override type >[S <: Δ.Element, T <: Δ.Element] = AdapterArrow[S, T]
 
-      trait Element {
-        protected[ElementalToposLayer] val arrow: Δ.ARROW[Any, Any]
-      }
-
-      override type DOT[S <: ~] = AdapterDot[S]
-      override type >[S <: ~, T <: ~] = AdapterArrow[S, T]
-
-      override type UNIT = WrappedArrow[Unit]
+      override type UNIT = Δ.WrappedArrow[Unit]
       lazy val I: DOT[UNIT] = makeDot(Δ.I).asInstanceOf[DOT[UNIT]]
 
       override type TRUTH = AdapterTruth
@@ -31,9 +27,9 @@ object ElementalToposLayer {
       override lazy val omega = makeDot(Δ.omega).asInstanceOf[DOT[TRUTH]]
       override lazy val truth = makeArrow(Δ.truth).asInstanceOf[UNIT > TRUTH]
 
-      trait AdapterTruth extends Element
+      trait AdapterTruth extends Δ.Element
 
-      trait AdapterDot[T <: Element] extends Dot[T] { self =>
+      trait AdapterDot[T <: Δ.Element] extends Dot[T] { self =>
         private[ElementalToposLayer] val dot: Δ.DOT[Any]
 
         override lazy val toI: T > UNIT =
@@ -44,7 +40,7 @@ object ElementalToposLayer {
             AdapterArrow.fromArrow(I, self, global)
           }
 
-        override def xUncached[U <: ~](that: DOT[U]) =
+        override def xUncached[U <: Δ.Element](that: DOT[U]) =
           new AdapterDot[T x U] with BiproductDot[T, U, T x U] {
             override val left = self
             override val right = that
@@ -59,12 +55,12 @@ object ElementalToposLayer {
               new (T, U)(
                 self.asElement(fletch(Δ.leftProjection(self.dot, that.dot))(fletch(anArrow))),
                 that.asElement(fletch(Δ.rightProjection(self.dot, that.dot))(fletch(anArrow)))
-              ) with Element {
+              ) with Δ.Element {
                 override val arrow: Δ.ARROW[Any, Any] = fletch(anArrow)
               }
           }
 
-        override def `>Uncached`[U <: ~](that: DOT[U]) =
+        override def `>Uncached`[U <: Δ.Element](that: DOT[U]) =
           new AdapterDot[T → U] with ExponentialDot[T, U, T → U] { exponentialAdapter =>
             override val source = self
             override val target = that
@@ -73,7 +69,7 @@ object ElementalToposLayer {
             override private[ElementalToposLayer] val dot = 
               exponential.exponentDot.asInstanceOf[Δ.DOT[Any]]
 
-            override def transpose[R <: ~](biArrow: BiArrow[R, T, U]) =
+            override def transpose[R <: Δ.Element](biArrow: BiArrow[R, T, U]) =
               AdapterArrow.fromArrow(
                 biArrow.product.left, 
                 exponentialAdapter,
@@ -81,7 +77,7 @@ object ElementalToposLayer {
               )
 
             override private[ElementalToposLayer] def asElement(anArrow: Δ.ARROW[_, _]) =
-              new (T => U) with Element {
+              new (T => U) with Δ.Element {
                 override val arrow: Δ.ARROW[Any, Any] = fletch(anArrow)
 
                 override def apply(s: T): U =
@@ -95,7 +91,7 @@ object ElementalToposLayer {
 
         override def sanityTest = dot.sanityTest
 
-        override def apply[U <: ~](target: DOT[U])(f: T => U) =
+        override def apply[U <: Δ.Element](target: DOT[U])(f: T => U) =
           AdapterArrow[T, U](this, target, f)
 
         private[ElementalToposLayer] def asElement(arrow: Δ.ARROW[_, _]): T
@@ -104,13 +100,15 @@ object ElementalToposLayer {
       }
 
       object AdapterArrow {
-        def apply[S <: ~, T <: ~](source: DOT[S], target: DOT[T], function:  S => T) =
+        def apply[S <: Δ.Element, T <: Δ.Element](
+          source: DOT[S], target: DOT[T], function:  S => T
+        ) =
           new AdapterArrow[S, T](source, target,
             () => function,
             () => function(source.asElement(source.dot.identity)).arrow
           )
 
-        def fromArrow[S <: ~, T <: ~](
+        def fromArrow[S <: Δ.Element, T <: Δ.Element](
           source: DOT[S],
           target: DOT[T],
           arrow: Δ.ARROW[_, _]
@@ -121,7 +119,7 @@ object ElementalToposLayer {
           )
       }
 
-      class AdapterArrow[S <: ~, T <: ~](
+      class AdapterArrow[S <: Δ.Element, T <: Δ.Element](
         val source: DOT[S],
         val target: DOT[T],
         _function: () => S => T,
@@ -133,7 +131,7 @@ object ElementalToposLayer {
 
         override def apply(s: S) = function(s)
 
-        override def o[R <: ~](that: R > S) =
+        override def o[R <: Δ.Element](that: R > S) =
           that.source(target)(function compose that.function)
 
         def ?=(that: S > T) =
@@ -148,9 +146,9 @@ object ElementalToposLayer {
             override private[ElementalToposLayer] def asElement(
               anArrow: Δ.ARROW[_, _]
             ): S =
-              new WrappedArrow(fletch(anArrow)).asInstanceOf[S]
+              new Δ.WrappedArrow(fletch(anArrow)).asInstanceOf[S]
 
-            override def restrict[R <: ~](arrow: R > S) =
+            override def restrict[R <: Δ.Element](arrow: R > S) =
               AdapterArrow.fromArrow(
                 arrow.source,
                 equalizingDot,
@@ -174,7 +172,7 @@ object ElementalToposLayer {
 
         override lazy val chi = AdapterArrow.fromArrow(target, omega, arrowChi.arrow)
 
-        override def \[U <: ~](monic: U > T) =
+        override def \[U <: Δ.Element](monic: U > T) =
           AdapterArrow.fromArrow(source, monic.source, monic.arrowChi.restrict(arrow))
 
         override def sanityTest = {
@@ -192,15 +190,11 @@ object ElementalToposLayer {
         private lazy val arrowChi = arrow.chi
       }
 
-      class WrappedArrow[X](protected[ElementalToposLayer] val arrow: Δ.ARROW[Any, Any]) extends ~ {
-        override def toString: String = s"WrappedArrow($arrow)"
-      }
-
-      private class WrappedDot[X](innerDot: Δ.DOT[X]) extends DOT[WrappedArrow[X]] {
+      private class WrappedDot[X](innerDot: Δ.DOT[X]) extends DOT[Δ.WrappedArrow[X]] {
         override private[ElementalToposLayer] val dot: Δ.DOT[Any] = innerDot.asInstanceOf[Δ.DOT[Any]]
 
         override private[ElementalToposLayer] def asElement(arrow: Δ.ARROW[_, _]) =
-          new WrappedArrow(fletch(arrow))
+          new Δ.WrappedArrow(fletch(arrow))
       }
 
       private val memoizedWrappedDot = {
@@ -213,29 +207,27 @@ object ElementalToposLayer {
 
       // wrapping API: TODO make this comment part of the structure
 
-      override type WRAPPER[S] = WrappedArrow[S]
-
-      override def makeDot[S](predot: Δ.DOT[S]): DOT[WrappedArrow[S]] =
+      override def makeDot[S](predot: Δ.DOT[S]): DOT[Δ.WrappedArrow[S]] =
         memoizedWrappedDot(predot)
 
-      override def makeArrow[S, T](prearrow: Δ.ARROW[S, T]): WRAPPER[S] > WRAPPER[T] =
+      override def makeArrow[S, T](prearrow: Δ.ARROW[S, T]): Δ.WrappedArrow[S] > Δ.WrappedArrow[T] =
         AdapterArrow.fromArrow(makeDot(prearrow.source), makeDot(prearrow.target), prearrow)
 
       override def functionAsArrow[S, T](
-        source: DOT[WrappedArrow[S]],
-        target: DOT[WrappedArrow[T]],
+        source: DOT[Δ.WrappedArrow[S]],
+        target: DOT[Δ.WrappedArrow[T]],
         f: S => T
       ) = makeArrow(Δ.buildArrow[S, T](
         source.dot.asInstanceOf[Δ.DOT[S]],
         target.dot.asInstanceOf[Δ.DOT[T]],
         f
-      ).asInstanceOf[Δ.ARROW[WRAPPER[S], WRAPPER[T]]]
-      ).asInstanceOf[WRAPPER[S] > WRAPPER[T]]
+      ).asInstanceOf[Δ.ARROW[Δ.WrappedArrow[S], Δ.WrappedArrow[T]]]
+      ).asInstanceOf[Δ.WrappedArrow[S] > Δ.WrappedArrow[T]]
 
       override def bifunctionAsBiArrow[L, R, T](
-        left: DOT[WRAPPER[L]],
-        right: DOT[WRAPPER[R]],
-        target: DOT[WRAPPER[T]]
+        left: DOT[Δ.WrappedArrow[L]],
+        right: DOT[Δ.WrappedArrow[R]],
+        target: DOT[Δ.WrappedArrow[T]]
       ) (
         bifunc: (L, R) => T
       ) = {
@@ -251,9 +243,9 @@ object ElementalToposLayer {
       }
 
       private def biArrow[
-        L <: ~,
-        R <: ~,
-        T <: ~
+        L <: Δ.Element,
+        R <: Δ.Element,
+        T <: Δ.Element
       ] (
         biArrow: BiArrow[L, R, T]
       ) =

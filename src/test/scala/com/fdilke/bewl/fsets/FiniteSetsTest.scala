@@ -4,7 +4,7 @@ import com.fdilke.bewl.topos.{GenericToposTests, ToposWithFixtures}
 import FiniteSetsUtilities._
 import org.scalatest.Matchers._
 
-class FiniteSetsTest extends GenericToposTests(new ToposWithFixtures {
+class FiniteSetsTest extends GenericToposTests(new ToposWithFixtures[Any] {
   val topos = FiniteSets
 
   type FOO = Boolean
