@@ -3,9 +3,11 @@ package com.fdilke.bewl.topos
 import com.fdilke.bewl.helper.{↔, Memoize}
 import com.fdilke.bewl.topos.algebra.{AlgebraicConstructions, AlgebraicMachinery, AlgebraicStructures}
 import com.fdilke.bewl.topos.constructions.{ConstructToposOfAutomorphisms, ConstructToposOfGroupActions, ConstructToposOfMonoidActions}
+import org.scalatest.Matchers
 
 import scala.Function.tupled
 import scala.language.{higherKinds, postfixOps}
+import Matchers._
 
 trait ToposAlgebra[~] extends
   AlgebraicMachinery[~] with
@@ -263,6 +265,48 @@ trait BaseTopos[~] { self: LogicalOperations[~] =>
         case (a, b) => predicate(a, b)
       }.whereTrue.inclusion
       (product.π1 o graph) / (product.π0 o graph)
+    }
+
+    type DoubleExponential[X <: ~] = (X → S) → S
+
+    lazy val doubleExpMonad =
+      new Monad[DoubleExponential] {
+        override def apply[X <: ~](dash: DOT[X]) =
+          dash > dot > dot
+
+        override def map[X <: ~, Y <: ~](arrow: X > Y): DoubleExponential[X] > DoubleExponential[Y] =
+          ???
+
+        // TODO: layer over an uncached version of this
+        override def eta[X <: ~](dash: DOT[X]) = {
+          val theEta: X > ((X → S) → S) =
+            ???
+          theEta
+//          _ (x)
+        }
+
+        // TODO: layer over an uncached version of this
+        override def mu[X <: ~](dash: DOT[X]) = {
+          val theMu: ((((X → S) → S) → S) → S) > ((X → S) → S) =
+            ???
+          theMu
+        }
+//          xh => mmx(_(xh))
+      }
+  }
+
+  abstract class Monad[M[X <: ~] <: ~] {
+    def apply[X <: ~](dot: DOT[X]): DOT[M[X]]
+    def map[X <: ~, Y <: ~](arrow: X > Y): M[X] > M[Y]
+    def eta[X <: ~](dot: DOT[X]): X > M[X]
+    def mu[X <: ~](dot: DOT[X]): M[M[X]] > M[X]
+
+    type Algebra[X <: ~] = M[X] => X
+
+    def sanityTestAt[X <: ~](dot: DOT[X]) = {
+      mu(dot) o map(eta(dot)) shouldBe apply(dot).identity
+      mu(dot) o eta(apply(dot)) shouldBe apply(dot).identity
+      mu(dot) o map(mu(dot)) shouldBe (mu(dot) o mu(apply(dot)))
     }
   }
 
