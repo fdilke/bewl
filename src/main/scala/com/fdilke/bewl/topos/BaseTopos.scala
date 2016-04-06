@@ -272,42 +272,50 @@ trait BaseTopos[~] { self: LogicalOperations[~] =>
     lazy val doubleExpMonad =
       new Monad[DoubleExponential] {
         override def apply[X <: ~](dash: DOT[X]) =
-          dash > dot > dot
+          new At[X] {
+
+            override lazy val free: DOT[DoubleExponential[X]] =
+              dash > dot > dot
+
+            // TODO: layer over an uncached version of this
+            override lazy val eta = {
+              val theEta: X > ((X → S) → S) =
+                ???
+              theEta
+              //          _ (x)
+            }
+
+            // TODO: layer over an uncached version of this
+            override lazy val mu = {
+              val theMu: ((((X → S) → S) → S) → S) > ((X → S) → S) =
+                ???
+              theMu
+            }
+            //          xh => mmx(_(xh))
+          }
 
         override def map[X <: ~, Y <: ~](arrow: X > Y): DoubleExponential[X] > DoubleExponential[Y] =
           ???
-
-        // TODO: layer over an uncached version of this
-        override def eta[X <: ~](dash: DOT[X]) = {
-          val theEta: X > ((X → S) → S) =
-            ???
-          theEta
-//          _ (x)
-        }
-
-        // TODO: layer over an uncached version of this
-        override def mu[X <: ~](dash: DOT[X]) = {
-          val theMu: ((((X → S) → S) → S) → S) > ((X → S) → S) =
-            ???
-          theMu
-        }
-//          xh => mmx(_(xh))
       }
   }
 
-  abstract class Monad[M[X <: ~] <: ~] {
-    def apply[X <: ~](dot: DOT[X]): DOT[M[X]]
+  abstract class Monad[M[X <: ~] <: ~] { // TODO: trait
+    def apply[X <: ~](dot: DOT[X]): At[X]
     def map[X <: ~, Y <: ~](arrow: X > Y): M[X] > M[Y]
-    def eta[X <: ~](dot: DOT[X]): X > M[X]
-    def mu[X <: ~](dot: DOT[X]): M[M[X]] > M[X]
 
-    type Algebra[X <: ~] = M[X] => X
+    trait At[X <: ~] {
+      val free: DOT[M[X]]
+      val eta: X > M[X]
+      val mu: M[M[X]] > M[X]
 
-    def sanityTestAt[X <: ~](dot: DOT[X]) = {
-      mu(dot) o map(eta(dot)) shouldBe apply(dot).identity
-      mu(dot) o eta(apply(dot)) shouldBe apply(dot).identity
-      mu(dot) o map(mu(dot)) shouldBe (mu(dot) o mu(apply(dot)))
+      def sanityTest = {
+//        mu o map(eta(dot)) shouldBe apply(dot).identity
+//        mu o eta(apply(dot)) shouldBe apply(dot).identity
+//        mu o map(mu(dot)) shouldBe (mu(dot) o mu(apply(dot)))
+      }
     }
+
+    type Algebra[X <: ~] = M[X] => X // TODO: sanity test
   }
 
   trait BaseArrow[S <: ~, T <: ~] {

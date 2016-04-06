@@ -11,20 +11,23 @@ class MonadConstructionsTest extends FunSpec {
   import FiniteSets._
 
   describe("The double-exponential monad") {
-    ignore("can be constructed for sets") {
+    it("can be constructed for sets") {
       val monadJoin = omega.doubleExpMonad
 
-      monadJoin(O).globals should have size 2
-      monadJoin(I).globals should have size 4
-      monadJoin(omega).globals should have size 16
+      monadJoin(O).free.globals should have size 2
+      monadJoin(I).free.globals should have size 4
+      monadJoin(omega).free.globals should have size 16
 
-      println("Testing 1")
-      monadJoin.sanityTestAt(dot(1))
-      println("Testing 1 2")
-      monadJoin.sanityTestAt(dot(1,2))
-      println("Testing 1 2 3")
-      monadJoin.sanityTestAt(dot(1,2,3)) // a bridge too far?
-      println("Testing 1 2 3 ... done")
+//      println("Testing 1")
+//      monadJoin.sanityTestAt(dot(1))
+//      println("Testing 1 2")
+//      monadJoin.sanityTestAt(dot(1,2))
+//      println("Testing 1 2 3")
+//      monadJoin.sanityTestAt(dot(1,2,3)) // a bridge too far?
+//      println("Testing 1 2 3 ... done")
+
+// check that M[X] is a monad, via multiplication as structure map. Or is that
+// too hard to calculate / a trivial consequence of our existing laws
     }
   }
 }
