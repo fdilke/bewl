@@ -274,18 +274,15 @@ trait BaseTopos[~] { self: LogicalOperations[~] =>
         override def apply[X <: ~](dash: DOT[X]) =
           new At[X] {
 
-            override lazy val free: DOT[DoubleExponential[X]] =
+            private lazy val doubleExp: EXPONENTIAL[X → S, S] =
               dash > dot > dot
 
-            // TODO: layer over an uncached version of this
-            override lazy val eta = {
-              val theEta: X > ((X → S) → S) =
-                ???
-              theEta
-              //          _ (x)
-            }
+            override lazy val free: DOT[DoubleExponential[X]] =
+              doubleExp
 
-            // TODO: layer over an uncached version of this
+            override lazy val eta =
+              doubleExp.transpose(dash) { (x, f) => f(x) }
+
             override lazy val mu = {
               val theMu: ((((X → S) → S) → S) → S) > ((X → S) → S) =
                 ???
@@ -299,7 +296,8 @@ trait BaseTopos[~] { self: LogicalOperations[~] =>
       }
   }
 
-  abstract class Monad[M[X <: ~] <: ~] { // TODO: trait
+  trait Monad[M[X <: ~] <: ~] {
+    // TODO: cache these automatically
     def apply[X <: ~](dot: DOT[X]): At[X]
     def map[X <: ~, Y <: ~](arrow: X > Y): M[X] > M[Y]
 

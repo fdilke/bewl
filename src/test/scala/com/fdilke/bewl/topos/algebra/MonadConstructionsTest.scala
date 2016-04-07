@@ -18,6 +18,16 @@ class MonadConstructionsTest extends FunSpec {
       monadJoin(I).free.globals should have size 4
       monadJoin(omega).free.globals should have size 16
 
+      val atTwo = monadJoin(two)
+      val eta: Symbol > ((Symbol → TRUTH) → TRUTH) = atTwo.eta
+      for (
+        global <- (two > omega).globals ;
+        symbol <- Seq('x, 'y)
+      ) {
+        val f: Symbol → TRUTH = global(())
+        eta(symbol)(f) shouldBe f(symbol)
+      }
+
 //      println("Testing 1")
 //      monadJoin.sanityTestAt(dot(1))
 //      println("Testing 1 2")
