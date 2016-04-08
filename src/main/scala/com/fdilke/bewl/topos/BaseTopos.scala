@@ -298,7 +298,12 @@ trait BaseTopos[~] { self: LogicalOperations[~] =>
       }
 
     // Contravariant exponential functor
-    final def >[T <: ~, U <: ~](arrow: T > U): (U → S) > (T → S) =
+    final def >[
+      T <: ~,
+      U <: ~
+    ] (
+      arrow: T > U
+    ): (U → S) > (T → S) =
       (arrow.source > dot).transpose(
         arrow.target > dot
       ) { (s_u, t) =>

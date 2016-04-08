@@ -2,6 +2,7 @@ package com.fdilke.bewl.topos.algebra
 
 import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
+import com.fdilke.bewl.topos.Wrappings.NO_WRAPPER
 import org.scalatest.{Ignore, FunSpec}
 import org.scalatest.Matchers._
 
@@ -28,7 +29,19 @@ class MonadConstructionsTest extends FunSpec {
         eta(symbol)(f) shouldBe f(symbol)
       }
 
-//      println("Testing 1")
+      val symbols = dot('a, 'b)
+      val ints = dot(1, 2, 3)
+      val f: Symbol > Int = arrow(symbols, ints, 'a -> 2, 'b -> 1)
+//      val map: ((Symbol → TRUTH) → TRUTH) > ((Int → TRUTH) → TRUTH) = monadJoin.map(f)
+
+//      for (soo <- ((symbols > omega) > omega).globals map { _(()) } ;
+//           io <- (ints > omega).globals map { _(()) } ;
+//           symbol <- Seq('a, 'b))
+//         map(soo)(io) shouldBe soo(  (omega > io)(f)  )
+
+// does there need to be a 'further internalized contravariant functor' "omega → io" ?
+
+      //      println("Testing 1")
 //      monadJoin.sanityTestAt(dot(1))
 //      println("Testing 1 2")
 //      monadJoin.sanityTestAt(dot(1,2))
