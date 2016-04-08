@@ -267,17 +267,17 @@ trait BaseTopos[~] { self: LogicalOperations[~] =>
       (product.π1 o graph) / (product.π0 o graph)
     }
 
-    type DoubleExponential[X <: ~] = (X → S) → S
-
     lazy val doubleExpMonad =
-      new Monad[DoubleExponential] {
+      new Monad[
+        ({type λ[X <: ~] = (X → S) → S}) # λ
+      ] {
         override def apply[X <: ~](dash: DOT[X]) =
           new At[X] {
 
             private lazy val doubleExp: EXPONENTIAL[X → S, S] =
               dash > dot > dot
 
-            override lazy val free: DOT[DoubleExponential[X]] =
+            override lazy val free: DOT[(X → S) → S] =
               doubleExp
 
             override lazy val eta =
@@ -291,7 +291,9 @@ trait BaseTopos[~] { self: LogicalOperations[~] =>
             //          xh => mmx(_(xh))
           }
 
-        override def map[X <: ~, Y <: ~](arrow: X > Y): DoubleExponential[X] > DoubleExponential[Y] =
+        override def map[X <: ~, Y <: ~](
+          arrow: X > Y
+        ): ((X → S) → S) > ((Y → S) → S) =
           ???
       }
 
