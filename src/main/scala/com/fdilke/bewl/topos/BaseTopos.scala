@@ -294,6 +294,14 @@ trait BaseTopos[~] { self: LogicalOperations[~] =>
         override def map[X <: ~, Y <: ~](arrow: X > Y): DoubleExponential[X] > DoubleExponential[Y] =
           ???
       }
+
+    // Contravariant exponential functor
+    final def >[T <: ~, U <: ~](arrow: T > U): (U → S) > (T → S) =
+      (arrow.source > dot).transpose(
+        arrow.target > dot
+      ) { (s_u, t) =>
+        s_u(arrow(t))
+      }
   }
 
   trait Monad[M[X <: ~] <: ~] {

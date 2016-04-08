@@ -1,7 +1,9 @@
 package com.fdilke.bewl.topos
 
+import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
+import com.fdilke.bewl.topos.Wrappings.NO_WRAPPER
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
@@ -175,6 +177,25 @@ class DotAndArrowEnrichmentTest extends FunSpec {
       )
       foo2target shouldBe (sum o (foo +- bar))
       bar2target shouldBe (sum o (foo -+ bar))
+    }
+  }
+
+  describe("The contravariant exponential functor H ^ _") {
+    it("behaves as expected") {
+      val h = dot(true, false)
+      val symbols = dot('A, 'B, 'C)
+      val numbers = dot(1, 2, 3)
+      val f: Symbol > Int = arrow(symbols, numbers,
+        'A -> 2, 'B -> 1, 'C -> 1
+      )
+      val h_f: (Int → Boolean) > (Symbol → Boolean) = h > f
+
+      for (
+        global <- (numbers > h).globals ;
+        g = global(()) ;
+        symbol <- Seq('A, 'B, 'C)
+      )
+        h_f(g)(symbol) shouldBe g(f(symbol))
     }
   }
 }
