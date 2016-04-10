@@ -293,8 +293,8 @@ trait BaseTopos[~] { self: LogicalOperations[~] =>
 
         override def map[X <: ~, Y <: ~](
           arrow: X > Y
-        ): ((X → S) → S) > ((Y → S) → S) =
-          ???
+        ) =
+          dot > (dot > arrow)
       }
 
     // Contravariant exponential functor

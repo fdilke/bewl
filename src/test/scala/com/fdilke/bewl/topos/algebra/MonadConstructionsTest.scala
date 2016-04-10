@@ -32,12 +32,12 @@ class MonadConstructionsTest extends FunSpec {
       val symbols = dot('a, 'b)
       val ints = dot(1, 2, 3)
       val f: Symbol > Int = arrow(symbols, ints, 'a -> 2, 'b -> 1)
-//      val map: ((Symbol → TRUTH) → TRUTH) > ((Int → TRUTH) → TRUTH) = monadJoin.map(f)
+      val map: ((Symbol → TRUTH) → TRUTH) > ((Int → TRUTH) → TRUTH) = monadJoin.map(f)
 
-//      for (soo <- ((symbols > omega) > omega).globals map { _(()) } ;
-//           io <- (ints > omega).globals map { _(()) } ;
-//           symbol <- Seq('a, 'b))
-//         map(soo)(io) shouldBe soo(  (omega > io)(f)  )
+      for (soo <- ((symbols > omega) > omega).globals map { _(()) } ;
+           io <- (ints > omega).globals map { _(()) } ;
+           symbol <- Seq('a, 'b))
+        map(soo)(io) shouldBe soo((omega > f)(io))
 
 // does there need to be a 'further internalized contravariant functor' "omega → io" ?
 
