@@ -334,9 +334,11 @@ trait BaseTopos[~] { self: LogicalOperations[~] =>
       val mu: M[M[X]] > M[X]
 
       def sanityTest = {
-//        mu o map(eta(dot)) shouldBe apply(dot).identity
-//        mu o eta(apply(dot)) shouldBe apply(dot).identity
-//        mu o map(mu(dot)) shouldBe (mu(dot) o mu(apply(dot)))
+        mu o map(eta) shouldBe free.identity
+        mu o apply(free).eta shouldBe free.identity
+//        val lhs: >[M[M[M[X]]], M[X]] = mu o map(mu)
+//        val rhs: >[M[M[M[X]]], M[X]] = mu o apply(free).mu
+//        mu o map(mu) shouldBe (mu o apply(free).mu)
       }
     }
 

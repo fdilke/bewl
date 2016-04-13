@@ -47,11 +47,14 @@ class MonadConstructionsTest extends FunSpec {
           (x, f) => f(x)
         }
 
+      // TODO: abstract away 'io' here, so we can compare ioooo and (ioooo o io2iooo) directly
       for (
         ioooo <- (I > omega > omega > omega > omega).globals map { _(()) } ;
         io <- (I > omega).globals map { _(()) }
       )
         mu(ioooo)(io) shouldBe ioooo(io2iooo(io))
+
+      monadJoin(I).sanityTest
 
 // does there need to be a 'further internalized contravariant functor' "omega → io" ?
 
