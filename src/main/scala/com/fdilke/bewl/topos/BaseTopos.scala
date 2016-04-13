@@ -269,26 +269,38 @@ trait BaseTopos[~] { self: LogicalOperations[~] =>
 
     lazy val doubleExpMonad =
       new Monad[
-        ({type λ[X <: ~] = (X → S) → S}) # λ
+        ({type λ[X <: ~] = X → S → S}) # λ
       ] {
-        override def apply[X <: ~](dash: DOT[X]) =
+        override def apply[X <: ~](
+          dash: DOT[X]
+        ) =
           new At[X] {
 
             private lazy val doubleExp: EXPONENTIAL[X → S, S] =
               dash > dot > dot
 
-            override lazy val free: DOT[(X → S) → S] =
+            override lazy val free: DOT[X → S → S] =
               doubleExp
 
             override lazy val eta =
-              doubleExp.transpose(dash) { (x, f) => f(x) }
+              doubleExp.transpose(dash) {
+                (x, f) => f(x)
+              }
 
-            override lazy val mu = {
-              val theMu: ((((X → S) → S) → S) → S) > ((X → S) → S) =
-                ???
-              theMu
-            }
-            //          xh => mmx(_(xh))
+            override lazy val mu =
+                (dash > dot > dot).transpose(
+                  dash > dot > dot > dot > dot
+                ) {
+                  (ffff, f) => ffff(
+                    (dash > dot > dot > dot).transpose(
+                      dash > dot
+                    ) {
+                      (x, f) => f(x)
+                    }(
+                      f
+                    )
+                  )
+                }
           }
 
         override def map[X <: ~, Y <: ~](
