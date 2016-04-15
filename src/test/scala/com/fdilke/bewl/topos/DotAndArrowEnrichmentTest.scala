@@ -1,9 +1,7 @@
 package com.fdilke.bewl.topos
 
-import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
-import com.fdilke.bewl.topos.Wrappings.NO_WRAPPER
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
