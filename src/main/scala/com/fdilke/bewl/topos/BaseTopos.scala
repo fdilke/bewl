@@ -271,7 +271,7 @@ trait BaseTopos[~] { self: LogicalOperations[~] =>
       new Monad[
         ({type λ[X <: ~] = X → S → S}) # λ
       ] {
-        override def apply[X <: ~](
+        override def atUncached[X <: ~](
           dash: DOT[X]
         ) =
           new At[X] {
@@ -324,8 +324,17 @@ trait BaseTopos[~] { self: LogicalOperations[~] =>
   }
 
   trait Monad[M[X <: ~] <: ~] {
-    // TODO: cache these automatically
-    def apply[X <: ~](dot: DOT[X]): At[X]
+    final private val memoizedLocalValues =
+      Memoize.generic.withLowerBound[
+        DOT,
+        At,
+        ~
+      ] (atUncached)
+
+    final def apply[X <: ~](dot: DOT[X]): At[X] =
+      memoizedLocalValues(dot)
+
+    def atUncached[X <: ~](dot: DOT[X]): At[X]
     def map[X <: ~, Y <: ~](arrow: X > Y): M[X] > M[Y]
 
     trait At[X <: ~] {
