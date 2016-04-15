@@ -2,6 +2,7 @@ package com.fdilke.bewl.apps.permutations
 
 import com.fdilke.bewl.apps.permutations.Permutations.Permutation
 import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsPreArrow}
+import com.fdilke.bewl.fsets.FiniteSetsUtilities.elementsOf
 
 import scala.language.postfixOps
 
@@ -23,15 +24,6 @@ class PermutationBuilder[T](
     new PermutationBuilder(
       cycles :+ Cycle(cycle :_*)
     )
-
-//  private def allAsSet: Set[T] =
-//    cycles.map {
-//      _.members.toSet
-//    }.fold (
-//      Set.empty
-//    )(
-//      _ union _
-//    )
 
   private def allMappings: Map[T, T] =
     Map(
@@ -80,9 +72,7 @@ object Permutations {
       Permutations.topos unwrap permutation
 
     lazy val carrier =
-      asArrow.source.globals map {
-        _(())
-      } toSet
+      elementsOf(asArrow.source) toSet
 
     lazy val asMap =
       carrier map { e =>

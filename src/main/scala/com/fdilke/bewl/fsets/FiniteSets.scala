@@ -172,6 +172,11 @@ object FiniteSetsUtilities {
       Function untupled Map(mappings:_*)
     )
 
+  def elementsOf[X](dot: DOT[X]): Traversable[X] =
+    dot.globals map {
+      _(())
+    }
+
   def makeNullaryOperator[X](carrier: DOT[X], value: X) =
     functionAsArrow(I, carrier, (_: UNIT) => value)
 

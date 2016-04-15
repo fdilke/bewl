@@ -21,21 +21,20 @@ class MonadConstructionsTest extends FunSpec {
       val atTwo = monadJoin(two)
       val eta: Symbol > (Symbol → TRUTH → TRUTH) = atTwo.eta
       for (
-        global <- (two > omega).globals ;
+        f <- elementsOf(two > omega) ;
         symbol <- Seq('x, 'y)
-      ) {
-        val f: Symbol → TRUTH = global(())
+      )
         eta(symbol)(f) shouldBe f(symbol)
-      }
 
       val symbols = dot('a, 'b)
       val ints = dot(1, 2, 3)
       val f: Symbol > Int = arrow(symbols, ints, 'a -> 2, 'b -> 1)
-      val map: ((Symbol → TRUTH) → TRUTH) > ((Int → TRUTH) → TRUTH) = monadJoin.map(f)
+      val map: (Symbol → TRUTH → TRUTH) > (Int → TRUTH → TRUTH) = monadJoin.map(f)
 
+      // TODO: abstract away 'io' here
       for (
-        soo <- (symbols > omega > omega).globals map { _(()) };
-        io <- (ints > omega).globals map { _(()) };
+        soo <- elementsOf(symbols > omega > omega) ;
+        io <- elementsOf(ints > omega) ;
         symbol <- Seq('a, 'b)
       )
         map(soo)(io) shouldBe soo((omega > f)(io))
@@ -49,8 +48,8 @@ class MonadConstructionsTest extends FunSpec {
 
       // TODO: abstract away 'io' here, so we can compare ioooo and (ioooo o io2iooo) directly
       for (
-        ioooo <- (I > omega > omega > omega > omega).globals map { _(()) } ;
-        io <- (I > omega).globals map { _(()) }
+        ioooo <- elementsOf(I > omega > omega > omega > omega) ;
+        io <- elementsOf(I > omega)
       )
         mu(ioooo)(io) shouldBe ioooo(io2iooo(io))
 

@@ -191,8 +191,7 @@ class DotAndArrowEnrichmentTest extends FunSpec {
       val h_f: (Int → Boolean) > (Symbol → Boolean) = h > f
 
       for (
-        global <- (numbers > h).globals ;
-        g = global(()) ;
+        g <- elementsOf(numbers > h) ;
         symbol <- Seq('A, 'B, 'C)
       )
         h_f(g)(symbol) shouldBe g(f(symbol))
