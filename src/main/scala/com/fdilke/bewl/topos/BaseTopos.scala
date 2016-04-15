@@ -307,6 +307,15 @@ trait BaseTopos[~] { self: LogicalOperations[~] =>
           arrow: X > Y
         ) =
           dot > (dot > arrow)
+
+        lazy val home: Algebra[S] = {
+          val ddd: EXPONENTIAL[S → S, S] = dot > dot > dot
+          val structure: (S → S → S) > S =
+            ddd(dot) { f =>
+              f(dot.identity.name(ddd.toI(f)))
+            }
+          new Algebra[S](structure)
+        }
       }
 
     // Contravariant exponential functor
@@ -352,7 +361,15 @@ trait BaseTopos[~] { self: LogicalOperations[~] =>
       }
     }
 
-    type Algebra[X <: ~] = M[X] => X // TODO: sanity test
+    case class Algebra[X <: ~](structure: M[X] > X){
+      lazy val carrier = structure.target
+      lazy val local = apply(carrier)
+
+      def sanityTest =
+        (structure o local.eta) shouldBe carrier.identity
+      def sanityTest2 =
+        (structure o map(structure)) shouldBe (structure o local.mu)
+    }
   }
 
   trait BaseArrow[S <: ~, T <: ~] {

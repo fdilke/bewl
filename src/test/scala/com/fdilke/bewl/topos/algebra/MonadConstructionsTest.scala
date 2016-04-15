@@ -4,6 +4,7 @@ import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
+import scala.language.reflectiveCalls
 
 class MonadConstructionsTest extends FunSpec {
   private val two = dot('x, 'y)
@@ -67,6 +68,18 @@ class MonadConstructionsTest extends FunSpec {
 
 // TODO: check that M[X] is a monad, via multiplication as structure map. Or is that...
 // TODO: ...too hard to calculate / a trivial consequence of our existing laws?
+    }
+
+    it("defines a valid home algebra structure map") {
+      monadJoin.home.structure should have (
+        'source(omega > omega > omega),
+        'target(omega)
+      )
+//      for (
+//        oo <- elementsOf(omega > omega)
+//      )
+//        monadJoin.home.structure(oo) shouldBe oo(identity)
+      monadJoin.home.sanityTest
     }
   }
 }
