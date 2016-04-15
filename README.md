@@ -2,7 +2,11 @@
 
 A DSL for the internal (Mitchell-Benabou) language of a topos. 
 
-[This slideshow](https://github.com/fdilke/bewl/blob/master/notes/StateOfTheBewlJan2016.pdf) explains the project and describes
+[This presentation](https://github.com/fdilke/bewl/blob/master/notes/DoubleExponentialMonads.pdf) describes
+my simplistic but ambitious plan to solve the mystery of permutation parity by calculating the double exponential
+monad for ¬, the permutation interchanging true and false.
+
+[This one](https://github.com/fdilke/bewl/blob/master/notes/StateOfTheBewlJan2016.pdf) explains the project and describes
 the overall state of play as of January 2016.
 
 [This one](https://github.com/fdilke/bewl/blob/master/notes/PartyingWithPermutations.pdf) gives the latest on the ongoing
