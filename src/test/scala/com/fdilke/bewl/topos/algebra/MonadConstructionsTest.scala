@@ -55,19 +55,10 @@ class MonadConstructionsTest extends FunSpec {
         mu(ioooo)(io) shouldBe ioooo(io2iooo(io))
 
       monadJoin(I).sanityTest
+      // Can't run sanityTest2, would take too long (2 ^ 2 ^ 2 ^ 2 ^ 2 ^ 2 ^ 1)
 
-// does there need to be a 'further internalized contravariant functor' "omega → io" ?
-
-      //      println("Testing 1")
-//      monadJoin.sanityTestAt(dot(1))
-//      println("Testing 1 2")
-//      monadJoin.sanityTestAt(dot(1,2))
-//      println("Testing 1 2 3")
-//      monadJoin.sanityTestAt(dot(1,2,3)) // a bridge too far?
-//      println("Testing 1 2 3 ... done")
-
-// check that M[X] is a monad, via multiplication as structure map. Or is that
-// too hard to calculate / a trivial consequence of our existing laws
+// TODO: check that M[X] is a monad, via multiplication as structure map. Or is that...
+// TODO: ...too hard to calculate / a trivial consequence of our existing laws?
     }
   }
 }

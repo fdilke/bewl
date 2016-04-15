@@ -35,7 +35,7 @@ object FiniteSets extends Topos[Any] with Wrappings[
       }
 
     override def `>Uncached`[T](that: FiniteSetsDot[T]) = {
-      // println(s"exponentiating: ${that.elements.size} ^ ${this.elements.size}")
+//      println(s"exponentiating: ${that.elements.size} ^ ${this.elements.size}")
       case class FunctionElement(function: S => T) extends (S => T) {
         override def equals(that: scala.Any): Boolean = that match {
           case that: FunctionElement => elements.forall {
@@ -45,7 +45,7 @@ object FiniteSets extends Topos[Any] with Wrappings[
         def apply(s: S): T = function(s)
       }
       new FiniteSetsDot[S → T](
-        allMaps(self.elements, that.elements).map { FunctionElement } // TODO: coalesce
+        allMaps(self.elements, that.elements) map FunctionElement
       ) with ExponentialDot[S, T, S → T] { exponentialDot =>
         override val source: DOT[S] = self
         override val target: DOT[T] = that
