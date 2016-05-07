@@ -21,15 +21,17 @@ trait ToposConstructions[~] extends BaseTopos[~]
 
   Ɛ: AlgebraicStructures[~] with
     AlgebraicMachinery[~] with
-    LogicalOperations[~] =>
+    LogicalOperations[~] with
+    Monads[~] =>
 }
 
 trait Topos[~] extends BaseTopos[~] with
+  Monads[~] with
   LogicalOperations[~] with
   ToposAlgebra[~] with
   ToposConstructions[~]
 
-trait BaseTopos[~] { self: LogicalOperations[~] =>
+trait BaseTopos[~] { self: LogicalOperations[~] with Monads[~] =>
   type DOT[S <: ~] <: Dot[S]
   type >[S <: ~, T <: ~] <: Arrow[S, T]
 
@@ -357,46 +359,6 @@ trait BaseTopos[~] { self: LogicalOperations[~] =>
       ) { (s_u, t) =>
         s_u(arrow(t))
       }
-  }
-
-  trait Monad[M[X <: ~] <: ~] {
-    final private val memoizedLocalValues =
-      Memoize.generic.withLowerBound[
-        DOT,
-        At,
-        ~
-      ] (atUncached)
-
-    final def apply[X <: ~](dot: DOT[X]): At[X] =
-      memoizedLocalValues(dot)
-
-    def atUncached[X <: ~](dot: DOT[X]): At[X]
-    def map[X <: ~, Y <: ~](arrow: X > Y): M[X] > M[Y]
-
-    trait At[X <: ~] {
-      val free: DOT[M[X]]
-      val eta: X > M[X]
-      val mu: M[M[X]] > M[X]
-
-      def sanityTest = {
-        mu o map(eta) shouldBe free.identity
-        mu o apply(free).eta shouldBe free.identity
-      }
-
-      def sanityTest2 = {
-        mu o map(mu) shouldBe (mu o apply(free).mu)
-      }
-    }
-
-    case class Algebra[X <: ~](structure: M[X] > X){
-      lazy val carrier = structure.target
-      lazy val local = apply(carrier)
-
-      def sanityTest =
-        (structure o local.eta) shouldBe carrier.identity
-      def sanityTest2 =
-        (structure o map(structure)) shouldBe (structure o local.mu)
-    }
   }
 
   trait BaseArrow[S <: ~, T <: ~] {
