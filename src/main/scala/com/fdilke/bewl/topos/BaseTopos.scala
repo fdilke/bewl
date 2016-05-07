@@ -172,10 +172,18 @@ trait BaseTopos[~] { self: LogicalOperations[~] =>
           }(f, w) > w
       }
 
-    final def preForAll[R <: ~](source: DOT[R])(bifunc: (R, S) => TRUTH): R > TRUTH =
+    final def preForAll[R <: ~](
+      source: DOT[R]
+    ) (
+      bifunc: (R, S) => TRUTH
+    ): R > TRUTH =
       ∀ o power.transpose(source)(bifunc)
 
-    final def forAll[T <: ~](target: DOT[T])(g: (S, T) => TRUTH): S > TRUTH =
+    final def forAll[T <: ~](
+      target: DOT[T]
+    ) (
+      g: (S, T) => TRUTH
+    ): S > TRUTH =
       target.preForAll(dot)(g)
 
     final def forAll[
@@ -213,14 +221,24 @@ trait BaseTopos[~] { self: LogicalOperations[~] =>
           }(t)
         }
 
-    final def preExists[R <: ~](source: DOT[R])(bifunc: (R, S) => TRUTH): R > TRUTH =
+    final def preExists[R <: ~](
+      source: DOT[R]
+    ) (
+      bifunc: (R, S) => TRUTH
+    ): R > TRUTH =
       ∃ o power.transpose(source)(bifunc)
 
-    final def exists[T <: ~](target: DOT[T])(g: (S, T) => TRUTH): S > TRUTH =
+    final def exists[T <: ~](
+      target: DOT[T]
+    )(
+      g: (S, T) => TRUTH
+    ): S > TRUTH =
       target.preExists(this)(g)
 
     final lazy val diagonal: S > (S x S) =
-      this(squared) { x => squared.pair(x, x) }
+      this(squared) { x =>
+        squared.pair(x, x)
+      }
 
     final lazy val =?= : BiArrow[S, S, TRUTH] =
       BiArrow(squared, diagonal.chi)
@@ -241,23 +259,32 @@ trait BaseTopos[~] { self: LogicalOperations[~] =>
     final lazy val fromO: VOID > S =
       InitialDot fromO dot
 
-    final lazy val pac = new PartialArrowClassifier(dot)
+    final lazy val pac =
+      new PartialArrowClassifier(dot)
 
-    final def `+Uncached`[T <: ~](that: DOT[T]) =
+    final def `+Uncached`[T <: ~](
+      that: DOT[T]
+    ) =
       new Coproduct(this, that)
 
-    final def +- [T <: ~](that: DOT[T]) =
+    final def +- [T <: ~](
+      that: DOT[T]
+    ) =
       (this ⊔ that).injectLeft
 
-    final def -+ [T <: ~](that: DOT[T]) =
+    final def -+ [T <: ~](
+      that: DOT[T]
+    ) =
       (this ⊔ that).injectRight
 
-    def +[U <: ~](dash: DOT[U]) =
+    def +[U <: ~](
+      dash: DOT[U]
+    ) =
       (dot ⊔ dash).coproduct
 
     def arrowFromFunctionalRelation[B <: ~](
       target: DOT[B]
-    )(
+    ) (
       predicate: (S, B) => TRUTH
     ): S > B = {
       val product = dot x target
