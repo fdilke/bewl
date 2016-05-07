@@ -9,28 +9,6 @@ import scala.Function.tupled
 import scala.language.{higherKinds, postfixOps}
 import Matchers._
 
-trait ToposAlgebra[~] extends
-  AlgebraicMachinery[~] with
-  AlgebraicConstructions[~] with
-  AlgebraicStructures[~]
-
-trait ToposConstructions[~] extends BaseTopos[~]
-  with ConstructToposOfMonoidActions[~]
-  with ConstructToposOfGroupActions[~]
-  with ConstructToposOfAutomorphisms[~] {
-
-  Ɛ: AlgebraicStructures[~] with
-    AlgebraicMachinery[~] with
-    LogicalOperations[~] with
-    Monads[~] =>
-}
-
-trait Topos[~] extends BaseTopos[~] with
-  Monads[~] with
-  LogicalOperations[~] with
-  ToposAlgebra[~] with
-  ToposConstructions[~]
-
 trait BaseTopos[~] { self: LogicalOperations[~] with Monads[~] =>
   type DOT[S <: ~] <: Dot[S]
   type >[S <: ~, T <: ~] <: Arrow[S, T]
