@@ -1,12 +1,12 @@
 package com.fdilke.bewl.topos.algebra
 
-import com.fdilke.bewl.topos.{Monads, BaseTopos, LogicalOperations}
+import com.fdilke.bewl.topos.{BaseTopos, LogicalOperations, Monads}
 
-trait AlgebraicStructures[~] extends
-  BaseTopos[~] with
-  LogicalOperations[~] with
-  Monads[~] with
-  AlgebraicMachinery[~] { builder =>
+trait AlgebraicStructures extends
+  BaseTopos with
+  LogicalOperations with
+  Monads with
+  AlgebraicMachinery { builder =>
 
   import NamedLaws._
   import StandardTermsAndOperators._

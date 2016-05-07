@@ -6,8 +6,11 @@ import com.fdilke.bewl.topos.algebra.{AlgebraicMachinery, AlgebraicStructures}
 import scala.language.higherKinds
 import scala.language.reflectiveCalls
 
-trait ConstructToposOfAutomorphisms[~] extends BaseTopos[~] with LogicalOperations[~] {
-  Ɛ: AlgebraicStructures[~] with AlgebraicMachinery[~] =>
+trait ConstructToposOfAutomorphisms extends
+  BaseTopos with
+  LogicalOperations {
+
+  Ɛ: AlgebraicStructures with AlgebraicMachinery =>
 
   object ToposOfAutomorphisms {
 

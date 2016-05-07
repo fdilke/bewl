@@ -4,7 +4,7 @@ import com.fdilke.bewl.topos.constructions.ConstructToposOfMonoidActions
 import org.scalatest.Matchers._
 import org.scalatest._
 
-abstract class ToposFixtureSanityTests[~, T <: BaseTopos[~]](fixtures: ToposWithFixtures[~]) extends FunSpec {
+abstract class ToposFixtureSanityTests[~, T <: Topos[~]](fixtures: ToposWithFixtures[~]) extends FunSpec {
   import fixtures._
 
   describe(s"The fixtures for ${fixtures.topos.getClass.getName}") {
@@ -48,7 +48,7 @@ abstract class ToposWithFixtures[~] {
   type BAZ <: ~
   type SUB_BAR <: ~
 
-  import topos._
+  import topos.{~ => _, _}
 
   def makeSampleDot(): DOT[_ <: ~]
   def makeSampleArrow(): >[_ <: ~, _ <: ~]
@@ -90,10 +90,10 @@ abstract class GenericToposTests[~](
 ) extends ToposFixtureSanityTests(fixtures) {
 
   import fixtures._
-  import fixtures.topos._
+  import fixtures.topos.{~ => ~~, _}
 
   private lazy val inActionTopos =
-    topos.getClass.getName.contains(classOf[ConstructToposOfMonoidActions[~]].getSimpleName)
+    topos.getClass.getName.contains(classOf[ConstructToposOfMonoidActions].getSimpleName)
 
   describe(s"The topos ${topos.getClass.getName}") {
 

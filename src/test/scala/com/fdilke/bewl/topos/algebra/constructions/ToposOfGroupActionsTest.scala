@@ -1,7 +1,6 @@
 
 package com.fdilke.bewl.topos.algebra.constructions
 
-import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsUtilities}
 import com.fdilke.bewl.topos.{GenericToposTests, ToposWithFixtures}
@@ -15,14 +14,14 @@ class ToposOfGroupActionsTest extends GenericToposTests[Any](
     private val (i, a) =
       ('i, 'a)
 
-    val group = groupOfUnits(monoidFromTable(
+    val group = FiniteSets.groupOfUnits(monoidFromTable(
       i, a,
       a, i
     ))._1
 
     override val topos = FiniteSets.ToposOfGroupActions of group
 
-    import topos._
+    import topos.{ ~ => _, _ }
 
     override type FOO = Symbol
     override type BAR = String
@@ -69,7 +68,7 @@ class ToposOfGroupActionsTest extends GenericToposTests[Any](
 
     override val equalizerSituation = {
       val altMonicBar2baz = functionAsArrow(bar, baz, Map("x" -> 2, "x'" -> 1, "y" -> 5))
-      val pickOutY = I(bar) { _ => "y" }
+      val pickOutY = tempConst(bar)("y")
 
       new EqualizerSituation[UNIT, String, Int](
         pickOutY,
@@ -80,7 +79,7 @@ class ToposOfGroupActionsTest extends GenericToposTests[Any](
   }
 ) {
   import fixtures._
-  import topos._
+  import topos.{~ => _, _}
 
   describe("The Boolean property") {
     it("holds") {

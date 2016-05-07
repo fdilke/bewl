@@ -5,7 +5,7 @@ import org.scalatest.Matchers
 import Matchers._
 import scala.language.higherKinds
 
-trait Monads[~] { topos: BaseTopos[~] =>
+trait Monads { topos: BaseTopos =>
 
   trait Monad[M[X <: ~] <: ~] {
     final private val memoizedLocalValues =

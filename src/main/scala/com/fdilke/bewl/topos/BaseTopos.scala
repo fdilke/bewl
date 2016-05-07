@@ -9,7 +9,8 @@ import scala.Function.tupled
 import scala.language.{higherKinds, postfixOps}
 import Matchers._
 
-trait BaseTopos[~] { self: LogicalOperations[~] with Monads[~] =>
+trait BaseTopos { self: LogicalOperations with Monads =>
+  type ~
   type DOT[S <: ~] <: Dot[S]
   type >[S <: ~, T <: ~] <: Arrow[S, T]
 
@@ -503,15 +504,19 @@ trait BaseTopos[~] { self: LogicalOperations[~] with Monads[~] =>
   ] (
     element: A
   ) extends ElementWrapper[A]
+
+  // TODO: shouldn't need this, hack to get round bug in Scala 2.12.0-M4
+  def tempConst[A <: ~](dot: DOT[A])(a: A) =
+    I(dot) { _ => a}
 }
 
 trait Wrappings[
-  ~,
+  ~~,
   BASE,
   PREDOT[_ <: BASE],
   PREARROW[_ <: BASE, _ <: BASE],
-  WRAPPER[T <: BASE] <: ~
-] { topos: BaseTopos[~] =>
+  WRAPPER[T <: BASE] <: ~~
+] { topos: Topos[~~] =>
 
   def makeDot[T <: BASE](predot: PREDOT[T]) : DOT[WRAPPER[T]]
   def makeArrow[S <: BASE, T <: BASE](prearrow: PREARROW[S, T]) : WRAPPER[S] > WRAPPER[T]

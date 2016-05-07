@@ -8,7 +8,7 @@ sealed trait AlgebraicSort
 class Principal extends AlgebraicSort
 class Scalar extends AlgebraicSort
 
-trait AlgebraicMachinery[~] { topos: BaseTopos[~] =>
+trait AlgebraicMachinery { topos: BaseTopos =>
 
   type NullaryOp[X <: ~] = UNIT > X
   type UnaryOp[X <: ~] = X > X
