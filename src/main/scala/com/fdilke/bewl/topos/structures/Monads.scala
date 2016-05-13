@@ -6,7 +6,8 @@ import org.scalatest.Matchers._
 
 import scala.language.{postfixOps, higherKinds, reflectiveCalls}
 
-trait Monads { topos: BaseTopos =>
+trait Monads {
+  Ɛ: BaseTopos =>
 
   trait Monad[
     M[X <: ~] <: ~

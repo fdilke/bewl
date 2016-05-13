@@ -5,7 +5,10 @@ import com.fdilke.bewl.helper.{Memoize, ↔}
 import scala.Function.tupled
 import scala.language.{higherKinds, postfixOps}
 
-trait BaseTopos { self: LogicalOperations with ToposStructures =>
+trait BaseTopos {
+  Ɛ: LogicalOperations with
+    ToposStructures =>
+
   type ~
   type DOT[S <: ~] <: Dot[S]
   type >[S <: ~, T <: ~] <: Arrow[S, T]
@@ -20,15 +23,14 @@ trait BaseTopos { self: LogicalOperations with ToposStructures =>
   val omega: DOT[TRUTH]
   val truth: UNIT > TRUTH
 
-  implicit class OmegaEnrichments(truthValue: TRUTH) {
-    import TruthObject._
-    def >(that: TRUTH) = implies(truthValue, that)
-    def ^(that: TRUTH) = and(truthValue, that)
-    def v(that: TRUTH) = or(truthValue, that)
-  }
+  type EXPONENTIAL[S <: ~, T <: ~] =
+    ExponentialDot[S, T, S → T] with DOT[S → T]
 
-  type EXPONENTIAL[S <: ~, T <: ~] = ExponentialDot[S, T, S → T] with DOT[S → T]
-  trait ExponentialDot[S <: ~, T <: ~, S_T <: (S => T) with ~] { dot: DOT[S_T] =>
+  trait ExponentialDot[
+    S <: ~,
+    T <: ~,
+    S_T <: (S => T) with ~
+  ] { dot: DOT[S_T] =>
     val source: DOT[S]
     val target: DOT[T]
 
@@ -49,16 +51,24 @@ trait BaseTopos { self: LogicalOperations with ToposStructures =>
       (this x source).biArrow(target) { _(_) }
   }
 
-  type BIPRODUCT[L <: ~, R <: ~] = BiproductDot[L, R, L x R] with DOT[L x R]
+  type BIPRODUCT[
+    L <: ~,
+    R <: ~
+  ] = BiproductDot[L, R, L x R] with DOT[L x R]
 
-  trait BiproductDot[L <: ~, R <: ~, LxR <: (L, R) with ~] { dot: DOT[LxR] =>
+  trait BiproductDot[
+    L <: ~,
+    R <: ~,
+    LxR <: (L, R) with ~
+  ] { dot: DOT[LxR] =>
     val left: DOT[L]
     val right: DOT[R]
     def pair(l: L, r: R): LxR
     final lazy val π0 = dot(left) { _._1 }
     final lazy val π1 = dot(right) { _._2 }
 
-    final private val hackedThis: BIPRODUCT[L, R] = this.asInstanceOf[BIPRODUCT[L, R]]
+    final private val hackedThis: BIPRODUCT[L, R] =
+      this.asInstanceOf[BIPRODUCT[L, R]]
 
     final def biArrow[T <: ~](
       target: DOT[T]
@@ -74,7 +84,9 @@ trait BaseTopos { self: LogicalOperations with ToposStructures =>
         BiArrow(hackedThis, hackedThis.exists(target)(bifunc))
     }
 
-  type EQUALIZER[S <: ~] = EqualizingDot[S] with DOT[S]
+  type EQUALIZER[S <: ~] =
+    EqualizingDot[S] with DOT[S]
+
   trait EqualizingDot[S <: ~] { dot: DOT[S] =>
     val equalizerTarget: DOT[S]
     def restrict[R <: ~](arrow: R > S): R > S
@@ -102,7 +114,8 @@ trait BaseTopos { self: LogicalOperations with ToposStructures =>
     def sanityTest
   }
 
-  trait Dot[S <: ~] extends BaseDot[S] { dot: DOT[S] =>
+  trait Dot[S <: ~] extends BaseDot[S] {
+    dot: DOT[S] =>
 
     final lazy val identity: S > S =
       dot(dot) { s => s }
@@ -114,7 +127,10 @@ trait BaseTopos { self: LogicalOperations with ToposStructures =>
         ~
       ] (xUncached)
 
-    final def x[U <: ~](that: DOT[U]): BIPRODUCT[S, U] = memoizedProduct(that)
+    final def x[U <: ~](
+      that: DOT[U]
+    ): BIPRODUCT[S, U] =
+      memoizedProduct(that)
 
     final private val memoizedExponential =
       Memoize.generic.withLowerBound[
@@ -134,15 +150,23 @@ trait BaseTopos { self: LogicalOperations with ToposStructures =>
         ({ type λ[T <: ~] = Coproduct[S, T]}) # λ,
         ~
       ](`+Uncached`)
-    final def ⊔[T <: ~](that: DOT[T]): Coproduct[S, T] = memoizedCoproduct(that)
+
+    final def ⊔[T <: ~](
+      that: DOT[T]
+    ): Coproduct[S, T] =
+      memoizedCoproduct(that)
 
     final lazy val toTrue = truth o toI
     final lazy val power = this > omega
     final lazy val ∀ = toTrue.name.chi
     final lazy val squared = dot x dot
 
-    final def map(f: S => S) = dot(dot) { f }
-    final def flatMap(bifunc: S => S > S) =
+    final def map(f: S => S) =
+      dot(dot) { f }
+
+    final def flatMap(
+      bifunc: S => S > S
+    ) =
       (this x this).biArrow(this) {
         bifunc(_)(_)
       }
@@ -284,7 +308,6 @@ trait BaseTopos { self: LogicalOperations with ToposStructures =>
           dash: DOT[X]
         ): At[X] =
           new At[X] {
-
             private lazy val doubleExp: EXPONENTIAL[X → S, S] =
               dash > dot > dot
 

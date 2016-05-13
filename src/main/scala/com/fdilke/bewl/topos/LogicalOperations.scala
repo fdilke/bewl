@@ -22,4 +22,14 @@ trait LogicalOperations { topos: BaseTopos with ToposStructures =>
   
   def isBoolean =
     (truth + falsity).isIso
+
+  implicit class OmegaEnrichments(
+    truthValue: TRUTH
+  ) {
+    import TruthObject._
+
+    def >(that: TRUTH) = implies(truthValue, that)
+    def ^(that: TRUTH) = and(truthValue, that)
+    def v(that: TRUTH) = or(truthValue, that)
+  }
 }
