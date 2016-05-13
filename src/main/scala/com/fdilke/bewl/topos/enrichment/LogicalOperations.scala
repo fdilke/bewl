@@ -1,4 +1,6 @@
-package com.fdilke.bewl.topos
+package com.fdilke.bewl.topos.enrichment
+
+import com.fdilke.bewl.topos.{BaseTopos, ToposStructures}
 
 trait LogicalOperations {
 
@@ -37,7 +39,7 @@ trait LogicalOperations {
   }
 
   import TruthObject.falsity
-  
+
   def isBoolean =
     (truth + falsity).isIso
 
