@@ -349,7 +349,7 @@ trait BaseTopos { self: LogicalOperations with Monads =>
     def ?=(that: S > T): EQUALIZER[S]
     def o[R <: ~](that: R > S) : R > T
     def \[U <: ~](monic: U > T) : S > U
-    def sanityTest
+    def sanityTest()
   }
 
   trait Arrow[S <: ~, T <: ~] extends BaseArrow[S, T] { self: S > T =>
@@ -358,17 +358,23 @@ trait BaseTopos { self: LogicalOperations with Monads =>
           (i, x) => this(x)
       }
 
-    final def x[U <: ~](that: S > U): S > (T x U) = {
+    final def x[U <: ~](
+      that: S > U
+    ): S > (T x U) = {
       val product = target x that.target
       source(product) {
         s => product.pair(this(s), that(s))
       }
     }
 
-    final def toBool(implicit eq: T =:= TRUTH): Boolean =
+    final def toBool(
+      implicit eq: T =:= TRUTH
+    ): Boolean =
       this == source.toTrue
 
-    final def whereTrue(implicit eq: T =:= TRUTH): EQUALIZER[S] =
+    final def whereTrue(
+      implicit eq: T =:= TRUTH
+    ): EQUALIZER[S] =
       self.asInstanceOf[S > TRUTH] ?= source.toTrue
 
     final lazy val isMonic: Boolean =
@@ -510,46 +516,3 @@ trait BaseTopos { self: LogicalOperations with Monads =>
     I(dot) { _ => a}
 }
 
-trait Wrappings[
-  ~~,
-  BASE,
-  PREDOT[_ <: BASE],
-  PREARROW[_ <: BASE, _ <: BASE],
-  WRAPPER[T <: BASE] <: ~~
-] { topos: Topos[~~] =>
-
-  def makeDot[T <: BASE](predot: PREDOT[T]) : DOT[WRAPPER[T]]
-  def makeArrow[S <: BASE, T <: BASE](prearrow: PREARROW[S, T]) : WRAPPER[S] > WRAPPER[T]
-  def functionAsArrow[S <: BASE, T <: BASE](
-    source: DOT[WRAPPER[S]], 
-    target: DOT[WRAPPER[T]], 
-    f: S => T
-  ): WRAPPER[S] > WRAPPER[T]
-  def bifunctionAsBiArrow[L <: BASE, R <: BASE, T <: BASE] (
-    left: DOT[WRAPPER[L]],
-    right: DOT[WRAPPER[R]],
-    target: DOT[WRAPPER[T]]
-  ) (
-    bifunc: (L, R) => T
-  ): BiArrow[WRAPPER[L], WRAPPER[R], WRAPPER[T]]
-
-  final def bifunctionAsBiArrow[X <: BASE] (
-    dot: DOT[WRAPPER[X]]
-  ) (
-     bifunc: (X, X) => X
-  ): BiArrow[WRAPPER[X], WRAPPER[X], WRAPPER[X]] =
-    bifunctionAsBiArrow[X, X, X](dot, dot, dot) { bifunc }
-
-  // An implementation may have the ability to "unwrap" dots
-  def unwrap[T <: BASE](dot: DOT[WRAPPER[T]]): PREDOT[T] =
-    ???
-
-  def burst[M[_], T <: BASE](
-    bubble: M[WRAPPER[T]]
-  )(implicit ev: WRAPPER[T] =:= T) : M[T] =
-    bubble.asInstanceOf[M[T]]
-}
-
-object Wrappings {
-  type NO_WRAPPER[T] = T
-}
