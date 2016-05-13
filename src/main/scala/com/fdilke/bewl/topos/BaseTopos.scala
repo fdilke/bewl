@@ -1,15 +1,11 @@
 package com.fdilke.bewl.topos
 
-import com.fdilke.bewl.helper.{↔, Memoize}
-import com.fdilke.bewl.topos.algebra.{AlgebraicConstructions, AlgebraicMachinery, AlgebraicStructures}
-import com.fdilke.bewl.topos.constructions.{ConstructToposOfAutomorphisms, ConstructToposOfGroupActions, ConstructToposOfMonoidActions}
-import org.scalatest.Matchers
+import com.fdilke.bewl.helper.{Memoize, ↔}
 
 import scala.Function.tupled
 import scala.language.{higherKinds, postfixOps}
-import Matchers._
 
-trait BaseTopos { self: LogicalOperations with Monads =>
+trait BaseTopos { self: LogicalOperations with ToposStructures =>
   type ~
   type DOT[S <: ~] <: Dot[S]
   type >[S <: ~, T <: ~] <: Arrow[S, T]
