@@ -1,12 +1,13 @@
 package com.fdilke.bewl.topos.enrichment
 
 import com.fdilke.bewl.topos.{BaseTopos, ToposStructures}
+import scala.language.implicitConversions
 
 trait ElementEnrichments {
 
   Ɛ: BaseTopos with ToposStructures =>
 
-  implicit class RichExponential[
+  class PoorExponential[
     S <: ~,
     T <: ~
   ] (
@@ -14,7 +15,7 @@ trait ElementEnrichments {
   ) (
     implicit expDot: EXPONENTIAL[S, T]
   ) {
-    def o[
+    def notThisName [
       R <: ~
     ] (
       preExp: R → S
@@ -30,4 +31,15 @@ trait ElementEnrichments {
         preExp
       )
   }
+
+//  implicit def enrichExp[
+//    S <: ~,
+//    T <: ~
+//  ] (
+//    exp: S → T
+//  ) (
+//    implicit preExpDot: EXPONENTIAL[S, T]
+//  ): RichExponential[S, T] =
+//    new RichExponential(exp)(preExpDot)
+
 }
