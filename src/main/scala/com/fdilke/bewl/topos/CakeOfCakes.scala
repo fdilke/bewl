@@ -17,7 +17,7 @@ trait ToposConstructions extends
 
   Ɛ: AlgebraicStructures with
     AlgebraicMachinery with
-    LogicalOperations with
+    ToposEnrichments with
     ToposStructures =>
 }
 
@@ -27,9 +27,15 @@ trait ToposStructures extends
   Ɛ: BaseTopos =>
 }
 
+trait ToposEnrichments extends
+  LogicalOperations with
+  ElementEnrichments {
+  Ɛ: BaseTopos with ToposStructures =>
+}
+
 trait Topos[BASE] extends BaseTopos with
   Monads with
-  LogicalOperations with
+  ToposEnrichments with
   ToposAlgebra with
   ToposConstructions {
   override type ~ = BASE

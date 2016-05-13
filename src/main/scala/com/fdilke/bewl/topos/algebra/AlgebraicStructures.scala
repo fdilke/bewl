@@ -1,10 +1,10 @@
 package com.fdilke.bewl.topos.algebra
 
-import com.fdilke.bewl.topos.{BaseTopos, LogicalOperations, ToposStructures}
+import com.fdilke.bewl.topos.{BaseTopos, ToposEnrichments, ToposStructures}
 
 trait AlgebraicStructures extends
   BaseTopos with
-  LogicalOperations with
+  ToposEnrichments with
   ToposStructures with
   AlgebraicMachinery { builder =>
 

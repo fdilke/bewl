@@ -6,7 +6,7 @@ import scala.Function.tupled
 import scala.language.{higherKinds, postfixOps}
 
 trait BaseTopos {
-  Ɛ: LogicalOperations with
+  Ɛ: ToposEnrichments with
     ToposStructures =>
 
   type ~

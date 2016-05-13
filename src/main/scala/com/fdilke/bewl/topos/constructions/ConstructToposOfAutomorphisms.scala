@@ -8,7 +8,7 @@ import scala.language.reflectiveCalls
 
 trait ConstructToposOfAutomorphisms extends
   BaseTopos with
-  LogicalOperations {
+  ToposEnrichments {
 
   Ɛ: AlgebraicStructures with AlgebraicMachinery =>
 

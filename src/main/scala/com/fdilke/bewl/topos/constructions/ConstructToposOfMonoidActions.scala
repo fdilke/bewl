@@ -5,7 +5,9 @@ import com.fdilke.bewl.helper.Memoize
 import com.fdilke.bewl.helper.↔
 import com.fdilke.bewl.topos.algebra.{AlgebraicStructures, AlgebraicMachinery}
 
-trait ConstructToposOfMonoidActions extends BaseTopos with LogicalOperations {
+trait ConstructToposOfMonoidActions extends
+  BaseTopos with
+  ToposEnrichments {
   Ɛ: AlgebraicStructures with AlgebraicMachinery =>
 
   object ToposOfMonoidActions {

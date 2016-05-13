@@ -2,10 +2,12 @@ package com.fdilke.bewl.topos.constructions
 
 import com.fdilke.bewl.helper.Memoize
 import com.fdilke.bewl.topos.algebra.{AlgebraicMachinery, AlgebraicStructures}
-import com.fdilke.bewl.topos.{Topos, Wrappings, BaseTopos, LogicalOperations}
+import com.fdilke.bewl.topos._
 
-trait ConstructToposOfGroupActions extends BaseTopos with LogicalOperations {
-  Ɛ: AlgebraicStructures with AlgebraicMachinery =>
+trait ConstructToposOfGroupActions extends
+  BaseTopos with ToposEnrichments {
+  Ɛ: AlgebraicStructures with
+    AlgebraicMachinery =>
 
   object ToposOfGroupActions {
     def of[G <: ~](group: Ɛ.Group[G]) : Topos[~] with Wrappings[
