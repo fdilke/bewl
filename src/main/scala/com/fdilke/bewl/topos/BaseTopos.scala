@@ -32,7 +32,9 @@ trait BaseTopos { self: LogicalOperations with ToposStructures =>
     val source: DOT[S]
     val target: DOT[T]
 
-    def transpose[R <: ~](biArrow: BiArrow[R, S, T]): R > S_T
+    def transpose[R <: ~](
+      biArrow: BiArrow[R, S, T]
+    ): R > S_T
 
     final def transpose[R <: ~](
       index: DOT[R]
@@ -121,7 +123,10 @@ trait BaseTopos { self: LogicalOperations with ToposStructures =>
         ~
       ] (`>Uncached`)
 
-    final def >[T <: ~](that: DOT[T]): EXPONENTIAL[S, T] = memoizedExponential(that)
+    final def >[T <: ~](
+      that: DOT[T]
+    ): EXPONENTIAL[S, T] =
+      memoizedExponential(that)
 
     final private val memoizedCoproduct =
       Memoize.generic.withLowerBound[
@@ -271,13 +276,13 @@ trait BaseTopos { self: LogicalOperations with ToposStructures =>
       (product.π1 o graph) / (product.π0 o graph)
     }
 
-    lazy val doubleExpMonad =
-      new Monad[
+    lazy val continuationMonad =
+      new StrongMonad[
         ({type λ[X <: ~] = X → S → S}) # λ
       ] {
         override def atUncached[X <: ~](
           dash: DOT[X]
-        ) =
+        ): At[X] =
           new At[X] {
 
             private lazy val doubleExp: EXPONENTIAL[X → S, S] =
@@ -305,6 +310,28 @@ trait BaseTopos { self: LogicalOperations with ToposStructures =>
                     )
                   )
                 }
+
+            override def tensorialStrength[
+              Y <: ~
+            ](
+              daa: DOT[Y]
+            ) = (
+              (dash x daa) > dot > dot
+            ).transpose {
+              dash x (daa > dot > dot)
+            } {
+              case (
+                (x, yss),
+                xys
+              ) =>
+                yss(
+                  (dot > daa(dash x daa) {
+                    y => dash x daa pair(x, y)
+                  }) (
+                    xys
+                  )
+                )
+            }
           }
 
         override def map[X <: ~, Y <: ~](

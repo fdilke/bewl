@@ -11,5 +11,38 @@ trait StrongMonads {
 
   trait StrongMonad[
     M[X <: ~] <: ~
-  ] extends Monad[M]
+  ] extends Monad[M] {
+
+    final private val memoizedLocalValues =
+      Memoize.generic.withLowerBound[
+        ({type λ[X <: ~] = DOT[X]}) # λ,
+        At,
+        ~
+      ] (atUncached)
+
+    override def apply[
+      X <: ~
+    ] (
+      dot: DOT[X]
+    ): At[X] =
+      memoizedLocalValues(dot)
+
+    override def atUncached[
+      X <: ~
+    ] (
+      dot: DOT[X]
+    ): At[X]
+
+    trait At[
+      X <: ~
+    ] extends super.At[X] {
+      def tensorialStrength[
+        Y <: ~
+      ](
+        dot: DOT[Y]
+      ):
+        X x M[Y] > M[X x Y]
+    }
+//    def sanityTest3
+  }
 }

@@ -4,7 +4,7 @@ import com.fdilke.bewl.helper.Memoize
 import com.fdilke.bewl.topos.BaseTopos
 import org.scalatest.Matchers._
 
-import scala.language.{higherKinds, reflectiveCalls}
+import scala.language.{postfixOps, higherKinds, reflectiveCalls}
 
 trait Monads { topos: BaseTopos =>
 
@@ -18,13 +18,29 @@ trait Monads { topos: BaseTopos =>
         ~
       ] (atUncached)
 
-    final def apply[X <: ~](dot: DOT[X]): At[X] =
+    def apply[
+      X <: ~
+    ] (
+      dot: DOT[X]
+    ): At[X] =
       memoizedLocalValues(dot)
 
-    def atUncached[X <: ~](dot: DOT[X]): At[X]
-    def map[X <: ~, Y <: ~](arrow: X > Y): M[X] > M[Y]
+    def atUncached[
+      X <: ~
+    ] (
+      dot: DOT[X]
+    ): At[X]
 
-    trait At[X <: ~] {
+    def map[
+      X <: ~,
+      Y <: ~
+    ] (
+      arrow: X > Y
+    ): M[X] > M[Y]
+
+    trait At[
+      X <: ~
+    ] {
       val free: DOT[M[X]]
       val eta: X > M[X]
       val mu: M[M[X]] > M[X]
@@ -39,10 +55,12 @@ trait Monads { topos: BaseTopos =>
       }
     }
 
-    case class Algebra[X <: ~](
+    case class Algebra[
+      X <: ~
+    ](
       structure: M[X] > X
-    ){
-      lazy val carrier = structure.target
+    ) {
+      lazy val carrier = structure target
       lazy val local = apply(carrier)
 
       def sanityTest =
