@@ -27,10 +27,10 @@ class ContinuationMonadTest extends FreeSpec {
 
     "embedding (eta) works" in {
       val eta: Symbol > (Symbol → TRUTH → TRUTH) = continuation(two).eta
-      for (
-        f <- elementsOf(two > omega);
+      for {
+        f <- elementsOf(two > omega)
         symbol <- Seq('x, 'y)
-      )
+      }
         eta(symbol)(f) shouldBe f(symbol)
     }
 
@@ -45,19 +45,12 @@ class ContinuationMonadTest extends FreeSpec {
       ) = continuation map f
 
       implicit val forSoo = symbols > omega > omega
-      implicit val forSoo2 = ints > omega
 
-      // TODO: abstract away 'io' here via internal composition
       for {
-        soo: (Symbol → TRUTH → TRUTH) <- elementsOf(symbols > omega > omega)
+        soo <- elementsOf(symbols > omega > omega)
         soo_ = soo : RichExponential[Symbol → TRUTH, TRUTH]
-        io <- elementsOf(ints > omega)
-      } {
-//        val hhh: (Int → TRUTH) > (Symbol → TRUTH)  = omega > f
-//        soo_ o hhh
-//        soo_ o (omega > f)
-        map(soo)(io) shouldBe soo((omega > f)(io))
       }
+        map(soo) shouldBe (soo_ o (omega > f))
     }
 
     "tensorial strength is defined correctly" in {
