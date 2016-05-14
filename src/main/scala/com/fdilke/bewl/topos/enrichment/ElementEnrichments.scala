@@ -7,7 +7,7 @@ trait ElementEnrichments {
 
   Ɛ: BaseTopos with ToposStructures =>
 
-  class PoorExponential[
+  implicit class RichExponential[
     S <: ~,
     T <: ~
   ] (
@@ -15,7 +15,7 @@ trait ElementEnrichments {
   ) (
     implicit expDot: EXPONENTIAL[S, T]
   ) {
-    def notThisName [
+    def o [
       R <: ~
     ] (
       preExp: R → S
@@ -31,15 +31,4 @@ trait ElementEnrichments {
         preExp
       )
   }
-
-//  implicit def enrichExp[
-//    S <: ~,
-//    T <: ~
-//  ] (
-//    exp: S → T
-//  ) (
-//    implicit preExpDot: EXPONENTIAL[S, T]
-//  ): RichExponential[S, T] =
-//    new RichExponential(exp)(preExpDot)
-
 }
