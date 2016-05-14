@@ -2,10 +2,10 @@ package com.fdilke.bewl.topos.algebra
 
 import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
-import com.fdilke.bewl.topos.Wrappings.NO_WRAPPER
-import org.scalatest.{FreeSpec, FunSpec}
-import org.scalatest.Matchers._
-import scala.language.reflectiveCalls
+import org.scalatest.{Matchers, FreeSpec}
+
+import scala.language.{implicitConversions, postfixOps, reflectiveCalls}
+import Matchers._
 
 class ContinuationMonadTest extends FreeSpec {
   private val two = dot('x, 'y)
@@ -44,13 +44,20 @@ class ContinuationMonadTest extends FreeSpec {
         Int → TRUTH → TRUTH
       ) = continuation map f
 
+      implicit val forSoo = symbols > omega > omega
+      implicit val forSoo2 = ints > omega
+
       // TODO: abstract away 'io' here via internal composition
-      for (
-        soo <- elementsOf(symbols > omega > omega);
-        io <- elementsOf(ints > omega);
-        symbol <- Seq('a, 'b)
-      )
-        map(soo)(io) shouldBe soo((omega > f) (io))
+      for {
+        soo: (Symbol → TRUTH → TRUTH) <- elementsOf(symbols > omega > omega)
+        soo_ = soo : RichExponential[Symbol → TRUTH, TRUTH]
+        io <- elementsOf(ints > omega)
+      } {
+//        val hhh: (Int → TRUTH) > (Symbol → TRUTH)  = omega > f
+//        soo_ o hhh
+//        soo_ o (omega > f)
+        map(soo)(io) shouldBe soo((omega > f)(io))
+      }
     }
 
     "tensorial strength is defined correctly" in {

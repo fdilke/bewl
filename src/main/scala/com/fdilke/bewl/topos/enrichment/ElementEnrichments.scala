@@ -30,5 +30,16 @@ trait ElementEnrichments {
       } (
         preExp
       )
+
+    def o [
+      R <: ~
+    ] (
+      preExp: R > S
+    ) (
+      implicit preExpDot: EXPONENTIAL[R, S]
+    ): R → T = {
+      val xxx: (S → T) > (R → T) = expDot.target > preExp
+      xxx(exp)
+    }
   }
 }
