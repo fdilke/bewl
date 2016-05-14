@@ -48,7 +48,7 @@ class ContinuationMonadTest extends FreeSpec {
 
       for {
         soo <- elementsOf(symbols > omega > omega)
-        soo_ = soo : RichExponential[Symbol → TRUTH, TRUTH]
+        soo_ : RichExponential[Symbol → TRUTH, TRUTH] = soo
       }
         map(soo) shouldBe (soo_ o (omega > f))
     }
@@ -84,12 +84,13 @@ class ContinuationMonadTest extends FreeSpec {
           (x, f) => f(x)
         }
 
-      // TODO: abstract away 'io' here, so we can compare ioooo and (ioooo o io2iooo) directly
-      for (
-        ioooo <- elementsOf(I > omega > omega > omega > omega) ;
-        io <- elementsOf(I > omega)
-      )
-        mu(ioooo)(io) shouldBe ioooo(io2iooo(io))
+      implicit val forIoooo = I > omega > omega > omega > omega
+
+      for {
+        ioooo <- elementsOf(I > omega > omega > omega > omega)
+        ioooo_ : RichExponential[UNIT → TRUTH → TRUTH → TRUTH, TRUTH] = ioooo
+      }
+        mu(ioooo) shouldBe (ioooo_ o io2iooo)
 
       continuation(I).sanityTest
       // Can't run sanityTest2, would take too long (2 ^ 2 ^ 2 ^ 2 ^ 2 ^ 2 ^ 1)
