@@ -43,10 +43,7 @@ class ElementEnrichmentTest extends FreeSpec {
       val ints = dot(1, 2, 3)
       val bools = dot(true, false)
 
-      // TODO: Bake these in deeper when we can
-      implicit val xx: EXPONENTIAL[Symbol, Int] =
-        symbols > ints
-
+      // TODO: Bake this in deeper when we can
       implicit val yy: EXPONENTIAL[Int, Boolean] =
         ints > bools
 
