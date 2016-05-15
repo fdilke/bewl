@@ -37,12 +37,50 @@ trait StrongMonads {
       X <: ~
     ] extends super.At[X] {
       def tensorialStrength[
-        Y <: ~
+      Y <: ~
       ](
         dot: DOT[Y]
       ):
-        X x M[Y] > M[X x Y]
+      X x M[Y] > M[X x Y]
     }
-//    def sanityTest3
+
+    def tensorialStrength[
+      A <: ~,
+      B <: ~
+    ](
+      a: DOT[A],
+      b: DOT[B]
+    ) =
+      apply(
+        a
+      ).tensorialStrength(
+        b
+      )
+
+    // Verify the axioms for a strong monad :
+    // https://en.wikipedia.org/wiki/Strong_monad
+
+    def sanityTest3[
+      A <: ~,
+      B <: ~
+    ](
+      a: DOT[A],
+      b: DOT[B]
+    ) {
+      val stIA =
+        tensorialStrength(I, a)
+
+      map((I x a).π1) o stIA shouldBe
+        (I x apply(a).free).π1
+
+      val stAB =
+        tensorialStrength(a, b)
+      val axb = a x b
+
+      stAB o (axb.π0 x (apply(b).eta o axb.π1)) shouldBe
+        apply(axb).eta
+
+//      ???
+    }
   }
 }
