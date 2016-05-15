@@ -65,11 +65,36 @@ class ContinuationMonadTest extends FreeSpec {
       val arrow = ints(mSymbol) { i =>
         mSymbolElements(i * 3)
       }
-      val ⊗ = continuation(ints).tensorialStrength(symbols)
+
+      val ⊗ : (
+        (
+          Int x (Symbol → TRUTH → TRUTH)
+        ) > (
+          (Int x Symbol) → TRUTH → TRUTH
+        )
+      ) = continuation(
+        ints
+      ).tensorialStrength(
+        symbols
+      )
+
       ⊗ should have (
         'source(ints x mSymbol),
         'target(continuation(ints x symbols).free)
       )
+
+      for {
+        i <- elementsOf(ints)
+        m: (Symbol → TRUTH → TRUTH) <- elementsOf(mSymbol)
+        ist: ((Int x Symbol) → TRUTH) <- elementsOf((ints x symbols) > omega)
+      }
+        ⊗(i, m)(ist) shouldBe m(
+          asElement(
+            symbols(omega) { s =>
+              ist(i, s)
+            }
+          )
+        )
     }
 
     "multiplication (mu) works" in {
