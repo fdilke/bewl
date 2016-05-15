@@ -357,7 +357,10 @@ trait BaseTopos {
             }
           }
 
-        override def map[X <: ~, Y <: ~](
+        override def map[
+          X <: ~,
+          Y <: ~
+        ](
           arrow: X > Y
         ) =
           dot > (dot > arrow)
@@ -366,9 +369,15 @@ trait BaseTopos {
           val ddd: EXPONENTIAL[S → S, S] = dot > dot > dot
           val structure: (S → S → S) > S =
             ddd(dot) { f =>
-              f(dot.identity.name(ddd.toI(f)))
+              f(
+                dot.identity.name(
+                  ddd.toI(f)
+                )
+              )
             }
-          new Algebra[S](structure)
+          new Algebra[S](
+            structure
+          )
         }
       }
 

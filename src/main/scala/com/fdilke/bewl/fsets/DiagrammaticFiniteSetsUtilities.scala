@@ -18,7 +18,9 @@ object DiagrammaticFiniteSetsUtilities {
 
   def allMaps[A, B](source: Traversable[A], target: Traversable[B]) : Traversable[A => B] =
     new Traversable[A => B] {
-      override def foreach[U](enumerate: (A => B) => U) =
+      override def foreach[U](
+        enumerate: (A => B) => U
+      ) =
         if (source.isEmpty)
           enumerate { _ => ??? }
         else

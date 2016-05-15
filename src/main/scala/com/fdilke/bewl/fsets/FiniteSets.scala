@@ -37,12 +37,17 @@ object FiniteSets extends Topos[Any] with Wrappings[
     override def `>Uncached`[T](that: FiniteSetsDot[T]) = {
 //      println(s"exponentiating: ${that.elements.size} ^ ${this.elements.size}")
       case class FunctionElement(function: S => T) extends (S => T) {
-        override def equals(that: scala.Any): Boolean = that match {
-          case that: FunctionElement => elements.forall {
-            s => function(s) == that.function(s)
-          }}
+        override def equals(
+          that: scala.Any
+        ): Boolean =
+          that match {
+            case that: FunctionElement => elements.forall {
+              s => function(s) == that.function(s)
+            }
+          }
         override def hashCode = 0
-        def apply(s: S): T = function(s)
+        override def apply(s: S): T =
+          function(s)
       }
       new FiniteSetsDot[S → T](
         allMaps(self.elements, that.elements) map FunctionElement
@@ -172,10 +177,17 @@ object FiniteSetsUtilities {
       Function untupled Map(mappings:_*)
     )
 
-  def elementsOf[X](dot: DOT[X]): Traversable[X] =
+  def elementsOf[X](
+    dot: DOT[X]
+  ): Traversable[X] =
     dot.globals map {
       _(())
     }
+
+  def asElement[X, Y](
+    arrow: X > Y
+  ): X → Y =
+    arrow.name(())
 
   def makeNullaryOperator[X](carrier: DOT[X], value: X) =
     functionAsArrow(I, carrier, (_: UNIT) => value)

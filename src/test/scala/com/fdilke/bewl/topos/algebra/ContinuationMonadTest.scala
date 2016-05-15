@@ -104,10 +104,19 @@ class ContinuationMonadTest extends FreeSpec {
         'source(omega > omega > omega),
         'target(omega)
       )
-//      for (
-//        oo <- elementsOf(omega > omega)
-//      )
-//        continuation.home.structure(oo) shouldBe oo(identity)
+
+      val id: TRUTH → TRUTH =
+        asElement(
+          omega.identity
+        )
+
+      for (
+        oo <- elementsOf(omega > omega > omega)
+      )
+        continuation.home.structure(
+          oo
+        ) shouldBe oo(id)
+
       continuation.home.sanityTest
     }
   }
