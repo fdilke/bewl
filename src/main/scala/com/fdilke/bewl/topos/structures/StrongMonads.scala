@@ -96,30 +96,18 @@ trait StrongMonads {
       b: DOT[B],
       c: DOT[C]
     ) {
-      val bxc = b x c
-      val a_btc = a x (b x apply(c).free)
-      val ab_tc = (a x b) x apply(c).free
-
-      // TODO: factor out calculation of associator
-      val associator =
-        ((a x b).π0 o ab_tc.π0) x (
-          ((a x b).π1 o ab_tc.π0) x (
-            ab_tc.π1
-          )
-        )
-      associator shouldBe 'iso
-
+      val tc = apply(c).free
+      val a_btc = a x (b x tc)
       val stBC = tensorialStrength(b, c)
 
-      a_btc.π0
-
-//      val x = ???
-//
-//      tensorialStrength(a, bxc) o
-//        (a_btc.π0 x (stBC o a_btc.π1)) o
-//        associator shouldBe x
-
-//      ???
+      tensorialStrength(a, b x c) o
+        (a_btc.π0 x (stBC o a_btc.π1)) o
+        associator(a, b, tc) shouldBe (
+          map(
+            associator(a, b, c)
+          ) o
+          tensorialStrength(a x b, c)
+        )
     }
   }
 }
