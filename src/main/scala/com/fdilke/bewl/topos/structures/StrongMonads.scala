@@ -57,6 +57,27 @@ trait StrongMonads {
         b
       )
 
+    private def T[
+      A <: ~
+    ](
+      a: DOT[A]
+    ) =
+      apply(a).free
+
+    private def η[
+      A <: ~
+    ](
+      a: DOT[A]
+    ) =
+      apply(a).eta
+
+    private def μ[
+      A <: ~
+    ](
+      a: DOT[A]
+    ) =
+      apply(a).mu
+
     // Verify the axioms for a strong monad :
     // https://en.wikipedia.org/wiki/Strong_monad
 
@@ -64,13 +85,14 @@ trait StrongMonads {
       A <: ~
     ](
       a: DOT[A]
-    ) {
-      val stIA =
-        tensorialStrength(I, a)
-
-      map((I x a).π1) o stIA shouldBe
-        (I x apply(a).free).π1
-    }
+    ) =
+      map(
+        (I x a).π1
+      ) o tensorialStrength(
+        I,
+        a
+      ) shouldBe
+        (I x T(a)).π1
 
     def sanityTest4[
       A <: ~,
@@ -78,14 +100,13 @@ trait StrongMonads {
     ](
       a: DOT[A],
       b: DOT[B]
-    ) {
-      val stAB =
-        tensorialStrength(a, b)
-      val axb = a x b
-
-      stAB o (axb.π0 x (apply(b).eta o axb.π1)) shouldBe
-        apply(axb).eta
-    }
+    ) =
+      tensorialStrength(a, b) o (
+        (a x b).π0 x (
+          η(b) o (a x b).π1
+        )
+      ) shouldBe
+        η(a x b)
 
     def sanityTest5[
       A <: ~,
@@ -96,18 +117,33 @@ trait StrongMonads {
       b: DOT[B],
       c: DOT[C]
     ) {
-      val tc = apply(c).free
-      val a_btc = a x (b x tc)
+      val a_btc = a x (b x T(c))
       val stBC = tensorialStrength(b, c)
 
       tensorialStrength(a, b x c) o
         (a_btc.π0 x (stBC o a_btc.π1)) o
-        associator(a, b, tc) shouldBe (
+        associator(a, b, T(c)) shouldBe (
           map(
             associator(a, b, c)
           ) o
           tensorialStrength(a x b, c)
         )
+    }
+
+    def sanityTest6[
+      A <: ~,
+      B <: ~
+    ](
+      a: DOT[A],
+      b: DOT[B]
+    ) {
+      val stAB = tensorialStrength(a, b)
+      val stATB = tensorialStrength(a, T(b))
+      val axttb = a x T(T(b))
+
+      stAB o (axttb.π0 x (μ(b) o axttb.π1)) shouldBe (
+        μ(a x b) o map(stAB) o stATB
+      )
     }
   }
 }
