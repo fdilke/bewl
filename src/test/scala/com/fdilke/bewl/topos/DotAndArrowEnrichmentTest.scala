@@ -47,7 +47,10 @@ class DotAndArrowEnrichmentTest extends FunSpec {
   describe("Sequence comprehensions for operators") {
     it("can define unary operators") {
       val set = dot(-1, 0, 1)
-      val unaryMinus = for (x <- set) yield -x
+      val unaryMinus =
+        for (x <- set)
+          yield -x
+
       unaryMinus shouldBe arrow(set, set,
         -1 -> 1, 0 -> 0, 1 -> -1
       )
@@ -193,6 +196,30 @@ class DotAndArrowEnrichmentTest extends FunSpec {
         symbol <- Seq('A, 'B, 'C)
       )
         h_f(g)(symbol) shouldBe g(f(symbol))
+    }
+  }
+
+  describe("The associator") {
+    it("should be calculated properly for sets") {
+      val symbols = dot('A, 'B)
+      val numbers = dot(1, 2)
+      val strings = dot("foo", "bar")
+
+      associator(
+        symbols,
+        numbers,
+        strings
+      ) should have(
+        'source(
+          (symbols x numbers) x strings
+        ),
+        'target(
+          symbols x (numbers x strings)
+        ),
+        'iso(
+          true
+        )
+      )
     }
   }
 }

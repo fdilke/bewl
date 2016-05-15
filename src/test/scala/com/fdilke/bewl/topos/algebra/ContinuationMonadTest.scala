@@ -103,7 +103,9 @@ class ContinuationMonadTest extends FreeSpec {
           )
         )
 
-      continuation.sanityTest3(ints, symbols)
+      continuation.sanityTest3(ints)
+      continuation.sanityTest4(ints, symbols)
+      continuation.sanityTest5(ints, symbols, I)
     }
 
     "multiplication (mu) works" in {

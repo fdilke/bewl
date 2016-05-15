@@ -569,5 +569,22 @@ trait BaseTopos {
   // TODO: shouldn't need this, hack to get round bug in Scala 2.12.0-M4
   def tempConst[A <: ~](dot: DOT[A])(a: A) =
     I(dot) { _ => a}
+
+  // TODO: factor this out into a utility cakelet
+  def associator[
+    A <: ~,
+    B <: ~,
+    C <: ~
+  ](
+    a: DOT[A],
+    b: DOT[B],
+    c: DOT[C]
+  ): ((A x B) x C) > (A x (B x C)) = {
+    val ab_c = (a x b) x c
+    ((a x b).π0 o ab_c.π0) x (
+      ((a x b).π1 o ab_c.π0) x
+        ab_c.π1
+    )
+  }
 }
 
