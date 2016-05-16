@@ -39,10 +39,40 @@ trait StrongMonads {
       def tensorialStrength[
       Y <: ~
       ](
-        dot: DOT[Y]
+        dash: DOT[Y]
       ):
       X x M[Y] > M[X x Y]
     }
+
+    def functorialStrength[
+      X <: ~,
+      Y <: ~
+    ](
+      x: DOT[X],
+      y: DOT[Y]
+    ): (X → Y) > (
+      M[X] → M[Y]
+    ) = (
+        T(x) > T(y)
+      ).transpose(
+        x > y
+      ) { (x2y, mx) =>
+        map(
+          (x > y).evaluation.arrow
+        )(
+          tensorialStrength(
+            x > y,
+            x
+          )(
+            (
+              (x > y) x T(x)
+            ).pair(
+              x2y,
+              mx
+            )
+          )
+        )
+      }
 
     def tensorialStrength[
       A <: ~,

@@ -53,18 +53,11 @@ class ContinuationMonadTest extends FreeSpec {
         map(soo) shouldBe (soo_ o (omega > f))
     }
 
-    "tensorial strength is defined correctly" in {
+    "tensorial strength is calculated correctly" in {
       val ints = dot(1, 2)
       val symbols = dot('a, 'b)
 
-      val mSymbol = continuation(symbols).free
-      val mSymbolElements: List[Symbol → Boolean → Boolean] =
-        elementsOf(mSymbol).toList
-
-      mSymbolElements should have size 16
-      val arrow = ints(mSymbol) { i =>
-        mSymbolElements(i * 3)
-      }
+      val mSymbols = continuation(symbols).free
 
       val strength : (
         (
@@ -80,7 +73,7 @@ class ContinuationMonadTest extends FreeSpec {
         )
 
       strength should have (
-        'source(ints x mSymbol),
+        'source(ints x mSymbols),
         'target(
           continuation(
             ints x symbols
@@ -90,7 +83,7 @@ class ContinuationMonadTest extends FreeSpec {
 
       for {
         i <- elementsOf(ints)
-        m <- elementsOf(mSymbol)
+        m <- elementsOf(mSymbols)
         ist <- elementsOf(
           (ints x symbols) > omega
         )
@@ -107,6 +100,45 @@ class ContinuationMonadTest extends FreeSpec {
       continuation.sanityTest4(ints, symbols)
       continuation.sanityTest5(ints, symbols, I)
       continuation.sanityTest6(I, I)
+    }
+
+    "functorial strength is calculated correctly" in {
+      val ints = dot(1)
+      val symbols = dot('a, 'b)
+
+      val mInts = continuation(ints).free
+      val mSymbols = continuation(symbols).free
+
+      val strength : (
+        (
+          Int → Symbol
+        ) > (
+          (Int → TRUTH → TRUTH) →
+          (Symbol → TRUTH → TRUTH)
+        )
+      ) =
+        continuation.functorialStrength(
+          ints,
+          symbols
+        )
+
+      strength should have (
+        'source(ints > symbols),
+        'target(mInts > mSymbols)
+      )
+
+      for {
+        i2s: (Int → Symbol) <- elementsOf(ints > symbols)
+        mi: (Int → TRUTH → TRUTH) <- elementsOf(mInts)
+        s2o: (Symbol → TRUTH) <- elementsOf(symbols > omega)
+      }
+        strength(i2s)(mi)(s2o) shouldBe mi(
+          asElement(
+            ints(omega) { i =>
+              s2o(i2s(i))
+            }
+          )
+        )
     }
 
     "multiplication (mu) works" in {
