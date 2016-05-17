@@ -26,6 +26,10 @@ class MonadicPlumbingTest extends FreeSpec {
           true
         )
       )
+
+      twist(symbols, numbers) o
+        twist(numbers, symbols) shouldBe
+          (numbers x symbols).identity
     }
   }
 

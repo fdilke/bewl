@@ -320,7 +320,7 @@ abstract class GenericToposTests[~](
             case (α, β) => (b x a).pair(β, α)
           }
 
-        twist(foo, bar).sanityTest
+        twist(foo, bar).sanityTest()
         twist(foo, bar) shouldBe 'iso
         twist(foo, bar).inverse shouldBe twist(bar, foo)
       }
