@@ -2,7 +2,7 @@ package com.fdilke.bewl.topos
 
 import com.fdilke.bewl.topos.algebra.{AlgebraicStructures, AlgebraicConstructions, AlgebraicMachinery}
 import com.fdilke.bewl.topos.constructions.{ConstructToposOfAutomorphisms, ConstructToposOfGroupActions, ConstructToposOfMonoidActions}
-import com.fdilke.bewl.topos.enrichment.{ElementEnrichments, LogicalOperations}
+import com.fdilke.bewl.topos.enrichment.{MonadicPlumbing, ElementEnrichments, LogicalOperations}
 import com.fdilke.bewl.topos.structures.{StrongMonads, Monads}
 
 trait ToposAlgebra extends
@@ -25,12 +25,13 @@ trait ToposConstructions extends
 trait ToposStructures extends
   Monads with
   StrongMonads {
-  Ɛ: BaseTopos =>
+  Ɛ: BaseTopos with ToposEnrichments =>
 }
 
 trait ToposEnrichments extends
   LogicalOperations with
-  ElementEnrichments {
+  ElementEnrichments with
+  MonadicPlumbing {
   Ɛ: BaseTopos with ToposStructures =>
 }
 

@@ -1,13 +1,14 @@
 package com.fdilke.bewl.topos.structures
 
 import com.fdilke.bewl.helper.Memoize
+import com.fdilke.bewl.topos.enrichment.MonadicPlumbing
 import com.fdilke.bewl.topos.{ToposStructures, BaseTopos}
 import org.scalatest.Matchers._
 
 import scala.language.{higherKinds, reflectiveCalls}
 
 trait StrongMonads {
-  Ɛ: BaseTopos with ToposStructures =>
+  Ɛ: BaseTopos with ToposStructures with MonadicPlumbing =>
 
   trait StrongMonad[
     M[X <: ~] <: ~
