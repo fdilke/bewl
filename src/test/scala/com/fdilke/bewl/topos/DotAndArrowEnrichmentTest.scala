@@ -199,27 +199,4 @@ class DotAndArrowEnrichmentTest extends FunSpec {
     }
   }
 
-  describe("The associator") {
-    it("should be calculated properly for sets") {
-      val symbols = dot('A, 'B)
-      val numbers = dot(1, 2)
-      val strings = dot("foo", "bar")
-
-      associator(
-        symbols,
-        numbers,
-        strings
-      ) should have(
-        'source(
-          (symbols x numbers) x strings
-        ),
-        'target(
-          symbols x (numbers x strings)
-        ),
-        'iso(
-          true
-        )
-      )
-    }
-  }
 }
