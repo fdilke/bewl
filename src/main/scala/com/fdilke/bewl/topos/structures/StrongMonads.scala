@@ -118,12 +118,12 @@ trait StrongMonads {
       a: DOT[A]
     ) =
       map(
-        (I x a).π1
+        I -* a
       ) o tensorialStrength(
         I,
         a
       ) shouldBe
-        (I x T(a)).π1
+        (I -* T(a))
 
     def sanityTest4[
       A <: ~,
@@ -133,8 +133,8 @@ trait StrongMonads {
       b: DOT[B]
     ) =
       tensorialStrength(a, b) o (
-        (a x b).π0 x (
-          η(b) o (a x b).π1
+        (a *- b) x (
+          η(b) o (a -* b)
         )
       ) shouldBe
         η(a x b)

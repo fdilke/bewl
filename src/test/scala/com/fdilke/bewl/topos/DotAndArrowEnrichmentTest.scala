@@ -181,6 +181,25 @@ class DotAndArrowEnrichmentTest extends FunSpec {
     }
   }
 
+  describe("The projection operations *-, -*") {
+    it("are correctly calculated for sets") {
+      val symbols = dot('A, 'B, 'C)
+      val numbers = dot(1, 2, 3)
+
+      symbols *- numbers shouldBe(
+        (symbols x numbers)(symbols){
+          case (s, _) => s
+        }
+      )
+
+      symbols -* numbers shouldBe(
+        (symbols x numbers)(numbers){
+          case (_, n) => n
+        }
+      )
+    }
+  }
+
   describe("The contravariant exponential functor H ^ _") {
     it("behaves as expected") {
       val h = dot(true, false)

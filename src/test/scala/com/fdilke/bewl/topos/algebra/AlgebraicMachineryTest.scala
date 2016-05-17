@@ -168,19 +168,19 @@ class AlgebraicMachineryTest extends FunSpec {
 
       algebra.EvaluationContext(Seq(α)).evaluate(
         α
-      ) shouldBe (act x I).π0
+      ) shouldBe (act *- I)
 
       algebra.EvaluationContext(Seq(α)).evaluate(
         α ** II
-      ) shouldBe (act x I).π0
+      ) shouldBe (act *- I)
 
       algebra.EvaluationContext(Seq(Ψ)).evaluateScalar(
         Ψ
-      ) shouldBe (scalars x I).π0
+      ) shouldBe (scalars *- I)
 
       algebra.EvaluationContext(Seq(Ψ)).evaluateScalar(
         ((Ψ *** II) *** II) *** II
-      ) shouldBe (scalars x I).π0
+      ) shouldBe (scalars *- I)
     }
   }
 

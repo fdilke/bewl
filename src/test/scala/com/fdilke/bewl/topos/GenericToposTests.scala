@@ -69,10 +69,10 @@ abstract class ToposWithFixtures[~] {
     s: M > T,
     t: M > T) {
 
-    def sanityTest {
-      r.sanityTest
-      s.sanityTest
-      t.sanityTest
+    def sanityTest() {
+      r.sanityTest()
+      s.sanityTest()
+      t.sanityTest()
     }
 
     if (s == t) {
@@ -314,16 +314,8 @@ abstract class GenericToposTests[~](
       fooI shouldBe 'iso
       fooI.inverse shouldBe fooI
 
-      if (!inActionTopos) { // reluctantly skip, too slow with current technology
-        def twist[A <: ~, B <: ~](a: DOT[A], b: DOT[B]) =
-          (a x b)(b x a) {
-            case (α, β) => (b x a).pair(β, α)
-          }
-
-        twist(foo, bar).sanityTest()
-        twist(foo, bar) shouldBe 'iso
-        twist(foo, bar).inverse shouldBe twist(bar, foo)
-      }
+      I -* foo shouldBe 'iso
+      foo *- I shouldBe 'iso
     }
   }
 }

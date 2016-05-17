@@ -268,6 +268,16 @@ trait BaseTopos {
     final lazy val pac =
       new PartialArrowClassifier(dot)
 
+    final def *- [T <: ~](
+      that: DOT[T]
+    ) =
+      (this x that).π0
+
+    final def -* [T <: ~](
+      that: DOT[T]
+    ) =
+      (this x that).π1
+
     final def `+Uncached`[T <: ~](
       that: DOT[T]
     ) =
@@ -520,7 +530,10 @@ trait BaseTopos {
         })
   }
 
-  class Coproduct[A <: ~, B <: ~](left: DOT[A], right: DOT[B]) {
+  class Coproduct[A <: ~, B <: ~](
+    left: DOT[A],
+    right: DOT[B]
+  ) {
     private val fullProduct = left.pac.classifier x right.pac.classifier
 
     private val injectLeftFull = left.pac.include x (right.pac.⏊ o left.toI)
@@ -532,7 +545,10 @@ trait BaseTopos {
     val injectLeft = coproduct restrict injectLeftFull
     val injectRight = coproduct restrict injectRightFull
 
-    def sum[X <: ~](leftArrow: A > X, rightArrow: B > X) = {
+    def sum[X <: ~](
+      leftArrow: A > X,
+      rightArrow: B > X
+    ) = {
       val target = leftArrow.target
       coproduct.arrowFromFunctionalRelation(target) {
         (αβ, x) =>
