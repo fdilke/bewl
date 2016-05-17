@@ -6,10 +6,19 @@ trait MonadicPlumbing {
 
   Ɛ: BaseTopos with ToposStructures =>
 
+  def twist[
+    A <: ~,
+    B <: ~
+  ](
+    a: DOT[A],
+    b: DOT[B]
+  ): (A x B) > (B x A) =
+    (a x b).π1 x (a x b).π0
+
   def associator[
-  A <: ~,
-  B <: ~,
-  C <: ~
+    A <: ~,
+    B <: ~,
+    C <: ~
   ](
     a: DOT[A],
     b: DOT[B],

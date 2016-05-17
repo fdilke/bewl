@@ -7,6 +7,28 @@ import org.scalatest.Matchers._
 
 class MonadicPlumbingTest extends FreeSpec {
 
+  "The twist map" - {
+    "should be calculated properly for sets" in {
+      val symbols = dot('A, 'B)
+      val numbers = dot(1, 2, 3)
+
+      twist(
+        symbols,
+        numbers
+      ) should have(
+        'source(
+          symbols x numbers
+        ),
+        'target(
+          numbers x symbols
+        ),
+        'iso(
+          true
+        )
+      )
+    }
+  }
+
   "The associator" - {
     "should be calculated properly for sets" in {
       val symbols = dot('A, 'B)
