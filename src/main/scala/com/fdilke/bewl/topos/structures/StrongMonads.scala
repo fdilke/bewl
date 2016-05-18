@@ -45,36 +45,6 @@ trait StrongMonads {
       X x M[Y] > M[X x Y]
     }
 
-    def functorialStrength[
-      X <: ~,
-      Y <: ~
-    ](
-      x: DOT[X],
-      y: DOT[Y]
-    ): (X → Y) > (
-      M[X] → M[Y]
-    ) = (
-        T(x) > T(y)
-      ).transpose(
-        x > y
-      ) { (x2y, mx) =>
-        map(
-          (x > y).evaluation.arrow
-        )(
-          tensorialStrength(
-            x > y,
-            x
-          )(
-            (
-              (x > y) x T(x)
-            ).pair(
-              x2y,
-              mx
-            )
-          )
-        )
-      }
-
     def tensorialStrength[
       A <: ~,
       B <: ~
@@ -87,6 +57,47 @@ trait StrongMonads {
       ).tensorialStrength(
         b
       )
+
+    def cotensorialStrength[
+      X <: ~,
+      Y <: ~
+    ](
+      x: DOT[X],
+      y: DOT[Y]
+    ): M[X] x Y > M[X x Y] =
+      map(twist(y, x)) o
+        tensorialStrength(y, x) o
+        twist(T(x), y)
+
+    def functorialStrength[
+      X <: ~,
+      Y <: ~
+    ](
+      x: DOT[X],
+      y: DOT[Y]
+    ): (X → Y) > (
+      M[X] → M[Y]
+      ) = (
+      T(x) > T(y)
+      ).transpose(
+      x > y
+    ) { (x2y, mx) =>
+      map(
+        (x > y).evaluation.arrow
+      )(
+        tensorialStrength(
+          x > y,
+          x
+        )(
+          (
+            (x > y) x T(x)
+            ).pair(
+            x2y,
+            mx
+          )
+        )
+      )
+    }
 
     private def T[
       A <: ~
