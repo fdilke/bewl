@@ -12,7 +12,7 @@ class ContinuationMonadTest extends FreeSpec {
 
   import FiniteSets._
 
-  val continuation = omega.continuationMonad
+  val continuation = continuationMonad(omega)
 
   "For the continuation (double-exponential) monad on sets" - {
     "values at a dot are cached" in {
