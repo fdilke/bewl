@@ -10,9 +10,9 @@ trait ContinuationMonad {
   ] (
     dot: DOT[S]
   ) =
-    new StrongMonad[
+    new CachingStrongMonad[
       ({type λ[X <: ~] = X → S → S}) # λ
-      ] {
+    ] {
       override def atUncached[X <: ~](
         dash: DOT[X]
       ): At[X] =

@@ -1,10 +1,9 @@
 package com.fdilke.bewl.topos.structures
 
-import com.fdilke.bewl.helper.Memoize
 import com.fdilke.bewl.topos.BaseTopos
 import org.scalatest.Matchers._
 
-import scala.language.{postfixOps, higherKinds, reflectiveCalls}
+import scala.language.{higherKinds, postfixOps, reflectiveCalls}
 
 trait Monads {
   Ɛ: BaseTopos =>
@@ -12,21 +11,7 @@ trait Monads {
   trait Monad[
     M[X <: ~] <: ~
   ] {
-    final private val memoizedLocalValues =
-      Memoize.generic.withLowerBound[
-        ({type λ[X <: ~] = DOT[X]}) # λ,
-        At,
-        ~
-      ] (atUncached)
-
     def apply[
-      X <: ~
-    ] (
-      dot: DOT[X]
-    ): At[X] =
-      memoizedLocalValues(dot)
-
-    def atUncached[
       X <: ~
     ] (
       dot: DOT[X]
