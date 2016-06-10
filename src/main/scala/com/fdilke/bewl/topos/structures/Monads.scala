@@ -15,7 +15,7 @@ trait Monads {
       X <: ~
     ] (
       dot: DOT[X]
-    ): At[X]
+    ): Monad.At[M, X]
 
     def map[
       X <: ~,
@@ -23,14 +23,6 @@ trait Monads {
     ] (
       arrow: X > Y
     ): M[X] > M[Y]
-
-    trait At[
-      X <: ~
-    ] {
-      val free: DOT[M[X]]
-      val eta: X > M[X]
-      val mu: M[M[X]] > M[X]
-    }
 
     case class Algebra[
       X <: ~
@@ -48,6 +40,15 @@ trait Monads {
   }
 
   object Monad {
+    trait At[
+      M[X <: ~] <: ~,
+      X <: ~
+    ] {
+      val free: DOT[M[X]]
+      val eta: X > M[X]
+      val mu: M[M[X]] > M[X]
+    }
+
     def sanityTest[
       M[X <: ~] <: ~,
       X <: ~

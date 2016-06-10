@@ -7,7 +7,9 @@ import org.scalatest.Matchers._
 import scala.language.{higherKinds, reflectiveCalls}
 
 trait StrongMonads {
-  Ɛ: BaseTopos with ToposStructures with MonadicPlumbing =>
+  Ɛ: BaseTopos with
+    ToposStructures with
+    MonadicPlumbing =>
 
   trait StrongMonad[
     M[X <: ~] <: ~
@@ -17,18 +19,7 @@ trait StrongMonads {
       X <: ~
     ] (
       dot: DOT[X]
-    ): At[X]
-
-    trait At[
-      X <: ~
-    ] extends super.At[X] {
-      def tensorialStrength[
-        Y <: ~
-      ](
-        dash: DOT[Y]
-      ):
-      X x M[Y] > M[X x Y]
-    }
+    ): StrongMonad.At[M, X]
 
     def tensorialStrength[
       A <: ~,
@@ -171,6 +162,20 @@ trait StrongMonads {
       stAB o (axttb.π0 x (μ(b) o axttb.π1)) shouldBe (
         μ(a x b) o map(stAB) o stATB
       )
+    }
+  }
+
+  object StrongMonad {
+    trait At[
+      M[X <: ~] <: ~,
+      X <: ~
+    ] extends Monad.At[M, X] {
+      def tensorialStrength[
+        Y <: ~
+      ](
+        dash: DOT[Y]
+      ):
+      X x M[Y] > M[X x Y]
     }
   }
 }

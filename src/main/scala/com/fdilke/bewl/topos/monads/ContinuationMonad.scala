@@ -21,12 +21,15 @@ trait ContinuationMonad {
   ](
     dot: DOT[S]
   ) extends StrongMonad[
-      ({type λ[X <: ~] = X → S → S}) # λ
+    ({type λ[X <: ~] = X → S → S}) # λ
   ] {
-    def apply[X <: ~](
+    override def apply[X <: ~](
       dash: DOT[X]
-    ): At[X] =
-      new At[X] {
+    ) =
+      new StrongMonad.At[
+        ({type λ[X <: ~] = X → S → S}) # λ,
+        X
+      ] {
         private lazy val doubleExp: EXPONENTIAL[X → S, S] =
           dash > dot > dot
 

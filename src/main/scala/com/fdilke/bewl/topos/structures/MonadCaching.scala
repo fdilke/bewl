@@ -14,15 +14,15 @@ trait MonadCaching {
     final private val memoizedLocalValues =
       Memoize.generic.withLowerBound[
         ({type λ[X <: ~] = DOT[X]}) # λ,
-        ({type λ[X <: ~] = At[X]}) # λ,
+        ({type λ[X <: ~] = Monad.At[M, X]}) # λ,
         ~
-        ] (super.apply)
+      ] (super.apply)
 
     abstract override def apply[
       X <: ~
     ] (
       dot: DOT[X]
-    ): At[X] =
+    ) =
       memoizedLocalValues(dot)
   }
 
@@ -32,7 +32,7 @@ trait MonadCaching {
     final private val memoizedLocalValues =
       Memoize.generic.withLowerBound[
         ({type λ[X <: ~] = DOT[X]}) # λ,
-        ({type λ[X <: ~] = At[X]}) # λ,
+        ({type λ[X <: ~] = StrongMonad.At[M, X]}) # λ,
         ~
         ] (super.apply)
 
@@ -40,7 +40,7 @@ trait MonadCaching {
       X <: ~
     ] (
       dot: DOT[X]
-    ): At[X] =
+    ) =
       memoizedLocalValues(dot)
   }
 }
