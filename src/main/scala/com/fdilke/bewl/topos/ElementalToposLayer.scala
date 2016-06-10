@@ -2,7 +2,7 @@ package com.fdilke.bewl.topos
 
 import com.fdilke.bewl.diagrammatic.BaseDiagrammaticTopos
 import com.fdilke.bewl.fsets.FiniteSets._
-import com.fdilke.bewl.helper.Memoize
+import com.fdilke.bewl.helper.{Memoize, ⊕}
 
 object ElementalToposLayer {
   def apply(
@@ -52,7 +52,7 @@ object ElementalToposLayer {
               (self.dot x that.dot).asInstanceOf[Δ.DOT[Any]]
 
             override private[ElementalToposLayer] def asElement(anArrow: Δ.ARROW[_, _]) =
-              new (T, U)(
+              new ⊕[T, U](
                 self.asElement(fletch(Δ.leftProjection(self.dot, that.dot))(fletch(anArrow))),
                 that.asElement(fletch(Δ.rightProjection(self.dot, that.dot))(fletch(anArrow)))
               ) with Δ.Element {

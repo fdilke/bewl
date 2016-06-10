@@ -4,6 +4,7 @@ import com.fdilke.bewl.topos._
 import com.fdilke.bewl.helper.Memoize
 import com.fdilke.bewl.helper.↔
 import com.fdilke.bewl.topos.algebra.{AlgebraicStructures, AlgebraicMachinery}
+import com.fdilke.bewl.helper.{Memoize, ⊕}
 
 trait ConstructToposOfMonoidActions extends
   BaseTopos with
@@ -44,7 +45,7 @@ trait ConstructToposOfMonoidActions extends
             aa: AA,
             bb: BB,
             aXb: Ɛ.x[A, B]
-          ) extends (AA, BB)(aa, bb) with Ɛ.ElementWrapper[
+          ) extends ⊕[AA, BB](aa, bb) with Ɛ.ElementWrapper[
             Ɛ.x[A, B]
           ] {
             override val element = aXb
@@ -93,7 +94,7 @@ trait ConstructToposOfMonoidActions extends
 
             private val idealMultiply =
               restrict(ideals x carrier) {
-                case ((i, s), t) => ideals.inclusion(i)(multiply(s, t))
+                case (i ⊕ s, t) => ideals.inclusion(i)(multiply(s, t))
               }
 
             val omega = ActionDot[IDEAL](ideals)(
@@ -104,10 +105,13 @@ trait ConstructToposOfMonoidActions extends
           override lazy val omega = Ideals.omega
 
           override lazy val truth: UNIT > TRUTH = // TODO: don't need generics in next line
-            ActionArrow[Ɛ.UNIT, UNIT, IDEAL, Ɛ.VanillaWrapper[IDEAL]](I, omega,
+            ActionArrow[Ɛ.UNIT, UNIT, IDEAL, Ɛ.VanillaWrapper[IDEAL]](
+              I,
+              omega,
               Ideals.restrict(Ɛ.I) {
                 (i, m) => Ɛ truth i
-              })
+              }
+            )
 
           trait ActionDotFacade[
             AA <: ~~
@@ -215,14 +219,14 @@ trait ConstructToposOfMonoidActions extends
                 BiproductWrapper[Z, ZZ, A, AA]
               ](
                 monoid.action(product) {
-                  case ((z, a), m) => product.pair(
+                  case (z ⊕ a, m) => product.pair(
                     pre.action.actionMultiply(z, m),
                     action.actionMultiply(a, m)
                   )
                 },
                 new ↔[Ɛ.x[Z, A], BiproductWrapper[Z, ZZ, A, AA]](
                   zxa => zxa match {
-                    case (z, a) =>
+                    case z ⊕ a =>
                       val zz: ZZ = pre.↔ / z
                       val aa: AA = dot.↔ / a
                       new BiproductWrapper[Z, ZZ, A, AA](zz, aa, zxa)
@@ -263,7 +267,7 @@ trait ConstructToposOfMonoidActions extends
 
               val morphismMultiply = morphisms.restrict(
                 possibleMorphisms.transpose(morphisms x carrier) {
-                  case ((f, m), (n, z)) => morphisms.inclusion(f)(
+                  case (f ⊕ m, n ⊕ z) => morphisms.inclusion(f)(
                     mXz.pair(multiply(m, n), z)
                   )
                 }
@@ -321,7 +325,7 @@ trait ConstructToposOfMonoidActions extends
               val innerArrow: Ɛ.>[A, P] =
                 morphisms.restrict(
                   possibleMorphisms.transpose(action.actionCarrier) {
-                    case (a, (m, r)) =>
+                    case (a, m ⊕ r) =>
                       target.↔.\(biArrow(
                         dot.↔ / action.actionMultiply(a, m),
                         source.↔ / r

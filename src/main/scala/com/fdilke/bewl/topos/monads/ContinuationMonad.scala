@@ -1,6 +1,7 @@
 package com.fdilke.bewl.topos.monads
 
 import com.fdilke.bewl.topos.{ToposStructures, BaseTopos}
+import com.fdilke.bewl.helper.{Memoize, ⊕}
 
 trait ContinuationMonad {
   Ɛ: BaseTopos with ToposStructures =>
@@ -44,7 +45,7 @@ trait ContinuationMonad {
             }
 
           override def tensorialStrength[
-          Y <: ~
+            Y <: ~
           ](
             daa: DOT[Y]
           ) = (
@@ -53,9 +54,9 @@ trait ContinuationMonad {
             dash x (daa > dot > dot)
           } {
             case (
-              (x, yss),
+              x ⊕ yss,
               xys
-              ) =>
+            ) =>
               yss(
                 (dot > daa(dash x daa) {
                     y => dash x daa pair(x, y)
@@ -67,8 +68,8 @@ trait ContinuationMonad {
         }
 
       override def map[
-      X <: ~,
-      Y <: ~
+        X <: ~,
+        Y <: ~
       ](
         arrow: X > Y
       ) =

@@ -26,7 +26,13 @@ object Memoize {
         resultMap.getOrElseUpdate(input, function(input)).asInstanceOf[OUTPUT[T]]
     }
 
-    def withLowerBound[INPUT[T <: BASE], OUTPUT[T <: BASE], BASE](function: INPUT[BASE] => OUTPUT[BASE]) =
+    def withLowerBound[
+      INPUT[T <: BASE],
+      OUTPUT[T <: BASE],
+      BASE
+    ](
+      function: INPUT[BASE] => OUTPUT[BASE]
+    ) =
       new MemoizedFunctionGeneric[INPUT, OUTPUT, BASE](
         function.asInstanceOf[INPUT[_ <: BASE] => OUTPUT[_ <: BASE]]
       )

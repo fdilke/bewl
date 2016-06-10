@@ -1,5 +1,6 @@
 package com.fdilke.bewl.topos
 
+import com.fdilke.bewl.helper.⊕
 import com.fdilke.bewl.topos.constructions.ConstructToposOfMonoidActions
 import org.scalatest.Matchers._
 import org.scalatest._
@@ -141,7 +142,7 @@ abstract class GenericToposTests[~](
 
       val fooXbar = foo x bar
       fooXbar(fooXbar) {
-        case (f, b) => fooXbar.pair(f, b)
+        ⊕ tupled fooXbar.pair
       } shouldBe fooXbar.identity
     }
 
@@ -205,7 +206,7 @@ abstract class GenericToposTests[~](
       )
 
       (foo x bar)(baz) {
-        case (f, b) =>
+        case f ⊕ b =>
           foo2bar2baz(f)(b)
       } shouldBe foobar2baz.arrow
     }

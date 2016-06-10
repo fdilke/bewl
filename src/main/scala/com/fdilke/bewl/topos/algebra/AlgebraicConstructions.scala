@@ -1,6 +1,8 @@
 package com.fdilke.bewl.topos.algebra
 
+import com.fdilke.bewl.helper.⊕
 import com.fdilke.bewl.topos.BaseTopos
+import ⊕._
 
 trait AlgebraicConstructions {
   topos: BaseTopos with
@@ -11,7 +13,7 @@ trait AlgebraicConstructions {
     val endos = dot > dot
     new Monoid[T → T](endos, dot.identity.name,
       BiArrow(endos x endos, endos.transpose(endos x endos) {
-        case ((f, g), x) => g(f(x))
+        case (f ⊕ g, x) => g(f(x))
       })
     )
   }
@@ -23,7 +25,7 @@ trait AlgebraicConstructions {
     val pairs = carrier.squared
     val unit = monoid.unit
     val invertiblePairs = pairs(omega) {
-      case (x, y) =>
+      case x ⊕ y =>
         def i = monoid.unit(carrier.toI(x))
         carrier.=?=(i, monoid.multiply(x, y)) ^
           carrier.=?=(i, monoid.multiply(y, x))
@@ -34,7 +36,7 @@ trait AlgebraicConstructions {
     val units2ip = ip2units.inverse
     val mulUnits = BiArrow(units x units, units.restrict(
       (units x units)(units) {
-        case (u, v) => monoid.multiply(units.inclusion(u), units.inclusion(v))
+        case u ⊕ v => monoid.multiply(units.inclusion(u), units.inclusion(v))
       }))
     val inversion = units.restrict(pairs.π1 o invertiblePairs.inclusion o units2ip)
     (

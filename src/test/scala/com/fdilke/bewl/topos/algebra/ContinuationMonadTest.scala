@@ -2,10 +2,12 @@ package com.fdilke.bewl.topos.algebra
 
 import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
-import org.scalatest.{Matchers, FreeSpec}
+import org.scalatest.{FreeSpec, Matchers}
 
 import scala.language.{implicitConversions, postfixOps, reflectiveCalls}
 import Matchers._
+import com.fdilke.bewl.helper.⊕
+import ⊕._
 
 class ContinuationMonadTest extends FreeSpec {
   private val two = dot('x, 'y)
@@ -88,10 +90,10 @@ class ContinuationMonadTest extends FreeSpec {
           (ints x symbols) > omega
         )
       }
-        strength(i, m)(ist) shouldBe m(
+        strength(i ⊕ m)(ist) shouldBe m(
           asElement(
             symbols(omega) {
-              ist(i, _)
+              h => ist(i ⊕ h)
             }
           )
         )

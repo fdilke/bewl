@@ -4,6 +4,7 @@ import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
+import com.fdilke.bewl.helper.{Memoize, ⊕}
 
 import scala.Function.untupled
 
@@ -14,7 +15,7 @@ class DotAndArrowEnrichmentTest extends FunSpec {
       val totalSet = dot(1, 2, 3, 4)
       val subset = dot(1, 3)
 
-      val embed = subset(totalSet) { x => x}
+      val embed = subset(totalSet) { x => x }
       val ∀ = totalSet.∀
       ∀ should have(
         'source(totalSet > omega),
@@ -186,17 +187,15 @@ class DotAndArrowEnrichmentTest extends FunSpec {
       val symbols = dot('A, 'B, 'C)
       val numbers = dot(1, 2, 3)
 
-      symbols *- numbers shouldBe(
-        (symbols x numbers)(symbols){
-          case (s, _) => s
+      symbols *- numbers shouldBe
+        (symbols x numbers) (symbols) {
+          case s ⊕ _ => s
         }
-      )
 
-      symbols -* numbers shouldBe(
-        (symbols x numbers)(numbers){
-          case (_, n) => n
+      symbols -* numbers shouldBe
+        (symbols x numbers) (numbers) {
+          case _ ⊕ n => n
         }
-      )
     }
   }
 

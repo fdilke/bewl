@@ -1,9 +1,10 @@
 package com.fdilke.bewl.topos
 
-import com.fdilke.bewl.helper.{Memoize, ↔}
+import com.fdilke.bewl.helper.{Memoize, ↔, ⊕}
 
 import scala.Function.tupled
 import scala.language.{higherKinds, postfixOps}
+import ⊕._
 
 trait BaseTopos {
   Ɛ: ToposEnrichments with
@@ -14,7 +15,7 @@ trait BaseTopos {
   type >[S <: ~, T <: ~] <: Arrow[S, T]
 
   type →[T <: ~, U <: ~] = (T => U) with ~
-  type x[T <: ~, U <: ~] = (T, U) with ~
+  type x[T <: ~, U <: ~] = (T ⊕ U) with ~
 
   type UNIT <: ~
   val I : DOT[UNIT]
@@ -59,7 +60,7 @@ trait BaseTopos {
   trait BiproductDot[
     L <: ~,
     R <: ~,
-    LxR <: (L, R) with ~
+    LxR <: (L ⊕ R) with ~
   ] { dot: DOT[LxR] =>
     val left: DOT[L]
     val right: DOT[R]
@@ -75,9 +76,9 @@ trait BaseTopos {
       ) (
       bifunc: (L, R) => T
       ) : BiArrow[L, R, T] =
-      BiArrow(hackedThis, hackedThis(target) (
-        tupled[L,R,T](bifunc)
-      ))
+      BiArrow(hackedThis, hackedThis(target) {
+        case x ⊕ y => bifunc(x, y)
+      })
       final def universally[T <: ~](target: DOT[T])(bifunc: (L x R, T) => TRUTH) =
         BiArrow(hackedThis, hackedThis.forAll(target)(bifunc))
       final def existentially[T <: ~](target: DOT[T])(bifunc: (L x R, T) => TRUTH) =
@@ -174,7 +175,7 @@ trait BaseTopos {
     final lazy val ∃ =
       power.forAll(omega) { (f, w) =>
           (power x omega).universally(dot) {
-            case ((f, w), x) => f(x) > w
+            case (f ⊕ w, x) => f(x) > w
           }(f, w) > w
       }
 
@@ -305,7 +306,7 @@ trait BaseTopos {
     ): S > B = {
       val product = dot x target
       val graph = product(omega) {
-        case (a, b) => predicate(a, b)
+        ⊕ tupled predicate
       }.whereTrue.inclusion
       (product.π1 o graph) / (product.π0 o graph)
     }
@@ -398,8 +399,21 @@ trait BaseTopos {
     product: BIPRODUCT[L, R],
     arrow: L x R > T
   ) {
-    def apply(l: L, r: R): T = arrow(product.pair(l, r))
-    def apply[S <: ~](l: S > L, r: S > R): S > T = arrow o (l x r)
+    def apply(
+      l: L,
+      r: R
+    ): T =
+      arrow(
+        product.pair(l, r)
+      )
+
+    def apply[
+      S <: ~
+    ](
+      l: S > L,
+      r: S > R
+    ): S > T =
+      arrow o (l x r)
   }
 
   // Helper methods for triproducts (this could obviously be extended).

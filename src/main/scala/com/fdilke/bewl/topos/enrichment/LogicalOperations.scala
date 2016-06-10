@@ -1,5 +1,7 @@
 package com.fdilke.bewl.topos.enrichment
 
+import com.fdilke.bewl.helper.⊕
+import ⊕._
 import com.fdilke.bewl.topos.{BaseTopos, ToposStructures}
 
 trait LogicalOperations {
@@ -29,7 +31,7 @@ trait LogicalOperations {
       BiArrow(
         omega.squared,
         omega.squared.forAll(omega) {
-            case ((a, b), ω) => ((a > ω) ^ (b > ω)) > ω
+            case (a ⊕ b, ω) => ((a > ω) ^ (b > ω)) > ω
         }
       )
     lazy val falsity =

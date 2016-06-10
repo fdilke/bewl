@@ -1,8 +1,9 @@
 package com.fdilke.bewl.fsets
 
 import com.fdilke.bewl.fsets.DiagrammaticFiniteSetsUtilities._
-import com.fdilke.bewl.helper.Memoize
-import com.fdilke.bewl.topos.{Wrappings, Topos}
+import com.fdilke.bewl.helper.{Memoize, ⊕}
+import com.fdilke.bewl.topos.{Topos, Wrappings}
+import ⊕._
 
 object FiniteSets extends Topos[Any] with Wrappings[
   Any, Any, Traversable, FiniteSetsPreArrow, Wrappings.NO_WRAPPER
@@ -27,11 +28,12 @@ object FiniteSets extends Topos[Any] with Wrappings[
     override def xUncached[T](that: DOT[T]) =
       new FiniteSetsDot[S x T](
         for(s <- this.elements ; t <- that.elements)
-          yield (s, t)
+          yield s ⊕ t
       ) with BiproductDot[S, T, S x T] {
         override val left: DOT[S] = self
         override val right: DOT[T] = that
-        override def pair(l: S, r: T): x[S, T] = (l, r)
+        override def pair(l: S, r: T): x[S, T] =
+          l ⊕ r
       }
 
     override def `>Uncached`[T](that: FiniteSetsDot[T]) = {

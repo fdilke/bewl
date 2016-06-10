@@ -1,6 +1,6 @@
 package com.fdilke.bewl.topos.constructions
 
-import com.fdilke.bewl.helper.Memoize
+import com.fdilke.bewl.helper.{Memoize, ⊕}
 import com.fdilke.bewl.topos.algebra.{AlgebraicMachinery, AlgebraicStructures}
 import com.fdilke.bewl.topos._
 
@@ -64,7 +64,7 @@ trait ConstructToposOfGroupActions extends
             val productDot = this.action.actionCarrier x that.action.actionCarrier
             new ActionDot[S x T](
               group.action(productDot){
-                case ((s, t), g) =>
+                case (s ⊕ t, g) =>
                   productDot.pair(
                     this.action.actionMultiply(s, g),
                     that.action.actionMultiply(t, g)
@@ -84,7 +84,7 @@ trait ConstructToposOfGroupActions extends
             new ActionDot[S → T](
               group.action(exponentialDot) {
                 case (f, g) => exponentialDot.transpose(exp_x_G) {
-                  case ((f, g), a) => that.action.actionMultiply(
+                  case (f ⊕ g, a) => that.action.actionMultiply(
                     f(
                       dot.action.actionMultiply(
                         a,
