@@ -30,15 +30,6 @@ trait Monads {
       val free: DOT[M[X]]
       val eta: X > M[X]
       val mu: M[M[X]] > M[X]
-
-      def sanityTest() = {
-        mu o map(eta) shouldBe free.identity
-        mu o apply(free).eta shouldBe free.identity
-      }
-
-      def sanityTest2() = {
-        mu o map(mu) shouldBe (mu o apply(free).mu)
-      }
     }
 
     case class Algebra[
@@ -55,4 +46,36 @@ trait Monads {
         (structure o map(structure)) shouldBe (structure o local.mu)
     }
   }
+
+  object Monad {
+    def sanityTest[
+      M[X <: ~] <: ~,
+      X <: ~
+    ](
+      monad: Monad[M],
+      dot: DOT[X]
+    ) = {
+      val at = monad(dot)
+      import at._
+
+      mu o monad.map(eta) shouldBe free.identity
+      mu o monad(free).eta shouldBe free.identity
+    }
+
+    def sanityTest2[
+      M[X <: ~] <: ~,
+      X <: ~
+    ](
+      monad: Monad[M],
+      dot: DOT[X]
+    ) = {
+
+      val at = monad(dot)
+      import at._
+
+      mu o monad.map(mu) shouldBe (mu o monad(free).mu)
+    }
+  }
 }
+
+

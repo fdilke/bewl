@@ -163,7 +163,10 @@ class ContinuationMonadTest extends FreeSpec {
       }
         mu(ioooo) shouldBe (ioooo_ o io2iooo)
 
-      continuation(I).sanityTest
+      Monad.sanityTest[
+        ({type λ[X <: ~] = X → TRUTH → TRUTH}) # λ,
+        UNIT
+      ](continuation, I)
       // Can't run sanityTest2, would take too long (2 ^ 2 ^ 2 ^ 2 ^ 2 ^ 2 ^ 1)
 
 // TODO: check that M[X] is a monad, via multiplication as structure map. Or is that...
@@ -188,7 +191,7 @@ class ContinuationMonadTest extends FreeSpec {
           oo
         ) shouldBe oo(id)
 
-      continuation.home.sanityTest
+      continuation.home.sanityTest()
     }
   }
 }
