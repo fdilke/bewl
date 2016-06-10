@@ -10,24 +10,16 @@ trait MonadCaching {
     Monads with
     StrongMonads =>
 
-  trait CachingMonad[
-    M[X <: ~] <: ~
-  ] extends Monad[M] {
-    def atUncached[
-    X <: ~
-    ] (
-      dot: DOT[X]
-    ): At[X]
-
+  trait CachingMonad[M[X <: ~] <: ~] extends Monad[M] {
     final private val memoizedLocalValues =
       Memoize.generic.withLowerBound[
         ({type λ[X <: ~] = DOT[X]}) # λ,
         ({type λ[X <: ~] = At[X]}) # λ,
         ~
-        ] (atUncached)
+        ] (super.apply)
 
-    override def apply[
-    X <: ~
+    abstract override def apply[
+      X <: ~
     ] (
       dot: DOT[X]
     ): At[X] =
@@ -35,23 +27,17 @@ trait MonadCaching {
   }
 
   trait CachingStrongMonad[
-  M[X <: ~] <: ~
+    M[X <: ~] <: ~
   ] extends StrongMonad[M] {
-    def atUncached[
-    X <: ~
-    ] (
-      dot: DOT[X]
-    ): At[X]
-
     final private val memoizedLocalValues =
       Memoize.generic.withLowerBound[
         ({type λ[X <: ~] = DOT[X]}) # λ,
         ({type λ[X <: ~] = At[X]}) # λ,
         ~
-        ] (atUncached)
+        ] (super.apply)
 
-    override def apply[
-    X <: ~
+    abstract override def apply[
+      X <: ~
     ] (
       dot: DOT[X]
     ): At[X] =

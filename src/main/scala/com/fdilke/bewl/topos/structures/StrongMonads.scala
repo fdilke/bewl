@@ -23,7 +23,7 @@ trait StrongMonads {
       X <: ~
     ] extends super.At[X] {
       def tensorialStrength[
-      Y <: ~
+        Y <: ~
       ](
         dash: DOT[Y]
       ):
