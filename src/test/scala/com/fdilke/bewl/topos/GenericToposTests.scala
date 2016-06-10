@@ -14,29 +14,29 @@ abstract class ToposFixtureSanityTests[~, T <: Topos[~]](fixtures: ToposWithFixt
 
       objects should have size 3
 
-      objects foreach { _.sanityTest }
+      objects foreach { _.sanityTest() }
     }
 
     it("include sane arrows whose sources and targets match their names") {
-      foo2bar.sanityTest
+      foo2bar.sanityTest()
       foo2bar.source shouldBe foo
       foo2bar.target shouldBe bar
 
-      foo2baz.sanityTest
+      foo2baz.sanityTest()
       foo2baz.source shouldBe foo
       foo2baz.target shouldBe baz
 
-      foobar2baz.arrow.sanityTest
+      foobar2baz.arrow.sanityTest()
       foobar2baz.product.left shouldBe foo
       foobar2baz.product.right shouldBe bar
       foobar2baz.arrow.source shouldBe (foo x bar)
       foobar2baz.arrow.target shouldBe baz
 
-      monicBar2baz.sanityTest
+      monicBar2baz.sanityTest()
       monicBar2baz.source shouldBe bar
       monicBar2baz.target shouldBe baz
 
-      equalizerSituation.sanityTest
+      equalizerSituation.sanityTest()
     }
   }
 }

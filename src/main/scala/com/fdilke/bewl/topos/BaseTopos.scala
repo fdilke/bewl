@@ -112,7 +112,7 @@ trait BaseTopos {
     def xUncached[T <: ~](that: DOT[T]): BIPRODUCT[S, T]
     def `>Uncached`[T <: ~](that: DOT[T]): EXPONENTIAL[S, T]
     def apply[T <: ~](target: DOT[T])(f: S => T) : S > T
-    def sanityTest
+    def sanityTest()
   }
 
   trait Dot[S <: ~] extends BaseDot[S] {

@@ -31,12 +31,12 @@ trait Monads {
       val eta: X > M[X]
       val mu: M[M[X]] > M[X]
 
-      def sanityTest = {
+      def sanityTest() = {
         mu o map(eta) shouldBe free.identity
         mu o apply(free).eta shouldBe free.identity
       }
 
-      def sanityTest2 = {
+      def sanityTest2() = {
         mu o map(mu) shouldBe (mu o apply(free).mu)
       }
     }
@@ -49,9 +49,9 @@ trait Monads {
       lazy val carrier = structure target
       lazy val local = apply(carrier)
 
-      def sanityTest =
+      def sanityTest() =
         (structure o local.eta) shouldBe carrier.identity
-      def sanityTest2 =
+      def sanityTest2() =
         (structure o map(structure)) shouldBe (structure o local.mu)
     }
   }
