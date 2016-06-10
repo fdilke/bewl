@@ -32,5 +32,14 @@ class SmartPairTest extends FreeSpec {
           b shouldBe "t"
       }
     }
+
+    "allow tupling of functions" in {
+      def bifunc(n: Int, text: String) =
+        text(n)
+
+      val tupledBifunc = ⊕ tupled bifunc
+
+      tupledBifunc(2 ⊕ "felix") shouldBe 'l'
+    }
   }
 }
