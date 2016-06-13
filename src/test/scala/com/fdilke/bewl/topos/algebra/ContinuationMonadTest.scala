@@ -105,7 +105,7 @@ class ContinuationMonadTest extends FreeSpec {
       continuation.sanityTest6(I, I)
     }
 
-    "functorial strength is calculated correctly" in {
+    "functorial strength is calculated correctly" in notOnSnap {
       val ints = dot(1)
       val symbols = dot('a, 'b)
 
@@ -144,7 +144,7 @@ class ContinuationMonadTest extends FreeSpec {
         )
     }
 
-    "multiplication (mu) works" in {
+    "multiplication (mu) works" in notOnSnap {
       val mu: (
         UNIT → TRUTH → TRUTH → TRUTH → TRUTH
       ) > (
@@ -174,7 +174,7 @@ class ContinuationMonadTest extends FreeSpec {
 // TODO: ...too hard to calculate / a trivial consequence of our existing laws?
     }
 
-    "defines a valid home algebra structure map" in {
+    "defines a valid home algebra structure map" in notOnSnap {
       continuation.home.structure should have (
         'source(omega > omega > omega),
         'target(omega)
