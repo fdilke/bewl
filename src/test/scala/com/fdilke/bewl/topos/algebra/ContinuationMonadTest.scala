@@ -8,6 +8,7 @@ import scala.language.{implicitConversions, postfixOps, reflectiveCalls}
 import Matchers._
 import com.fdilke.bewl.helper.⊕
 import ⊕._
+import com.fdilke.bewl.helper.ContinuousIntegration.notOnSnap
 
 class ContinuationMonadTest extends FreeSpec {
   private val two = dot('x, 'y)
@@ -55,7 +56,7 @@ class ContinuationMonadTest extends FreeSpec {
         map(soo) shouldBe (soo_ o (omega > f))
     }
 
-    "tensorial strength is calculated correctly" in {
+    "tensorial strength is calculated correctly" in notOnSnap {
       val ints = dot(1, 2)
       val symbols = dot('a, 'b)
 
