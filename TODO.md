@@ -214,6 +214,9 @@ Seems there is a need for some kind of enhanced or inverse mapping.
 
 # The Horror That Is AlgebraicMachinery
 
+AlgebraicSort -> Principal, Scalar
+    Should these classes actually do something?
+    encapsulate principal/scalar processing inside them?
 types Nullary/Unary/Binary/RightScalarBinaryOp
     Should these all be functional i.e. (X, X) => X? Not of type >{_,_}?
 Law, NamedLaws
@@ -234,8 +237,22 @@ OperatorAssignment
 OperatorAssignments
     REALLY messy. Does essentially same lookup for each type
     ... factored out common code
-    ... could be improved by formalizing operator types?
-
-
-
+    ... could be improved by formalizing operator types, i.e.
+        having a class that encapsulates them?
+        or 'operator context' that we can be in the context of?
+AbstractBinaryOp/RightScalarBinaryOp/ScalarBinaryOp/UnaryOp
+    Part of above mechanism: Selectively override the lookups.
+    There MUST be a better way.
+    Shouldn't each Operator come with its own type?
+    i.e. it should be Operator[_ <: OperatorType]
+    and then OperatorAssignment could use this type
+StandardTermsAndOperators    
+    Define things like o, II, α, β etc. Lookup for binops
+AlgebraicTheory
+    tell if an arrow is a morphism
+    Algebra
+        has an OperatorAssignment[_, _] < FIX
+        EvaluationContext
+            comes in type Simple, Compound
+            ^ check overlap between these, factor out
 

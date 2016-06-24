@@ -240,32 +240,44 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       } flatMap
       handleAssignment
 
-    def lookup(constant: PrincipalConstant): Option[NullaryOp[T]] =
-      doLookup(constant) {
+    def lookup(
+      principalConstant: PrincipalConstant
+    ): Option[NullaryOp[T]] =
+      doLookup(principalConstant) {
         _.lookupPrincipalConstant
       }
 
-    def lookup(constant: ScalarConstant): Option[NullaryOp[S]] =
-      doLookup(constant) {
+    def lookup(
+      scalarConstant: ScalarConstant
+    ): Option[NullaryOp[S]] =
+      doLookup(scalarConstant) {
         _.lookupScalarConstant
       }
 
-    def lookup(op: AbstractUnaryOp): Option[UnaryOp[T]] =
-      doLookup(op) {
+    def lookup(
+      unaryOp: AbstractUnaryOp
+    ): Option[UnaryOp[T]] =
+      doLookup(unaryOp) {
         _.lookupUnaryOp
       }
 
-    def lookup(op: AbstractBinaryOp): Option[BinaryOp[T]] =
-      doLookup(op) {
+    def lookup(
+      binaryOp: AbstractBinaryOp
+    ): Option[BinaryOp[T]] =
+      doLookup(binaryOp) {
         _.lookupBinaryOp
       }
 
-    def lookup(op: AbstractRightScalarBinaryOp): Option[RightScalarBinaryOp[T, S]] =
+    def lookup(
+      op: AbstractRightScalarBinaryOp
+    ): Option[RightScalarBinaryOp[T, S]] =
       doLookup(op) {
         _.lookupRightScalarBinaryOp
       }
 
-    def lookup(op: AbstractScalarBinaryOp): Option[BinaryOp[S]] =
+    def lookup(
+      op: AbstractScalarBinaryOp
+    ): Option[BinaryOp[S]] =
       doLookup(op) {
         _.lookupScalarBinaryOp
       }
