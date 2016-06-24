@@ -252,6 +252,8 @@ AlgebraicTheory
     tell if an arrow is a morphism
     Algebra
         has an OperatorAssignment[_, _] < FIX
+            Can make it an [S, T] ... OpAssign[T, S]*?
+            Step 1: fix type safety for T
         EvaluationContext
             comes in type Simple, Compound
             ^ check overlap between these, factor out

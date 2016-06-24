@@ -318,8 +318,8 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   class AbstractScalarBinaryOp(
     name: String
   ) extends Operator(name, 2) {
-    def :=[S <: ~](binaryOp: BinaryOp[S]) =
-      new OperatorAssignment[~, S](this){
+    def :=[S <: ~, T <: ~](binaryOp: BinaryOp[S]) =
+      new OperatorAssignment[T, S](this){
         override def lookupScalarBinaryOp =
           Some(binaryOp)
       }
@@ -450,7 +450,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     class Algebra[T <: ~](
       val carrier: DOT[T]
     )(
-      assignments: OperatorAssignment[_ <: ~, _ <: ~]*
+      assignments: OperatorAssignment[T, _ <: ~]*
     ) { algebra =>
       val operatorAssignments =
         OperatorAssignments(
