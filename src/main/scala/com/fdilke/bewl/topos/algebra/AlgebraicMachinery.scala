@@ -373,10 +373,13 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       )
   }
 
-  class AlgebraicTheory[S <: ~](
+  class AlgebraicTheory[
+    S <: ~,
+    T <: ~
+  ](
       scalars: DOT[S]
    )(
-      preassignments: OperatorAssignment[_ <: ~, S]*
+      preassignments: OperatorAssignment[T, S]*
    )(
       operators: Operator*
    )(
@@ -651,24 +654,27 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   }
 
   object AlgebraicTheory {
-    def apply(operators: Operator*)(laws: Law*) =
-      new AlgebraicTheory[UNIT](I)()(operators:_*)(laws:_*)
+    def apply[T <: ~](operators: Operator*)(laws: Law*) =
+      new AlgebraicTheory[UNIT, T](I)()(operators:_*)(laws:_*)
   }
 
   object AlgebraicTheoryWithScalars {
-    def apply[S <: ~](
+    def apply[
+      S <: ~,
+      T <: ~
+    ](
       scalars: DOT[S]
     )(
-      preassignments: OperatorAssignment[_ <: ~, S]*
+      preassignments: OperatorAssignment[T, S]*
     )(
       operators: Operator*
     )(
       laws: Law*
     ) =
-      new AlgebraicTheory[S](scalars)(preassignments :_*)(operators :_*)(laws:_*)
+      new AlgebraicTheory[S, T](scalars)(preassignments :_*)(operators :_*)(laws:_*)
   }
 
-  type Algebra = AlgebraicTheory[_ <: ~]#Algebra[_ <: ~]
+  type Algebra = AlgebraicTheory[_ <: ~, _ <: ~]#Algebra[_ <: ~]
 }
 
 
