@@ -524,6 +524,20 @@ trait AlgebraicMachinery { topos: BaseTopos =>
           } getOrElse bail(
             "Unknown constant in expression: " + term.name
           )
+
+        protected def evaluateBinaryScalarOpTerm(
+          term: BinaryScalarOpTerm
+        ): ROOT > S =
+          operatorAssignments.lookup(term.op) map { op =>
+            root(scalars) { r =>
+              op(
+                evaluateScalar(term.left)(r),
+                evaluateScalar(term.right)(r)
+              )
+            }
+          } getOrElse bail(
+            "Unknown operator in expression: " + term.op
+          )
       }
 
       class SimpleEvaluationContext extends EvaluationContext {
@@ -550,17 +564,8 @@ trait AlgebraicMachinery { topos: BaseTopos =>
             case term: ScalarConstant =>
               evaluateScalarConstant(term)
 
-            case term @ BinaryScalarOpTerm(left, op, right) =>
-              operatorAssignments.lookup(op) map { op =>
-                root(scalars) { r =>
-                  op(
-                    evaluateScalar(left)(r),
-                    evaluateScalar(right)(r)
-                  )
-                }
-              } getOrElse bail(
-                  "Unknown operator in expression: " + op
-                )
+            case term : BinaryScalarOpTerm =>
+              evaluateBinaryScalarOpTerm(term)
 
             case _ =>
               bail(
@@ -627,9 +632,6 @@ trait AlgebraicMachinery { topos: BaseTopos =>
           term: Term[Scalar]
         ): HEAD x TAIL > S =
           term match {
-            case term: ScalarConstant =>
-              evaluateScalarConstant(term)
-
             case VariableTerm(symbol, _) if symbol == name =>
               root.π0.asInstanceOf[HEAD x TAIL > S]
 
