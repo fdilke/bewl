@@ -270,7 +270,12 @@ ingredients and have it do this itself
 Also lots of very similar methods here, 
 should be able to refactor further
 
-so next step is:
+...so now only 3 areas that could be cleaned up:
+- the cast in EvalContext: depends on recursive mechanism for
+building the context from multiple dots. Is there a way round it?
+- 
+
+next step is:
 add 'operator/term-type-specification classes' that localize
 this machinery, so we don't need case splitting and 
 multiple dispatch

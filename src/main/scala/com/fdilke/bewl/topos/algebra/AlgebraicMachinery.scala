@@ -49,7 +49,9 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     }
   }
 
-  sealed trait Term[X <: AlgebraicSort] extends Dynamic {
+  sealed trait Term[
+    X <: AlgebraicSort
+  ] extends Dynamic {
     def applyDynamic(
       name: String
     )(
@@ -100,12 +102,15 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       implicit eq: =:=[X, Principal]
     ) =
       Law(
-        this.asInstanceOf[Term[Principal]],
+        this.asInstanceOf[Term[Principal]], // cast justified by =:=
         that
-      ) // cast justified by =:=
+      )
   }
 
-  case class Operator(name: String, arity: Int)
+  case class Operator(
+    name: String,
+    arity: Int
+  )
 
   case class VariableTerm[
     S <: AlgebraicSort
@@ -405,45 +410,56 @@ trait AlgebraicMachinery { topos: BaseTopos =>
                   sourceAlgebra.operatorAssignments.lookup(op)
                 tgtConstant <-
                   targetAlgebra.operatorAssignments.lookup(op)
-              } yield {
+              } yield
                 (arrow o srcConstant) == tgtConstant
-              }) getOrElse bail(
+              ) getOrElse bail(
                 "Not found in source algebra: " + op.name
               )
 
           case op: AbstractUnaryOp => (
-            for (
-              srcOp <- sourceAlgebra.operatorAssignments.lookup(op);
-              tgtOp <- targetAlgebra.operatorAssignments.lookup(op)
-            ) yield {
+            for {
+              srcOp <-
+                sourceAlgebra.operatorAssignments.lookup(op)
+              tgtOp <-
+                targetAlgebra.operatorAssignments.lookup(op)
+            } yield
               (arrow o srcOp) == (tgtOp o arrow)
-            }) getOrElse bail(
+            ) getOrElse bail(
               "Not found in source algebra: " + op.name
             )
 
           case op: AbstractBinaryOp =>
             val square = sourceAlgebra.carrier.squared
-            (for (
-              srcOp <- sourceAlgebra.operatorAssignments.lookup(op);
-              tgtOp <- targetAlgebra.operatorAssignments.lookup(op)
-            ) yield {
-                (arrow o srcOp.arrow) == tgtOp(arrow o square.π0, arrow o square.π1)
-              }) getOrElse bail(
+            (
+              for {
+                srcOp <-
+                  sourceAlgebra.operatorAssignments.lookup(op)
+                tgtOp <-
+                  targetAlgebra.operatorAssignments.lookup(op)
+              } yield
+                (arrow o srcOp.arrow) ==
+                  tgtOp(
+                    arrow o square.π0,
+                    arrow o square.π1
+                  )
+            ) getOrElse bail(
                 "Not found in source algebra: " + op.name
               )
 
           case op: AbstractRightScalarBinaryOp =>
             val carrierScalars = sourceAlgebra.carrier x scalars
-            (for (
-              srcOp <- sourceAlgebra.operatorAssignments.lookup(op);
-              tgtOp <- targetAlgebra.operatorAssignments.lookup(op)
-            ) yield {
+            (for {
+              srcOp <-
+                sourceAlgebra.operatorAssignments.lookup(op)
+              tgtOp <-
+                targetAlgebra.operatorAssignments.lookup(op)
+            } yield
               (arrow o srcOp.arrow) ==
                 tgtOp(
                   arrow o carrierScalars.π0,
                   carrierScalars.π1
                 )
-            }) getOrElse bail(
+            ) getOrElse bail(
                 "Not found in source algebra: " + op.name
               )
 
