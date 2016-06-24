@@ -347,6 +347,8 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   object StandardTermsAndOperators {
     val o = new PrincipalConstant("o")
     val ι = new PrincipalConstant("ι")
+    val ⊥ = new PrincipalConstant("⊥")
+    val ⊤ = new PrincipalConstant("⊤")
     val II = new ScalarConstant("II")
 
     val α = PrincipalTerm("α")
@@ -359,6 +361,8 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
     val * = new AbstractBinaryOp("*")
     val + = new AbstractBinaryOp("+")
+    val ∧ = new AbstractBinaryOp("∧")
+    val ∨ = new AbstractBinaryOp("∨")
 
     val ** = new AbstractRightScalarBinaryOp("**")
     val *** = new AbstractScalarBinaryOp("***")
@@ -366,7 +370,9 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     private val binaryOperators =
       Map[String, AbstractBinaryOp](
         "*" -> *,
-        "+" -> $plus
+        "+" -> $plus,
+        "∧" -> ∧,
+        "∨" -> ∨
       )
 
     def binaryOpFrom(name: String) =

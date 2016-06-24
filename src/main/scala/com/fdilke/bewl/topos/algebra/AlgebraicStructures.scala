@@ -96,4 +96,30 @@ trait AlgebraicStructures extends
   ) with Actions[G] with CommutativityCriterion {
     lazy val asMonoid = new Monoid[G](carrier, unit, multiply)
   }
+
+  lazy val lattices = AlgebraicTheory(⊥, ⊤, ∨, ∧)(
+    "commutative ∨" law ( α ∨ β := β ∨ α ),
+    "associative ∨" law ( (α ∨ β) ∨ γ := α ∨ (β ∨ γ) ),
+    "unit ⊥ for ∨" law ( ⊥ ∨ α := α  ),
+
+    "commutative ∧" law ( α ∧ β := β ∧ α ),
+    "associative ∧" law ( (α ∧ β) ∧ γ := α ∧ (β ∧ γ) ),
+    "unit ⊤ for ∧" law ( ⊤ ∧ α := α  ),
+
+    "absorptive ∧ over ∨" law ( α ∧ (α ∨ β) := α ),
+    "absorptive ∨ over ∧" law ( α ∨ (α ∧ β) := α )
+  )
+
+  class Lattice[L <: ~](
+    override val carrier: DOT[L],
+    val bottom: NullaryOp[L],
+    val top: NullaryOp[L],
+    val meet: BinaryOp[L],
+    val join: BinaryOp[L]
+  ) extends lattices.Algebra[L](carrier)(
+    ⊥ := bottom,
+    ⊤ := top,
+    ∨ := meet,
+    ∧ := join
+  )
 }

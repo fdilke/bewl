@@ -1,5 +1,6 @@
 package com.fdilke.bewl.topos.algebra
 
+import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
@@ -221,6 +222,24 @@ class AlgebraicStructuresTest extends FunSpec {
       val monoid = group.asMonoid
       monoid.sanityTest
       monoids.isMorphism(monoid, largerMonoid, inject) shouldBe true
+    }
+  }
+
+  describe("Lattices") {
+    it("can be defined and verified") {
+      val carrier = dot(0 to 7 :_*)
+      val bottom = makeNullaryOperator(carrier, 0)
+      val top = makeNullaryOperator(carrier, 7)
+      val meet = bifunctionAsBiArrow(carrier) { _ | _ }
+      val join = bifunctionAsBiArrow(carrier) { _ & _ }
+
+      new Lattice[Int](
+        carrier,
+        bottom,
+        top,
+        meet,
+        join
+      ).sanityTest()
     }
   }
 }

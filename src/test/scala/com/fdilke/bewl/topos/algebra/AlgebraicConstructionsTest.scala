@@ -45,8 +45,8 @@ class AlgebraicConstructionsTest extends FunSpec {
     it("for the trivial monoid") {
       val monoid = monoidFromTable('o)
       val (group, inject) = groupOfUnits(monoid)
-      group shouldBe an[Group[_]]
-      group.sanityTest
+      group shouldBe a[Group[_]]
+      group.sanityTest()
       group.carrier.globals.size shouldBe 1
       inject should have(
         'source(group.carrier),
@@ -61,7 +61,7 @@ class AlgebraicConstructionsTest extends FunSpec {
         'x, 'x
       )
       val (group, inject) = groupOfUnits(monoid)
-      group.sanityTest
+      group.sanityTest()
       group.carrier.globals.size shouldBe 1
       group shouldBe 'commutative
       inject should have(
