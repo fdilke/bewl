@@ -267,5 +267,11 @@ EvaluationContext implementations invoke these as necessary.
 Would be better if:
 you could invoke each term (uniformly) with the required 
 ingredients and have it do this itself
+Also lots of very similar methods here, 
+should be able to refactor further
 
+so next step is:
+add 'operator/term-type-specification classes' that localize
+this machinery, so we don't need case splitting and 
+multiple dispatch
 
