@@ -379,12 +379,11 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   }
 
   class AlgebraicTheory[
-    S <: ~,
-    T <: ~
+    S <: ~
   ](
       scalars: DOT[S]
    )(
-      preassignments: OperatorAssignment[T, S]*
+      preassignments: OperatorAssignment[_ <: ~, S]*
    )(
       operators: Operator*
    )(
@@ -412,18 +411,19 @@ trait AlgebraicMachinery { topos: BaseTopos =>
                   targetAlgebra.operatorAssignments.lookup(op)
               } yield
                 (arrow o srcConstant) == tgtConstant
-              ) getOrElse bail(
-                "Not found in source algebra: " + op.name
-              )
+            ) getOrElse bail(
+              "Not found in source algebra: " + op.name
+            )
 
-          case op: AbstractUnaryOp => (
-            for {
-              srcOp <-
-                sourceAlgebra.operatorAssignments.lookup(op)
-              tgtOp <-
-                targetAlgebra.operatorAssignments.lookup(op)
-            } yield
-              (arrow o srcOp) == (tgtOp o arrow)
+          case op: AbstractUnaryOp =>
+            (
+              for {
+                srcOp <-
+                  sourceAlgebra.operatorAssignments.lookup(op)
+                tgtOp <-
+                  targetAlgebra.operatorAssignments.lookup(op)
+              } yield
+                (arrow o srcOp) == (tgtOp o arrow)
             ) getOrElse bail(
               "Not found in source algebra: " + op.name
             )
@@ -479,9 +479,9 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     ) { algebra =>
       val operatorAssignments =
         OperatorAssignments(
-          (preassignments ++ assignments) map {
+          (preassignments map {
             _.asInstanceOf[OperatorAssignment[T, S]]
-          }
+          }) ++ assignments
         )
 
       object EvaluationContext {
@@ -690,27 +690,26 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   }
 
   object AlgebraicTheory {
-    def apply[T <: ~](operators: Operator*)(laws: Law*) =
-      new AlgebraicTheory[UNIT, T](I)()(operators:_*)(laws:_*)
+    def apply(operators: Operator*)(laws: Law*) =
+      new AlgebraicTheory[UNIT](I)()(operators:_*)(laws:_*)
   }
 
   object AlgebraicTheoryWithScalars {
     def apply[
-      S <: ~,
-      T <: ~
+      S <: ~
     ](
       scalars: DOT[S]
     )(
-      preassignments: OperatorAssignment[T, S]*
+      preassignments: OperatorAssignment[_ <: ~, S]*
     )(
       operators: Operator*
     )(
       laws: Law*
     ) =
-      new AlgebraicTheory[S, T](scalars)(preassignments :_*)(operators :_*)(laws:_*)
+      new AlgebraicTheory[S](scalars)(preassignments :_*)(operators :_*)(laws:_*)
   }
 
-  type Algebra = AlgebraicTheory[_ <: ~, _ <: ~]#Algebra[_ <: ~]
+  type Algebra = AlgebraicTheory[_ <: ~]#Algebra[_ <: ~]
 }
 
 

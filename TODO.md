@@ -270,13 +270,19 @@ ingredients and have it do this itself
 Also lots of very similar methods here, 
 should be able to refactor further
 
-...so now only 3 areas that could be cleaned up:
+...so, remaining areas that could be cleaned up:
 - the cast in EvalContext: depends on recursive mechanism for
 building the context from multiple dots. Is there a way round it?
-- 
+- the cast on preAssignments, which never know what T is
+ but are OperatorAssignments[T, S]s
+ There could be a mechanism to erase and restore the T
+    when there never was a T in the first place
+- all the lookup methods in OperatorAssignment/OperatorAssignments. Just broken
+- case switch on operators in isMorphism:
+    can't an Operator know how to verify it's preserved between algebras?
+- in EvaluationContext, evaluation for different terms:
+    duplication here, and can the terms know how to eval themselves?
 
-next step is:
-add 'operator/term-type-specification classes' that localize
-this machinery, so we don't need case splitting and 
-multiple dispatch
+Try to avoid all the case splitting and multiple dispatch.
+Put logic into the term/operator classes of relevant types?
 
