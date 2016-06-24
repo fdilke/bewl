@@ -254,6 +254,7 @@ AlgebraicTheory
         has an OperatorAssignment[_, _] < FIX
             Can make it an [S, T] ... OpAssign[T, S]*?
             Step 1: fix type safety for T
+            Step 2: do for S. Have to adjust implementations of ":=" 
         EvaluationContext
             comes in type Simple, Compound
             ^ check overlap between these, factor out

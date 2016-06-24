@@ -506,6 +506,24 @@ trait AlgebraicMachinery { topos: BaseTopos =>
         def evaluateScalar(
           term: Term[Scalar]
         ): ROOT > S
+
+        protected def evaluateScalarConstant(
+          term: ScalarConstant
+        ): ROOT > S =
+          operatorAssignments.lookup(term) map { constant =>
+            constant o root.toI
+          } getOrElse bail(
+            "Unknown constant in expression: " + term.name
+          )
+
+        protected def evaluatePrincipalConstant(
+          term: PrincipalConstant
+        ): ROOT > T =
+          operatorAssignments.lookup(term) map { constant =>
+            constant o root.toI
+          } getOrElse bail(
+            "Unknown constant in expression: " + term.name
+          )
       }
 
       class SimpleEvaluationContext extends EvaluationContext {
@@ -517,11 +535,8 @@ trait AlgebraicMachinery { topos: BaseTopos =>
         ): UNIT > T =
           term match {
             case term: PrincipalConstant =>
-              operatorAssignments.lookup(term) map { constant =>
-                constant o root.toI
-              } getOrElse bail(
-                "Unknown constant in expression: " + term.name
-              )
+              evaluatePrincipalConstant(term)
+
             case _ =>
               bail(
                 "No variables available for principal term: " + term
@@ -533,11 +548,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
         ): UNIT > S =
           term match {
             case term: ScalarConstant =>
-              operatorAssignments.lookup(term) map { constant =>
-                constant o root.toI
-              } getOrElse bail(
-                  "Unknown constant in expression: " + term.name
-                )
+              evaluateScalarConstant(term)
 
             case term @ BinaryScalarOpTerm(left, op, right) =>
               operatorAssignments.lookup(op) map { op =>
@@ -565,9 +576,12 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       ) extends EvaluationContext {
         private type TAIL = tail.ROOT
         override type ROOT = HEAD x TAIL
-        override def root : BIPRODUCT[HEAD, TAIL] = head x tail.root
+        override def root : BIPRODUCT[HEAD, TAIL] =
+          head x tail.root
 
-        override def evaluate(term: Term[Principal]): HEAD x TAIL > T =
+        override def evaluate(
+          term: Term[Principal]
+        ): HEAD x TAIL > T =
           term match {
             case VariableTerm(symbol, _) if symbol == name =>
               root.π0.asInstanceOf[HEAD x TAIL > T]
@@ -609,14 +623,12 @@ trait AlgebraicMachinery { topos: BaseTopos =>
               tail.evaluate(term) o root.π1
           }
 
-        override def evaluateScalar(term: Term[Scalar]): HEAD x TAIL > S =
+        override def evaluateScalar(
+          term: Term[Scalar]
+        ): HEAD x TAIL > S =
           term match {
             case term: ScalarConstant =>
-              operatorAssignments.lookup(term) map { constant =>
-                constant o root.toI
-              } getOrElse bail(
-                "Unknown constant in expression: " + term.name
-              )
+              evaluateScalarConstant(term)
 
             case VariableTerm(symbol, _) if symbol == name =>
               root.π0.asInstanceOf[HEAD x TAIL > S]
