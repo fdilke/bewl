@@ -635,17 +635,8 @@ trait AlgebraicMachinery { topos: BaseTopos =>
             case VariableTerm(symbol, _) if symbol == name =>
               root.π0.asInstanceOf[HEAD x TAIL > S]
 
-            case term @ BinaryScalarOpTerm(left, op, right) =>
-              operatorAssignments.lookup(op) map { op =>
-                root(scalars) { r =>
-                  op(
-                    evaluateScalar(left)(r),
-                    evaluateScalar(right)(r)
-                  )
-                }
-              } getOrElse bail(
-                "Unknown operator in expression: " + op
-              )
+            case term : BinaryScalarOpTerm =>
+              evaluateBinaryScalarOpTerm(term)
 
             case _ =>
               tail.evaluateScalar(term) o root.π1
