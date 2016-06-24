@@ -202,10 +202,13 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   ) extends ConstantOperator[Scalar](
     name
   ) {
-    def :=[T <: ~](
+    def :=[
+      S <: ~,
+      T <: ~
+    ](
       nullaryOp: NullaryOp[T]
     ) =
-      new OperatorAssignment[~, T](this) {
+      new OperatorAssignment[S, T](this) {
         override def lookupScalarConstant =
           Some(nullaryOp)
       }
