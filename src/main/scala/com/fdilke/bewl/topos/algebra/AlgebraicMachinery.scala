@@ -165,10 +165,10 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   case class UnaryOpTerm[S <: AlgebraicSort](
     op: AbstractUnaryOp,
-    term: Term[S]
+    innerTerm: Term[S]
   ) extends Term[S] {
     override val freeVariables =
-      term.freeVariables
+      innerTerm.freeVariables
   }
 
   class ConstantOperator[
@@ -566,6 +566,17 @@ trait AlgebraicMachinery { topos: BaseTopos =>
           } getOrElse bail(
             "Unknown operator in expression: " + term.op
           )
+
+        protected def evaluateUnaryOpTerm(
+          term: UnaryOpTerm[Principal]
+        ): ROOT > T =
+          operatorAssignments.lookup(term.op) map { op =>
+            root(carrier) { r =>
+              op(evaluate(term.innerTerm)(r))
+            }
+          } getOrElse bail(
+            "Unknown operator in expression: " + term.op
+          )
       }
 
       class SimpleEvaluationContext extends EvaluationContext {
@@ -625,14 +636,8 @@ trait AlgebraicMachinery { topos: BaseTopos =>
             case term: BinaryRightScalarOpTerm =>
               evaluateBinaryRightScalarOpTerm(term)
 
-            case term @ UnaryOpTerm(op, innerTerm) =>
-              operatorAssignments.lookup(op) map { op =>
-                root(carrier) { r =>
-                  op(evaluate(innerTerm)(r))
-                }
-              } getOrElse bail(
-                "Unknown operator in expression: " + op
-              )
+            case term : UnaryOpTerm[Principal] =>
+              evaluateUnaryOpTerm(term)
 
             case _ =>
               tail.evaluate(term) o root.π1
