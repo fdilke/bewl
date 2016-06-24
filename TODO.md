@@ -259,3 +259,13 @@ AlgebraicTheory
             comes in type Simple, Compound
             ^ check overlap between these, factor out
 
+EvaluationContext:
+Factored out some of this.
+It ends up being sensible to put the term-specific handling
+in the base class, and then have the case statements in the
+EvaluationContext implementations invoke these as necessary.
+Would be better if:
+you could invoke each term (uniformly) with the required 
+ingredients and have it do this itself
+
+

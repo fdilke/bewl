@@ -538,6 +538,20 @@ trait AlgebraicMachinery { topos: BaseTopos =>
           } getOrElse bail(
             "Unknown operator in expression: " + term.op
           )
+
+        protected def evaluateBinaryOpTerm(
+          term: BinaryOpTerm[Principal]
+        ): ROOT > T =
+          operatorAssignments.lookup(term.op) map { op =>
+            root(carrier) { r =>
+              op(
+                evaluate(term.left)(r),
+                evaluate(term.right)(r)
+              )
+            }
+          } getOrElse bail(
+            "Unknown operator in expression: " + term.op
+          )
       }
 
       class SimpleEvaluationContext extends EvaluationContext {
@@ -591,17 +605,8 @@ trait AlgebraicMachinery { topos: BaseTopos =>
             case VariableTerm(symbol, _) if symbol == name =>
               root.π0.asInstanceOf[HEAD x TAIL > T]
 
-            case term @ BinaryOpTerm(left, op, right) =>
-              operatorAssignments.lookup(op) map { op =>
-                root(carrier) { r =>
-                  op(
-                    evaluate(left)(r),
-                    evaluate(right)(r)
-                  )
-                }
-              } getOrElse bail(
-                  "Unknown operator in expression: " + op
-                )
+            case term: BinaryOpTerm[Principal] =>
+              evaluateBinaryOpTerm(term)
 
             case term @ BinaryRightScalarOpTerm(left, op, right) =>
               operatorAssignments.lookup(op) map { op =>
