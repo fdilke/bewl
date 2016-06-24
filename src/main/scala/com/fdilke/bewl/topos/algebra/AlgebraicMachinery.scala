@@ -186,11 +186,12 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     name
   ) {
     def :=[
+      S <: ~,
       T <: ~
     ](
       nullaryOp: NullaryOp[T]
     ) =
-      new OperatorAssignment[T, ~](this) {
+      new OperatorAssignment[T, S](this) {
         override def lookupPrincipalConstant =
           Some(nullaryOp)
       }
@@ -452,7 +453,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     class Algebra[T <: ~](
       val carrier: DOT[T]
     )(
-      assignments: OperatorAssignment[T, _ <: ~]*
+      assignments: OperatorAssignment[T, S]*
     ) { algebra =>
       val operatorAssignments =
         OperatorAssignments(
