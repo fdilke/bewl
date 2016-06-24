@@ -21,8 +21,11 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     right: Term[Principal],
     name: Option[String] = None
   ) {
-    def isSatisfiedIn(context: Algebra#EvaluationContext) =
-      context.evaluate(left) == context.evaluate(right)
+    def isSatisfiedIn(
+      context: Algebra#EvaluationContext
+    ) =
+      context.evaluate(left) ==
+        context.evaluate(right)
 
     def fails =
       bail(
@@ -138,7 +141,8 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     op: AbstractBinaryOp,
     right: Term[S]
   ) extends Term[S] {
-    override val freeVariables = (left.freeVariables ++ right.freeVariables).distinct
+    override val freeVariables =
+      (left.freeVariables ++ right.freeVariables).distinct
   }
 
   case class BinaryRightScalarOpTerm(
@@ -146,7 +150,8 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     op: AbstractRightScalarBinaryOp,
     right: Term[Scalar]
   ) extends Term[Principal] {
-    override val freeVariables = (left.freeVariables ++ right.freeVariables).distinct
+    override val freeVariables =
+      (left.freeVariables ++ right.freeVariables).distinct
   }
 
   case class BinaryScalarOpTerm(
@@ -154,27 +159,30 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     op: AbstractScalarBinaryOp,
     right: Term[Scalar]
   ) extends Term[Scalar] {
-    override val freeVariables = (left.freeVariables ++ right.freeVariables).distinct
+    override val freeVariables =
+      (left.freeVariables ++ right.freeVariables).distinct
   }
 
   case class UnaryOpTerm[S <: AlgebraicSort](
     op: AbstractUnaryOp,
     term: Term[S]
   ) extends Term[S] {
-    override val freeVariables = term.freeVariables
+    override val freeVariables =
+      term.freeVariables
   }
 
-  class GeneralConstant[
+  class ConstantOperator[
     X <: AlgebraicSort
   ](
     name: String
   ) extends Operator(name, 0) with Term[X] {
-    override val freeVariables = Nil
+    override val freeVariables =
+      Nil
   }
 
   class PrincipalConstant(
     name: String
-  ) extends GeneralConstant[Principal](
+  ) extends ConstantOperator[Principal](
     name
   ) {
     def :=[
@@ -190,7 +198,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   class ScalarConstant(
     name: String
-  ) extends GeneralConstant[Scalar](
+  ) extends ConstantOperator[Scalar](
     name
   ) {
     def :=[T <: ~](
@@ -222,40 +230,52 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   ](
     assignments: Seq[OperatorAssignment[T, S]]
   ) {
-    def lookup(constant: PrincipalConstant): Option[NullaryOp[T]] = (
-      for (assignment <- assignments if assignment.operator == constant)
-        yield assignment.lookupPrincipalConstant
-    ).headOption.flatten
+    private def doLookup[OP](
+      op: Operator
+    )(
+      handleAssignment: OperatorAssignment[T, S] => Option[OP]
+    ): Option[OP] =
+      assignments find {
+        _.operator == op
+      } flatMap
+      handleAssignment
 
-    def lookup(constant: ScalarConstant): Option[NullaryOp[S]] = (
-      for (assignment <- assignments if assignment.operator == constant)
-        yield assignment.lookupScalarConstant
-    ).headOption.flatten
+    def lookup(constant: PrincipalConstant): Option[NullaryOp[T]] =
+      doLookup(constant) {
+        _.lookupPrincipalConstant
+      }
 
-    def lookup(op: AbstractUnaryOp): Option[UnaryOp[T]] = (
-      for (assignment <- assignments if assignment.operator == op)
-        yield assignment.lookupUnaryOp
-    ).headOption.flatten
+    def lookup(constant: ScalarConstant): Option[NullaryOp[S]] =
+      doLookup(constant) {
+        _.lookupScalarConstant
+      }
 
-    def lookup(op: AbstractBinaryOp): Option[BinaryOp[T]] = (
-      for (assignment <- assignments if assignment.operator == op)
-        yield assignment.lookupBinaryOp
-    ).headOption.flatten
+    def lookup(op: AbstractUnaryOp): Option[UnaryOp[T]] =
+      doLookup(op) {
+        _.lookupUnaryOp
+      }
 
-    def lookup(op: AbstractRightScalarBinaryOp): Option[RightScalarBinaryOp[T, S]] = (
-      for (assignment <- assignments if assignment.operator == op)
-        yield assignment.lookupRightScalarBinaryOp
-      ).headOption.flatten
+    def lookup(op: AbstractBinaryOp): Option[BinaryOp[T]] =
+      doLookup(op) {
+        _.lookupBinaryOp
+      }
 
-    def lookup(op: AbstractScalarBinaryOp): Option[BinaryOp[S]] = (
-      for (assignment <- assignments if assignment.operator == op)
-        yield assignment.lookupScalarBinaryOp
-      ).headOption.flatten
+    def lookup(op: AbstractRightScalarBinaryOp): Option[RightScalarBinaryOp[T, S]] =
+      doLookup(op) {
+        _.lookupRightScalarBinaryOp
+      }
+
+    def lookup(op: AbstractScalarBinaryOp): Option[BinaryOp[S]] =
+      doLookup(op) {
+        _.lookupScalarBinaryOp
+      }
 
     def hasPrecisely(
       operators: Seq[Operator]
     ): Boolean =
-        assignments.map { _.operator }.toSet ==
+        assignments.map {
+          _.operator
+        }.toSet ==
           operators.toSet
   }
 
@@ -318,6 +338,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
     val * = new AbstractBinaryOp("*")
     val + = new AbstractBinaryOp("+")
+
     val ** = new AbstractRightScalarBinaryOp("**")
     val *** = new AbstractScalarBinaryOp("***")
 

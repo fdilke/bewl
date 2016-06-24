@@ -212,9 +212,29 @@ Or is there a need for interchangeable representations:
 (sequence of cycles) <-> (dot in the topos)?
 Seems there is a need for some kind of enhanced or inverse mapping.
 
+# The Horror That Is AlgebraicMachinery
 
-
-
+types Nullary/Unary/Binary/RightScalarBinaryOp
+    Should these all be functional i.e. (X, X) => X? Not of type >{_,_}?
+Law, NamedLaws
+    ok
+Term extends Dynamic - with ops *,**,***, etc
+Operator
+VariableTerm -> Principal/ScalarTerm
+    ok
+BinaryOpTerm, BinaryRightScalarOpTerm, BinaryScalarOpTerm, UnaryOpTerm
+    ok. Define free variables for each
+ConstantOperator -> Principal/ScalarConstant
+    ok
+OperatorAssignment
+    :( has multiple methods for looking up different types of operator
+    By default these all return None
+    The subclasses AbstractBinaryOp, etc override these for some types
+    Is there a better way to do it?
+OperatorAssignments
+    REALLY messy. Does essentially same lookup for each type
+    ... factored out common code
+    ... could be improved by formalizing operator types?
 
 
 
