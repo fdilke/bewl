@@ -294,10 +294,10 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   class AbstractBinaryOp(
     name: String
   ) extends Operator(name, 2) {
-    def :=[T <: ~](
+    def :=[S <: ~, T <: ~](
       binaryOp: BinaryOp[T]
     ) =
-      new OperatorAssignment[T, ~](this){
+      new OperatorAssignment[T, S](this){
         override def lookupBinaryOp =
           Some(binaryOp)
       }
@@ -328,8 +328,8 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   class AbstractUnaryOp(
     name: String
   ) extends Operator(name, 1) {
-    def :=[T <: ~](unaryOp: UnaryOp[T]) =
-      new OperatorAssignment[T, ~](this){
+    def :=[S <: ~, T <: ~](unaryOp: UnaryOp[T]) =
+      new OperatorAssignment[T, S](this){
         override def lookupUnaryOp =
           Some(unaryOp)
       }
@@ -372,7 +372,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   class AlgebraicTheory[S <: ~](
       scalars: DOT[S]
    )(
-      preassignments: OperatorAssignment[_ <: ~, _ <: ~]*
+      preassignments: OperatorAssignment[_ <: ~, S]*
    )(
       operators: Operator*
    )(
@@ -393,10 +393,12 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
           case op: PrincipalConstant =>
             (
-              for (
-                srcConstant <- sourceAlgebra.operatorAssignments.lookup(op);
-                tgtConstant <- targetAlgebra.operatorAssignments.lookup(op)
-              ) yield {
+              for {
+                srcConstant <-
+                  sourceAlgebra.operatorAssignments.lookup(op)
+                tgtConstant <-
+                  targetAlgebra.operatorAssignments.lookup(op)
+              } yield {
                 (arrow o srcConstant) == tgtConstant
               }) getOrElse bail(
                 "Not found in source algebra: " + op.name
@@ -653,7 +655,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     def apply[S <: ~](
       scalars: DOT[S]
     )(
-      preassignments: OperatorAssignment[_ <: ~, _ <: ~]*
+      preassignments: OperatorAssignment[_ <: ~, S]*
     )(
       operators: Operator*
     )(
