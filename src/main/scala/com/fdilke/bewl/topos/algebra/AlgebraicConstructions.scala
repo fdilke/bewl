@@ -27,7 +27,7 @@ trait AlgebraicConstructions {
     val invertiblePairs = pairs(omega) {
       case x ⊕ y =>
         def i = monoid.unit(carrier.toI(x))
-        carrier.=?=(i, monoid.multiply(x, y)) ^
+        carrier.=?=(i, monoid.multiply(x, y)) ∧
           carrier.=?=(i, monoid.multiply(y, x))
     }.whereTrue
     val ip2carrier = pairs.π0 o invertiblePairs.inclusion

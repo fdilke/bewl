@@ -31,7 +31,7 @@ trait LogicalOperations {
       BiArrow(
         omega.squared,
         omega.squared.forAll(omega) {
-            case (a ⊕ b, ω) => ((a > ω) ^ (b > ω)) > ω
+            case (a ⊕ b, ω) => ((a → ω) ∧ (b → ω)) → ω
         }
       )
     lazy val falsity =
@@ -50,8 +50,8 @@ trait LogicalOperations {
   ) {
     import TruthObject._
 
-    def >(that: TRUTH) = implies(truthValue, that)
-    def ^(that: TRUTH) = and(truthValue, that)
-    def v(that: TRUTH) = or(truthValue, that)
+    def →(that: TRUTH) = implies(truthValue, that)
+    def ∧(that: TRUTH) = and(truthValue, that)
+    def ∨(that: TRUTH) = or(truthValue, that)
   }
 }

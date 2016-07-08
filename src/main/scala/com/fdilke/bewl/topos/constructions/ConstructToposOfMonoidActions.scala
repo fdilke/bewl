@@ -80,7 +80,7 @@ trait ConstructToposOfMonoidActions extends
 
             private val ideals =
               possibleIdeals.forAll(carrier, carrier) {
-                (f, m, n) => Ɛ.OmegaEnrichments(f(m)) > f(multiply(m, n))
+                (f, m, n) => Ɛ.OmegaEnrichments(f(m)) → f(multiply(m, n))
               }.whereTrue
 
             def restrict[

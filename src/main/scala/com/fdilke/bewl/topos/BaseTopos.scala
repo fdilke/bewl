@@ -175,8 +175,8 @@ trait BaseTopos {
     final lazy val ∃ =
       power.forAll(omega) { (f, w) =>
           (power x omega).universally(dot) {
-            case (f ⊕ w, x) => f(x) > w
-          }(f, w) > w
+            case (f ⊕ w, x) => f(x) → w
+          }(f, w) → w
       }
 
     final def preForAll[R <: ~](
@@ -366,7 +366,7 @@ trait BaseTopos {
       source.forAll(source) {
         (s, t) => target.=?=(
           this(s), this(t)
-        ) > source.=?=(s, t)
+        ) → source.=?=(s, t)
       } toBool
 
     final lazy val isEpic: Boolean =
@@ -435,7 +435,7 @@ trait BaseTopos {
   class PartialArrowClassifier[A <: ~](dot: DOT[A]) {
     val classifier = dot.power.forAll(dot, dot) {
       (f, a, b) =>
-        (f(a) ^ f(b)) > dot.=?=(a, b)
+        (f(a) ∧ f(b)) → dot.=?=(a, b)
     } whereTrue
 
     val include = classifier restrict dot.singleton
@@ -455,7 +455,7 @@ trait BaseTopos {
             (t, s) =>
               dot.=?=(
                 arrowOnSub(s), a
-              ) ^
+              ) ∧
                 monic.target.=?=(
                   monic(s), t
                 )
@@ -473,7 +473,7 @@ trait BaseTopos {
     private val injectRightFull = (left.pac.⏊ o right.toI) x right.pac.include
 
     val coproduct = fullProduct(omega) { x =>
-      injectLeftFull.chi(x) v injectRightFull.chi(x)
+      injectLeftFull.chi(x) ∨ injectRightFull.chi(x)
     } whereTrue
     val injectLeft = coproduct restrict injectLeftFull
     val injectRight = coproduct restrict injectRightFull
@@ -486,10 +486,10 @@ trait BaseTopos {
       coproduct.arrowFromFunctionalRelation(target) {
         (αβ, x) =>
           coproduct.exists(left) {
-            (αβ, a) => coproduct.=?=(αβ, injectLeft(a)) ^ target.=?=(x, leftArrow(a))
-          }(αβ) v
+            (αβ, a) => coproduct.=?=(αβ, injectLeft(a)) ∧ target.=?=(x, leftArrow(a))
+          }(αβ) ∨
           coproduct.exists(right) {
-            (αβ, b) => coproduct.=?=(αβ, injectRight(b)) ^ target.=?=(x, rightArrow(b))
+            (αβ, b) => coproduct.=?=(αβ, injectRight(b)) ∧ target.=?=(x, rightArrow(b))
           }(αβ)
       }
     }
