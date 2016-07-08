@@ -395,6 +395,17 @@ trait AlgebraicMachinery { topos: BaseTopos =>
    )(
       laws: Law*
    ){
+    def extend(moreOperators: Operator*)(moreLaws: Law*) =
+      new AlgebraicTheory[S](
+        scalars
+      )(
+        preassignments :_*
+      )(
+        operators ++ moreOperators :_*
+      )(
+        laws ++ moreLaws :_*
+      )
+
     def isMorphism[A <: ~, B <: ~](
       sourceAlgebra: Algebra[A],
       targetAlgebra: Algebra[B],

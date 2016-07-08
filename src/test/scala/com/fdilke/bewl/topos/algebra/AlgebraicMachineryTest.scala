@@ -1,6 +1,5 @@
 package com.fdilke.bewl.topos.algebra
 
-import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.FunSpec
@@ -10,6 +9,7 @@ class AlgebraicMachineryTest extends FunSpec {
 
   private val topos = com.fdilke.bewl.fsets.FiniteSets
   import topos.StandardTermsAndOperators._
+  import topos.NamedLaws._
 
   describe("Simple and compound terms") {
     it("can describe their own free variables") {
@@ -342,6 +342,51 @@ class AlgebraicMachineryTest extends FunSpec {
       algebra.satisfies(
         -α := -(-(-α))
       ) shouldBe true
+    }
+
+    it("can be extended by adding new constants/operations, and laws ") {
+        val magmas = AlgebraicTheory(*)()
+        val commutativeMagmasWith1 =
+          magmas.extend(ι)(
+            "commutative" law( α * β := β * α ),
+            "unit" law( α * ι := α )
+          )
+        case class CommutativeMagmaWith1[T](
+          override val carrier: DOT[T],
+          unit: NullaryOp[T],
+          op: BinaryOp[T]
+        ) extends commutativeMagmasWith1.Algebra[T](carrier)(
+          ι := unit,
+          * := op
+        )
+
+        val carrier = dot(true, false)
+        val commutativeOp = bifunctionAsBiArrow(carrier) { _ & _}
+        val nonCommutativeOp = bifunctionAsBiArrow(carrier) { _ & !_ }
+        val okUnit = makeNullaryOperator(carrier, true)
+        val notOkUnit = makeNullaryOperator(carrier, false)
+
+        new CommutativeMagmaWith1[Boolean](
+          carrier,
+          okUnit,
+          commutativeOp
+        ).sanityTest()
+
+        intercept[IllegalArgumentException] {
+          new CommutativeMagmaWith1[Boolean](
+            carrier,
+            okUnit,
+            nonCommutativeOp
+          ).sanityTest()
+        }.getMessage shouldBe "commutative law failed"
+
+        intercept[IllegalArgumentException] {
+          new CommutativeMagmaWith1[Boolean](
+            carrier,
+            notOkUnit,
+            commutativeOp
+          ).sanityTest()
+        }.getMessage shouldBe "unit law failed"
     }
   }
 }
