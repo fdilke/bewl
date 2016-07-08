@@ -94,21 +94,27 @@ trait DiagrammaticAlgebraicStructures { topos: BaseDiagrammaticTopos with Diagra
     theory = Monoids
   )
 
-  case class Group[X](dot: DOT[X],
-                      unit: Operator[X],
-                      product: Operator[X],
-                      inversion: Operator[X]) extends DiagrammaticAlgebraicStructure[X] (
+  case class Group[X](
+    dot: DOT[X],
+    unit: Operator[X],
+    product: Operator[X],
+    inversion: Operator[X]
+  ) extends DiagrammaticAlgebraicStructure[X] (
     carrier = dot,
-    operatorMap = Map(_1 -> unit,
-                      * -> product,
-                      invert -> inversion),
+    operatorMap = Map(
+      _1 -> unit,
+      * -> product,
+      invert -> inversion
+    ),
     theory = Groups
   )
 
-  case class AdditiveAbelianGroup[X](dot: DOT[X],
-                      zero: Operator[X],
-                      sum: Operator[X],
-                      negate: Operator[X]) extends DiagrammaticAlgebraicStructure[X] (
+  case class AdditiveAbelianGroup[X](
+    dot: DOT[X],
+    zero: Operator[X],
+    sum: Operator[X],
+    negate: Operator[X]
+  ) extends DiagrammaticAlgebraicStructure[X] (
     carrier = dot,
     operatorMap = Map(_0 -> zero,
                       ++ -> sum,
