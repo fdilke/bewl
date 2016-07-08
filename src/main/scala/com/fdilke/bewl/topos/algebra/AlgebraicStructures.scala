@@ -122,4 +122,30 @@ trait AlgebraicStructures extends
     ∨ := meet,
     ∧ := join
   )
+
+  lazy val heytingAlgebras = lattices.extend(
+    →
+  )(
+    "self implication" law ( α → α := ⊤ ),
+    "modus ponens" law ( α ∧ (α → β) := α ∧ β ),
+    "implication supersedes" law ( α ∧ (β → α) := α ),
+    "left distributive →/∧" law ( α → (β ∧ γ) := (α → β) ∧ (α → γ) )
+  )
+
+  class HeytingAlgebra[H <: ~](
+    override val carrier: DOT[H],
+    val bottom: NullaryOp[H],
+    val top: NullaryOp[H],
+    val meet: BinaryOp[H],
+    val join: BinaryOp[H],
+    val implies: BinaryOp[H]
+  ) extends heytingAlgebras.Algebra[H](
+    carrier
+  )(
+    ⊥ := bottom,
+    ⊤ := top,
+    ∨ := meet,
+    ∧ := join,
+    → := implies
+  )
 }

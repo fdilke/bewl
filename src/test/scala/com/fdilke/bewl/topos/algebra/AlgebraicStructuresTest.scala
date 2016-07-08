@@ -213,14 +213,14 @@ class AlgebraicStructuresTest extends FunSpec {
       ))._1
       group.sanityTest()
       group.carrier.globals.size shouldBe 6
-      group should not be('commutative)
+      group should not be 'commutative
     }
 
     it("can be regarded as monoids") {
       val largerMonoid = endomorphismMonoid(dot(1, 2, 3))
       val (group, inject) = groupOfUnits(largerMonoid)
       val monoid = group.asMonoid
-      monoid.sanityTest
+      monoid.sanityTest()
       monoids.isMorphism(monoid, largerMonoid, inject) shouldBe true
     }
   }
@@ -239,6 +239,36 @@ class AlgebraicStructuresTest extends FunSpec {
         top,
         meet,
         join
+      ).sanityTest()
+    }
+  }
+
+  describe("Heyting algebras") {
+    it("can be defined and verified") {
+      implicit class NotEnabledInt(n: Int) {
+        val not = ~n & 7
+      }
+
+      val carrier = dot(0 to 7: _*)
+      val bottom = makeNullaryOperator(carrier, 0)
+      val top = makeNullaryOperator(carrier, 7)
+      val meet = bifunctionAsBiArrow(carrier) {
+        _ | _
+      }
+      val join = bifunctionAsBiArrow(carrier) {
+        _ & _
+      }
+      val implies = bifunctionAsBiArrow(carrier) {
+        _.not | _
+      }
+
+      new HeytingAlgebra[Int](
+        carrier,
+        bottom,
+        top,
+        meet,
+        join,
+        implies
       ).sanityTest()
     }
   }

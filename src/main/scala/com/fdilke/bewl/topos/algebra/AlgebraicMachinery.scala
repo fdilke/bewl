@@ -69,6 +69,9 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     def *(other: Term[X]) =
       applyDynamic("*")(other)
 
+    def →(other: Term[X]) =
+      applyDynamic("→")(other)
+
     def **(
       other: Term[Scalar]
     )(
@@ -363,6 +366,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     val + = new AbstractBinaryOp("+")
     val ∧ = new AbstractBinaryOp("∧")
     val ∨ = new AbstractBinaryOp("∨")
+    val → = new AbstractBinaryOp("→")
 
     val ** = new AbstractRightScalarBinaryOp("**")
     val *** = new AbstractScalarBinaryOp("***")
@@ -372,7 +376,8 @@ trait AlgebraicMachinery { topos: BaseTopos =>
         "*" -> *,
         "+" -> $plus,
         "∧" -> ∧,
-        "∨" -> ∨
+        "∨" -> ∨,
+        "→" -> →
       )
 
     def binaryOpFrom(name: String) =
