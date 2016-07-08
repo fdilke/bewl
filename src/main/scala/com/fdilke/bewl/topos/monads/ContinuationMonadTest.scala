@@ -1,14 +1,13 @@
-package com.fdilke.bewl.topos.algebra
+package com.fdilke.bewl.topos.monads
 
 import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
-import org.scalatest.{FreeSpec, Matchers}
+import com.fdilke.bewl.helper.ContinuousIntegration.notOnSnap
+import com.fdilke.bewl.helper.⊕._
+import org.scalatest.FreeSpec
+import org.scalatest.Matchers._
 
 import scala.language.{implicitConversions, postfixOps, reflectiveCalls}
-import Matchers._
-import com.fdilke.bewl.helper.⊕
-import ⊕._
-import com.fdilke.bewl.helper.ContinuousIntegration.notOnSnap
 
 class ContinuationMonadTest extends FreeSpec {
   private val two = dot('x, 'y)
