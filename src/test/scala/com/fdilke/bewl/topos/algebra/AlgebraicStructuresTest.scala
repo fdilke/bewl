@@ -211,7 +211,7 @@ class AlgebraicStructuresTest extends FunSpec {
         r, b, c, a, s, i,
         s, c, a, b, i, r
       ))._1
-      group.sanityTest
+      group.sanityTest()
       group.carrier.globals.size shouldBe 6
       group should not be('commutative)
     }
