@@ -230,8 +230,8 @@ class AlgebraicStructuresTest extends FunSpec {
       val carrier = dot(0 to 7 :_*)
       val bottom = makeNullaryOperator(carrier, 0)
       val top = makeNullaryOperator(carrier, 7)
-      val meet = bifunctionAsBiArrow(carrier) { _ | _ }
-      val join = bifunctionAsBiArrow(carrier) { _ & _ }
+      val meet = bifunctionAsBiArrow(carrier) { _ & _ }
+      val join = bifunctionAsBiArrow(carrier) { _ | _ }
 
       new Lattice[Int](
         carrier,
@@ -253,10 +253,10 @@ class AlgebraicStructuresTest extends FunSpec {
       val bottom = makeNullaryOperator(carrier, 0)
       val top = makeNullaryOperator(carrier, 7)
       val meet = bifunctionAsBiArrow(carrier) {
-        _ | _
+        _ & _
       }
       val join = bifunctionAsBiArrow(carrier) {
-        _ & _
+        _ | _
       }
       val implies = bifunctionAsBiArrow(carrier) {
         _.not | _

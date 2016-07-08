@@ -99,11 +99,11 @@ abstract class GenericToposTests[~](
   describe(s"The topos ${topos.getClass.getName}") {
 
     it("wraps dots and arrows with relatively sane equality semantics") {
-      makeSampleDot().sanityTest
+      makeSampleDot().sanityTest()
       makeSampleDot() shouldBe makeSampleDot()
       (makeSampleDot() eq makeSampleDot()) shouldBe true
 
-      makeSampleArrow().sanityTest
+      makeSampleArrow().sanityTest()
       makeSampleArrow() shouldBe makeSampleArrow()
       (makeSampleArrow() eq makeSampleArrow()) shouldBe false
     }
@@ -115,22 +115,22 @@ abstract class GenericToposTests[~](
     }
 
     it("can construct biproduct diagrams") {
-      (bar x baz).sanityTest
+      (bar x baz).sanityTest()
       (bar x baz) should have(
         'left (bar),
         'right (baz)
       )
       val productArrow = foo2bar x foo2baz
 
-      productArrow.sanityTest
+      productArrow.sanityTest()
       productArrow should have (
         'source (foo),
         'target (bar x baz),
         'sanityTest (null)
       )
 
-      (bar x baz).π0.sanityTest
-      (bar x baz).π1.sanityTest
+      (bar x baz).π0.sanityTest()
+      (bar x baz).π1.sanityTest()
 
       foo(bar) {
         x => productArrow(x)._1
@@ -147,9 +147,9 @@ abstract class GenericToposTests[~](
     }
 
     it("has a terminator") {
-      I.sanityTest
+      I.sanityTest()
       val fooToI = foo.toI
-      fooToI.sanityTest
+      fooToI.sanityTest()
       fooToI.source shouldBe foo
       fooToI.target shouldBe topos.I
 
@@ -157,9 +157,9 @@ abstract class GenericToposTests[~](
     }
 
     it("has a (derived) initial object") {
-      O.sanityTest
+      O.sanityTest()
       val fooFromO = foo.fromO
-      fooFromO.sanityTest
+      fooFromO.sanityTest()
       fooFromO.source shouldBe O
       fooFromO.target shouldBe foo
 
@@ -178,7 +178,7 @@ abstract class GenericToposTests[~](
     it("can chain products") {
       val barXfooXbaz = bar x foo x baz
       val productArrow = foo2bar x foo.identity x foo2baz
-      productArrow.sanityTest
+      productArrow.sanityTest()
       productArrow.source shouldBe foo
       productArrow.target shouldBe barXfooXbaz
 
@@ -190,16 +190,16 @@ abstract class GenericToposTests[~](
     it("can construct exponential diagrams") {
       // Check evaluation maps baz^bar x bar -> baz
       val exponential = bar > baz
-      exponential.sanityTest
+      exponential.sanityTest()
       val evaluation = exponential.evaluation
-      evaluation.product.sanityTest
+      evaluation.product.sanityTest()
       evaluation.product.left shouldBe (bar > baz)
       evaluation.product.right shouldBe bar
-      evaluation.arrow.sanityTest
+      evaluation.arrow.sanityTest()
       evaluation.arrow.target shouldBe baz
 
       val foo2bar2baz: FOO > (BAR → BAZ) = (bar > baz) transpose foobar2baz
-      foo2bar2baz.sanityTest
+      foo2bar2baz.sanityTest()
       foo2bar2baz should have(
         'source(foo),
         'target(bar > baz)
@@ -231,22 +231,22 @@ abstract class GenericToposTests[~](
     }
 
     it("has a truth object (subobject classifier)") {
-      omega.sanityTest
-      truth.sanityTest
+      omega.sanityTest()
+      truth.sanityTest()
       truth.source shouldBe I
       truth.target shouldBe omega
 
-      TruthObject.falsity.sanityTest
+      TruthObject.falsity.sanityTest()
 
       val char = monicBar2baz.chi
-      char.sanityTest
+      char.sanityTest()
       char.source shouldBe baz
       char.target shouldBe omega
 
       char o monicBar2baz shouldBe bar.toTrue
 
       val restriction = foo2ImageOfBar \ monicBar2baz
-      restriction.sanityTest
+      restriction.sanityTest()
       restriction.source shouldBe foo
       restriction.target shouldBe bar
       monicBar2baz o restriction shouldBe foo2ImageOfBar
@@ -255,6 +255,15 @@ abstract class GenericToposTests[~](
       // construct a non-monic arrow, have chi throw a NotMonicException
       // try backdividing by a monic when we can't
       // It's up to the caller to check. There could be a safe backdivide
+    }
+
+    it("expresses the subobject classifier as the carrier of a Heyting algebra") {
+      if (!inActionTopos) {
+        // reluctantly skip, too slow with current technology
+        Ω shouldBe a[HeytingAlgebra[_]]
+        Ω.carrier shouldBe omega
+        Ω.sanityTest()
+      }
     }
 
     it("has enumeration of globals and arrows") {

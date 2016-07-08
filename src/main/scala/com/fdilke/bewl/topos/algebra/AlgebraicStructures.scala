@@ -119,8 +119,8 @@ trait AlgebraicStructures extends
   ) extends lattices.Algebra[L](carrier)(
     ⊥ := bottom,
     ⊤ := top,
-    ∨ := meet,
-    ∧ := join
+    ∧ := meet,
+    ∨ := join
   )
 
   lazy val heytingAlgebras = lattices.extend(
@@ -144,8 +144,8 @@ trait AlgebraicStructures extends
   )(
     ⊥ := bottom,
     ⊤ := top,
-    ∨ := meet,
-    ∧ := join,
+    ∧ := meet,
+    ∨ := join,
     → := implies
   )
 }

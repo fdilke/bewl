@@ -1,12 +1,14 @@
 package com.fdilke.bewl.topos.enrichment
 
 import com.fdilke.bewl.helper.⊕
-import ⊕._
+import com.fdilke.bewl.topos.algebra.AlgebraicStructures
 import com.fdilke.bewl.topos.{BaseTopos, ToposStructures}
 
 trait LogicalOperations {
 
-  Ɛ: BaseTopos with ToposStructures =>
+  Ɛ: BaseTopos with
+    ToposStructures with
+    AlgebraicStructures =>
 
   object TruthObject {
     // TODO: This should eventually express omega as a
@@ -54,4 +56,14 @@ trait LogicalOperations {
     def ∧(that: TRUTH) = and(truthValue, that)
     def ∨(that: TRUTH) = or(truthValue, that)
   }
+
+  lazy val Ω =
+    new HeytingAlgebra[TRUTH](
+      omega,
+      falsity,
+      truth,
+      TruthObject.and,
+      TruthObject.or,
+      TruthObject.implies
+    )
 }

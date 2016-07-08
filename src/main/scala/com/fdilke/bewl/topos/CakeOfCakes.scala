@@ -34,7 +34,9 @@ trait ToposEnrichments extends
   LogicalOperations with
   ElementEnrichments with
   MonadicPlumbing {
-  Ɛ: BaseTopos with ToposStructures =>
+  Ɛ: BaseTopos with
+    ToposStructures with
+    AlgebraicStructures =>
 }
 
 trait MonadConstructions extends
