@@ -21,9 +21,9 @@ class MonadOfMonoidActionsTest extends FreeSpec {
 
   private val actionsMonad = monadOfActions(monoidOf3)
 
-  "For the continuation (double-exponential) monad on sets" - {
+  "For the monad of monoid actions" - {
     "values at a dot are cached" in {
-//      (actionsMonad(O) eq actionsMonad(O)) shouldBe true
+      (actionsMonad(O) eq actionsMonad(O)) shouldBe true
     }
   }
 }
