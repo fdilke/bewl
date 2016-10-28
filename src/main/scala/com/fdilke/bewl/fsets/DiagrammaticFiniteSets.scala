@@ -9,7 +9,8 @@ object DiagrammaticFiniteSets extends DiagrammaticTopos {
   case class DiagrammaticFiniteSetsDot[X](elements: Traversable[X]) extends Dot[X] with Traversable[X] {
     override def toString = elements.toString
 
-    override def foreach[U](f: (X) => U) { elements.foreach(f) }
+    override def foreach[U](f: X => U) =
+      elements foreach f
 
     override def identity: DiagrammaticFiniteSetsArrow[X, X] =
       DiagrammaticFiniteSetsArrow(this, this, x => x)
