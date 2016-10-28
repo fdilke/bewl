@@ -29,7 +29,7 @@ trait LogicalOperations {
         )
       )
 
-    lazy val or =
+    lazy val or: BiArrow[TRUTH, TRUTH, TRUTH] =
       BiArrow(
         omega.squared,
         omega.squared.forAll(omega) {
@@ -42,28 +42,29 @@ trait LogicalOperations {
       }
   }
 
-  import TruthObject.falsity
-
-  def isBoolean =
-    (truth + falsity).isIso
-
-  implicit class OmegaEnrichments(
-    truthValue: TRUTH
-  ) {
-    import TruthObject._
-
-    def →(that: TRUTH) = implies(truthValue, that)
-    def ∧(that: TRUTH) = and(truthValue, that)
-    def ∨(that: TRUTH) = or(truthValue, that)
-  }
-
   lazy val Ω =
     new HeytingAlgebra[TRUTH](
       omega,
-      falsity,
+      TruthObject.falsity,
       truth,
       TruthObject.and,
       TruthObject.or,
       TruthObject.implies
     )
+
+  def isBoolean =
+    (truth + Ω.bottom).isIso
+
+  implicit class OmegaEnrichments(
+    truthValue: TRUTH
+  ) {
+    def →(that: TRUTH) =  // implies(truthValue, that)
+      Ω.implies(truthValue, that)
+
+    def ∧(that: TRUTH) = // and(truthValue, that)
+      Ω.meet(truthValue, that)
+
+    def ∨(that: TRUTH) = // or(truthValue, that)
+      Ω.join(truthValue, that)
+  }
 }
