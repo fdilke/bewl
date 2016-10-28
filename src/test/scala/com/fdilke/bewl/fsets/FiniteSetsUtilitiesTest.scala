@@ -17,7 +17,7 @@ class FiniteSetsUtilitiesTest extends FunSpec {
     }
 
     it("gives sensible results even when the source is empty") {
-      allMaps(Seq(), Seq(0)) should have ('size (1))
+      allMaps(Seq(), Seq(0)) should have size 1
     }
 
     it("gives sensible results even when the target is empty") {
@@ -25,7 +25,7 @@ class FiniteSetsUtilitiesTest extends FunSpec {
     }
 
     it("gives sensible results even when both source and target are empty") {
-      allMaps(Seq(), Seq()) should have ('size (1))
+      allMaps(Seq(), Seq()) should have size 1
     }
   }
 }

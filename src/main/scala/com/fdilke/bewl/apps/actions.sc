@@ -4,13 +4,13 @@ import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsUtilities}
 
 object Worksheet {
   private val (i, x, y) = ('i, 'x, 'y)
-  val monoid = naiveMonoidFromTable(
+  val monoid = monoidFromTable(
     i, x, y,
     x, x, y,
     y, x, y
   )
-  val topos = monoid.actions
-  import topos._
+  val topos = FiniteSets.ToposOfMonoidActions of monoid
+  import topos.omega
 
   val regular = dot(monoid.regularAction)
 

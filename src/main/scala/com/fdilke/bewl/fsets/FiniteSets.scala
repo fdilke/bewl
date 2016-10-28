@@ -229,8 +229,10 @@ object FiniteSetsUtilities {
     )
   }
 
-
-  def allMaps[A, B](source: Traversable[A], target: Traversable[B]) : Traversable[A => B] =
+  def allMaps[A, B](
+    source: Traversable[A],
+    target: Traversable[B]
+  ) : Traversable[A => B] =
     new Traversable[A => B] {
       override def foreach[U](
         enumerate: (A => B) => U
@@ -238,8 +240,16 @@ object FiniteSetsUtilities {
         if (source.isEmpty)
           enumerate { _ => ??? }
         else
-          for (f <- allMaps(source.tail, target);
-               choice <- target) {
-            enumerate { x => if (x == source.head) choice else f(x)}
-          }}
+          for {
+            f <- allMaps(source.tail, target);
+            choice <- target
+          } {
+            enumerate { x =>
+              if (x == source.head)
+                choice
+              else
+                f(x)
+            }
+          }
+    }
 }
