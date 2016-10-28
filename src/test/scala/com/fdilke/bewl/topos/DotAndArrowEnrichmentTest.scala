@@ -69,20 +69,25 @@ class DotAndArrowEnrichmentTest extends FunSpec {
   }
 
   describe("The truth object") {
+// TODO: fix and use below
+//    def theBinOp(binop: (Boolean, Boolean) => Boolean)= // : BinaryOp[TRUTH] =
+//      for(i <- omega ; j <- omega)
+//        binop(i, j)
+
     it("has the correct binary operations for binary operations") {
-      TruthObject.and shouldBe (
+      Ω.meet shouldBe (
         for(i <- omega ; j <- omega)
           yield i & j
         )
-      TruthObject.or shouldBe (
+      Ω.join shouldBe (
         for(i <- omega ; j <- omega)
           yield i | j
         )
-      TruthObject.implies shouldBe (
+      Ω.implies shouldBe (
         for(i <- omega ; j <- omega)
           yield !i | j
         )
-      TruthObject.falsity shouldBe I(omega) {
+      falsity shouldBe I(omega) {
         _ => false
       }
     }

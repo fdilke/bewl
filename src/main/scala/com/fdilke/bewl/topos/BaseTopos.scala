@@ -96,9 +96,9 @@ trait BaseTopos {
   }
 
   private object InitialDot {
-    lazy val O = TruthObject.falsity whereTrue
+    lazy val O = falsity whereTrue
     def fromO[X <: ~](dot: DOT[X]) = {
-      val xO = dot.toTrue ?= (TruthObject.falsity o dot.toI)
+      val xO = dot.toTrue ?= (falsity o dot.toI)
       val xOtoO = O restrict xO.toI
       xO.inclusion o xOtoO.inverse
     }
@@ -442,7 +442,7 @@ trait BaseTopos {
 
     val ⏊ = classifier restrict
       dot.power.transpose(I) {
-        (i, x) => TruthObject.falsity(i)
+        (i, x) => falsity(i)
       }
 
     def extend[S <: ~, B <: ~](

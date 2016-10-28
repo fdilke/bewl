@@ -10,17 +10,14 @@ trait LogicalOperations {
     ToposStructures with
     AlgebraicStructures =>
 
-  object TruthObject {
-    // TODO: This should eventually express omega as a
-    // complete Heyting algebra
-
-    lazy val and =
+  lazy val Ω: HeytingAlgebra[TRUTH] = {
+    val and =
       BiArrow(
         omega.squared,
         (truth x truth).chi
       )
 
-    lazy val implies =
+    val implies =
       BiArrow(
         omega.squared,
         omega.=?=(
@@ -29,28 +26,30 @@ trait LogicalOperations {
         )
       )
 
-    lazy val or: BiArrow[TRUTH, TRUTH, TRUTH] =
+    val or: BiArrow[TRUTH, TRUTH, TRUTH] =
       BiArrow(
         omega.squared,
         omega.squared.forAll(omega) {
-            case (a ⊕ b, ω) => ((a → ω) ∧ (b → ω)) → ω
+          case (a ⊕ b, ω) => ((a → ω) ∧ (b → ω)) → ω
         }
       )
-    lazy val falsity =
+    val falsity =
       I.forAll(omega) {
         (_, ω) => ω
       }
-  }
 
-  lazy val Ω =
     new HeytingAlgebra[TRUTH](
       omega,
-      TruthObject.falsity,
+      falsity,
       truth,
-      TruthObject.and,
-      TruthObject.or,
-      TruthObject.implies
+      and,
+      or,
+      implies
     )
+  }
+
+  lazy val falsity: UNIT > TRUTH =
+    Ω.bottom
 
   def isBoolean =
     (truth + Ω.bottom).isIso

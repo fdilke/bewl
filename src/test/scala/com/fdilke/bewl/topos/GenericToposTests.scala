@@ -236,7 +236,7 @@ abstract class GenericToposTests[~](
       truth.source shouldBe I
       truth.target shouldBe omega
 
-      TruthObject.falsity.sanityTest()
+      falsity.sanityTest()
 
       val char = monicBar2baz.chi
       char.sanityTest()
@@ -289,7 +289,7 @@ abstract class GenericToposTests[~](
 
       I.identity shouldBe 'monic
       truth shouldBe 'monic
-      TruthObject.falsity shouldBe 'monic
+      falsity shouldBe 'monic
 
       foo.toI should not be 'monic
       foo.fromO shouldBe 'monic
