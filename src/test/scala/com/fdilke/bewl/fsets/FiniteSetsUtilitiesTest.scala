@@ -1,27 +1,10 @@
 package com.fdilke.bewl.fsets
 
-import DiagrammaticFiniteSetsUtilities._
+import FiniteSetsUtilities.allMaps
 import org.scalatest.{Matchers, FunSpec}
 import Matchers._
 
-class DiagrammaticFiniteSetsUtilitiesTest extends FunSpec {
-  describe("cartesian products") {
-    it("work in the trivial case") {
-      cartesian[String](List()) shouldBe Seq(
-        Seq()
-      )
-    }
-
-    it("enumerate all sequences") {
-      cartesian[Any](List(Seq(1, 2), Seq("a", "b"), Seq(true, false))).toList shouldBe Seq(
-        Seq(1,"a",true), Seq(1,"a",false),
-        Seq(1,"b",true), Seq(1,"b",false),
-        Seq(2,"a",true), Seq(2,"a",false),
-        Seq(2,"b",true), Seq(2,"b",false)
-      )
-    }
-  }
-
+class FiniteSetsUtilitiesTest extends FunSpec {
   describe("allMaps()") {
     it("enumerates all maps between two sets") {
       allMaps(Seq(1, 2), Set("a", "b", "c")).map {

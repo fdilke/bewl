@@ -1,9 +1,9 @@
 package com.fdilke.bewl.fsets
 
-import com.fdilke.bewl.fsets.DiagrammaticFiniteSetsUtilities._
 import com.fdilke.bewl.helper.{Memoize, ⊕}
 import com.fdilke.bewl.topos.{Topos, Wrappings}
 import ⊕._
+import FiniteSetsUtilities.allMaps
 
 object FiniteSets extends Topos[Any] with Wrappings[
   Any, Any, Traversable, FiniteSetsPreArrow, Wrappings.NO_WRAPPER
@@ -228,4 +228,18 @@ object FiniteSetsUtilities {
       product
     )
   }
+
+
+  def allMaps[A, B](source: Traversable[A], target: Traversable[B]) : Traversable[A => B] =
+    new Traversable[A => B] {
+      override def foreach[U](
+        enumerate: (A => B) => U
+      ) =
+        if (source.isEmpty)
+          enumerate { _ => ??? }
+        else
+          for (f <- allMaps(source.tail, target);
+               choice <- target) {
+            enumerate { x => if (x == source.head) choice else f(x)}
+          }}
 }
