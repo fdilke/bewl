@@ -57,7 +57,6 @@ To see the current to-do list and state of play, you can view this [Trello board
 - Adapter that makes a dots-and-arrows topos look like a stars-and-quivers one
 - Implementation of FiniteSets using new DSL
 - Defined quantifiers in new DSL
-- Implemented the topos of actions for a monoid
 - Construct the initial object 0
 - Coproducts
 - predicates isMonic, isEpic, isIso
@@ -65,15 +64,19 @@ To see the current to-do list and state of play, you can view this [Trello board
 - Partial arrow classifier
 - walkthrough for using Bewl as a learning aid for studying category theory
 - universal algebra: can define algebraic structures, using existing ones as parameter spaces (for monoid actions)
+- implemented topos of monoid actions
 - implemented topos of automorphisms
+- traits for monads and strong monads
+- implement double-exponential (continuation) monad
+- endow the subobject classifier with a Heyting algebra structure
+- removed legacy DiagrammaticTopos code
 
 # To do
 
+- coequalizers
 - Define more algebraic structures
 - Can extend and remap algebraic structures, e.g. ring extends abelian group remaps group with an extra law
 - More algebraic constructions: endomorphism ring, transfer
-- Extract the Heyting algebra structure of the subobject classifier
-- coequalizers
 - tell if an object has an injective hull
 - Optimize algorithm enough to construct triadic topos and its topologies
 - Construct the slice topos. Use McLarty's construction, NOT the one in Moerdijk/Maclane which
