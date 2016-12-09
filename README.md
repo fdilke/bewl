@@ -21,8 +21,6 @@ Really it should be in Haskell or Idris but I'm not ready for those yet.
 [This presentation](http://prezi.com/dwrz2mft3y-g/?utm_campaign=share&utm_medium=copy&rc=ex0share) explains the new "intrinsic" Bewl 2.0 DSL and why it's
  better than the previous "diagrammatic" 1.0 one.
 
-If you want to use Bewl as a learning aid to study category theory, [start here](https://github.com/fdilke/bewl/blob/master/CommandLine.md).
-
 Here's a presentation about Bewl's [universal algebra capabilities](https://github.com/fdilke/bewl/blob/master/notes/BewlUniversalAlgebra.pdf).
 
 And here's one about the [topos of automorphisms](https://github.com/fdilke/bewl/blob/master/notes/ToposOfAutomorphisms.pdf), 
@@ -32,6 +30,12 @@ This [animated video](http://www.youtube.com/watch/?v=nUwjGBHXKYs) was an initia
 
 To see the current to-do list and state of play, you can view this [Trello board](https://trello.com/b/PfdnsRNl/bewl). There's also a 
 [continuous integration setup](https://snap-ci.com/fdilke/bewl/branch/master) which runs all the tests on each commit.
+
+# Category theory tutorials
+
+Refresher on [strong monads](https://github.com/fdilke/bewl/blob/master/notes/StrongMonads.pdf).
+
+If you want to use Bewl as a learning aid to study category theory, [start here](https://github.com/fdilke/bewl/blob/master/CommandLine.md).
 
 # Intended applications
 
