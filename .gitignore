@@ -2,6 +2,7 @@
 *.log
 nohup.out
 scratch/
+.DS_Store
 
 # IDEA specific
 .idea/
