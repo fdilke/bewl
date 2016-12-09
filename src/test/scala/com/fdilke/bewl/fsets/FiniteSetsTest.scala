@@ -18,7 +18,8 @@ class FiniteSetsTest extends GenericToposTests(new ToposWithFixtures[Any] {
   override val foo2ImageOfBar = arrow(foo, baz)(true -> 3, false -> 2)
 
   override val foobar2baz = biArrow(
-    foo, bar, baz,
+    foo, bar, baz
+  ) (
     (true, "X") -> 2, (false, "X") -> 3,
     (true, "Y") -> 1, (false, "Y") -> 2,
     (true, "Z") -> 2, (false, "Z") -> 3

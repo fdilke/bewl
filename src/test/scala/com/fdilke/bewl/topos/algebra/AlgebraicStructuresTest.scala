@@ -128,31 +128,52 @@ class AlgebraicStructuresTest extends FunSpec {
       monoid1x.sanityTest
       val rightAction = {
         val actionCarrier = dot(a, b)
-        val actionMultiply = biArrow(actionCarrier, monoid1x.carrier, actionCarrier,
-          (a, i) -> a, (a, x) -> a,
-          (b, i) -> b, (b, x) -> a
-        )
+        val actionMultiply =
+          biArrow(
+            actionCarrier,
+            monoid1x.carrier,
+            actionCarrier
+          ) (
+            (a, i) -> a, (a, x) -> a,
+            (b, i) -> b, (b, x) -> a
+          )
         new monoid1x.Action[Symbol](actionCarrier, actionMultiply.apply)
       }
       rightAction.sanityTest
       val rightAction2 = {
         val actionCarrier = dot(c, d, e)
-        val actionMultiply = biArrow(actionCarrier, monoid1x.carrier, actionCarrier,
-          (c, i) -> c, (c, x) -> d,
-          (d, i) -> d, (d, x) -> d,
-          (e, i) -> e, (e, x) -> e
+        val actionMultiply =
+          biArrow(
+            actionCarrier,
+            monoid1x.carrier,
+            actionCarrier
+          )(
+            (c, i) -> c, (c, x) -> d,
+            (d, i) -> d, (d, x) -> d,
+            (e, i) -> e, (e, x) -> e
+          )
+        new monoid1x.Action[Symbol](
+          actionCarrier,
+          actionMultiply.apply
         )
-        new monoid1x.Action[Symbol](actionCarrier, actionMultiply.apply)
       }
       rightAction2.sanityTest
       val actionMorphism = arrow(rightAction.carrier, rightAction2.carrier)(
         'a -> 'd, 'b -> 'c
       )
       monoid1x.actions.isMorphism(rightAction, rightAction2, actionMorphism) shouldBe true
-      val nonActionMorphism = arrow(rightAction.carrier, rightAction2.carrier)(
-        'a -> 'c, 'b -> 'c
-      )
-      monoid1x.actions.isMorphism(rightAction, rightAction2, nonActionMorphism) shouldBe false
+      val nonActionMorphism =
+        arrow(
+          rightAction.carrier,
+          rightAction2.carrier
+        )(
+          'a -> 'c, 'b -> 'c
+        )
+      monoid1x.actions.isMorphism(
+        rightAction,
+        rightAction2,
+        nonActionMorphism
+      ) shouldBe false
     }
   }
 
@@ -168,7 +189,12 @@ class AlgebraicStructuresTest extends FunSpec {
         (x, i) -> x, (x, x) -> y, (x, y) -> i,
         (y, i) -> y, (y, x) -> i, (y, y) -> x
       )
-      new Group[Symbol](carrier, unit, product, inverse).sanityTest
+      new Group[Symbol](
+        carrier,
+        unit,
+        product,
+        inverse
+      ).sanityTest()
     }
 
     it("must have inverses for every element") {
