@@ -48,12 +48,13 @@ trait ConstructToposOfGroupActions extends
             ActionArrow(this, I, action.actionCarrier.toI)
 
           override lazy val globals = {
-            val fixedPoints = action.actionCarrier.forAll(group.carrier) {
-              (a, g) => action.actionCarrier.=?=(
-                a,
-                action.actionMultiply(a, g)
-              )
-            }.whereTrue
+            val fixedPoints =
+              action.actionCarrier.forAll(group.carrier) {
+                (a, g) => action.actionCarrier.=?=(
+                  a,
+                  action.actionMultiply(a, g)
+                )
+              }.whereTrue
 
             fixedPoints.globals.map { global =>
               ActionArrow(I, dot, fixedPoints.inclusion o global)

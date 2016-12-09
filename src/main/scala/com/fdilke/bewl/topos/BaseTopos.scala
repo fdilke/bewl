@@ -305,9 +305,9 @@ trait BaseTopos {
       predicate: (S, B) => TRUTH
     ): S > B = {
       val product = dot x target
-      val graph = product(omega) {
+      val graph = (product where {
         ⊕ tupled predicate
-      }.whereTrue.inclusion
+      }).inclusion
       (product.π1 o graph) / (product.π0 o graph)
     }
 
@@ -487,9 +487,9 @@ trait BaseTopos {
     private val injectLeftFull = left.pac.include x (right.pac.⏊ o left.toI)
     private val injectRightFull = (left.pac.⏊ o right.toI) x right.pac.include
 
-    val coproduct = fullProduct(omega) { x =>
+    val coproduct = fullProduct where { x =>
       injectLeftFull.chi(x) ∨ injectRightFull.chi(x)
-    } whereTrue
+    }
     val injectLeft = coproduct restrict injectLeftFull
     val injectRight = coproduct restrict injectRightFull
 

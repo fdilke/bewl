@@ -34,10 +34,19 @@ trait AlgebraicConstructions {
     val units = ip2carrier.chi.whereTrue
     val ip2units = units.restrict(ip2carrier)
     val units2ip = ip2units.inverse
-    val mulUnits = BiArrow(units x units, units.restrict(
-      (units x units)(units) {
-        case u ⊕ v => monoid.multiply(units.inclusion(u), units.inclusion(v))
-      }))
+    val mulUnits =
+      BiArrow(
+        units x units,
+        units.restrict(
+          (units x units)(units) {
+            case u ⊕ v =>
+              monoid.multiply(
+                units.inclusion(u),
+                units.inclusion(v)
+              )
+          }
+        )
+      )
     val inversion = units.restrict(pairs.π1 o invertiblePairs.inclusion o units2ip)
     (
       new Group[T](
