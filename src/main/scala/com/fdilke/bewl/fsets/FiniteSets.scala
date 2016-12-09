@@ -240,6 +240,22 @@ object FiniteSetsUtilities {
       )
     )
 
+  def doubleCharacteristic[T](
+    set: DOT[T]
+  )(
+    subsets: Set[T]*
+  ): (T → TRUTH) > TRUTH = {
+    val incl =
+      bifunctionAsBiArrow(
+        dot(subsets :_*),
+        set,
+        omega
+      ) {
+        _ contains _
+      }
+    (set.power transpose incl).chi
+  }
+
   private def intSqrt(square: Int) =
     (1 to square).find { n =>
       n * n == square
