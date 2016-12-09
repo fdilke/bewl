@@ -39,7 +39,10 @@ class ContinuationMonadTest extends FreeSpec {
     "functoriality (map) works" in {
       val symbols = dot('a, 'b)
       val ints = dot(1, 2, 3)
-      val f: Symbol > Int = arrow(symbols, ints, 'a -> 2, 'b -> 1)
+      val f: Symbol > Int = arrow(symbols, ints)(
+        'a -> 2,
+        'b -> 1
+      )
       val map: (
         Symbol → TRUTH → TRUTH
       ) > (

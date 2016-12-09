@@ -13,9 +13,9 @@ class FiniteSetsTest extends GenericToposTests(new ToposWithFixtures[Any] {
 
   override val foo = dot(true, false)
   override val bar = dot("X", "Y", "Z")
-  override val foo2bar = arrow(foo, bar, true -> "X", false -> "Y")
+  override val foo2bar = arrow(foo, bar)(true -> "X", false -> "Y")
   override val baz = dot(1, 2, 3, 4)
-  override val foo2ImageOfBar = arrow(foo, baz, true -> 3, false -> 2)
+  override val foo2ImageOfBar = arrow(foo, baz)(true -> 3, false -> 2)
 
   override val foobar2baz = biArrow(
     foo, bar, baz,
@@ -25,18 +25,30 @@ class FiniteSetsTest extends GenericToposTests(new ToposWithFixtures[Any] {
   )
 
   override val monicBar2baz = arrow(
-    bar, baz, "X" -> 2, "Y" -> 3, "Z" -> 1
+    bar,
+    baz
+  )(
+    "X" -> 2,
+    "Y" -> 3,
+    "Z" -> 1
   )
 
-  override def makeSampleDot() = dot(1, 2)
+  override def makeSampleDot() =
+    dot(1, 2)
 
   override def makeSampleArrow() =
-    arrow(dot(1, 2), dot(true, false), 1 -> true, 2 -> false)
+    arrow(
+      dot(1, 2),
+      dot(true, false)
+    )(
+      1 -> true,
+      2 -> false
+    )
 
   override val equalizerSituation = new EqualizerSituation[FOO, BAR, BAZ](
     foo2bar,
-    arrow(bar, baz, "X" -> 1, "Y" -> 2, "Z" -> 3),
-    arrow(bar, baz, "X" -> 1, "Y" -> 2, "Z" -> 1)
+    arrow(bar, baz)("X" -> 1, "Y" -> 2, "Z" -> 3),
+    arrow(bar, baz)("X" -> 1, "Y" -> 2, "Z" -> 1)
   )
 }) {
   import fixtures._

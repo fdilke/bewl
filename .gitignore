@@ -1,6 +1,7 @@
 *.class
 *.log
 nohup.out
+scratch/
 
 # IDEA specific
 .idea/

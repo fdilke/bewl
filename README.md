@@ -75,12 +75,17 @@ To see the current to-do list and state of play, you can view this [Trello board
 # To do
 
 - coequalizers
-- Define more algebraic structures
+- Define more algebraic structures: a complete list
 - construct the monad of monoid actions
 - construct the reader monad 
+- construct 'pitchfork' for algebras over a strong monad
 - construct the topos of coalgebras, and so (maybe a slow implementation of) the slice topos
 - Can extend and remap algebraic structures, e.g. ring extends abelian group remaps group with an extra law
 - More algebraic constructions: endomorphism ring, transfer
+- separate out the language, have an independent first-order grammar, in which there can be proofs?
+- have a concept of 'models' and streamline construction constellation/scalars
+- language in which class ::== a theory
+- implicit objects, follow Odersky concept of 'context' used in Dotty
 - tell if an object has an injective hull
 - Optimize algorithm enough to construct triadic topos and its topologies
 - Construct the slice topos. Use McLarty's construction, NOT the one in Moerdijk/Maclane which

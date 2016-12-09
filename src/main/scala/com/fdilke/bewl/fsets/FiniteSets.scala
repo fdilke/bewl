@@ -166,7 +166,12 @@ object FiniteSetsUtilities {
 
   def dot[T](elements: T*) = makeDot(elements)
 
-  def arrow[S, T](source: DOT[S], target: DOT[T], map: (S, T)*) =
+  def arrow[S, T](
+    source: DOT[S],
+    target: DOT[T]
+  ) (
+    map: (S, T)*
+  ) =
     functionAsArrow(source, target, Map(map: _*))
 
   def biArrow[L, R, T](

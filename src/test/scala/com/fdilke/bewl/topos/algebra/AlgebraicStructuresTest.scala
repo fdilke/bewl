@@ -145,11 +145,11 @@ class AlgebraicStructuresTest extends FunSpec {
         new monoid1x.Action[Symbol](actionCarrier, actionMultiply.apply)
       }
       rightAction2.sanityTest
-      val actionMorphism = arrow(rightAction.carrier, rightAction2.carrier,
+      val actionMorphism = arrow(rightAction.carrier, rightAction2.carrier)(
         'a -> 'd, 'b -> 'c
       )
       monoid1x.actions.isMorphism(rightAction, rightAction2, actionMorphism) shouldBe true
-      val nonActionMorphism = arrow(rightAction.carrier, rightAction2.carrier,
+      val nonActionMorphism = arrow(rightAction.carrier, rightAction2.carrier)(
         'a -> 'c, 'b -> 'c
       )
       monoid1x.actions.isMorphism(rightAction, rightAction2, nonActionMorphism) shouldBe false
@@ -183,7 +183,7 @@ class AlgebraicStructuresTest extends FunSpec {
         (y, i) -> y, (y, x) -> y, (y, y) -> y
       )
       intercept[IllegalArgumentException] {
-        new Group[Symbol](carrier, unit, product, inverse).sanityTest
+        new Group[Symbol](carrier, unit, product, inverse).sanityTest()
       }.getMessage shouldBe "left inverse law failed"
     }
 
@@ -198,8 +198,12 @@ class AlgebraicStructuresTest extends FunSpec {
         (x, i) -> x, (x, x) -> y, (x, y) -> i,
         (y, i) -> y, (y, x) -> i, (y, y) -> x
       )
-      val group = new Group[Symbol](carrier, unit, product, inverse)
-      group shouldBe 'commutative
+      new Group[Symbol](
+        carrier,
+        unit,
+        product,
+        inverse
+      ) shouldBe 'commutative
     }
 
     it("can tell if a group is not commutative") {

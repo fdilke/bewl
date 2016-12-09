@@ -52,9 +52,13 @@ class DotAndArrowEnrichmentTest extends FunSpec {
         for (x <- set)
           yield -x
 
-      unaryMinus shouldBe arrow(set, set,
+      unaryMinus shouldBe arrow(set, set)(
         -1 -> 1, 0 -> 0, 1 -> -1
       )
+
+      unaryMinus shouldBe {
+        set map { -_ }
+      }
     }
 
     it("can define binary operators") {
@@ -102,7 +106,7 @@ class DotAndArrowEnrichmentTest extends FunSpec {
         ('B, 1) -> true,  ('B, 2) -> false, ('B, 3) -> false,
         ('C, 1) -> true,  ('C, 2) -> false, ('C, 3) -> false
       ))) shouldBe
-        arrow(symbols, numbers,
+        arrow(symbols, numbers)(
           'A -> 2, 'B -> 1, 'C -> 1
         )
     }
@@ -127,8 +131,8 @@ class DotAndArrowEnrichmentTest extends FunSpec {
 
       val foo = dot('a, 'b)
       val subFoo = dot(true)
-      val inclusion = arrow(subFoo, foo, true -> 'a)
-      val subFoo2set = arrow(subFoo, set, true -> 1)
+      val inclusion = arrow(subFoo, foo)(true -> 'a)
+      val subFoo2set = arrow(subFoo, set)(true -> 1)
 
       val foo2setStar = pac.extend(inclusion, subFoo2set)
       foo2setStar should have (
@@ -164,8 +168,8 @@ class DotAndArrowEnrichmentTest extends FunSpec {
       )
 
       val target = dot("P", "Q", "R")
-      val foo2target = arrow(foo, target, 0 -> "Q", 1 -> "P")
-      val bar2target = arrow(bar, target, 'a -> "R", 'b -> "P", 'c -> "Q")
+      val foo2target = arrow(foo, target)(0 -> "Q", 1 -> "P")
+      val bar2target = arrow(bar, target)('a -> "R", 'b -> "P", 'c -> "Q")
       val sum = foo2target + bar2target
 
       sum should have (
@@ -199,7 +203,7 @@ class DotAndArrowEnrichmentTest extends FunSpec {
       val h = dot(true, false)
       val symbols = dot('A, 'B, 'C)
       val numbers = dot(1, 2, 3)
-      val f: Symbol > Int = arrow(symbols, numbers,
+      val f: Symbol > Int = arrow(symbols, numbers)(
         'A -> 2, 'B -> 1, 'C -> 1
       )
       val h_f: (Int → Boolean) > (Symbol → Boolean) = h > f
@@ -211,5 +215,4 @@ class DotAndArrowEnrichmentTest extends FunSpec {
         h_f(g)(symbol) shouldBe g(f(symbol))
     }
   }
-
 }

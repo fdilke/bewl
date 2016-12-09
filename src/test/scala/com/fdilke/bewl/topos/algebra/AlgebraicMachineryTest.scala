@@ -229,10 +229,10 @@ class AlgebraicMachineryTest extends FunSpec {
       algebraStrings.sanityTest
       algebraInts.sanityTest
 
-      val morphism = arrow(carrierStrings, carrierInts, "+" -> 1, "-" -> -1)
-      val morphismWithWrongSource = arrow(wrongSource, carrierInts, "*" -> 1)
+      val morphism = arrow(carrierStrings, carrierInts)("+" -> 1, "-" -> -1)
+      val morphismWithWrongSource = arrow(wrongSource, carrierInts)("*" -> 1)
       morphismWithWrongSource.sanityTest
-      val morphismWithWrongTarget = arrow(carrierStrings, wrongTarget, "+" -> 0, "-" -> 0)
+      val morphismWithWrongTarget = arrow(carrierStrings, wrongTarget)("+" -> 0, "-" -> 0)
       morphismWithWrongTarget.sanityTest
       setsWithInvolution.isMorphism(algebraStrings, algebraInts, morphism) shouldBe true
       intercept[IllegalArgumentException] {
@@ -242,7 +242,7 @@ class AlgebraicMachineryTest extends FunSpec {
         setsWithInvolution.isMorphism(algebraStrings, algebraInts, morphismWithWrongTarget) shouldBe true
       }
 
-      val notAMorphism = arrow(carrierStrings, carrierInts, "+" -> 1, "-" -> 1)
+      val notAMorphism = arrow(carrierStrings, carrierInts)("+" -> 1, "-" -> 1)
       setsWithInvolution.isMorphism(algebraStrings, algebraInts, notAMorphism) shouldBe false
     }
 
@@ -256,8 +256,8 @@ class AlgebraicMachineryTest extends FunSpec {
       val algebraStrings = new pointedSets.Algebra[String](carrierStrings)(o := pointStrings)
       val algebraInts = new pointedSets.Algebra[Int](carrierInts)(o := pointInts)
 
-      val morphism = arrow(carrierStrings, carrierInts, "samson" -> 1, "delilah" -> 0)
-      val notAMorphism = arrow(carrierStrings, carrierInts, "samson" -> 1, "delilah" -> 1)
+      val morphism = arrow(carrierStrings, carrierInts)("samson" -> 1, "delilah" -> 0)
+      val notAMorphism = arrow(carrierStrings, carrierInts)("samson" -> 1, "delilah" -> 1)
 
       pointedSets.isMorphism(algebraStrings, algebraInts, morphism) shouldBe true
       pointedSets.isMorphism(algebraStrings, algebraInts, notAMorphism) shouldBe false
@@ -272,8 +272,8 @@ class AlgebraicMachineryTest extends FunSpec {
       val magmas = AlgebraicTheory(*)()
       val algebra = new magmas.Algebra[Int](carrier)(* := multiplication)
 
-      val morphism = arrow(carrier, carrier, 0 -> 0, 1 -> 2, 2 -> 0, 3 -> 2)
-      val notAMorphism = arrow(carrier, carrier, 0 -> 1, 1 -> 2, 2 -> 3, 3 -> 0)
+      val morphism = arrow(carrier, carrier)(0 -> 0, 1 -> 2, 2 -> 0, 3 -> 2)
+      val notAMorphism = arrow(carrier, carrier)(0 -> 1, 1 -> 2, 2 -> 3, 3 -> 0)
 
       magmas.isMorphism(algebra, algebra, morphism) shouldBe true
       magmas.isMorphism(algebra, algebra, notAMorphism) shouldBe false
@@ -294,8 +294,8 @@ class AlgebraicMachineryTest extends FunSpec {
       val algebra = new weakActsOverAPointedMagma.Algebra[Boolean](carrier)(** := multiplication)
       algebra.sanityTest
 
-      val morphism = arrow(carrier, carrier, true -> false, false -> true)
-      val notAMorphism = arrow(carrier, carrier, true -> true, false -> true)
+      val morphism = arrow(carrier, carrier)(true -> false, false -> true)
+      val notAMorphism = arrow(carrier, carrier)(true -> true, false -> true)
 
       weakActsOverAPointedMagma.isMorphism(algebra, algebra, morphism) shouldBe true
       weakActsOverAPointedMagma.isMorphism(algebra, algebra, notAMorphism) shouldBe false
