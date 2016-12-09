@@ -10,7 +10,9 @@ trait MonadCaching {
     Monads with
     StrongMonads =>
 
-  trait CachingMonad[M[X <: ~] <: ~] extends Monad[M] {
+  trait CachingMonad[
+    M[X <: ~] <: ~
+  ] extends Monad[M] {
     final private val memoizedLocalValues =
       Memoize.generic.withLowerBound[
         ({type λ[X <: ~] = DOT[X]}) # λ,

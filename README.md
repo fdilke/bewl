@@ -35,10 +35,11 @@ To see the current to-do list and state of play, you can view this [Trello board
 
 # Intended applications
 
-- Explore the topos of graphs. Bewl will let us talk about graphs as if they were sets
-- Explore fuzzy sets (using the more careful definition that makes them into a topos)
+- Explore music theory via the triadic topos (see []The Topos of Music](http://link.springer.com/book/10.1007%2F978-3-0348-8141-8))
 - Explore parity in other topoi (as it's so poorly understood for sets). Easier now that the
 "topos of permutations" is implemented.
+- Explore the topos of graphs. Bewl will let us talk about graphs as if they were sets
+- Explore fuzzy sets (using the more careful definition that makes them into a topos)
 - Explore Lawvere-Tierney topologies (and perhaps save [these](http://www.math.uchicago.edu/~may/VIGRE/VIGRE2007/REUPapers/FINALFULL/Bartlett.pdf) 
 [poor](http://user.cs.tu-berlin.de/~noll/ToposOfTriads.pdf) music theorists from having to calculate them by hand)
 
@@ -62,7 +63,7 @@ To see the current to-do list and state of play, you can view this [Trello board
 - predicates isMonic, isEpic, isIso
 - enumerate morphisms / global elements
 - Partial arrow classifier
-- walkthrough for using Bewl as a learning aid for studying category theory
+- walkthrough for using Bewl as a learning aid for studying category theory [NEEDS UPDATING]
 - universal algebra: can define algebraic structures, using existing ones as parameter spaces (for monoid actions)
 - implemented topos of monoid actions
 - implemented topos of automorphisms
@@ -75,6 +76,9 @@ To see the current to-do list and state of play, you can view this [Trello board
 
 - coequalizers
 - Define more algebraic structures
+- construct the monad of monoid actions
+- construct the reader monad 
+- construct the topos of coalgebras, and so (maybe a slow implementation of) the slice topos
 - Can extend and remap algebraic structures, e.g. ring extends abelian group remaps group with an extra law
 - More algebraic constructions: endomorphism ring, transfer
 - tell if an object has an injective hull
