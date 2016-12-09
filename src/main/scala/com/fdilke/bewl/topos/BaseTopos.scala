@@ -331,6 +331,13 @@ trait BaseTopos {
         (s, g) =>
           family(g) → g(s)
       }
+
+    final def where(
+      condition: S => TRUTH
+    ): EQUALIZER[S] =
+      dot(omega) {
+        condition
+      } ?= dot.toTrue
   }
 
   trait BaseArrow[S <: ~, T <: ~] {

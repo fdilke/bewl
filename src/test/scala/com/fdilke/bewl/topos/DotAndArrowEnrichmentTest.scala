@@ -230,6 +230,26 @@ class DotAndArrowEnrichmentTest extends FunSpec {
     }
   }
 
+  describe("To select subobjects") {
+    it("you can use whereTrue") {
+      val just2 =
+        dot(1, 2, 3)(omega) {
+          _ == 2
+        }.whereTrue
+
+      elementsOf(just2) shouldBe Seq(2)
+    }
+
+    it("you can use where") {
+      val just2 =
+        dot(1, 2, 3) where {
+          _ == 2
+        }
+
+      elementsOf(just2) shouldBe Seq(2)
+    }
+  }
+
   describe("The intersection operator ⋀") {
     it("is correctly calculated for sets") {
       val symbols = dot('A, 'B, 'C)

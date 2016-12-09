@@ -24,12 +24,12 @@ trait AlgebraicConstructions {
     val carrier = monoid.carrier
     val pairs = carrier.squared
     val unit = monoid.unit
-    val invertiblePairs = pairs(omega) {
+    val invertiblePairs = pairs where {
       case x ⊕ y =>
         def i = monoid.unit(carrier.toI(x))
         carrier.=?=(i, monoid.multiply(x, y)) ∧
           carrier.=?=(i, monoid.multiply(y, x))
-    }.whereTrue
+    }
     val ip2carrier = pairs.π0 o invertiblePairs.inclusion
     val units = ip2carrier.chi.whereTrue
     val ip2units = units.restrict(ip2carrier)
