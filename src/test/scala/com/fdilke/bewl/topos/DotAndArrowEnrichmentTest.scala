@@ -90,9 +90,15 @@ class DotAndArrowEnrichmentTest extends FunSpec {
   describe("The equality comparison arrow") {
     it("should have the correct value for finite sets") {
       val set = dot(0, 1)
-      set.=?= shouldBe biArrow(set, set, omega,
-        (0,0) -> true, (0, 1) -> false,
-        (1,0) -> false,(1,1) -> true
+      set.=?= shouldBe biArrow(
+        set,
+        set,
+        omega
+      )(
+        (0,0) -> true,
+        (0, 1) -> false,
+        (1,0) -> false,
+        (1,1) -> true
       )
     }
   }
@@ -101,11 +107,17 @@ class DotAndArrowEnrichmentTest extends FunSpec {
     it("can be converted to arrows") {
       val symbols = dot('A, 'B, 'C)
       val numbers = dot(1, 2, 3)
-      symbols.arrowFromFunctionalRelation(numbers)(untupled(Map(
-        ('A, 1) -> false, ('A, 2) -> true,  ('A, 3) -> false,
-        ('B, 1) -> true,  ('B, 2) -> false, ('B, 3) -> false,
-        ('C, 1) -> true,  ('C, 2) -> false, ('C, 3) -> false
-      ))) shouldBe
+      symbols.arrowFromFunctionalRelation(
+        numbers
+      )(
+        untupled(
+          Map(
+            ('A, 1) -> false, ('A, 2) -> true,  ('A, 3) -> false,
+            ('B, 1) -> true,  ('B, 2) -> false, ('B, 3) -> false,
+            ('C, 1) -> true,  ('C, 2) -> false, ('C, 3) -> false
+          )
+        )
+      ) shouldBe
         arrow(symbols, numbers)(
           'A -> 2, 'B -> 1, 'C -> 1
         )

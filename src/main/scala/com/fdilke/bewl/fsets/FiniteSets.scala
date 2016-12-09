@@ -164,7 +164,8 @@ case class FiniteSetsPreArrow[S, T](
 object FiniteSetsUtilities {
   import FiniteSets._
 
-  def dot[T](elements: T*) = makeDot(elements)
+  def dot[T](elements: T*) =
+    makeDot(elements)
 
   def arrow[S, T](
     source: DOT[S],
@@ -172,16 +173,27 @@ object FiniteSetsUtilities {
   ) (
     map: (S, T)*
   ) =
-    functionAsArrow(source, target, Map(map: _*))
+    functionAsArrow(
+      source,
+      target,
+      Map(map: _*)
+    )
 
   def biArrow[L, R, T](
    left: DOT[L],
    right: DOT[R],
-   target: DOT[T],
+   target: DOT[T]
+  )(
    mappings: ((L, R), T)*
  ) =
-    bifunctionAsBiArrow[L, R, T](left, right, target)(
-      Function untupled Map(mappings:_*)
+    bifunctionAsBiArrow[L, R, T](
+      left,
+      right,
+      target
+    )(
+      Function untupled Map(
+        mappings:_*
+      )
     )
 
   def elementsOf[X](
@@ -196,21 +208,36 @@ object FiniteSetsUtilities {
   ): X → Y =
     arrow.name(())
 
-  def makeNullaryOperator[X](carrier: DOT[X], value: X) =
-    functionAsArrow(I, carrier, (_: UNIT) => value)
+  def makeNullaryOperator[X](
+    carrier: DOT[X],
+    value: X
+  ) =
+    functionAsArrow(
+      I,
+      carrier,
+      (_: UNIT) => value
+    )
 
   def makeUnaryOperator[X](
     carrier: DOT[X],
     mappings: (X, X)*
   ) =
-    functionAsArrow(carrier, carrier, Map(mappings:_*))
+    functionAsArrow(
+      carrier,
+      carrier,
+      Map(mappings:_*)
+    )
 
   def makeBinaryOperator[X](
     carrier: DOT[X],
     mappings: ((X, X), X)*
   ) =
-    bifunctionAsBiArrow[X](carrier) (
-      Function untupled Map(mappings:_*)
+    bifunctionAsBiArrow[X](
+      carrier
+    ) (
+      Function untupled Map(
+        mappings:_*
+      )
     )
 
   private def intSqrt(square: Int) =
@@ -224,12 +251,27 @@ object FiniteSetsUtilities {
     val carrierSize = intSqrt(table.size)
     val carrierAsList = table.take(carrierSize)
     val carrier = dot(carrierAsList :_*)
-    val mappings = for (i <- 0 until carrierSize ; j <- 0 until carrierSize)
-      yield (carrierAsList(i), carrierAsList(j)) -> table(i * carrierSize + j)
-    val product = makeBinaryOperator(carrier, mappings:_ *)
+    val mappings =
+      for {
+        i <- 0 until carrierSize
+        j <- 0 until carrierSize
+      } yield (
+        carrierAsList(i),
+        carrierAsList(j)
+      ) -> table(
+        i * carrierSize + j
+      )
+    val product =
+      makeBinaryOperator(
+        carrier,
+        mappings:_ *
+      )
     new Monoid[M](
       carrier,
-      makeNullaryOperator(carrier, carrierAsList.head),
+      makeNullaryOperator(
+        carrier,
+        carrierAsList.head
+      ),
       product
     )
   }
