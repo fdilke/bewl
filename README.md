@@ -35,7 +35,7 @@ To see the current to-do list and state of play, you can view this [Trello board
 
 # Intended applications
 
-- Explore music theory via the triadic topos (see []The Topos of Music](http://link.springer.com/book/10.1007%2F978-3-0348-8141-8))
+- Explore music theory via the triadic topos (see [The Topos of Music](http://link.springer.com/book/10.1007%2F978-3-0348-8141-8))
 - Explore parity in other topoi (as it's so poorly understood for sets). Easier now that the
 "topos of permutations" is implemented.
 - Explore the topos of graphs. Bewl will let us talk about graphs as if they were sets
