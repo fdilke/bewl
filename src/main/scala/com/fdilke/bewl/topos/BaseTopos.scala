@@ -228,7 +228,7 @@ trait BaseTopos {
           }(t)
         }
 
-    final def preExists[R <: ~](
+    final private def preExists[R <: ~](
       source: DOT[R]
     ) (
       bifunc: (R, S) => TRUTH
@@ -322,6 +322,14 @@ trait BaseTopos {
         arrow.target > dot
       ) { (s_u, t) =>
         s_u(arrow(t))
+      }
+
+    final def ⋀(
+      family: (S → TRUTH) > TRUTH
+    ): S > TRUTH =
+      forAll(power) {
+        (s, g) =>
+          family(g) → g(s)
       }
   }
 

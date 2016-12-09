@@ -90,6 +90,7 @@ If you want to use Bewl as a learning aid to study category theory, [start here]
 - have a concept of 'models' and streamline construction constellation/scalars
 - language in which class ::== a theory
 - implicit objects, follow Odersky concept of 'context' used in Dotty
+- make =?= be a binary operation on (extra rich) elements 
 - tell if an object has an injective hull
 - Optimize algorithm enough to construct triadic topos and its topologies
 - Construct the slice topos. Use McLarty's construction, NOT the one in Moerdijk/Maclane which

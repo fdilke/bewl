@@ -5,6 +5,7 @@ import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 import com.fdilke.bewl.helper.{Memoize, ⊕}
+import com.fdilke.bewl.topos.Wrappings.NO_WRAPPER
 
 import scala.Function.untupled
 
@@ -215,16 +216,41 @@ class DotAndArrowEnrichmentTest extends FunSpec {
       val h = dot(true, false)
       val symbols = dot('A, 'B, 'C)
       val numbers = dot(1, 2, 3)
-      val f: Symbol > Int = arrow(symbols, numbers)(
-        'A -> 2, 'B -> 1, 'C -> 1
-      )
-      val h_f: (Int → Boolean) > (Symbol → Boolean) = h > f
+      val f: Symbol > Int =
+        arrow(symbols, numbers)(
+          'A -> 2, 'B -> 1, 'C -> 1
+        )
+      val h_f: (Int → Boolean) > (Symbol → Boolean) =
+        h > f
 
       for (
         g <- elementsOf(numbers > h) ;
         symbol <- Seq('A, 'B, 'C)
       )
         h_f(g)(symbol) shouldBe g(f(symbol))
+    }
+  }
+
+  describe("The intersection operator ⋀") {
+    it("is correctly calculated for sets") {
+      val symbols = dot('A, 'B, 'C)
+      val markers = dot("AB", "AC")
+      val incl =
+        bifunctionAsBiArrow(
+          markers,
+          symbols,
+          omega
+        ) {
+          _ contains _.name
+        }
+      val chi: >[→[Symbol, TRUTH], TRUTH] =
+        (symbols.power transpose incl).chi
+      val intersection: Symbol > TRUTH =
+        symbols.⋀(chi)
+      intersection shouldBe
+        symbols(omega) {
+          _ == 'A
+        }
     }
   }
 }
