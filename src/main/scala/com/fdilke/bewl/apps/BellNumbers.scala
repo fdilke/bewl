@@ -7,27 +7,21 @@ import com.fdilke.bewl.helper.⊕
 object BellNumbers extends App {
 
   def bell(n: Int): Int = {
-    val set = dot(0 to n :_*)
+    val set: DOT[Int] = dot(0 until n :_*)
     val set2 = set.squared
 
-    val eqRelns = set2.power where { ssp =>
-      set2.power.forAll(set) {
-        (ssp, s) =>
-          ssp(set.squared.pair(s, s))
-      }(ssp)
-    } where { ssp =>
-      set2.power.forAll(set, set) {
-        (ssp, x, y) =>
-          ssp(set.squared.pair(x, y)) →
-          ssp(set.squared.pair(y, x))
-      }(ssp)
-    } where { ssp =>
-      set2.power.forAll(set, set, set) {
-        (ssp, x, y, z) =>
-          ssp(set.squared.pair(x, y)) ∧
-          ssp(set.squared.pair(y, z)) →
-          ssp(set.squared.pair(x, z))
-      }(ssp)
+    val eqRelns = set2.power.whereAll(set) {
+      (ssp, s) =>
+        ssp(set.squared.pair(s, s))
+    }.whereAll(set, set) {
+      (ssp, x, y) =>
+        ssp(set.squared.pair(x, y)) →
+        ssp(set.squared.pair(y, x))
+    }.whereAll(set, set, set) {
+      (ssp, x, y, z) =>
+        ssp(set.squared.pair(x, y)) ∧
+        ssp(set.squared.pair(y, z)) →
+        ssp(set.squared.pair(x, z))
     }
     elementsOf(eqRelns).size
   }

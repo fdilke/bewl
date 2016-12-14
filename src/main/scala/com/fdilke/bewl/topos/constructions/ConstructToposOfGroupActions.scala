@@ -49,20 +49,27 @@ trait ConstructToposOfGroupActions extends
 
           override lazy val globals = {
             val fixedPoints =
-              action.actionCarrier.forAll(group.carrier) {
+              action.actionCarrier.whereAll(
+                group.carrier
+              ) {
                 (a, g) => action.actionCarrier.=?=(
                   a,
                   action.actionMultiply(a, g)
                 )
-              }.whereTrue
+              }
 
             fixedPoints.globals.map { global =>
               ActionArrow(I, dot, fixedPoints.inclusion o global)
             }
           }
 
-          override def xUncached[T <: ~](that: DOT[T]): BIPRODUCT[S, T] = {
-            val productDot = this.action.actionCarrier x that.action.actionCarrier
+          override def xUncached[
+            T <: ~
+          ](
+            that: DOT[T]
+          ): BIPRODUCT[S, T] = {
+            val productDot =
+              this.action.actionCarrier x that.action.actionCarrier
             new ActionDot[S x T](
               group.action(productDot){
                 case (s ⊕ t, g) =>

@@ -228,6 +228,30 @@ trait BaseTopos {
           }(t)
         }
 
+    final def whereAll[T <: ~](
+      target: DOT[T]
+    ) (
+      g: (S, T) => TRUTH
+    ): EQUALIZER[S] =
+      forAll(target)(g).whereTrue
+
+    final def whereAll[T <: ~, U <: ~](
+      target: DOT[T],
+      target2: DOT[U]
+    ) (
+      g: (S, T, U) => TRUTH
+    ): EQUALIZER[S] =
+      forAll(target, target2)(g).whereTrue
+
+    final def whereAll[T <: ~, U <: ~, V <: ~](
+      target: DOT[T],
+      target2: DOT[U],
+      target3: DOT[V]
+    ) (
+      g: (S, T, U, V) => TRUTH
+    ): EQUALIZER[S] =
+      forAll(target, target2, target3)(g).whereTrue
+
     final private def preExists[R <: ~](
       source: DOT[R]
     ) (
