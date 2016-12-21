@@ -362,6 +362,13 @@ trait BaseTopos {
       dot(omega) {
         condition
       } ?= dot.toTrue
+
+    final def isEquivalence(
+      equiv: S x S => TRUTH
+    ) =
+      true
+      // this.forAll(this)
+
   }
 
   trait BaseArrow[S <: ~, T <: ~] {

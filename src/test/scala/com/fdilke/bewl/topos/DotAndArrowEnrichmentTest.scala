@@ -193,6 +193,58 @@ class DotAndArrowEnrichmentTest extends FunSpec {
     }
   }
 
+  describe("Equivalences") {
+    it("can be tested for sets") {
+      val symbols = dot('A, 'B, 'C)
+      val identifyBandC = Set(
+        Set('A),
+        Set('B),
+        Set('C),
+        Set('B, 'C)
+      )
+      def equivalenceFrom(
+        identifications: Set[Set[Symbol]]
+      ) (
+        pxq: Symbol x Symbol
+      ): Boolean =
+        pxq match {
+          case p ⊕ q => identifications contains Set (p, q)
+        }
+
+      symbols.isEquivalence(
+        equivalenceFrom(identifyBandC)
+      ) shouldBe true
+    }
+  }
+
+//  describe("Quotients") {
+//    it("give the expected construction for sets") {
+//      // ...
+  //      val equivalence = symbols.squared(omega) {
+  //        case p ⊕ q => identifications contains Set(p, q)
+  //      }
+//    }
+//  }
+
+//  describe("Coequalizers") {
+//    it("should give the expected construction for sets") {
+//      val symbols = dot('A, 'B)
+//      val numbers = dot(1, 2, 3, 4)
+//
+//      val f1 = arrow(symbols, numbers)(
+//        'A -> 1,
+//        'B -> 3
+//      )
+//      val f2 = arrow(symbols, numbers)(
+//        'A -> 2,
+//        'B -> 4
+//      )
+//      val coequalizer: Int > COEQUALIZER[Int] =
+//        f1 =? f2
+//      coequalizer.source shouldBe f2
+//    }
+//  }
+
   describe("The projection operations *-, -*") {
     it("are correctly calculated for sets") {
       val symbols = dot('A, 'B, 'C)
