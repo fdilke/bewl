@@ -193,25 +193,64 @@ class DotAndArrowEnrichmentTest extends FunSpec {
     }
   }
 
+  describe("Universaility of a prediacte") {
+    it("can be tested for sets") {
+      val symbols = dot('A, 'B, 'C)
+
+      symbols.universally { _ => true } shouldBe true
+      symbols.universally { _ == 'A } shouldBe false
+    }
+  }
+
   describe("Equivalences") {
     it("can be tested for sets") {
       val symbols = dot('A, 'B, 'C)
+      val notReflexive = Set(
+        'A -> 'A
+      )
+      val notSymmetric = Set(
+        'A -> 'A,
+        'B -> 'B,
+        'C -> 'C,
+        'A -> 'B
+      )
+      val notTransitive = Set(
+        'A -> 'A,
+        'B -> 'B,
+        'C -> 'C,
+        'A -> 'B,
+        'B -> 'A,
+        'B -> 'C,
+        'C -> 'B
+      )
       val identifyBandC = Set(
-        Set('A),
-        Set('B),
-        Set('C),
-        Set('B, 'C)
+        'A -> 'A,
+        'B -> 'B,
+        'C -> 'C,
+        'B -> 'C,
+        'C -> 'B
       )
       def equivalenceFrom(
-        identifications: Set[Set[Symbol]]
+        identifications: Set[(Symbol, Symbol)]
       ) (
-        pxq: Symbol x Symbol
+        p: Symbol,
+        q: Symbol
       ): Boolean =
-        pxq match {
-          case p ⊕ q => identifications contains Set (p, q)
-        }
+          identifications contains (p -> q)
 
-      symbols.isEquivalence(
+      symbols.isEquivalenceRelation(
+        equivalenceFrom(notReflexive)
+      ) shouldBe false
+
+      symbols.isEquivalenceRelation(
+        equivalenceFrom(notSymmetric)
+      ) shouldBe false
+
+      symbols.isEquivalenceRelation(
+        equivalenceFrom(notTransitive)
+      ) shouldBe false
+
+      symbols.isEquivalenceRelation(
         equivalenceFrom(identifyBandC)
       ) shouldBe true
     }

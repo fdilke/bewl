@@ -65,25 +65,45 @@ trait BaseTopos {
     val left: DOT[L]
     val right: DOT[R]
     def pair(l: L, r: R): LxR
-    final lazy val π0 = dot(left) { _._1 }
-    final lazy val π1 = dot(right) { _._2 }
+
+    final lazy val π0 =
+      dot(left) { _._1 }
+
+    final lazy val π1 =
+      dot(right) { _._2 }
 
     final private val hackedThis: BIPRODUCT[L, R] =
       this.asInstanceOf[BIPRODUCT[L, R]]
 
     final def biArrow[T <: ~](
       target: DOT[T]
-      ) (
+    ) (
       bifunc: (L, R) => T
-      ) : BiArrow[L, R, T] =
+    ) : BiArrow[L, R, T] =
       BiArrow(hackedThis, hackedThis(target) {
         case x ⊕ y => bifunc(x, y)
       })
-      final def universally[T <: ~](target: DOT[T])(bifunc: (L x R, T) => TRUTH) =
-        BiArrow(hackedThis, hackedThis.forAll(target)(bifunc))
-      final def existentially[T <: ~](target: DOT[T])(bifunc: (L x R, T) => TRUTH) =
-        BiArrow(hackedThis, hackedThis.exists(target)(bifunc))
-    }
+
+    final def universally[T <: ~](
+      target: DOT[T]
+    )(
+      bifunc: (L x R, T) => TRUTH
+    ) =
+      BiArrow(
+        hackedThis,
+        hackedThis.forAll(target)(bifunc)
+      )
+
+      final def existentially[T <: ~](
+        target: DOT[T]
+      )(
+        bifunc: (L x R, T) => TRUTH
+      ) =
+        BiArrow(
+          hackedThis,
+          hackedThis.exists(target)(bifunc)
+        )
+  }
 
   type EQUALIZER[S <: ~] =
     EqualizingDot[S] with DOT[S]
@@ -91,6 +111,7 @@ trait BaseTopos {
   trait EqualizingDot[S <: ~] { dot: DOT[S] =>
     val equalizerTarget: DOT[S]
     def restrict[R <: ~](arrow: R > S): R > S
+
     lazy val inclusion: S > S =
       dot(equalizerTarget) { s => s }
   }
@@ -363,12 +384,27 @@ trait BaseTopos {
         condition
       } ?= dot.toTrue
 
-    final def isEquivalence(
-      equiv: S x S => TRUTH
-    ) =
-      true
-      // this.forAll(this)
+    final def universally(
+      criterion: S => TRUTH
+    ): Boolean =
+      dot(omega) {
+        criterion
+      }.toBool
 
+    final def isEquivalenceRelation(
+      equiv: (S, S) => TRUTH
+    ) = // TODO: rewrite this using first order logic
+      this.universally { s =>
+        equiv(s, s)
+      } &&
+      squared.universally {
+        case s ⊕ t =>
+          equiv(s, t) → equiv(t, s)
+      } &&
+      (squared x dot).universally {
+        case s ⊕ t ⊕ u  =>
+          equiv(s, t) ∧ equiv(t, u) → equiv(s, u)
+      }
   }
 
   trait BaseArrow[S <: ~, T <: ~] {
