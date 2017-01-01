@@ -193,7 +193,7 @@ class DotAndArrowEnrichmentTest extends FunSpec {
     }
   }
 
-  describe("Universaility of a prediacte") {
+  describe("Universality of a prediacte") {
     it("can be tested for sets") {
       val symbols = dot('A, 'B, 'C)
 
@@ -230,13 +230,6 @@ class DotAndArrowEnrichmentTest extends FunSpec {
         'B -> 'C,
         'C -> 'B
       )
-      def equivalenceFrom(
-        identifications: Set[(Symbol, Symbol)]
-      ) (
-        p: Symbol,
-        q: Symbol
-      ): Boolean =
-          identifications contains (p -> q)
 
       symbols.isEquivalenceRelation(
         equivalenceFrom(notReflexive)
@@ -256,14 +249,27 @@ class DotAndArrowEnrichmentTest extends FunSpec {
     }
   }
 
-//  describe("Quotients") {
-//    it("give the expected construction for sets") {
-//      // ...
-  //      val equivalence = symbols.squared(omega) {
-  //        case p ⊕ q => identifications contains Set(p, q)
-  //      }
-//    }
-//  }
+  describe("Quotients") {
+    // TODO: not quite right. Need images first
+    ignore("give the expected construction for sets") {
+      val symbols = dot('A, 'B, 'C)
+      val identifyBandC =
+        Set(
+          'A -> 'A,
+          'B -> 'B,
+          'C -> 'C,
+          'B -> 'C,
+          'C -> 'B
+        )
+      val quotient: Symbol > QUOTIENT[Symbol] =
+        symbols / equivalenceFrom(identifyBandC)
+
+      quotient.source shouldBe symbols
+      quotient shouldBe 'epic
+      quotient.target.globals should have size 2
+      quotient('B) shouldBe quotient('A)
+    }
+  }
 
 //  describe("Coequalizers") {
 //    it("should give the expected construction for sets") {
@@ -360,4 +366,12 @@ class DotAndArrowEnrichmentTest extends FunSpec {
         }
     }
   }
+
+  private def equivalenceFrom(
+    identifications: Set[(Symbol, Symbol)]
+  ) (
+    p: Symbol,
+    q: Symbol
+  ): Boolean =
+    identifications contains (p -> q)
 }

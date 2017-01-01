@@ -78,11 +78,13 @@ If you want to use Bewl as a learning aid to study category theory, [start here]
 
 # To do
 
+- images
 - coequalizers
 - Define more algebraic structures: a complete list
 - construct the monad of monoid actions
 - construct the reader monad 
 - construct 'pitchfork' for algebras over a strong monad
+- construct 'pitchfork' for 'informal' (operator) algebras
 - construct the topos of coalgebras, and so (maybe a slow implementation of) the slice topos
 - Can extend and remap algebraic structures, e.g. ring extends abelian group remaps group with an extra law
 - More algebraic constructions: endomorphism ring, transfer

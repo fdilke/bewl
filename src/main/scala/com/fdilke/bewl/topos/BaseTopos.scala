@@ -125,6 +125,8 @@ trait BaseTopos {
     }
   }
   type VOID = UNIT // TODO: fix with strict equalizers
+  type QUOTIENT[X <: ~] = X → TRUTH
+
   lazy val O: DOT[VOID] = InitialDot.O
 
   trait BaseDot[S <: ~] { self: DOT[S] =>
@@ -405,6 +407,36 @@ trait BaseTopos {
         case s ⊕ t ⊕ u  =>
           equiv(s, t) ∧ equiv(t, u) → equiv(s, u)
       }
+
+    final def /(
+      equiv: (S, S) => TRUTH
+    ): S > QUOTIENT[S] = {
+      power.transpose(dot)(equiv)
+      // TODO: not quite right. We need the image of this arrow
+    }
+
+    /* good for calculating coequalizers
+          val eqRelns: EQUALIZER[S x S → TRUTH] =
+            squared.power.whereAll(dot) {
+              (ssp, s) =>
+                ssp(squared.pair(s, s))
+            }.whereAll(dot, dot) {
+              (ssp, x, y) =>
+                ssp(squared.pair(x, y)) →
+                  ssp(squared.pair(y, x))
+            }.whereAll(dot, dot, dot) {
+              (ssp, x, y, z) =>
+                ssp(squared.pair(x, y)) ∧
+                  ssp(squared.pair(y, z)) →
+                  ssp(squared.pair(x, z))
+            }
+
+          val family: (S x S → TRUTH) > TRUTH =
+            eqRelns.inclusion.chi
+
+          val intersection = squared.⋀(family)
+    */
+
   }
 
   trait BaseArrow[S <: ~, T <: ~] {
