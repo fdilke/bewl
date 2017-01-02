@@ -249,6 +249,28 @@ class DotAndArrowEnrichmentTest extends FunSpec {
     }
   }
 
+  describe("Images") {
+    it("give the expected construction for sets") {
+      val symbols = dot('A, 'B, 'C)
+      val numbers = dot(1, 2, 3, 4)
+      val anArrow = arrow(symbols, numbers)(
+        'A -> 2,
+        'B -> 2,
+        'C -> 3
+      )
+      val (
+        epic,
+        monic
+      ) : (
+        Symbol > Int,
+        Int > Int
+      ) = anArrow.image
+      epic shouldBe 'epic
+      monic shouldBe 'monic
+      (monic o epic) shouldBe anArrow
+    }
+  }
+
   describe("Quotients") {
     // TODO: not quite right. Need images first
     ignore("give the expected construction for sets") {

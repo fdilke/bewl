@@ -94,15 +94,15 @@ trait BaseTopos {
         hackedThis.forAll(target)(bifunc)
       )
 
-      final def existentially[T <: ~](
-        target: DOT[T]
-      )(
-        bifunc: (L x R, T) => TRUTH
-      ) =
-        BiArrow(
-          hackedThis,
-          hackedThis.exists(target)(bifunc)
-        )
+    final def existentially[T <: ~](
+      target: DOT[T]
+    )(
+      bifunc: (L x R, T) => TRUTH
+    ) =
+      BiArrow(
+        hackedThis,
+        hackedThis.exists(target)(bifunc)
+      )
   }
 
   type EQUALIZER[S <: ~] =
@@ -195,7 +195,7 @@ trait BaseTopos {
         bifunc(_)(_)
       }
 
-    final lazy val ∃ =
+    final lazy val ∃ : S → TRUTH > TRUTH =
       power.forAll(omega) { (f, w) =>
           (power x omega).universally(dot) {
             case (f ⊕ w, x) => f(x) → w
@@ -502,7 +502,25 @@ trait BaseTopos {
       self o iso.inverse
 
     def +[U <: ~](that: U > T) =
-      (source ⊔ that.source).sum(this, that)
+      (source ⊔ that.source).sum(
+        this,
+        that
+      )
+
+    lazy val image: (
+      S > T, T > T
+    ) = {
+      val incl =
+        target.exists(
+          source
+        ) { (t, s) =>
+          target.=?=(
+            self(s),
+            t
+          )
+        }.whereTrue.inclusion
+      (self \ incl, incl)
+    }
   }
 
   case class BiArrow[
@@ -600,16 +618,31 @@ trait BaseTopos {
       coproduct.arrowFromFunctionalRelation(target) {
         (αβ, x) =>
           coproduct.exists(left) {
-            (αβ, a) => coproduct.=?=(αβ, injectLeft(a)) ∧ target.=?=(x, leftArrow(a))
+            (αβ, a) =>
+              coproduct.=?=(
+                αβ,
+                injectLeft(a)
+              ) ∧ target.=?=(
+                x,
+                leftArrow(a)
+              )
           }(αβ) ∨
           coproduct.exists(right) {
-            (αβ, b) => coproduct.=?=(αβ, injectRight(b)) ∧ target.=?=(x, rightArrow(b))
+            (αβ, b) =>
+              coproduct.=?=(
+                αβ,
+                injectRight(b)
+              ) ∧ target.=?=(
+                x,
+                rightArrow(b)
+              )
           }(αβ)
       }
     }
   }
 
-  // TODO: machineries to help with the topos of monoid actions. Can these go somewhere else?
+  // TODO: machineries to help with the topos of monoid actions.
+  // Can these go somewhere else?
   trait ElementWrapper[
     A <: ~
   ] {
