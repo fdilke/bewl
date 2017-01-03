@@ -272,8 +272,7 @@ class DotAndArrowEnrichmentTest extends FunSpec {
   }
 
   describe("Quotients") {
-    // TODO: not quite right. Need images first
-    ignore("give the expected construction for sets") {
+    it("give the expected construction for sets") {
       val symbols = dot('A, 'B, 'C)
       val identifyBandC =
         Set(
@@ -284,12 +283,15 @@ class DotAndArrowEnrichmentTest extends FunSpec {
           'C -> 'B
         )
       val quotient: Symbol > QUOTIENT[Symbol] =
-        symbols / equivalenceFrom(identifyBandC)
+        symbols / equivalenceFrom(
+          identifyBandC
+        )
 
       quotient.source shouldBe symbols
       quotient shouldBe 'epic
       quotient.target.globals should have size 2
-      quotient('B) shouldBe quotient('A)
+      quotient('A) should not be quotient('B)
+      quotient('B) shouldBe quotient('C)
     }
   }
 

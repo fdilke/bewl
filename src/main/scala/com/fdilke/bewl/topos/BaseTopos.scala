@@ -410,10 +410,8 @@ trait BaseTopos {
 
     final def /(
       equiv: (S, S) => TRUTH
-    ): S > QUOTIENT[S] = {
-      power.transpose(dot)(equiv)
-      // TODO: not quite right. We need the image of this arrow
-    }
+    ): S > QUOTIENT[S] =
+      power.transpose(dot)(equiv).image._1
 
     /* good for calculating coequalizers
           val eqRelns: EQUALIZER[S x S → TRUTH] =
