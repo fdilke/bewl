@@ -411,7 +411,7 @@ trait BaseTopos {
     final def /(
       equiv: (S, S) => TRUTH
     ): S > QUOTIENT[S] =
-      power.transpose(dot)(equiv).image._1
+      power.transpose(dot)(equiv).factorizeEpiMono._1
 
     /* good for calculating coequalizers
           val eqRelns: EQUALIZER[S x S → TRUTH] =
@@ -493,7 +493,7 @@ trait BaseTopos {
 
     final lazy val inverse: T > S =
       source.power.transpose(target) {
-          (t, s) => target.=?=(t, this(s))  
+          (t, s) => target.=?=(t, this(s))
         } \ source.singleton
 
     def /[R <: ~](iso: S > R) : R > T =
@@ -505,7 +505,7 @@ trait BaseTopos {
         that
       )
 
-    lazy val image: (
+    lazy val factorizeEpiMono: (
       S > T, T > T
     ) = {
       val incl =

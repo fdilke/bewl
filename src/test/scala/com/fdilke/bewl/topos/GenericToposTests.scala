@@ -335,7 +335,7 @@ abstract class GenericToposTests[~](
       ) : (
         FOO > BAR,
         BAR > BAR
-      ) = foo2bar.image
+      ) = foo2bar.factorizeEpiMono
 
       epic shouldBe 'epic
       monic shouldBe 'monic

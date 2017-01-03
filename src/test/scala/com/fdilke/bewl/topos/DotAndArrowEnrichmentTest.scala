@@ -249,8 +249,8 @@ class DotAndArrowEnrichmentTest extends FunSpec {
     }
   }
 
-  describe("Images") {
-    it("give the expected construction for sets") {
+  describe("Epi-mono factorizations") {
+    it("give the expected result for sets") {
       val symbols = dot('A, 'B, 'C)
       val numbers = dot(1, 2, 3, 4)
       val anArrow = arrow(symbols, numbers)(
@@ -264,7 +264,7 @@ class DotAndArrowEnrichmentTest extends FunSpec {
       ) : (
         Symbol > Int,
         Int > Int
-      ) = anArrow.image
+      ) = anArrow.factorizeEpiMono
       epic shouldBe 'epic
       monic shouldBe 'monic
       (monic o epic) shouldBe anArrow
