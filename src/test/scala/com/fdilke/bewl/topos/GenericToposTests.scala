@@ -332,10 +332,11 @@ abstract class GenericToposTests[~](
       val (
         epic,
         monic
-        ) : (
-          FOO > BAR,
-          BAR > BAR
-        ) = foo2bar.image
+      ) : (
+        FOO > BAR,
+        BAR > BAR
+      ) = foo2bar.image
+
       epic shouldBe 'epic
       monic shouldBe 'monic
       (monic o epic) shouldBe foo2bar
