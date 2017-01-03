@@ -327,5 +327,18 @@ abstract class GenericToposTests[~](
       I -* foo shouldBe 'iso
       foo *- I shouldBe 'iso
     }
+
+    it("can do epic-mono factorizations (images)") {
+      val (
+        epic,
+        monic
+        ) : (
+          FOO > BAR,
+          BAR > BAR
+        ) = foo2bar.image
+      epic shouldBe 'epic
+      monic shouldBe 'monic
+      (monic o epic) shouldBe foo2bar
+    }
   }
 }
