@@ -681,15 +681,16 @@ trait BaseTopos {
       ) {
         (
           arrow.target.power.transpose(
-            (epi.target x arrow.target).existentially(
+            (
+              epi.target x
+                arrow.target
+            ).existentially (
               arrow.source
             ) {
-              (qt, s) => qt match {
-                case q ⊕ t =>
-                  q(s) ∧ arrow.target.=?=(
-                    arrow(s), t
-                  )
-              }
+              case (q ⊕ t, s) =>
+                q(s) ∧ arrow.target.=?=(
+                  arrow(s), t
+                )
             }
           ) \ arrow.target.singleton
         ) (

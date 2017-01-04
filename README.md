@@ -75,10 +75,11 @@ If you want to use Bewl as a learning aid to study category theory, [start here]
 - implement double-exponential (continuation) monad
 - endow the subobject classifier with a Heyting algebra structure
 - removed legacy DiagrammaticTopos code
+- images
+- quotients and lifts
 
 # To do
 
-- images
 - coequalizers
 - Define more algebraic structures: a complete list
 - construct the monad of monoid actions
