@@ -352,9 +352,10 @@ trait BaseTopos {
       predicate: (S, B) => TRUTH
     ): S > B = {
       val product = dot x target
-      val graph = (product where {
+      val graph = product where {
         ⊕ tupled predicate
-      }).inclusion
+      } inclusion
+
       (product.π1 o graph) / (product.π0 o graph)
     }
 
