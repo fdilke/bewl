@@ -55,7 +55,13 @@ trait BaseTopos {
   type BIPRODUCT[
     L <: ~,
     R <: ~
-  ] = BiproductDot[L, R, L x R] with DOT[L x R]
+  ] = BiproductDot[
+    L,
+    R,
+    L x R
+  ] with DOT[
+    L x R
+  ]
 
   trait BiproductDot[
     L <: ~,
@@ -669,16 +675,13 @@ trait BaseTopos {
       T <: ~
     ](
       arrow: S > T
-    ): QUOTIENT[S] > T = {
-
-      val prod =
-        epi.target x arrow.target
-
-      val ll: QUOTIENT[S] > QUOTIENT[T] =
-        arrow.target.power.transpose( // TODO: tidy this up
-          BiArrow(
-            prod,
-            prod.exists(
+    ): QUOTIENT[S] > T =
+      epi.target(
+        arrow.target
+      ) {
+        (
+          arrow.target.power.transpose(
+            (epi.target x arrow.target).existentially(
               arrow.source
             ) {
               (qt, s) => qt match {
@@ -688,18 +691,11 @@ trait BaseTopos {
                   )
               }
             }
-          )
+          ) \ arrow.target.singleton
+        ) (
+          _
         )
-
-      val mm: QUOTIENT[S] > T =
-        ll \ arrow.target.singleton
-
-      epi.target(
-        arrow.target
-      ) { qs =>
-        mm(qs)
       }
-    }
   }
 
   // TODO: machineries to help with the topos of monoid actions.
