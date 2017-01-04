@@ -291,9 +291,25 @@ class DotAndArrowEnrichmentTest extends FunSpec {
         quotient.arrow
       quotientArrow.source shouldBe symbols
       quotientArrow shouldBe 'epic
-      quotientArrow.target.globals should have size 2
       quotientArrow('A) should not be quotientArrow('B)
       quotientArrow('B) shouldBe quotientArrow('C)
+
+      val quotientObject: DOT[QUOTIENT[Symbol]] =
+        quotientArrow.target
+      quotientObject.globals should have size 2
+
+      val numbers = dot(1, 2, 3)
+      val arrowToLift =
+        arrow(symbols, numbers) (
+          'A -> 2,
+          'B -> 3,
+          'C -> 3
+        )
+      val lifted: QUOTIENT[Symbol] > Int =
+        quotient.lift(arrowToLift)
+      lifted.source shouldBe quotientObject
+      lifted.target shouldBe numbers
+      lifted o quotientArrow shouldBe arrowToLift
     }
   }
 

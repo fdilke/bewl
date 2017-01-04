@@ -648,12 +648,57 @@ trait BaseTopos {
     dot: DOT[S],
     equiv: (S, S) => TRUTH
   ) {
-    val arrow: S > QUOTIENT[S] =
+    private val (
+      epi,
+      mono
+    ): (
+      S > QUOTIENT[S],
+      QUOTIENT[S] > QUOTIENT[S]
+    ) =
       dot.power.transpose(
         dot
       )(
         equiv
-      ).factorizeEpiMono._1
+      ).factorizeEpiMono
+
+    val arrow: S > QUOTIENT[S] =
+      epi
+
+    def lift[
+      T <: ~
+    ](
+      arrow: S > T
+    ): QUOTIENT[S] > T = {
+
+      val prod =
+        epi.target x arrow.target
+
+      val ll: QUOTIENT[S] > QUOTIENT[T] =
+        arrow.target.power.transpose( // TODO: tidy this up
+          BiArrow(
+            prod,
+            prod.exists(
+              arrow.source
+            ) {
+              (qt, s) => qt match {
+                case q ⊕ t =>
+                  q(s) ∧ arrow.target.=?=(
+                    arrow(s), t
+                  )
+              }
+            }
+          )
+        )
+
+      val mm: QUOTIENT[S] > T =
+        ll \ arrow.target.singleton
+
+      epi.target(
+        arrow.target
+      ) { qs =>
+        mm(qs)
+      }
+    }
   }
 
   // TODO: machineries to help with the topos of monoid actions.
