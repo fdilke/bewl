@@ -410,8 +410,8 @@ trait BaseTopos {
 
     final def /(
       equiv: (S, S) => TRUTH
-    ): S > QUOTIENT[S] =
-      power.transpose(dot)(equiv).factorizeEpiMono._1
+    ): Quotient[S] =
+      new Quotient(dot, equiv)
 
     /* good for calculating coequalizers
           val eqRelns: EQUALIZER[S x S → TRUTH] =
@@ -580,8 +580,12 @@ trait BaseTopos {
       arrowOnSub: S > A
     ) =
       classifier.restrict(
-        dot.power.transpose(monic.target) {
-          (t, a) => monic.target.exists(monic.source) {
+        dot.power.transpose(
+          monic.target
+        ) {
+          (t, a) => monic.target.exists(
+            monic.source
+          ) {
             (t, s) =>
               dot.=?=(
                 arrowOnSub(s), a
@@ -590,7 +594,8 @@ trait BaseTopos {
                   monic(s), t
                 )
           }(t)
-        })
+        }
+      )
   }
 
   class Coproduct[A <: ~, B <: ~](
@@ -637,6 +642,18 @@ trait BaseTopos {
           }(αβ)
       }
     }
+  }
+
+  class Quotient[S <: ~](
+    dot: DOT[S],
+    equiv: (S, S) => TRUTH
+  ) {
+    val arrow: S > QUOTIENT[S] =
+      dot.power.transpose(
+        dot
+      )(
+        equiv
+      ).factorizeEpiMono._1
   }
 
   // TODO: machineries to help with the topos of monoid actions.

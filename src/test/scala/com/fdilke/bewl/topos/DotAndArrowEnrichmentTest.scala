@@ -282,16 +282,18 @@ class DotAndArrowEnrichmentTest extends FunSpec {
           'B -> 'C,
           'C -> 'B
         )
-      val quotient: Symbol > QUOTIENT[Symbol] =
-        symbols / equivalenceFrom(
-          identifyBandC
-        )
+      val quotient =
+          symbols / equivalenceFrom(
+            identifyBandC
+          )
 
-      quotient.source shouldBe symbols
-      quotient shouldBe 'epic
-      quotient.target.globals should have size 2
-      quotient('A) should not be quotient('B)
-      quotient('B) shouldBe quotient('C)
+      val quotientArrow : Symbol > QUOTIENT[Symbol] =
+        quotient.arrow
+      quotientArrow.source shouldBe symbols
+      quotientArrow shouldBe 'epic
+      quotientArrow.target.globals should have size 2
+      quotientArrow('A) should not be quotientArrow('B)
+      quotientArrow('B) shouldBe quotientArrow('C)
     }
   }
 
