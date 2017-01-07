@@ -381,9 +381,9 @@ trait BaseTopos {
     final def ⋀(
       family: (S → TRUTH) > TRUTH
     ): S > TRUTH =
-      forAll(power) {
+      forAll(family.whereTrue) {
         (s, g) =>
-          family(g) → g(s)
+          g(s)
       }
 
     final def where(
