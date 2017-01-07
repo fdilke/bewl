@@ -506,40 +506,36 @@ trait BaseTopos {
     }
 
     final def =?(that: S > T) = {
-      val n2 = target.squared
+      val t2 = target.squared
 
-      val eqRelns: EQUALIZER[T x T → TRUTH] =
-        n2.power.whereAll(target) {
+      val congruences: EQUALIZER[T x T → TRUTH] =
+        t2.power.whereAll(target) {
           (ssp, t) =>
-            ssp(n2.pair(t, t))
+            ssp(t2.pair(t, t))
         }.whereAll(target, target) {
           (ssp, t, u) =>
-            ssp(n2.pair(t, u)) →
-              ssp(n2.pair(u, t))
+            ssp(t2.pair(t, u)) →
+              ssp(t2.pair(u, t))
         }.whereAll(target, target, target) {
           (ssp, t, u, v) =>
-            ssp(n2.pair(t, u)) ∧
-              ssp(n2.pair(u, v)) →
-              ssp(n2.pair(t, v))
+            ssp(t2.pair(t, u)) ∧
+              ssp(t2.pair(u, v)) →
+              ssp(t2.pair(t, v))
         }.whereAll(source) {
           (ssp, s) =>
             ssp(
-              n2.pair(
+              t2.pair(
                 this(s),
                 that(s)
               )
             )
         }
 
-      val family: (T x T → TRUTH) > TRUTH =
-        eqRelns.inclusion.chi
-
-      val intersection: T x T > TRUTH =
-        n2.⋀(family)
-
       target / { (t, u) =>
-        intersection(
-          n2.pair(t, u)
+        t2.⋀(
+          congruences.inclusion.chi
+        ) (
+          t2.pair(t, u)
         )
       }
     }
