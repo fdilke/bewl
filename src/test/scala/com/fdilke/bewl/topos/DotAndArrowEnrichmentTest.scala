@@ -346,9 +346,9 @@ class DotAndArrowEnrichmentTest extends FunSpec {
       otherEqualizer o f1 shouldBe (
         otherEqualizer o f2
       )
-//      val factor: COEQUALIZER[Int] > Boolean =
-//        coequalizer.lift(otherEqualizer)
-//      factor o coequalizerArrow shouldBe otherEqualizer
+      val factor: COEQUALIZER[Int] > Boolean =
+        coequalizer.lift(otherEqualizer)
+      factor o coequalizerArrow shouldBe otherEqualizer
     }
   }
 

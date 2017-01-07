@@ -677,12 +677,9 @@ trait BaseTopos {
     f1: S > T,
     f2: S > T
   ) {
-    println("XXX 1")
-
     private val numerator = f1.target
     private val n2 = numerator.squared
 
-    println("XXX 2")
     private val eqRelns: EQUALIZER[T x T → TRUTH] =
       n2.power.whereAll(numerator) {
         (ssp, t) =>
@@ -706,27 +703,30 @@ trait BaseTopos {
           )
       }
 
-    println("XXX 3")
+    private val family: (T x T → TRUTH) > TRUTH =
+      eqRelns.inclusion.chi
 
-      private val family: (T x T → TRUTH) > TRUTH =
-        eqRelns.inclusion.chi
+    private val intersection: T x T > TRUTH =
+      n2.⋀(family)
 
-    println("XXX 4")
+    private val quotient =
+      numerator / { (t, u) =>
+        intersection(
+          n2.pair(t, u)
+        )
+      }
 
-      private val intersection: T x T > TRUTH =
-        n2.⋀(family)
+    val arrow: T > COEQUALIZER[T] =
+      quotient.arrow
 
-    println("XXX 5")
-
-      private val quotient =
-        numerator / { (t, u) =>
-          intersection(
-            n2.pair(t, u)
-          )
-        }
-
-      val arrow: T > COEQUALIZER[T] =
-        quotient.arrow
+    def lift[
+      U <: ~
+    ] (
+      otherEqualizer: T > U
+    ): COEQUALIZER[T] > U =
+      quotient.lift(
+        otherEqualizer
+      )
   }
 
     // TODO: machineries to help with the topos of monoid actions.
