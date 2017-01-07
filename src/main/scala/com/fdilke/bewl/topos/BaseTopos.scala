@@ -676,27 +676,17 @@ trait BaseTopos {
     ](
       arrow: S > T
     ): QUOTIENT[S] > T =
-      epi.target(
-        arrow.target
-      ) {
-        (
-          arrow.target.power.transpose(
-            (
-              epi.target x
-                arrow.target
-            ).existentially (
-              arrow.source
-            ) {
-              case (q ⊕ t, s) =>
-                q(s) ∧ arrow.target.=?=(
-                  arrow(s), t
-                )
-            }
-          ) \ arrow.target.singleton
-        ) (
-          _
-        )
-      }
+      arrow.target.power.transpose(
+        (epi.target x arrow.target).
+          existentially (
+            arrow.source
+          ) {
+            case (q ⊕ t, s) =>
+              q(s) ∧ arrow.target.=?=(
+                arrow(s), t
+              )
+          }
+      ) \ arrow.target.singleton
   }
 
   // TODO: machineries to help with the topos of monoid actions.
