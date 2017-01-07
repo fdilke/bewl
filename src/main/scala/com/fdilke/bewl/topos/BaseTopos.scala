@@ -505,8 +505,44 @@ trait BaseTopos {
       (self \ incl, incl)
     }
 
-    final def =?(that: S > T) =
-      new Coequalizer(this, that)
+    final def =?(that: S > T) = {
+      val n2 = target.squared
+
+      val eqRelns: EQUALIZER[T x T → TRUTH] =
+        n2.power.whereAll(target) {
+          (ssp, t) =>
+            ssp(n2.pair(t, t))
+        }.whereAll(target, target) {
+          (ssp, t, u) =>
+            ssp(n2.pair(t, u)) →
+              ssp(n2.pair(u, t))
+        }.whereAll(target, target, target) {
+          (ssp, t, u, v) =>
+            ssp(n2.pair(t, u)) ∧
+              ssp(n2.pair(u, v)) →
+              ssp(n2.pair(t, v))
+        }.whereAll(source) {
+          (ssp, s) =>
+            ssp(
+              n2.pair(
+                this(s),
+                that(s)
+              )
+            )
+        }
+
+      val family: (T x T → TRUTH) > TRUTH =
+        eqRelns.inclusion.chi
+
+      val intersection: T x T > TRUTH =
+        n2.⋀(family)
+
+      target / { (t, u) =>
+        intersection(
+          n2.pair(t, u)
+        )
+      }
+    }
   }
 
   case class BiArrow[
@@ -670,66 +706,7 @@ trait BaseTopos {
       ) \ arrow.target.singleton
   }
 
-  class Coequalizer[
-    S <: ~,
-    T <: ~
-  ](
-    f1: S > T,
-    f2: S > T
-  ) {
-    private val numerator = f1.target
-    private val n2 = numerator.squared
-
-    private val eqRelns: EQUALIZER[T x T → TRUTH] =
-      n2.power.whereAll(numerator) {
-        (ssp, t) =>
-          ssp(n2.pair(t, t))
-      }.whereAll(numerator, numerator) {
-        (ssp, t, u) =>
-          ssp(n2.pair(t, u)) →
-            ssp(n2.pair(u, t))
-      }.whereAll(numerator, numerator, numerator) {
-        (ssp, t, u, v) =>
-          ssp(n2.pair(t, u)) ∧
-            ssp(n2.pair(u, v)) →
-            ssp(n2.pair(t, v))
-      }.whereAll(f1.source) {
-        (ssp, s) =>
-          ssp(
-            n2.pair(
-              f1(s),
-              f2(s)
-            )
-          )
-      }
-
-    private val family: (T x T → TRUTH) > TRUTH =
-      eqRelns.inclusion.chi
-
-    private val intersection: T x T > TRUTH =
-      n2.⋀(family)
-
-    private val quotient =
-      numerator / { (t, u) =>
-        intersection(
-          n2.pair(t, u)
-        )
-      }
-
-    val arrow: T > COEQUALIZER[T] =
-      quotient.arrow
-
-    def lift[
-      U <: ~
-    ] (
-      otherEqualizer: T > U
-    ): COEQUALIZER[T] > U =
-      quotient.lift(
-        otherEqualizer
-      )
-  }
-
-    // TODO: machineries to help with the topos of monoid actions.
+  // TODO: machineries to help with the topos of monoid actions.
   // Can these go somewhere else?
   trait ElementWrapper[
     A <: ~
