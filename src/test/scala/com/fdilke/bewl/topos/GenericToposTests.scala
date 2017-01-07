@@ -60,10 +60,18 @@ abstract class ToposWithFixtures[~] {
 
   val foo2bar : FOO > BAR
   val foo2ImageOfBar : FOO > BAZ
-  val foobar2baz : BiArrow[FOO, BAR, BAZ]
+  val foobar2baz : BiArrow[
+    FOO,
+    BAR,
+    BAZ
+  ]
   val monicBar2baz: BAR > BAZ
 
-  val equalizerSituation: EqualizerSituation[_ <: ~, _ <: ~, _ <: ~]
+  val equalizerSituation: EqualizerSituation[
+    _ <: ~,
+    _ <: ~,
+    _ <: ~
+  ]
 
   case class EqualizerSituation[S <: ~, M <: ~, T <: ~](
     r: S > M,

@@ -132,6 +132,7 @@ trait BaseTopos {
   }
   type VOID = UNIT // TODO: fix with strict equalizers
   type QUOTIENT[X <: ~] = X → TRUTH
+  type COEQUALIZER[X <: ~] = X → TRUTH
 
   lazy val O: DOT[VOID] = InitialDot.O
 
@@ -419,29 +420,6 @@ trait BaseTopos {
       equiv: (S, S) => TRUTH
     ): Quotient[S] =
       new Quotient(dot, equiv)
-
-    /* good for calculating coequalizers
-          val eqRelns: EQUALIZER[S x S → TRUTH] =
-            squared.power.whereAll(dot) {
-              (ssp, s) =>
-                ssp(squared.pair(s, s))
-            }.whereAll(dot, dot) {
-              (ssp, x, y) =>
-                ssp(squared.pair(x, y)) →
-                  ssp(squared.pair(y, x))
-            }.whereAll(dot, dot, dot) {
-              (ssp, x, y, z) =>
-                ssp(squared.pair(x, y)) ∧
-                  ssp(squared.pair(y, z)) →
-                  ssp(squared.pair(x, z))
-            }
-
-          val family: (S x S → TRUTH) > TRUTH =
-            eqRelns.inclusion.chi
-
-          val intersection = squared.⋀(family)
-    */
-
   }
 
   trait BaseArrow[S <: ~, T <: ~] {
@@ -526,6 +504,9 @@ trait BaseTopos {
         }.whereTrue.inclusion
       (self \ incl, incl)
     }
+
+    final def =?(that: S > T) =
+      new Coequalizer(this, that)
   }
 
   case class BiArrow[
@@ -689,7 +670,66 @@ trait BaseTopos {
       ) \ arrow.target.singleton
   }
 
-  // TODO: machineries to help with the topos of monoid actions.
+  class Coequalizer[
+    S <: ~,
+    T <: ~
+  ](
+    f1: S > T,
+    f2: S > T
+  ) {
+    println("XXX 1")
+
+    private val numerator = f1.target
+    private val n2 = numerator.squared
+
+    println("XXX 2")
+    private val eqRelns: EQUALIZER[T x T → TRUTH] =
+      n2.power.whereAll(numerator) {
+        (ssp, t) =>
+          ssp(n2.pair(t, t))
+      }.whereAll(numerator, numerator) {
+        (ssp, t, u) =>
+          ssp(n2.pair(t, u)) →
+            ssp(n2.pair(u, t))
+      }.whereAll(numerator, numerator, numerator) {
+        (ssp, t, u, v) =>
+          ssp(n2.pair(t, u)) ∧
+            ssp(n2.pair(u, v)) →
+            ssp(n2.pair(t, v))
+      }.whereAll(f1.source) {
+        (ssp, s) =>
+          ssp(
+            n2.pair(
+              f1(s),
+              f2(s)
+            )
+          )
+      }
+
+    println("XXX 3")
+
+      private val family: (T x T → TRUTH) > TRUTH =
+        eqRelns.inclusion.chi
+
+    println("XXX 4")
+
+      private val intersection: T x T > TRUTH =
+        n2.⋀(family)
+
+    println("XXX 5")
+
+      private val quotient =
+        numerator / { (t, u) =>
+          intersection(
+            n2.pair(t, u)
+          )
+        }
+
+      val arrow: T > COEQUALIZER[T] =
+        quotient.arrow
+  }
+
+    // TODO: machineries to help with the topos of monoid actions.
   // Can these go somewhere else?
   trait ElementWrapper[
     A <: ~

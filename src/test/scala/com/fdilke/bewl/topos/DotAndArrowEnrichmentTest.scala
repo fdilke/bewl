@@ -313,24 +313,44 @@ class DotAndArrowEnrichmentTest extends FunSpec {
     }
   }
 
-//  describe("Coequalizers") {
-//    it("should give the expected construction for sets") {
-//      val symbols = dot('A, 'B)
-//      val numbers = dot(1, 2, 3, 4)
-//
-//      val f1 = arrow(symbols, numbers)(
-//        'A -> 1,
-//        'B -> 3
-//      )
-//      val f2 = arrow(symbols, numbers)(
-//        'A -> 2,
-//        'B -> 4
-//      )
-//      val coequalizer: Int > COEQUALIZER[Int] =
-//        f1 =? f2
-//      coequalizer.source shouldBe f2
-//    }
-//  }
+  describe("Coequalizers") {
+    it("should give the expected construction for sets") {
+      val symbols = dot('A, 'B)
+      val numbers = dot(1, 2, 3, 4)
+
+      val f1 = arrow(symbols, numbers)(
+        'A -> 1,
+        'B -> 3
+      )
+      val f2 = arrow(symbols, numbers)(
+        'A -> 2,
+        'B -> 4
+      )
+      val coequalizer =
+        f1 =? f2
+      val coequalizerArrow: Int > COEQUALIZER[Int] =
+        coequalizer.arrow
+      coequalizerArrow.source shouldBe numbers
+      coequalizerArrow o f1 shouldBe (
+        coequalizerArrow o f2
+      )
+
+      val booleans = dot(true, false)
+      val otherEqualizer =
+        arrow(numbers, booleans) (
+          1 -> true,
+          2 -> true,
+          3 -> false,
+          4 -> false
+        )
+      otherEqualizer o f1 shouldBe (
+        otherEqualizer o f2
+      )
+//      val factor: COEQUALIZER[Int] > Boolean =
+//        coequalizer.lift(otherEqualizer)
+//      factor o coequalizerArrow shouldBe otherEqualizer
+    }
+  }
 
   describe("The projection operations *-, -*") {
     it("are correctly calculated for sets") {
