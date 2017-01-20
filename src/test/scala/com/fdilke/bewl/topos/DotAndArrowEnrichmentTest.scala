@@ -63,7 +63,12 @@ class DotAndArrowEnrichmentTest extends FunSpec {
 
     it("can define binary operators") {
       val three = dot(0, 1, 2)
-      val subtract = for (x <- three ; y <- three) yield (x - y + 3) % 3;
+      val subtract =
+        for {
+          x <- three
+          y <- three
+        }
+          yield (x - y + 3) % 3
       subtract shouldBe makeBinaryOperator(three,
         (0, 0) -> 0, (0, 1) -> 2, (0, 2) -> 1,
         (1, 0) -> 1, (1, 1) -> 0, (1, 2) -> 2,
@@ -74,7 +79,10 @@ class DotAndArrowEnrichmentTest extends FunSpec {
 
   describe("The truth object") {
     def theBinOp(binop: (Boolean, Boolean) => Boolean): BinaryOp[TRUTH] =
-      for(i <- omega ; j <- omega)
+      for {
+        i <- omega
+        j <- omega
+      }
         yield binop(i, j)
 
     it("has the correct binary operations for binary operations") {

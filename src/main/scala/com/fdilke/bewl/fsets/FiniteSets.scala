@@ -27,7 +27,10 @@ object FiniteSets extends Topos[Any] with Wrappings[
 
     override def xUncached[T](that: DOT[T]) =
       new FiniteSetsDot[S x T](
-        for(s <- this.elements ; t <- that.elements)
+        for {
+          s <- this.elements
+          t <- that.elements
+        }
           yield s ⊕ t
       ) with BiproductDot[S, T, S x T] {
         override val left: DOT[S] = self
@@ -70,7 +73,10 @@ object FiniteSets extends Topos[Any] with Wrappings[
       s"FiniteSetsDot[$elements]"
 
     override def sanityTest =
-      for (x <- elements ; y <- elements)
+      for {
+        x <- elements
+        y <- elements
+      }
         x == y
   }
 
@@ -304,7 +310,7 @@ object FiniteSetsUtilities {
           enumerate { _ => ??? }
         else
           for {
-            f <- allMaps(source.tail, target);
+            f <- allMaps(source.tail, target)
             choice <- target
           } {
             enumerate { x =>

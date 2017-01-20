@@ -248,9 +248,9 @@ class AlgebraicMachineryTest extends FunSpec {
 
     it("can validate morphisms preserving constants") {
       val carrierInts = dot[Int](0, 1, 2)
-      val pointInts = makeNullaryOperator(carrierInts, 0);
+      val pointInts = makeNullaryOperator(carrierInts, 0)
       val carrierStrings = dot[String]("samson", "delilah")
-      val pointStrings = makeNullaryOperator(carrierStrings, "delilah");
+      val pointStrings = makeNullaryOperator(carrierStrings, "delilah")
 
       val pointedSets = AlgebraicTheory(o)()
       val algebraStrings = new pointedSets.Algebra[String](carrierStrings)(o := pointStrings)
