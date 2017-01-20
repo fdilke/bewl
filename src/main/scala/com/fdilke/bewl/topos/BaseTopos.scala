@@ -707,38 +707,32 @@ trait BaseTopos {
     dot: DOT[S],
     equiv: (S, S) => TRUTH
   ) {
-    private val (
-      epi,
-      mono
-    ): (
-      S > QUOTIENT[S],
-      QUOTIENT[S] > QUOTIENT[S]
-    ) =
+    val arrow: S > QUOTIENT[S] =
       dot.power.transpose(
         dot
       )(
         equiv
-      ).factorizeEpiMono
-
-    val arrow: S > QUOTIENT[S] =
-      epi
+      ).factorizeEpiMono._1
 
     def lift[
       T <: ~
     ](
-      arrow: S > T
-    ): QUOTIENT[S] > T =
-      arrow.target.power.transpose(
-        (epi.target x arrow.target).
-          existentially (
-            arrow.source
+      compatibleArrow: S > T
+    ): QUOTIENT[S] > T = {
+      val target = compatibleArrow.target
+
+      target.power.transpose(
+        (arrow.target x target).
+          existentially(
+            compatibleArrow.source
           ) {
             case (q ⊕ t, s) =>
-              q(s) ∧ arrow.target.=?=(
-                arrow(s), t
+              q(s) ∧ target.=?=(
+                compatibleArrow(s), t
               )
           }
-      ) \ arrow.target.singleton
+      ) \ target.singleton
+    }
   }
 
   // TODO: shouldn't need this, hack to get round bug in Scala 2.12.0-M4
