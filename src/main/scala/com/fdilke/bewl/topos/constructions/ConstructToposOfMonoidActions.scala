@@ -647,4 +647,31 @@ trait ConstructToposOfMonoidActions extends
           }
         }
   }
+
+  trait ElementWrapper[
+    A <: ~
+  ] {
+    val element: A
+  }
+
+  object VanillaWrapper {
+    def ↔[
+      A <: ~
+    ] =
+      new ↔[
+        A,
+        VanillaWrapper[A]
+      ](
+        a => VanillaWrapper(a),
+        aa => aa.element
+      )
+  }
+
+  case class VanillaWrapper[
+    A <: ~
+  ] (
+    element: A
+  ) extends ElementWrapper[
+    A
+  ]
 }

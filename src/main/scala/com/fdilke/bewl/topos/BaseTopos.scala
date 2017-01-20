@@ -615,11 +615,14 @@ trait BaseTopos {
   ) : X x Y x Z > Z =
     (x x y x z).π1
 
-  class PartialArrowClassifier[A <: ~](dot: DOT[A]) {
-    val classifier = dot.power.forAll(dot, dot) {
-      (f, a, b) =>
-        (f(a) ∧ f(b)) → dot.=?=(a, b)
-    } whereTrue
+  class PartialArrowClassifier[A <: ~](
+    dot: DOT[A]
+  ) {
+    val classifier =
+      dot.power.forAll(dot, dot) {
+        (f, a, b) =>
+          (f(a) ∧ f(b)) → dot.=?=(a, b)
+      } whereTrue
 
     val include = classifier restrict dot.singleton
 
@@ -655,10 +658,13 @@ trait BaseTopos {
     left: DOT[A],
     right: DOT[B]
   ) {
-    private val fullProduct = left.pac.classifier x right.pac.classifier
+    private val fullProduct =
+      left.pac.classifier x right.pac.classifier
 
-    private val injectLeftFull = left.pac.include x (right.pac.⏊ o left.toI)
-    private val injectRightFull = (left.pac.⏊ o right.toI) x right.pac.include
+    private val injectLeftFull =
+      left.pac.include x (right.pac.⏊ o left.toI)
+    private val injectRightFull =
+      (left.pac.⏊ o right.toI) x right.pac.include
 
     val coproduct = fullProduct where { x =>
       injectLeftFull.chi(x) ∨ injectRightFull.chi(x)
@@ -734,27 +740,6 @@ trait BaseTopos {
           }
       ) \ arrow.target.singleton
   }
-
-  // TODO: machineries to help with the topos of monoid actions.
-  // Can these go somewhere else?
-  trait ElementWrapper[
-    A <: ~
-  ] {
-    val element: A
-  }
-
-  object VanillaWrapper {
-    def ↔[A <: ~] = new ↔[A, VanillaWrapper[A]](
-      a => VanillaWrapper(a),
-      aa => aa.element
-    )
-  }
-
-  case class VanillaWrapper[
-    A <: ~
-  ] (
-    element: A
-  ) extends ElementWrapper[A]
 
   // TODO: shouldn't need this, hack to get round bug in Scala 2.12.0-M4
   def tempConst[A <: ~](dot: DOT[A])(a: A) =
