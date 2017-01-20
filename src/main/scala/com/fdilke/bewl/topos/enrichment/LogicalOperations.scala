@@ -52,18 +52,18 @@ trait LogicalOperations {
     Ω.bottom
 
   def isBoolean =
-    (truth + Ω.bottom).isIso
+    (truth + falsity).isIso
 
   implicit class OmegaEnrichments(
     truthValue: TRUTH
   ) {
-    def →(that: TRUTH) =  // implies(truthValue, that)
+    def →(that: TRUTH) =
       Ω.implies(truthValue, that)
 
-    def ∧(that: TRUTH) = // and(truthValue, that)
+    def ∧(that: TRUTH) =
       Ω.meet(truthValue, that)
 
-    def ∨(that: TRUTH) = // or(truthValue, that)
+    def ∨(that: TRUTH) =
       Ω.join(truthValue, that)
   }
 }

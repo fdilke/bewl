@@ -1,6 +1,6 @@
 package com.fdilke.bewl.topos
 
-import com.fdilke.bewl.helper.{Memoize, ↔, ⊕}
+import com.fdilke.bewl.helper.{IterateToFixed, Memoize, ↔, ⊕}
 
 import scala.Function.tupled
 import scala.language.{higherKinds, postfixOps}
@@ -505,7 +505,9 @@ trait BaseTopos {
       (self \ incl, incl)
     }
 
-    final def =?(that: S > T) = {
+    final def =?( // slow ("pure") coequalizer
+      that: S > T
+    ): Quotient[T] = {
       val t2 = target.squared
 
       val congruences: EQUALIZER[T x T → TRUTH] =
@@ -539,6 +541,35 @@ trait BaseTopos {
         )
       }
     }
+
+    final def =?!(  // fast ("hybrid") coequalizer
+      that: S > T
+    ): Quotient[T] = {
+      val t2 = target.squared
+
+      val isEdge: T x T > TRUTH =
+        (self x that).factorizeEpiMono._2.chi
+
+      target / BiArrow(
+        t2,
+        IterateToFixed(
+          t2(omega) {
+            case p ⊕ q =>
+              isEdge(t2.pair(p, q)) ∨
+              isEdge(t2.pair(q, p)) ∨
+              target.=?=(p, q)
+          }
+        ) { s =>
+          t2.exists(target) {
+            (pr, q) => pr match {
+              case p ⊕ r =>
+                s(t2.pair(p, q)) ∧
+                s(t2.pair(q, r))
+            }
+          }
+        }
+      )
+    }
   }
 
   case class BiArrow[
@@ -548,6 +579,8 @@ trait BaseTopos {
   ] (
     product: BIPRODUCT[L, R],
     arrow: L x R > T
+  ) extends (
+    (L, R) => T
   ) {
     def apply(
       l: L,
