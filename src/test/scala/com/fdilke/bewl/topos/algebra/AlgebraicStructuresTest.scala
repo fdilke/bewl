@@ -247,7 +247,7 @@ class AlgebraicStructuresTest extends FunSpec {
     }
 
     it("can be regarded as monoids") {
-      val largerMonoid = endomorphismMonoid(dot(1, 2, 3))
+      val largerMonoid = endomorphismMonoid(dot(1, 2, 3)).monoid
       val (group, inject) = groupOfUnits(largerMonoid)
       val monoid = group.asMonoid
       monoid.sanityTest()

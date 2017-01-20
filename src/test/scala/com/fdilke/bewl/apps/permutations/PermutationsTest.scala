@@ -61,7 +61,9 @@ class PermutationsTest extends FunSpec {
     it("can compute the automorphism group of 'flip'") {
       import Permutations.topos.{ ~ => _, _ }
       val flip = π(1,2)π
-      val group: Group[Int → Int] = groupOfUnits(endomorphismMonoid(flip))._1
+      val group: Group[Int → Int] = groupOfUnits(
+        endomorphismMonoid(flip).monoid
+      )._1
       group.sanityTest
       val groupCarrier : Permutation[Int → Int] = group.carrier
       groupCarrier.carrier should have size 2

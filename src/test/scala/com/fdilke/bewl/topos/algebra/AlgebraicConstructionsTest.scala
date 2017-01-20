@@ -12,7 +12,7 @@ class AlgebraicConstructionsTest extends FunSpec {
 
   describe("The monoid of endomorphisms can be constructed") {
     it("for the empty set") {
-      val endosOf0 = endomorphismMonoid(dot())
+      val endosOf0 = endomorphismMonoid(dot()).monoid
       endosOf0 shouldBe an[Monoid[_]]
       endosOf0.sanityTest
       endosOf0.carrier.globals.size shouldBe 1
@@ -20,24 +20,41 @@ class AlgebraicConstructionsTest extends FunSpec {
     }
 
     it("for a 1-element set") {
-      val endosOf1 = endomorphismMonoid(dot('x))
+      val endosOf1 = endomorphismMonoid(dot('x)).monoid
       endosOf1.sanityTest
       endosOf1.carrier.globals.size shouldBe 1
       endosOf1 shouldBe 'commutative
     }
 
     it("for a 2-element set") {
-      val endosOf2 = endomorphismMonoid(dot('x, 'y))
+      val endosOf2 = endomorphismMonoid(dot('x, 'y)).monoid
       endosOf2.sanityTest
       endosOf2.carrier.globals.size shouldBe 4
       endosOf2 should not be 'commutative
     }
 
     it("for a 3-element set") {
-      val endosOf3 = endomorphismMonoid(dot('x, 'y, 'z))
+      val endosOf3 = endomorphismMonoid(dot('x, 'y, 'z)).monoid
       endosOf3.sanityTest
       endosOf3.carrier.globals.size shouldBe 27
       endosOf3 should not be 'commutative
+    }
+
+    it("and has a 'home' action on the original object") {
+      val three: FiniteSetsDot[Symbol] = dot('x, 'y, 'z)
+      val endosOf3 = endomorphismMonoid(three)
+      import endosOf3.homeAction
+      homeAction.carrier shouldBe three
+      for {
+        symbol <- elementsOf(three)
+        mapping <- elementsOf(endosOf3.monoid.carrier)
+      }
+        homeAction.actionMultiply(
+          symbol,
+          mapping
+        ) should equal(
+          mapping(symbol)
+        )
     }
   }
 
@@ -91,7 +108,10 @@ class AlgebraicConstructionsTest extends FunSpec {
     }
 
     it("for a larger endomorphism monoid") {
-      val group = groupOfUnits(endomorphismMonoid(dot(1,2,3)))._1
+      val group =
+        groupOfUnits(
+          endomorphismMonoid(dot(1,2,3)).monoid
+        )._1
       group.sanityTest
       group.carrier.globals.size shouldBe 6
       group should not be('commutative)

@@ -9,13 +9,27 @@ trait AlgebraicConstructions {
     AlgebraicMachinery with
     AlgebraicStructures  =>
 
-  def endomorphismMonoid[T <: ~](dot: DOT[T]) = {
-    val endos = dot > dot
-    new Monoid[T → T](endos, dot.identity.name,
-      BiArrow(endos x endos, endos.transpose(endos x endos) {
-        case (f ⊕ g, x) => g(f(x))
-      })
-    )
+  def endomorphismMonoid[T <: ~](
+    dot: DOT[T]
+  ) =
+    new EndomorphismMonoid[T](dot)
+
+  class EndomorphismMonoid[T <: ~](
+    dot: DOT[T]
+  ) {
+    private val endos = dot > dot
+
+    val monoid =
+      new Monoid[T → T](endos, dot.identity.name,
+        BiArrow(endos x endos, endos.transpose(endos x endos) {
+          case (f ⊕ g, x) => g(f(x))
+        })
+      )
+
+    lazy val homeAction =
+      monoid.action(dot) { (a, m) =>
+        m(a)
+      }
   }
 
   def groupOfUnits[T <: ~](
