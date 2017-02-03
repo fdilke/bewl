@@ -15,7 +15,7 @@ class DotAndArrowEnrichmentTest extends FunSpec {
     it("detects whether a subobject is the whole object") {
       val totalSet = dot(1, 2, 3, 4)
       val subset = dot(1, 3)
-
+      
       val embed = subset(totalSet) { x => x }
       val ∀ = totalSet.∀
       ∀ should have(
