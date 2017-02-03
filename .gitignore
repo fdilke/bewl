@@ -1,11 +1,20 @@
 *.class
 *.log
 nohup.out
+
 scratch/
 .DS_Store
 
 # IDEA specific
 .idea/
+
+# Eclipse specific
+.cache-main
+.cache-tests
+.classpath
+.project
+.settings/
+bin/
 
 # security specific
 keys/
