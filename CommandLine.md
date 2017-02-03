@@ -62,11 +62,11 @@ You can compose it with the appropriate identity arrows:
 
 Let's create a dot that might represent a set of techies who work at Springer:
 
-    val techies = dot("Felix", "Abdul", "Tom")
+    val techies = dot("Felix", "Artur", "Tom")
 
 and an arrow from it to omega that might express membership of a team:
 
-    val inTeam = arrow(techies, omega, "Felix" -> true, "Abdul" -> true, "Tom" -> false)
+    val inTeam = arrow(techies, omega, "Felix" -> true, "Artur" -> true, "Tom" -> false)
 
 You can verify that this is epic, but not monic.
 
@@ -99,7 +99,7 @@ So `inTeam.toBool` is `false`, but `(truth o techies.toI).toBool` is `true`.
 
 Let's construct an isomorphism between `team` and `omega`:
 
-    val myIso = arrow(team, omega, "Felix" -> false, "Abdul" -> true)
+    val myIso = arrow(team, omega, "Felix" -> false, "Artur" -> true)
 
 You can verify this is iso:
 
@@ -109,7 +109,7 @@ and even construct its inverse:
 
     myIso.inverse
 
-which unsurprisingly maps `false` to `Felix` and `true` to `Abdul`.
+which unsurprisingly maps `false` to `Felix` and `true` to `Artur`.
 
 Just to prove this really is an inverse:
 
