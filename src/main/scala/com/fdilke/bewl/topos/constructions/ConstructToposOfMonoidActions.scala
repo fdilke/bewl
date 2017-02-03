@@ -182,15 +182,22 @@ trait ConstructToposOfMonoidActions extends
 
             override lazy val globals: Traversable[UNIT > AA] = {
               val fixedPoints =
-                action.actionCarrier.whereAll(carrier) {
-                  (a, m) => action.actionCarrier.=?=(
-                    a,
-                    action.actionMultiply(a, m)
-                  )
+                action.actionCarrier.whereAll(
+                    carrier
+                ) {
+                  (a, m) => 
+                    action.actionCarrier.=?=(
+                      a,
+                      action.actionMultiply(a, m)
+                    )
                 }
 
               fixedPoints.globals.map { global =>
-                ActionArrow(I, dot, fixedPoints.inclusion o global)
+                ActionArrow(
+                  I, 
+                  dot, 
+                  fixedPoints.inclusion o global
+                )
               }
             }
 

@@ -1,12 +1,13 @@
-package com.fdilke.bewl.topos
+package com.fdilke.bewl.topos.enrichment
 
 import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
-import com.fdilke.bewl.helper.⊕
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
-
 import scala.Function.untupled
+import com.fdilke.bewl.topos.BaseTopos.QUOTIENT
+import com.fdilke.bewl.topos.BaseTopos.{→ => →}
+import org.scalatest.Finders
 
 class DotAndArrowEnrichmentTest extends FunSpec {
 
