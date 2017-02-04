@@ -420,6 +420,9 @@ trait BaseTopos {
       equiv: (S, S) => TRUTH
     ): Quotient[S] =
       new Quotient(dot, equiv)
+    
+    final lazy val isInjective: Boolean =
+      singleton isSection
   }
 
   trait BaseArrow[S <: ~, T <: ~] {

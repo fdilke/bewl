@@ -507,6 +507,13 @@ class DotAndArrowEnrichmentTest extends FunSpec {
         nonsection should not be a ('retraction) 
     }
   }
+  
+  describe("Injective objects") {
+    it("are detected properly for sets") {
+    	dot[VOID]() should not be 'injective
+      dot(1) shouldBe 'injective
+    }
+  }
     
   private def equivalenceFrom(
     identifications: Set[(Symbol, Symbol)]

@@ -349,5 +349,13 @@ abstract class GenericToposTests[~](
       monic shouldBe 'monic
       (monic o epic) shouldBe foo2bar
     }
+    
+    if (!inActionTopos) { // reluctantly skip, too slow with current technology
+      it("has sane injectives") {
+      	O should not be 'injective
+      	I shouldBe 'injective
+        omega shouldBe 'injective
+      }
+    }
   }
 }
