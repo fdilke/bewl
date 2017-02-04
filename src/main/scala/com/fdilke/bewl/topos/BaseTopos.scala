@@ -476,6 +476,16 @@ trait BaseTopos {
     final lazy val isIso: Boolean =
       isMonic && isEpic
 
+    final lazy val isSection: Boolean =
+      (target >> source).exists { left: T > S =>
+        (left o self) == source.identity
+      }
+
+    final lazy val isRetraction: Boolean =
+      (target >> source).exists { right: T > S =>
+        (self o right) == target.identity
+      }
+      
     final lazy val inverse: T > S =
       source.power.transpose(target) {
           (t, s) => target.=?=(t, this(s))

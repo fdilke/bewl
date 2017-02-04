@@ -474,6 +474,40 @@ class DotAndArrowEnrichmentTest extends FunSpec {
     }
   }
 
+  describe("Sections") {
+	  it("are detected correctly for sets") {
+		  val symbols = dot('A, 'B)
+				  val numbers = dot(1, 2, 3)
+				  val section: Symbol > Int =
+				  arrow(symbols, numbers)(
+						  'A -> 2, 'B -> 1
+						  )
+				  section should be a 'section 
+				  val nonsection: Symbol > Int =
+				  arrow(symbols, numbers)(
+						  'A -> 2, 'B -> 2
+						  )
+				  nonsection should not be a ('section) 
+	  }
+  }
+  
+  describe("Retractions") {
+    it("are detected correctly for sets") {
+      val symbols = dot('A, 'B, 'C)
+      val numbers = dot(1, 2)
+      val section: Symbol > Int =
+      arrow(symbols, numbers)(
+      		'A -> 2, 'B -> 1, 'C -> 1
+      		)
+      section should be a 'retraction 
+      val nonsection: Symbol > Int =
+        arrow(symbols, numbers)(
+          'A -> 2, 'B -> 2, 'C -> 2
+        )
+        nonsection should not be a ('retraction) 
+    }
+  }
+    
   private def equivalenceFrom(
     identifications: Set[(Symbol, Symbol)]
   ) (
