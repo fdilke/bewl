@@ -77,17 +77,28 @@ trait ConstructToposOfMonoidActionsAlt extends
             Ideals.omega
             
           override lazy val truth = 
-            ???
+            new ActionArrow[Ɛ.UNIT, IDEAL](
+              I,
+              omega,
+              Ideals.restrict(Ɛ.I) {
+                (i, m) => Ɛ truth i
+              }
+            )
 
           trait ActionDotFacade[
             S <: ~
-          ] extends Dot[S] 
+          ] extends Dot[S] {
+            val underlyingDot: Ɛ.DOT[S] // TODO: need action? 
+          }
             
           class ActionDot[
             S <: ~
           ](
-              action: Action[S]
-          ) extends ActionDotFacade[S] {
+            action: Action[S]
+          ) extends ActionDotFacade[S] { actionDot =>
+            override val underlyingDot =
+              action.actionCarrier
+
             override def `>Uncached`[
               T <: ~
             ](
@@ -102,7 +113,12 @@ trait ConstructToposOfMonoidActionsAlt extends
             )(
                 f: S => T
             ): S > T = 
-              ???
+              new ActionArrow[S, T](
+                actionDot,
+                target,
+                f
+              )
+                  
               
             override lazy val globals: Traversable[UNIT > S] = 
               ???
@@ -121,7 +137,7 @@ trait ConstructToposOfMonoidActionsAlt extends
               ???
           }
           
-          trait ActionArrowFacade[
+          trait ActionArrowFacade[ // TODO: do we need this trait?
             S <: ~,
             T <: ~
           ] extends Arrow[S, T] 
@@ -130,10 +146,25 @@ trait ConstructToposOfMonoidActionsAlt extends
             S <: ~,
             T <: ~
           ](
-              val source: ActionDotFacade[S],
-              val target: ActionDotFacade[T],
-              val function: S => T
+            val source: ActionDotFacade[S],
+            val target: ActionDotFacade[T],
+            val arrow: Ɛ.>[S, T]
           ) extends ActionArrowFacade[S, T] {
+            def this(
+              source: ActionDotFacade[S],
+              target: ActionDotFacade[T],
+              function: S => T
+            ) =
+              this(
+                  source,
+                  target,
+                  source.underlyingDot(
+                      target.underlyingDot
+                  )(
+                      function
+                  )
+                )
+                
             override def \[
               U <: ~
             ](
