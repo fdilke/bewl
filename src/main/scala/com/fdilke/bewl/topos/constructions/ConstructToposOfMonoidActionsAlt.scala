@@ -88,7 +88,7 @@ trait ConstructToposOfMonoidActionsAlt extends
           trait ActionDotFacade[
             S <: ~
           ] extends Dot[S] {
-            val underlyingDot: Ɛ.DOT[S] // TODO: need action? 
+            val underlyingAction: Action[S] 
           }
             
           class ActionDot[
@@ -96,8 +96,8 @@ trait ConstructToposOfMonoidActionsAlt extends
           ](
             action: Action[S]
           ) extends ActionDotFacade[S] { actionDot =>
-            override val underlyingDot =
-              action.actionCarrier
+            override val underlyingAction =
+              action // TODO: tidy up
 
             override def `>Uncached`[
               T <: ~
@@ -118,7 +118,6 @@ trait ConstructToposOfMonoidActionsAlt extends
                 target,
                 f
               )
-                  
               
             override lazy val globals: Traversable[UNIT > S] = 
               ???
@@ -137,10 +136,12 @@ trait ConstructToposOfMonoidActionsAlt extends
               ???
           }
           
-          trait ActionArrowFacade[ // TODO: do we need this trait?
+          trait ActionArrowFacade[ // TODO: do we need this trait? Is there more than one implementation?
             S <: ~,
             T <: ~
-          ] extends Arrow[S, T] 
+          ] extends Arrow[S, T] {
+            val arrow: Ɛ.>[S, T]
+          }
           
           class ActionArrow[
             S <: ~,
@@ -148,7 +149,7 @@ trait ConstructToposOfMonoidActionsAlt extends
           ](
             val source: ActionDotFacade[S],
             val target: ActionDotFacade[T],
-            val arrow: Ɛ.>[S, T]
+            override val arrow: Ɛ.>[S, T]
           ) extends ActionArrowFacade[S, T] {
             def this(
               source: ActionDotFacade[S],
@@ -158,8 +159,8 @@ trait ConstructToposOfMonoidActionsAlt extends
               this(
                   source,
                   target,
-                  source.underlyingDot(
-                      target.underlyingDot
+                  source.underlyingAction.carrier(
+                      target.underlyingAction.carrier
                   )(
                       function
                   )
@@ -170,17 +171,54 @@ trait ConstructToposOfMonoidActionsAlt extends
             ](
                 monic: U > T
             ): S > U = 
-              ???
+              new ActionArrow[S, U](
+                  source,
+                  monic.source,
+                  arrow \ monic.arrow
+              )
               
             override def ?=(
               that: S > T
-            ): EQUALIZER[S] = 
-              ???
+            ): EQUALIZER[S] = {
+              val equalizer : Ɛ.EQUALIZER[S]= 
+                arrow ?= that.arrow
+              val equalizerCarrier =
+                equalizer x carrier  
+              val restrictedMultiply =
+                equalizer.restrict(
+                    equalizerCarrier.biArrow(source.underlyingAction.carrier) {
+                      (s, m) => source.underlyingAction.actionMultiply(equalizer.inclusion(s), m)
+                    }.arrow
+                )
+              new ActionDot(
+                  action(
+                      equalizer
+                  ){ (s, m) =>
+                      restrictedMultiply(
+                          equalizerCarrier.pair(s, m)
+                      )
+                  }
+              ) with EqualizingDot[S] { equalizingDot =>
+                val equalizerTarget = source 
+                def restrict[
+                  R <: ~
+                ](
+                    actionArrow: ActionArrowFacade[R, S]
+                ) = 
+                  new ActionArrow[R, S](
+                    actionArrow.source,
+                    equalizingDot,
+                    equalizer.restrict(
+                      actionArrow.arrow
+                    )
+                  )
+              }
+            }
               
             override def apply(
               s: S
             ): T = 
-              ???
+              arrow(s)
               
             override lazy val chi: T > TRUTH = 
               ???
@@ -190,10 +228,22 @@ trait ConstructToposOfMonoidActionsAlt extends
             ](
               that: R > S
             ): R > T = 
-              ???
+              new ActionArrow[R, T](
+                that.source,
+                target,
+                arrow o that.arrow
+              )
               
-            override def sanityTest() = 
-              ???
+            override def sanityTest() {
+              arrow.sanityTest
+              assert(
+                monoid.actions.isMorphism(
+                  source.underlyingAction, 
+                  target.underlyingAction, 
+                  arrow
+                )
+              )
+            }
           }
           
           object ActionDot {
@@ -207,11 +257,11 @@ trait ConstructToposOfMonoidActionsAlt extends
               A
             ] =
               new ActionDot(
-                  action(
-                      actionCarrier
-                  )(
-                      actionMultiply
-                  )
+                action(
+                    actionCarrier
+                )(
+                    actionMultiply
+                )
               )
           }
       }
