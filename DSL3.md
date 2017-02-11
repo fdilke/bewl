@@ -21,7 +21,15 @@ An object encapsulating the type of the elements in a dot (but shouldn't the dot
 
 if a encaps A, b encaps B then a ^ b encaps A ^ B, etc
 
-move less clunkily between a t: T and a dot: DOT[T]  
+move less clunkily between a t: T and a dot: DOT[T]
+by having an implicit DOT[T] for each T, so we can say:
+x[T : DOT] and not have to pass the dots around, only the types
+Then could just pass functions around, not arrows, and have:
+f === g :== 
+	def ===[S : DOT, T: DOT]: Boolean =
+		implicitly[DOT[S]](
+			implicitly[[DOT[T]]
+		)(f) == xxxx(g)  
 
 But do the dots need to be separate from the types?
 

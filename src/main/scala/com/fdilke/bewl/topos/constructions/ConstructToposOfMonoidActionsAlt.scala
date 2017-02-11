@@ -19,17 +19,64 @@ trait ConstructToposOfMonoidActionsAlt extends
       monoid: Ɛ.Monoid[M]
     ) : Topos[~] =
       new Topos[~] {
+        import monoid.{ carrier, action, Action }
+        
           override type DOT[A <: ~] = ActionDotFacade[A]
           override type >[A <: ~, B <: ~] = ActionArrowFacade[A, B]
           override type UNIT = Ɛ.UNIT
+          
+          type IDEAL = M → Ɛ.TRUTH
+          override type TRUTH = IDEAL
 
-          override val I = 
-            ??? 
+          override lazy val I = 
+            ActionDot(Ɛ.I) {
+              (i, m) => i
+            }
+
+          private object Ideals {
+            private val possibleIdeals = carrier.power
+
+            private val ideals =
+              possibleIdeals.whereAll(carrier, carrier) {
+                (f, m, n) => 
+                  Ɛ.OmegaEnrichments(f(m)) → 
+                    f(monoid.multiply(m, n))
+              }
+
+            def restrict[
+              H <: ~
+            ](
+              that: Ɛ.DOT[H]
+            )(
+              bifunc: (H, M) => Ɛ.TRUTH
+            ): Ɛ.>[H, IDEAL] =
+              ideals.restrict(
+                  possibleIdeals.transpose(that)(bifunc)
+              )
+
+            private val idealMultiply =
+              restrict(ideals x carrier) {
+                case (i ⊕ s, t) => 
+                  ideals.inclusion(i)(
+                      monoid.multiply(s, t)
+                  )
+              }
+
+            val omega = 
+              ActionDot[IDEAL](
+                  ideals
+              )(
+                Ɛ.BiArrow[IDEAL, M, IDEAL](
+                    ideals x carrier, 
+                    idealMultiply
+                )(_, _)
+              )
+          }
+          
+          override lazy val omega = 
+            Ideals.omega
             
-          override val omega = 
-            ???
-            
-          override val truth = 
+          override lazy val truth = 
             ???
 
           trait ActionDotFacade[
@@ -39,7 +86,7 @@ trait ConstructToposOfMonoidActionsAlt extends
           class ActionDot[
             S <: ~
           ](
-              action: monoid.Action[S]
+              action: Action[S]
           ) extends ActionDotFacade[S] {
             override def `>Uncached`[
               T <: ~
@@ -57,13 +104,13 @@ trait ConstructToposOfMonoidActionsAlt extends
             ): S > T = 
               ???
               
-            override val globals: Traversable[UNIT > S] = 
+            override lazy val globals: Traversable[UNIT > S] = 
               ???
               
             override def sanityTest(): Unit = 
               ???
               
-            override val toI: S > UNIT = 
+            override lazy val toI: S > UNIT = 
               ???
               
             override def xUncached[
@@ -104,7 +151,7 @@ trait ConstructToposOfMonoidActionsAlt extends
             ): T = 
               ???
               
-            override val chi: T > TRUTH = 
+            override lazy val chi: T > TRUTH = 
               ???
               
             override def o[
@@ -116,6 +163,25 @@ trait ConstructToposOfMonoidActionsAlt extends
               
             override def sanityTest() = 
               ???
+          }
+          
+          object ActionDot {
+            def apply[
+              A <: ~
+            ](
+              actionCarrier: Ɛ.DOT[A]
+            )(
+              actionMultiply: (A, M) => A
+            ): ActionDot[
+              A
+            ] =
+              new ActionDot(
+                  action(
+                      actionCarrier
+                  )(
+                      actionMultiply
+                  )
+              )
           }
       }
     }
