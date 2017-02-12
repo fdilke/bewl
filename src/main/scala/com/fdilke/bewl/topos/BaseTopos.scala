@@ -116,10 +116,14 @@ trait BaseTopos {
 
   trait EqualizingDot[S <: ~] { dot: DOT[S] =>
     val equalizerTarget: DOT[S]
-    def restrict[R <: ~](arrow: R > S): R > S
+    def restrict[R <: ~](
+      arrow: R > S
+    ): R > S
 
     lazy val inclusion: S > S =
-      dot(equalizerTarget) { s => s }
+      dot(equalizerTarget) { 
+        s => s 
+      }
   }
 
   private object InitialDot {

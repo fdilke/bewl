@@ -227,7 +227,11 @@ trait ConstructToposOfMonoidActionsAlt extends
               val restrictedMultiply =
                 equalizer.restrict(
                     equalizerCarrier.biArrow(source.underlyingAction.carrier) {
-                      (s, m) => source.underlyingAction.actionMultiply(equalizer.inclusion(s), m)
+                      (s, m) => 
+                        source.underlyingAction.actionMultiply(
+                          equalizer.inclusion(s), 
+                          m
+                        )
                     }.arrow
                 )
               new ActionDot(
@@ -261,7 +265,12 @@ trait ConstructToposOfMonoidActionsAlt extends
               arrow(s)
               
             override lazy val chi: T > TRUTH = 
-              ???
+              new ActionArrow(
+                target,
+                omega,
+                Ideals.restrict(target.underlyingAction.actionCarrier) {
+                  (t, m) => arrow.chi(target.underlyingAction.actionMultiply(t, m))
+                })
               
             override def o[
               R <: ~
