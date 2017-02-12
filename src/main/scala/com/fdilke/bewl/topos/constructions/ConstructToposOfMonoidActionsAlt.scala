@@ -119,21 +119,61 @@ trait ConstructToposOfMonoidActionsAlt extends
                 f
               )
               
-            override lazy val globals: Traversable[UNIT > S] = 
-              ???
+            override lazy val globals: Traversable[UNIT > S] = {
+              val fixedPoints =
+                action.actionCarrier.whereAll(
+                    carrier
+                ) {
+                  (a, m) => 
+                    action.actionCarrier.=?=(
+                      a,
+                      action.actionMultiply(a, m)
+                    )
+                }
+
+              fixedPoints.globals.map { global =>
+                new ActionArrow(
+                  I, 
+                  actionDot, 
+                  fixedPoints.inclusion o global
+                )
+              }
+            }
               
-            override def sanityTest(): Unit = 
-              ???
+            override def sanityTest(): Unit = {
+              action.actionCarrier.sanityTest
+              action.sanityTest
+            }
               
             override lazy val toI: S > UNIT = 
-              ???
+              new ActionArrow(
+                actionDot, 
+                I, 
+                action.actionCarrier.toI
+              )
               
             override def xUncached[
               T <: ~
             ](
-                that: ActionDotFacade[T]
-            ): BIPRODUCT[S, T] = 
-              ???
+              that: ActionDotFacade[T]
+            ): BIPRODUCT[S, T] = {
+              val product: Ɛ.BIPRODUCT[S, T] =
+                action.actionCarrier x that.underlyingAction.actionCarrier
+
+              new ActionDot[S x T](
+                monoid.action(product) {
+                  case (s ⊕ t, m) => product.pair(
+                    action.actionMultiply(s, m),
+                    that.underlyingAction.actionMultiply(t, m)
+                  )
+                }
+              ) with BiproductDot[S, T, S x T] {
+                override val left = actionDot
+                override val right = that
+                def pair(l: S,r: T) = 
+                  product.pair(l, r)
+              }
+            }
           }
           
           trait ActionArrowFacade[ // TODO: do we need this trait? Is there more than one implementation?
