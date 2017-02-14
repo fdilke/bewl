@@ -3,13 +3,23 @@ package com.fdilke.bewl.topos.constructions
 import com.fdilke.bewl.topos._
 import com.fdilke.bewl.helper.Memoize
 import com.fdilke.bewl.topos.algebra.{AlgebraicStructures, AlgebraicMachinery}
+import Wrappings.NO_WRAPPER
 
 trait ConstructToposOfMaskables extends
   BaseTopos with
   ToposEnrichments {
   Ɛ: AlgebraicStructures with AlgebraicMachinery =>
     
-  class ToposOfMaskables extends Topos[~] {
+  class ToposOfMaskables extends Topos[~] 
+  /* with Wrappings[
+    ~,
+    ~,
+//      Ɛ.DOT,
+//      Ɛ.>,
+    ({type λ[X <: ~] = Ɛ.DOT[X]}) # λ,
+    ({type λ[X <: ~, Y <: ~] = Ɛ.>[X, Y]}) # λ,
+    ({type λ[T <: ~] = T}) # λ
+  ] */{
     override type DOT[A <: ~] = MaskableDotFacade[A]
     override type >[A <: ~, B <: ~] = MaskableArrowFacade[A, B]
     override type UNIT = Ɛ.UNIT
@@ -106,5 +116,42 @@ trait ConstructToposOfMaskables extends
           ???
       }
     }
+ 
+//      override def bifunctionAsBiArrow[
+//        L <: ~,
+//        R <: ~,
+//        T <: ~
+//      ] (
+//        left: Ɛ.DOT[L],
+//        right: Ɛ.DOT[R],
+//        target: Ɛ.DOT[T]
+//      ) (
+//        bifunc: (L, R) => T
+//      ): BiArrow[L, R, T] =
+//        ???
+//
+//      override def functionAsArrow[
+//        S <: ~,
+//        T <: ~
+//      ](
+//        source: Ɛ.DOT[S],
+//        target: Ɛ.DOT[T],
+//        f: S => T
+//      ): S > T
+//        
+//      override def makeArrow[
+//        S <: ~, 
+//        T <: ~
+//      ](
+//        prearrow: S > T
+//      ): MaskableArrowFacade[S,T] = 
+//        ???
+//        
+//      override def makeDot[
+//        T <: ~
+//      ](
+//        predot: MaskableDotFacade[T]
+//      ): MaskableDotFacade[T] = 
+//        ???
   }
 }
