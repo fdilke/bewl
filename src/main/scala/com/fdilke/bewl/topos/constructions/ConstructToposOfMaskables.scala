@@ -9,9 +9,8 @@ trait ConstructToposOfMaskables extends
   BaseTopos with
   ToposEnrichments {
   Ɛ: AlgebraicStructures with AlgebraicMachinery =>
-    
-  class ToposOfMaskables extends Topos[~] 
-  /* with Wrappings[
+
+  trait Hack extends Wrappings[ 
     ~,
     ~,
 //      Ɛ.DOT,
@@ -19,9 +18,57 @@ trait ConstructToposOfMaskables extends
     ({type λ[X <: ~] = Ɛ.DOT[X]}) # λ,
     ({type λ[X <: ~, Y <: ~] = Ɛ.>[X, Y]}) # λ,
     ({type λ[T <: ~] = T}) # λ
-  ] */{
+    ] { topos: Topos[~] =>
+      override def bifunctionAsBiArrow[
+        L <: ~,
+        R <: ~,
+        T <: ~
+      ] (
+        left: DOT[L],
+        right: DOT[R],
+        target: DOT[T]
+      ) (
+        bifunc: (L, R) => T
+      ): BiArrow[L, R, T] =
+        ???
+    
+      override def functionAsArrow[
+        S <: ~,
+        T <: ~
+      ](
+        source: DOT[S],
+        target: DOT[T],
+        f: S => T
+      ): S > T
+        
+      override def makeArrow[
+        S <: ~, 
+        T <: ~
+      ](
+        prearrow: Ɛ.>[S, T]
+      ): >[S,T] = 
+        ???
+        
+      override def makeDot[
+        T <: ~
+      ](
+        predot: Ɛ.DOT[T]
+      ): DOT[T] = 
+        ???
+   }
+  
+  class ToposOfMaskables extends Topos[
+    ~
+  ] with Wrappings[
+    ~,
+    ~,
+    ({type λ[X <: ~] = Ɛ.DOT[X]}) # λ,
+    ({type λ[X <: ~, Y <: ~] = Ɛ.>[X, Y]}) # λ,
+    ({type λ[T <: ~] = T}) # λ
+  ] {
     override type DOT[A <: ~] = MaskableDotFacade[A]
     override type >[A <: ~, B <: ~] = MaskableArrowFacade[A, B]
+    
     override type UNIT = Ɛ.UNIT
     override type TRUTH = Ɛ.TRUTH
 
@@ -52,7 +99,7 @@ trait ConstructToposOfMaskables extends
        override def `>Uncached`[
          T <: ~
        ](
-           that: MaskableDotFacade[T]
+         that: MaskableDotFacade[T]
        ): EXPONENTIAL[A,T] = 
          ???
          
@@ -116,42 +163,43 @@ trait ConstructToposOfMaskables extends
           ???
       }
     }
- 
-//      override def bifunctionAsBiArrow[
-//        L <: ~,
-//        R <: ~,
-//        T <: ~
-//      ] (
-//        left: Ɛ.DOT[L],
-//        right: Ɛ.DOT[R],
-//        target: Ɛ.DOT[T]
-//      ) (
-//        bifunc: (L, R) => T
-//      ): BiArrow[L, R, T] =
-//        ???
-//
-//      override def functionAsArrow[
-//        S <: ~,
-//        T <: ~
-//      ](
-//        source: Ɛ.DOT[S],
-//        target: Ɛ.DOT[T],
-//        f: S => T
-//      ): S > T
-//        
-//      override def makeArrow[
-//        S <: ~, 
-//        T <: ~
-//      ](
-//        prearrow: S > T
-//      ): MaskableArrowFacade[S,T] = 
-//        ???
-//        
-//      override def makeDot[
-//        T <: ~
-//      ](
-//        predot: MaskableDotFacade[T]
-//      ): MaskableDotFacade[T] = 
-//        ???
-  }
+
+    override def bifunctionAsBiArrow[
+      L <: ~,
+      R <: ~,
+      T <: ~
+    ] (
+      left: DOT[L],
+      right: DOT[R],
+      target: DOT[T]
+    ) (
+      bifunc: (L, R) => T
+    ): BiArrow[L, R, T] =
+      ???
+  
+    override def functionAsArrow[
+      S <: ~,
+      T <: ~
+    ](
+      source: DOT[S],
+      target: DOT[T],
+      f: S => T
+    ): S > T =
+      ???
+      
+    override def makeArrow[
+      S <: ~, 
+      T <: ~
+    ](
+      prearrow: Ɛ.>[S, T]
+    ): >[S,T] = 
+      ???
+      
+    override def makeDot[
+      T <: ~
+    ](
+      predot: Ɛ.DOT[T]
+    ): DOT[T] = 
+      ???
+}
 }
