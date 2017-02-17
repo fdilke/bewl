@@ -4,10 +4,10 @@ import scala.language.higherKinds
 
 object Memoize {
   def apply[INPUT, OUTPUT](
-      function: INPUT => OUTPUT
+    function: INPUT => OUTPUT
   ) =
     new MemoizedFunction[INPUT, OUTPUT](
-        function
+      function
     )
 
   class MemoizedFunction[INPUT, OUTPUT](
@@ -18,9 +18,9 @@ object Memoize {
 
     def apply(input: INPUT): OUTPUT =
       resultMap.getOrElseUpdate(
-          input, 
-          function(input)
-        )
+        input, 
+        function(input)
+      )
   }
 
   object generic {
@@ -33,8 +33,18 @@ object Memoize {
         ]
       )
 
-    class MemoizedFunctionGeneric[INPUT[T <: BASE], OUTPUT[T <: BASE], BASE](function: INPUT[_ <: BASE] => OUTPUT[_ <: BASE]) {
-      private val resultMap = scala.collection.mutable.Map[INPUT[_], OUTPUT[_]]()
+    class MemoizedFunctionGeneric[
+      INPUT[T <: BASE], 
+      OUTPUT[T <: BASE], 
+      BASE
+    ](
+        function: INPUT[_ <: BASE] => OUTPUT[_ <: BASE]
+    ) {
+      private val resultMap = 
+        scala.collection.mutable.Map[
+          INPUT[_], 
+          OUTPUT[_]
+        ]()
 
       def apply[T <: BASE](input: INPUT[T]): OUTPUT[T] =
         resultMap.getOrElseUpdate(
