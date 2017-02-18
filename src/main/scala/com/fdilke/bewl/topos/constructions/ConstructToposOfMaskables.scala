@@ -1,8 +1,6 @@
 package com.fdilke.bewl.topos.constructions
 
 import com.fdilke.bewl.topos._
-import com.fdilke.bewl.helper.↔
-import com.fdilke.bewl.helper.{ ↔ => equivalence }
 import com.fdilke.bewl.helper.{Memoize, ⊕}
 import com.fdilke.bewl.topos.algebra.{AlgebraicStructures, AlgebraicMachinery}
 import Wrappings.NO_WRAPPER
@@ -14,28 +12,28 @@ trait ConstructToposOfMaskables extends
   
    Ɛ: AlgebraicStructures with AlgebraicMachinery =>
 
-  case class MaskablePreDot[
-    U <: ~,
-    A <: ~
-  ](
-    innerDot: DOT[U],
-    ↔ : U ↔ A   
-  )
-  
-  object MaskablePreDot {
-    def apply[
-      A <: ~
-    ](
-      innerDot: DOT[A]
-    ): MaskablePreDot[A, A] =
-      MaskablePreDot(
-        innerDot,
-        ↔.identity[A]
-      )
-  }
-  
+   case class Mask[
+     A <: ~,
+     B <: ~
+   ](
+  		 / : A > B, 
+       \ : B > A 
+   )
+
+   object Mask {
+     def apply[
+       A <: ~
+     ] (
+       dot: DOT[A]
+     ) =
+       new Mask(
+         dot.identity, 
+         dot.identity
+       )
+   }
+   
   type MASKED_PREDOT[A <: ~] = 
-      Ɛ.MaskablePreDot[_ <: ~, A]
+      Mask[_ <: ~, A]
 
   case class MaskablePreArrow[
     U <: ~,
@@ -44,8 +42,8 @@ trait ConstructToposOfMaskables extends
     B <: ~
   ](
     innerArrow: U > V,
-    `↔1` : U ↔ A,   
-    `↔2` : V ↔ B   
+    `⇄1` : Mask[U, A],   
+    `⇄2` : Mask[V, B]   
   )
 
   object MaskablePreArrow {
@@ -57,8 +55,8 @@ trait ConstructToposOfMaskables extends
     ): MaskablePreArrow[A, B, A, B] =
       MaskablePreArrow(
         innerArrow,
-        ↔.identity[A],
-        ↔.identity[B]
+        Mask(innerArrow.source),
+        Mask(innerArrow.target)
       )
   }
   
@@ -82,6 +80,7 @@ trait ConstructToposOfMaskables extends
     MASKED_PREARROW,
     ({type λ[T <: ~] = T}) # λ
   ] {
+    import Ɛ.{ Mask => ⇄ }
     override type DOT[A <: ~] = MaskableDotFacade[A]
     override type >[A <: ~, B <: ~] = MaskableArrowFacade[A, B]
     
@@ -125,9 +124,10 @@ trait ConstructToposOfMaskables extends
       U <: ~,
       A <: ~
     ](
-      val innerDot: Ɛ.DOT[U],
-      val ↔ : U ↔ A   
+      val ⇄ : ⇄[U, A]   
     ) extends MaskableDotFacade[A] { dot =>
+       val innerDot: Ɛ.DOT[U] =
+          ⇄./.source
 
        override def `>Uncached`[
          T <: ~
@@ -154,12 +154,12 @@ trait ConstructToposOfMaskables extends
        ): MaskableArrowFacade[Z, A] = {
            val newArrow: Ɛ.>[T, U] = 
              source.innerDot(innerDot) { t =>
-               ↔ \ f(source.↔ / t)
+               ⇄ \ f(source.⇄ / t)
              }
            new MaskableArrow[T, U, Z, A](
              newArrow,
-             source.↔,
-             ↔
+             source.⇄,
+             ⇄
            )
          }
          
@@ -167,7 +167,7 @@ trait ConstructToposOfMaskables extends
          MaskableArrowFacade[UNIT, A]
        ] = 
          innerDot.globals map { 
-           cachedArrow(_, equivalence.identity[UNIT], ↔)
+           cachedArrow(_, Ɛ.Mask(Ɛ.I), ⇄)
          }
          
        override def sanityTest() = 
@@ -176,8 +176,8 @@ trait ConstructToposOfMaskables extends
        override lazy val toI: MaskableArrowFacade[A, UNIT] = 
          cachedArrow(
            innerDot.toI,
-           ↔,
-           equivalence.identity[UNIT]
+           ⇄,
+           Ɛ.Mask(Ɛ.I)
          )
          
        override def xUncached[
@@ -222,18 +222,16 @@ trait ConstructToposOfMaskables extends
       T <: ~
     ] (
       innerArrow: Ɛ.>[A, B],
-      `↔1` : A ↔ S,   
-      `↔2` : B ↔ T   
+      `⇄1` : A ⇄ S,   
+      `⇄2` : B ⇄ T   
     ) extends MaskableArrowFacade[S, T] { arrow =>
       override lazy val source = 
         cachedDot(
-          innerArrow.source, 
-          `↔1`
+          `⇄1`
         )
       override lazy val target = 
         cachedDot(
-          innerArrow.target, 
-          `↔2`
+          `⇄2`
         )
         
       override def \[U <: ~](
@@ -253,8 +251,8 @@ trait ConstructToposOfMaskables extends
       override lazy val chi: MaskableArrowFacade[T, TRUTH] = 
         cachedArrow(
           innerArrow.chi,
-          `↔2`,
-          equivalence.identity[TRUTH]
+          `⇄2`,
+          Ɛ.Mask(Ɛ.omega)
         )
         
       override def o[R <: ~](
@@ -300,8 +298,8 @@ trait ConstructToposOfMaskables extends
     ): >[S,T] = 
       new MaskableArrow(
         preArrow.innerArrow,
-        preArrow.`↔1`,
-        preArrow.`↔2`
+        preArrow.`⇄1`,
+        preArrow.`⇄2`
       )
       
     override def makeArrow[
@@ -314,11 +312,10 @@ trait ConstructToposOfMaskables extends
 
   private val memoizedDotWrapper = {
     def subwrap[U <: ~, T <: ~](
-      predot: Ɛ.MaskablePreDot[U, T]
+      predot: U ⇄ T
     ) =
       new MaskableDot[U, T](
-        predot.innerDot,
-        predot.↔
+        predot
       )
 
     def wrap[T <: ~](
@@ -346,14 +343,10 @@ trait ConstructToposOfMaskables extends
     T <: ~,
     U <: ~
   ](
-    innerDot: Ɛ.DOT[T],
-    ↔ : T ↔ U  
+    ⇄ : T ⇄ U  
   ): DOT[U] =
     makeDot(
-         Ɛ.MaskablePreDot(
-       innerDot, 
-       ↔
-      )
+       ⇄
     )
 
   private def cachedDot[
@@ -362,7 +355,7 @@ trait ConstructToposOfMaskables extends
     innerDot: Ɛ.DOT[T] 
   ) =
     makeDot(
-          Ɛ.MaskablePreDot(
+      Ɛ.Mask(
         innerDot 
       )
     )
@@ -374,14 +367,14 @@ trait ConstructToposOfMaskables extends
     V <: ~
   ](
     innerArrow: Ɛ.>[S, T],
-    `↔1` : S ↔ U,  
-    `↔2` : T ↔ V  
+    `⇄1` : S ⇄ U,  
+    `⇄2` : T ⇄ V  
   ): U > V =
     makeArrow(
         Ɛ.MaskablePreArrow(
       innerArrow,
-      `↔1`,
-      `↔2`
+      `⇄1`,
+      `⇄2`
      )
     )
     

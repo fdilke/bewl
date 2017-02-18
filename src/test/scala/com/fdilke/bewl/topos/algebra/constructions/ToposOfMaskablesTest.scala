@@ -16,7 +16,7 @@ abstract class ToposOfMaskablesTest extends GenericToposTests(new ToposWithFixtu
     elements: T*
   ) = 
     topos.makeDot(
-      FiniteSets.MaskablePreDot(
+      FiniteSets.Mask(
         dot(elements :_*)
       )
     )
