@@ -118,7 +118,15 @@ trait ConstructToposOfMaskables extends
     trait MaskableArrowFacade[
       S <: ~,
       T <: ~
-    ] extends Arrow[S, T] 
+    ] extends Arrow[S, T] {
+      def preCompose[
+        P <: ~, 
+        Q <: ~,
+        U <: ~
+      ] (
+        left: MaskableArrow[P, Q, T, U] 
+      ): MaskableArrowFacade[S, U]
+    }
     
     class MaskableDot[
       U <: ~,
@@ -126,8 +134,10 @@ trait ConstructToposOfMaskables extends
     ](
       val ⇄ : ⇄[U, A]   
     ) extends MaskableDotFacade[A] { dot =>
-       val innerDot: Ɛ.DOT[U] =
+       lazy val innerSource: Ɛ.DOT[U] =
           ⇄./.source
+       lazy val innerTarget: Ɛ.DOT[A] =
+          ⇄./.target
 
        override def `>Uncached`[
          T <: ~
@@ -153,7 +163,7 @@ trait ConstructToposOfMaskables extends
          f: Z => A
        ): MaskableArrowFacade[Z, A] = {
            val newArrow: Ɛ.>[T, U] = 
-             source.innerDot(innerDot) { t =>
+             source.innerSource(innerSource) { t =>
                ⇄ \ f(source.⇄ / t)
              }
            new MaskableArrow[T, U, Z, A](
@@ -166,7 +176,7 @@ trait ConstructToposOfMaskables extends
        override val globals: Traversable[
          MaskableArrowFacade[UNIT, A]
        ] = 
-         innerDot.globals map { 
+         innerSource.globals map { 
            cachedArrow(_, Ɛ.Mask(Ɛ.I), ⇄)
          }
          
@@ -175,7 +185,7 @@ trait ConstructToposOfMaskables extends
          
        override lazy val toI: MaskableArrowFacade[A, UNIT] = 
          cachedArrow(
-           innerDot.toI,
+           innerSource.toI,
            ⇄,
            Ɛ.Mask(Ɛ.I)
          )
@@ -191,27 +201,38 @@ trait ConstructToposOfMaskables extends
          T <: ~,
          Z <: ~
        ] (
-           left: MaskableDot[T, Z]
+           leftDot: MaskableDot[T, Z]
        ): BIPRODUCT[Z, A] = {
-//         val innerProductDot = left.innerDot x innerDot
-//         val tepee = 
-//           new ↔[T x U, Z x A] (
-//              _ match { case t ⊕ u => (left.↔ / t) ⊕ (↔ / u) },
-//              ???
-//            )
-//
-//        new MaskableDot[T x U, Z x A](
-//            innerProductDot,
-//            new ↔[T x U, Z x A] {
-//              _ match { case t ⊕ u => (left.↔ / t) ⊕ (↔ / u) },
-//              ???
-//            }
-//        ) with BiproductDot[
-//          Z,
-//          A,
-//          Z x A
-//        ]
-         ???
+         val sourceProduct = leftDot.innerSource x innerSource
+         val targetProduct = leftDot.innerTarget x innerTarget
+
+         new MaskableDot[T x U, Z x A](
+           new ⇄[T x U, Z x A] (
+               sourceProduct(targetProduct) {
+                 case t ⊕ u => 
+                   targetProduct.pair(
+                     leftDot.⇄ / t,
+                     ⇄ / u
+                   )
+               },
+               targetProduct(sourceProduct) {
+                 case z ⊕ a => 
+                   sourceProduct.pair(
+                     leftDot.⇄ \ z,
+                     ⇄ \ a
+                   )
+               }
+            )
+        ) with BiproductDot[
+          Z,
+          A,
+          Z x A
+        ] {
+           override val left = leftDot
+           override val right = dot        
+           override def pair(z: Z, a: A) = 
+             targetProduct.pair(z, a) 
+         }
        }
     }
 
@@ -221,9 +242,9 @@ trait ConstructToposOfMaskables extends
       S <: ~,
       T <: ~
     ] (
-      innerArrow: Ɛ.>[A, B],
-      `⇄1` : A ⇄ S,   
-      `⇄2` : B ⇄ T   
+      val innerArrow: Ɛ.>[A, B],
+      val `⇄1` : A ⇄ S,   
+      val `⇄2` : B ⇄ T   
     ) extends MaskableArrowFacade[S, T] { arrow =>
       override lazy val source = 
         cachedDot(
@@ -258,7 +279,22 @@ trait ConstructToposOfMaskables extends
       override def o[R <: ~](
         that: MaskableArrowFacade[R, S]
       ): MaskableArrowFacade[R,T] = 
-        ???
+        that.preCompose(
+          arrow
+        )
+        
+      override def preCompose[
+        P <: ~, 
+        Q <: ~,
+        U <: ~
+      ] (
+        left: MaskableArrow[P, Q, T, U] 
+      ) =
+        new MaskableArrow[A, Q, S, U](
+            left.innerArrow o left.`⇄1`.\ o `⇄2`./ o innerArrow,
+            `⇄1`,
+            left.`⇄2`
+        )
         
       override def sanityTest() = 
         ???
