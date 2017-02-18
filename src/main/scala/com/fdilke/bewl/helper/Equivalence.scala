@@ -25,7 +25,3 @@ object ↔ {
     )
 }
 
-//object equivalence {
-//	def apply[A] = 
-//	  ↔.identity[A]
-//}

@@ -3,9 +3,10 @@ package com.fdilke.bewl.topos.constructions
 import com.fdilke.bewl.topos._
 import com.fdilke.bewl.helper.↔
 import com.fdilke.bewl.helper.{ ↔ => equivalence }
-import com.fdilke.bewl.helper.Memoize
+import com.fdilke.bewl.helper.{Memoize, ⊕}
 import com.fdilke.bewl.topos.algebra.{AlgebraicStructures, AlgebraicMachinery}
 import Wrappings.NO_WRAPPER
+import ⊕._
 
 trait ConstructToposOfMaskables extends
   BaseTopos with
@@ -98,7 +99,22 @@ trait ConstructToposOfMaskables extends
     
     trait MaskableDotFacade[
       A <: ~
-    ] extends Dot[A]
+    ] extends Dot[A] {
+      def preApply[
+        T <: ~,
+        Z <: ~
+      ](
+         source: MaskableDot[T, Z],
+         f: Z => A
+      ): MaskableArrowFacade[Z, A]
+      
+       def pre_xUncached[
+         T <: ~,
+         Z <: ~
+       ] (
+         left: MaskableDot[T, Z]
+       ): BIPRODUCT[Z, A]
+    }
 
     trait MaskableArrowFacade[
       S <: ~,
@@ -109,8 +125,8 @@ trait ConstructToposOfMaskables extends
       U <: ~,
       A <: ~
     ](
-      innerDot: Ɛ.DOT[U],
-      ↔ : U ↔ A   
+      val innerDot: Ɛ.DOT[U],
+      val ↔ : U ↔ A   
     ) extends MaskableDotFacade[A] { dot =>
 
        override def `>Uncached`[
@@ -121,13 +137,31 @@ trait ConstructToposOfMaskables extends
          ???
          
        override def apply[
-         T <: ~
+         B <: ~
        ](
-         target: MaskableDotFacade[T]
+         target: MaskableDotFacade[B]
        )(
-         f: A => T
-       ): MaskableArrowFacade[A,T] = 
-         ???
+         f: A => B
+       ): MaskableArrowFacade[A, B] = 
+         target.preApply(dot, f)
+         
+       override def preApply[
+         T <: ~,
+         Z <: ~
+       ](
+         source: MaskableDot[T, Z],
+         f: Z => A
+       ): MaskableArrowFacade[Z, A] = {
+           val newArrow: Ɛ.>[T, U] = 
+             source.innerDot(innerDot) { t =>
+               ↔ \ f(source.↔ / t)
+             }
+           new MaskableArrow[T, U, Z, A](
+             newArrow,
+             source.↔,
+             ↔
+           )
+         }
          
        override val globals: Traversable[
          MaskableArrowFacade[UNIT, A]
@@ -150,8 +184,35 @@ trait ConstructToposOfMaskables extends
          T <: ~
        ](
          that: MaskableDotFacade[T]
-       ): BIPRODUCT[A,T] = 
+       ): BIPRODUCT[A,T] =
+         that.pre_xUncached(dot)
+         
+       override def pre_xUncached[
+         T <: ~,
+         Z <: ~
+       ] (
+           left: MaskableDot[T, Z]
+       ): BIPRODUCT[Z, A] = {
+//         val innerProductDot = left.innerDot x innerDot
+//         val tepee = 
+//           new ↔[T x U, Z x A] (
+//              _ match { case t ⊕ u => (left.↔ / t) ⊕ (↔ / u) },
+//              ???
+//            )
+//
+//        new MaskableDot[T x U, Z x A](
+//            innerProductDot,
+//            new ↔[T x U, Z x A] {
+//              _ match { case t ⊕ u => (left.↔ / t) ⊕ (↔ / u) },
+//              ???
+//            }
+//        ) with BiproductDot[
+//          Z,
+//          A,
+//          Z x A
+//        ]
          ???
+       }
     }
 
     class MaskableArrow[
@@ -205,6 +266,7 @@ trait ConstructToposOfMaskables extends
         ???
     }
     
+    // unusually simple generic definition for this topos because WRAPPER is trivial
     override def bifunctionAsBiArrow[
       L <: ~,
       R <: ~,
@@ -216,7 +278,7 @@ trait ConstructToposOfMaskables extends
     ) (
       bifunc: (L, R) => T
     ): BiArrow[L, R, T] =
-      ???
+      (left x right).biArrow(target) { bifunc }
   
     override def functionAsArrow[
       S <: ~,
