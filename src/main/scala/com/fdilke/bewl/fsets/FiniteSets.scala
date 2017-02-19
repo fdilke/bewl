@@ -120,10 +120,10 @@ object FiniteSets extends Topos[Any] with Wrappings[
 
     override def equals(other: Any): Boolean = other match {
       case that: FiniteSetsArrow[S, T] =>
-        source == that.source &&
-          target == that.target &&
-          source.elements.forall {
-            x => function(x) == that.function(x)
+        (source eq that.source) &&
+          (target eq that.target) &&
+          source.elements.forall { x => 
+            function(x) == that.function(x)
           }
       case _ => false
     }

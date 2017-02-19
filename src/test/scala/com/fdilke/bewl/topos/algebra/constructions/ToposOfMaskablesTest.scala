@@ -94,7 +94,7 @@ abstract class ToposOfMaskablesTest extends GenericToposTests(new ToposWithFixtu
 
   describe("The Boolean property") {
     it("holds") {
-      topos should be('boolean)
+      topos shouldBe 'boolean
     }
   }
 

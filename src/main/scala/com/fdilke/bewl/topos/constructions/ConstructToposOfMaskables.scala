@@ -298,6 +298,17 @@ trait ConstructToposOfMaskables extends
         
       override def sanityTest() = 
         ???
+        
+      override def equals(other: Any): Boolean = 
+          other match {
+            case that: MaskableArrow[S, T, A, B] =>
+              (that.source eq source) &&
+                (that.target eq target) &&
+                (that.innerArrow == innerArrow)
+            case _ => false
+          }
+        
+      override def hashCode = 0
     }
     
     // unusually simple generic definition for this topos because WRAPPER is trivial

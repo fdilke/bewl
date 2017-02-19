@@ -57,7 +57,7 @@ class FiniteSetsTest extends GenericToposTests(new ToposWithFixtures[Any] {
 
   describe("The Boolean property") {
     it("holds") {
-      topos should be('boolean)
+      topos shouldBe 'boolean
     }
   }
 
