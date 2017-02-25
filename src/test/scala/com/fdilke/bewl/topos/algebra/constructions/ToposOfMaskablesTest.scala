@@ -5,7 +5,7 @@ import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.Matchers._
 
-class ToposOfMaskablesTest extends GenericToposTests(new ToposWithFixtures[Any] {
+abstract class ToposOfMaskablesTest extends GenericToposTests(new ToposWithFixtures[Any] {
   val topos = FiniteSets.Maskables
 
   type FOO = Boolean
