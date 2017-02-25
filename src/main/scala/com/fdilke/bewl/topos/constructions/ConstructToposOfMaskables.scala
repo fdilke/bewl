@@ -16,9 +16,14 @@ trait ConstructToposOfMaskables extends
      A <: ~,
      B <: ~
    ](
-  		 / : A > B, 
-       \ : B > A 
-   )
+		 / : A > B, 
+     \ : B > A 
+   ) {
+     def sanityTest() { 
+    	 /.sanityTest
+       \.sanityTest
+     }
+   }
 
    object Mask {
      def apply[
@@ -113,6 +118,13 @@ trait ConstructToposOfMaskables extends
        ] (
          left: MaskableDot[T, Z]
        ): BIPRODUCT[Z, A]
+      
+       def preExponential[
+         T <: ~,
+         Z <: ~
+       ] (
+         pre: MaskableDot[T, Z]
+       ): EXPONENTIAL[Z, A]
     }
 
     trait MaskableArrowFacade[
@@ -143,9 +155,39 @@ trait ConstructToposOfMaskables extends
          T <: ~
        ](
          that: MaskableDotFacade[T]
-       ): EXPONENTIAL[A,T] = 
-         ???
-         
+       ): EXPONENTIAL[A,T] =
+         that.preExponential(
+           dot
+         )
+
+       override def preExponential[
+         T <: ~,
+         Z <: ~
+       ](
+         pre: MaskableDot[T, Z]
+       ): EXPONENTIAL[Z, A] = {
+      		 val to: Ɛ.>[T → U, Z → U] =
+      				 innerSource > pre.⇄.\
+//           val to2: Ɛ.>[Z → U, Z → A] =
+//             ⇄./ > pre.innerTarget
+        new MaskableDot[
+           T → U,
+           Z → A
+         ](
+           new ⇄[T → U, Z → A](
+             ???,
+             ???
+           )
+         ) with ExponentialDot[Z, A, Z → A] {
+           override val source = pre 
+           override val target = dot 
+           override def transpose[R <: ~](
+             biArrow: BiArrow[R, Z, A]
+           ): MaskableArrowFacade[R, Z → A] = 
+             ???
+         }
+       }
+       
        override def apply[
          B <: ~
        ](
@@ -181,7 +223,7 @@ trait ConstructToposOfMaskables extends
          }
          
        override def sanityTest() = 
-         ???
+         ⇄.sanityTest
          
        override lazy val toI: MaskableArrowFacade[A, UNIT] = 
          cachedArrow(
@@ -246,10 +288,14 @@ trait ConstructToposOfMaskables extends
       val `⇄1` : A ⇄ S,   
       val `⇄2` : B ⇄ T   
     ) extends MaskableArrowFacade[S, T] { arrow =>
+      private val applyArrow = 
+        `⇄2`./ o innerArrow o `⇄1`.\
+
       override lazy val source = 
         cachedDot(
           `⇄1`
         )
+        
       override lazy val target = 
         cachedDot(
           `⇄2`
@@ -266,8 +312,8 @@ trait ConstructToposOfMaskables extends
         
       override def apply(
         s: S
-      ): T = 
-        ???
+      ): T =
+        applyArrow(s)
         
       override lazy val chi: MaskableArrowFacade[T, TRUTH] = 
         cachedArrow(
@@ -296,8 +342,11 @@ trait ConstructToposOfMaskables extends
             left.`⇄2`
         )
         
-      override def sanityTest() = 
-        ???
+      override def sanityTest() {
+        innerArrow.sanityTest()
+        `⇄1`.sanityTest()
+        `⇄2`.sanityTest()
+      }
         
       override def equals(other: Any): Boolean = 
           other match {
