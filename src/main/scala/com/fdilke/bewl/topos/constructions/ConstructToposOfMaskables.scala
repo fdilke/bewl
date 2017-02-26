@@ -86,6 +86,24 @@ trait ConstructToposOfMaskables extends
     ({type λ[T <: ~] = T}) # λ
   ] {
     import Ɛ.{ Mask => ⇄ }
+//    class ⇄[
+//      U <: ~,
+//      A <: ~
+//    ](
+//    		/: Ɛ.>[U, A],
+//        \: Ɛ.>[A, U]
+//    ) extends Ɛ.Mask[U, A](/,\) {
+//      def >[
+//        T <: ~,
+//        Z <: ~
+//      ]: ⇄[T → U, Z → A] = {
+//      val to: Ɛ.>[T → U, Z → U] =
+//      			 innerSource > pre.⇄.\
+//      val to2: Ɛ.>[Z → U, Z → A] =
+//             ⇄./ > pre.innerTarget
+//      }
+//    }
+
     override type DOT[A <: ~] = MaskableDotFacade[A]
     override type >[A <: ~, B <: ~] = MaskableArrowFacade[A, B]
     
@@ -112,19 +130,32 @@ trait ConstructToposOfMaskables extends
          f: Z => A
       ): MaskableArrowFacade[Z, A]
       
-       def pre_xUncached[
-         T <: ~,
-         Z <: ~
-       ] (
-         left: MaskableDot[T, Z]
-       ): BIPRODUCT[Z, A]
+      def pre_xUncached[
+        T <: ~,
+        Z <: ~
+      ] (
+        left: MaskableDot[T, Z]
+      ): BIPRODUCT[Z, A]
       
-       def preExponential[
-         T <: ~,
-         Z <: ~
-       ] (
-         pre: MaskableDot[T, Z]
-       ): EXPONENTIAL[Z, A]
+      def preExponential[
+        T <: ~,
+        Z <: ~
+      ] (
+        pre: MaskableDot[T, Z]
+      ): EXPONENTIAL[Z, A]
+      
+      def preTranspose[
+        T <: ~,
+        Z <: ~,
+        V <: ~,
+        B <: ~
+      ] (
+        pre: MaskableDot[T, Z],
+        post: MaskableDot[V, B],
+        exponential: Ɛ.EXPONENTIAL[T, V],
+        expEquiv: ⇄[T → V, Z → B],
+        biarrow: BiArrow[A, Z, B]
+      ): MaskableArrowFacade[A, Z → B] 
     }
 
     trait MaskableArrowFacade[
@@ -160,39 +191,76 @@ trait ConstructToposOfMaskables extends
            dot
          )
 
+       def exponentialEquivalence[
+         T <: ~,
+         Z <: ~
+       ] (
+         pre: MaskableDot[T, Z]
+       ) =
+         new ⇄[T → U, Z → A](
+      		 (⇄./ > pre.innerTarget) o (innerSource > pre.⇄.\),
+           (innerSource > pre.⇄./) o (⇄.\ > pre.innerTarget)
+         )
+         
        override def preExponential[
          T <: ~,
          Z <: ~
        ](
          pre: MaskableDot[T, Z]
        ): EXPONENTIAL[Z, A] = {
-      		 val to: Ɛ.>[T → U, Z → U] =
-      				 innerSource > pre.⇄.\
-           val to2: Ɛ.>[Z → U, Z → A] =
-             ⇄./ > pre.innerTarget
-           val to3: Ɛ.>[Z → A, Z → U] =
-             ⇄.\ > pre.innerTarget
-      		 val to4: Ɛ.>[Z → U, T → U] =
-    				 innerSource > pre.⇄./
+        val expEquiv =
+          exponentialEquivalence(pre)
+        val underlyingExponential =
+          pre.innerSource > innerSource
         new MaskableDot[
            T → U,
            Z → A
          ](
-           new ⇄[T → U, Z → A](
-             to2 o to,
-             to4 o to3
-           )
+           expEquiv
          ) with ExponentialDot[Z, A, Z → A] {
            override val source = pre 
            override val target = dot 
            override def transpose[R <: ~](
              biArrow: BiArrow[R, Z, A]
-           ): MaskableArrowFacade[R, Z → A] = 
-             ??? // new MaskableArrow[R, Z → A]
+           ): MaskableArrowFacade[R, Z → A] =
+             biArrow.product.left.preTranspose[T, Z, U, A](
+                 pre,
+                 dot,
+                 underlyingExponential,
+                 expEquiv,
+                 biArrow
+             )
          }
-       }
+      }
        
-       override def apply[
+      override def preTranspose[
+        T <: ~,
+        Z <: ~,
+        V <: ~,
+        B <: ~
+      ] (
+        pre: MaskableDot[T, Z],
+        post: MaskableDot[V, B],
+        exponential: Ɛ.EXPONENTIAL[T, V],
+        expEquiv: ⇄[T → V, Z → B],
+        biArrow: BiArrow[A, Z, B]
+      ): MaskableArrowFacade[A, Z → B] = 
+        new MaskableArrow[U, T → V, A, Z → B](
+          exponential.transpose(
+            innerSource
+          ){
+            (u, t) => post.⇄.\(
+              biArrow(
+                  ⇄./(u),
+                  pre.⇄./(t)
+              )
+            )
+          },
+          ⇄,
+          expEquiv
+        )
+
+        override def apply[
          B <: ~
        ](
          target: MaskableDotFacade[B]
