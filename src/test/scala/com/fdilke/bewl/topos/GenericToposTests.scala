@@ -27,6 +27,7 @@ abstract class ToposFixtureSanityTests[~, T <: Topos[~]](fixtures: ToposWithFixt
       foo2baz.target shouldBe baz
 
       foobar2baz.arrow.sanityTest()
+      foobar2baz.product shouldBe (foo x bar)
       foobar2baz.product.left shouldBe foo
       foobar2baz.product.right shouldBe bar
       foobar2baz.arrow.source shouldBe (foo x bar)

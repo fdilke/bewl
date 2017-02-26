@@ -283,7 +283,9 @@ trait ConstructToposOfMaskables extends
            new MaskableArrow[T, U, Z, A](
              newArrow,
              source.⇄,
-             ⇄
+             ⇄,
+             Some(source),
+             Some(dot)
            )
          }
          
@@ -358,21 +360,27 @@ trait ConstructToposOfMaskables extends
     ] (
       val innerArrow: Ɛ.>[A, B],
       val `⇄1` : A ⇄ S,   
-      val `⇄2` : B ⇄ T   
+      val `⇄2` : B ⇄ T,
+      val defaultSource: Option[MaskableDot[A, S]] = None,
+      val defaultTarget: Option[MaskableDot[B, T]] = None
     ) extends MaskableArrowFacade[S, T] { arrow =>
       private val applyArrow = 
         `⇄2`./ o innerArrow o `⇄1`.\
 
       override lazy val source = 
-        cachedDot(
-          `⇄1`
-        )
-        
+        defaultSource.getOrElse(
+          cachedDot(
+            `⇄1`
+          )
+      )
+      
       override lazy val target = 
-        cachedDot(
-          `⇄2`
-        )
-        
+        defaultTarget.getOrElse(
+          cachedDot(
+            `⇄2`
+          )
+      )
+      
       override def \[U <: ~](
         monic: MaskableArrowFacade[U,T]
       ): MaskableArrowFacade[S,U] = ???
