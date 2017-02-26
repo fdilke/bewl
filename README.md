@@ -1,3 +1,6 @@
+
+[![Continuous Integration](https://circleci.com/gh/fdilke/bewl/tree/master.svg?style=shield)](https://circleci.com/gh/fdilke/bewl)
+
 # Project Bewl
 
 A DSL for the internal (Mitchell-Benabou) language of a topos. 
