@@ -201,7 +201,7 @@ class DotAndArrowEnrichmentTest extends FunSpec {
     }
   }
 
-  describe("Universality of a prediacte") {
+  describe("Universality of a predicate") {
     it("can be tested for sets") {
       val symbols = dot('A, 'B, 'C)
 
@@ -415,6 +415,26 @@ class DotAndArrowEnrichmentTest extends FunSpec {
   }
 
   describe("The contravariant exponential functor H ^ _") {
+  	it("behaves as expected") {
+  		val h = dot(true, false)
+  				val symbols = dot('A, 'B, 'C)
+  				val numbers = dot(1, 2, 3)
+  				val f: Symbol > Int =
+  				arrow(symbols, numbers)(
+  						'A -> 2, 'B -> 1, 'C -> 1
+  						)
+  				val h_f: (Int → Boolean) > (Symbol → Boolean) =
+  				h > f
+  				
+  				for {
+  					g <- elementsOf(numbers > h)
+  					symbol <- elementsOf(symbols)
+  				}
+  				h_f(g)(symbol) shouldBe g(f(symbol))
+  	}
+  }
+  
+  describe("The covariant exponential functor _ ^ H") {
     it("behaves as expected") {
       val h = dot(true, false)
       val symbols = dot('A, 'B, 'C)
@@ -423,14 +443,14 @@ class DotAndArrowEnrichmentTest extends FunSpec {
         arrow(symbols, numbers)(
           'A -> 2, 'B -> 1, 'C -> 1
         )
-      val h_f: (Int → Boolean) > (Symbol → Boolean) =
-        h > f
+      val f_h: (Boolean → Symbol) > (Boolean → Int) =
+        f > h
 
       for {
-        g <- elementsOf(numbers > h)
-        symbol <- Seq('A, 'B, 'C)
+        g <- elementsOf(h > symbols)
+        b <- elementsOf(h)
       }
-        h_f(g)(symbol) shouldBe g(f(symbol))
+        f_h(g)(b) shouldBe f(g(b))
     }
   }
 

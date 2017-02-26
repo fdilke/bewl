@@ -587,6 +587,18 @@ trait BaseTopos {
         }
       )
     }
+    
+    // Contravariant exponential functor
+    final def >[
+      U <: ~
+    ] (
+      exponent: DOT[U]
+    ): (U → S) > (U → T) =
+      (exponent > target).transpose(
+        exponent > source
+      ) { (s_u, u) =>
+        self(s_u(u))
+      }
   }
 
   case class BiArrow[
