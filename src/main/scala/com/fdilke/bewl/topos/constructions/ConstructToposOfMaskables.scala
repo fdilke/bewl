@@ -168,15 +168,19 @@ trait ConstructToposOfMaskables extends
        ): EXPONENTIAL[Z, A] = {
       		 val to: Ɛ.>[T → U, Z → U] =
       				 innerSource > pre.⇄.\
-//           val to2: Ɛ.>[Z → U, Z → A] =
-//             ⇄./ > pre.innerTarget
+           val to2: Ɛ.>[Z → U, Z → A] =
+             ⇄./ > pre.innerTarget
+           val to3: Ɛ.>[Z → A, Z → U] =
+             ⇄.\ > pre.innerTarget
+      		 val to4: Ɛ.>[Z → U, T → U] =
+    				 innerSource > pre.⇄./
         new MaskableDot[
            T → U,
            Z → A
          ](
            new ⇄[T → U, Z → A](
-             ???,
-             ???
+             to2 o to,
+             to4 o to3
            )
          ) with ExponentialDot[Z, A, Z → A] {
            override val source = pre 
@@ -184,7 +188,7 @@ trait ConstructToposOfMaskables extends
            override def transpose[R <: ~](
              biArrow: BiArrow[R, Z, A]
            ): MaskableArrowFacade[R, Z → A] = 
-             ???
+             ??? // new MaskableArrow[R, Z → A]
          }
        }
        
