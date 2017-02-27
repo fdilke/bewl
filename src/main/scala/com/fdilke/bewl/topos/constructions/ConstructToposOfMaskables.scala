@@ -169,6 +169,25 @@ trait ConstructToposOfMaskables extends
       ] (
         left: MaskableArrow[P, Q, T, U] 
       ): MaskableArrowFacade[S, U]
+
+      def preEqualize[
+        P <: ~,
+        Q <: ~
+      ] (
+        pre: MaskableArrow[P, Q, S, T]
+      ): EQUALIZER[S] 
+
+      def preRestrict[
+        P <: ~,
+        Q <: ~,
+        R <: ~,
+        X <: ~,
+        Y <: ~
+      ](
+        pre: MaskableArrow[P, Q, T, R],
+        alt: MaskableArrow[X, Y, T, R],
+        innerEqualizer: Ɛ.EQUALIZER[X]
+      ): MaskableArrowFacade[S, T]
     }
     
     class MaskableDot[
@@ -388,6 +407,50 @@ trait ConstructToposOfMaskables extends
       override def ?=(
         that: MaskableArrowFacade[S, T]
       ): EQUALIZER[S] = 
+        that.preEqualize(this)
+        
+      override def preEqualize[
+        P <: ~,
+        Q <: ~
+      ] (
+        pre: MaskableArrow[P, Q, S, T]
+      ): EQUALIZER[S] = 
+        new MaskableDot[A, S](
+            `⇄1`
+        ) with EqualizingDot[S] {
+          override val equalizerTarget = source
+          
+          private val parallelInner: Ɛ.>[A, B] =
+            (`⇄2`.\) o (pre.`⇄2`./) o 
+              pre.innerArrow o 
+              (pre.`⇄1`.\) o (`⇄1`./) 
+
+          private val innerEqualizer: Ɛ.EQUALIZER[A] =
+            innerArrow ?= parallelInner
+            
+          override def restrict[
+            R <: ~
+          ](
+            parallelArrow: MaskableArrowFacade[R, S]
+          ): MaskableArrowFacade[R, S] = 
+            parallelArrow.preRestrict[P, Q, T, A, B](
+              pre,
+              arrow,
+              innerEqualizer
+            )
+        }
+      
+      override def preRestrict[
+        P <: ~,
+        Q <: ~,
+        R <: ~,
+        X <: ~,
+        Y <: ~
+      ](
+        pre: MaskableArrow[P, Q, T, R],
+        alt: MaskableArrow[X, Y, T, R],
+        innerEqualizer: Ɛ.EQUALIZER[X]
+      ): MaskableArrowFacade[S, T] =
         ???
         
       override def apply(
