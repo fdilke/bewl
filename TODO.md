@@ -301,10 +301,21 @@ Given a dot D=D(A <= B) in R(Ɛ) expressed as a pair A <-r- B <-s- A in Ɛ,
 - equivalently, given an "arrow of retractions", can we reconstruct it from one Ɛ-arrow?
 - does this work as required for the 'masking' of the exponential M-set?  
 
+# The Topos of Toy (Informal) Presheaves
+
 Should we construct the 'topos of toy presheaves' for a 'toy (i.e. finite) category'
-[But also toy in the sense that it doesn't need foundations, doesn't live in a topos]
+[But also toy/informal in the sense that it doesn't need foundations, doesn't live in a topos]
 and then autocompute the truth object?
 Then could do permutations, (toy) monoid actions etc as a special case. 
+
+What about types? Typical dot in the 'toy presheaf' categories will map each of the n 'toy dots'
+to a dot in Ɛ, so has an n-tuple type.
+Would have to work out a formalism that passes the types around properly when (un)wrapping these.
+
+Informal functor ℝ -> Ɛ in fact maps 
+
+How to construct the truth object? It's an informal functor ℝ -> Ɛ that maps each r in ℝ to its
+'object of sieves'.  
 
  
  
