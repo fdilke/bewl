@@ -286,3 +286,25 @@ building the context from multiple dots. Is there a way round it?
 Try to avoid all the case splitting and multiple dispatch.
 Put logic into the term/operator classes of relevant types?
 
+# The Topos of Retractions
+
+Define the retraction category ℝ to have two dots A, B and a generic retraction-section pair
+A <-r- B <-s- A whose composite is 1. Then the only non-identity arrows are r, s and the idempotent sr.
+The functors from ℝ to Ɛ form a topos, the 'topos of retractions' R(Ɛ) on Ɛ.
+
+- What is the truth object? (Construct in terms of sieves on ℝ =~= ℝ^op)
+- R(Ɛ) retracts onto Ɛ as a category. Is this a logical morphism?
+
+Given a dot D=D(A <= B) in R(Ɛ) expressed as a pair A <-r- B <-s- A in Ɛ,
+
+- is it OK to regard this as having type A, or type B?
+- equivalently, given an "arrow of retractions", can we reconstruct it from one Ɛ-arrow?
+- does this work as required for the 'masking' of the exponential M-set?  
+
+Should we construct the 'topos of toy presheaves' for a 'toy (i.e. finite) category'
+[But also toy in the sense that it doesn't need foundations, doesn't live in a topos]
+and then autocompute the truth object?
+Then could do permutations, (toy) monoid actions etc as a special case. 
+
+ 
+ 
