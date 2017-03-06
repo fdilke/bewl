@@ -292,6 +292,7 @@ Define the retraction category ℝ to have two dots A, B and a generic retractio
 A <-r- B <-s- A whose composite is 1. Then the only non-identity arrows are r, s and the idempotent sr.
 The functors from ℝ to Ɛ form a topos, the 'topos of retractions' R(Ɛ) on Ɛ.
 
+
 - What is the truth object? (Construct in terms of sieves on ℝ =~= ℝ^op)
 - R(Ɛ) retracts onto Ɛ as a category. Is this a logical morphism?
 
@@ -316,6 +317,28 @@ Informal functor ℝ -> Ɛ in fact maps
 
 How to construct the truth object? It's an informal functor ℝ -> Ɛ that maps each r in ℝ to its
 'object of sieves'.  
+
+# Plan for fixing exponentials in the topos of actions
+
+We have to give up on every element of an exponential B^A being itself a function A => B, because
+we can then re-use elements and have an element of M x A > B behave differently in the context of an
+action topos and so act as a function A => B rather than M x A => B.
+
+Instead of exposing the action of an element f of B^A on the element itself, we just build it into the evaluation arrow, and then provide an implicit so that f can be regarded as a function, but in
+the context of the relevant exponential.
+
+This will massively simplify the topos of actions, removing the need for special wrapper classes
+and remapping of arrows. Also the 'topos of maskables' (which was beginning to seem unworkable anyway) becomes redundant.
+
+Steps: A useful warm-up is to eliminate the use of "pair" by using an implicit inside the product
+with a special operator ⊕⊕. Then:
+
+- Modify the definition of S → T to not include S => T.
+- Modify ExponentialDot to have a method evaluate(), which we'll have to implement for every topos.
+- Add an implicit class here to allow exponential elements to be treated as functions.
+- Use it everywhere we currently apply such an element, to fix the error of it not being a function. 
+- Get rid of the 'maskables' code
+- Complete the 'alt' construction of ToposOfActions, which will now need less wrapping.
 
  
  
