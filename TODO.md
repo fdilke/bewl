@@ -331,7 +331,12 @@ This will massively simplify the topos of actions, removing the need for special
 and remapping of arrows. Also the 'topos of maskables' (which was beginning to seem unworkable anyway) becomes redundant.
 
 Steps: A useful warm-up is to eliminate the use of "pair" by using an implicit inside the product
-with a special operator ⊕⊕. Then:
+with a special operator ⊕⊕. << Note, this doesn't seem to be entirely trivial: there is a
+problem with the scope of the implicit class, or something.
+? Do it with a class RichElement which then has an implicit conversion on type T depending on an
+implicit parameter of type BIPRODUCT[T, U] for some U, to apply ⊕⊕(u: U) ? Why is this needed?
+ 
+Then:
 
 - Modify the definition of S → T to not include S => T.
 - Modify ExponentialDot to have a method evaluate(), which we'll have to implement for every topos.
