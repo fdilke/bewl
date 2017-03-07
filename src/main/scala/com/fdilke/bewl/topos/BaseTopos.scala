@@ -140,6 +140,19 @@ trait BaseTopos {
 
   lazy val O: DOT[VOID] = InitialDot.O
 
+  implicit class RichElement[
+    A <: ~
+  ](
+    a: A
+  ) {
+    def ⊕⊕[B <: ~](
+      b: B
+    )(
+      implicit biproduct: BIPRODUCT[A, B]
+    ): A x B =
+      biproduct.pair(a, b)
+  }
+  
   trait BaseDot[S <: ~] { self: DOT[S] =>
     val toI: S > UNIT
     val globals: Traversable[UNIT > S]
@@ -302,7 +315,8 @@ trait BaseTopos {
 
     final lazy val diagonal: S > (S x S) =
       this(squared) { x =>
-        squared.pair(x, x)
+        implicit val _ = squared
+        x ⊕⊕ x
       }
 
     final lazy val =?= : BiArrow[S, S, TRUTH] =
@@ -450,9 +464,9 @@ trait BaseTopos {
     final def x[U <: ~](
       that: S > U
     ): S > (T x U) = {
-      val product = target x that.target
+      implicit val product = target x that.target
       source(product) {
-        s => product.pair(this(s), that(s))
+        s => this(s) ⊕⊕ that(s)
       }
     }
 
@@ -525,28 +539,25 @@ trait BaseTopos {
     final def =?( // slow ("pure") coequalizer
       that: S > T
     ): Quotient[T] = {
-      val t2 = target.squared
+      implicit val t2 = target.squared
 
       val congruences: EQUALIZER[T x T → TRUTH] =
         t2.power.whereAll(target) {
           (ssp, t) =>
-            ssp(t2.pair(t, t))
+            ssp(t ⊕⊕ t)
         }.whereAll(target, target) {
           (ssp, t, u) =>
-            ssp(t2.pair(t, u)) →
-              ssp(t2.pair(u, t))
+            ssp(t ⊕⊕  u) →
+              ssp(u ⊕⊕ t)
         }.whereAll(target, target, target) {
           (ssp, t, u, v) =>
-            ssp(t2.pair(t, u)) ∧
-              ssp(t2.pair(u, v)) →
-              ssp(t2.pair(t, v))
+            ssp(t ⊕⊕ u) ∧
+              ssp(u ⊕⊕ v) →
+              ssp(t ⊕⊕ v)
         }.whereAll(source) {
           (ssp, s) =>
             ssp(
-              t2.pair(
-                this(s),
-                that(s)
-              )
+              this(s) ⊕⊕ that(s)
             )
         }
 
@@ -554,7 +565,7 @@ trait BaseTopos {
         t2.⋀(
           congruences.inclusion.chi
         ) (
-          t2.pair(t, u)
+          t ⊕⊕ u
         )
       }
     }
@@ -562,7 +573,7 @@ trait BaseTopos {
     final def =?!(  // fast ("hybrid") coequalizer
       that: S > T
     ): Quotient[T] = {
-      val t2 = target.squared
+      implicit val t2 = target.squared
 
       val isEdge: T x T > TRUTH =
         (self x that).factorizeEpiMono._2.chi
@@ -572,16 +583,16 @@ trait BaseTopos {
         IterateToFixed(
           t2(omega) {
             case p ⊕ q =>
-              isEdge(t2.pair(p, q)) ∨
-              isEdge(t2.pair(q, p)) ∨
+              isEdge(p ⊕⊕ q) ∨
+              isEdge(q ⊕⊕ p) ∨
               target.=?=(p, q)
           }
         ) { s =>
           t2.exists(target) {
             (pr, q) => pr match {
               case p ⊕ r =>
-                s(t2.pair(p, q)) ∧
-                s(t2.pair(q, r))
+                s(p ⊕⊕ q) ∧
+                s(q ⊕⊕ r)
             }
           }
         }
@@ -615,9 +626,10 @@ trait BaseTopos {
       l: L,
       r: R
     ): T =
-      arrow(
-        product.pair(l, r)
-      )
+      arrow {
+        implicit val _ = product
+        l ⊕⊕ r
+      }
 
     def apply[
       S <: ~

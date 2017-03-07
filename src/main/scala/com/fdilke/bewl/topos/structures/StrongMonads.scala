@@ -58,6 +58,7 @@ trait StrongMonads {
       ).transpose(
       x > y
     ) { (x2y, mx) =>
+      implicit val _ = (x > y) x T(x)
       map(
         (x > y).evaluation.arrow
       )(
@@ -65,12 +66,7 @@ trait StrongMonads {
           x > y,
           x
         )(
-          (
-            (x > y) x T(x)
-            ).pair(
-            x2y,
-            mx
-          )
+          x2y ⊕⊕ mx
         )
       )
     }

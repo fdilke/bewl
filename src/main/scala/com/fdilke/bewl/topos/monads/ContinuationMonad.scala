@@ -69,12 +69,13 @@ trait ContinuationMonad {
             x ⊕ yss,
             xys
           ) =>
+            implicit val dashDaa = dash x daa
             yss(
-              (dot > daa(dash x daa) {
-                  y => dash x daa pair(x, y)
-                }) (
-                  xys
-                )
+              (dot > daa(dashDaa) {
+                  y => x ⊕⊕ y
+              }) (
+                xys
+              )
             )
         }
       }

@@ -78,7 +78,8 @@ trait ConstructToposOfAutomorphisms extends
             ) with BiproductDot[X, Y, X x Y] {
               override val left: DOT[X] = automorphism
               override val right: DOT[Y] = that
-              override def pair(l: X, r: Y): x[X, Y] = productCarrier.pair(l, r)
+              override def pair(l: X, r: Y): x[X, Y] = 
+                productCarrier.pair(l, r)
             }
           }
           override def `>Uncached`[Y <: ~](that: DOT[Y]) = {

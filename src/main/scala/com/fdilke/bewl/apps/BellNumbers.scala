@@ -8,20 +8,20 @@ object BellNumbers extends App {
 
   def bell(n: Int): Int = {
     val set: DOT[Int] = dot(0 until n :_*)
-    val set2 = set.squared
+    implicit val set2 = set.squared
 
     val eqRelns = set2.power.whereAll(set) {
       (ssp, s) =>
-        ssp(set.squared.pair(s, s))
+        ssp(s ⊕⊕ s)
     }.whereAll(set, set) {
       (ssp, x, y) =>
-        ssp(set.squared.pair(x, y)) →
-        ssp(set.squared.pair(y, x))
+        ssp(x ⊕⊕ y) →
+        ssp(y ⊕⊕ x)
     }.whereAll(set, set, set) {
       (ssp, x, y, z) =>
-        ssp(set.squared.pair(x, y)) ∧
-        ssp(set.squared.pair(y, z)) →
-        ssp(set.squared.pair(x, z))
+        ssp(x ⊕⊕ y) ∧
+        ssp(y ⊕⊕ z) →
+        ssp(x ⊕⊕ z)
     }
     elementsOf(eqRelns).size
   }
