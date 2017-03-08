@@ -93,7 +93,8 @@ trait ConstructToposOfGroupActions extends
               group.action(exponentialDot) {
                 case (f, g) => exponentialDot.transpose(exp_x_G) {
                   case (f ⊕ g, a) => that.action.actionMultiply(
-                    f(
+                    exponentialDot.evaluate(
+                      f,
                       dot.action.actionMultiply(
                         a,
                         group.inverse(g)
@@ -120,6 +121,15 @@ trait ConstructToposOfGroupActions extends
                   ) {
                     biArrow(_, _)
                   }
+                )
+                
+               override def evaluate(
+                function: S → T, 
+                arg: S
+              ): T = 
+                exponentialDot.evaluate(
+                  function, 
+                  arg
                 )
             }
           }

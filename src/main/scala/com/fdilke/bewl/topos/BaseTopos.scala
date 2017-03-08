@@ -14,7 +14,7 @@ trait BaseTopos {
   type DOT[S <: ~] <: Dot[S]
   type >[S <: ~, T <: ~] <: Arrow[S, T]
 
-  type →[T <: ~, U <: ~] = (T => U) with ~
+  type →[T <: ~, U <: ~] = ~
   type x[T <: ~, U <: ~] = (T ⊕ U) with ~
 
   type UNIT <: ~
@@ -30,7 +30,7 @@ trait BaseTopos {
   trait ExponentialDot[
     S <: ~,
     T <: ~,
-    S_T <: (S => T) with ~
+    S_T <: S → T // TODO: no longer need this type?
   ] { dot: DOT[S_T] =>
     val source: DOT[S]
     val target: DOT[T]
@@ -48,8 +48,15 @@ trait BaseTopos {
         (index x source).biArrow(target)(bifunc)
       )
 
+    def evaluate(
+        function: S_T, 
+        arg: S
+    ): T
+    
     final def evaluation: BiArrow[S_T, S, T] =
-      (this x source).biArrow(target) { _(_) }
+      (this x source).biArrow(target) {
+        evaluate(_, _) 
+      }
   }
 
   type BIPRODUCT[
@@ -140,7 +147,7 @@ trait BaseTopos {
 
   lazy val O: DOT[VOID] = InitialDot.O
 
-  implicit class RichElement[
+  implicit class RichLeftElement[
     A <: ~
   ](
     a: A
@@ -151,6 +158,20 @@ trait BaseTopos {
       implicit biproduct: BIPRODUCT[A, B]
     ): A x B =
       biproduct.pair(a, b)
+  }
+  
+  implicit class RichFunctionalElement[
+    S <: ~,
+    T <: ~
+  ](
+    f: S → T
+  ) (
+    implicit exp: EXPONENTIAL[S, T]   
+  ) {
+    def apply(
+      s: S
+    ): T =
+      exp.evaluate(f, s)
   }
   
   trait BaseDot[S <: ~] { self: DOT[S] =>
@@ -221,9 +242,11 @@ trait BaseTopos {
 
     final lazy val ∃ : S → TRUTH > TRUTH =
       power.forAll(omega) { (f, w) =>
-          (power x omega).universally(dot) {
-            case (f ⊕ w, x) => f(x) → w
-          }(f, w) → w
+        implicit val _: EXPONENTIAL[S, TRUTH] = power
+        (power x omega).universally(dot) {
+          case (f ⊕ w, x) =>
+            f(x) → w
+        }(f, w) → w
       }
 
     final def preForAll[R <: ~](
@@ -332,6 +355,7 @@ trait BaseTopos {
     ] =
       (dot > target).globals map { global =>
         dot(target) { s =>
+          implicit val _ = dot > target
           global(dot toI s)(s)
         }}
 
@@ -394,6 +418,7 @@ trait BaseTopos {
       (arrow.source > dot).transpose(
         arrow.target > dot
       ) { (s_u, t) =>
+        implicit val _ = arrow.target > dot 
         s_u(arrow(t))
       }
 
@@ -402,6 +427,7 @@ trait BaseTopos {
     ): S > TRUTH =
       forAll(family.whereTrue) {
         (s, g) =>
+          implicit val _ = power
           g(s)
       }
 
@@ -456,7 +482,7 @@ trait BaseTopos {
   }
 
   trait Arrow[S <: ~, T <: ~] extends BaseArrow[S, T] { self: S > T =>
-    final lazy val name =
+    final lazy val name: UNIT > (S → T) =
       (source > target).transpose(I) {
           (i, x) => this(x)
       }
@@ -540,6 +566,7 @@ trait BaseTopos {
       that: S > T
     ): Quotient[T] = {
       implicit val t2 = target.squared
+      implicit val _ = t2.power
 
       val congruences: EQUALIZER[T x T → TRUTH] =
         t2.power.whereAll(target) {
@@ -608,6 +635,7 @@ trait BaseTopos {
       (exponent > target).transpose(
         exponent > source
       ) { (s_u, u) =>
+        implicit val _ = exponent > source
         self(s_u(u))
       }
   }
@@ -662,6 +690,7 @@ trait BaseTopos {
     val classifier =
       dot.power.forAll(dot, dot) {
         (f, a, b) =>
+          implicit val _ = dot.power
           (f(a) ∧ f(b)) → dot.=?=(a, b)
       } whereTrue
 
@@ -768,6 +797,7 @@ trait BaseTopos {
             compatibleArrow.source
           ) {
             case (q ⊕ t, s) =>
+              implicit val _ = dot.power
               q(s) ∧ target.=?=(
                 compatibleArrow(s), t
               )

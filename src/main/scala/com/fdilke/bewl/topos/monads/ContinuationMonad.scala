@@ -38,12 +38,13 @@ trait ContinuationMonad {
 
         override lazy val eta =
           doubleExp.transpose(dash) {
-            (x, f) => f(x)
+            (x, f) => doubleExp.evaluate(f, x)
           }
 
-        override lazy val mu =
+        override lazy val mu = {
+          implicit val dashDotDotDotDot = dash > dot > dot > dot > dot
           (dash > dot > dot).transpose(
-            dash > dot > dot > dot > dot
+            dashDotDotDotDot
           ) {
             (ffff, f) => ffff(
               (dash > dot > dot > dot).transpose(
@@ -55,6 +56,7 @@ trait ContinuationMonad {
               )
             )
           }
+        }
 
         override def tensorialStrength[
           Y <: ~
@@ -70,6 +72,7 @@ trait ContinuationMonad {
             xys
           ) =>
             implicit val dashDaa = dash x daa
+            implicit val _ = daa > dot > dot
             yss(
               (dot > daa(dashDaa) {
                   y => x ⊕⊕ y
@@ -89,7 +92,7 @@ trait ContinuationMonad {
       dot > (dot > arrow)
 
     lazy val home: Algebra[S] = {
-      val ddd: EXPONENTIAL[S → S, S] = dot > dot > dot
+      implicit val ddd: EXPONENTIAL[S → S, S] = dot > dot > dot
       val structure: (S → S → S) > S =
         ddd(dot) { f =>
           f(

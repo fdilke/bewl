@@ -17,7 +17,7 @@ trait AlgebraicConstructions {
   class EndomorphismMonoid[T <: ~](
     dot: DOT[T]
   ) {
-    private val endos = dot > dot
+    private implicit val endos = dot > dot
 
     val monoid =
       new Monoid[T → T](endos, dot.identity.name,

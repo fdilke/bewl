@@ -41,7 +41,7 @@ trait ConstructToposOfAutomorphisms extends
         override type DOT[X <: ~] = Automorphism[X]
         override type >[S <: ~, T <: ~] = AutomorphismArrow[S, T]
         override type TRUTH = Ɛ.TRUTH
-
+        
         override val I = trivialAutomorphism(Ɛ.I)
         override val omega = trivialAutomorphism(Ɛ.omega)
         override val truth = AutomorphismArrow(I, omega, Ɛ.truth)
@@ -86,14 +86,28 @@ trait ConstructToposOfAutomorphisms extends
             val exponentialCarrier = carrier > that.carrier
             new Automorphism(
               exponentialCarrier.transpose(exponentialCarrier) {
-                (e, x) => that.arrow(e(inverse(x)))
+                (e, x) => that.arrow(
+                  exponentialCarrier.evaluate(e, inverse(x))
+                )
               },
               exponentialCarrier.transpose(exponentialCarrier) {
-                (e, x) => that.inverse(e(arrow(x)))
+                (e, x) => that.inverse(
+                   exponentialCarrier.evaluate(e, arrow(x))
+                )
               }
             ) with ExponentialDot[X, Y, X → Y] { exponentialAutomorphism =>
               override val source = automorphism
               override val target = that
+              
+              override def evaluate(
+                function: X → Y, 
+                arg: X
+              ): Y = 
+                exponentialCarrier.evaluate(
+                  function, 
+                  arg
+                )
+              
               override def transpose[R <: ~](biArrow: BiArrow[R, X, Y]): R > (X → Y) =
                 AutomorphismArrow(
                   biArrow.product.left,
