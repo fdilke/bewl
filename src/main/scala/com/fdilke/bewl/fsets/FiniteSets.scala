@@ -12,6 +12,8 @@ object FiniteSets extends Topos[Any] with Wrappings[
   override type >[S, T] = FiniteSetsArrow[S, T]
   override type UNIT = Unit
   override type TRUTH = Boolean
+  override type →[T <: ~, U <: ~] = (T => U) with ~
+  
   override lazy val I = makeDot(Traversable(()))
   override lazy val omega = makeDot(Traversable(true, false))
   override lazy val truth = I(omega) { _ => true }
@@ -54,6 +56,7 @@ object FiniteSets extends Topos[Any] with Wrappings[
         override def apply(s: S): T =
           function(s)
       }
+      
       new FiniteSetsDot[S → T](
         allMaps(self.elements, that.elements) map FunctionElement
       ) with ExponentialDot[S, T, S → T] { exponentialDot =>
@@ -64,7 +67,16 @@ object FiniteSets extends Topos[Any] with Wrappings[
           biArrow.product.left(exponentialDot) {
             r => FunctionElement {
               s => biArrow(r, s)
-            }}}}
+            }
+        }
+            
+        override def evaluate(
+            function: S → T, 
+            arg: S
+        ): T =
+          function(arg)
+      }
+    }
 
     override def apply[T](target: DOT[T])(f: S => T) =
       new FiniteSetsArrow(this, target, f)
@@ -145,7 +157,11 @@ object FiniteSets extends Topos[Any] with Wrappings[
     source(target)(f)
 
   override def makeArrow[S, T](prearrow: FiniteSetsPreArrow[S, T]) =
-    makeDot(prearrow.source)(makeDot(prearrow.target))(prearrow.function)
+    makeDot(prearrow.source)(
+      makeDot(prearrow.target)
+    )(
+      prearrow.function
+    )
 
   override def makeDot[T](predot: Traversable[T]) =
     memoizedDotWrapper(predot)
@@ -211,8 +227,10 @@ object FiniteSetsUtilities {
 
   def asElement[X, Y](
     arrow: X > Y
-  ): X → Y =
+  ): X → Y = {
+    val xx: UNIT > (X → Y) = arrow.name
     arrow.name(())
+  }
 
   def makeNullaryOperator[X](
     carrier: DOT[X],

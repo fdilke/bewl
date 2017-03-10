@@ -23,6 +23,7 @@ trait ConstructToposOfMonoidActionsAlt extends
           override type DOT[A <: ~] = ActionDotFacade[A]
           override type >[A <: ~, B <: ~] = ActionArrowFacade[A, B]
           override type UNIT = Ɛ.UNIT
+          override type →[T <: ~, U <: ~] = Ɛ.→[T, U]
           
           type IDEAL = M → Ɛ.TRUTH
           override type TRUTH = IDEAL
@@ -34,12 +35,13 @@ trait ConstructToposOfMonoidActionsAlt extends
 
           private object Ideals {
             private val possibleIdeals = carrier.power
+            import possibleIdeals.{ evaluate => $ }
 
             private val ideals =
               possibleIdeals.whereAll(carrier, carrier) {
                 (f, m, n) => 
-                  Ɛ.OmegaEnrichments(f(m)) → 
-                    f(monoid.multiply(m, n))
+                  Ɛ.OmegaEnrichments($(f, m)) → 
+                    $(f, monoid.multiply(m, n))
               }
 
             def restrict[
@@ -56,7 +58,7 @@ trait ConstructToposOfMonoidActionsAlt extends
             private val idealMultiply =
               restrict(ideals x carrier) {
                 case (i ⊕ s, t) => 
-                  ideals.inclusion(i)(
+                  $(ideals.inclusion(i),
                       monoid.multiply(s, t)
                   )
               }

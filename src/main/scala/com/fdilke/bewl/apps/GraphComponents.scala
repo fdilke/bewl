@@ -31,10 +31,11 @@ object GraphComponents extends App {
   val numComponents = components.globals.size
   println(s"$numComponents components")
 
+  import vertices.power.{ evaluate => $ }
   for {c <- elementsOf(components)} {
     print("component: { ")
     for {v <- elementsOf(vertices)}
-      if (c(v))
+      if ($(c, v))
         print(s"$v ")
     println("}")
   }

@@ -9,6 +9,7 @@ object BellNumbers extends App {
   def bell(n: Int): Int = {
     val set: DOT[Int] = dot(0 until n :_*)
     implicit val set2 = set.squared
+    implicit val _ = set2.power
 
     val eqRelns = set2.power.whereAll(set) {
       (ssp, s) =>

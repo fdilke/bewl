@@ -11,7 +11,9 @@ object YangBaxter extends App {
     (BxB > BxB)(omega) { f =>
       val xx = (BxB > ((BxB.π1 o BxBxB.π0) x BxBxB.π1) )(f)
 
+/*      
       val hh: (((Int x Int) x Int) → (Int x Int)) = (BxB > BxBxB.π0)(f)
+*/      
 //      val _f_1 = (BxB > BxBxB.π0)(f) x BxBxB.π1
 
 //      val _1_f = (

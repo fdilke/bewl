@@ -106,6 +106,7 @@ trait ConstructToposOfMaskables extends
 
     override type DOT[A <: ~] = MaskableDotFacade[A]
     override type >[A <: ~, B <: ~] = MaskableArrowFacade[A, B]
+    override type →[T <: ~, U <: ~] = Ɛ.→[T, U]
     
     override type UNIT = Ɛ.UNIT
     override type TRUTH = Ɛ.TRUTH
@@ -238,7 +239,13 @@ trait ConstructToposOfMaskables extends
            expEquiv
          ) with ExponentialDot[Z, A, Z → A] {
            override val source = pre 
-           override val target = dot 
+           override val target = dot
+           override def evaluate(
+             function: Z → A, 
+             arg: Z
+           ) =
+             ???
+             
            override def transpose[R <: ~](
              biArrow: BiArrow[R, Z, A]
            ): MaskableArrowFacade[R, Z → A] =

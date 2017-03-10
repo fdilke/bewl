@@ -69,6 +69,7 @@ trait ConstructToposOfMonoidActions extends
           override type DOT[AA <: ~~] = ActionDotFacade[AA]
           override type >[AA <: ~~, BB <: ~~] = ActionArrowFacade[AA, BB]
           override type UNIT = Ɛ.VanillaWrapper[Ɛ.UNIT]
+          override type →[T <: ~, U <: ~] = ~
 
           type IDEAL = Ɛ.→[M, Ɛ.TRUTH]
 
@@ -80,10 +81,11 @@ trait ConstructToposOfMonoidActions extends
 
           private object Ideals {
             private val possibleIdeals = carrier.power
+            import possibleIdeals.{ evaluate => $ }
 
             private val ideals =
               possibleIdeals.whereAll(carrier, carrier) {
-                (f, m, n) => Ɛ.OmegaEnrichments(f(m)) → f(multiply(m, n))
+                (f, m, n) => Ɛ.OmegaEnrichments($(f, m)) → $(f, multiply(m, n))
               }
 
             def restrict[
@@ -97,7 +99,7 @@ trait ConstructToposOfMonoidActions extends
 
             private val idealMultiply =
               restrict(ideals x carrier) {
-                case (i ⊕ s, t) => ideals.inclusion(i)(multiply(s, t))
+                case (i ⊕ s, t) => $(ideals.inclusion(i), multiply(s, t))
               }
 
             val omega = ActionDot[IDEAL](ideals)(
@@ -264,6 +266,7 @@ trait ConstructToposOfMonoidActions extends
             ): EXPONENTIAL[ZZ, AA] = {
               val mXz = pre.pairs
               val possibleMorphisms = mXz > action.actionCarrier
+              import possibleMorphisms.{ evaluate => $ }
 
               type P = Ɛ.→[Ɛ.x[M, Z], A]
 
@@ -275,14 +278,14 @@ trait ConstructToposOfMonoidActions extends
                 ) {
                   case (f, n, m, z) =>
                     action.actionCarrier.=?=(
-                      f(
+                      $(f, 
                         mXz.pair(
                           multiply(m, n),
                           pre.action.actionMultiply(z, n)
                         )
                       ),
                       action.actionMultiply(
-                        f(
+                        $(f, 
                           mXz.pair(m, z)
                         ),
                         n
@@ -296,7 +299,7 @@ trait ConstructToposOfMonoidActions extends
                     morphisms x carrier
                   ) {
                     case (f ⊕ m, n ⊕ z) =>
-                      morphisms.inclusion(f)(
+                      $(morphisms.inclusion(f),
                         mXz.pair(multiply(m, n), z)
                       )
                   }
@@ -311,7 +314,7 @@ trait ConstructToposOfMonoidActions extends
                     (zz: ZZ) => {
                       val z = pre.↔ \ zz
                       val unitM: M = unit(pre.action.actionCarrier.toI(z))
-                      val a: A = p(mXz.pair(unitM, z))
+                      val a: A = $(p, mXz.pair(unitM, z))
                       dot.↔ / a
                     }
                   ),
@@ -322,10 +325,16 @@ trait ConstructToposOfMonoidActions extends
                   ExponentialWrapper[Z, ZZ, A, AA]
                 ] {
                   exponentialDot =>
-                  val source: DOT[ZZ] = pre
-                  val target: DOT[AA] = dot
+                  override val source: DOT[ZZ] = pre
+                  override val target: DOT[AA] = dot
 
-                  def transpose[RR <: ~~](
+                  override def evaluate(
+                      function: ExponentialWrapper[Z, ZZ, A, AA], 
+                      arg: ZZ
+                  ): AA =
+                    function(arg)
+                  
+                  override def transpose[RR <: ~~](
                     biArrow: BiArrow[RR, ZZ, AA]
                   ): RR > ExponentialWrapper[Z, ZZ, A, AA] =
                     biArrow.product.left.calcTranspose[Z, ZZ, A, AA](

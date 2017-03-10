@@ -28,6 +28,7 @@ trait ConstructToposOfGroupActions extends
         override type >[X <: ~, Y <: ~] = ActionArrow[X, Y]
         override type UNIT = Ɛ.UNIT
         override type TRUTH = Ɛ.TRUTH
+        override type →[T <: ~, U <: ~] = Ɛ.→[T, U]
 
         override val I: DOT[UNIT] =
           ActionDot(Ɛ.I) { (i, g) => i }
@@ -93,7 +94,8 @@ trait ConstructToposOfGroupActions extends
               group.action(exponentialDot) {
                 case (f, g) => exponentialDot.transpose(exp_x_G) {
                   case (f ⊕ g, a) => that.action.actionMultiply(
-                    f(
+                    exponentialDot.evaluate(
+                      f,
                       dot.action.actionMultiply(
                         a,
                         group.inverse(g)
@@ -120,6 +122,15 @@ trait ConstructToposOfGroupActions extends
                   ) {
                     biArrow(_, _)
                   }
+                )
+                
+               override def evaluate(
+                function: S → T, 
+                arg: S
+              ): T = 
+                exponentialDot.evaluate(
+                  function, 
+                  arg
                 )
             }
           }
