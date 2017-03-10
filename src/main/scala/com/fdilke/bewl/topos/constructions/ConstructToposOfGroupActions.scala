@@ -28,6 +28,7 @@ trait ConstructToposOfGroupActions extends
         override type >[X <: ~, Y <: ~] = ActionArrow[X, Y]
         override type UNIT = Ɛ.UNIT
         override type TRUTH = Ɛ.TRUTH
+        override type →[T <: ~, U <: ~] = Ɛ.→[T, U]
 
         override val I: DOT[UNIT] =
           ActionDot(Ɛ.I) { (i, g) => i }

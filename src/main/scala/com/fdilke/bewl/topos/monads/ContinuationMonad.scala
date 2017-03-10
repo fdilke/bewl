@@ -38,11 +38,14 @@ trait ContinuationMonad {
 
         override lazy val eta =
           doubleExp.transpose(dash) {
-            (x, f) => doubleExp.evaluate(f, x)
+            (x, f) =>
+              implicit val _ = dash > dot
+              f(x)
           }
 
         override lazy val mu = {
-          implicit val dashDotDotDotDot = dash > dot > dot > dot > dot
+          implicit val dashDotDot = dash > dot > dot
+          implicit val dashDotDotDotDot = dashDotDot > dot > dot
           (dash > dot > dot).transpose(
             dashDotDotDotDot
           ) {
@@ -50,7 +53,8 @@ trait ContinuationMonad {
               (dash > dot > dot > dot).transpose(
                 dash > dot
               ) {
-                (x, f) => f(x)
+                (x, f) =>
+                  f(x)
               }(
                 f
               )

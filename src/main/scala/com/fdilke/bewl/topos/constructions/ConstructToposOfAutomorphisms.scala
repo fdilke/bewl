@@ -41,6 +41,7 @@ trait ConstructToposOfAutomorphisms extends
         override type DOT[X <: ~] = Automorphism[X]
         override type >[S <: ~, T <: ~] = AutomorphismArrow[S, T]
         override type TRUTH = Ɛ.TRUTH
+        override type →[T <: ~, U <: ~] = Ɛ.→[T, U]
         
         override val I = trivialAutomorphism(Ɛ.I)
         override val omega = trivialAutomorphism(Ɛ.omega)
@@ -84,7 +85,7 @@ trait ConstructToposOfAutomorphisms extends
           }
           override def `>Uncached`[Y <: ~](that: DOT[Y]) = {
             val exponentialCarrier = carrier > that.carrier
-            new Automorphism(
+            new Automorphism[X → Y](
               exponentialCarrier.transpose(exponentialCarrier) {
                 (e, x) => that.arrow(
                   exponentialCarrier.evaluate(e, inverse(x))

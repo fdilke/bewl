@@ -23,6 +23,7 @@ trait ConstructToposOfMonoidActionsAlt extends
           override type DOT[A <: ~] = ActionDotFacade[A]
           override type >[A <: ~, B <: ~] = ActionArrowFacade[A, B]
           override type UNIT = Ɛ.UNIT
+          override type →[T <: ~, U <: ~] = Ɛ.→[T, U]
           
           type IDEAL = M → Ɛ.TRUTH
           override type TRUTH = IDEAL

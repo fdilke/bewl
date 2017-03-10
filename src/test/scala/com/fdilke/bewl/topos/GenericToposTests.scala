@@ -207,13 +207,15 @@ abstract class GenericToposTests[~](
       evaluation.arrow.sanityTest()
       evaluation.arrow.target shouldBe baz
 
-      val foo2bar2baz: FOO > (BAR → BAZ) = (bar > baz) transpose foobar2baz
+      val foo2bar2baz: FOO > (BAR → BAZ) = 
+        (bar > baz) transpose foobar2baz
       foo2bar2baz.sanityTest()
       foo2bar2baz should have(
         'source(foo),
         'target(bar > baz)
       )
 
+      implicit val _ = bar > baz
       (foo x bar)(baz) {
         case f ⊕ b =>
           foo2bar2baz(f)(b)

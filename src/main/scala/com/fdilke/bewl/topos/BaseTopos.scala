@@ -14,7 +14,7 @@ trait BaseTopos {
   type DOT[S <: ~] <: Dot[S]
   type >[S <: ~, T <: ~] <: Arrow[S, T]
 
-  type →[T <: ~, U <: ~] = ~
+  type →[T <: ~, U <: ~] <: ~
   type x[T <: ~, U <: ~] = (T ⊕ U) with ~
 
   type UNIT <: ~

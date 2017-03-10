@@ -56,9 +56,6 @@ object FiniteSets extends Topos[Any] with Wrappings[
         override def apply(s: S): T =
           function(s)
       }
-      val hh: DOT[S → T] with ExponentialDot[S, T, S → T] = ???
-      val kk: EXPONENTIAL[S, T] = hh
-      ???
       
       new FiniteSetsDot[S → T](
         allMaps(self.elements, that.elements) map FunctionElement
@@ -160,7 +157,11 @@ object FiniteSets extends Topos[Any] with Wrappings[
     source(target)(f)
 
   override def makeArrow[S, T](prearrow: FiniteSetsPreArrow[S, T]) =
-    makeDot(prearrow.source)(makeDot(prearrow.target))(prearrow.function)
+    makeDot(prearrow.source)(
+      makeDot(prearrow.target)
+    )(
+      prearrow.function
+    )
 
   override def makeDot[T](predot: Traversable[T]) =
     memoizedDotWrapper(predot)
