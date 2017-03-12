@@ -45,16 +45,23 @@ trait AlgebraicStructures extends
     ) (
       actionMultiply: (A, M) => A
     ) =
-      Action[A](actionCarrier, actionMultiply)
+      Action[A](
+        actionCarrier, 
+        (actionCarrier x carrier).biArrow(
+          actionCarrier
+        )(
+          actionMultiply
+        )
+      )
 
     def regularAction =
       action(carrier) { multiply(_, _) }
 
     case class Action[A <: ~](
       actionCarrier: DOT[A],
-      actionMultiply: (A, M) => A
+      actionMultiply: BiArrow[A, M, A]
     ) extends actions.Algebra[A](actionCarrier)(
-      ** := (actionCarrier x carrier).biArrow(actionCarrier)(actionMultiply),
+      ** := actionMultiply,
       *** := multiply
     )
 

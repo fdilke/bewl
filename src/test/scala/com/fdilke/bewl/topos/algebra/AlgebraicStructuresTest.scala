@@ -90,27 +90,39 @@ class AlgebraicStructuresTest extends FunSpec {
 
   describe("Monoid actions") {
     it("can be constructed and validated") {
-      new monoid4.Action[Symbol](dot(a, b), Function untupled Map(
-        (a, i) -> a, (a, x) -> a, (a, y) -> a,
-        (b, i) -> b, (b, x) -> b, (b, y) -> b
-      )).sanityTest
+      monoid4.action[Symbol](
+        dot(a, b)
+      ){ 
+        Function untupled Map(
+          (a, i) -> a, (a, x) -> a, (a, y) -> a,
+          (b, i) -> b, (b, x) -> b, (b, y) -> b
+        )
+      }.sanityTest
     }
 
     it("enforce the right unit law") {
       intercept[IllegalArgumentException] {
-        new monoid4.Action[Symbol](dot(a, b), Function untupled Map(
-          (a, i) -> b, (a, x) -> a, (a, y) -> a,
-          (b, i) -> a, (b, x) -> b, (b, y) -> b
-        )).sanityTest
+        monoid4.action[Symbol](
+          dot(a, b)
+        ){
+          Function untupled Map(
+            (a, i) -> b, (a, x) -> a, (a, y) -> a,
+            (b, i) -> a, (b, x) -> b, (b, y) -> b
+          )
+        }.sanityTest
       }.getMessage shouldBe "right unit law failed"
     }
 
     it("enforce the associative law") {
       intercept[IllegalArgumentException] {
-        new monoid4.Action[Symbol](dot(a, b), Function untupled Map(
-          (a, i) -> a, (a, x) -> b, (a, y) -> a,
-          (b, i) -> b, (b, x) -> b, (b, y) -> a
-        )).sanityTest
+        monoid4.action[Symbol](
+          dot(a, b)
+        ) {
+          Function untupled Map(
+            (a, i) -> a, (a, x) -> b, (a, y) -> a,
+            (b, i) -> b, (b, x) -> b, (b, y) -> a
+          )
+        }.sanityTest
       }.getMessage shouldBe "mixed associative law failed"
     }
 
@@ -137,7 +149,10 @@ class AlgebraicStructuresTest extends FunSpec {
             (a, i) -> a, (a, x) -> a,
             (b, i) -> b, (b, x) -> a
           )
-        new monoid1x.Action[Symbol](actionCarrier, actionMultiply.apply)
+        new monoid1x.Action[Symbol](
+          actionCarrier,
+          actionMultiply
+        )
       }
       rightAction.sanityTest
       val rightAction2 = {
@@ -154,7 +169,7 @@ class AlgebraicStructuresTest extends FunSpec {
           )
         new monoid1x.Action[Symbol](
           actionCarrier,
-          actionMultiply.apply
+          actionMultiply
         )
       }
       rightAction2.sanityTest

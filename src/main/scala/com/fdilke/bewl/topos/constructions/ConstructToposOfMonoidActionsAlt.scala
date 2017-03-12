@@ -29,14 +29,14 @@ trait ConstructToposOfMonoidActionsAlt extends
       ({type λ[X <: ~, Y <: ~] = monoid.ActionPreArrow[X, Y]}) # λ,
       ({type λ[T <: ~] = T}) # λ
     ] {
-      import monoid.{ carrier, action, Action }
+      import monoid.{ carrier, multiply, action, Action }
       
       override type DOT[A <: ~] = ActionDot[A]
       override type >[A <: ~, B <: ~] = ActionArrow[A, B]
       override type UNIT = Ɛ.UNIT
-      override type →[T <: ~, U <: ~] = Ɛ.→[T, U]
+      override type →[T <: ~, U <: ~] = Ɛ.→[Ɛ.x[M, T], U]
       
-      type IDEAL = M → Ɛ.TRUTH
+      type IDEAL = Ɛ.→[M, Ɛ.TRUTH]
       override type TRUTH = IDEAL
   
       override lazy val I = 
@@ -107,7 +107,107 @@ trait ConstructToposOfMonoidActionsAlt extends
           ](
             that: ActionDot[T]
           ): EXPONENTIAL[S,T] = 
-            ???
+            {
+              val mXs = carrier x action.carrier
+              val possibleMorphisms = 
+                mXs > that.action.actionCarrier
+                
+              import possibleMorphisms.{ evaluate => $ }
+
+              val morphisms: Ɛ.EQUALIZER[S → T] =
+                possibleMorphisms.whereAll(
+                  carrier,
+                  carrier,
+                  action.actionCarrier
+                ) {
+                  (f, n, m, s) =>
+                    that.action.actionCarrier.=?=(
+                      $(f, 
+                        mXs.pair(
+                          multiply(m, n),
+                          action.actionMultiply(s, n)
+                        )
+                      ),
+                      that.action.actionMultiply(
+                        $(f, 
+                          mXs.pair(m, s)
+                        ),
+                        n
+                      )
+                    )
+                }
+
+              val morphismMultiply  =
+                morphisms.restrict(
+                  possibleMorphisms.transpose(
+                    morphisms x carrier
+                  ) {
+                    case (f ⊕ m, n ⊕ s) =>
+                      $(morphisms.inclusion(f),
+                        mXs.pair(
+                          multiply(m, n), 
+                          s
+                        )
+                      )
+                  }
+                )
+              
+              new ActionDot[S → T] (
+                Action(
+                  morphisms, 
+                  Ɛ.BiArrow[S → T, M, S → T](
+                    morphisms x carrier,
+                    morphismMultiply
+                  )
+                )
+              ) with ExponentialDot[
+                S, 
+                T, 
+                S → T
+              ] { exponentialDot =>
+                override val source = actionDot 
+                override val target = that 
+                override def evaluate(
+                  function: S → T,
+                  arg: S
+                ): T = ??? 
+                override def transpose[
+                  R <: ~
+                ](
+                  biArrow: BiArrow[R, S, T]
+                ): ActionArrow[R, S → T] = {
+//                  val hhh =
+//                    possibleMorphisms.transpose(
+//                      action.actionCarrier
+//                    ) {
+//                      case (s, m ⊕ r) =>
+//                        biArrow(
+//                          action.actionMultiply(s, m),
+//                          r
+//                        )
+//                    }
+//                    
+//                  val innerArrow: Ɛ.>[R, S → T] =
+//                    morphisms.restrict(
+//                      possibleMorphisms.transpose(
+//                        action.actionCarrier
+//                      ) {
+//                        case (s, m ⊕ r) =>
+//                          biArrow(
+//                            action.actionMultiply(s, m),
+//                            r
+//                          )
+//                      }
+//                    )
+//                  biArrow.product.left(
+//                    exponentialDot
+//                  ) { aa =>
+//                    innerArrow(aa)
+//                  }
+                  ???
+                }
+              }
+          }
             
           override def apply[
             T <: ~
