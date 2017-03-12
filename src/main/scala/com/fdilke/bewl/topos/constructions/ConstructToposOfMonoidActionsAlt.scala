@@ -26,7 +26,7 @@ trait ConstructToposOfMonoidActionsAlt extends
     import monoid.{ carrier, action, Action }
     
     override type DOT[A <: ~] = ActionDot[A]
-    override type >[A <: ~, B <: ~] = ActionArrowFacade[A, B]
+    override type >[A <: ~, B <: ~] = ActionArrow[A, B]
     override type UNIT = Ɛ.UNIT
     override type →[T <: ~, U <: ~] = Ɛ.→[T, U]
     
@@ -173,21 +173,14 @@ trait ConstructToposOfMonoidActionsAlt extends
         }
       }
       
-      trait ActionArrowFacade[ // TODO: do we need this trait? Is there more than one implementation?
-        S <: ~,
-        T <: ~
-      ] extends Arrow[S, T] {
-        val arrow: Ɛ.>[S, T]
-      }
-      
       class ActionArrow[
         S <: ~,
         T <: ~
       ](
         val source: ActionDot[S],
         val target: ActionDot[T],
-        override val arrow: Ɛ.>[S, T]
-      ) extends ActionArrowFacade[S, T] {
+        val arrow: Ɛ.>[S, T]
+      ) extends Arrow[S, T] {
         def this(
           source: ActionDot[S],
           target: ActionDot[T],
@@ -246,7 +239,7 @@ trait ConstructToposOfMonoidActionsAlt extends
             def restrict[
               R <: ~
             ](
-              actionArrow: ActionArrowFacade[R, S]
+              actionArrow: ActionArrow[R, S]
             ) = 
               new ActionArrow[R, S](
                 actionArrow.source,
@@ -336,7 +329,7 @@ trait ConstructToposOfMonoidActionsAlt extends
         source: ActionDot[S], 
         target: ActionDot[T], 
         f: S ⇒ T
-      ): ActionArrowFacade[S,T] =
+      ): ActionArrow[S,T] =
         ???
       
       override def makeArrow[
@@ -344,7 +337,7 @@ trait ConstructToposOfMonoidActionsAlt extends
         T <: ~
       ](
         prearrow: monoid.ActionPreArrow[S,T]
-      ): ActionArrowFacade[S,T] = ??? 
+      ): ActionArrow[S,T] = ??? 
       
       override def makeDot[T <: ~](
         predot: monoid.Action[T]
