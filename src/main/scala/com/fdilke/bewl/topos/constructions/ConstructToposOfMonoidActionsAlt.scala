@@ -17,7 +17,13 @@ trait ConstructToposOfMonoidActionsAlt extends
     ] (
       monoid: Ɛ.Monoid[M]
     ) : Topos[~] =
-      new Topos[~] {
+      new Topos[~] with Wrappings[
+    ~,
+    ~,
+    ({type λ[X <: ~] = monoid.Action[X]}) # λ,
+    ({type λ[X <: ~, Y <: ~] = monoid.ActionPreArrow[X, Y]}) # λ,
+    ({type λ[T <: ~] = T}) # λ
+  ] {
         import monoid.{ carrier, action, Action }
         
           override type DOT[A <: ~] = ActionDotFacade[A]
@@ -198,19 +204,19 @@ trait ConstructToposOfMonoidActionsAlt extends
               function: S => T
             ) =
               this(
-                  source,
-                  target,
-                  source.underlyingAction.carrier(
-                      target.underlyingAction.carrier
-                  )(
-                      function
-                  )
+                source,
+                target,
+                source.underlyingAction.carrier(
+                  target.underlyingAction.carrier
+                )(
+                  function
                 )
+              )
                 
             override def \[
               U <: ~
             ](
-                monic: U > T
+              monic: U > T
             ): S > U = 
               new ActionArrow[S, U](
                   source,
@@ -239,16 +245,16 @@ trait ConstructToposOfMonoidActionsAlt extends
                   action(
                       equalizer
                   ){ (s, m) =>
-                      restrictedMultiply(
-                          equalizerCarrier.pair(s, m)
-                      )
+                    restrictedMultiply(
+                      equalizerCarrier.pair(s, m)
+                    )
                   }
               ) with EqualizingDot[S] { equalizingDot =>
                 val equalizerTarget = source 
                 def restrict[
                   R <: ~
                 ](
-                    actionArrow: ActionArrowFacade[R, S]
+                  actionArrow: ActionArrowFacade[R, S]
                 ) = 
                   new ActionArrow[R, S](
                     actionArrow.source,
@@ -269,9 +275,12 @@ trait ConstructToposOfMonoidActionsAlt extends
               new ActionArrow(
                 target,
                 omega,
-                Ideals.restrict(target.underlyingAction.actionCarrier) {
+                Ideals.restrict(
+                  target.underlyingAction.actionCarrier
+                ) {
                   (t, m) => arrow.chi(target.underlyingAction.actionMultiply(t, m))
-                })
+                }
+              )
               
             override def o[
               R <: ~
@@ -314,6 +323,41 @@ trait ConstructToposOfMonoidActionsAlt extends
                 )
               )
           }
+          
+        override def bifunctionAsBiArrow[
+          L <: ~, 
+          R <: ~, 
+          T <: ~
+        ](
+          left: ActionDotFacade[L], 
+          right: ActionDotFacade[R], 
+          target: ActionDotFacade[T]
+        )(
+          bifunc: (L, R) ⇒ T
+        ): BiArrow[L,R,T] =
+          ???
+          
+        override def functionAsArrow[
+          S <: ~, 
+          T <: ~
+        ](
+          source: ActionDotFacade[S], 
+          target: ActionDotFacade[T], 
+          f: S ⇒ T
+        ): ActionArrowFacade[S,T] =
+          ???
+        
+        override def makeArrow[
+          S <: ~, 
+          T <: ~
+        ](
+          prearrow: monoid.ActionPreArrow[S,T]
+        ): ActionArrowFacade[S,T] = ??? 
+        
+        override def makeDot[T <: ~](
+          predot: monoid.Action[T]
+        ): ActionDotFacade[T] = 
+          ???          
       }
     }
 }
