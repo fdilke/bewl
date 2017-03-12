@@ -89,7 +89,7 @@ trait ConstructToposOfMonoidActionsAlt extends
           Ideals.omega
           
         override lazy val truth = 
-          new ActionArrow[Ɛ.UNIT, IDEAL](
+          ActionArrow[Ɛ.UNIT, IDEAL](
             I,
             omega,
             Ideals.restrict(Ɛ.I) {
@@ -112,14 +112,16 @@ trait ConstructToposOfMonoidActionsAlt extends
           override def apply[
             T <: ~
           ](
-              target: ActionDot[T]
+            target: ActionDot[T]
           )(
               f: S => T
           ): S > T = 
-            new ActionArrow[S, T](
+            ActionArrow[S, T](
               actionDot,
               target,
-              f
+              action.carrier(
+                target.action.carrier
+              ) { f }
             )
             
           override lazy val globals: Traversable[UNIT > S] = {
@@ -135,7 +137,7 @@ trait ConstructToposOfMonoidActionsAlt extends
               }
   
             fixedPoints.globals.map { global =>
-              new ActionArrow(
+              ActionArrow(
                 I, 
                 actionDot, 
                 fixedPoints.inclusion o global
@@ -149,7 +151,7 @@ trait ConstructToposOfMonoidActionsAlt extends
           }
                 
           override lazy val toI: S > UNIT = 
-            new ActionArrow(
+            ActionArrow(
               actionDot, 
               I, 
               action.actionCarrier.toI
@@ -179,13 +181,13 @@ trait ConstructToposOfMonoidActionsAlt extends
           }
         }
         
-        class ActionArrow[
+        case class ActionArrow[
           S <: ~,
           T <: ~
         ](
-          val source: ActionDot[S],
-          val target: ActionDot[T],
-          val arrow: Ɛ.>[S, T]
+          source: ActionDot[S],
+          target: ActionDot[T],
+          arrow: Ɛ.>[S, T]
         ) extends Arrow[S, T] {
           def this(
             source: ActionDot[S],
@@ -207,10 +209,10 @@ trait ConstructToposOfMonoidActionsAlt extends
           ](
             monic: U > T
           ): S > U = 
-            new ActionArrow[S, U](
-                source,
-                monic.source,
-                arrow \ monic.arrow
+            ActionArrow[S, U](
+              source,
+              monic.source,
+              arrow \ monic.arrow
             )
             
           override def ?=(
@@ -247,7 +249,7 @@ trait ConstructToposOfMonoidActionsAlt extends
               ](
                 actionArrow: ActionArrow[R, S]
               ) = 
-                new ActionArrow[R, S](
+                ActionArrow[R, S](
                   actionArrow.source,
                   equalizingDot,
                   equalizer.restrict(
@@ -263,7 +265,7 @@ trait ConstructToposOfMonoidActionsAlt extends
             arrow(s)
             
           override lazy val chi: T > TRUTH = 
-            new ActionArrow(
+            ActionArrow(
               target,
               omega,
               Ideals.restrict(
@@ -278,7 +280,7 @@ trait ConstructToposOfMonoidActionsAlt extends
           ](
             that: R > S
           ): R > T = 
-            new ActionArrow[R, T](
+            ActionArrow[R, T](
               that.source,
               target,
               arrow o that.arrow
@@ -325,18 +327,18 @@ trait ConstructToposOfMonoidActionsAlt extends
           target: ActionDot[T]
         )(
           bifunc: (L, R) ⇒ T
-        ): BiArrow[L,R,T] =
-          ???
+        ): BiArrow[L,R,T] = // no wrappings: generic version will do
+          (left x right).biArrow(target) { bifunc }
           
         override def functionAsArrow[
           S <: ~, 
           T <: ~
-        ](
+        ]( 
           source: ActionDot[S], 
           target: ActionDot[T], 
           f: S ⇒ T
-        ): ActionArrow[S,T] =
-          ???
+        ): ActionArrow[S,T] = // no wrappings: generic version will do
+          source(target){ f }
         
         override def makeArrow[
           S <: ~, 
@@ -344,11 +346,24 @@ trait ConstructToposOfMonoidActionsAlt extends
         ](
           prearrow: monoid.ActionPreArrow[S,T]
         ): ActionArrow[S,T] = ??? 
-        
+
+        private val memoizedDotWrapper =
+          Memoize.generic withLowerBound[
+            ({
+              type λ[T <: Ɛ.~] = Action[T]
+            }) # λ,
+            ({
+              type λ[T <: Ɛ.~] = DOT[T]
+            }) # λ,
+            Ɛ.~
+          ] { action => 
+            new ActionDot(action) 
+          }
+            
         override def makeDot[T <: ~](
           predot: monoid.Action[T]
         ): ActionDot[T] = 
-          ???          
+          memoizedDotWrapper(predot)          
       }
   }
 }
