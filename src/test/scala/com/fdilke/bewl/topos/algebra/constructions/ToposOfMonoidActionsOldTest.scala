@@ -5,11 +5,11 @@ import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsUtilities}
 import com.fdilke.bewl.topos.{GenericToposTests, ToposWithFixtures}
 import org.scalatest.Matchers._
-import FiniteSets.ToposOfMonoidActions.~~
+import FiniteSets.ToposOfMonoidActionsOld.~~
 
 import scala.Function.untupled
 
-class ToposOfMonoidActionsTest extends GenericToposTests[~~](
+class ToposOfMonoidActionsOldTest extends GenericToposTests[~~](
   new ToposWithFixtures[~~] {
 
     private val (i, x, y) = ('i, 'x, 'y)
@@ -21,7 +21,7 @@ class ToposOfMonoidActionsTest extends GenericToposTests[~~](
         y, x, y
       ) // right-dominant on two generators
 
-    override val topos = FiniteSets.ToposOfMonoidActions of monoidOf3
+    override val topos = FiniteSets.ToposOfMonoidActionsOld of monoidOf3
 
     import topos._
 

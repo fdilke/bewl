@@ -22,7 +22,7 @@ class ToposOfMonoidActionsAltTest extends GenericToposTests[~](
       ) // right-dominant on two generators
 
     override val topos = 
-      FiniteSets.ToposOfMonoidActionsAlt of monoidOf3
+      FiniteSets.ToposOfMonoidActions of monoidOf3
 
     import topos._
 
