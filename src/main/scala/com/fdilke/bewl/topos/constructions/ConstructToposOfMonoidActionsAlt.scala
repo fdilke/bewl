@@ -29,7 +29,7 @@ trait ConstructToposOfMonoidActionsAlt extends
       ({type λ[X <: ~, Y <: ~] = monoid.ActionPreArrow[X, Y]}) # λ,
       ({type λ[T <: ~] = T}) # λ
     ] {
-      import monoid.{ carrier, multiply, action, Action }
+      import monoid.{ carrier, multiply, action, unit, Action }
       
       override type DOT[A <: ~] = ActionDot[A]
       override type >[A <: ~, B <: ~] = ActionArrow[A, B]
@@ -40,9 +40,11 @@ trait ConstructToposOfMonoidActionsAlt extends
       override type TRUTH = IDEAL
   
       override lazy val I = 
-        ActionDot(Ɛ.I) {
-          (i, m) => i
-        }
+        new ActionDot(
+          action(Ɛ.I) {
+            (i, m) => i
+          }
+        )
   
       private object Ideals {
         private val possibleIdeals = carrier.power
@@ -75,14 +77,15 @@ trait ConstructToposOfMonoidActionsAlt extends
           }
   
           val omega = 
-            ActionDot[IDEAL](
-                ideals
-            )(
+            new ActionDot[IDEAL](
+              Action(
+                ideals,
               Ɛ.BiArrow[IDEAL, M, IDEAL](
                   ideals x carrier, 
                   idealMultiply
-              )(_, _)
+              )
             )
+          )
         }
             
         override lazy val omega = 
@@ -169,42 +172,40 @@ trait ConstructToposOfMonoidActionsAlt extends
                 override val target = that 
                 override def evaluate(
                   function: S → T,
-                  arg: S
-                ): T = ??? 
+                  s: S
+                ): T = 
+                  $(
+                    function,
+                    mXs.pair(
+                      unit(
+                        actionDot.action.carrier.toI(s)
+                      ),
+                      s
+                    )
+                  )
+                  
                 override def transpose[
                   R <: ~
                 ](
                   biArrow: BiArrow[R, S, T]
                 ): ActionArrow[R, S → T] = {
-//                  val hhh =
-//                    possibleMorphisms.transpose(
-//                      action.actionCarrier
-//                    ) {
-//                      case (s, m ⊕ r) =>
-//                        biArrow(
-//                          action.actionMultiply(s, m),
-//                          r
-//                        )
-//                    }
-//                    
-//                  val innerArrow: Ɛ.>[R, S → T] =
-//                    morphisms.restrict(
-//                      possibleMorphisms.transpose(
-//                        action.actionCarrier
-//                      ) {
-//                        case (s, m ⊕ r) =>
-//                          biArrow(
-//                            action.actionMultiply(s, m),
-//                            r
-//                          )
-//                      }
-//                    )
-//                  biArrow.product.left(
-//                    exponentialDot
-//                  ) { aa =>
-//                    innerArrow(aa)
-//                  }
-                  ???
+                  val rAction = biArrow.product.left
+
+                  ActionArrow(
+                    rAction,
+                    exponentialDot,
+                    morphisms.restrict(
+                      possibleMorphisms.transpose(
+                        rAction.action.actionCarrier
+                      ) {
+                        case (r, m ⊕ s) => 
+                          biArrow(
+                            rAction.action.actionMultiply(r, m),
+                            s
+                          )
+                      }
+                    )
+                  )
                 }
               }
           }
@@ -371,7 +372,9 @@ trait ConstructToposOfMonoidActionsAlt extends
               Ideals.restrict(
                 target.action.actionCarrier
               ) {
-                (t, m) => arrow.chi(target.action.actionMultiply(t, m))
+                (t, m) => arrow.chi(
+                  target.action.actionMultiply(t, m)
+                )
               }
             )
             
@@ -398,25 +401,6 @@ trait ConstructToposOfMonoidActionsAlt extends
           }
         }
         
-        object ActionDot {
-          def apply[
-            A <: ~
-          ](
-            actionCarrier: Ɛ.DOT[A]
-          )(
-            actionMultiply: (A, M) => A
-          ): ActionDot[
-            A
-          ] =
-            new ActionDot(
-              action(
-                  actionCarrier
-              )(
-                  actionMultiply
-              )
-            )
-        }
-            
         override def bifunctionAsBiArrow[
           L <: ~, 
           R <: ~, 
