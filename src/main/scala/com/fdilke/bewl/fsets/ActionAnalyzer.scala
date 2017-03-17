@@ -4,7 +4,7 @@ import FiniteSetsUtilities._
 import FiniteSets.{~, >, Monoid, makeDot}
 import scala.language.postfixOps
 
-object ActionAnalyser {
+object ActionAnalyzer {
   trait Ingredients[M, S ] {
     val monoid: Monoid[M]
     val action: monoid.Action[S]
@@ -15,7 +15,7 @@ object ActionAnalyser {
     _monoid: Monoid[M]
   ) (
     _action: _monoid.Action[S]
-  ) = new ActionAnalyser[M, S] (
+  ) = new ActionAnalyzer[M, S] (
       new Ingredients[M, S] {
         override val monoid = _monoid
         override val action = _action.asInstanceOf[monoid.Action[S]]
@@ -23,8 +23,8 @@ object ActionAnalyser {
     )
 }
 
-class ActionAnalyser[M, S]( 
-  ingredients: ActionAnalyser.Ingredients[M, S] 
+class ActionAnalyzer[M, S]( 
+  ingredients: ActionAnalyzer.Ingredients[M, S] 
 ){
   import ingredients._
   
@@ -35,7 +35,7 @@ class ActionAnalyser[M, S](
     elementsOf(action.actionCarrier)
     
   class MaximalCyclics(
-    cyclics: Seq[Set[S]] =
+    val cyclics: Seq[Set[S]] =
       Seq.empty
   ) { self =>
     def contains(s: S) =
@@ -45,12 +45,13 @@ class ActionAnalyser[M, S](
     
     def +(
       newCyclic: Set[S]
-    ) =
+    ) = 
       new MaximalCyclics(
-        newCyclic +: 
+        newCyclic +: ( 
           cyclics filterNot { 
             _.subsetOf(newCyclic)
           } 
+        )
       )
 
     def transversal =

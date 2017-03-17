@@ -13,7 +13,7 @@ object FiniteSetsActionAssistant {
   ) (
     action: monoid.Action[S]
   ): S > S = 
-    ActionAnalyser(
+    ActionAnalyzer(
       monoid
     )(
       action
