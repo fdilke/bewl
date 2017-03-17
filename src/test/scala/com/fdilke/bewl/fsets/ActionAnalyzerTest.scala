@@ -29,13 +29,15 @@ class ActionAnalyzerTest extends FreeSpec {
     )(
       regularAction
     )
-    
+
+  import analyzer.{ MaximalCyclics, Cyclic }
+  
   "The action analyzer" - {
     "can build up a set of maximal cyclic subalgebras for a monoid action" - {
 
       "which are initially empty" in {
         val cyclics =
-          new analyzer.MaximalCyclics
+          new MaximalCyclics
           
         cyclics.cyclics shouldBe empty
         
@@ -46,47 +48,32 @@ class ActionAnalyzerTest extends FreeSpec {
       
       "which can be added to, filtering out any eclipsed cyclics" in {
         val cyclics_I =
-          new analyzer.MaximalCyclics + Set(i)
+          new MaximalCyclics + Cyclic(i)
 
         cyclics_I.cyclics should have size 1
         
-        val cyclics_I_X_Y =
-          new analyzer.MaximalCyclics + Set(i) + Set(x) + Set(y)
+        val cyclics_X_Y =
+          new MaximalCyclics + Cyclic(x) + Cyclic(y)
 
-        cyclics_I_X_Y.cyclics should have size 3
+        cyclics_X_Y.cyclics should have size 1
         
-        (cyclics_I_X_Y + Set(i, y)).cyclics shouldBe Seq(
-          Set(i, y),
-          Set(x)
+        (cyclics_X_Y + Cyclic(i)).cyclics shouldBe Seq(
+          Cyclic(i)
         )
       }
       
       "which can be used to build up the complete set" in {
         val allMaxCyclics =
           Seq(i, x, y).foldLeft(
-            new analyzer.MaximalCyclics
+            new MaximalCyclics
           ) { 
             _ << _
           }
         
         allMaxCyclics.cyclics shouldBe Seq(
-          Set(i, x, y)
+          Cyclic(i)
         )
       }
-      
-//      cyclics.cy        
-//      generators shouldBe 'monic
-//      val generatingElements = 
-//        elementsOf(
-//          generators.source
-//        )        
-      
-//      generatingElements should have size 1
-//      
-//      // Check it's one of the elements that can BE a generator
-//      Set[M]() should contain (
-//        generatingElements.head
-//      )
     }
   }
 }

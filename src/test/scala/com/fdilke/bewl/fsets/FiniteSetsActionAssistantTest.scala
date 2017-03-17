@@ -33,17 +33,11 @@ class FiniteSetsActionAssistantTest extends FreeSpec {
         )
         
       generators shouldBe 'monic
-      val generatingElements = 
-        elementsOf(
-          generators.source
-        )        
-      
-//      generatingElements should have size 1
-//      
-//      // Check it's one of the elements that can BE a generator
-//      Set[M]() should contain (
-//        generatingElements.head
-//      )
+
+      // Check it's the unique generator
+      elementsOf(
+        generators.source
+      ) shouldBe Seq(i)
     }
   }
 }

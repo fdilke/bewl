@@ -33,9 +33,31 @@ class ActionAnalyzer[M, S](
 
   private val actionElements = 
     elementsOf(action.actionCarrier)
+
+  case class Cyclic(
+     generator: S
+  ) {
+   val elements: Set[S] =
+      monoidElements map { 
+        action.actionMultiply(
+          generator, 
+          _
+        )
+      } toSet
     
+    def contains(s: S) =
+      elements contains s
+
+    def subsetOf(
+      other: Cyclic
+    ) =
+      elements.subsetOf(
+        other.elements          
+      )
+  }
+  
   class MaximalCyclics(
-    val cyclics: Seq[Set[S]] =
+    val cyclics: Seq[Cyclic] =
       Seq.empty
   ) { self =>
     def contains(s: S) =
@@ -44,7 +66,7 @@ class ActionAnalyzer[M, S](
       }
     
     def +(
-      newCyclic: Set[S]
+      newCyclic: Cyclic
     ) = 
       new MaximalCyclics(
         newCyclic +: ( 
@@ -56,17 +78,14 @@ class ActionAnalyzer[M, S](
 
     def transversal =
       cyclics map {
-        _.head
+        _.generator
       }
     
     def <<(s: S): MaximalCyclics = 
       if (self.contains(s))
         self
       else 
-        self + 
-          monoidElements.map { 
-            action.actionMultiply(s, _)
-          }.toSet
+        self + Cyclic(s)
   }
     
   lazy val extractGenerators: S > S = 
