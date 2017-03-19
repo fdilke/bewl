@@ -9,7 +9,7 @@ import FiniteSets.~
 
 import scala.Function.untupled
 
-class ToposOfMonoidActionsAltTest extends GenericToposTests[~](
+class ToposOfMonoidActionsTest extends GenericToposTests[~](
   new ToposWithFixtures[~] {
 
     private val (i, x, y) = ('i, 'x, 'y)
