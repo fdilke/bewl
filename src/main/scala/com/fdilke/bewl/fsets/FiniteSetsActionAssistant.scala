@@ -3,9 +3,10 @@ package com.fdilke.bewl.fsets
 import FiniteSetsUtilities._
 import FiniteSets.{~, >, Monoid, makeDot}
 import scala.language.postfixOps
+import scala.language.reflectiveCalls
 
 object FiniteSetsActionAssistant {
-  def extractGenerators[
+  def generators[
     M <: ~, 
     S <: ~
   ](
@@ -13,9 +14,15 @@ object FiniteSetsActionAssistant {
   ) (
     action: monoid.Action[S]
   ): S > S = 
-    ActionAnalyzer(
-      monoid
+    makeDot(
+      FiniteSetsMonoidAnalyzer(
+        monoid
+      ).actionAnalyzer(
+        action
+      ).generators
     )(
-      action
-    ).extractGenerators
+      action.actionCarrier
+    ) {
+      identity[S]
+    }
 }

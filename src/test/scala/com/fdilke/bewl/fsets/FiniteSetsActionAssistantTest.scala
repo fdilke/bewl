@@ -2,11 +2,10 @@ package com.fdilke.bewl.fsets
 
 import FiniteSetsUtilities._
 import FiniteSets.>
-import FiniteSetsActionAssistant.extractGenerators
+import FiniteSetsActionAssistant.generators
 
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
-
 
 class FiniteSetsActionAssistantTest extends FreeSpec {
   
@@ -25,18 +24,18 @@ class FiniteSetsActionAssistantTest extends FreeSpec {
     "can extract a set of generators for a monoid" in {
       import monoidOf3.regularAction
 
-      val generators: M > M =
-        extractGenerators(
+      val theGenerators: M > M =
+        generators(
           monoidOf3
         )(
           regularAction
         )
         
-      generators shouldBe 'monic
+      theGenerators shouldBe 'monic
 
       // Check it's the unique generator
       elementsOf(
-        generators.source
+        theGenerators.source
       ) shouldBe Seq(i)
     }
   }

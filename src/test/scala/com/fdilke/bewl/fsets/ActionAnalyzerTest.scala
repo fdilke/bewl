@@ -2,11 +2,12 @@ package com.fdilke.bewl.fsets
 
 import FiniteSetsUtilities._
 import FiniteSets.{UNIT, >, ToposOfMonoidActions }
-import FiniteSetsActionAssistant.extractGenerators
+import FiniteSetsActionAssistant.generators
 
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
-
+import scala.language.reflectiveCalls
+import scala.language.existentials
 
 class ActionAnalyzerTest extends FreeSpec {
   
@@ -20,15 +21,18 @@ class ActionAnalyzerTest extends FreeSpec {
     ) // right-dominant on two generators
 
   import monoidOf3.regularAction
-    
+
+  private val monoidAnalyzer =
+    FiniteSetsMonoidAnalyzer(
+      monoidOf3
+    )
+        
   private type M = Symbol
 
   def analyzerFor[A](
     action: monoidOf3.Action[A]
   ) =
-    ActionAnalyzer(
-      monoidOf3
-    )(
+    monoidAnalyzer.actionAnalyzer(
       action
     )
 
@@ -37,7 +41,7 @@ class ActionAnalyzerTest extends FreeSpec {
       regularAction
     )
 
-  import analyzer.{ MaximalCyclics, Cyclic }
+  import analyzer.{ initialCyclics, cyclic }
   
   private val actionTopos = 
       ToposOfMonoidActions of monoidOf3
@@ -47,7 +51,7 @@ class ActionAnalyzerTest extends FreeSpec {
 
       "which are initially empty" in {
         val cyclics =
-          new MaximalCyclics
+          analyzer.initialCyclics
           
         cyclics.cyclics shouldBe empty
         
@@ -58,30 +62,30 @@ class ActionAnalyzerTest extends FreeSpec {
       
       "which can be added to, filtering out any eclipsed cyclics" in {
         val cyclics_I =
-          new MaximalCyclics + Cyclic(i)
+          initialCyclics + cyclic(i)
 
         cyclics_I.cyclics should have size 1
         
         val cyclics_X_Y =
-          new MaximalCyclics + Cyclic(x) + Cyclic(y)
+          initialCyclics + cyclic(x) + cyclic(y)
 
         cyclics_X_Y.cyclics should have size 1
         
-        (cyclics_X_Y + Cyclic(i)).cyclics shouldBe Seq(
-          Cyclic(i)
+        (cyclics_X_Y + cyclic(i)).cyclics shouldBe Seq(
+          cyclic(i)
         )
       }
       
       "which can be used to build up the complete set" in {
         val allMaxCyclics =
           Seq(i, x, y).foldLeft(
-            new MaximalCyclics
+            initialCyclics
           ) { 
             _ << _
           }
         
         allMaxCyclics.cyclics shouldBe Seq(
-          Cyclic(i)
+          cyclic(i)
         )
       }
 
@@ -90,13 +94,9 @@ class ActionAnalyzerTest extends FreeSpec {
           actionTopos.unwrap(
             actionTopos.O
           )
-        val emptyAnalyzer = 
-          analyzerFor(
-            emptyAction
-          )
-        elementsOf(
-          emptyAnalyzer.extractGenerators.source
-        ) shouldBe empty
+        analyzerFor(
+          emptyAction
+        ).generators shouldBe empty
       }
       
       "as expected for a non-cyclic action" in {
@@ -106,13 +106,9 @@ class ActionAnalyzerTest extends FreeSpec {
               regularAction
             ).squared
           )
-        val squareAnalyzer = 
-          analyzerFor(
-            regularSquared
-          )
-        elementsOf(
-          squareAnalyzer.extractGenerators.source
-        ) should have size 7
+        analyzerFor(
+          regularSquared
+        ).generators should have size 7
       }
       
       "as expected for another non-cyclic action" in {
@@ -120,35 +116,35 @@ class ActionAnalyzerTest extends FreeSpec {
           actionTopos.unwrap(
             actionTopos.omega
           )
-        val omegaAnalyzer =
-          analyzerFor(
-            theOmega
-          )
-        elementsOf(
-          omegaAnalyzer.extractGenerators.source
-        ) should have size 2
+        analyzerFor(
+          theOmega
+        ).generators should have size 2
       }
     }
     
     "can enumerate the morphisms into another action" - {
-      "for the trivial action" in {
+      "for the trivial action" ignore {
         val otherAction: monoidOf3.Action[actionTopos.UNIT] =
           actionTopos.unwrap(
             actionTopos.I
           )
-//        val morphisms =
-//          analyzer.morphismsTo(
-//            otherAction
-//          ) 
-//          
-//        morphisms should have size 1
-//        val morphism: M > UNIT =
-//          morphisms.head
-//        morphism should have {
-//          'source(regularAction.actionCarrier)
-//          'target(I)
-//        }
-//        morphism.sanityTest
+        val morphisms =
+          analyzer.morphismsTo(
+            otherAction
+          ) 
+          
+        morphisms should have size 1
+        val morphism: M > actionTopos.UNIT =
+          morphisms.head
+        morphism should have {
+          'source(regularAction.actionCarrier)
+          'target(
+            actionTopos.unwrap(
+              actionTopos.I
+            )
+          )
+        }
+        morphism.sanityTest
       }
     }
   }

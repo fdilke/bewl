@@ -57,13 +57,34 @@ trait AlgebraicStructures extends
     def regularAction =
       action(carrier) { multiply(_, _) }
 
+    trait Analyzer
+    
     case class Action[A <: ~](
       actionCarrier: DOT[A],
       actionMultiply: BiArrow[A, M, A]
     ) extends actions.Algebra[A](actionCarrier)(
       ** := actionMultiply,
       *** := multiply
-    )
+    ) {
+      trait Analyzer {
+        type CYCLIC <: BaseCyclic
+        type MAX_CYCLICS <: BaseMaximalCyclics
+
+        trait BaseMaximalCyclics {
+          def contains(a: A): Boolean
+          def +(cyclic: CYCLIC): MAX_CYCLICS
+          def <<(a: A): MAX_CYCLICS 
+        }
+        trait BaseCyclic 
+        
+        def initialCyclics: MAX_CYCLICS
+        def cyclic(a: A): CYCLIC
+        val generators: Seq[A]
+        def morphismsTo[B <: ~](
+          targetAction: Action[B]
+        ): Traversable[A > B]
+      }
+    }
 
     case class ActionPreArrow[
       S <: ~,
