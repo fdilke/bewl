@@ -23,10 +23,17 @@ class ActionAnalyzerTest extends FreeSpec {
     
   private type M = Symbol
 
-  private val analyzer = 
+  def analyzerFor[A](
+    action: monoidOf3.Action[A]
+  ) =
     ActionAnalyzer(
       monoidOf3
     )(
+      action
+    )
+
+  private val analyzer = 
+    analyzerFor(
       regularAction
     )
 
@@ -86,9 +93,7 @@ class ActionAnalyzerTest extends FreeSpec {
             ).squared
           )
         val squareAnalyzer = 
-          ActionAnalyzer(
-            monoidOf3
-          )(
+          analyzerFor(
             regularSquared
           )
         elementsOf(
@@ -102,9 +107,7 @@ class ActionAnalyzerTest extends FreeSpec {
             actionTopos.omega
           )
         val omegaAnalyzer =
-          ActionAnalyzer(
-            monoidOf3
-          ) (
+          analyzerFor(
             theOmega
           )
         elementsOf(
