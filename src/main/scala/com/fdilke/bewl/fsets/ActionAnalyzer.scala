@@ -3,28 +3,36 @@ package com.fdilke.bewl.fsets
 import FiniteSetsUtilities._
 import FiniteSets.{~, >, Monoid, makeDot}
 import scala.language.postfixOps
+import scala.language.higherKinds
 
 object ActionAnalyzer {
-  trait Ingredients[M, S ] {
+  trait Ingredients[M, A] {
     val monoid: Monoid[M]
-    val action: monoid.Action[S]
+    val action: monoid.Action[A]
   } 
 
   // Synthetic curried constructor with dependent types
-  def apply[M, S](
+  def apply[M, A](
     _monoid: Monoid[M]
   ) (
-    _action: _monoid.Action[S]
-  ) = new ActionAnalyzer[M, S] (
-      new Ingredients[M, S] {
+    _action: _monoid.Action[A]
+  ) = new ActionAnalyzer[
+    M, 
+    A 
+  ] (
+      new Ingredients[M, A] {
         override val monoid = _monoid
-        override val action = _action.asInstanceOf[monoid.Action[S]]
+        override val action = 
+          _action.asInstanceOf[monoid.Action[A]]
       }
     )
 }
 
-class ActionAnalyzer[M, S]( 
-  ingredients: ActionAnalyzer.Ingredients[M, S] 
+class ActionAnalyzer[
+  M, 
+  A 
+]( 
+  ingredients: ActionAnalyzer.Ingredients[M, A] 
 ){
   import ingredients._
   
@@ -35,9 +43,9 @@ class ActionAnalyzer[M, S](
     elementsOf(action.actionCarrier)
 
   case class Cyclic(
-     generator: S
+     generator: A
   ) {
-   val elements: Set[S] =
+   val elements: Set[A] =
       monoidElements map { 
         action.actionMultiply(
           generator, 
@@ -45,8 +53,8 @@ class ActionAnalyzer[M, S](
         )
       } toSet
     
-    def contains(s: S) =
-      elements contains s
+    def contains(a: A) =
+      elements contains a
 
     def subsetOf(
       other: Cyclic
@@ -60,9 +68,9 @@ class ActionAnalyzer[M, S](
     val cyclics: Seq[Cyclic] =
       Seq.empty
   ) { self =>
-    def contains(s: S) =
+    def contains(a: A) =
       cyclics.exists { 
-        _.contains(s) 
+        _ contains a 
       }
     
     def +(
@@ -71,7 +79,7 @@ class ActionAnalyzer[M, S](
       new MaximalCyclics(
         newCyclic +: ( 
           cyclics filterNot { 
-            _.subsetOf(newCyclic)
+            _ subsetOf newCyclic
           } 
         )
       )
@@ -81,14 +89,14 @@ class ActionAnalyzer[M, S](
         _.generator
       }
     
-    def <<(s: S): MaximalCyclics = 
-      if (self.contains(s))
+    def <<(a: A): MaximalCyclics = 
+      if (self contains a)
         self
       else 
-        self + Cyclic(s)
+        self + Cyclic(a)
   }
     
-  lazy val extractGenerators: S > S = 
+  lazy val extractGenerators: A > A = 
     makeDot(
       actionElements.foldLeft(
         new MaximalCyclics
@@ -98,6 +106,17 @@ class ActionAnalyzer[M, S](
     ) (
       action.actionCarrier
     ) {
-      identity[S]
+      identity[A]
+    }
+    
+  def morphismsTo[B](
+    target: monoid.Action[B]
+  ) =
+    new Traversable[A > B] {
+      override def foreach[U](
+        f: (A > B) => U
+      ) {
+        ???
+      }
     }
 }

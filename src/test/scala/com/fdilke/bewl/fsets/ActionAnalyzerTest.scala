@@ -1,7 +1,7 @@
 package com.fdilke.bewl.fsets
 
 import FiniteSetsUtilities._
-import FiniteSets.{>, ToposOfMonoidActions }
+import FiniteSets.{UNIT, >, ToposOfMonoidActions }
 import FiniteSetsActionAssistant.extractGenerators
 
 import org.scalatest.FreeSpec
@@ -84,6 +84,20 @@ class ActionAnalyzerTest extends FreeSpec {
           Cyclic(i)
         )
       }
+
+      "as expected for the empty action" in {
+        val emptyAction =
+          actionTopos.unwrap(
+            actionTopos.O
+          )
+        val emptyAnalyzer = 
+          analyzerFor(
+            emptyAction
+          )
+        elementsOf(
+          emptyAnalyzer.extractGenerators.source
+        ) shouldBe empty
+      }
       
       "as expected for a non-cyclic action" in {
         val regularSquared =
@@ -113,6 +127,28 @@ class ActionAnalyzerTest extends FreeSpec {
         elementsOf(
           omegaAnalyzer.extractGenerators.source
         ) should have size 2
+      }
+    }
+    
+    "can enumerate the morphisms into another action" - {
+      "for the trivial action" in {
+        val otherAction: monoidOf3.Action[actionTopos.UNIT] =
+          actionTopos.unwrap(
+            actionTopos.I
+          )
+//        val morphisms =
+//          analyzer.morphismsTo(
+//            otherAction
+//          ) 
+//          
+//        morphisms should have size 1
+//        val morphism: M > UNIT =
+//          morphisms.head
+//        morphism should have {
+//          'source(regularAction.actionCarrier)
+//          'target(I)
+//        }
+//        morphism.sanityTest
       }
     }
   }
