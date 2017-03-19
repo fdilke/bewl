@@ -2,7 +2,7 @@ package com.fdilke.bewl.topos.monads
 
 import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
-import com.fdilke.bewl.helper.ContinuousIntegration.notOnSnap
+import com.fdilke.bewl.helper.ContinuousIntegration.notOnCI
 import com.fdilke.bewl.helper.⊕._
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
@@ -58,7 +58,7 @@ class ContinuationMonadTest extends FreeSpec {
         map(soo) shouldBe (soo_ o (omega > f))
     }
 
-    "tensorial strength is calculated correctly" in notOnSnap {
+    "tensorial strength is calculated correctly" in notOnCI {
       val ints = dot(1, 2)
       val symbols = dot('a, 'b)
 
