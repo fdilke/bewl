@@ -1,7 +1,7 @@
 package com.fdilke.bewl.fsets
 
 import FiniteSetsUtilities._
-import FiniteSets.>
+import FiniteSets.{>, ToposOfMonoidActions }
 import FiniteSetsActionAssistant.extractGenerators
 
 import org.scalatest.FreeSpec
@@ -31,6 +31,9 @@ class ActionAnalyzerTest extends FreeSpec {
     )
 
   import analyzer.{ MaximalCyclics, Cyclic }
+  
+  private val actionTopos = 
+      ToposOfMonoidActions of monoidOf3
   
   "The action analyzer" - {
     "can build up a set of maximal cyclic subalgebras for a monoid action" - {
@@ -73,6 +76,40 @@ class ActionAnalyzerTest extends FreeSpec {
         allMaxCyclics.cyclics shouldBe Seq(
           Cyclic(i)
         )
+      }
+      
+      "as expected for a non-cyclic action" in {
+        val regularSquared =
+          actionTopos.unwrap(
+            actionTopos.makeDot(
+              regularAction
+            ).squared
+          )
+        val squareAnalyzer = 
+          ActionAnalyzer(
+            monoidOf3
+          )(
+            regularSquared
+          )
+        elementsOf(
+          squareAnalyzer.extractGenerators.source
+        ) should have size 7
+      }
+      
+      "as expected for another non-cyclic action" in {
+        val theOmega = 
+          actionTopos.unwrap(
+            actionTopos.omega
+          )
+        val omegaAnalyzer =
+          ActionAnalyzer(
+            monoidOf3
+          ) (
+            theOmega
+          )
+        elementsOf(
+          omegaAnalyzer.extractGenerators.source
+        ) should have size 2
       }
     }
   }

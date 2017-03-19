@@ -447,7 +447,12 @@ trait ConstructToposOfMonoidActions extends
         override def makeDot[T <: ~](
           predot: monoid.Action[T]
         ): ActionDot[T] = 
-          memoizedDotWrapper(predot)          
+          memoizedDotWrapper(predot)
+          
+        override def unwrap[T <: ~](
+          dot: ActionDot[T]
+        ) =
+          dot.action
       }
   }
 }

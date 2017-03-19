@@ -17,17 +17,22 @@ trait AlgebraicConstructions {
   class EndomorphismMonoid[T <: ~](
     dot: DOT[T]
   ) {
-    private implicit val endos = dot > dot
+    private implicit val endos = 
+      dot > dot
 
     val monoid =
-      new Monoid[T → T](endos, dot.identity.name,
+      new Monoid[T → T](
+        endos, 
+        dot.identity.name,
         BiArrow(endos x endos, endos.transpose(endos x endos) {
           case (f ⊕ g, x) => g(f(x))
         })
       )
 
     lazy val homeAction =
-      monoid.action(dot) { (a, m) =>
+      monoid.action(
+        dot
+      ) { (a, m) =>
         m(a)
       }
   }
