@@ -66,19 +66,18 @@ trait AlgebraicStructures extends
       ** := actionMultiply,
       *** := multiply
     ) {
-      trait Analyzer {
-        type CYCLIC <: BaseCyclic
-        type MAX_CYCLICS <: BaseMaximalCyclics
-
-        trait BaseMaximalCyclics {
-          def contains(a: A): Boolean
-          def +(cyclic: CYCLIC): MAX_CYCLICS
-          def <<(a: A): MAX_CYCLICS 
-        }
-        trait BaseCyclic 
-        
+      trait BaseMaximalCyclics[
+        MAX_CYCLICS <: BaseMaximalCyclics[MAX_CYCLICS]
+      ] {
+        def contains(a: A): Boolean
+        def +(a: A): MAX_CYCLICS
+        def <<(a: A): MAX_CYCLICS 
+      }
+      
+      trait Analyzer [
+        MAX_CYCLICS <: BaseMaximalCyclics[MAX_CYCLICS]
+      ]{
         def initialCyclics: MAX_CYCLICS
-        def cyclic(a: A): CYCLIC
         val generators: Seq[A]
         def morphismsTo[B <: ~](
           targetAction: Action[B]

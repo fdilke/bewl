@@ -41,7 +41,7 @@ class ActionAnalyzerTest extends FreeSpec {
       regularAction
     )
 
-  import analyzer.{ initialCyclics, cyclic }
+  import analyzer.{ initialCyclics }
   
   private val actionTopos = 
       ToposOfMonoidActions of monoidOf3
@@ -62,18 +62,20 @@ class ActionAnalyzerTest extends FreeSpec {
       
       "which can be added to, filtering out any eclipsed cyclics" in {
         val cyclics_I =
-          initialCyclics + cyclic(i)
+          initialCyclics + i
 
         cyclics_I.cyclics should have size 1
         
         val cyclics_X_Y =
-          initialCyclics + cyclic(x) + cyclic(y)
+          initialCyclics + x + y
 
         cyclics_X_Y.cyclics should have size 1
         
-        (cyclics_X_Y + cyclic(i)).cyclics shouldBe Seq(
-          cyclic(i)
-        )
+        val theCyclics = 
+          (cyclics_X_Y + i).cyclics 
+          
+        theCyclics should have size 1
+        theCyclics.head.generator shouldEqual i
       }
       
       "which can be used to build up the complete set" in {
@@ -84,9 +86,11 @@ class ActionAnalyzerTest extends FreeSpec {
             _ << _
           }
         
-        allMaxCyclics.cyclics shouldBe Seq(
-          cyclic(i)
-        )
+        val theCyclics =
+          allMaxCyclics.cyclics 
+          
+        theCyclics should have size 1
+        theCyclics.head.generator shouldEqual i
       }
 
       "as expected for the empty action" in {

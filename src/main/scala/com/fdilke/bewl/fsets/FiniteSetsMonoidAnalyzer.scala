@@ -4,6 +4,7 @@ import FiniteSetsUtilities._
 import FiniteSets.{~, >, Monoid, makeDot}
 import scala.language.postfixOps
 import scala.language.higherKinds
+import scala.language.existentials
 
 object FiniteSetsMonoidAnalyzer {
   def apply[M](
@@ -17,16 +18,13 @@ object FiniteSetsMonoidAnalyzer {
       A 
     ]( 
       action: monoid.Action[A]
-    ) = new action.Analyzer {
-      override type CYCLIC = Cyclic
-      override type MAX_CYCLICS = MaximalCyclics
-      
-      private val actionElements = 
+    ) = {
+      val actionElements = 
         elementsOf(action.actionCarrier)
-    
+        
       case class Cyclic(
          generator: A
-      ) extends BaseCyclic {
+      ) {
        val elements: Set[A] =
           monoidElements map { 
             action.actionMultiply(
@@ -49,13 +47,15 @@ object FiniteSetsMonoidAnalyzer {
       class MaximalCyclics(
         val cyclics: Seq[Cyclic] =
           Seq.empty
-      ) extends BaseMaximalCyclics { self =>
+      ) extends action.BaseMaximalCyclics[
+        MaximalCyclics
+      ] { self =>
         override def contains(a: A) =
           cyclics.exists { 
             _ contains a 
           }
         
-        override def +(
+        private def +(
           newCyclic: Cyclic
         ) = 
           new MaximalCyclics(
@@ -66,6 +66,11 @@ object FiniteSetsMonoidAnalyzer {
             )
           )
     
+        override def +(
+          a: A
+        ) = 
+          this + Cyclic(a)
+          
         def transversal =
           cyclics map {
             _.generator
@@ -78,29 +83,30 @@ object FiniteSetsMonoidAnalyzer {
             self + Cyclic(a)
       }
 
-      override val initialCyclics: MAX_CYCLICS =
-        new MaximalCyclics
-        
-      override def cyclic(a: A): CYCLIC =
-        Cyclic(a)
-        
-      override lazy val generators =
-        actionElements.foldLeft(
-          initialCyclics
-        ) { 
-          _ << _
-        }.transversal
-        
-      override def morphismsTo[B](
-        target: monoid.Action[B]
-      ) =
-        new Traversable[A > B] {
-          override def foreach[U](
-            f: (A > B) => U
-          ) {
-            ???
+      new action.Analyzer[
+        MaximalCyclics
+      ] {
+        override val initialCyclics: MaximalCyclics =
+          new MaximalCyclics
+          
+        override lazy val generators =
+          actionElements.foldLeft(
+            initialCyclics
+          ) { 
+            _ << _
+          }.transversal
+          
+        override def morphismsTo[B](
+          target: monoid.Action[B]
+        ) =
+          new Traversable[A > B] {
+            override def foreach[U](
+              f: (A > B) => U
+            ) {
+              ???
+            }
           }
-        }
       }
     }
   }
+}
