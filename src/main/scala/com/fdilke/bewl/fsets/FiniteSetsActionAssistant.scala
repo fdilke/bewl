@@ -15,9 +15,9 @@ object FiniteSetsActionAssistant {
     action: monoid.Action[S]
   ): S > S = 
     makeDot(
-      FiniteSetsMonoidAnalyzer(
+      FiniteSetsMonoidAction(
         monoid
-      ).actionAnalyzer(
+      ) (
         action
       ).generators
     )(
