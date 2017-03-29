@@ -84,7 +84,8 @@ object FiniteSetsMonoidAnalyzer {
       }
 
       new action.Analyzer[
-        MaximalCyclics
+        MaximalCyclics,
+        monoid.Action
       ] {
         override val initialCyclics: MaximalCyclics =
           new MaximalCyclics

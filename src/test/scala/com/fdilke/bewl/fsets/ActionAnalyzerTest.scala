@@ -29,7 +29,7 @@ class ActionAnalyzerTest extends FreeSpec {
         
   private type M = Symbol
 
-  def analyzerFor[A](
+  private def analyzerFor[A](
     action: monoidOf3.Action[A]
   ) =
     monoidAnalyzer.actionAnalyzer(

@@ -1,6 +1,7 @@
 package com.fdilke.bewl.topos.algebra
 
 import com.fdilke.bewl.topos.{BaseTopos, ToposEnrichments, ToposStructures}
+import scala.language.higherKinds
 
 trait AlgebraicStructures extends
   BaseTopos with
@@ -75,12 +76,13 @@ trait AlgebraicStructures extends
       }
       
       trait Analyzer [
-        MAX_CYCLICS <: BaseMaximalCyclics[MAX_CYCLICS]
+        MAX_CYCLICS <: BaseMaximalCyclics[MAX_CYCLICS],
+        MONOID_ACTION[_ <: ~]
       ]{
         def initialCyclics: MAX_CYCLICS
         val generators: Seq[A]
         def morphismsTo[B <: ~](
-          targetAction: Action[B]
+          targetAction: MONOID_ACTION[B]
         ): Traversable[A > B]
       }
     }
