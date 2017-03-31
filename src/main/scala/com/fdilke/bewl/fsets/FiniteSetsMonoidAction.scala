@@ -37,7 +37,6 @@ object FiniteSetsMonoidAction {
       override def analyze[A](
         action: monoid.Action[A]
       ) = new AbstractActionAnalysis[A] with 
-        action.Analysis with 
         monoid.MorphismEnumerator[A] {
 
         case class Cyclic(

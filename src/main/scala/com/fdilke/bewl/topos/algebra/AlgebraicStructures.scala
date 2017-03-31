@@ -32,7 +32,7 @@ trait AlgebraicStructures extends
     trait ActionAnalyzer[ACTION_ANALYSIS[_ <: ~]] {
       def analyze[A <: ~](
         action: Action[A]
-      ) : ACTION_ANALYSIS[A] with action.Analysis
+      ) : ACTION_ANALYSIS[A]
     }
 
     trait MorphismEnumerator[A <: ~] {
@@ -76,9 +76,7 @@ trait AlgebraicStructures extends
     ) extends actions.Algebra[A](actionCarrier)(
       ** := actionMultiply,
       *** := multiply
-    ) {
-      trait Analysis
-    }
+    ) 
 
     case class ActionPreArrow[
       S <: ~,
