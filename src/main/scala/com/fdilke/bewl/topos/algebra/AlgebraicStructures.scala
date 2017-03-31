@@ -40,6 +40,14 @@ trait AlgebraicStructures extends
         target: Action[B] 
       ): Traversable[A > B]
     }
+
+    trait Presentation[A <: ~] {
+      val action: Action[A] 
+      def project[B <: ~](
+        otherAction: Action[B],
+        targetElements: List[B]
+      ): A > B
+    }
     
     lazy val actions =
       AlgebraicTheoryWithScalars(

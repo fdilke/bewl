@@ -1,0 +1,85 @@
+package com.fdilke.bewl.helper
+
+import org.scalatest.FreeSpec
+import org.scalatest.Matchers._
+import scala.language.reflectiveCalls
+import scala.language.existentials
+
+class BuildEquivalenceTest extends FreeSpec {
+  "Equivalence relations" - {
+    "can be calculated over an empty set" in {
+      BuildEquivalence(
+          0, 
+          Set.empty
+      ) shouldBe List()
+    }
+    "can be calculated over a singleton with no relators" in {
+      BuildEquivalence(
+          1, 
+          Set.empty
+      ) shouldBe List(
+          0
+      )
+    }
+    "can be calculated over a doubleton with no relators" in {
+      BuildEquivalence(
+          2, 
+          Set.empty
+      ) shouldBe List(
+          0, 1
+      )
+    }
+    "can be calculated over a doubleton with only trivial relators" in {
+      BuildEquivalence(
+          2, 
+          Traversable(
+              0 -> 0,
+              1 -> 1
+          )
+      ) shouldBe List(
+          0,
+          1
+      )
+    }
+    "can be calculated over a doubleton with a relator equating the elements" in {
+      BuildEquivalence(
+          2, 
+          Traversable(
+              0 -> 1
+          )
+      ) shouldBe List(
+          1,
+          1
+      )
+    }
+    "can be calculated for a nontrivial example" in {
+      BuildEquivalence(
+          4, 
+          Traversable(
+              1 -> 2
+          )
+      ) shouldBe List(
+          0,
+          2,
+          2,
+          3
+      )
+    }
+    "can be calculated for a bigger nontrivial example" in {
+      BuildEquivalence(
+          6, 
+          Traversable(
+              1 -> 2,
+              2 -> 3
+          )
+      ) shouldBe List(
+          0,
+          3,
+          3,
+          3,
+          4,
+          5
+      )
+    }
+  }
+}
