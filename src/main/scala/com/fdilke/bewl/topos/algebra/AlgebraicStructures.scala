@@ -29,6 +29,18 @@ trait AlgebraicStructures extends
     val unit: NullaryOp[M]
     val multiply: BinaryOp[M]
 
+    trait ActionAnalyzer[ACTION_ANALYSIS[_ <: ~]] {
+      def analyze[A <: ~](
+        action: Action[A]
+      ) : ACTION_ANALYSIS[A] with action.Analysis
+    }
+
+    trait MorphismEnumerator[A <: ~] {
+      def morphismsTo[B <: ~](
+        target: Action[B] 
+      ): Traversable[A > B]
+    }
+    
     lazy val actions =
       AlgebraicTheoryWithScalars(
         carrier
@@ -64,7 +76,9 @@ trait AlgebraicStructures extends
     ) extends actions.Algebra[A](actionCarrier)(
       ** := actionMultiply,
       *** := multiply
-    )
+    ) {
+      trait Analysis
+    }
 
     case class ActionPreArrow[
       S <: ~,

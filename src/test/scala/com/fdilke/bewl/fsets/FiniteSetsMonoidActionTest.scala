@@ -26,10 +26,10 @@ class FiniteSetsMonoidActionTest extends FreeSpec {
 
   private def analyzerFor[A](
     action: monoidOf3.Action[A]
-  ) =
+  ): AbstractActionAnalysis[A] with monoidOf3.MorphismEnumerator[A] =
     FiniteSetsMonoidAction(
       monoidOf3
-    ) (
+    ).analyze(
       action
     )
 
@@ -38,23 +38,22 @@ class FiniteSetsMonoidActionTest extends FreeSpec {
       regularAction
     )
 
-  import analyzer.{ initialCyclics }
-  
   private val actionTopos = 
       ToposOfMonoidActions of monoidOf3
-  
+
+  import analyzer.initialCyclics
+      
   "The action analyzer" - {
     "can build up a set of maximal cyclic subalgebras for a monoid action" - {
 
       "which are initially empty" in {
-        val cyclics =
-          analyzer.initialCyclics
+          import analyzer.initialCyclics
           
-        cyclics.cyclics shouldBe empty
+        initialCyclics.cyclics shouldBe empty
         
-        cyclics.contains(i) shouldBe false
+        initialCyclics.contains(i) shouldBe false
         
-        cyclics.transversal shouldBe empty
+        initialCyclics.transversal shouldBe empty
       }
       
       "which can be added to, filtering out any eclipsed cyclics" in {

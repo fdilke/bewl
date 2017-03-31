@@ -17,7 +17,7 @@ object FiniteSetsActionAssistant {
     makeDot(
       FiniteSetsMonoidAction(
         monoid
-      ) (
+      ).analyze (
         action
       ).generators
     )(
