@@ -1,14 +1,14 @@
-package com.fdilke.bewl.fsets
+package com.fdilke.bewl.fsets.monoid_actions
 
-import FiniteSetsUtilities._
-import FiniteSets.{~, >, Monoid, makeDot}
+import com.fdilke.bewl.fsets.FiniteSetsUtilities._
+import com.fdilke.bewl.fsets.FiniteSets.{makeDot, Monoid, >}
 import scala.language.postfixOps
 import scala.language.reflectiveCalls
 
 object FiniteSetsActionAssistant {
   def generators[
-    M <: ~, 
-    S <: ~
+    M, 
+    S
   ](
     monoid: Monoid[M]
   ) (

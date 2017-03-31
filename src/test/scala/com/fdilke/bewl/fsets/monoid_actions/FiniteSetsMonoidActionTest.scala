@@ -1,13 +1,13 @@
-package com.fdilke.bewl.fsets
+package com.fdilke.bewl.fsets.monoid_actions
 
-import FiniteSetsUtilities._
-import FiniteSets.{UNIT, >, ToposOfMonoidActions }
-import FiniteSetsActionAssistant.generators
-
+import com.fdilke.bewl.fsets.FiniteSets
+import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
 import scala.language.reflectiveCalls
 import scala.language.existentials
+
+import FiniteSets.{>, ToposOfMonoidActions}
 
 class FiniteSetsMonoidActionTest extends FreeSpec {
   

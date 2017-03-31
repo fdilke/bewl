@@ -1,9 +1,9 @@
-package com.fdilke.bewl.fsets
+package com.fdilke.bewl.fsets.monoid_actions
 
-import FiniteSetsUtilities._
+import com.fdilke.bewl.fsets.FiniteSets
 import FiniteSets.>
+import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import FiniteSetsActionAssistant.generators
-
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
 

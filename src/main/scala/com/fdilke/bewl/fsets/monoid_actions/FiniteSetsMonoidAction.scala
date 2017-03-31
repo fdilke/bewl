@@ -1,9 +1,10 @@
-package com.fdilke.bewl.fsets
+package com.fdilke.bewl.fsets.monoid_actions
 
-import FiniteSetsUtilities._
-import FiniteSets.{~, >}
+import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import scala.language.higherKinds
 import scala.language.postfixOps
+import com.fdilke.bewl.fsets.FiniteSets
+import FiniteSets.>
 
 trait AbstractCyclic[A] {
   val generator: A
@@ -31,7 +32,7 @@ object FiniteSetsMonoidAction {
       elementsOf(monoid.carrier)
       
     new monoid.ActionAnalyzer[
-      ({type λ[X <: ~] = AbstractActionAnalysis[X] with 
+      ({type λ[X] = AbstractActionAnalysis[X] with 
         monoid.MorphismEnumerator[X]}) # λ
     ] {
       override def analyze[A](
@@ -112,7 +113,7 @@ object FiniteSetsMonoidAction {
             _ << _
           }.transversal
           
-        override def morphismsTo[B <: ~](
+        override def morphismsTo[B](
           target: monoid.Action[B] 
         ) =
           new Traversable[A > B] {
