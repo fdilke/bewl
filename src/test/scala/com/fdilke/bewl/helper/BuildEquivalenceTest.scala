@@ -9,75 +9,99 @@ class BuildEquivalenceTest extends FreeSpec {
   "Equivalence relations" - {
     "can be calculated over an empty set" in {
       BuildEquivalence(
-          0, 
-          Set.empty
+        0, 
+        Set.empty
       ) shouldBe List()
     }
     "can be calculated over a singleton with no relators" in {
       BuildEquivalence(
-          1, 
-          Set.empty
+        1, 
+        Set.empty
       ) shouldBe List(
-          0
+        0
       )
     }
     "can be calculated over a doubleton with no relators" in {
       BuildEquivalence(
-          2, 
-          Set.empty
+        2, 
+        Set.empty
       ) shouldBe List(
-          0, 1
+        0, 1
       )
     }
     "can be calculated over a doubleton with only trivial relators" in {
       BuildEquivalence(
           2, 
           Traversable(
-              0 -> 0,
-              1 -> 1
+            0 -> 0,
+            1 -> 1
           )
       ) shouldBe List(
-          0,
-          1
+        0,
+        1
       )
     }
     "can be calculated over a doubleton with a relator equating the elements" in {
       BuildEquivalence(
-          2, 
-          Traversable(
-              0 -> 1
-          )
+        2, 
+        Traversable(
+          0 -> 1
+        )
       ) shouldBe List(
-          1,
-          1
+        1,
+        1
       )
     }
     "can be calculated for a nontrivial example" in {
       BuildEquivalence(
-          4, 
-          Traversable(
-              1 -> 2
-          )
+        4, 
+        Traversable(
+          1 -> 2
+        )
       ) shouldBe List(
-          0,
-          2,
-          2,
-          3
+        0,
+        2,
+        2,
+        3
       )
     }
-    "can be calculated for a bigger nontrivial example" in {
+    "can be calculated for a bigger example" in {
       BuildEquivalence(
-          6, 
-          Traversable(
-              1 -> 2,
-              2 -> 3
-          )
+        6, 
+        Traversable(
+          1 -> 2,
+          2 -> 3
+        )
+      ) shouldBe List(
+        0,
+        3,
+        3,
+        3,
+        4,
+        5
+      )
+    }
+    "can be calculated for a yet bigger example" in {
+      BuildEquivalence(
+        10, 
+        Traversable(
+          1 -> 2,
+          7 -> 0,
+          4 -> 3,
+          3 -> 7,
+          6 -> 5,
+          9 -> 5
+        )
       ) shouldBe List(
           0,
-          3,
-          3,
-          3,
-          4,
+          2,
+          2,
+          0,
+          0,
+          5,
+          5,
+          0,
+          8,
           5
       )
     }

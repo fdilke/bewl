@@ -9,13 +9,8 @@ object BuildEquivalence {
   ): Seq[Int] = {
     val array = (0 until size).toArray
 
-    @tailrec def trackUp(i: Int): Int = {
-      val ii = array(i)
-      if (i == ii)
-        i
-      else
-        trackUp(ii)
-    }
+    def trackUp(i: Int) =
+      IterateToFixed(i)(array)
     
     for {
       (j, k) <- relators
@@ -25,12 +20,6 @@ object BuildEquivalence {
       if (jj != kk)
         array(jj) = kk
     
-    for {
-      j <- 0 until size
-    }
-      while (array(j) != array(array(j))) 
-        array(j) = array(array(j))
-      
-    array
+    array map trackUp
   }
 }
