@@ -1,0 +1,18 @@
+---
+language: scala
+#script: "sbt coveralls"
+script:
+  - sbt test
+notifications:
+  email:
+    recipients:
+      - fdilke@gmail.com
+    on_success: change
+    on_failure: always
+jdk:
+- oraclejdk7
+- openjdk7
+# whitelist
+branches:
+  only:
+    - master
