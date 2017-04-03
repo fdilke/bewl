@@ -1,5 +1,5 @@
 package com.fdilke.bewl.fsets.monoid_actions
 
-class GeneratorWithRelators[A] {
-  
-}
+case class GeneratorWithRelators[A](
+  generator: A
+)

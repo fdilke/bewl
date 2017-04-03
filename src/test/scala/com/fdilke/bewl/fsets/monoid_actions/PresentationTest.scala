@@ -1,7 +1,7 @@
 package com.fdilke.bewl.fsets.monoid_actions;
 
 import com.fdilke.bewl.fsets.FiniteSets
-import FiniteSets.ToposOfMonoidActions
+import FiniteSets.{ ToposOfMonoidActions, x }
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
@@ -25,7 +25,7 @@ class PresentationTest extends FreeSpec {
       ToposOfMonoidActions of monoidOf3
       
   "Building actions from presentations" - {
-		"works for an empty generating set" ignore {
+		"works for an empty generating set" in {
 			val presentation = 
 			  Presentation(
 		      monoidOf3
@@ -37,15 +37,20 @@ class PresentationTest extends FreeSpec {
         actionTopos.unwrap(
           actionTopos.O
         )	      
-	    val emptyProjection: VOID > actionTopos.VOID = 
+	    val emptyProjection: (VOID x Symbol) > actionTopos.VOID = 
 	      presentation.project(
           emptyAction,
           List[actionTopos.VOID]()
         )
       emptyProjection should have(
-        'source(presentation.action),
-        'target(emptyAction)
+        'source(presentation.action.actionCarrier),
+        'target(emptyAction.actionCarrier)
       )
+	    monoidOf3.actions.isMorphism(
+        presentation.action,
+        emptyAction,
+        emptyProjection
+      ) shouldBe true
 		}
 	}
 }
