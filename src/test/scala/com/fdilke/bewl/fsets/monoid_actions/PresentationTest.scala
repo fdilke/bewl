@@ -52,5 +52,34 @@ class PresentationTest extends FreeSpec {
         emptyProjection
       ) shouldBe true
 		}
+		"works for a single generator with no relators" in {
+			val presentation = 
+			  Presentation(
+		      monoidOf3
+	      )(
+		      List[GeneratorWithRelators[FiniteSets.UNIT]](
+	          GeneratorWithRelators(())
+          )
+	      )
+
+      val regularAction =
+        monoidOf3.regularAction
+	    val regularProjection: (FiniteSets.UNIT x Symbol) > Symbol = 
+	      presentation.project(
+          regularAction,
+          List(
+            i
+          )
+        )
+      regularProjection should have(
+        'source(presentation.action.actionCarrier),
+        'target(regularAction.actionCarrier)
+      )
+	    monoidOf3.actions.isMorphism(
+        presentation.action,
+        regularAction,
+        regularProjection
+      ) shouldBe true
+		}
 	}
 }
