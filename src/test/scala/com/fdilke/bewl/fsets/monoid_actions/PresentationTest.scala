@@ -30,14 +30,14 @@ class PresentationTest extends FreeSpec {
 			  Presentation(
 		      monoidOf3
 	      )(
-		      List[GeneratorWithRelators[VOID]]()
+		      List[GeneratorWithRelators[Symbol, VOID]]()
 	      )
 
       val emptyAction: monoidOf3.Action[actionTopos.VOID] =
         actionTopos.unwrap(
           actionTopos.O
         )	      
-	    val emptyProjection: (VOID x Symbol) > actionTopos.VOID = 
+	    val emptyProjection: Int > actionTopos.VOID = 
 	      presentation.project(
           emptyAction,
           List[actionTopos.VOID]()
@@ -52,19 +52,22 @@ class PresentationTest extends FreeSpec {
         emptyProjection
       ) shouldBe true
 		}
-		"works for a single generator with no relators" in {
+		"works for a single generator with no relators" ignore {
 			val presentation = 
 			  Presentation(
 		      monoidOf3
 	      )(
-		      List[GeneratorWithRelators[FiniteSets.UNIT]](
-	          GeneratorWithRelators(())
+		      List[GeneratorWithRelators[Symbol, FiniteSets.UNIT]](
+	          GeneratorWithRelators(
+              (),
+	            Seq.empty
+            )
           )
 	      )
 
       val regularAction =
         monoidOf3.regularAction
-	    val regularProjection: (FiniteSets.UNIT x Symbol) > Symbol = 
+	    val regularProjection: Int > Symbol = 
 	      presentation.project(
           regularAction,
           List(
@@ -75,11 +78,52 @@ class PresentationTest extends FreeSpec {
         'source(presentation.action.actionCarrier),
         'target(regularAction.actionCarrier)
       )
+	    println("presentation.action =" + presentation.action)
 	    monoidOf3.actions.isMorphism(
         presentation.action,
         regularAction,
         regularProjection
       ) shouldBe true
+      regularProjection shouldBe 'iso
+		}
+		"works for presenting a cyclic right ideal { x, y }" ignore {
+			val presentation = 
+			  Presentation(
+		      monoidOf3
+	      )(
+		      List[GeneratorWithRelators[Symbol, FiniteSets.UNIT]](
+	          GeneratorWithRelators(
+              (),
+              Seq(
+                Relator(x, 0, i)
+              )        
+            )
+          )
+	      )
+
+		  val idealCarrier = dot(x, y)
+		  val idealAction = 
+		    monoidOf3.action(idealCarrier) {
+		      monoidOf3.multiply(_, _)
+		    }
+	      
+	    val idealProjection: Int > Symbol = 
+	      presentation.project(
+          idealAction,
+          List(
+            x
+          )
+        )
+      idealProjection should have(
+        'source(presentation.action.actionCarrier),
+        'target(idealCarrier)
+      )
+	    monoidOf3.actions.isMorphism(
+        presentation.action,
+        idealAction,
+        idealProjection
+      ) shouldBe true
+      idealProjection shouldBe 'iso
 		}
 	}
 }

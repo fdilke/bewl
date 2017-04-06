@@ -28,7 +28,7 @@ trait AlgebraicStructures extends
     val carrier: DOT[M]
     val unit: NullaryOp[M]
     val multiply: BinaryOp[M]
-
+    
     trait ActionAnalyzer[ACTION_ANALYSIS[_ <: ~]] {
       def analyze[A <: ~](
         action: Action[A]
