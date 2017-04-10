@@ -52,7 +52,7 @@ class PresentationTest extends FreeSpec {
         emptyProjection
       ) shouldBe true
 		}
-		"works for a single generator with no relators" ignore {
+		"works for a single generator with no relators" in {
 			val presentation = 
 			  Presentation(
 		      monoidOf3
@@ -78,7 +78,14 @@ class PresentationTest extends FreeSpec {
         'source(presentation.action.actionCarrier),
         'target(regularAction.actionCarrier)
       )
-	    println("presentation.action =" + presentation.action)
+//	    println("presentation.action =" + presentation.action.actionCarrier)
+//	    for {
+//	      s <- elementsOf(presentation.action.actionCarrier)
+//	      m <- elementsOf(monoidOf3.carrier)
+//	    } {
+//	      println(s"$s * $m = ${ presentation.action.actionMultiply(s, m) }")
+//	    }
+//	    println("===========")
 	    monoidOf3.actions.isMorphism(
         presentation.action,
         regularAction,
@@ -86,7 +93,7 @@ class PresentationTest extends FreeSpec {
       ) shouldBe true
       regularProjection shouldBe 'iso
 		}
-		"works for presenting a cyclic right ideal { x, y }" ignore {
+		"works for presenting a cyclic right ideal { x, y }" in {
 			val presentation = 
 			  Presentation(
 		      monoidOf3

@@ -30,7 +30,7 @@ object Presentation {
 
     def wordOfIndex(index: Int): (A, M) =
       generators(index / monoidElements.size) ->
-          monoidElements(index / monoidElements.size)
+          monoidElements(index % monoidElements.size)
     
     val equivalenceTable: Seq[Int] =
       BuildEquivalence(
@@ -45,7 +45,8 @@ object Presentation {
             indexOfWord(generators(index), n)
           )
       )
-      
+     
+//    println("equivalenceTable = " + equivalenceTable)
     val wordIndices = equivalenceTable.toSet
     val wordIndicesDot = makeDot(wordIndices)
      
@@ -55,9 +56,11 @@ object Presentation {
           (index, n) =>
             val (g, m) = wordOfIndex(index)
             val mn = monoid.multiply(m, n)
-            equivalenceTable(
+            val product = equivalenceTable(
               indexOfWord(g, mn)
             )
+//            println(s"** ${index}*${n} : index=$index -> ($g, $m) -- n=$n --> ($g, $mn) -> $product")  
+            product
         }
       override def project[B](
         otherAction: monoid.Action[B],
