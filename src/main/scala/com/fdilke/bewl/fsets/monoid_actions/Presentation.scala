@@ -39,14 +39,15 @@ object Presentation {
           gr <- generatorsWithRelators
           g = gr.generator
           Relator(m, index, n) <- gr.relators
+          p <- monoidElements
         }
           yield (
-            indexOfWord(g, m),
-            indexOfWord(generators(index), n)
+            indexOfWord(g, monoid.multiply(m, p)),
+            indexOfWord(generators(index), monoid.multiply(n, p))
           )
       )
      
-//    println("equivalenceTable = " + equivalenceTable)
+//     println("equivalenceTable = " + equivalenceTable)
     val wordIndices = equivalenceTable.toSet
     val wordIndicesDot = makeDot(wordIndices)
      

@@ -1,7 +1,7 @@
 package com.fdilke.bewl.fsets.monoid_actions;
 
 import com.fdilke.bewl.fsets.FiniteSets
-import FiniteSets.{ ToposOfMonoidActions, x }
+import FiniteSets.{ ToposOfMonoidActions, x, groupOfUnits }
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
@@ -12,7 +12,7 @@ import FiniteSets.{>, VOID, ToposOfMonoidActions}
 
 class PresentationTest extends FreeSpec {
 
-  private val (i, x, y) = ('i, 'x, 'y)
+  private val (i, x, y, a, b, c, r, s) = ('i, 'x, 'y, 'a, 'b, 'c, 'r, 's)
   
   private val monoidOf3 =
       monoidFromTable(
@@ -132,7 +132,7 @@ class PresentationTest extends FreeSpec {
       ) shouldBe true
       idealProjection shouldBe 'iso
 		}
-		"works for presenting 2 over its endomorphism monoid" in {
+		"works for presenting 2 over its endomorphism monoid" ignore {
 		  val ¬ = '¬
 		  val O = 'O
 		  val I = 'I
@@ -190,6 +190,34 @@ class PresentationTest extends FreeSpec {
         twoProjection
       ) shouldBe true
       twoProjection shouldBe 'iso
+		}
+		"works for a cyclic action over a group" ignore {
+      val group = monoidFromTable(
+        i, a, b, c, r, s,
+        a, i, s, r, c, b,
+        b, r, i, s, a, c,
+        c, s, r, i, b, a,
+        r, b, c, a, s, i,
+        s, c, a, b, i, r
+      )
+
+			val presentation = 
+			  Presentation(
+		      group
+	      )(
+		      List[GeneratorWithRelators[Symbol, String]](
+	          GeneratorWithRelators(
+              "x",
+              Seq(
+                Relator(r, 0, a)
+              )        
+            )
+          )
+	      )
+
+      elementsOf(
+        presentation.action.actionCarrier
+      ) should have size 3
 		}
   }
 }
