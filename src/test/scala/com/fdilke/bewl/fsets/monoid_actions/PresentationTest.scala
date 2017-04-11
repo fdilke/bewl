@@ -132,5 +132,64 @@ class PresentationTest extends FreeSpec {
       ) shouldBe true
       idealProjection shouldBe 'iso
 		}
-	}
+		"works for presenting 2 over its endomorphism monoid" in {
+		  val ¬ = '¬
+		  val O = 'O
+		  val I = 'I
+      val end2 =
+        monoidFromTable(
+          i, ¬, O, I,
+          ¬, i, O, I,
+          O, I, O, I,
+          I, O, O, I
+        ) 
+      
+			val presentation = 
+			  Presentation(
+		      end2
+	      )(
+		      List[GeneratorWithRelators[Symbol, Int]](
+	          GeneratorWithRelators(
+              0,
+              Seq(
+                Relator(O, 0, i),
+                Relator(¬, 0, I)
+              )        
+            )
+          )
+	      )
+
+		  val twoCarrier = dot(0, 1)
+		  val twoActionMap: Map[Symbol, Int => Int] =
+		    Map(
+		        i -> identity,
+		        ¬ -> { 1 - _ },
+		        O -> { _ => 0 },
+		        I -> { _ => 1 }
+        )
+		  val twoAction = 
+		    end2.action(twoCarrier) {
+		      (s, m) => 
+		        twoActionMap(m)(s)
+		    }
+	      
+	    val twoProjection: Int > Int = 
+	      presentation.project(
+          twoAction,
+          List(
+            0
+          )
+        )
+      twoProjection should have(
+        'source(presentation.action.actionCarrier),
+        'target(twoCarrier)
+      )
+	    end2.actions.isMorphism(
+        presentation.action,
+        twoAction,
+        twoProjection
+      ) shouldBe true
+      twoProjection shouldBe 'iso
+		}
+  }
 }
