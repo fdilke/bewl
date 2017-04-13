@@ -1,7 +1,9 @@
-
+<!---
+Alas, these CI badges are too flaky, commented out for now.
 [![Continuous Integration](https://circleci.com/gh/fdilke/bewl/tree/master.svg?style=shield)](https://circleci.com/gh/fdilke/bewl)
 
 [![Build Status](https://app.snap-ci.com/fdilke/bewl/branch/master/build_image)](https://app.snap-ci.com/fdilke/bewl/branch/master)
+-->
 
 # Project Bewl
 
