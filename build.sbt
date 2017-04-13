@@ -6,6 +6,8 @@ scalaVersion := "2.12.1"
 
 scalacOptions ++= Seq("-feature", "-deprecation", "-Xexperimental")
 
+parallelExecution in Test := false
+
 libraryDependencies ++= Seq(
   "org.scala-lang" % "scala-reflect" % "2.12.1",
   "junit" % "junit" % "4.12" % "test" exclude("org.scala-lang.modules", "scala-xml_2.12"),
