@@ -105,5 +105,29 @@ class BuildEquivalenceTest extends FreeSpec {
           5
       )
     }
+    "can be calculated for a formerly problematic example" in {
+      BuildEquivalence(
+        4, 
+        Traversable(
+          2 -> 0,
+          3 -> 1,
+          2 -> 2,
+          3 -> 3,
+          1 -> 3,
+          0 -> 2,
+          2 -> 2,
+          3 -> 3
+        )
+      ) shouldBe List(
+          2,
+          1,
+          2,
+          1 
+      )
+    }
   }
 }
+
+// memo: how to tag:
+// taggedAs(new org.scalatest.Tag("MyTag"))
+// test-only com.fdilke.bewl.helper.BuildEquivalenceTest -- -n MyTag

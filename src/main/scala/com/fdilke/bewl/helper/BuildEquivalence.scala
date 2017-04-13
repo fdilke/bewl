@@ -11,7 +11,7 @@ object BuildEquivalence {
 
     def trackUp(i: Int) =
       IterateToFixed(i)(array)
-    
+
     for {
       (j, k) <- relators
       jj = trackUp(j)
@@ -19,7 +19,16 @@ object BuildEquivalence {
     } 
       if (jj != kk)
         array(jj) = kk
-    
-    array map trackUp
+
+// exercise for the student: why doesn't this work?
+//        array map trackUp
+// instead we have to do:
+        
+    for { i <- 1 until size } {
+      while (array(i) != array(array(i)))
+          array(i) = array(array(i))
+    }
+	  
+    array
   }
 }

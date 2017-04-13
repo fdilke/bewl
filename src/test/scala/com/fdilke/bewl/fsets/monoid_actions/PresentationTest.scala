@@ -132,7 +132,7 @@ class PresentationTest extends FreeSpec {
       ) shouldBe true
       idealProjection shouldBe 'iso
 		}
-		"works for presenting 2 over its endomorphism monoid" ignore {
+		"works for presenting 2 over its endomorphism monoid" in {
 		  val ¬ = '¬
 		  val O = 'O
 		  val I = 'I
@@ -191,7 +191,7 @@ class PresentationTest extends FreeSpec {
       ) shouldBe true
       twoProjection shouldBe 'iso
 		}
-		"works for a cyclic action over a group" ignore {
+		"works for a cyclic action over a group" in {
       val group = monoidFromTable(
         i, a, b, c, r, s,
         a, i, s, r, c, b,
