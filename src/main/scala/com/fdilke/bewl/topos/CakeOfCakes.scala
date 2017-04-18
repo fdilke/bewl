@@ -1,7 +1,7 @@
 package com.fdilke.bewl.topos
 
 import com.fdilke.bewl.topos.algebra.{AlgebraicConstructions, AlgebraicMachinery, AlgebraicStructures}
-import com.fdilke.bewl.topos.constructions.{ConstructToposOfAutomorphisms, ConstructToposOfGroupActions, ConstructToposOfMonoidActionsOld, ConstructToposOfMonoidActions, ConstructToposOfMaskables}
+import com.fdilke.bewl.topos.constructions.{ConstructToposOfAutomorphisms, ConstructToposOfGroupActions, ConstructToposOfMonoidActionsOld, ConstructToposOfMonoidActions}
 import com.fdilke.bewl.topos.enrichment.{ElementEnrichments, LogicalOperations, MonadicPlumbing}
 import com.fdilke.bewl.topos.monads.{ContinuationMonad, MonadOfMonoidActions}
 import com.fdilke.bewl.topos.structures.{MonadCaching, Monads, StrongMonads}
@@ -13,7 +13,6 @@ trait ToposAlgebra extends
 
 trait ToposConstructions extends
   BaseTopos with
-  ConstructToposOfMaskables with
   ConstructToposOfMonoidActionsOld with
   ConstructToposOfMonoidActions with
   ConstructToposOfGroupActions with
