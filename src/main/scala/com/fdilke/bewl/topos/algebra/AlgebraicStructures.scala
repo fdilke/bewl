@@ -45,7 +45,7 @@ trait AlgebraicStructures extends
       val action: Action[A] 
       def project[B <: ~](
         otherAction: Action[B],
-        targetElements: List[B]
+        targetElements: Seq[B]
       ): A > B
     }
     

@@ -4,7 +4,10 @@ import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import scala.language.higherKinds
 import scala.language.postfixOps
 import com.fdilke.bewl.fsets.FiniteSets
-import FiniteSets.>
+import com.fdilke.bewl.helper.⊕
+import ⊕._
+import FiniteSets.{ >, x }
+import scala.Function.tupled
 
 trait AbstractCyclic[A] {
   val generator: A
@@ -19,9 +22,10 @@ trait AbstractCyclics[A] {
   def <<(a: A): AbstractCyclics[A]
 }
 
-trait AbstractActionAnalysis[A] {
+trait AbstractActionAnalysis[M, A] {
   val initialCyclics: AbstractCyclics[A]
   val generators: Seq[A]
+  val presentation: Seq[GeneratorWithRelators[M, A]]
 }
 
 object FiniteSetsMonoidAction {
@@ -32,12 +36,12 @@ object FiniteSetsMonoidAction {
       elementsOf(monoid.carrier)
       
     new monoid.ActionAnalyzer[
-      ({type λ[X] = AbstractActionAnalysis[X] with 
+      ({type λ[X] = AbstractActionAnalysis[M, X] with 
         monoid.MorphismEnumerator[X]}) # λ
     ] {
       override def analyze[A](
         action: monoid.Action[A]
-      ) = new AbstractActionAnalysis[A] with 
+      ) = new AbstractActionAnalysis[M, A] with 
         monoid.MorphismEnumerator[A] {
 
         case class Cyclic(
@@ -112,6 +116,34 @@ object FiniteSetsMonoidAction {
           ) { 
             _ << _
           }.transversal
+
+        override lazy val presentation: Seq[GeneratorWithRelators[M, A]] = 
+          generators.zipWithIndex map tupled { (g, j) =>
+            GeneratorWithRelators[M, A](
+              g,
+              generators.take(j+1).zipWithIndex
+                flatMap tupled { (f, i) =>
+                  analyze(
+                    monoid.action(
+                      (monoid.carrier x monoid.carrier) where {
+                        case m ⊕ n => 
+                          action.actionMultiply(g, m) == 
+                            action.actionMultiply(f, n)
+                      }
+                    ) {
+                      (pair, m) => pair match {
+                        case p ⊕ q =>
+                          monoid.multiply(p, m) ⊕
+                            monoid.multiply(q, m)
+                      }
+                    }
+                  ).generators map {
+                    case m ⊕ n =>
+                      Relator(m, 0, n) 
+                  }
+                }
+            )
+          } 
           
         override def morphismsTo[B](
           target: monoid.Action[B] 

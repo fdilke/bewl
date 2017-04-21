@@ -12,14 +12,14 @@ object Presentation {
   def apply[M, A](
     monoid: FiniteSets.Monoid[M]
   )(
-    generatorsWithRelators: List[GeneratorWithRelators[M, A]]
+    generatorsWithRelators: Seq[GeneratorWithRelators[M, A]]
   ) : monoid.Presentation[Int] = {
     val monoidElements: List[M] =
       elementsOf(monoid.carrier).toList
     val lookupMonoid: Map[M, Int] =
       monoidElements.zipWithIndex.toMap
     val generators: List[A] =
-      generatorsWithRelators map { _.generator }
+      generatorsWithRelators map { _.generator } toList
     val lookupGenerator: Map[A, Int] =
       generators.zipWithIndex.toMap
     
@@ -47,7 +47,6 @@ object Presentation {
           )
       )
 
-//     println("equivalenceTable = " + equivalenceTable)
     val wordIndices = equivalenceTable.toSet
     val wordIndicesDot = makeDot(wordIndices)
 
@@ -60,12 +59,11 @@ object Presentation {
             val product = equivalenceTable(
               indexOfWord(g, mn)
             )
-//            println(s"** ${index}*${n} : index=$index -> ($g, $m) -- n=$n --> ($g, $mn) -> $product")  
             product
         }
       override def project[B](
         otherAction: monoid.Action[B],
-        targetElements: List[B]
+        targetElements: Seq[B]
       ): Int > B =
         wordIndicesDot(otherAction.actionCarrier) { 
           index => 
@@ -78,13 +76,4 @@ object Presentation {
     }
   }
 }
-
-//    val monoidElements = 
-//      elementsOf(monoid.carrier)
-      
-//    new monoid.ActionAnalyzer[
-//      ({type λ[X] = AbstractActionAnalysis[X] with 
-//        monoid.MorphismEnumerator[X]}) # λ
-//    ] {
-//    }
 

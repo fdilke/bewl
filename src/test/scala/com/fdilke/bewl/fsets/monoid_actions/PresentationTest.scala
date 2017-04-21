@@ -51,6 +51,7 @@ class PresentationTest extends FreeSpec {
         emptyAction,
         emptyProjection
       ) shouldBe true
+      emptyProjection shouldBe 'iso
 		}
 		"works for a single generator with no relators" in {
 			val presentation = 
@@ -78,14 +79,6 @@ class PresentationTest extends FreeSpec {
         'source(presentation.action.actionCarrier),
         'target(regularAction.actionCarrier)
       )
-//	    println("presentation.action =" + presentation.action.actionCarrier)
-//	    for {
-//	      s <- elementsOf(presentation.action.actionCarrier)
-//	      m <- elementsOf(monoidOf3.carrier)
-//	    } {
-//	      println(s"$s * $m = ${ presentation.action.actionMultiply(s, m) }")
-//	    }
-//	    println("===========")
 	    monoidOf3.actions.isMorphism(
         presentation.action,
         regularAction,
@@ -219,5 +212,7 @@ class PresentationTest extends FreeSpec {
         presentation.action.actionCarrier
       ) should have size 3
 		}
+		// note: should probably add a more sophisticated
+		// example, with multiple interacting generators
   }
 }

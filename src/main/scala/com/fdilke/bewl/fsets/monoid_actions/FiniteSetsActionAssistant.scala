@@ -6,7 +6,7 @@ import scala.language.postfixOps
 import scala.language.reflectiveCalls
 
 object FiniteSetsActionAssistant {
-  def generators[
+  def findGenerators[
     M, 
     S
   ](
@@ -25,4 +25,18 @@ object FiniteSetsActionAssistant {
     ) {
       identity[S]
     }
+
+  def findGeneratorsWithRelators[
+    M, 
+    S
+  ](
+    monoid: Monoid[M]
+  ) (
+    action: monoid.Action[S]
+  ): Seq[GeneratorWithRelators[M, S]] = 
+      FiniteSetsMonoidAction(
+        monoid
+      ).analyze (
+        action
+      ).presentation
 }

@@ -26,7 +26,7 @@ class FiniteSetsMonoidActionTest extends FreeSpec {
 
   private def analyzerFor[A](
     action: monoidOf3.Action[A]
-  ): AbstractActionAnalysis[A] with monoidOf3.MorphismEnumerator[A] =
+  ): AbstractActionAnalysis[Symbol, A] with monoidOf3.MorphismEnumerator[A] =
     FiniteSetsMonoidAction(
       monoidOf3
     ).analyze(
@@ -39,7 +39,7 @@ class FiniteSetsMonoidActionTest extends FreeSpec {
     )
 
   private val actionTopos = 
-      ToposOfMonoidActions of monoidOf3
+    ToposOfMonoidActions of monoidOf3
 
   import analyzer.initialCyclics
       
