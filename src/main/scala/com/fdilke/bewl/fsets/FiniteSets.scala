@@ -12,14 +12,14 @@ object FiniteSets extends Topos[Any] with Wrappings[
   override type >[S, T] = FiniteSetsArrow[S, T]
   override type UNIT = Unit
   override type TRUTH = Boolean
-  override type →[T <: ~, U <: ~] = (T => U) with ~
+  override type →[T <: ~, U <: ~] = Map[T, U] with ~
   
   override lazy val I = makeDot(Traversable(()))
   override lazy val omega = makeDot(Traversable(true, false))
   override lazy val truth = I(omega) { _ => true }
 
   class FiniteSetsDot[S](private[FiniteSets] val elements: Traversable[S])
-    extends Dot[S] { self =>
+    extends Dot[S] { outerDot =>
     override lazy val toI = this(I) { _ => () }
 
     override lazy val globals: Traversable[UNIT > S] =
@@ -35,38 +35,25 @@ object FiniteSets extends Topos[Any] with Wrappings[
         }
           yield s ⊕ t
       ) with BiproductDot[S, T, S x T] {
-        override val left: DOT[S] = self
+        override val left: DOT[S] = outerDot
         override val right: DOT[T] = that
         override def pair(l: S, r: T): x[S, T] =
           l ⊕ r
       }
 
     override def `>Uncached`[T](that: FiniteSetsDot[T]) = {
-      case class FunctionElement(function: S => T) extends (S => T) {
-        override def equals(
-          that: scala.Any
-        ): Boolean =
-          that match {
-            case that: FunctionElement => elements.forall {
-              s => function(s) == that.function(s)
-            }
-          }
-        override def hashCode = 0
-        override def apply(s: S): T =
-          function(s)
-      }
-      
       new FiniteSetsDot[S → T](
-        allMaps(self.elements, that.elements) map FunctionElement
+        allMaps(outerDot.elements, that.elements) 
       ) with ExponentialDot[S, T, S → T] { exponentialDot =>
-        override val source: DOT[S] = self
+        override val source: DOT[S] = outerDot
         override val target: DOT[T] = that
 
         override def transpose[R](biArrow: BiArrow[R, S, T]) =
           biArrow.product.left(exponentialDot) {
-            r => FunctionElement {
-              s => biArrow(r, s)
-            }
+            r =>
+              outerDot.elements.map {
+                s => s -> biArrow(r, s)
+              }.toMap
         }
             
         override def evaluate(

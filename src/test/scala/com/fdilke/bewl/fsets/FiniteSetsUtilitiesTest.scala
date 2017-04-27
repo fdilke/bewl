@@ -9,7 +9,7 @@ import Matchers._
 class FiniteSetsUtilitiesTest extends FunSpec {
   describe("allMaps()") {
     it("enumerates all maps between two sets") {
-      allMaps(Seq(1, 2), Set("a", "b", "c")).map {
+      allMaps(Seq(1, 2), Set("a", "b", "c")) map {
         f => Map(1->f(1), 2->f(2))
       } shouldBe Seq(
         Map(1->"a", 2->"a"), Map(1->"b", 2->"a"), Map(1->"c", 2->"a"),
