@@ -10,7 +10,7 @@ instead of "objects and arrows" which most textbooks use. We're still doing cate
 
 # Running Bewl
 
-To run Bewl, you will need git and sbt. (On OS X, use MacPorts or Brew to install these.)
+To run Bewl, you will need __git__ and __sbt__. (On OS X, use MacPorts or Brew to install these.)
 
     git clone https://github.com/fdilke/bewl.git
     cd bewl
