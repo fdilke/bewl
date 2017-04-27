@@ -42,7 +42,6 @@ object FiniteSets extends Topos[Any] with Wrappings[
       }
 
     override def `>Uncached`[T](that: FiniteSetsDot[T]) = {
-//      println(s"exponentiating: ${that.elements.size} ^ ${this.elements.size}")
       case class FunctionElement(function: S => T) extends (S => T) {
         override def equals(
           that: scala.Any
