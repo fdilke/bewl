@@ -1,6 +1,7 @@
 package com.fdilke.bewl.fsets.monoid_actions
 
 import com.fdilke.bewl.fsets.FiniteSets
+import FiniteSets.functionAsArrow
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
@@ -190,6 +191,61 @@ class FiniteSetsMonoidActionTest extends FreeSpec {
         ) shouldBe true
         morphism.sanityTest
       }
+    }
+    "for the regular action to itself" in {
+      val morphisms =
+        analyzer.morphismsTo(
+          regularAction
+        ) 
+        
+      morphisms should have size 3
+      
+      def leftMultiplication(
+        l: Symbol
+      ) =
+        functionAsArrow[Symbol, Symbol](
+          regularAction.actionCarrier,
+          regularAction.actionCarrier,
+          { regularAction.actionMultiply(l, _) }
+        )
+        
+      morphisms.toSet shouldBe { 
+        elementsOf(monoidOf3.carrier).toSet map leftMultiplication
+      }
+
+      morphisms.forall { 
+        monoidOf3.actions.isMorphism(
+          regularAction, 
+          regularAction, 
+          _
+        ) 
+      } shouldBe true
+    }
+    
+    "for a more complex situation" ignore {
+      val o2r =
+        actionTopos.omega.squared // x actionTopos.makeDot(regularAction)
+      val o2rAction =
+        actionTopos.unwrap(
+          o2r
+        )
+          
+      val morphisms =
+        analyzerFor(
+          o2rAction
+        ).morphismsTo(
+          o2rAction
+        ) 
+        
+//      morphisms shouldBe xx
+      
+      morphisms.forall { 
+        monoidOf3.actions.isMorphism(
+          o2rAction, 
+          o2rAction, 
+          _
+        ) 
+      } shouldBe true
     }
   }
 
