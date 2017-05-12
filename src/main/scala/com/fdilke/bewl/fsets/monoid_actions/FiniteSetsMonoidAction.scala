@@ -6,7 +6,7 @@ import scala.language.postfixOps
 import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.helper.⊕
 import ⊕._
-import FiniteSets.{ >, x }
+import FiniteSets.{ >, x, functionAsArrow }
 import scala.Function.tupled
 
 trait AbstractCyclic[A] {
@@ -25,7 +25,7 @@ trait AbstractCyclics[A] {
 trait AbstractActionAnalysis[M, A] {
   val initialCyclics: AbstractCyclics[A]
   val generators: Seq[A]
-  val presentation: Seq[GeneratorWithRelators[M, A]]
+  val generatorsWithRelators: Seq[GeneratorWithRelators[M, A]]
 }
 
 object FiniteSetsMonoidAction {
@@ -38,7 +38,8 @@ object FiniteSetsMonoidAction {
       type λ[X] = AbstractActionAnalysis[M, X] with monoid.MorphismEnumerator[X]
     })#λ] {
       override def analyze[A](
-        action: monoid.Action[A]) = new AbstractActionAnalysis[M, A] with monoid.MorphismEnumerator[A] {
+        action: monoid.Action[A]
+      ) = new AbstractActionAnalysis[M, A] with monoid.MorphismEnumerator[A] {
 
         case class Cyclic(
             override val generator: A) extends AbstractCyclic[A] {
@@ -102,7 +103,7 @@ object FiniteSetsMonoidAction {
               _ << _
             }.transversal
 
-        override lazy val presentation: Seq[GeneratorWithRelators[M, A]] =
+        override lazy val generatorsWithRelators: Seq[GeneratorWithRelators[M, A]] =
           generators.zipWithIndex map tupled { (g, j) =>
             GeneratorWithRelators[M, A](
               g,
@@ -129,13 +130,76 @@ object FiniteSetsMonoidAction {
           }
 
         override def morphismsTo[B](
-          target: monoid.Action[B]) =
-          new Traversable[A > B] {
-            override def foreach[U](
-              f: (A > B) => U) {
-              ???
+          target: monoid.Action[B]
+        ) = {
+          val targetElements = 
+            elementsOf(target.actionCarrier)
+          def compatibleExtensions(
+            partialMap: Map[A, B],
+            index: Int
+          ): Traversable[Map[A, B]] = {
+            val gr = generatorsWithRelators(index)
+            val generator = gr.generator
+            targetElements filter { targetElement =>
+              println(s"Considering $targetElement as a destination for $generator")
+              val anyGood =
+              gr.relators.forall { relator =>
+                val otherTarget =
+                  if (relator.otherIndex == index)
+                    targetElement
+                  else
+                    partialMap(generator)
+                target.actionMultiply(
+                  targetElement, 
+                  relator.selfScalar
+                ) == target.actionMultiply(
+                  otherTarget, 
+                  relator.selfScalar
+                )
+              }
+              println(s"anyGood = $anyGood")
+              anyGood
+            } map { targetElement =>
+              {
+                for {
+                  m <- monoidElements
+                } yield {
+                  action.actionMultiply(
+                    generator,
+                    m
+                  ) -> target.actionMultiply(
+                    targetElement,
+                    m
+                  )
+                }
+              }.toMap
             }
           }
+          def absorb(
+            partialMaps: Traversable[Map[A, B]], 
+            index: Int
+          ) = {
+            println("Absorbing at level " + index)
+            for {
+              partialMap <- partialMaps
+              extension <- compatibleExtensions(partialMap, index)
+            } yield {
+              partialMap ++ extension                                 
+            }
+          }
+          println("Length = " + generatorsWithRelators.length)
+          (0 until generatorsWithRelators.length).foldLeft(
+            Traversable(Map.empty[A, B])
+          ) {
+            absorb
+          } map { 
+            functionAsArrow(
+              action.actionCarrier,
+              target.actionCarrier,
+              _
+            )
+          }
+        }
       }
     }
   }

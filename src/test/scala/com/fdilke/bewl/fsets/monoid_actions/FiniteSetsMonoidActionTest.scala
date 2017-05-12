@@ -164,14 +164,14 @@ class FiniteSetsMonoidActionTest extends FreeSpec {
     }
      
     "can enumerate the morphisms into another action" - {
-      "for the trivial action" ignore {
-        val otherAction: monoidOf3.Action[actionTopos.UNIT] =
+      "for the trivial action" in {
+        val trivialAction: monoidOf3.Action[actionTopos.UNIT] =
           actionTopos.unwrap(
             actionTopos.I
           )
         val morphisms =
           analyzer.morphismsTo(
-            otherAction
+            trivialAction
           ) 
           
         morphisms should have size 1
@@ -180,11 +180,14 @@ class FiniteSetsMonoidActionTest extends FreeSpec {
         morphism should have {
           'source(regularAction.actionCarrier)
           'target(
-            actionTopos.unwrap(
-              actionTopos.I
-            )
+            trivialAction.actionCarrier
           )
         }
+        monoidOf3.actions.isMorphism(
+          regularAction, 
+          trivialAction, 
+          morphism
+        ) shouldBe true
         morphism.sanityTest
       }
     }
@@ -198,7 +201,7 @@ class FiniteSetsMonoidActionTest extends FreeSpec {
           monoidOf3
         ).analyze(
           action
-        ).presentation
+        ).generatorsWithRelators
 
       val presentedAction =
         FiniteSetsPresentedAction(
@@ -221,7 +224,4 @@ class FiniteSetsMonoidActionTest extends FreeSpec {
          theProjection
       ) shouldBe true
     }
-  
-  "<Appropriately named object>" - {
-      }
 }
