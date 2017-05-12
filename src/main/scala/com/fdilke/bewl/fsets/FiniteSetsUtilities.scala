@@ -137,13 +137,13 @@ object FiniteSetsUtilities {
     source: Traversable[A],
     target: Traversable[B]
   ) : Traversable[Map[A, B]] =
-        if (source.isEmpty)
-          Traversable { Map.empty }
-        else
-          for {
-            f <- allMaps(source.tail, target)
-            choice <- target
-          } yield {
-              f + (source.head -> choice)
-          }
+      if (source.isEmpty)
+        Traversable { Map.empty }
+      else
+        for {
+          f <- allMaps(source.tail, target)
+          choice <- target
+        } yield {
+            f + (source.head -> choice)
+        }
 }

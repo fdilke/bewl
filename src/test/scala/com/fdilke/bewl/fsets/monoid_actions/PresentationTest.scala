@@ -27,7 +27,7 @@ class PresentationTest extends FreeSpec {
   "Building actions from presentations" - {
 		"works for an empty generating set" in {
 			val presentation = 
-			  Presentation(
+			  FiniteSetsPresentedAction(
 		      monoidOf3
 	      )(
 		      List[GeneratorWithRelators[Symbol, VOID]]()
@@ -55,7 +55,7 @@ class PresentationTest extends FreeSpec {
 		}
 		"works for a single generator with no relators" in {
 			val presentation = 
-			  Presentation(
+			  FiniteSetsPresentedAction(
 		      monoidOf3
 	      )(
 		      List[GeneratorWithRelators[Symbol, FiniteSets.UNIT]](
@@ -88,7 +88,7 @@ class PresentationTest extends FreeSpec {
 		}
 		"works for presenting a cyclic right ideal { x, y }" in {
 			val presentation = 
-			  Presentation(
+			  FiniteSetsPresentedAction(
 		      monoidOf3
 	      )(
 		      List[GeneratorWithRelators[Symbol, FiniteSets.UNIT]](
@@ -138,7 +138,7 @@ class PresentationTest extends FreeSpec {
         ) 
       
 			val presentation = 
-			  Presentation(
+			  FiniteSetsPresentedAction(
 		      end2
 	      )(
 		      List[GeneratorWithRelators[Symbol, Int]](
@@ -195,7 +195,7 @@ class PresentationTest extends FreeSpec {
       )
 
 			val presentation = 
-			  Presentation(
+			  FiniteSetsPresentedAction(
 		      group
 	      )(
 		      List[GeneratorWithRelators[Symbol, String]](

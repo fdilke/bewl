@@ -122,6 +122,47 @@ class FiniteSetsMonoidActionTest extends FreeSpec {
       }
     }
     
+    "can extract a set of generators for a monoid" in {
+      import monoidOf3.regularAction
+
+      FiniteSetsMonoidAction(
+        monoidOf3
+      ).analyze(
+        regularAction
+      ).generators shouldBe Seq(i)
+    }
+
+    "can extract a presentation" - {
+      "for the regular monoid action" in {
+        canExtractPresentation(monoidOf3.regularAction)
+      }
+      "for an empty monoid action" in {
+        canExtractPresentation(        
+            actionTopos.unwrap(
+              actionTopos.O
+            )
+          )
+      }
+      "for the truth object monoid action" in {
+        canExtractPresentation(        
+            actionTopos.unwrap(
+              actionTopos.omega
+            )
+          )
+      }
+      "for a more fancy monoid action" in {
+        canExtractPresentation(        
+            actionTopos.unwrap(
+              actionTopos.omega x
+                actionTopos.makeDot(
+                  monoidOf3.regularAction
+                )
+            )
+          )
+      }
+    // TODO: add more tests like this!
+    }
+     
     "can enumerate the morphisms into another action" - {
       "for the trivial action" ignore {
         val otherAction: monoidOf3.Action[actionTopos.UNIT] =
@@ -148,4 +189,39 @@ class FiniteSetsMonoidActionTest extends FreeSpec {
       }
     }
   }
+
+  private def canExtractPresentation[A](
+      action: monoidOf3.Action[A]
+    ) {
+      val generatorsWithRelators: Seq[GeneratorWithRelators[M, A]] =
+        FiniteSetsMonoidAction(
+          monoidOf3
+        ).analyze(
+          action
+        ).presentation
+
+      val presentedAction =
+        FiniteSetsPresentedAction(
+          monoidOf3
+        )(
+          generatorsWithRelators
+        )
+      presentedAction.sanityTest
+
+      // Check this presents the original action
+	    val theProjection: Int > A = 
+	      presentedAction.project(
+          action,
+          generatorsWithRelators map { _.generator }
+        )
+        
+      monoidOf3.actions.isMorphism(
+         presentedAction.action,
+         action,
+         theProjection
+      ) shouldBe true
+    }
+  
+  "<Appropriately named object>" - {
+      }
 }

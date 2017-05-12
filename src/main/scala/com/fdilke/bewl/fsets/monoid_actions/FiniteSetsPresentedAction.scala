@@ -8,12 +8,12 @@ import com.fdilke.bewl.fsets.FiniteSets
 import FiniteSets.{ >, x, makeDot }
 import com.fdilke.bewl.helper.⊕
 
-object Presentation {
+object FiniteSetsPresentedAction {
   def apply[M, A](
     monoid: FiniteSets.Monoid[M]
   )(
     generatorsWithRelators: Seq[GeneratorWithRelators[M, A]]
-  ) : monoid.Presentation[Int] = {
+  ) : monoid.PresentedAction[Int] = {
     val monoidElements: List[M] =
       elementsOf(monoid.carrier).toList
     val lookupMonoid: Map[M, Int] =
@@ -50,7 +50,7 @@ object Presentation {
     val wordIndices = equivalenceTable.toSet
     val wordIndicesDot = makeDot(wordIndices)
 
-    new monoid.Presentation[Int] {
+    new monoid.PresentedAction[Int] {
       override val action: monoid.Action[Int] =
         monoid.action(wordIndicesDot) { 
           (index, n) =>
@@ -72,6 +72,15 @@ object Presentation {
               targetElements(lookupGenerator(g)),
               m
             )
+      }
+      override def sanityTest {
+        for {
+          (gr, i) <- generatorsWithRelators.zipWithIndex
+          relator <- gr.relators
+        }
+          assert(relator.otherIndex <= i)
+          
+        action.sanityTest
       }
     }
   }

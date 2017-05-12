@@ -41,12 +41,13 @@ trait AlgebraicStructures extends
       ): Traversable[A > B]
     }
 
-    trait Presentation[A <: ~] {
+    trait PresentedAction[A <: ~] {
       val action: Action[A] 
       def project[B <: ~](
         otherAction: Action[B],
         targetElements: Seq[B]
       ): A > B
+      def sanityTest: Unit
     }
     
     lazy val actions =
