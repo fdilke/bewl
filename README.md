@@ -84,11 +84,11 @@ If you want to use Bewl as a learning aid to study category theory, [start here]
 - removed legacy DiagrammaticTopos code
 - images
 - quotients and lifts
+- more algebraic structures: now include all the classical ones
+- coequalizers
 
 # To do
 
-- coequalizers
-- Define more algebraic structures: a complete list
 - construct the monad of monoid actions
 - construct the reader monad 
 - construct 'pitchfork' for algebras over a strong monad
