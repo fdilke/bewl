@@ -9,6 +9,8 @@ import scala.language.reflectiveCalls
 import scala.language.existentials
 
 import FiniteSets.{>, ToposOfMonoidActions}
+import scala.language.postfixOps
+import com.fdilke.bewl.helper.⊕
 
 class FiniteSetsMonoidActionTest extends FreeSpec {
   
@@ -222,13 +224,16 @@ class FiniteSetsMonoidActionTest extends FreeSpec {
       } shouldBe true
     }
     
-    "for a more complex situation" ignore {
+    "for a more complex situation" in {
+      println("xXx 1")
       val o2r =
         actionTopos.omega.squared // x actionTopos.makeDot(regularAction)
+      println("xXx 2")
       val o2rAction =
         actionTopos.unwrap(
           o2r
         )
+      println("xXx 3")
           
       val morphisms =
         analyzerFor(
@@ -236,8 +241,23 @@ class FiniteSetsMonoidActionTest extends FreeSpec {
         ).morphismsTo(
           o2rAction
         ) 
-        
-//      morphisms shouldBe xx
+      println("xXx 4")
+
+//      val bubber = morphisms.toSet
+//      bubber map { morphism =>
+//        type T2 = actionTopos.x[actionTopos.TRUTH, actionTopos.TRUTH]
+//        val m: FiniteSets.FiniteSetsArrow[T2, T2] = morphism 
+//        val ff: T2 => T2 = m.apply _
+//        actionTopos.makeArrow(
+//            new monoidOf3.ActionPreArrow(
+//                o2rAction,
+//                o2rAction,
+//                ff
+//            )
+//        )
+//      } shouldBe {
+//        o2r >> o2r toSet
+//      }
       
       morphisms.forall { 
         monoidOf3.actions.isMorphism(
