@@ -141,28 +141,20 @@ object FiniteSetsMonoidAction {
             val gr = generatorsWithRelators(index)
             val generator = gr.generator
             targetElements filter { targetElement =>
-              println(s"Considering $targetElement as a destination for $generator")
-              val anyGood =
               gr.relators.forall { relator =>
-                println("ttt 1")
                 val otherTarget: B =
                   if (relator.otherIndex == index)
                     targetElement
                   else
                     partialMap(generators(relator.otherIndex))
-                println("ttt 2")
-                val x = target.actionMultiply(
+                target.actionMultiply(
                   targetElement, 
                   relator.selfScalar
                 ) == target.actionMultiply(
-                  otherTarget, 
+                  otherTarget,
                   relator.selfScalar
                 )
-                println("ttt 3 and final")
-                x
               }
-              println(s"anyGood = $anyGood")
-              anyGood
             } map { targetElement =>
               {
                 for {

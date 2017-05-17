@@ -428,8 +428,17 @@ trait ConstructToposOfMonoidActions extends
           S <: ~, 
           T <: ~
         ](
-          prearrow: monoid.ActionPreArrow[S,T]
-        ): ActionArrow[S,T] = ??? 
+          preArrow: monoid.ActionPreArrow[S,T]
+        ): ActionArrow[S,T] =
+          ActionArrow[S, T](
+            makeDot(preArrow.source),
+            makeDot(preArrow.target),
+            preArrow.source.actionCarrier(
+              preArrow.target.actionCarrier
+            ) {
+              preArrow.function
+            }
+          )
 
         private val memoizedDotWrapper =
           Memoize.generic withLowerBound[

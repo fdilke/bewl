@@ -223,50 +223,71 @@ class FiniteSetsMonoidActionTest extends FreeSpec {
         ) 
       } shouldBe true
     }
-    
-    "for a more complex situation" in {
-      println("xXx 1")
-      val o2r =
-        actionTopos.omega.squared // x actionTopos.makeDot(regularAction)
-      println("xXx 2")
-      val o2rAction =
-        actionTopos.unwrap(
-          o2r
-        )
-      println("xXx 3")
-          
-      val morphisms =
-        analyzerFor(
-          o2rAction
-        ).morphismsTo(
-          o2rAction
-        ) 
-      println("xXx 4")
 
-//      val bubber = morphisms.toSet
-//      bubber map { morphism =>
-//        type T2 = actionTopos.x[actionTopos.TRUTH, actionTopos.TRUTH]
-//        val m: FiniteSets.FiniteSetsArrow[T2, T2] = morphism 
-//        val ff: T2 => T2 = m.apply _
-//        actionTopos.makeArrow(
-//            new monoidOf3.ActionPreArrow(
-//                o2rAction,
-//                o2rAction,
-//                ff
-//            )
-//        )
-//      } shouldBe {
-//        o2r >> o2r toSet
-//      }
-      
-      morphisms.forall { 
-        monoidOf3.actions.isMorphism(
-          o2rAction, 
-          o2rAction, 
-          _
-        ) 
-      } shouldBe true
+    "for the regular action to itself, checked another way" in {
+      val wrappedRegularAction =
+        actionTopos.makeDot(regularAction)
+
+      canEnumerateMorphisms(
+        wrappedRegularAction,
+        wrappedRegularAction,
+        thorough=false // true passes, but takes too long
+      )
     }
+
+    "for a more complex situation" in {
+      canEnumerateMorphisms(
+        actionTopos.omega.squared,
+        actionTopos.omega.squared,
+        thorough=false
+      )
+    }
+  }
+
+  def canEnumerateMorphisms[X, Y](
+   source: actionTopos.DOT[X],
+   target: actionTopos.DOT[Y],
+   thorough: Boolean
+  ) {
+    val sourceAction =
+      actionTopos.unwrap(
+        source
+      )
+    val targetAction =
+      actionTopos.unwrap(
+        target
+      )
+
+  val morphisms =
+    analyzerFor(
+      sourceAction
+    ).morphismsTo(
+      targetAction
+    )
+
+    morphisms.forall {
+      monoidOf3.actions.isMorphism(
+        sourceAction,
+        targetAction,
+        _
+      )
+    } shouldBe true
+
+    if (thorough)
+      morphisms.toSet map { (morphism: X > Y) =>
+        val preArrow =
+          new monoidOf3.ActionPreArrow[X, Y](
+            sourceAction,
+            targetAction,
+            x => morphism(x)
+          )
+
+        actionTopos.makeArrow(
+          preArrow
+        )
+      } shouldBe {
+        (source >> target) toSet
+      }
   }
 
   private def canExtractPresentation[A](
