@@ -9,15 +9,21 @@ Alas, these CI badges are too flaky, commented out for now.
 
 A DSL for the internal (Mitchell-Benabou) language of a topos. 
 
-[This presentation](https://github.com/fdilke/bewl/blob/master/notes/DoubleExponentialMonads.pdf) describes
-my simplistic but ambitious plan to solve the mystery of permutation parity by calculating the double exponential
-monad for ¬, the permutation interchanging true and false.
+Bewl is an ambitious and quixotic attempt to enable new techniques for manipulating
+set-like objects (permutations, musical objects, graphs, fuzzy sets, etc) as if they
+were sets. This involves a mix of advanced Scala and ludicrously abstract math. The
+most likely applications (still some way down the line) are to music theory or to 
+the continuing quest for a proper explanation of permutation parity. It is also
+possible to use Bewl as an aid to learning category theory or as a computational
+algebra package where you can easily define your own algebraic structures. 
+
+To see the current to-do list and state of play, you can view this [Trello board](https://trello.com/b/PfdnsRNl/bewl). There's also a 
+[continuous integration setup](https://snap-ci.com/fdilke/bewl/branch/master) which runs all the tests on each commit.
+
+# Presentations explaining the project
 
 [This one](https://github.com/fdilke/bewl/blob/master/notes/StateOfTheBewlJan2016.pdf) explains the project and describes
 the overall state of play as of January 2016.
-
-[This one](https://github.com/fdilke/bewl/blob/master/notes/PartyingWithPermutations.pdf) gives the latest on the ongoing
-quest for permutation parity, a "real-life application" of Bewl.
 
 See [this presentation](https://www.evernote.com/shard/s141/sh/8e6b9d94-bc20-4fde-b2bf-9e844f486f76/d11244bad0729071fa00d19eaad312ce)
 for an attempt at "the internal language for dummies"
@@ -25,18 +31,24 @@ for an attempt at "the internal language for dummies"
 I've had to keep re-implementing Bewl in successively more powerful programming languages (Java, Clojure and now Scala). 
 Really it should be in Haskell or Idris but I'm not ready for those yet.
 
-[This presentation](http://prezi.com/dwrz2mft3y-g/?utm_campaign=share&utm_medium=copy&rc=ex0share) explains the new "intrinsic" Bewl 2.0 DSL and why it's
- better than the previous "diagrammatic" 1.0 one.
+[This presentation](http://prezi.com/dwrz2mft3y-g/?utm_campaign=share&utm_medium=copy&rc=ex0share) explains the new "intrinsic" Bewl 2.0 DSL and why it's better than the previous "diagrammatic" 1.0 one.
 
 Here's a presentation about Bewl's [universal algebra capabilities](https://github.com/fdilke/bewl/blob/master/notes/BewlUniversalAlgebra.pdf).
 
-And here's one about the [topos of automorphisms](https://github.com/fdilke/bewl/blob/master/notes/ToposOfAutomorphisms.pdf), 
-another chapter in the ongoing quest for a decent explanation of permutation parity.
-
 This [animated video](http://www.youtube.com/watch/?v=nUwjGBHXKYs) was an initial attempt to explain Bewl (back when it was called Bile)
 
-To see the current to-do list and state of play, you can view this [Trello board](https://trello.com/b/PfdnsRNl/bewl). There's also a 
-[continuous integration setup](https://snap-ci.com/fdilke/bewl/branch/master) which runs all the tests on each commit.
+Notes on some promising breakthroughs re [speeding up the topos of actions](https://github.com/fdilke/bewl/blob/master/Speedup.md)
+
+# Parity
+
+[This presentation](https://github.com/fdilke/bewl/blob/master/notes/DoubleExponentialMonads.pdf) describes
+my simplistic but ambitious plan to solve the mystery of permutation parity by calculating the double exponential
+monad for ¬, the permutation interchanging true and false. 
+Here's one about the [topos of automorphisms](https://github.com/fdilke/bewl/blob/master/notes/ToposOfAutomorphisms.pdf), 
+another chapter in the ongoing parity quest. Here's an
+[update](https://github.com/fdilke/bewl/blob/master/notes/PartyingWithPermutations.pdf).
+(Since then, I've decided it would be easier to generalize the transfer using the 
+theory of Coxeter groups, but that's another story.) 
 
 # Category theory tutorials
 
