@@ -52,7 +52,7 @@ theory of Coxeter groups, but that's another story.)
 
 # Music
 
-[Here I relate](https://github.com/fdilke/bewl/blob/master/notes/BewlSpeedup.pptx) Bewl to [Thomas Noll's paper](http://user.cs.tu-berlin.de/~noll/ToposOfTriads.pdf) about music theory and topoi 
+[Here I relate](https://github.com/fdilke/bewl/blob/master/notes/BewlSpeedup.pdf) Bewl to [Thomas Noll's paper](http://user.cs.tu-berlin.de/~noll/ToposOfTriads.pdf) about music theory and topoi 
 
 # Category theory tutorials
 
