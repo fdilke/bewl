@@ -48,7 +48,11 @@ Here's one about the [topos of automorphisms](https://github.com/fdilke/bewl/blo
 another chapter in the ongoing parity quest. Here's an
 [update](https://github.com/fdilke/bewl/blob/master/notes/PartyingWithPermutations.pdf).
 (Since then, I've decided it would be easier to generalize the transfer using the 
-theory of Coxeter groups, but that's another story.) 
+theory of Coxeter groups, but that's another story.)
+
+# Music
+
+[Here I relate](https://github.com/fdilke/bewl/blob/master/notes/BewlSpeedup.pptx) Bewl to [Thomas Noll's paper](http://user.cs.tu-berlin.de/~noll/ToposOfTriads.pdf) about music theory and topoi 
 
 # Category theory tutorials
 
@@ -63,8 +67,7 @@ If you want to use Bewl as a learning aid to study category theory, [start here]
 "topos of permutations" is implemented.
 - Explore the topos of graphs. Bewl will let us talk about graphs as if they were sets
 - Explore fuzzy sets (using the more careful definition that makes them into a topos)
-- Explore Lawvere-Tierney topologies (and perhaps save [these](http://www.math.uchicago.edu/~may/VIGRE/VIGRE2007/REUPapers/FINALFULL/Bartlett.pdf) 
-[poor](http://user.cs.tu-berlin.de/~noll/ToposOfTriads.pdf) music theorists from having to calculate them by hand)
+- Explore Lawvere-Tierney topologies (and perhaps save [these](http://www.math.uchicago.edu/~may/VIGRE/VIGRE2007/REUPapers/FINALFULL/Bartlett.pdf) music theorists from having to calculate them by hand)
 
 # Done so far
 
