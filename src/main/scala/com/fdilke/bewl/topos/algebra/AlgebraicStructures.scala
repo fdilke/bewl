@@ -29,7 +29,9 @@ trait AlgebraicStructures extends
     val unit: NullaryOp[M]
     val multiply: BinaryOp[M]
     
-    trait ActionAnalyzer[ACTION_ANALYSIS[_ <: ~]] {
+    trait ActionAnalyzer[
+      ACTION_ANALYSIS[_ <: ~]
+    ] {
       def analyze[A <: ~](
         action: Action[A]
       ) : ACTION_ANALYSIS[A]
@@ -106,16 +108,12 @@ trait AlgebraicStructures extends
     * := multiply
   ) with Actions[M] with CommutativityCriterion
 
-  trait MonoidAssistant[
-    ACTION_ANALYSIS[_ <: ~]
+  class ActionAnalysis[
+    T <: ~
   ] {
-    def actionAnalyzer[
-      M <: ~
-    ] (
-      monoid: Monoid[M]
-    ): monoid.ActionAnalyzer[ACTION_ANALYSIS]
+    
   }
-  
+    
   lazy val groups = AlgebraicTheory(ι, ~, *)( 
     "left unit" law ( ι * α := α ),
     "right unit" law ( α * ι := α ),

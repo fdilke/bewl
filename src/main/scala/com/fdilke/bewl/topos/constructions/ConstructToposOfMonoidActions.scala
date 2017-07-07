@@ -4,17 +4,21 @@ import com.fdilke.bewl.topos._
 import com.fdilke.bewl.helper.Memoize
 import com.fdilke.bewl.topos.algebra.{AlgebraicStructures, AlgebraicMachinery}
 import com.fdilke.bewl.helper.{Memoize, ⊕}
+import scala.language.higherKinds
+import scala.language.reflectiveCalls
 
 trait ConstructToposOfMonoidActions extends
   BaseTopos with
-  ToposEnrichments {
+  ToposEnrichments with  
+  ConstructDefaultMonoidAssistant {
   Ɛ: AlgebraicStructures with AlgebraicMachinery =>
 
   object ToposOfMonoidActions {
     def of[
       M <: ~
-    ] (
-      monoid: Ɛ.Monoid[M]
+    ] ( 
+      monoid: Monoid[M],
+      assistant: MonoidAssistant = monoidAssistant
     ) : Topos[~] with Wrappings[
       ~,
       ~,
@@ -31,6 +35,8 @@ trait ConstructToposOfMonoidActions extends
     ] {
       import monoid.{ carrier, multiply, action, unit, Action }
       
+     val analyzer: monoid.ActionAnalyzer[Ɛ.ActionAnalysis] =
+        assistant.actionAnalyzer(monoid)
       override type DOT[A <: ~] = ActionDot[A]
       override type >[A <: ~, B <: ~] = ActionArrow[A, B]
       override type UNIT = Ɛ.UNIT
