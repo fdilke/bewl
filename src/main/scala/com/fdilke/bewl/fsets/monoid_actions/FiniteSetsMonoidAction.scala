@@ -30,7 +30,8 @@ trait AbstractActionAnalysis[M, A] {
 
 object FiniteSetsMonoidAction {
   def apply[M](
-    monoid: FiniteSets.Monoid[M]) = {
+    monoid: FiniteSets.Monoid[M]
+  ) = {
     val monoidElements =
       elementsOf(monoid.carrier)
 

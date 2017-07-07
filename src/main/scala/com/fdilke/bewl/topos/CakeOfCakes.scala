@@ -6,6 +6,7 @@ import com.fdilke.bewl.topos.algebra.{
   AlgebraicStructures
 }
 import com.fdilke.bewl.topos.constructions.{
+  ConstructDefaultMonoidAssistant,
   ConstructToposOfAutomorphisms, 
   ConstructToposOfGroupActions, 
   ConstructToposOfMonoidActions
@@ -32,6 +33,7 @@ trait ToposAlgebra extends
 
 trait ToposConstructions extends
   BaseTopos with
+  ConstructDefaultMonoidAssistant with
   ConstructToposOfMonoidActions with
   ConstructToposOfGroupActions with
   ConstructToposOfAutomorphisms {

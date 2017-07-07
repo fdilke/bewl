@@ -106,6 +106,16 @@ trait AlgebraicStructures extends
     * := multiply
   ) with Actions[M] with CommutativityCriterion
 
+  trait MonoidAssistant[
+    ACTION_ANALYSIS[_ <: ~]
+  ] {
+    def actionAnalyzer[
+      M <: ~
+    ] (
+      monoid: Monoid[M]
+    ): monoid.ActionAnalyzer[ACTION_ANALYSIS]
+  }
+  
   lazy val groups = AlgebraicTheory(ι, ~, *)( 
     "left unit" law ( ι * α := α ),
     "right unit" law ( α * ι := α ),
