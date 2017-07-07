@@ -12,26 +12,28 @@ trait ConstructDefaultMonoidAssistant extends
 
   Ɛ: AlgebraicStructures with AlgebraicMachinery =>
 
-    // TODO fix 'bakery of doom' issue
-    // and put the monoid assistant code in here
+  // TODO fix 'bakery of doom' issue and put the ActionAnalysis class in here
 
-  trait MonoidAssistant {
-    def actionAnalyzer[
-      M <: ~
-    ] (
-      monoid: Monoid[M]
-    ): monoid.ActionAnalyzer[ActionAnalysis]
-  }
-    
-  object DefaultMonoidAssistant extends MonoidAssistant {
+  object DefaultMonoidAssistant extends MonoidAssistant[
+    ActionAnalysis
+  ] {
     override def actionAnalyzer[
       M <: ~
     ] (
       monoid: Ɛ.Monoid[M]
-    ): monoid.ActionAnalyzer[ActionAnalysis] =
-      null // :( :( :(
+    ) =
+      new monoid.ActionAnalyzer[
+        ActionAnalysis
+      ] {
+        override def analyze[A <: ~](
+          action: monoid.Action[A]
+        ) = 
+          new ActionAnalysis[A] {
+          
+          }
+    }
   }
   
-  val monoidAssistant : MonoidAssistant = 
+  val monoidAssistant: MonoidAssistant[ActionAnalysis] = 
     DefaultMonoidAssistant    
 }

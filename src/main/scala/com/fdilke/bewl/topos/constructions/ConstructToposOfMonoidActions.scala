@@ -18,7 +18,7 @@ trait ConstructToposOfMonoidActions extends
       M <: ~
     ] ( 
       monoid: Monoid[M],
-      assistant: MonoidAssistant = monoidAssistant
+      assistant: MonoidAssistant[ActionAnalysis] = monoidAssistant
     ) : Topos[~] with Wrappings[
       ~,
       ~,

@@ -37,7 +37,8 @@ object FiniteSetsMonoidAction {
 
     new monoid.ActionAnalyzer[({
       type λ[X] = AbstractActionAnalysis[M, X] with monoid.MorphismEnumerator[X]
-    })#λ] {
+      })#λ
+    ] {
       override def analyze[A](
         action: monoid.Action[A]
       ) = new AbstractActionAnalysis[M, A] with monoid.MorphismEnumerator[A] {
