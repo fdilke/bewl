@@ -83,17 +83,17 @@ class AlgebraicMachineryTest extends FunSpec {
         2 -> 1
       )
 
-      val pointedSetsWithOp = AlgebraicTheory(o, $minus)()
-      val algebra = new pointedSetsWithOp.Algebra[Int](carrier)(o := theO, $minus := twiddle)
+      val pointedSetsWithOp = AlgebraicTheory(o, ~)()
+      val algebra = new pointedSetsWithOp.Algebra[Int](carrier)(o := theO, $tilde := twiddle)
       val context = algebra.EvaluationContext(Seq(α))
       val interpretO = theO o context.root.toI
       val interpretα = context.evaluate(α)
 
       interpretα should not be interpretO
       context.evaluate(o) shouldBe interpretO
-      val minusO = -o
-      context.evaluate(-o) shouldBe interpretO
-      context.evaluate(-(-α)) shouldBe interpretα
+      val minusO = ~o
+      context.evaluate(~o) shouldBe interpretO
+      context.evaluate(~(~α)) shouldBe interpretα
     }
 
     it("can evaluate compound terms with binary operators") {
@@ -223,9 +223,9 @@ class AlgebraicMachineryTest extends FunSpec {
       val wrongSource = dot[String]("*")
       val wrongTarget = dot[Int](0)
 
-      val setsWithInvolution = AlgebraicTheory($minus)(-(-α) := α)
-      val algebraStrings = new setsWithInvolution.Algebra[String](carrierStrings)($minus := minusStrings)
-      val algebraInts = new setsWithInvolution.Algebra[Int](carrierInts)($minus := minusInts)
+      val setsWithInvolution = AlgebraicTheory(~)(~(~α) := α)
+      val algebraStrings = new setsWithInvolution.Algebra[String](carrierStrings)($tilde := minusStrings)
+      val algebraInts = new setsWithInvolution.Algebra[Int](carrierInts)($tilde := minusInts)
       algebraStrings.sanityTest
       algebraInts.sanityTest
 
@@ -313,12 +313,12 @@ class AlgebraicMachineryTest extends FunSpec {
         -1 -> 1
       )
 
-      val setsWithInvolution = AlgebraicTheory($minus)(
-        "involutive" law (-(-α) := α)
+      val setsWithInvolution = AlgebraicTheory(~)(
+        "involutive" law (~(~α) := α)
       )
-      new setsWithInvolution.Algebra[Int](carrier)($minus := minusGood).sanityTest
+      new setsWithInvolution.Algebra[Int](carrier)($tilde := minusGood).sanityTest
       intercept[IllegalArgumentException] {
-        new setsWithInvolution.Algebra[Int](carrier)($minus := minusBad).sanityTest
+        new setsWithInvolution.Algebra[Int](carrier)($tilde := minusBad).sanityTest
       }.getMessage should include("involutive")
     }
 
@@ -330,17 +330,17 @@ class AlgebraicMachineryTest extends FunSpec {
         -1 -> 1
       )
 
-      val setsWithInvolution = AlgebraicTheory($minus)(
-        "involutive" law (-(-α) := α)
+      val setsWithInvolution = AlgebraicTheory(~)(
+        "involutive" law (~(~α) := α)
       )
-      val algebra = new setsWithInvolution.Algebra[Int](carrier)($minus := minus)
+      val algebra = new setsWithInvolution.Algebra[Int](carrier)($tilde := minus)
       algebra.sanityTest
 
       algebra.satisfies(
-        -α := α
+        ~α := α
       ) shouldBe false
       algebra.satisfies(
-        -α := -(-(-α))
+        ~α := ~(~(~α))
       ) shouldBe true
     }
 

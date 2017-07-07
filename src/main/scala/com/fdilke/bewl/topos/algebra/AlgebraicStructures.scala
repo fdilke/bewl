@@ -106,10 +106,10 @@ trait AlgebraicStructures extends
     * := multiply
   ) with Actions[M] with CommutativityCriterion
 
-  lazy val groups = AlgebraicTheory(ι, $minus, *)( // TODO try ~
+  lazy val groups = AlgebraicTheory(ι, ~, *)( 
     "left unit" law ( ι * α := α ),
     "right unit" law ( α * ι := α ),
-    "left inverse" law ( (-α) * α := ι ),
+    "left inverse" law ( (~α) * α := ι ),
     "associative" law ( (α * β) * γ := α * (β * γ ) )
   )
 
@@ -121,7 +121,7 @@ trait AlgebraicStructures extends
   ) extends groups.Algebra[G](carrier)(
     ι := unit,
     * := multiply,
-    $minus := inverse
+    $tilde := inverse
   ) with Actions[G] with CommutativityCriterion {
     lazy val asMonoid = new Monoid[G](carrier, unit, multiply)
   }

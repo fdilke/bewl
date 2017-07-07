@@ -94,8 +94,8 @@ trait AlgebraicMachinery { topos: BaseTopos =>
         other
       )
 
-    def unary_- : Term[X] =
-      UnaryOpTerm(StandardTermsAndOperators.-, this)
+    def unary_~ : Term[X] =
+      UnaryOpTerm(StandardTermsAndOperators.~, this)
 
     val freeVariables : Seq[VariableTerm[_ <: AlgebraicSort]]
 
@@ -360,7 +360,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     val Φ = ScalarTerm("Φ")
     val Ψ = ScalarTerm("Ψ")
 
-    val - = new AbstractUnaryOp("-")
+    val ~ = new AbstractUnaryOp("~")
 
     val * = new AbstractBinaryOp("*")
     val + = new AbstractBinaryOp("+")
