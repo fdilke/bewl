@@ -1,12 +1,16 @@
 package com.fdilke.bewl.topos
 
 import com.fdilke.bewl.helper.⊕
-import com.fdilke.bewl.topos.constructions.ConstructToposOfMonoidActionsOld
 import com.fdilke.bewl.topos.constructions.ConstructToposOfMonoidActions
 import org.scalatest.Matchers._
 import org.scalatest._
 
-abstract class ToposFixtureSanityTests[~, T <: Topos[~]](fixtures: ToposWithFixtures[~]) extends FunSpec {
+abstract class ToposFixtureSanityTests[
+  ~, 
+  T <: Topos[~]
+] (
+    fixtures: ToposWithFixtures[~]
+) extends FunSpec {
   import fixtures._
 
   describe(s"The fixtures for ${fixtures.topos.getClass.getSimpleName}") {
@@ -104,7 +108,6 @@ abstract class GenericToposTests[~](
   import fixtures.topos.{~ => ~~, _}
 
   private lazy val inActionTopos =
-    topos.getClass.getName.contains(classOf[ConstructToposOfMonoidActionsOld].getSimpleName) ||
     topos.getClass.getName.contains(classOf[ConstructToposOfMonoidActions].getSimpleName)
 
   describe(s"The topos ${topos.getClass.getSimpleName}") {
