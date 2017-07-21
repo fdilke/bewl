@@ -5,6 +5,7 @@ import com.fdilke.bewl.topos._
 import com.fdilke.bewl.topos.algebra.{AlgebraicMachinery, AlgebraicStructures}
 import scala.language.higherKinds
 import scala.language.reflectiveCalls
+import scala.language.postfixOps
 
 trait ConstructDefaultMonoidAssistant extends
   BaseTopos with
@@ -47,8 +48,19 @@ trait ConstructDefaultMonoidAssistant extends
           new monoid.MonoidSpecificActionAnalysis[A] {
             override def morphismsTo[B <: ~](
               target: monoid.Action[B] 
-            ): Traversable[A > B] =
-              ???
+            ): Traversable[A > B] = {
+              val product = action.actionCarrier x monoid.carrier
+              action.actionCarrier >> target.actionCarrier filter { arrow =>
+                  ( product.biArrow(target.actionCarrier) { (a, m) =>
+                    arrow(action.actionMultiply(a, m))
+                  } arrow
+                ) == ( 
+                  product.biArrow(target.actionCarrier) { (a, m) =>
+                    target.actionMultiply(arrow(a), m)
+                  } arrow
+                )
+              } 
+            }
           }
     }
   }

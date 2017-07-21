@@ -668,7 +668,7 @@ trait BaseTopos {
       arrow o (l x r)
   }
 
-  // Helper methods for triproducts (this could obviously be extended).
+  // Helper methods for triple products (this could obviously be extended).
   def leftProjection[X <: ~, Y <: ~, Z <: ~](
     x: DOT[X], y: DOT[Y], z: DOT[Z]
   ) : X x Y x Z > X =

@@ -1,7 +1,7 @@
 package com.fdilke.bewl.topos.algebra.constructions
 
 import com.fdilke.bewl.fsets.FiniteSets
-import FiniteSets.functionAsArrow
+import FiniteSets.{ ~, functionAsArrow }
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
@@ -28,15 +28,30 @@ class DefaultMonoidAssistantTest extends FreeSpec {
       
   private val bar = monoidOf3.action(barDot)(scalarMultiply)
 
-//  private val analyzer: monoidOf3.ActionAnalyzer[
-//  ] =
-//      FiniteSets.DefaultMonoidAssistant.actionAnalyzer(
-//        monoidOf3          
-//      )
+  private val analyzer
+//  : monoidOf3.ActionAnalyzer[
+//    ({
+//      type λ[A <: ~] = 
+//        monoidOf3.MonoidSpecificActionAnalysis[A]  
+//    }) # λ    
+//  ] 
+      =
+      FiniteSets.DefaultMonoidAssistant.actionAnalyzer(
+        monoidOf3          
+      )
 
+  private val regularAnalysis =
+    analyzer.analyze(regularAction)
+      
   "The default monoid assistant" - {
     "can enumerate morphisms" in {
-      // TODO fill in
+      regularAnalysis.morphismsTo(bar).toSet shouldBe {
+        elementsOf(barDot).toSet map { (a: String) =>
+          regularAction.actionCarrier(barDot) { m => 
+            scalarMultiply(a, m)
+          }
+        }
+      }
     }
   }
 }
