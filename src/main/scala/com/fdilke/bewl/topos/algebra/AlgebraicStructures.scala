@@ -29,12 +29,12 @@ trait AlgebraicStructures extends
     val unit: NullaryOp[M]
     val multiply: BinaryOp[M]
     
-//    trait MonoidSpecificActionAnalysis[
-//      A <: ~
-//    ] extends MorphismEnumerator[A]
+    trait MonoidSpecificActionAnalysis[
+      A <: ~
+    ] extends MorphismEnumerator[A]
     
     trait ActionAnalyzer[
-      ACTION_ANALYSIS[_ <: ~]
+      ACTION_ANALYSIS[A <: ~] <: MonoidSpecificActionAnalysis[A]
     ] {
       def analyze[A <: ~](
         action: Action[A]

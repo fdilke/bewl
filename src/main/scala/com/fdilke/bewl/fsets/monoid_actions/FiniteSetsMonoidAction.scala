@@ -36,12 +36,12 @@ object FiniteSetsMonoidAction {
       elementsOf(monoid.carrier)
 
     new monoid.ActionAnalyzer[({
-      type λ[X] = AbstractActionAnalysis[M, X] with monoid.MorphismEnumerator[X]
+      type λ[X] = AbstractActionAnalysis[M, X] with monoid.MonoidSpecificActionAnalysis[X]
       })#λ
     ] {
       override def analyze[A](
         action: monoid.Action[A]
-      ) = new AbstractActionAnalysis[M, A] with monoid.MorphismEnumerator[A] {
+      ) = new AbstractActionAnalysis[M, A] with monoid.MonoidSpecificActionAnalysis[A] {
 
         case class Cyclic(
             override val generator: A) extends AbstractCyclic[A] {
