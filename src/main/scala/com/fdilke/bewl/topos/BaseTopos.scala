@@ -348,7 +348,7 @@ trait BaseTopos {
     final lazy val singleton: S > (S → TRUTH) =
       power transpose =?=
 
-    final def >>[T <: ~](
+    def >>[T <: ~](
       target: DOT[T]
     ): Traversable[
       S > T

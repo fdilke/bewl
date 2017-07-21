@@ -117,6 +117,24 @@ trait ConstructToposOfMonoidActions extends
         ](
           val action: Action[S]
         ) extends Dot[S] { actionDot =>
+          lazy val analysis = 
+            analyzer.analyze(action)
+          
+          override def >>[T <: ~](
+            target: ActionDot[T]
+          ): Traversable[
+            S > T
+          ] =
+            analysis.morphismsTo(
+              target.action
+            ) map { arrow =>
+              ActionArrow(
+                actionDot,
+                target,
+                arrow
+              )
+            }
+
           override def `>Uncached`[
             T <: ~
           ](
