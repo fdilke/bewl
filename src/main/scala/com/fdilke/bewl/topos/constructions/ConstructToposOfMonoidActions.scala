@@ -42,6 +42,7 @@ trait ConstructToposOfMonoidActions extends
         }) # λ
      ] =
         assistant.actionAnalyzer(monoid)
+        
       override type DOT[A <: ~] = ActionDot[A]
       override type >[A <: ~, B <: ~] = ActionArrow[A, B]
       override type UNIT = Ɛ.UNIT

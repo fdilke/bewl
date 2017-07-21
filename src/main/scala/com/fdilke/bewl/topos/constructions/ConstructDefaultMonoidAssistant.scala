@@ -51,14 +51,14 @@ trait ConstructDefaultMonoidAssistant extends
             ): Traversable[A > B] = {
               val product = action.actionCarrier x monoid.carrier
               action.actionCarrier >> target.actionCarrier filter { arrow =>
-                  ( product.biArrow(target.actionCarrier) { (a, m) =>
-                    arrow(action.actionMultiply(a, m))
+                (
+                  product.biArrow(omega) { (a, m) =>
+                    target.actionCarrier.=?=(
+                      arrow(action.actionMultiply(a, m)),
+                      target.actionMultiply(arrow(a), m)
+                    )
                   } arrow
-                ) == ( 
-                  product.biArrow(target.actionCarrier) { (a, m) =>
-                    target.actionMultiply(arrow(a), m)
-                  } arrow
-                )
+                ) toBool
               } 
             }
           }

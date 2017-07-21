@@ -510,7 +510,9 @@ trait BaseTopos {
       source.forAll(source) {
         (s, t) => target.=?=(
           this(s), this(t)
-        ) → source.=?=(s, t)
+        ) → source.=?=(
+          s, t
+        )
       } toBool
 
     final lazy val isEpic: Boolean =
