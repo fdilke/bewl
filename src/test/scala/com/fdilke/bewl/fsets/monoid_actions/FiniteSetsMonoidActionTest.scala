@@ -8,7 +8,7 @@ import org.scalatest.Matchers._
 import scala.language.reflectiveCalls
 import scala.language.existentials
 
-import FiniteSets.{>, ToposOfMonoidActions}
+import FiniteSets.{>, ToposOfMonoidActions, monoidAssistant, ActionAnalysis}
 import scala.language.postfixOps
 import com.fdilke.bewl.helper.⊕
 

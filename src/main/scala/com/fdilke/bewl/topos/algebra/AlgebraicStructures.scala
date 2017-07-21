@@ -30,7 +30,7 @@ trait AlgebraicStructures extends
     val multiply: BinaryOp[M]
     
     trait ActionAnalyzer[
-      +ACTION_ANALYSIS[_ <: ~]
+      ACTION_ANALYSIS[_ <: ~]
     ] {
       def analyze[A <: ~](
         action: Action[A]
@@ -115,7 +115,7 @@ trait AlgebraicStructures extends
   }
     
   trait MonoidAssistant[
-    +H[A <: ~]
+    H[A <: ~] <: ActionAnalysis[A]
   ] {
     def actionAnalyzer[
       M <: ~
@@ -123,6 +123,30 @@ trait AlgebraicStructures extends
       monoid: Monoid[M]
     ): monoid.ActionAnalyzer[H]
   }
+
+  // TODO: move this into ConstructDefaultMonoidAssistant
+  object DefaultMonoidAssistant extends MonoidAssistant[
+    ActionAnalysis
+  ] {
+    override def actionAnalyzer[
+      M <: ~
+    ] (
+      monoid: Monoid[M]
+    ) =
+      new monoid.ActionAnalyzer[
+        ActionAnalysis
+      ] {
+        override def analyze[A <: ~](
+          action: monoid.Action[A]
+        ) = 
+          new ActionAnalysis[A] {
+          
+          }
+    }
+  }
+  
+  val monoidAssistant: MonoidAssistant[ActionAnalysis] = 
+    DefaultMonoidAssistant    
   
   lazy val groups = AlgebraicTheory(ι, $tilde, *)( // TODO: compiler accepts ~, IDE not
     "left unit" law ( ι * α := α ),
