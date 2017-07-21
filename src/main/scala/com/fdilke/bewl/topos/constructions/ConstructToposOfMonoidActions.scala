@@ -29,7 +29,7 @@ trait ConstructToposOfMonoidActions extends
         monoid, 
         monoidAssistant.asInstanceOf[
           MonoidAssistant[
-            ({type λ[A <: ~] <: ActionAnalysis[A]}) # λ
+            ({type λ[A <: ~]}) # λ
           ]
         ] /* TODO: shouldn't need this cast, but I'm b******d if I can fix it.
         		 Bug in type checker? */
@@ -37,7 +37,7 @@ trait ConstructToposOfMonoidActions extends
       
     def of[
       M <: ~,
-      ACTION_ANALYSIS[Z <: ~] <: ActionAnalysis[Z]
+      ACTION_ANALYSIS[Z <: ~]
     ] ( 
       monoid: Monoid[M],
       assistant: MonoidAssistant[ACTION_ANALYSIS] 
