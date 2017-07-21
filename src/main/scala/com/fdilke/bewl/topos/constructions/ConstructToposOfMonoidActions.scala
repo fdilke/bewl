@@ -16,31 +16,9 @@ trait ConstructToposOfMonoidActions extends
   object ToposOfMonoidActions {
     def of[
       M <: ~
-    ]( 
-      monoid: Monoid[M]
-    ) : Topos[~] with Wrappings[
-      ~,
-      ~,
-      ({type λ[X <: ~] = monoid.Action[X]}) # λ,
-      ({type λ[X <: ~, Y <: ~] = monoid.ActionPreArrow[X, Y]}) # λ,
-      ({type λ[T <: ~] = T}) # λ
-    ] =
-      of(
-        monoid, 
-        monoidAssistant.asInstanceOf[
-          MonoidAssistant[
-            ({type λ[A <: ~]}) # λ
-          ]
-        ] /* TODO: shouldn't need this cast, but I'm b******d if I can fix it.
-        		 Bug in type checker? */
-      )
-      
-    def of[
-      M <: ~,
-      ACTION_ANALYSIS[Z <: ~]
     ] ( 
       monoid: Monoid[M],
-      assistant: MonoidAssistant[ACTION_ANALYSIS] 
+      assistant: MonoidAssistant = monoidAssistant 
     ) : Topos[~] with Wrappings[
       ~,
       ~,
@@ -60,7 +38,7 @@ trait ConstructToposOfMonoidActions extends
      val analyzer: monoid.ActionAnalyzer[
         ({
           type λ[A <: ~] = 
-            monoid.MonoidSpecificActionAnalysis[A] with ACTION_ANALYSIS[A]  
+            monoid.MonoidSpecificActionAnalysis[A] with assistant.ACTION_ANALYSIS[A]  
         }) # λ
      ] =
         assistant.actionAnalyzer(monoid)

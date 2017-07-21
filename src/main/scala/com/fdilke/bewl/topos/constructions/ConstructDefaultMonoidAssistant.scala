@@ -12,13 +12,9 @@ trait ConstructDefaultMonoidAssistant extends
 
   Ɛ: AlgebraicStructures with AlgebraicMachinery =>
 
-  trait GenericAny[
-    A <: ~
-  ] // TODO: abominable concept, shouldn't need this (type system limitations?)
+  trait MonoidAssistant {
+    type ACTION_ANALYSIS[A <: ~]
     
-  trait MonoidAssistant[
-    ACTION_ANALYSIS[A <: ~] 
-  ] {
     def actionAnalyzer[
       M <: ~
     ] (
@@ -31,9 +27,9 @@ trait ConstructDefaultMonoidAssistant extends
     ]
   }
 
-  object DefaultMonoidAssistant extends MonoidAssistant[
-    GenericAny
-  ] {
+  object DefaultMonoidAssistant extends MonoidAssistant {
+    override type ACTION_ANALYSIS[A <: ~] = {}
+    
     override def actionAnalyzer[
       M <: ~
     ] (
@@ -42,13 +38,13 @@ trait ConstructDefaultMonoidAssistant extends
       new monoid.ActionAnalyzer[
         ({
           type λ[A <: ~] = 
-            monoid.MonoidSpecificActionAnalysis[A] with GenericAny[A]    
+            monoid.MonoidSpecificActionAnalysis[A]    
         }) # λ
       ] {
         override def analyze[A <: ~](
           action: monoid.Action[A]
         ) = 
-          new monoid.MonoidSpecificActionAnalysis[A] with GenericAny[A] {
+          new monoid.MonoidSpecificActionAnalysis[A] {
             override def morphismsTo[B <: ~](
               target: monoid.Action[B] 
             ): Traversable[A > B] =
@@ -57,6 +53,6 @@ trait ConstructDefaultMonoidAssistant extends
     }
   }
   
-  val monoidAssistant: MonoidAssistant[GenericAny] = 
+  val monoidAssistant: MonoidAssistant = 
     DefaultMonoidAssistant    
 }
