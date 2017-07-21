@@ -176,16 +176,13 @@ object FiniteSetsMonoidAction {
           def absorb(
             partialMaps: Traversable[Map[A, B]], 
             index: Int
-          ) = {
-            println("Absorbing at level " + index)
+          ) = 
             for {
               partialMap <- partialMaps
               extension <- compatibleExtensions(partialMap, index)
             } yield {
               partialMap ++ extension                                 
             }
-          }
-          println("Length = " + generatorsWithRelators.length)
           (0 until generatorsWithRelators.length).foldLeft(
             Traversable(Map.empty[A, B])
           ) {

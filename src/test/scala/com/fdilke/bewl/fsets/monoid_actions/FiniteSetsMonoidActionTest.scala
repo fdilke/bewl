@@ -8,7 +8,7 @@ import org.scalatest.Matchers._
 import scala.language.reflectiveCalls
 import scala.language.existentials
 
-import FiniteSets.{>, ToposOfMonoidActions, monoidAssistant, ActionAnalysis}
+import FiniteSets.{>, ToposOfMonoidActions}
 import scala.language.postfixOps
 import com.fdilke.bewl.helper.⊕
 
@@ -25,8 +25,6 @@ class FiniteSetsMonoidActionTest extends FreeSpec {
 
   import monoidOf3.regularAction
   
-  private type M = Symbol
-
   private def analyzerFor[A](
     action: monoidOf3.Action[A]
   ): AbstractActionAnalysis[Symbol, A] with monoidOf3.MorphismEnumerator[A] =
@@ -178,7 +176,7 @@ class FiniteSetsMonoidActionTest extends FreeSpec {
           ) 
           
         morphisms should have size 1
-        val morphism: M > actionTopos.UNIT =
+        val morphism: Symbol > actionTopos.UNIT =
           morphisms.head
         morphism should have {
           'source(regularAction.actionCarrier)
@@ -293,7 +291,7 @@ class FiniteSetsMonoidActionTest extends FreeSpec {
   private def canExtractPresentation[A](
       action: monoidOf3.Action[A]
     ) {
-      val generatorsWithRelators: Seq[GeneratorWithRelators[M, A]] =
+      val generatorsWithRelators: Seq[GeneratorWithRelators[Symbol, A]] =
         FiniteSetsMonoidAction(
           monoidOf3
         ).analyze(
