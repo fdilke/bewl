@@ -1,6 +1,5 @@
 package com.fdilke.bewl.fsets
 
-//import com.fdilke.bewl.fsets.FiniteSetsUtilities.elementsOf
 import scala.language.higherKinds
 import scala.language.postfixOps
 import com.fdilke.bewl.helper.{Memoize, ⊕}
@@ -9,6 +8,25 @@ import com.fdilke.bewl.fsets.monoid_actions.{GeneratorWithRelators, Relator}
 import scala.Function.tupled
 import scala.Traversable
 import FiniteSets.functionAsArrow
+
+trait AbstractCyclic[A] {
+  val generator: A
+}
+
+trait AbstractCyclics[A] {
+  val cyclics: Seq[AbstractCyclic[A]]
+  val transversal: Seq[A]
+
+  def contains(a: A): Boolean
+  def +(a: A): AbstractCyclics[A]
+  def <<(a: A): AbstractCyclics[A]
+}
+
+trait AbstractActionAnalysis[M, A] {
+  val initialCyclics: AbstractCyclics[A]
+  val generators: Seq[A]
+  val generatorsWithRelators: Seq[GeneratorWithRelators[M, A]]
+}
 
 trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
   
@@ -194,39 +212,4 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
     }
   }
 }
-
-trait AbstractCyclic[A] {
-  val generator: A
-}
-
-trait AbstractCyclics[A] {
-  val cyclics: Seq[AbstractCyclic[A]]
-  val transversal: Seq[A]
-
-  def contains(a: A): Boolean
-  def +(a: A): AbstractCyclics[A]
-  def <<(a: A): AbstractCyclics[A]
-}
-
-trait AbstractActionAnalysis[M, A] {
-  val initialCyclics: AbstractCyclics[A]
-  val generators: Seq[A]
-  val generatorsWithRelators: Seq[GeneratorWithRelators[M, A]]
-}
-
-//object FiniteSetsMonoidAction {
-//  def apply[M](
-//    monoid: FiniteSets.Monoid[M]
-//  ) = {
-//
-//    new monoid.ActionAnalyzer[({
-//      type λ[X] = AbstractActionAnalysis[M, X] with monoid.MonoidSpecificActionAnalysis[X]
-//      })#λ
-//    ] {
-//      override def analyze[A](
-//        action: monoid.Action[A]
-//      ) = 
-//    }
-//  }
-//}
 

@@ -26,7 +26,7 @@ class FiniteSetsMonoidActionTest extends FreeSpec {
 
   import monoidOf3.regularAction
   
-  private def analyzerFor[A](
+  private def analysisFor[A](
     action: monoidOf3.Action[A]
   ): AbstractActionAnalysis[Symbol, A] with 
     monoidOf3.MorphismEnumerator[A] =
@@ -36,21 +36,21 @@ class FiniteSetsMonoidActionTest extends FreeSpec {
       action
     )
 
-  private val analyzer = 
-    analyzerFor(
+  private val regularAnalysis = 
+    analysisFor(
       regularAction
     )
 
   private val actionTopos = 
     ToposOfMonoidActions of monoidOf3
 
-  import analyzer.initialCyclics
+  import regularAnalysis.initialCyclics
       
   "The action analyzer" - {
     "can build up a set of maximal cyclic subalgebras for a monoid action" - {
 
       "which are initially empty" in {
-          import analyzer.initialCyclics
+        import regularAnalysis.initialCyclics
           
         initialCyclics.cyclics shouldBe empty
         
@@ -97,7 +97,7 @@ class FiniteSetsMonoidActionTest extends FreeSpec {
           actionTopos.unwrap(
             actionTopos.O
           )
-        analyzerFor(
+        analysisFor(
           emptyAction
         ).generators shouldBe empty
       }
@@ -109,7 +109,7 @@ class FiniteSetsMonoidActionTest extends FreeSpec {
               regularAction
             ).squared
           )
-        analyzerFor(
+        analysisFor(
           regularSquared
         ).generators should have size 7
       }
@@ -119,14 +119,14 @@ class FiniteSetsMonoidActionTest extends FreeSpec {
           actionTopos.unwrap(
             actionTopos.omega
           )
-        analyzerFor(
+        analysisFor(
           theOmega
         ).generators should have size 2
       }
     }
     
     "can extract a set of generators for a monoid" in {
-      analyzerFor(
+      analysisFor(
         monoidOf3.regularAction
       ).generators shouldBe Seq(i)
     }
@@ -169,7 +169,7 @@ class FiniteSetsMonoidActionTest extends FreeSpec {
             actionTopos.I
           )
         val morphisms =
-          analyzer.morphismsTo(
+          regularAnalysis.morphismsTo(
             trivialAction
           ) 
           
@@ -192,7 +192,7 @@ class FiniteSetsMonoidActionTest extends FreeSpec {
     }
     "for the regular action to itself" in {
       val morphisms =
-        analyzer.morphismsTo(
+        regularAnalysis.morphismsTo(
           regularAction
         ) 
         
@@ -255,7 +255,7 @@ class FiniteSetsMonoidActionTest extends FreeSpec {
       )
 
   val morphisms =
-    analyzerFor(
+    analysisFor(
       sourceAction
     ).morphismsTo(
       targetAction
@@ -290,7 +290,7 @@ class FiniteSetsMonoidActionTest extends FreeSpec {
       action: monoidOf3.Action[A]
     ) {
       val generatorsWithRelators: Seq[GeneratorWithRelators[Symbol, A]] =
-        analyzerFor(
+        analysisFor(
           action
         ).generatorsWithRelators
 
