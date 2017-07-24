@@ -5,7 +5,10 @@ import com.fdilke.bewl.topos.{Topos, Wrappings}
 import ⊕._
 import FiniteSetsUtilities.allMaps
 
-object FiniteSets extends Topos[Any] with Wrappings[
+object FiniteSets extends BaseFiniteSets 
+  with FiniteSetsMonoidAssistant
+
+class BaseFiniteSets extends Topos[Any] with Wrappings[
   Any, Any, Traversable, FiniteSetsPreArrow, Wrappings.NO_WRAPPER
 ] {
   override type DOT[S] = FiniteSetsDot[S]
@@ -18,7 +21,9 @@ object FiniteSets extends Topos[Any] with Wrappings[
   override lazy val omega = makeDot(Traversable(true, false))
   override lazy val truth = I(omega) { _ => true }
 
-  class FiniteSetsDot[S](private[FiniteSets] val elements: Traversable[S])
+  class FiniteSetsDot[S](
+      protected[fsets] val elements: Traversable[S]
+  )
     extends Dot[S] { outerDot =>
     override lazy val toI = this(I) { _ => () }
 
@@ -81,7 +86,7 @@ object FiniteSets extends Topos[Any] with Wrappings[
   class FiniteSetsArrow[S, T](
     val source: FiniteSetsDot[S],
     val target: FiniteSetsDot[T],
-    private[FiniteSets] val function: S => T
+    private[BaseFiniteSets] val function: S => T
   ) extends Arrow[S, T] { self =>
     override def \[U](monic: U > T) =
       source(monic.source) { s =>

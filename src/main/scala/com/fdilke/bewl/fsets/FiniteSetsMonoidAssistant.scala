@@ -1,47 +1,40 @@
-package com.fdilke.bewl.fsets.monoid_actions
+package com.fdilke.bewl.fsets
 
-import com.fdilke.bewl.fsets.FiniteSetsUtilities._
+//import com.fdilke.bewl.fsets.FiniteSetsUtilities.elementsOf
 import scala.language.higherKinds
 import scala.language.postfixOps
-import com.fdilke.bewl.fsets.FiniteSets
-import com.fdilke.bewl.helper.⊕
+import com.fdilke.bewl.helper.{Memoize, ⊕}
 import ⊕._
-import FiniteSets.{ >, x, functionAsArrow }
+import com.fdilke.bewl.fsets.monoid_actions.{GeneratorWithRelators, Relator}
 import scala.Function.tupled
+import scala.Traversable
+import FiniteSets.functionAsArrow
 
-trait AbstractCyclic[A] {
-  val generator: A
-}
-
-trait AbstractCyclics[A] {
-  val cyclics: Seq[AbstractCyclic[A]]
-  val transversal: Seq[A]
-
-  def contains(a: A): Boolean
-  def +(a: A): AbstractCyclics[A]
-  def <<(a: A): AbstractCyclics[A]
-}
-
-trait AbstractActionAnalysis[M, A] {
-  val initialCyclics: AbstractCyclics[A]
-  val generators: Seq[A]
-  val generatorsWithRelators: Seq[GeneratorWithRelators[M, A]]
-}
-
-object FiniteSetsMonoidAction {
-  def apply[M](
-    monoid: FiniteSets.Monoid[M]
-  ) = {
-    val monoidElements =
-      elementsOf(monoid.carrier)
-
-    new monoid.ActionAnalyzer[({
-      type λ[X] = AbstractActionAnalysis[M, X] with monoid.MonoidSpecificActionAnalysis[X]
-      })#λ
-    ] {
-      override def analyze[A](
-        action: monoid.Action[A]
-      ) = new AbstractActionAnalysis[M, A] with monoid.MonoidSpecificActionAnalysis[A] {
+trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
+  
+  object LocalMonoidAssistant extends MonoidAssistant {
+    override type ACTION_ANALYSIS[M <: ~, A <: ~] = 
+      AbstractActionAnalysis[M, A] 
+    
+    override def actionAnalyzer[
+      M <: ~
+    ] (
+      monoid: Monoid[M]
+    ) =
+      new monoid.ActionAnalyzer[
+        ({
+          type λ[A <: ~] = 
+            monoid.MonoidSpecificActionAnalysis[A] with 
+              AbstractActionAnalysis[M, A]    
+        }) # λ
+      ] {
+        private val monoidElements =
+          monoid.carrier.elements
+      
+        override def analyze[A <: ~](
+          action: monoid.Action[A]
+        ) = 
+          new AbstractActionAnalysis[M, A] with monoid.MonoidSpecificActionAnalysis[A] {
 
         case class Cyclic(
             override val generator: A) extends AbstractCyclic[A] {
@@ -62,7 +55,8 @@ object FiniteSetsMonoidAction {
         }
 
         class MaximalCyclics(
-            override val cyclics: Seq[Cyclic] = Seq.empty) extends AbstractCyclics[A] { self =>
+            override val cyclics: Seq[Cyclic] = Seq.empty
+        ) extends AbstractCyclics[A] { self =>
 
           override def contains(a: A) =
             cyclics.exists {
@@ -94,7 +88,7 @@ object FiniteSetsMonoidAction {
         }
 
         private val actionElements =
-          elementsOf(action.carrier)
+          action.carrier.elements
 
         override lazy val initialCyclics =
           new MaximalCyclics
@@ -124,7 +118,8 @@ object FiniteSetsMonoidAction {
                               monoid.multiply(p, m) ⊕
                                 monoid.multiply(q, m)
                           }
-                      }).generators map {
+                      }
+                    ).generators map {
                       case m ⊕ n =>
                         Relator(m, 0, n)
                     }
@@ -135,7 +130,7 @@ object FiniteSetsMonoidAction {
           target: monoid.Action[B]
         ) = {
           val targetElements = 
-            elementsOf(target.actionCarrier)
+            target.actionCarrier.elements
           def compatibleExtensions(
             partialMap: Map[A, B],
             index: Int
@@ -199,4 +194,39 @@ object FiniteSetsMonoidAction {
     }
   }
 }
+
+trait AbstractCyclic[A] {
+  val generator: A
+}
+
+trait AbstractCyclics[A] {
+  val cyclics: Seq[AbstractCyclic[A]]
+  val transversal: Seq[A]
+
+  def contains(a: A): Boolean
+  def +(a: A): AbstractCyclics[A]
+  def <<(a: A): AbstractCyclics[A]
+}
+
+trait AbstractActionAnalysis[M, A] {
+  val initialCyclics: AbstractCyclics[A]
+  val generators: Seq[A]
+  val generatorsWithRelators: Seq[GeneratorWithRelators[M, A]]
+}
+
+//object FiniteSetsMonoidAction {
+//  def apply[M](
+//    monoid: FiniteSets.Monoid[M]
+//  ) = {
+//
+//    new monoid.ActionAnalyzer[({
+//      type λ[X] = AbstractActionAnalysis[M, X] with monoid.MonoidSpecificActionAnalysis[X]
+//      })#λ
+//    ] {
+//      override def analyze[A](
+//        action: monoid.Action[A]
+//      ) = 
+//    }
+//  }
+//}
 

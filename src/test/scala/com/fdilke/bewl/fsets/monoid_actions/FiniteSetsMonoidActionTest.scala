@@ -1,7 +1,7 @@
 package com.fdilke.bewl.fsets.monoid_actions
 
 import com.fdilke.bewl.fsets.FiniteSets
-import FiniteSets.functionAsArrow
+import FiniteSets.{ functionAsArrow, LocalMonoidAssistant }
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
@@ -11,6 +11,7 @@ import scala.language.existentials
 import FiniteSets.{>, ToposOfMonoidActions}
 import scala.language.postfixOps
 import com.fdilke.bewl.helper.⊕
+import com.fdilke.bewl.fsets.AbstractActionAnalysis
 
 class FiniteSetsMonoidActionTest extends FreeSpec {
   
@@ -27,8 +28,9 @@ class FiniteSetsMonoidActionTest extends FreeSpec {
   
   private def analyzerFor[A](
     action: monoidOf3.Action[A]
-  ): AbstractActionAnalysis[Symbol, A] with monoidOf3.MorphismEnumerator[A] =
-    FiniteSetsMonoidAction(
+  ): AbstractActionAnalysis[Symbol, A] with 
+    monoidOf3.MorphismEnumerator[A] =
+    LocalMonoidAssistant.actionAnalyzer(
       monoidOf3
     ).analyze(
       action
@@ -124,12 +126,8 @@ class FiniteSetsMonoidActionTest extends FreeSpec {
     }
     
     "can extract a set of generators for a monoid" in {
-      import monoidOf3.regularAction
-
-      FiniteSetsMonoidAction(
-        monoidOf3
-      ).analyze(
-        regularAction
+      analyzerFor(
+        monoidOf3.regularAction
       ).generators shouldBe Seq(i)
     }
 
@@ -292,9 +290,7 @@ class FiniteSetsMonoidActionTest extends FreeSpec {
       action: monoidOf3.Action[A]
     ) {
       val generatorsWithRelators: Seq[GeneratorWithRelators[Symbol, A]] =
-        FiniteSetsMonoidAction(
-          monoidOf3
-        ).analyze(
+        analyzerFor(
           action
         ).generatorsWithRelators
 

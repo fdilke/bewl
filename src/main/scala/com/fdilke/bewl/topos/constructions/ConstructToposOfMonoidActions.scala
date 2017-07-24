@@ -38,7 +38,8 @@ trait ConstructToposOfMonoidActions extends
      val analyzer: monoid.ActionAnalyzer[
         ({
           type λ[A <: ~] = 
-            monoid.MonoidSpecificActionAnalysis[A] with assistant.ACTION_ANALYSIS[A]  
+            monoid.MonoidSpecificActionAnalysis[A] with 
+              assistant.ACTION_ANALYSIS[M, A]  
         }) # λ
      ] =
         assistant.actionAnalyzer(monoid)
