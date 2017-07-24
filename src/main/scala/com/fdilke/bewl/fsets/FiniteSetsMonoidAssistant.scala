@@ -22,7 +22,7 @@ trait AbstractCyclics[A] {
   def <<(a: A): AbstractCyclics[A]
 }
 
-trait AbstractActionAnalysis[M, A] {
+trait FiniteSetsActionAnalysis[M, A] {
   val initialCyclics: AbstractCyclics[A]
   val generators: Seq[A]
   val generatorsWithRelators: Seq[GeneratorWithRelators[M, A]]
@@ -32,7 +32,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
   
   object LocalMonoidAssistant extends MonoidAssistant {
     override type ACTION_ANALYSIS[M <: ~, A <: ~] = 
-      AbstractActionAnalysis[M, A] 
+      FiniteSetsActionAnalysis[M, A] 
     
     override def actionAnalyzer[
       M <: ~
@@ -43,7 +43,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
         ({
           type λ[A <: ~] = 
             monoid.MonoidSpecificActionAnalysis[A] with 
-              AbstractActionAnalysis[M, A]    
+              FiniteSetsActionAnalysis[M, A]    
         }) # λ
       ] {
         private val monoidElements =
@@ -52,7 +52,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
         override def analyze[A <: ~](
           action: monoid.Action[A]
         ) = 
-          new AbstractActionAnalysis[M, A] with monoid.MonoidSpecificActionAnalysis[A] {
+          new FiniteSetsActionAnalysis[M, A] with monoid.MonoidSpecificActionAnalysis[A] {
 
         case class Cyclic(
             override val generator: A) extends AbstractCyclic[A] {

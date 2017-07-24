@@ -11,9 +11,9 @@ import scala.language.existentials
 import FiniteSets.{>, ToposOfMonoidActions}
 import scala.language.postfixOps
 import com.fdilke.bewl.helper.⊕
-import com.fdilke.bewl.fsets.AbstractActionAnalysis
+import com.fdilke.bewl.fsets.FiniteSetsActionAnalysis
 
-class FiniteSetsMonoidActionTest extends FreeSpec {
+class FiniteSetsMonoidAssistantTest extends FreeSpec {
   
   private val (i, x, y) = ('i, 'x, 'y)
 
@@ -28,7 +28,7 @@ class FiniteSetsMonoidActionTest extends FreeSpec {
   
   private def analysisFor[A](
     action: monoidOf3.Action[A]
-  ): AbstractActionAnalysis[Symbol, A] with 
+  ): FiniteSetsActionAnalysis[Symbol, A] with 
     monoidOf3.MorphismEnumerator[A] =
     LocalMonoidAssistant.actionAnalyzer(
       monoidOf3
