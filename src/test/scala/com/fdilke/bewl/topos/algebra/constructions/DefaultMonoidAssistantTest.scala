@@ -1,10 +1,12 @@
 package com.fdilke.bewl.topos.algebra.constructions
 
 import com.fdilke.bewl.fsets.FiniteSets
-import FiniteSets.{ ~, functionAsArrow }
+import FiniteSets.{ ~, functionAsArrow, bifunctionAsBiArrow }
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
+import com.fdilke.bewl.helper.⊕
+import Function.untupled
 import scala.language.reflectiveCalls
 import scala.language.existentials
 
@@ -46,5 +48,44 @@ class DefaultMonoidAssistantTest extends FreeSpec {
         }
       }
     }
+    
+//    "can calculate raw exponentials" in {
+//      val bazDot = dot("i", "x", "y")
+//      val baz = monoidOf3.action(bazDot)(scalarMultiply)
+//      val barAnalysis = analyzer.analyze(bar)
+//    
+//      val rawExponential = barAnalysis.rawExponential(baz)
+//      rawExponential.exponentialAction.sanityTest()
+//      rawExponential.evaluation should have(
+//        'source(rawExponential.exponentialAction.actionCarrier x barDot),
+//        'target(bazDot)
+//      )
+//      monoidOf3.actions.isMorphism(
+//        rawExponential.exponentialAction x bar, 
+//        targetAlgebra, 
+//        rawExponential.evaluation
+//      ) shouldBe true
+//
+//      val foo = regularAction
+//      val foobar2baz = bifunctionAsBiArrow(
+//          foo.actionCarrier, 
+//          barDot, 
+//          bazDot
+//        )(untupled (Map(
+//          (i, "x") -> "x", (x, "x") -> "x", (y, "x") -> "y",
+//          (i, "y") -> "y", (x, "y") -> "x", (y, "y") -> "y"
+//        )))
+//
+//      val foo2bar2baz = barAnalysis.transpose(foobar2baz)
+//      foo2bar2baz.sanityTest()
+//      foo2bar2baz should have(
+//        'source(foo),
+//        'target(rawExponential.exponentialAction.actionCarrier)
+//      )
+//      (foo.actionCarrier x barDot)(bazDot) {
+//        case f ⊕ b =>
+//          rawExponential.evaluation(foo2bar2baz(f), b)
+//      } shouldBe foobar2baz.arrow
+//    }
   }
 }
