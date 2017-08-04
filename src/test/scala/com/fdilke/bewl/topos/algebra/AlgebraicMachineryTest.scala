@@ -411,6 +411,57 @@ class AlgebraicMachineryTest extends FunSpec {
       c6.carrier(c2xc3.carrier) {
         a => product.pair(a % 2, a % 3)
       } shouldBe 'iso
+      
+      groups.isMorphism(
+        c2xc3, 
+        c2, 
+        product.π0
+      ) shouldBe true
+      groups.isMorphism(
+        c2xc3, 
+        c3, 
+        product.π1
+      ) shouldBe true
+    }
+
+    it("support binary multiplication of their algebras, even with scalar extensions") {
+      val (i, x, y) = ('i, 'x, 'y)
+      val monoidOf3 =
+        monoidFromTable(
+          i, x, y,
+          x, x, y,
+          y, x, y
+        ) // right-dominant on two generators
+    
+      import monoidOf3.regularAction
+  
+      val barDot = dot("x", "y")
+      val scalarMultiply: (String, Symbol) => String =
+        (s, m) => monoidOf3.multiply(Symbol(s), m).name
+      
+      val bar = monoidOf3.action(barDot)(scalarMultiply)
+
+      val product = bar x regularAction
+      val underlyingProduct = barDot x regularAction.actionCarrier
+      product.sanityTest()
+      product.carrier shouldBe ( underlyingProduct )
+      product.operatorAssignments.lookup(II).get(()) shouldEqual 'i
+      monoidOf3.actions.isMorphism[String x Symbol, String](
+        product, 
+        bar, 
+        underlyingProduct.π0
+      )
+      monoidOf3.actions.isMorphism[String x Symbol, Symbol](
+        product, 
+        regularAction, 
+        underlyingProduct.π1
+      )
+
+      val operatorsUsed = product.operatorAssignments.assignments map {
+          _.operator
+        }
+        
+      operatorsUsed.distinct.size shouldBe operatorsUsed.size
     }
   }
 }

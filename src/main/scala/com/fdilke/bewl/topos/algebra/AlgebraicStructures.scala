@@ -91,7 +91,18 @@ trait AlgebraicStructures extends
     ) extends actions.Algebra[A](actionCarrier)(
       ** := actionMultiply,
       *** := multiply
-    ) 
+    ) { 
+      // Formalism to make the product of two Actions an Action to facilitate sugar
+      def x[B <: ~](
+        that: Action[B]
+      ): Action[A x B] = {
+        val product = (this : actions.Algebra[A])x(that)
+        new Action[A x B](
+          product.carrier,
+          product.operatorAssignments.lookup(**).get
+        )
+      }
+    }
 
     case class ActionPreArrow[
       S <: ~,
@@ -130,6 +141,19 @@ trait AlgebraicStructures extends
     $tilde := inverse
   ) with Actions[G] with CommutativityCriterion {
     lazy val asMonoid = new Monoid[G](carrier, unit, multiply)
+    
+    // Formalism to make the product of two Groups a Group so we can add sugar here
+    def x[H <: ~](
+      that: Group[H]
+    ): Group[G x H] = {
+      val product = (this : groups.Algebra[G])x(that)
+      new Group[G x H](
+        product.carrier,
+        product.operatorAssignments.lookup(ι).get,
+        product.operatorAssignments.lookup(*).get,
+        product.operatorAssignments.lookup($tilde).get
+      )
+    }
   }
 
   lazy val lattices = AlgebraicTheory(⊥, ⊤, ∨, ∧)(

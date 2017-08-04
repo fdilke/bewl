@@ -304,7 +304,8 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
     def crossedWith[U <: ~](
       that: OperatorAssignments[U, S],
-      productCarrier: BIPRODUCT[T, U]
+      productCarrier: BIPRODUCT[T, U],
+      scalars: DOT[S]
     ): Seq[OperatorAssignment[T x U, S]] =
       assignments map { assignment =>
         import assignment.operator
@@ -355,19 +356,41 @@ trait AlgebraicMachinery { topos: BaseTopos =>
                           thatOp(u, w)
                       )
                   }
-                
-              // TODO: complete these methods
-              override def lookupScalarConstant: Option[NullaryOp[S]] = 
-                ???
-                
+
               override def lookupRightScalarBinaryOp: Option[RightScalarBinaryOp[T x U, S]] = 
-                ???
+                for {
+                  op <- assignment.lookupRightScalarBinaryOp
+                  thatOp <- thatAssignment.lookupRightScalarBinaryOp
+                } yield
+                  (productCarrier x scalars).biArrow(productCarrier){ 
+                    (tu, s) =>
+                      val t = productCarrier.π0(tu)
+                      val u = productCarrier.π1(tu)
+                      productCarrier.pair(
+                          op(t, s),
+                          thatOp(u, s)
+                      )
+                  }
+                
+              override def lookupScalarConstant: Option[NullaryOp[S]] = 
+                  throw new IllegalArgumentException(
+                    "algebra multiplication should not override scalar constant operator " + operator
+                  )
                 
               override def lookupScalarBinaryOp: Option[BinaryOp[S]] = 
-                ???
+                for {
+                  op <- assignment.lookupScalarBinaryOp
+                  thatOp <- thatAssignment.lookupScalarBinaryOp
+                } yield
+                  if (op == thatOp)
+                    op
+                  else
+                    throw new IllegalArgumentException(
+                      "algebra multiplication failed: inconsistent binary ops for operator " + operator
+                    )
             }
           )
-        } getOrElse { 
+        } getOrElse {
           throw new IllegalArgumentException(
             "algebra multiplication failed: can't match operator " + operator
           )
@@ -569,7 +592,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     class Algebra[T <: ~](
       val carrier: DOT[T]
     )(
-      val assignments: OperatorAssignment[T, S]*
+      private val assignments: OperatorAssignment[T, S]*
     ) { algebra =>
       val operatorAssignments =
         OperatorAssignments(
@@ -585,9 +608,12 @@ trait AlgebraicMachinery { topos: BaseTopos =>
         new Algebra(
           productCarrier
         )(
-          operatorAssignments.crossedWith(
-            that.operatorAssignments,
-            productCarrier
+          OperatorAssignments(
+            assignments
+          ).crossedWith(
+            OperatorAssignments(that.assignments),
+            productCarrier,
+            scalars
           ) :_*
         ) 
       }
@@ -819,5 +845,3 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   type Algebra = AlgebraicTheory[_ <: ~]#Algebra[_ <: ~]
 }
-
-
