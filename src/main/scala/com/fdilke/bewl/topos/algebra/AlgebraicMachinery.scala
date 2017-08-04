@@ -249,8 +249,8 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     ): Option[OP] =
       assignments find {
         _.operator == op
-      } flatMap
-      handleAssignment
+      } flatMap 
+        handleAssignment
 
     def lookup(
       principalConstant: PrincipalConstant
@@ -301,6 +301,78 @@ trait AlgebraicMachinery { topos: BaseTopos =>
           _.operator
         }.toSet ==
           operators.toSet
+
+    def crossedWith[U <: ~](
+      that: OperatorAssignments[U, S],
+      productCarrier: BIPRODUCT[T, U]
+    ): Seq[OperatorAssignment[T x U, S]] =
+      assignments map { assignment =>
+        import assignment.operator
+        that.doLookup(operator) {
+          thatAssignment => Some(
+            new OperatorAssignment[T x U, S](operator) {
+              override def lookupUnaryOp: Option[UnaryOp[T x U]] = 
+                for {
+                  op <- assignment.lookupUnaryOp
+                  thatOp <- thatAssignment.lookupUnaryOp
+                } yield
+                  productCarrier(productCarrier){ 
+                    tu =>
+                      val t = productCarrier.π0(tu)
+                      val u = productCarrier.π1(tu)
+                      productCarrier.pair(
+                          op(t),
+                          thatOp(u)
+                      )
+                  }
+
+              override def lookupPrincipalConstant: Option[NullaryOp[T x U]] = 
+                for {
+                  op <- assignment.lookupPrincipalConstant
+                  thatOp <- thatAssignment.lookupPrincipalConstant
+                } yield
+                  I(productCarrier){ 
+                    __ =>
+                      productCarrier.pair(
+                          op(__),
+                          thatOp(__)
+                      )
+                  }
+              
+              override def lookupBinaryOp: Option[BinaryOp[T x U]] = 
+                for {
+                  op <- assignment.lookupBinaryOp
+                  thatOp <- thatAssignment.lookupBinaryOp
+                } yield
+                  productCarrier.squared.biArrow(productCarrier){ 
+                    (tu, vw) =>
+                      val t = productCarrier.π0(tu)
+                      val u = productCarrier.π1(tu)
+                      val v = productCarrier.π0(vw)
+                      val w = productCarrier.π1(vw)
+                      productCarrier.pair(
+                          op(t, v),
+                          thatOp(u, w)
+                      )
+                  }
+                
+              // TODO: complete these methods
+              override def lookupScalarConstant: Option[NullaryOp[S]] = 
+                ???
+                
+              override def lookupRightScalarBinaryOp: Option[RightScalarBinaryOp[T x U, S]] = 
+                ???
+                
+              override def lookupScalarBinaryOp: Option[BinaryOp[S]] = 
+                ???
+            }
+          )
+        } getOrElse { 
+          throw new IllegalArgumentException(
+            "algebra multiplication failed: can't match operator " + operator
+          )
+        }
+      }
   }
 
   class AbstractBinaryOp(
@@ -497,7 +569,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     class Algebra[T <: ~](
       val carrier: DOT[T]
     )(
-      assignments: OperatorAssignment[T, S]*
+      val assignments: OperatorAssignment[T, S]*
     ) { algebra =>
       val operatorAssignments =
         OperatorAssignments(
@@ -506,6 +578,20 @@ trait AlgebraicMachinery { topos: BaseTopos =>
           }) ++ assignments
         )
 
+      def x[U <: ~](
+        that: Algebra[U]
+      ): Algebra[T x U] = {
+        val productCarrier = carrier x that.carrier
+        new Algebra(
+          productCarrier
+        )(
+          operatorAssignments.crossedWith(
+            that.operatorAssignments,
+            productCarrier
+          ) :_*
+        ) 
+      }
+        
       object EvaluationContext {
         def apply[T <: ~](
           variables: Seq[VariableTerm[_ <: AlgebraicSort]]

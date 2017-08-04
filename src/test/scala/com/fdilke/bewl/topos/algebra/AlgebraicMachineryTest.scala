@@ -388,5 +388,29 @@ class AlgebraicMachineryTest extends FunSpec {
           ).sanityTest()
         }.getMessage shouldBe "unit law failed"
     }
+    
+    it("support binary multiplication of their algebras") {
+      def integersMod(n: Int) = {
+        val carrier = makeDot(0 until n)
+        new Group[Int](
+          carrier,
+          makeNullaryOperator(carrier, 0),
+          bifunctionAsBiArrow(carrier) {
+            (x: Int, y:Int) => (x + y) % n
+          },
+          functionAsArrow(carrier, carrier, n - _)
+        )
+      }
+      val c2 = integersMod(2)
+      val c3 = integersMod(3)
+      val c6 = integersMod(6)
+      val c2xc3 = c2 x c3 // TODO: fix type to be Group[Int x Int]
+      c2xc3.sanityTest()
+      val product = c2.carrier x c3.carrier
+      c2xc3.carrier shouldBe ( product )
+      c6.carrier(c2xc3.carrier) {
+        a => product.pair(a % 2, a % 3)
+      } shouldBe 'iso
+    }
   }
 }
