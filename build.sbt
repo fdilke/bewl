@@ -15,7 +15,7 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "3.0.1" exclude(
   	"org.scala-lang.modules", "scala-xml_2.12"
 	),
-  "org.scala-lang.modules" % "scala-xml_2.12" % "1.0.6"
+  "org.scala-lang.modules" %% "scala-xml" % "1.0.6"
 ) map {
   _ withSources() withJavadoc()
 }

@@ -60,7 +60,8 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
             monoidElements map { (m: M) =>
               action.actionMultiply(
                 generator,
-                m)
+                m
+              )
             } toSet
 
           def contains(a: A) =
@@ -69,7 +70,8 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
           def subsetOf(
             other: Cyclic) =
             elements.subsetOf(
-              other.elements)
+              other.elements
+            )
         }
 
         class MaximalCyclics(
@@ -87,7 +89,9 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
               newCyclic +: (
                 cyclics filterNot {
                   _ subsetOf newCyclic
-                }))
+                }
+              )
+            )
 
           override def +(
             a: A): MaximalCyclics =
@@ -113,9 +117,10 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
 
         override lazy val generators =
           actionElements.foldLeft(
-            initialCyclics) {
+            initialCyclics
+          ) {
               _ << _
-            }.transversal
+            } transversal
 
         override lazy val generatorsWithRelators: Seq[GeneratorWithRelators[M, A]] =
           generators.zipWithIndex map tupled { (g, j) =>
@@ -156,7 +161,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
             val gr = generatorsWithRelators(index)
             val generator = gr.generator
             targetElements filter { targetElement =>
-              gr.relators.forall { relator =>
+              gr.relators forall { relator =>
                 val otherTarget: B =
                   if (relator.otherIndex == index)
                     targetElement
@@ -183,7 +188,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
                     m
                   )
                 }
-              }.toMap
+              } toMap
             }
           }
           def absorb(
