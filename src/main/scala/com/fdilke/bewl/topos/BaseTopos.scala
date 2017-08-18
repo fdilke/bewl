@@ -82,15 +82,12 @@ trait BaseTopos {
     final lazy val π1 =
       dot(right) { _._2 }
 
-    final private val hackedThis: BIPRODUCT[L, R] =
-      this.asInstanceOf[BIPRODUCT[L, R]]
-
     final def biArrow[T <: ~](
       target: DOT[T]
     ) (
       bifunc: (L, R) => T
     ) : BiArrow[L, R, T] =
-      BiArrow(hackedThis, hackedThis(target) {
+      BiArrow(this, this(target) {
         case x ⊕ y => bifunc(x, y)
       })
 
@@ -100,8 +97,8 @@ trait BaseTopos {
       bifunc: (L x R, T) => TRUTH
     ) =
       BiArrow(
-        hackedThis,
-        hackedThis.forAll(target)(bifunc)
+        this,
+        this.forAll(target)(bifunc)
       )
 
     final def existentially[T <: ~](
@@ -110,8 +107,8 @@ trait BaseTopos {
       bifunc: (L x R, T) => TRUTH
     ) =
       BiArrow(
-        hackedThis,
-        hackedThis.exists(target)(bifunc)
+        this,
+        this.exists(target)(bifunc)
       )
   }
 
