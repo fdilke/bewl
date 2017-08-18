@@ -135,7 +135,7 @@ trait ConstructDefaultMonoidAssistant extends
                 override def transpose[X <: ~](
                     otherAction: monoid.Action[X],
                     biArrow: BiArrow[X, A, B]
-                ): X > (M x A → B) = {
+                ) = {
                   morphisms.restrict(
                     possibleMorphisms.transpose(
                       otherAction.actionCarrier

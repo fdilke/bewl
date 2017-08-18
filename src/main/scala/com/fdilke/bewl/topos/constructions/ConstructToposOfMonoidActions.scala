@@ -142,99 +142,38 @@ trait ConstructToposOfMonoidActions extends
             that: ActionDot[T]
           ): EXPONENTIAL[S,T] = 
             {
-              val mXs = carrier x action.carrier
-              val possibleMorphisms = 
-                mXs > that.action.actionCarrier
-                
-              import possibleMorphisms.{ evaluate => $ }
-
-              val morphisms: Ɛ.EQUALIZER[S → T] =
-                possibleMorphisms.whereAll(
-                  carrier,
-                  carrier,
-                  action.actionCarrier
-                ) {
-                  (f, n, m, s) =>
-                    that.action.actionCarrier.=?=(
-                      $(f, 
-                        mXs.pair(
-                          multiply(m, n),
-                          action.actionMultiply(s, n)
-                        )
-                      ),
-                      that.action.actionMultiply(
-                        $(f, 
-                          mXs.pair(m, s)
-                        ),
-                        n
-                      )
-                    )
-                }
-
-              val morphismMultiply  =
-                morphisms.restrict(
-                  possibleMorphisms.transpose(
-                    morphisms x carrier
-                  ) {
-                    case (f ⊕ m, n ⊕ s) =>
-                      $(morphisms.inclusion(f),
-                        mXs.pair(
-                          multiply(m, n), 
-                          s
-                        )
-                      )
-                  }
-                )
+              val rawExponential = 
+                analysis.rawExponential(that.action)
               
               new ActionDot[S → T] (
-                Action(
-                  morphisms, 
-                  Ɛ.BiArrow[S → T, M, S → T](
-                    morphisms x carrier,
-                    morphismMultiply
-                  )
-                )
-              ) with ExponentialDot[
-                S, 
-                T
-              ] { exponentialDot =>
+                rawExponential.exponentialAction 
+              ) with ExponentialDot[S, T] { exponentialDot =>
                 override val source = actionDot 
                 override val target = that 
                 override def evaluate(
                   function: S → T,
                   s: S
-                ): T = 
-                  $(
-                    function,
-                    mXs.pair(
-                      unit(
-                        actionDot.action.carrier.toI(s)
-                      ),
-                      s
-                    )
-                  )
+                ): T =
+                  rawExponential.evaluation(function, s)
                   
                 override def transpose[
                   R <: ~
                 ](
                   biArrow: BiArrow[R, S, T]
                 ): ActionArrow[R, S → T] = {
-                  val rAction = biArrow.product.left
-
+                  val otherAction = biArrow.product.left
+                  val biProduct =
+                    otherAction.action.actionCarrier x actionDot.action.actionCarrier
                   ActionArrow(
-                    rAction,
+                    otherAction,
                     exponentialDot,
-                    morphisms.restrict(
-                      possibleMorphisms.transpose(
-                        rAction.action.actionCarrier
-                      ) {
-                        case (r, m ⊕ s) => 
-                          biArrow(
-                            rAction.action.actionMultiply(r, m),
-                            s
-                          )
-                      }
-                    )
+                    rawExponential.transpose(
+                      otherAction.action,
+                                  Ɛ.BiArrow(
+                        biProduct, 
+                        biArrow.arrow.arrow
+                      )
+                    )                    
                   )
                 }
               }
