@@ -69,16 +69,11 @@ trait ConstructToposOfGroupActions extends
           ](
             that: DOT[T]
           ): BIPRODUCT[S, T] = {
-            val productDot =
+            val productDot: Ɛ.BIPRODUCT[S, T] =
               this.action.actionCarrier x that.action.actionCarrier
+
             new ActionDot[S x T](
-              group.action(productDot){
-                case (s ⊕ t, g) =>
-                  productDot.pair(
-                    this.action.actionMultiply(s, g),
-                    that.action.actionMultiply(t, g)
-                  )
-              }
+              this.action x that.action
             ) with BiproductDot[S, T] {
               override val left = dot
               override val right = that

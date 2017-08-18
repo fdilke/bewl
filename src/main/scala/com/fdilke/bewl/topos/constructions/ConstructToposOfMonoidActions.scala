@@ -293,21 +293,16 @@ trait ConstructToposOfMonoidActions extends
           ](
             that: ActionDot[T]
           ): BIPRODUCT[S, T] = {
-            val product: Ɛ.BIPRODUCT[S, T] =
+            val productDot: Ɛ.BIPRODUCT[S, T] =
               action.actionCarrier x that.action.actionCarrier
   
             new ActionDot[S x T](
-              monoid.action(product) {
-                case (s ⊕ t, m) => product.pair(
-                  action.actionMultiply(s, m),
-                  that.action.actionMultiply(t, m)
-                )
-              }
+              this.action x that.action
             ) with BiproductDot[S, T] {
               override val left = actionDot
               override val right = that
               def pair(l: S,r: T) = 
-                product.pair(l, r)
+                productDot.pair(l, r)
             }
           }
         }
