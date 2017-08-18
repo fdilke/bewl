@@ -404,9 +404,11 @@ class AlgebraicMachineryTest extends FunSpec {
       val c2 = integersMod(2)
       val c3 = integersMod(3)
       val c6 = integersMod(6)
-      val c2xc3 = c2 x c3 // TODO: fix type to be Group[Int x Int]
+      val c2xc3: Group[Int x Int] =
+        c2 x c3
       c2xc3.sanityTest()
-      val product = c2.carrier x c3.carrier
+      val product =
+        c2.carrier x c3.carrier
       c2xc3.carrier shouldBe ( product )
       c6.carrier(c2xc3.carrier) {
         a => product.pair(a % 2, a % 3)
@@ -441,10 +443,11 @@ class AlgebraicMachineryTest extends FunSpec {
       
       val bar = monoidOf3.action(barDot)(scalarMultiply)
 
-      val product = bar x regularAction
+      val product: monoidOf3.Action[String x Symbol] =
+        bar x regularAction
       val underlyingProduct = barDot x regularAction.actionCarrier
       product.sanityTest()
-      product.carrier shouldBe ( underlyingProduct )
+      product.carrier shouldBe underlyingProduct
       product.operatorAssignments.lookup(II).get(()) shouldEqual 'i
       monoidOf3.actions.isMorphism[String x Symbol, String](
         product, 
