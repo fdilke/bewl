@@ -123,13 +123,13 @@ trait ConstructToposOfGroupActions extends
                     biArrow(_, _)
                   }
                 )
-
+                
                override def evaluate(
-                function: S → T,
+                function: S → T, 
                 arg: S
-              ): T =
+              ): T = 
                 exponentialDot.evaluate(
-                  function,
+                  function, 
                   arg
                 )
             }

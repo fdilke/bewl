@@ -16,9 +16,9 @@ trait ConstructToposOfMonoidActions extends
   object ToposOfMonoidActions {
     def of[
       M <: ~
-    ] (
+    ] ( 
       monoid: Monoid[M],
-      assistant: MonoidAssistant = monoidAssistant
+      assistant: MonoidAssistant = monoidAssistant 
     ) : Topos[~] with Wrappings[
       ~,
       ~,
@@ -34,42 +34,42 @@ trait ConstructToposOfMonoidActions extends
       ({type λ[T <: ~] = T}) # λ
     ] {
       import monoid.{ carrier, multiply, action, unit, Action }
-
+      
      val analyzer: monoid.ActionAnalyzer[
         ({
-          type λ[A <: ~] =
-            monoid.MonoidSpecificActionAnalysis[A] with
-              assistant.ACTION_ANALYSIS[M, A]
+          type λ[A <: ~] = 
+            monoid.MonoidSpecificActionAnalysis[A] with 
+              assistant.ACTION_ANALYSIS[M, A]  
         }) # λ
      ] =
         assistant.actionAnalyzer(monoid)
-
+        
       override type DOT[A <: ~] = ActionDot[A]
       override type >[A <: ~, B <: ~] = ActionArrow[A, B]
       override type UNIT = Ɛ.UNIT
       override type →[T <: ~, U <: ~] = Ɛ.→[Ɛ.x[M, T], U]
-
+      
       type IDEAL = Ɛ.→[M, Ɛ.TRUTH]
       override type TRUTH = IDEAL
-
-      override lazy val I =
+  
+      override lazy val I = 
         new ActionDot(
           action(Ɛ.I) {
             (i, m) => i
           }
         )
-
+  
       private object Ideals {
         private val possibleIdeals = carrier.power
         import possibleIdeals.{ evaluate => $ }
-
+  
         private val ideals =
           possibleIdeals.whereAll(carrier, carrier) {
-            (f, m, n) =>
-              Ɛ.OmegaEnrichments($(f, m)) →
+            (f, m, n) => 
+              Ɛ.OmegaEnrichments($(f, m)) → 
                 $(f, monoid.multiply(m, n))
           }
-
+  
         def restrict[
           H <: ~
         ](
@@ -80,31 +80,31 @@ trait ConstructToposOfMonoidActions extends
           ideals.restrict(
               possibleIdeals.transpose(that)(bifunc)
           )
-
+  
         private val idealMultiply =
           restrict(ideals x carrier) {
-            case (i ⊕ s, t) =>
+            case (i ⊕ s, t) => 
               $(ideals.inclusion(i),
                   monoid.multiply(s, t)
               )
           }
-
-          val omega =
+  
+          val omega = 
             new ActionDot[IDEAL](
               Action(
                 ideals,
               Ɛ.BiArrow[IDEAL, M, IDEAL](
-                  ideals x carrier,
+                  ideals x carrier, 
                   idealMultiply
               )
             )
           )
         }
-
-        override lazy val omega =
+            
+        override lazy val omega = 
           Ideals.omega
-
-        override lazy val truth =
+          
+        override lazy val truth = 
           ActionArrow[Ɛ.UNIT, IDEAL](
             I,
             omega,
@@ -112,15 +112,15 @@ trait ConstructToposOfMonoidActions extends
               (i, m) => Ɛ truth i
             }
           )
-
+  
         class ActionDot[
           S <: ~
         ](
           val action: Action[S]
         ) extends Dot[S] { actionDot =>
-          lazy val analysis =
+          lazy val analysis = 
             analyzer.analyze(action)
-
+          
           override def >>[T <: ~](
             target: ActionDot[T]
           ): Traversable[
@@ -140,12 +140,12 @@ trait ConstructToposOfMonoidActions extends
             T <: ~
           ](
             that: ActionDot[T]
-          ): EXPONENTIAL[S,T] =
+          ): EXPONENTIAL[S,T] = 
             {
               val mXs = carrier x action.carrier
-              val possibleMorphisms =
+              val possibleMorphisms = 
                 mXs > that.action.actionCarrier
-
+                
               import possibleMorphisms.{ evaluate => $ }
 
               val morphisms: Ɛ.EQUALIZER[S → T] =
@@ -156,14 +156,14 @@ trait ConstructToposOfMonoidActions extends
                 ) {
                   (f, n, m, s) =>
                     that.action.actionCarrier.=?=(
-                      $(f,
+                      $(f, 
                         mXs.pair(
                           multiply(m, n),
                           action.actionMultiply(s, n)
                         )
                       ),
                       that.action.actionMultiply(
-                        $(f,
+                        $(f, 
                           mXs.pair(m, s)
                         ),
                         n
@@ -179,32 +179,32 @@ trait ConstructToposOfMonoidActions extends
                     case (f ⊕ m, n ⊕ s) =>
                       $(morphisms.inclusion(f),
                         mXs.pair(
-                          multiply(m, n),
+                          multiply(m, n), 
                           s
                         )
                       )
                   }
                 )
-
+              
               new ActionDot[S → T] (
                 Action(
-                  morphisms,
+                  morphisms, 
                   Ɛ.BiArrow[S → T, M, S → T](
                     morphisms x carrier,
                     morphismMultiply
                   )
                 )
               ) with ExponentialDot[
-                S,
-                T,
+                S, 
+                T, 
                 S → T
               ] { exponentialDot =>
-                override val source = actionDot
-                override val target = that
+                override val source = actionDot 
+                override val target = that 
                 override def evaluate(
                   function: S → T,
                   s: S
-                ): T =
+                ): T = 
                   $(
                     function,
                     mXs.pair(
@@ -214,7 +214,7 @@ trait ConstructToposOfMonoidActions extends
                       s
                     )
                   )
-
+                  
                 override def transpose[
                   R <: ~
                 ](
@@ -229,7 +229,7 @@ trait ConstructToposOfMonoidActions extends
                       possibleMorphisms.transpose(
                         rAction.action.actionCarrier
                       ) {
-                        case (r, m ⊕ s) =>
+                        case (r, m ⊕ s) => 
                           biArrow(
                             rAction.action.actionMultiply(r, m),
                             s
@@ -240,14 +240,14 @@ trait ConstructToposOfMonoidActions extends
                 }
               }
           }
-
+            
           override def apply[
             T <: ~
           ](
             target: ActionDot[T]
           )(
               f: S => T
-          ): S > T =
+          ): S > T = 
             ActionArrow[S, T](
               actionDot,
               target,
@@ -255,40 +255,40 @@ trait ConstructToposOfMonoidActions extends
                 target.action.carrier
               ) { f }
             )
-
+            
           override lazy val globals: Traversable[UNIT > S] = {
             val fixedPoints =
               action.actionCarrier.whereAll(
                   carrier
               ) {
-                (a, m) =>
+                (a, m) => 
                   action.actionCarrier.=?=(
                     a,
                     action.actionMultiply(a, m)
                   )
               }
-
+  
             fixedPoints.globals.map { global =>
               ActionArrow(
-                I,
-                actionDot,
+                I, 
+                actionDot, 
                 fixedPoints.inclusion o global
               )
             }
           }
-
+            
           override def sanityTest(): Unit = {
             action.actionCarrier.sanityTest
             action.sanityTest
           }
-
-          override lazy val toI: S > UNIT =
+                
+          override lazy val toI: S > UNIT = 
             ActionArrow(
-              actionDot,
-              I,
+              actionDot, 
+              I, 
               action.actionCarrier.toI
             )
-
+            
           override def xUncached[
             T <: ~
           ](
@@ -296,7 +296,7 @@ trait ConstructToposOfMonoidActions extends
           ): BIPRODUCT[S, T] = {
             val product: Ɛ.BIPRODUCT[S, T] =
               action.actionCarrier x that.action.actionCarrier
-
+  
             new ActionDot[S x T](
               monoid.action(product) {
                 case (s ⊕ t, m) => product.pair(
@@ -307,12 +307,12 @@ trait ConstructToposOfMonoidActions extends
             ) with BiproductDot[S, T, S x T] {
               override val left = actionDot
               override val right = that
-              def pair(l: S,r: T) =
+              def pair(l: S,r: T) = 
                 product.pair(l, r)
             }
           }
         }
-
+        
         case class ActionArrow[
           S <: ~,
           T <: ~
@@ -335,33 +335,33 @@ trait ConstructToposOfMonoidActions extends
                 function
               )
             )
-
+              
           override def \[
             U <: ~
           ](
             monic: U > T
-          ): S > U =
+          ): S > U = 
             ActionArrow[S, U](
               source,
               monic.source,
               arrow \ monic.arrow
             )
-
+            
           override def ?=(
             that: S > T
           ): EQUALIZER[S] = {
-            val equalizer : Ɛ.EQUALIZER[S]=
+            val equalizer : Ɛ.EQUALIZER[S]= 
               arrow ?= that.arrow
             val equalizerCarrier =
-              equalizer x carrier
+              equalizer x carrier  
             val restrictedMultiply =
               equalizer.restrict(
                   equalizerCarrier.biArrow(
                     source.action.carrier
                   ) {
-                    (s, m) =>
+                    (s, m) => 
                       source.action.actionMultiply(
-                        equalizer.inclusion(s),
+                        equalizer.inclusion(s), 
                         m
                       )
                   }.arrow
@@ -375,12 +375,12 @@ trait ConstructToposOfMonoidActions extends
                   )
                 }
             ) with EqualizingDot[S] { equalizingDot =>
-              val equalizerTarget = source
+              val equalizerTarget = source 
               def restrict[
                 R <: ~
               ](
                 actionArrow: ActionArrow[R, S]
-              ) =
+              ) = 
                 ActionArrow[R, S](
                   actionArrow.source,
                   equalizingDot,
@@ -390,13 +390,13 @@ trait ConstructToposOfMonoidActions extends
                 )
             }
           }
-
+            
           override def apply(
             s: S
-          ): T =
+          ): T = 
             arrow(s)
-
-          override lazy val chi: T > TRUTH =
+            
+          override lazy val chi: T > TRUTH = 
             ActionArrow(
               target,
               omega,
@@ -408,55 +408,55 @@ trait ConstructToposOfMonoidActions extends
                 )
               }
             )
-
+            
           override def o[
             R <: ~
           ](
             that: R > S
-          ): R > T =
+          ): R > T = 
             ActionArrow[R, T](
               that.source,
               target,
               arrow o that.arrow
             )
-
+            
           override def sanityTest() {
             arrow.sanityTest
             assert(
               monoid.actions.isMorphism(
-                source.action,
-                target.action,
+                source.action, 
+                target.action, 
                 arrow
               )
             )
           }
         }
-
+        
         override def bifunctionAsBiArrow[
-          L <: ~,
-          R <: ~,
+          L <: ~, 
+          R <: ~, 
           T <: ~
         ](
-          left: ActionDot[L],
-          right: ActionDot[R],
+          left: ActionDot[L], 
+          right: ActionDot[R], 
           target: ActionDot[T]
         )(
           bifunc: (L, R) ⇒ T
         ): BiArrow[L,R,T] = // no wrappings: generic version will do
           (left x right).biArrow(target) { bifunc }
-
+          
         override def functionAsArrow[
-          S <: ~,
+          S <: ~, 
           T <: ~
-        ](
-          source: ActionDot[S],
-          target: ActionDot[T],
+        ]( 
+          source: ActionDot[S], 
+          target: ActionDot[T], 
           f: S ⇒ T
         ): ActionArrow[S,T] = // no wrappings: generic version will do
           source(target){ f }
-
+        
         override def makeArrow[
-          S <: ~,
+          S <: ~, 
           T <: ~
         ](
           preArrow: monoid.ActionPreArrow[S,T]
@@ -480,15 +480,15 @@ trait ConstructToposOfMonoidActions extends
               type λ[T <: Ɛ.~] = DOT[T]
             }) # λ,
             Ɛ.~
-          ] { action =>
-            new ActionDot(action)
+          ] { action => 
+            new ActionDot(action) 
           }
-
+            
         override def makeDot[T <: ~](
           predot: monoid.Action[T]
-        ): ActionDot[T] =
+        ): ActionDot[T] = 
           memoizedDotWrapper(predot)
-
+          
         override def unwrap[T <: ~](
           dot: ActionDot[T]
         ) =

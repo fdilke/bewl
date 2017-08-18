@@ -42,7 +42,7 @@ trait ConstructToposOfAutomorphisms extends
         override type >[S <: ~, T <: ~] = AutomorphismArrow[S, T]
         override type TRUTH = Ɛ.TRUTH
         override type →[T <: ~, U <: ~] = Ɛ.→[T, U]
-
+        
         override val I = trivialAutomorphism(Ɛ.I)
         override val omega = trivialAutomorphism(Ɛ.omega)
         override val truth = AutomorphismArrow(I, omega, Ɛ.truth)
@@ -79,7 +79,7 @@ trait ConstructToposOfAutomorphisms extends
             ) with BiproductDot[X, Y, X x Y] {
               override val left: DOT[X] = automorphism
               override val right: DOT[Y] = that
-              override def pair(l: X, r: Y): x[X, Y] =
+              override def pair(l: X, r: Y): x[X, Y] = 
                 productCarrier.pair(l, r)
             }
           }
@@ -99,16 +99,16 @@ trait ConstructToposOfAutomorphisms extends
             ) with ExponentialDot[X, Y, X → Y] { exponentialAutomorphism =>
               override val source = automorphism
               override val target = that
-
+              
               override def evaluate(
-                function: X → Y,
+                function: X → Y, 
                 arg: X
-              ): Y =
+              ): Y = 
                 exponentialCarrier.evaluate(
-                  function,
+                  function, 
                   arg
                 )
-
+              
               override def transpose[R <: ~](biArrow: BiArrow[R, X, Y]): R > (X → Y) =
                 AutomorphismArrow(
                   biArrow.product.left,
