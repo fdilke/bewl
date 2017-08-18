@@ -43,7 +43,7 @@ class PermutationBuilder[T](
 }
 
 object Permutations {
-  val topos = FiniteSets.ToposOfAutomorphisms.build
+  lazy val topos = FiniteSets.ToposOfAutomorphisms.build
 
   type Permutation[T] = Permutations.topos.DOT[T]
 
