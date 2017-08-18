@@ -31,7 +31,7 @@ trait AlgebraicStructures extends
     
     trait MonoidSpecificActionAnalysis[
       A <: ~
-    ] extends MorphismEnumerator[A]
+    ] extends MorphismEnumerator[A] with ActionExponentiator[A]
     
     trait ActionAnalyzer[
       ACTION_ANALYSIS[A <: ~] <: MonoidSpecificActionAnalysis[A]
@@ -47,6 +47,12 @@ trait AlgebraicStructures extends
       ): Traversable[A > B]
     }
 
+    trait ActionExponentiator[A <: ~] {
+      def rawExponential[B <: ~](
+        target: Action[B] 
+      ): RawExponential[A, B]
+    }
+    
     trait PresentedAction[A <: ~] {
       val action: Action[A] 
       def project[B <: ~](
@@ -54,6 +60,15 @@ trait AlgebraicStructures extends
         targetElements: Seq[B]
       ): A > B
       def sanityTest: Unit
+    }
+
+    trait RawExponential[S <: ~, T <: ~] {
+      val exponentialAction: Action[M x S → T]
+      val evaluation: BiArrow[M x S → T, S, T]
+      def transpose[X <: ~](
+          otherAction: Action[X],
+          biArrow: BiArrow[X, S, T]
+      ): X > (M x S → T)
     }
     
     lazy val actions =

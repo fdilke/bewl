@@ -1,6 +1,6 @@
 package com.fdilke.bewl.topos.constructions
 
-import com.fdilke.bewl.helper.Memoize
+import com.fdilke.bewl.helper.{Memoize, ⊕}
 import com.fdilke.bewl.topos._
 import com.fdilke.bewl.topos.algebra.{AlgebraicMachinery, AlgebraicStructures}
 import scala.language.higherKinds
@@ -60,6 +60,95 @@ trait ConstructDefaultMonoidAssistant extends
                   } arrow
                 ) toBool
               } 
+            }
+            
+            override def rawExponential[B <: ~](
+              target: monoid.Action[B] 
+            ) = {
+              val mXs = monoid.carrier x action.actionCarrier
+              val possibleMorphisms =
+                mXs > target.actionCarrier
+              import possibleMorphisms.{ evaluate => $ }
+                
+              val morphisms: EQUALIZER[M x A → B] =
+                possibleMorphisms.whereAll(
+                  monoid.carrier,
+                  monoid.carrier,
+                  action.actionCarrier
+                ) {
+                  (f, n, m, s) =>
+                    target.actionCarrier.=?=(
+                      $(f, 
+                        mXs.pair(
+                          monoid.multiply(m, n),
+                          action.actionMultiply(s, n)
+                        )
+                      ),
+                      target.actionMultiply(
+                        $(f, 
+                          mXs.pair(m, s)
+                        ),
+                        n
+                      )
+                    )
+                }
+  
+              val morphismMultiply  =
+                morphisms.restrict(
+                  possibleMorphisms.transpose(
+                    morphisms x monoid.carrier
+                  ) {
+                    case (f ⊕ m, n ⊕ s) =>
+                      $(morphisms.inclusion(f),
+                        mXs.pair(
+                          monoid.multiply(m, n), 
+                          s
+                        )
+                      )
+                  }
+                )
+
+              new monoid.RawExponential[A, B] {
+                override val exponentialAction =
+                  monoid.Action[M x A → B](
+                    morphisms, 
+                    BiArrow[M x A → B, M, M x A → B](
+                      morphisms x monoid.carrier,
+                      morphismMultiply
+                    )
+                )
+                override val evaluation =
+                  (morphisms x action.actionCarrier).biArrow(
+                      target.actionCarrier
+                  ) {
+                     (f, s) =>
+                       $(
+                          f,
+                          mXs.pair(
+                            monoid.unit(
+                              action.actionCarrier.toI(s)
+                            ),
+                            s
+                          )
+                        )
+                  }
+                override def transpose[X <: ~](
+                    otherAction: monoid.Action[X],
+                    biArrow: BiArrow[X, A, B]
+                ): X > (M x A → B) = {
+                  morphisms.restrict(
+                    possibleMorphisms.transpose(
+                      otherAction.actionCarrier
+                    ) {
+                      case (x, m ⊕ s) => 
+                        biArrow(
+                          otherAction.actionMultiply(x, m),
+                          s
+                        )
+                    }
+                  )
+                }
+              }
             }
           }
     }

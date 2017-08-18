@@ -213,6 +213,11 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
             )
           }
         }
+        
+        override def rawExponential[B <: ~](
+          target: monoid.Action[B] 
+        ): monoid.RawExponential[A, B] =
+          ???
       }
     }
   }
