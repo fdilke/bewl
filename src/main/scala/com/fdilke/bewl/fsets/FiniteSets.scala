@@ -49,7 +49,7 @@ class BaseFiniteSets extends Topos[Any] with Wrappings[
     override def `>Uncached`[T](that: FiniteSetsDot[T]) = {
       new FiniteSetsDot[S → T](
         allMaps(outerDot.elements, that.elements) 
-      ) with ExponentialDot[S, T, S → T] { exponentialDot =>
+      ) with ExponentialDot[S, T] { exponentialDot =>
         override val source: DOT[S] = outerDot
         override val target: DOT[T] = that
 

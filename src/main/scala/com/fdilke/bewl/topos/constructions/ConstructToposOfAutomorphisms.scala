@@ -96,7 +96,7 @@ trait ConstructToposOfAutomorphisms extends
                    exponentialCarrier.evaluate(e, arrow(x))
                 )
               }
-            ) with ExponentialDot[X, Y, X → Y] { exponentialAutomorphism =>
+            ) with ExponentialDot[X, Y] { exponentialAutomorphism =>
               override val source = automorphism
               override val target = that
               

@@ -196,8 +196,7 @@ trait ConstructToposOfMonoidActions extends
                 )
               ) with ExponentialDot[
                 S, 
-                T, 
-                S → T
+                T
               ] { exponentialDot =>
                 override val source = actionDot 
                 override val target = that 

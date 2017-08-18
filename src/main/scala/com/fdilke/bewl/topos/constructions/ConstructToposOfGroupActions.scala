@@ -107,7 +107,7 @@ trait ConstructToposOfGroupActions extends
                   exp_x_G.pair(f, g)
                 )
               }
-            ) with ExponentialDot[S, T, S → T] {
+            ) with ExponentialDot[S, T] {
               override val source = dot
               override val target = that
 
@@ -135,7 +135,11 @@ trait ConstructToposOfGroupActions extends
             }
           }
 
-          override def apply[T <: ~](target: DOT[T])(f: S => T) : S > T =
+          override def apply[T <: ~](
+            target: DOT[T]
+          )(
+            f: S => T
+          ) : S > T =
             ActionArrow(
               this,
               target,

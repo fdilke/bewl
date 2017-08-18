@@ -25,35 +25,34 @@ trait BaseTopos {
   val truth: UNIT > TRUTH
 
   type EXPONENTIAL[S <: ~, T <: ~] =
-    ExponentialDot[S, T, S → T] with DOT[S → T]
+    ExponentialDot[S, T] with DOT[S → T]
 
   trait ExponentialDot[
     S <: ~,
-    T <: ~,
-    S_T <: S → T // TODO: no longer need this type?
-  ] { dot: DOT[S_T] =>
+    T <: ~
+  ] { dot: DOT[S → T] =>
     val source: DOT[S]
     val target: DOT[T]
 
     def transpose[R <: ~](
       biArrow: BiArrow[R, S, T]
-    ): R > S_T
+    ): R > (S → T)
 
     final def transpose[R <: ~](
       index: DOT[R]
     )(
       bifunc: (R, S) => T
-    ): R > S_T =
+    ): R > (S → T) =
       transpose(
         (index x source).biArrow(target)(bifunc)
       )
 
     def evaluate(
-        function: S_T, 
+        function: S → T,
         arg: S
     ): T
     
-    final def evaluation: BiArrow[S_T, S, T] =
+    final def evaluation: BiArrow[S → T, S, T] =
       (this x source).biArrow(target) {
         evaluate(_, _) 
       }
