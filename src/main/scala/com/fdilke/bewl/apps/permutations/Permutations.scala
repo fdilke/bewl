@@ -1,12 +1,11 @@
 package com.fdilke.bewl.apps.permutations
 
-//import com.fdilke.bewl.apps.permutations.Permutations.Permutation
+import com.fdilke.bewl.apps.permutations.Permutations.Permutation
 import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsPreArrow}
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.elementsOf
 
 import scala.language.postfixOps
 
-/*
 case class Cycle[T](members: T*) {
   private val numMembers = members.size
 
@@ -44,7 +43,7 @@ class PermutationBuilder[T](
 }
 
 object Permutations {
-  val topos = FiniteSets.ToposOfAutomorphisms.build
+  lazy val topos = FiniteSets.ToposOfAutomorphisms.build
 
   type Permutation[T] = Permutations.topos.DOT[T]
 
@@ -112,4 +111,3 @@ object Parity {
     }
 }
 
-*/
