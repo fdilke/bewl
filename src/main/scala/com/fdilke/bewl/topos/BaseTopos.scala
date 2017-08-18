@@ -71,10 +71,10 @@ trait BaseTopos {
   trait BiproductDot[
     L <: ~,
     R <: ~
-  ] { dot: DOT[(L ⊕ R) with ~] =>
+  ] { dot: DOT[L x R] =>
     val left: DOT[L]
     val right: DOT[R]
-    def pair(l: L, r: R): (L ⊕ R) with ~
+    def pair(l: L, r: R): L x R
 
     final lazy val π0 =
       dot(left) { _._1 }
