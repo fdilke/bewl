@@ -1,11 +1,12 @@
 package com.fdilke.bewl.apps.permutations
 
-import com.fdilke.bewl.apps.permutations.Permutations.Permutation
+//import com.fdilke.bewl.apps.permutations.Permutations.Permutation
 import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsPreArrow}
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.elementsOf
 
 import scala.language.postfixOps
 
+/*
 case class Cycle[T](members: T*) {
   private val numMembers = members.size
 
@@ -111,3 +112,4 @@ object Parity {
     }
 }
 
+*/
