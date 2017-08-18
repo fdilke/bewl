@@ -39,7 +39,7 @@ class BaseFiniteSets extends Topos[Any] with Wrappings[
           t <- that.elements
         }
           yield s ⊕ t
-      ) with BiproductDot[S, T, S x T] {
+      ) with BiproductDot[S, T] {
         override val left: DOT[S] = outerDot
         override val right: DOT[T] = that
         override def pair(l: S, r: T): x[S, T] =

@@ -76,7 +76,7 @@ trait ConstructToposOfAutomorphisms extends
             new Automorphism(
               (arrow o productCarrier.π0) x (that.arrow o productCarrier.π1),
               (inverse o productCarrier.π0) x (that.inverse o productCarrier.π1)
-            ) with BiproductDot[X, Y, X x Y] {
+            ) with BiproductDot[X, Y] {
               override val left: DOT[X] = automorphism
               override val right: DOT[Y] = that
               override def pair(l: X, r: Y): x[X, Y] = 

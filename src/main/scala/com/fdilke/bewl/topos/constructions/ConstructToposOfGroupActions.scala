@@ -79,7 +79,7 @@ trait ConstructToposOfGroupActions extends
                     that.action.actionMultiply(t, g)
                   )
               }
-            ) with BiproductDot[S, T, S x T] {
+            ) with BiproductDot[S, T] {
               override val left = dot
               override val right = that
               override def pair(s: S, t: T) =

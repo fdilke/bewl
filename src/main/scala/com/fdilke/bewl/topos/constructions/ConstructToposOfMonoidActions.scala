@@ -303,7 +303,7 @@ trait ConstructToposOfMonoidActions extends
                   that.action.actionMultiply(t, m)
                 )
               }
-            ) with BiproductDot[S, T, S x T] {
+            ) with BiproductDot[S, T] {
               override val left = actionDot
               override val right = that
               def pair(l: S,r: T) = 
