@@ -1,17 +1,20 @@
 package com.fdilke.bewl.fsets.monoid_actions
 
+import Function.untupled
+
 import com.fdilke.bewl.fsets.FiniteSets
-import FiniteSets.{ functionAsArrow, LocalMonoidAssistant }
+import FiniteSets.{ 
+  functionAsArrow, LocalMonoidAssistant, bifunctionAsBiArrow, >, ToposOfMonoidActions }
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
+
+import scala.language.postfixOps
+import com.fdilke.bewl.helper.⊕
+import com.fdilke.bewl.fsets.FiniteSetsActionAnalysis
+
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
 import scala.language.reflectiveCalls
 import scala.language.existentials
-
-import FiniteSets.{>, ToposOfMonoidActions}
-import scala.language.postfixOps
-import com.fdilke.bewl.helper.⊕
-import com.fdilke.bewl.fsets.FiniteSetsActionAnalysis
 
 class FiniteSetsMonoidAssistantTest extends FreeSpec {
   
@@ -28,8 +31,7 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
   
   private def analysisFor[A](
     action: monoidOf3.Action[A]
-  ): FiniteSetsActionAnalysis[Symbol, A] with 
-    monoidOf3.MorphismEnumerator[A] =
+  ) =
     LocalMonoidAssistant.actionAnalyzer(
       monoidOf3
     ).analyze(
@@ -237,6 +239,56 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
         actionTopos.omega.squared,
         thorough=false
       )
+    }
+    
+    "can calculate raw exponentials" ignore {
+      val scalarMultiply: (String, Symbol) => String =
+        (s, m) => monoidOf3.multiply(Symbol(s), m).name
+      val barDot: FiniteSets.DOT[String] = dot("x", "y")
+      val bar = monoidOf3.action(barDot)(scalarMultiply)
+      val bazDot = dot("i", "x", "y")
+      
+      val baz = monoidOf3.action(bazDot)(scalarMultiply)
+      val barAnalysis = 
+        analysisFor(bar)
+    
+      val rawExponential = barAnalysis.rawExponential(baz)
+      rawExponential.exponentialAction.sanityTest()
+      rawExponential.evaluation.arrow should have(
+        'source(rawExponential.exponentialAction.actionCarrier x barDot),
+        'target(bazDot)
+      )
+      monoidOf3.actions.isMorphism(
+        rawExponential.exponentialAction x bar, 
+        baz, 
+        rawExponential.evaluation.arrow
+      ) shouldBe true
+
+      val foo = regularAction
+      val foobar2baz = bifunctionAsBiArrow(
+          foo.actionCarrier, 
+          barDot, 
+          bazDot
+        )(untupled (Map(
+          (i, "x") -> "x", (x, "x") -> "x", (y, "x") -> "y",
+          (i, "y") -> "y", (x, "y") -> "x", (y, "y") -> "y"
+        )))
+
+      val exponentialDot = 
+        rawExponential.exponentialAction.actionCarrier
+      val foo2bar2baz = rawExponential.transpose(foo, foobar2baz)
+      foo2bar2baz.sanityTest()
+      foo2bar2baz should have(
+        'source(foo.actionCarrier),
+        'target(exponentialDot)
+      )
+      (foo.actionCarrier x barDot)(bazDot) {
+        case f ⊕ b =>
+          rawExponential.evaluation(
+            foo2bar2baz(f), 
+            b
+          )
+      } shouldBe foobar2baz.arrow
     }
   }
 

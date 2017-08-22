@@ -1,13 +1,12 @@
 package com.fdilke.bewl.fsets
 
-import scala.language.higherKinds
-import scala.language.postfixOps
-import com.fdilke.bewl.helper.{Memoize, ⊕}
-import ⊕._
+import com.fdilke.bewl.fsets.FiniteSetsUtilities.elementsOf
 import com.fdilke.bewl.fsets.monoid_actions.{GeneratorWithRelators, Relator}
+import com.fdilke.bewl.helper.⊕
+import com.fdilke.bewl.helper.⊕._
+
 import scala.Function.tupled
-import scala.Traversable
-import FiniteSets.functionAsArrow
+import scala.language.{higherKinds, postfixOps}
 
 trait AbstractCyclic[A] {
   val generator: A
@@ -214,10 +213,75 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
           }
         }
         
+        lazy val recursiveImago =
+          analyze(monoid.regularAction x action)
+        
         override def rawExponential[B <: ~](
           target: monoid.Action[B] 
-        ): monoid.RawExponential[A, B] =
-          ???
+        ): monoid.RawExponential[A, B] = {
+          implicit val mXa: BIPRODUCT[M, A] =
+            monoid.carrier x action.actionCarrier
+
+          // TODO write better versions of these helper methods
+          def arrowToMap(arrow: M x A > B): M x A → B =
+            mXa.elements map {
+              m_a => m_a -> arrow(m_a)
+            } toMap
+
+          def mapToArrow(arrow: M x A → B): M x A > B = 
+              mXa.biArrow(target.actionCarrier) {
+                (m, a) => arrow(m ⊕⊕ a)
+              }.arrow
+          
+          val morphisms: DOT[M x A → B] =
+            makeDot(
+              recursiveImago.morphismsTo(target) map arrowToMap
+            )
+            
+          new monoid.RawExponential[A, B] {
+              override val exponentialAction = 
+                monoid.action(
+                  morphisms    
+                ) {
+                 (f, m) =>
+                   arrowToMap(
+                     mXa.biArrow(target.actionCarrier) {
+                       (n, a) => 
+                         f(monoid.multiply(m, n) ⊕⊕ a)
+                     }.arrow
+                   )
+                }
+                
+              override val evaluation = 
+                (morphisms x action.actionCarrier).biArrow(
+                    target.actionCarrier
+                ) {
+                 (f, s) =>
+                   f(
+                     monoid.unit(
+                       action.actionCarrier.toI(s)
+                     ) ⊕⊕ s
+                   )
+                }
+              
+              override def transpose[X <: ~](
+                otherAction: monoid.Action[X],
+                biArrow: BiArrow[X, A, B]
+              ) = 
+                otherAction.actionCarrier(morphisms) {
+                  x =>
+                    arrowToMap(
+                      mXa.biArrow(target.actionCarrier) {
+                         (m, a) => 
+                           biArrow(
+                             otherAction.actionMultiply(x, m), 
+                             a
+                           )
+                       }.arrow
+                     )
+                }
+          }
+        }
       }
     }
   }
