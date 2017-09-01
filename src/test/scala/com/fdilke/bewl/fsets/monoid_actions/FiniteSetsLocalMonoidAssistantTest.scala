@@ -41,7 +41,17 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
     )
 
   private val actionTopos = 
-    ToposOfMonoidActions of monoidOf3
+    ToposOfMonoidActions of(
+      monoidOf3,
+      FiniteSets.DefaultMonoidAssistant
+    )
+
+  private val scalarMultiply: (String, Symbol) => String =
+    (s, m) => monoidOf3.multiply(Symbol(s), m).name
+
+  private val barDot: FiniteSets.DOT[String] = dot("x", "y")
+
+  private val bar = monoidOf3.action(barDot)(scalarMultiply)
 
   import regularAnalysis.initialCyclics
       
@@ -124,7 +134,7 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
       }
     }
     
-    "can extract a set of generators for a monoid" in {
+    "can extract a set of generators for a monoid action" in {
       analysisFor(
         monoidOf3.regularAction
       ).generators shouldBe Seq(i)
@@ -140,6 +150,16 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
               actionTopos.O
             )
           )
+      }
+      "for a right ideal action" in {
+        canExtractPresentation(
+          bar
+        )
+      }
+      "for a right ideal squared action" in {
+        canExtractPresentation(
+          bar x bar
+        )
       }
       "for the truth object monoid action" in {
         canExtractPresentation(        
@@ -220,29 +240,49 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
     }
 
     "for the regular action to itself, checked another way" in {
-      val wrappedRegularAction =
-        actionTopos.makeDot(regularAction)
-
       canEnumerateMorphisms(
-        wrappedRegularAction,
-        wrappedRegularAction,
+        regularAction,
+        regularAction,
         thorough=false // true passes, but takes too long
       )
     }
 
     "for a more complex situation" in {
       canEnumerateMorphisms(
-        actionTopos.omega.squared,
-        actionTopos.omega.squared,
+        regularAction x bar,
+        regularAction,
+        thorough=true
+      )
+    }
+
+    "for yet another more complex situation" in {
+      canEnumerateMorphisms(
+        bar x bar,
+        bar,
+        thorough=true
+      )
+    }
+
+    "and for yet ANOTHER more complex situation" in {
+      canEnumerateMorphisms(
+        bar x bar,
+        regularAction,
+        thorough=true
+      )
+    }
+
+    "for another more complex situation" ignore {// too slow
+      val o2 =
+        actionTopos.unwrap(actionTopos.omega.squared)
+
+      canEnumerateMorphisms(
+        o2,
+        o2,
         thorough=false
       )
     }
-    
-    "can calculate raw exponentials" ignore {
-      val scalarMultiply: (String, Symbol) => String =
-        (s, m) => monoidOf3.multiply(Symbol(s), m).name
-      val barDot: FiniteSets.DOT[String] = dot("x", "y")
-      val bar = monoidOf3.action(barDot)(scalarMultiply)
+
+    "can calculate raw exponentials" in {
       val bazDot = dot("i", "x", "y")
 
       val baz = monoidOf3.action(bazDot)(scalarMultiply)
@@ -275,34 +315,6 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
         rawExponential.exponentialAction.actionCarrier
       val foo2bar2baz = rawExponential.transpose(foo, foobar2baz)
 
-    {
-      println("Elements of target: #" + foo2bar2baz.target.elements.size)
-      for {tgt <- foo2bar2baz.target.elements}
-        println("\t " + tgt)
-
-
-      for (e <- foo2bar2baz.source.elements) {
-        val dest: Map[FiniteSets.x[Symbol, String] with Any, String] =
-          foo2bar2baz(e)
-        if (!foo2bar2baz.target.elements.toSet.contains(dest)) {
-          println("BAD! value " + e)
-          println("BAD! maps to: " + dest)
-          println("BAD! dest isMorphism = " +
-            monoidOf3.actions.isMorphism(
-              foo x bar,
-              baz,
-              (foo.actionCarrier x barDot).biArrow(bazDot) {
-                (m, a) =>
-                  dest(
-                    (foo.actionCarrier x barDot).pair(m, a)
-                  )
-              }.arrow
-            ))
-          throw new IllegalArgumentException("Not in target.")
-        }
-      }
-    }
-
       foo2bar2baz.sanityTest()
       foo2bar2baz should have(
         'source(foo.actionCarrier),
@@ -319,18 +331,10 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
   }
 
   def canEnumerateMorphisms[X, Y](
-   source: actionTopos.DOT[X],
-   target: actionTopos.DOT[Y],
+   sourceAction: monoidOf3.Action[X],
+   targetAction: monoidOf3.Action[Y],
    thorough: Boolean
   ) {
-    val sourceAction =
-      actionTopos.unwrap(
-        source
-      )
-    val targetAction =
-      actionTopos.unwrap(
-        target
-      )
 
   val morphisms =
     analysisFor(
@@ -360,7 +364,10 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
           preArrow
         )
       } shouldBe {
-        (source >> target) toSet
+        (
+          actionTopos.makeDot(sourceAction) >>
+          actionTopos.makeDot(targetAction)
+        ) toSet
       }
   }
 
@@ -371,6 +378,12 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
         analysisFor(
           action
         ).generatorsWithRelators
+
+      for {
+        (g, index) <- generatorsWithRelators.zipWithIndex
+      } {
+        g.relators should not contain Relator('i, index, 'i)
+      }
 
       val presentedAction =
         FiniteSetsPresentedAction(

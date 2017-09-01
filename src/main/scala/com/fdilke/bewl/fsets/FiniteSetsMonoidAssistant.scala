@@ -126,13 +126,13 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
             GeneratorWithRelators[M, A](
               g,
               generators.take(j + 1).zipWithIndex
-                flatMap tupled { (f, i) =>
+                flatMap tupled { (h, i) =>
                   analyze(
                     monoid.action(
-                      (monoid.carrier x monoid.carrier) where {
+                      monoid.carrier.squared where {
                         case m ⊕ n =>
                           action.actionMultiply(g, m) ==
-                            action.actionMultiply(f, n)
+                            action.actionMultiply(h, n)
                       }) {
                         (pair, m) =>
                           pair match {
@@ -141,9 +141,9 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
                                 monoid.multiply(q, m)
                           }
                       }
-                    ).generators map {
-                      case m ⊕ n =>
-                        Relator(m, 0, n)
+                    ).generators collect {
+                      case m ⊕ n if !(m == n && i == j) =>
+                        Relator(m, i, n)
                     }
                 })
           }
@@ -151,7 +151,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
         override def morphismsTo[B](
           target: monoid.Action[B]
         ) = {
-          val targetElements = 
+          val targetElements =
             target.actionCarrier.elements
           def compatibleExtensions(
             partialMap: Map[A, B],
