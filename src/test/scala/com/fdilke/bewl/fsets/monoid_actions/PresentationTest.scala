@@ -1,27 +1,19 @@
 package com.fdilke.bewl.fsets.monoid_actions;
 
 import com.fdilke.bewl.fsets.FiniteSets
-import FiniteSets.{ ToposOfMonoidActions, x, groupOfUnits }
+import com.fdilke.bewl.fsets.FiniteSets.{>, ToposOfMonoidActions, VOID}
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
+import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
-import scala.language.reflectiveCalls
-import scala.language.existentials
 
-import FiniteSets.{>, VOID, ToposOfMonoidActions}
+import scala.language.{existentials, reflectiveCalls}
 
 class PresentationTest extends FreeSpec {
 
   private val (i, x, y, a, b, c, r, s) = ('i, 'x, 'y, 'a, 'b, 'c, 'r, 's)
   
-  private val monoidOf3 =
-      monoidFromTable(
-        i, x, y,
-        x, x, y,
-        y, x, y
-      ) // right-dominant on two generators
-
-  private val actionTopos = 
+  private val actionTopos =
       ToposOfMonoidActions of monoidOf3
       
   "Building actions from presentations" - {

@@ -277,7 +277,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
                              otherAction.actionMultiply(x, m), 
                              a
                            )
-                       }.arrow
+                       } arrow
                      )
                 }
           }
@@ -285,5 +285,8 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
       }
     }
   }
+
+  override val monoidAssistant =
+    LocalMonoidAssistant
 }
 

@@ -14,13 +14,7 @@ class DefaultMonoidAssistantTest extends FreeSpec {
   
   private val (i, x, y) = ('i, 'x, 'y)
 
-  private val monoidOf3 =
-    monoidFromTable(
-      i, x, y,
-      x, x, y,
-      y, x, y
-    ) // right-dominant on two generators
-    
+  import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
   import monoidOf3.regularAction
   
   private val barDot: FiniteSets.DOT[String] = dot("x", "y")

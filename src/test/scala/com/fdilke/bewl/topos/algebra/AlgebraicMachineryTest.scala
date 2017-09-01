@@ -428,13 +428,8 @@ class AlgebraicMachineryTest extends FunSpec {
 
     it("support binary multiplication of their algebras, even with scalar extensions") {
       val (i, x, y) = ('i, 'x, 'y)
-      val monoidOf3 =
-        monoidFromTable(
-          i, x, y,
-          x, x, y,
-          y, x, y
-        ) // right-dominant on two generators
-    
+
+      import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
       import monoidOf3.regularAction
   
       val barDot = dot("x", "y")

@@ -1,28 +1,19 @@
 package com.fdilke.bewl.fsets.monoid_actions
 
-import Function.untupled
-import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsActionAnalysis}
-import FiniteSets.{>, LocalMonoidAssistant, ToposOfMonoidActions, bifunctionAsBiArrow, functionAsArrow}
+import com.fdilke.bewl.fsets.FiniteSets
+import com.fdilke.bewl.fsets.FiniteSets.{>, LocalMonoidAssistant, ToposOfMonoidActions, bifunctionAsBiArrow, functionAsArrow}
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
-
-import scala.language.postfixOps
 import com.fdilke.bewl.helper.⊕
+import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
 
-import scala.language.reflectiveCalls
-import scala.language.existentials
+import scala.Function.untupled
+import scala.language.{existentials, postfixOps, reflectiveCalls}
 
 class FiniteSetsMonoidAssistantTest extends FreeSpec {
   
   private val (i, x, y) = ('i, 'x, 'y)
-
-  private val monoidOf3 =
-    monoidFromTable(
-      i, x, y,
-      x, x, y,
-      y, x, y
-    ) // right-dominant on two generators
 
   import monoidOf3.regularAction
   
@@ -178,11 +169,10 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
             )
           )
       }
-    // TODO: add more tests like this!
     }
      
     "can enumerate the morphisms into another action" - {
-      "for the trivial action" in {
+      "for the trivial action to itself" in {
         val trivialAction: monoidOf3.Action[actionTopos.UNIT] =
           actionTopos.unwrap(
             actionTopos.I
@@ -208,78 +198,90 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
         ) shouldBe true
         morphism.sanityTest
       }
-    }
-    "for the regular action to itself" in {
-      val morphisms =
-        regularAnalysis.morphismsTo(
-          regularAction
-        ) 
-        
-      morphisms should have size 3
-      
-      def leftMultiplication(
-        l: Symbol
-      ) =
-        functionAsArrow[Symbol, Symbol](
-          regularAction.actionCarrier,
-          regularAction.actionCarrier,
-          { regularAction.actionMultiply(l, _) }
-        )
-        
-      morphisms.toSet shouldBe { 
-        elementsOf(monoidOf3.carrier).toSet map leftMultiplication
+
+      "for the regular action to itself" in {
+        val morphisms =
+          regularAnalysis.morphismsTo(
+            regularAction
+          )
+
+        morphisms should have size 3
+
+        def leftMultiplication(
+          l: Symbol
+        ) =
+          functionAsArrow[Symbol, Symbol](
+            regularAction.actionCarrier,
+            regularAction.actionCarrier,
+            { regularAction.actionMultiply(l, _) }
+          )
+
+        morphisms.toSet shouldBe {
+          elementsOf(monoidOf3.carrier).toSet map leftMultiplication
+        }
+
+        morphisms.forall {
+          monoidOf3.actions.isMorphism(
+            regularAction,
+            regularAction,
+            _
+          )
+        } shouldBe true
       }
 
-      morphisms.forall { 
-        monoidOf3.actions.isMorphism(
-          regularAction, 
-          regularAction, 
-          _
-        ) 
-      } shouldBe true
-    }
+      "for the regular action to itself, another way" in {
+        canEnumerateMorphisms(
+          regularAction,
+          regularAction,
+          thorough=false // true passes, but takes too long
+        )
+      }
 
-    "for the regular action to itself, checked another way" in {
-      canEnumerateMorphisms(
-        regularAction,
-        regularAction,
-        thorough=false // true passes, but takes too long
-      )
-    }
+      "for regularAction x bar to bar" in {
+        canEnumerateMorphisms(
+          regularAction x bar,
+          regularAction,
+          thorough=true
+        )
+      }
 
-    "for a more complex situation" in {
-      canEnumerateMorphisms(
-        regularAction x bar,
-        regularAction,
-        thorough=true
-      )
-    }
+      "for bar x bar to bar" in {
+        canEnumerateMorphisms(
+          bar x bar,
+          bar,
+          thorough=true
+        )
+      }
 
-    "for yet another more complex situation" in {
-      canEnumerateMorphisms(
-        bar x bar,
-        bar,
-        thorough=true
-      )
-    }
+      "and for bar x bar to regularAction" in {
+        canEnumerateMorphisms(
+          bar x bar,
+          regularAction,
+          thorough=true
+        )
+      }
 
-    "and for yet ANOTHER more complex situation" in {
-      canEnumerateMorphisms(
-        bar x bar,
-        regularAction,
-        thorough=true
-      )
-    }
+      "for omega to itself" in {
+        val o2 =
+          actionTopos.unwrap(actionTopos.omega)
 
-    "for another more complex situation" ignore {// too slow
-      val o2 =
-        actionTopos.unwrap(actionTopos.omega.squared)
+        canEnumerateMorphisms(
+          o2,
+          o2,
+          thorough=false
+        )
+      }
 
-      canEnumerateMorphisms(
-        o2,
-        o2,
-        thorough=false
-      )
+      "for omega squared to itself" ignore {// too slow
+        val o2 =
+          actionTopos.unwrap(actionTopos.omega.squared)
+
+        canEnumerateMorphisms(
+          o2,
+          o2,
+          thorough=false
+        )
+      }
     }
 
     "can calculate raw exponentials" in {
@@ -331,9 +333,9 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
   }
 
   def canEnumerateMorphisms[X, Y](
-   sourceAction: monoidOf3.Action[X],
-   targetAction: monoidOf3.Action[Y],
-   thorough: Boolean
+    sourceAction: monoidOf3.Action[X],
+    targetAction: monoidOf3.Action[Y],
+    thorough: Boolean
   ) {
 
   val morphisms =
@@ -353,15 +355,12 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
 
     if (thorough)
       morphisms.toSet map { (morphism: X > Y) =>
-        val preArrow =
+        actionTopos.makeArrow(
           new monoidOf3.ActionPreArrow[X, Y](
             sourceAction,
             targetAction,
             x => morphism(x)
           )
-
-        actionTopos.makeArrow(
-          preArrow
         )
       } shouldBe {
         (
