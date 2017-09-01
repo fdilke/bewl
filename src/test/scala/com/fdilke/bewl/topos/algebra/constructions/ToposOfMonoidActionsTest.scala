@@ -134,8 +134,7 @@ class ToposOfMonoidActionsTest(
   }
 
   describe("Arrow enumeration") {
-    // TODO: Fix!
-    ignore("also works on the fixtures") {
+    it("also works on the fixtures") {
       (omega >> omega) should have size 6
     }
 

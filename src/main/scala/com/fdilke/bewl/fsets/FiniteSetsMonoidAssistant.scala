@@ -159,7 +159,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
           ): Traversable[Map[A, B]] = {
             val gr = generatorsWithRelators(index)
             val generator = gr.generator
-            targetElements filter { targetElement =>
+            targetElements.filter { targetElement =>
               gr.relators forall { relator =>
                 val otherTarget: B =
                   if (relator.otherIndex == index)
@@ -174,7 +174,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
                   relator.selfScalar
                 )
               }
-            } map { targetElement =>
+            }.map { targetElement =>
               {
                 for {
                   m <- monoidElements
@@ -188,7 +188,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
                   )
                 }
               } toMap
-            }
+            }.toSeq.distinct // TODO: optimize this filtering out of redundancies
           }
           def absorb(
             partialMaps: Traversable[Map[A, B]], 
