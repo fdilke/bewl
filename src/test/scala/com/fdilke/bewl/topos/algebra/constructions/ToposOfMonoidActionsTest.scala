@@ -1,7 +1,6 @@
 
 package com.fdilke.bewl.topos.algebra.constructions
 
-//import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import com.fdilke.bewl.fsets.FiniteSets.{ToposOfMonoidActions, ~}
 import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsUtilities}
 import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3

@@ -19,12 +19,12 @@ object EndOmega extends App {
     omega >> omega
   )
 
+  // trick to get round 'cyclic dependency' issue: abstract the type
+
   def doIt[IDEAL](
     ideals: Traversable[IDEAL],
     mappings: Traversable[IDEAL > IDEAL]
   ) {
-//    ideals foreach println
-
     assert( ideals.size == 3 )
     val Seq(_m, _i, _o) = ideals
 
