@@ -74,7 +74,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
         }
 
         class MaximalCyclics(
-            override val cyclics: Seq[Cyclic] = Seq.empty
+          override val cyclics: Seq[Cyclic] = Seq.empty
         ) extends AbstractCyclics[A] { self =>
 
           override def contains(a: A) =
@@ -188,8 +188,9 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
                   )
                 }
               } toMap
-            }.toSeq.distinct // TODO: optimize this filtering out of redundancies
+            }.toSeq distinct 
           }
+
           def absorb(
             partialMaps: Traversable[Map[A, B]], 
             index: Int
@@ -200,7 +201,8 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
             } yield {
               partialMap ++ extension                                 
             }
-          (0 until generatorsWithRelators.length).foldLeft(
+
+          generatorsWithRelators.indices.foldLeft(
             Traversable(Map.empty[A, B])
           ) {
             absorb
@@ -222,7 +224,6 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
           implicit val mXa: BIPRODUCT[M, A] =
             monoid.carrier x action.actionCarrier
 
-          // TODO write better versions of these helper methods
           def arrowToMap(arrow: M x A > B): M x A → B =
             mXa.elements map {
               m_a => m_a -> arrow(m_a)
@@ -235,7 +236,9 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
           
           val morphisms: DOT[M x A → B] =
             makeDot(
-              recursiveImago.morphismsTo(target) map arrowToMap
+              recursiveImago.morphismsTo(
+                target
+              ) map arrowToMap
             )
             
           new monoid.RawExponential[A, B] {
