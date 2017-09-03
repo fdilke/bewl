@@ -7,6 +7,7 @@ import com.fdilke.bewl.helper.⊕
 import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
+import com.fdilke.bewl.testutil.CustomMatchers._
 
 import scala.Function.untupled
 import scala.language.{existentials, postfixOps, reflectiveCalls}
@@ -353,7 +354,8 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
       )
     } shouldBe true
 
-    if (thorough)
+    if (thorough) {
+      morphisms should not(containDuplicates)
       morphisms.toSet map { (morphism: X > Y) =>
         actionTopos.makeArrow(
           new monoidOf3.ActionPreArrow[X, Y](
@@ -365,9 +367,10 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
       } shouldBe {
         (
           actionTopos.makeDot(sourceAction) >>
-          actionTopos.makeDot(targetAction)
-        ) toSet
+            actionTopos.makeDot(targetAction)
+          ) toSet
       }
+    }
   }
 
   private def canExtractPresentation[A](

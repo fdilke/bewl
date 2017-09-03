@@ -100,5 +100,4 @@ object NollCalculations extends App {
     ) ( affineMapApply )
 
   notSane.sanityTest()
-
 }

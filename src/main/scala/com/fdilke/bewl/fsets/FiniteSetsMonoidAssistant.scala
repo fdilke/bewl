@@ -83,7 +83,8 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
             }
 
           private def +(
-            newCyclic: Cyclic) =
+            newCyclic: Cyclic
+          ) =
             new MaximalCyclics(
               newCyclic +: (
                 cyclics filterNot {
@@ -93,7 +94,8 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
             )
 
           override def +(
-            a: A): MaximalCyclics =
+            a: A
+          ): MaximalCyclics =
             self + Cyclic(a)
 
           override lazy val transversal =
