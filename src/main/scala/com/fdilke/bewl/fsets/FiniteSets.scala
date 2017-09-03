@@ -97,9 +97,12 @@ class BaseFiniteSets extends Topos[Any] with Wrappings[
           throw new IllegalArgumentException(s"Cannot backdivide $self by monic $monic")
       }}
     override def sanityTest =
-      if (!source.elements.map(function).forall(x => target.elements.exists(_ == x))) {
-        throw new IllegalArgumentException("Map values not in target")
-      }
+      for { targetElement <- source.elements map function }
+        if (!target.elements.exists( _ == targetElement )) {
+          throw new IllegalArgumentException(
+            "Map value " + targetElement + " not in target " + target.elements
+          )
+        }
     override def ?=(that: S > T) =
       new FiniteSetsDot[S] (
         source.elements.filter { s => function(s) == that.function(s) }

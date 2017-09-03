@@ -662,6 +662,9 @@ trait BaseTopos {
       r: S > R
     ): S > T =
       arrow o (l x r)
+
+    def sanityTest() =
+      arrow.sanityTest()
   }
 
   // Helper methods for triple products (this could obviously be extended).

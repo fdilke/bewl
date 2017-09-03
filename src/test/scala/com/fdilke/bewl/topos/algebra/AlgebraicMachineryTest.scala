@@ -209,6 +209,25 @@ class AlgebraicMachineryTest extends FunSpec {
       }
     }
 
+    describe("can sanity-check their algebras") {
+      it("for valid unary operators") {
+        val setsWithInvolution = AlgebraicTheory(~)(~(~α) := α)
+        val carrier = dot(0)
+        val invertBadRange =
+          makeUnaryOperator(
+            carrier,
+            0 -> 1,
+          )
+        intercept[IllegalArgumentException] {
+          new setsWithInvolution.Algebra[Int](
+            carrier
+          )(
+            $tilde := invertBadRange
+          ).sanityTest
+        }
+      }
+    }
+
     it("can validate morphisms preserving unary operations") {
       val carrierStrings = dot[String]("+", "-")
       val minusStrings = makeUnaryOperator(carrierStrings,
@@ -398,12 +417,19 @@ class AlgebraicMachineryTest extends FunSpec {
           bifunctionAsBiArrow(carrier) {
             (x: Int, y:Int) => (x + y) % n
           },
-          functionAsArrow(carrier, carrier, n - _)
+          functionAsArrow(
+            carrier,
+            carrier,
+            i => (n - i) % n
+          )
         )
       }
       val c2 = integersMod(2)
       val c3 = integersMod(3)
       val c6 = integersMod(6)
+      c2.sanityTest()
+      c3.sanityTest()
+      c6.sanityTest()
       val c2xc3: Group[Int x Int] =
         c2 x c3
       c2xc3.sanityTest()

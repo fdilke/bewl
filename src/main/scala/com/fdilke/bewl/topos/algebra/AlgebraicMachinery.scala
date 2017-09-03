@@ -222,18 +222,28 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       }
   }
 
-  case class OperatorAssignment[
+  abstract case class OperatorAssignment[
     T <: ~,
     S <: ~
   ](
     operator: Operator
   ) {
+    // TODO: refactor this to be table-driven
     def lookupPrincipalConstant: Option[NullaryOp[T]] = None
     def lookupScalarConstant: Option[NullaryOp[S]] = None
     def lookupUnaryOp: Option[UnaryOp[T]] = None
     def lookupBinaryOp: Option[BinaryOp[T]] = None
     def lookupRightScalarBinaryOp: Option[RightScalarBinaryOp[T, S]] = None
     def lookupScalarBinaryOp: Option[BinaryOp[S]] = None
+
+    final def sanityTest() {
+//      lookupPrincipalConstant.foreach{ _.sanityTest() }
+//      lookupScalarConstant.foreach{ _.sanityTest() }
+      lookupUnaryOp foreach{ _.sanityTest() }
+//      lookupBinaryOp.foreach{ _.sanityTest() }
+//      lookupRightScalarBinaryOp.foreach{ _.sanityTest() }
+//      lookupScalarBinaryOp.foreach{ _.sanityTest() }
+    }
   }
 
   case class OperatorAssignments[
@@ -808,18 +818,25 @@ trait AlgebraicMachinery { topos: BaseTopos =>
           }
       }
 
-      def sanityTest() =
-        if (!operatorAssignments.hasPrecisely(operators))
-          bail("Assignments do not match signature of theory")
-        else
-          laws foreach { law =>
-            if (!satisfies(law))
-              law.fails
-          }
-
       def satisfies(law: Law) =
         law isSatisfiedIn
-          EvaluationContext(law.freeVariables)
+          EvaluationContext(
+            law.freeVariables
+          )
+
+      def sanityTest() {
+        if (!operatorAssignments.hasPrecisely(operators))
+          bail("Assignments do not match signature of theory")
+
+        operatorAssignments.assignments foreach {
+          _.sanityTest()
+        }
+
+        laws foreach { law =>
+          if (!satisfies(law))
+            law.fails
+        }
+      }
     }
   }
 
