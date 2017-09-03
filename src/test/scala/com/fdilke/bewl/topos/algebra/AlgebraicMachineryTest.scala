@@ -210,6 +210,18 @@ class AlgebraicMachineryTest extends FunSpec {
     }
 
     describe("can sanity-check their algebras") {
+      it("for valid nullary operators") {
+        val carrier = dot(0)
+        val pointedSets = AlgebraicTheory(o)()
+        val badZero =
+          makeNullaryOperator(carrier, 1)
+        
+        intercept[IllegalArgumentException] {
+          new pointedSets.Algebra[Int](
+            carrier
+          )(o := badZero).sanityTest()
+        }
+      }
       it("for valid unary operators") {
         val setsWithInvolution = AlgebraicTheory(~)(~(~α) := α)
         val carrier = dot(0)
@@ -240,6 +252,12 @@ class AlgebraicMachineryTest extends FunSpec {
             * := combineBadRange
           ).sanityTest()
         }
+      }
+      it("for scalar constants ") {
+//          ...
+//        val weakActsOverAPointedMagma = AlgebraicTheoryWithScalars(scalars)(II := pointScalar)(II, **)()
+//        val algebra = new weakActsOverAPointedMagma.Algebra[Boolean](carrier)(** := multiplication)
+//        algebra.sanityTest
       }
     }
 

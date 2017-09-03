@@ -230,17 +230,17 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   ) {
     // TODO: refactor this to be table-driven
     def lookupPrincipalConstant: Option[NullaryOp[T]] = None
-    def lookupScalarConstant: Option[NullaryOp[S]] = None
     def lookupUnaryOp: Option[UnaryOp[T]] = None
     def lookupBinaryOp: Option[BinaryOp[T]] = None
+    def lookupScalarConstant: Option[NullaryOp[S]] = None
     def lookupRightScalarBinaryOp: Option[RightScalarBinaryOp[T, S]] = None
     def lookupScalarBinaryOp: Option[BinaryOp[S]] = None
 
     final def sanityTest() {
-//      lookupPrincipalConstant.foreach{ _.sanityTest() }
-//      lookupScalarConstant.foreach{ _.sanityTest() }
+      lookupPrincipalConstant foreach{ _.sanityTest() }
       lookupUnaryOp foreach{ _.sanityTest() }
-      lookupBinaryOp.foreach{ _.sanityTest() }
+      lookupBinaryOp foreach{ _.sanityTest() }
+//      lookupScalarConstant.foreach{ _.sanityTest() }
 //      lookupRightScalarBinaryOp.foreach{ _.sanityTest() }
 //      lookupScalarBinaryOp.foreach{ _.sanityTest() }
     }
