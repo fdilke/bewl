@@ -254,10 +254,17 @@ class AlgebraicMachineryTest extends FunSpec {
         }
       }
       it("for scalar constants ") {
-//          ...
-//        val weakActsOverAPointedMagma = AlgebraicTheoryWithScalars(scalars)(II := pointScalar)(II, **)()
-//        val algebra = new weakActsOverAPointedMagma.Algebra[Boolean](carrier)(** := multiplication)
-//        algebra.sanityTest
+        val scalars = dot(0)
+        val badPointScalar =
+          makeNullaryOperator(scalars, 1)
+        val weakSetsOverAPointedSet =
+          AlgebraicTheoryWithScalars(scalars)(II := badPointScalar)(II)()
+        intercept[IllegalArgumentException] {
+          new weakSetsOverAPointedSet.Algebra[String](
+            dot("")
+          )().sanityTest()
+//          )(** := multiplication)
+        }
       }
     }
 
