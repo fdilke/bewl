@@ -46,6 +46,13 @@ object NollCalculations extends App {
       )
 
     affineMaps.sanityTest()
+
+    val notSane =
+      affineMaps.action(
+        chordDot
+      ) ( affineMapApply )
+
+    notSane.sanityTest()
   }
 
   private def affineMapApply(
@@ -94,10 +101,10 @@ object NollCalculations extends App {
 
   octave.sanityTest()
 
-  val notSane =
+  val chord =
     triadicMaps.action(
       chordDot
     ) ( affineMapApply )
 
-  notSane.sanityTest()
+  chord.sanityTest()
 }

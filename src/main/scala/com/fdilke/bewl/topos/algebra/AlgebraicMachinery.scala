@@ -240,9 +240,9 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       lookupPrincipalConstant foreach{ _.sanityTest() }
       lookupUnaryOp foreach{ _.sanityTest() }
       lookupBinaryOp foreach{ _.sanityTest() }
-      lookupScalarConstant.foreach{ _.sanityTest() }
-      lookupRightScalarBinaryOp.foreach{ _.sanityTest() }
-//      lookupScalarBinaryOp.foreach{ _.sanityTest() }
+      lookupScalarConstant foreach{ _.sanityTest() }
+      lookupRightScalarBinaryOp foreach{ _.sanityTest() }
+      lookupScalarBinaryOp foreach{ _.sanityTest() }
     }
   }
 

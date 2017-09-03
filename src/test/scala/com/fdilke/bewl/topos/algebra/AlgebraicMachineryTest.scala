@@ -265,10 +265,10 @@ class AlgebraicMachineryTest extends FunSpec {
           )().sanityTest()
         }
       }
-      it("for right scalar binary operators") {
+      it("for right scalar multiplications") {
         val scalars = dot(0)
         val carrier = dot(true)
-        val badScalarMultiplication =
+        val badScalarRightMultiplication =
           bifunctionAsBiArrow(carrier, scalars, carrier) {
             Function untupled Map(
               (true, 0) -> false
@@ -280,7 +280,25 @@ class AlgebraicMachineryTest extends FunSpec {
           new weakActsOverASet.Algebra[Boolean](
             carrier
           )(
-            ** := badScalarMultiplication
+            ** := badScalarRightMultiplication
+          ).sanityTest()
+        }
+      }
+      it("for scalar multiplications") {
+        val scalars = dot(0)
+        val badScalarMultiplication =
+          bifunctionAsBiArrow(scalars) {
+            Function untupled Map(
+              (0, 0) -> 1
+            )
+          }
+        val weakActsOverASet =
+          AlgebraicTheoryWithScalars(scalars)()(***)()
+        intercept[IllegalArgumentException] {
+          new weakActsOverASet.Algebra[Boolean](
+            dot(true)
+          )(
+            *** := badScalarMultiplication
           ).sanityTest()
         }
       }
