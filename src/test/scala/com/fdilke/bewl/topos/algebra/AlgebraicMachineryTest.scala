@@ -253,7 +253,7 @@ class AlgebraicMachineryTest extends FunSpec {
           ).sanityTest()
         }
       }
-      it("for scalar constants ") {
+      it("for scalar constants") {
         val scalars = dot(0)
         val badPointScalar =
           makeNullaryOperator(scalars, 1)
@@ -263,7 +263,25 @@ class AlgebraicMachineryTest extends FunSpec {
           new weakSetsOverAPointedSet.Algebra[String](
             dot("")
           )().sanityTest()
-//          )(** := multiplication)
+        }
+      }
+      it("for right scalar binary operators") {
+        val scalars = dot(0)
+        val carrier = dot(true)
+        val badScalarMultiplication =
+          bifunctionAsBiArrow(carrier, scalars, carrier) {
+            Function untupled Map(
+              (true, 0) -> false
+            )
+          }
+        val weakActsOverASet =
+          AlgebraicTheoryWithScalars(scalars)()(**)()
+        intercept[IllegalArgumentException] {
+          new weakActsOverASet.Algebra[Boolean](
+            carrier
+          )(
+            ** := badScalarMultiplication
+          ).sanityTest()
         }
       }
     }

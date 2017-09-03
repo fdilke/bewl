@@ -241,7 +241,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       lookupUnaryOp foreach{ _.sanityTest() }
       lookupBinaryOp foreach{ _.sanityTest() }
       lookupScalarConstant.foreach{ _.sanityTest() }
-//      lookupRightScalarBinaryOp.foreach{ _.sanityTest() }
+      lookupRightScalarBinaryOp.foreach{ _.sanityTest() }
 //      lookupScalarBinaryOp.foreach{ _.sanityTest() }
     }
   }
