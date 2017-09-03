@@ -226,6 +226,21 @@ class AlgebraicMachineryTest extends FunSpec {
           ).sanityTest
         }
       }
+      it("for valid binary operators") {
+        val magmas = AlgebraicTheory(*)()
+        val carrier = dot(1)
+        val combineBadRange =
+          bifunctionAsBiArrow(
+            carrier
+          ) { _ + _ }
+        intercept[IllegalArgumentException] {
+          new magmas.Algebra[Int](
+            carrier
+          )(
+            * := combineBadRange
+          ).sanityTest()
+        }
+      }
     }
 
     it("can validate morphisms preserving unary operations") {

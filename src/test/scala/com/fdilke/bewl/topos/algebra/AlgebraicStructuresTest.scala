@@ -26,11 +26,14 @@ class AlgebraicStructuresTest extends FunSpec {
 
     it("enforce the left unit element") {
       intercept[IllegalArgumentException] {
-        monoidFromTable(
-          i, i, i,
-          x, x, x,
-          y, y, y
-        ).sanityTest
+        val carrier = dot(i, x, y)
+        val unit = makeNullaryOperator(carrier, i)
+        val product = makeBinaryOperator(carrier,
+          (i, i) -> i, (i, x) -> i, (i, y) -> i,
+          (x, i) -> x, (x, x) -> x, (x, y) -> x,
+          (y, i) -> y, (y, x) -> y, (y, y) -> y
+        )
+        new Monoid[Symbol](carrier, unit, product).sanityTest
       }.getMessage shouldBe "left unit law failed"
     }
 
