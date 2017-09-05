@@ -1,9 +1,11 @@
 package com.fdilke.bewl.apps
 
-import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsUtilities}
-import com.fdilke.bewl.fsets.FiniteSets.{Monoid, bifunctionAsBiArrow, makeDot, x}
+import com.fdilke.bewl.fsets.FiniteSets
+import com.fdilke.bewl.fsets.FiniteSets.{Monoid, ToposOfMonoidActions, bifunctionAsBiArrow, makeDot, x}
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.{elementsOf, makeNullaryOperator}
 import com.fdilke.bewl.helper.⊕
+
+import scala.language.postfixOps
 
 object NollCalculations extends App {
 
@@ -46,13 +48,6 @@ object NollCalculations extends App {
       )
 
     affineMaps.sanityTest()
-
-    val notSane =
-      affineMaps.action(
-        chordDot
-      ) ( affineMapApply )
-
-    notSane.sanityTest()
   }
 
   private def affineMapApply(
@@ -78,7 +73,7 @@ object NollCalculations extends App {
 
   println("# triadic maps = " + elementsOf(triadicMapsDot).size)
 
-  val triadicMaps =
+  val triadicMonoid =
     new Monoid[Int x Int](
       triadicMapsDot,
       makeNullaryOperator(
@@ -92,19 +87,78 @@ object NollCalculations extends App {
       )
     )
 
-  triadicMaps.sanityTest()
+  triadicMonoid.sanityTest()
 
-  val octave =
-    triadicMaps.action(
+  val octaveAction =
+    triadicMonoid.action(
       octaveDot
     ) ( affineMapApply )
 
-  octave.sanityTest()
+  octaveAction.sanityTest()
 
-  val chord =
-    triadicMaps.action(
+  val chordAction =
+    triadicMonoid.action(
       chordDot
     ) ( affineMapApply )
 
-  chord.sanityTest()
+  chordAction.sanityTest()
+
+  // now construct the topos and some dots in it
+
+  val triadicTopos =
+    ToposOfMonoidActions of triadicMonoid
+
+  val octave =
+    triadicTopos.makeDot(
+      octaveAction
+    )
+  
+  val chord =
+    triadicTopos.makeDot(
+      chordAction
+    )
+
+  val cyclic =
+    triadicTopos.makeDot(
+      triadicMonoid.regularAction
+    )
+
+  def measure[T](
+    tune: triadicTopos.DOT[T]
+  ) =
+    elementsOf(
+      triadicTopos.unwrap(
+        tune
+      ).actionCarrier
+    ) size
+
+  def showInjectivity[T](
+    name: String,
+    tune: triadicTopos.DOT[T]
+  ) {
+    println(s"$name injective: ")
+//    println(tune.isInjective)
+    val power = tune.power
+    println("calculated power")
+    println("size of omega = " + measure(triadicTopos.omega))
+    println("size of power = " + measure(power))
+    (power >> triadicTopos.I) foreach { to1 =>
+      println("calculated power -> 1")
+    }
+    println("calculated power -> 1... done")
+    val isInjective =
+      (power >> tune) exists { projection =>
+        print("*")
+        val retracts =
+          (projection o tune.singleton) == tune.identity
+        if (retracts)
+          println("!")
+        retracts
+      }
+    println(isInjective)
+  }
+
+  showInjectivity("chord", chord)
+  showInjectivity("cyclic", cyclic)
+  showInjectivity("octave", octave)
 }

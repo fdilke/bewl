@@ -4,6 +4,7 @@ import com.fdilke.bewl.helper.{Memoize, ⊕}
 import com.fdilke.bewl.topos.{Topos, Wrappings}
 import ⊕._
 import FiniteSetsUtilities.allMaps
+import com.fdilke.bewl.topos.Wrappings.NO_WRAPPER
 
 object FiniteSets extends BaseFiniteSets 
   with FiniteSetsMonoidAssistant
@@ -157,7 +158,7 @@ class BaseFiniteSets extends Topos[Any] with Wrappings[
       prearrow.function
     )
 
-  override def makeDot[T](predot: Traversable[T]) =
+  override def makeDot[T](predot: Traversable[T]): FiniteSetsDot[T] =
     memoizedDotWrapper(predot)
 
   // unusually simple generic definition for this topos because WRAPPER is trivial
