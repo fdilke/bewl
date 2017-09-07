@@ -17,13 +17,16 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
   private val (i, x, y) = ('i, 'x, 'y)
 
   import monoidOf3.regularAction
-  
+
+  private val analyzer =
+    LocalMonoidAssistant.actionAnalyzer(
+      monoidOf3
+    )
+
   private def analysisFor[A](
     action: monoidOf3.Action[A]
   ) =
-    LocalMonoidAssistant.actionAnalyzer(
-      monoidOf3
-    ).analyze(
+    analyzer.analyze(
       action
     )
 
@@ -45,87 +48,7 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
 
   private val bar = monoidOf3.action(barDot)(scalarMultiply)
 
-  import regularAnalysis.initialCyclics
-      
   "The action analyzer" - {
-    "can build up a set of maximal cyclic subalgebras for a monoid action" - {
-
-      "which are initially empty" in {
-        import regularAnalysis.initialCyclics
-          
-        initialCyclics.cyclics shouldBe empty
-        
-        initialCyclics.contains(i) shouldBe false
-        
-        initialCyclics.transversal shouldBe empty
-      }
-      
-      "which can be added to, filtering out any eclipsed cyclics" in {
-        val cyclics_I =
-          initialCyclics + i
-
-        cyclics_I.cyclics should have size 1
-        
-        val cyclics_X_Y =
-          initialCyclics + x + y
-
-        cyclics_X_Y.cyclics should have size 1
-        
-        val theCyclics = 
-          (cyclics_X_Y + i).cyclics 
-          
-        theCyclics should have size 1
-        theCyclics.head.generator shouldEqual i
-      }
-      
-      "which can be used to build up the complete set" in {
-        val allMaxCyclics =
-          Seq(i, x, y).foldLeft(
-            initialCyclics
-          ) { 
-            _ << _
-          }
-        
-        val theCyclics =
-          allMaxCyclics.cyclics 
-          
-        theCyclics should have size 1
-        theCyclics.head.generator shouldEqual i
-      }
-
-      "as expected for the empty action" in {
-        val emptyAction =
-          actionTopos.unwrap(
-            actionTopos.O
-          )
-        analysisFor(
-          emptyAction
-        ).generators shouldBe empty
-      }
-      
-      "as expected for a non-cyclic action" in {
-        val regularSquared =
-          actionTopos.unwrap(
-            actionTopos.makeDot(
-              regularAction
-            ).squared
-          )
-        analysisFor(
-          regularSquared
-        ).generators should have size 7
-      }
-      
-      "as expected for another non-cyclic action" in {
-        val theOmega = 
-          actionTopos.unwrap(
-            actionTopos.omega
-          )
-        analysisFor(
-          theOmega
-        ).generators should have size 2
-      }
-    }
-    
     "can extract a set of generators for a monoid action" in {
       analysisFor(
         monoidOf3.regularAction

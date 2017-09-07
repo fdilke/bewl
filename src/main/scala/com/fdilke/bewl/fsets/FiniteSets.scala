@@ -4,9 +4,11 @@ import com.fdilke.bewl.helper.{Memoize, ⊕}
 import com.fdilke.bewl.topos.{Topos, Wrappings}
 import ⊕._
 import FiniteSetsUtilities.allMaps
+import com.fdilke.bewl.fsets.monoid_actions.GeneratorFinder
 import com.fdilke.bewl.topos.Wrappings.NO_WRAPPER
 
-object FiniteSets extends BaseFiniteSets 
+object FiniteSets extends BaseFiniteSets
+  with GeneratorFinder
   with FiniteSetsMonoidAssistant
 
 class BaseFiniteSets extends Topos[Any] with Wrappings[

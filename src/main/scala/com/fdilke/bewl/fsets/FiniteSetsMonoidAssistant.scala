@@ -1,33 +1,19 @@
 package com.fdilke.bewl.fsets
 
-import com.fdilke.bewl.fsets.FiniteSetsUtilities.elementsOf
-import com.fdilke.bewl.fsets.monoid_actions.{GeneratorWithRelators, Relator}
+import com.fdilke.bewl.fsets.monoid_actions.{GeneratorFinder, GeneratorWithRelators, Relator}
 import com.fdilke.bewl.helper.⊕
 import com.fdilke.bewl.helper.⊕._
 
 import scala.Function.tupled
-import scala.language.{higherKinds, postfixOps}
-
-trait AbstractCyclic[A] {
-  val generator: A
-}
-
-trait AbstractCyclics[A] {
-  val cyclics: Seq[AbstractCyclic[A]]
-  val transversal: Seq[A]
-
-  def contains(a: A): Boolean
-  def +(a: A): AbstractCyclics[A]
-  def <<(a: A): AbstractCyclics[A]
-}
+import scala.language.{higherKinds, postfixOps, reflectiveCalls}
 
 trait FiniteSetsActionAnalysis[M, A] {
-  val initialCyclics: AbstractCyclics[A]
   val generators: Seq[A]
   val generatorsWithRelators: Seq[GeneratorWithRelators[M, A]]
 }
 
 trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
+  Ɛ: GeneratorFinder =>
   
   object LocalMonoidAssistant extends MonoidAssistant {
     override type ACTION_ANALYSIS[M <: ~, A <: ~] = 
@@ -45,6 +31,15 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
               FiniteSetsActionAnalysis[M, A]    
         }) # λ
       ] {
+        private val generatorFinder: {
+          def findGenerators[A](
+            action: monoid.Action[A]
+          ): FindGeneratorAnalysis[M, A]
+        } =
+          GeneratorFinder.forMonoid(
+            monoid
+          )
+
         private val monoidElements =
           monoid.carrier.elements
       
@@ -53,75 +48,13 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
         ) = 
           new FiniteSetsActionAnalysis[M, A] with monoid.MonoidSpecificActionAnalysis[A] {
 
-        case class Cyclic(
-            override val generator: A) extends AbstractCyclic[A] {
-          val elements: Set[A] =
-            monoidElements map { (m: M) =>
-              action.actionMultiply(
-                generator,
-                m
-              )
-            } toSet
-
-          def contains(a: A) =
-            elements contains a
-
-          def subsetOf(
-            other: Cyclic) =
-            elements.subsetOf(
-              other.elements
-            )
-        }
-
-        class MaximalCyclics(
-          override val cyclics: Seq[Cyclic] = Seq.empty
-        ) extends AbstractCyclics[A] { self =>
-
-          override def contains(a: A) =
-            cyclics.exists {
-              _ contains a
-            }
-
-          private def +(
-            newCyclic: Cyclic
-          ) =
-            new MaximalCyclics(
-              newCyclic +: (
-                cyclics filterNot {
-                  _ subsetOf newCyclic
-                }
-              )
-            )
-
-          override def +(
-            a: A
-          ): MaximalCyclics =
-            self + Cyclic(a)
-
-          override lazy val transversal =
-            cyclics map {
-              _.generator
-            }
-
-          override def <<(a: A): MaximalCyclics =
-            if (self contains a)
-              self
-            else
-              self + Cyclic(a)
-        }
-
         private val actionElements =
           action.carrier.elements
 
-        override lazy val initialCyclics =
-          new MaximalCyclics
-
         override lazy val generators =
-          actionElements.foldLeft(
-            initialCyclics
-          ) {
-              _ << _
-            } transversal
+          generatorFinder findGenerators(
+            action
+          ) generators
 
         override lazy val generatorsWithRelators: Seq[GeneratorWithRelators[M, A]] =
           generators.zipWithIndex map tupled { (g, j) =>
