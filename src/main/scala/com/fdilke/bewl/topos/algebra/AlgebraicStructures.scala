@@ -32,8 +32,16 @@ trait AlgebraicStructures extends
     trait ActionAnalysis[
       A <: ~,
       ANALYSIS[B <: ~] <: ActionAnalysis[B, ANALYSIS]
-    ] extends MorphismEnumerator[A, ANALYSIS] with ActionExponentiator[A, ANALYSIS] {
+    ] {
       val action: Action[A]
+
+      def morphismsTo[B <: ~](
+        target: ANALYSIS[B]
+      ): Traversable[A > B]
+
+      def rawExponential[B <: ~](
+        target: ANALYSIS[B]
+      ): RawExponential[A, B]
     }
     
     trait ActionAnalyzer[
@@ -44,24 +52,6 @@ trait AlgebraicStructures extends
       ) : ANALYSIS[A]
     }
 
-    trait MorphismEnumerator[
-      A <: ~,
-      ANALYSIS[B <: ~] <: ActionAnalysis[B, ANALYSIS]
-    ] {
-      def morphismsTo[B <: ~](
-        target: ANALYSIS[B]
-      ): Traversable[A > B]
-    }
-
-    trait ActionExponentiator[
-      A <: ~,
-      ANALYSIS[B <: ~] <: ActionAnalysis[B, ANALYSIS]
-    ] {
-      def rawExponential[B <: ~](
-        target: ANALYSIS[B]
-      ): RawExponential[A, B]
-    }
-    
     trait PresentedAction[A <: ~] {
       val action: Action[A] 
       def project[B <: ~](

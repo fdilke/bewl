@@ -1,14 +1,14 @@
 package com.fdilke.bewl.topos.algebra.constructions
 
 import com.fdilke.bewl.fsets.FiniteSets
-import FiniteSets.{ ~, functionAsArrow, bifunctionAsBiArrow }
+import com.fdilke.bewl.fsets.FiniteSets.bifunctionAsBiArrow
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
+import com.fdilke.bewl.helper.⊕
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
-import com.fdilke.bewl.helper.⊕
-import Function.untupled
-import scala.language.reflectiveCalls
-import scala.language.{ higherKinds, existentials }
+
+import scala.Function.untupled
+import scala.language.{existentials, higherKinds, reflectiveCalls}
 
 class DefaultMonoidAssistantTest extends FreeSpec {
   

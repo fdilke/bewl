@@ -10,7 +10,7 @@ import org.scalatest.Matchers._
 import com.fdilke.bewl.testutil.CustomMatchers._
 
 import scala.Function.untupled
-import scala.language.{existentials, postfixOps, reflectiveCalls}
+import scala.language.{existentials, postfixOps, reflectiveCalls, higherKinds}
 
 class FiniteSetsMonoidAssistantTest extends FreeSpec {
   
