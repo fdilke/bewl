@@ -4,19 +4,10 @@ import com.fdilke.bewl.fsets.monoid_actions.{GeneratorFinder, GeneratorWithRelat
 
 import scala.language.{higherKinds, postfixOps, reflectiveCalls}
 
-// TODO: needed? optimize away
-trait FiniteSetsActionAnalysis[M, A] {
-  // TODO: needed? optimize away
-  val generatorsWithRelators: Seq[GeneratorWithRelators[M, A]]
-}
-
 trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
   Ɛ: GeneratorFinder with PresentationFinder =>
   
   object LocalMonoidAssistant extends MonoidAssistant {
-    override type ACTION_ANALYSIS[M <: ~, A <: ~] = 
-      FiniteSetsActionAnalysis[M, A] 
-    
     override def actionAnalyzer[
       M <: ~
     ] (
@@ -25,8 +16,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
       new monoid.ActionAnalyzer[
         ({
           type λ[A <: ~] = 
-            monoid.MonoidSpecificActionAnalysis[A] with 
-              FiniteSetsActionAnalysis[M, A]    
+            monoid.MonoidSpecificActionAnalysis[A]
         }) # λ
       ] {
         private val presentationFinder: {
@@ -44,17 +34,15 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
         override def analyze[A <: ~](
           action: monoid.Action[A]
         ) = 
-          new FiniteSetsActionAnalysis[M, A] with
-            monoid.MonoidSpecificActionAnalysis[A] {
+          new monoid.MonoidSpecificActionAnalysis[A] {
 
         private val actionElements =
           action.carrier.elements
 
-        // TODO: needed? optimize away
-        override lazy val generatorsWithRelators: Seq[GeneratorWithRelators[M, A]] =
+        private lazy val generatorsWithRelators =
           presentationFinder.findPresentation(action)
 
-        lazy val generators =
+        private lazy val generators =
           generatorsWithRelators map {
             _.generator
           }

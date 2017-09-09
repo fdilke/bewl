@@ -14,8 +14,6 @@ trait ConstructDefaultMonoidAssistant extends
   Ɛ: AlgebraicStructures with AlgebraicMachinery =>
 
   trait MonoidAssistant {
-    type ACTION_ANALYSIS[M <: ~, A <: ~]
-    
     def actionAnalyzer[
       M <: ~
     ] (
@@ -23,14 +21,12 @@ trait ConstructDefaultMonoidAssistant extends
     ): monoid.ActionAnalyzer[
         ({
           type λ[A <: ~] = 
-            monoid.MonoidSpecificActionAnalysis[A] with ACTION_ANALYSIS[M, A]  
+            monoid.MonoidSpecificActionAnalysis[A]
         }) # λ
     ]
   }
 
   object DefaultMonoidAssistant extends MonoidAssistant {
-    override type ACTION_ANALYSIS[M <: ~, A <: ~] = {}
-    
     override def actionAnalyzer[
       M <: ~
     ] (
