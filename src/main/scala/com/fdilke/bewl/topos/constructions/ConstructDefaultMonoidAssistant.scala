@@ -18,12 +18,7 @@ trait ConstructDefaultMonoidAssistant extends
       M <: ~
     ] (
       monoid: Monoid[M]
-    ): monoid.ActionAnalyzer[
-        ({
-          type λ[A <: ~] = 
-            monoid.MonoidSpecificActionAnalysis[A]
-        }) # λ
-    ]
+    ): monoid.ActionAnalyzer
   }
 
   object DefaultMonoidAssistant extends MonoidAssistant {
@@ -32,16 +27,11 @@ trait ConstructDefaultMonoidAssistant extends
     ] (
       monoid: Monoid[M]
     ) =
-      new monoid.ActionAnalyzer[
-        ({
-          type λ[A <: ~] = 
-            monoid.MonoidSpecificActionAnalysis[A]    
-        }) # λ
-      ] {
+      new monoid.ActionAnalyzer {
         override def analyze[A <: ~](
           action: monoid.Action[A]
         ) = 
-          new monoid.MonoidSpecificActionAnalysis[A] {
+          new monoid.ActionAnalysis[A] {
             override def morphismsTo[B <: ~](
               target: monoid.Action[B] 
             ): Traversable[A > B] = {

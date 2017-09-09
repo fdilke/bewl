@@ -13,12 +13,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
     ] (
       monoid: Monoid[M]
     ) =
-      new monoid.ActionAnalyzer[
-        ({
-          type λ[A <: ~] = 
-            monoid.MonoidSpecificActionAnalysis[A]
-        }) # λ
-      ] {
+      new monoid.ActionAnalyzer {
         private val presentationFinder: {
           def findPresentation[A](
             action: monoid.Action[A]
@@ -34,7 +29,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
         override def analyze[A <: ~](
           action: monoid.Action[A]
         ) = 
-          new monoid.MonoidSpecificActionAnalysis[A] {
+          new monoid.ActionAnalysis[A] {
 
         private val actionElements =
           action.carrier.elements
