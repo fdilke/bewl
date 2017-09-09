@@ -127,9 +127,7 @@ trait ConstructToposOfMonoidActions extends
             S > T
           ] =
             analysis.morphismsTo(
-              analyzer.analyze(
-                target.action
-              )
+              target.analysis
             ) map { arrow =>
               ActionArrow(
                 actionDot,
@@ -146,9 +144,7 @@ trait ConstructToposOfMonoidActions extends
             {
               val rawExponential = 
                 analysis.rawExponential(
-                  analyzer.analyze(
-                    that.action
-                  )
+                  that.analysis
                 )
               
               new ActionDot[S → T] (

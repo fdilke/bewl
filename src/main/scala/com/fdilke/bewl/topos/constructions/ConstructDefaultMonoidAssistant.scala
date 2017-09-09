@@ -65,7 +65,7 @@ trait ConstructDefaultMonoidAssistant extends
                           targetMultiply(arrow(a), m)
                         )
                       } arrow
-                      ) toBool
+                    ) toBool
                   }
                 }
 
