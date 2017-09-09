@@ -4,8 +4,9 @@ import com.fdilke.bewl.fsets.monoid_actions.{GeneratorFinder, GeneratorWithRelat
 
 import scala.language.{higherKinds, postfixOps, reflectiveCalls}
 
+// TODO: needed? optimize away
 trait FiniteSetsActionAnalysis[M, A] {
-  val generators: Seq[A]
+  // TODO: needed? optimize away
   val generatorsWithRelators: Seq[GeneratorWithRelators[M, A]]
 }
 
@@ -28,16 +29,6 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
               FiniteSetsActionAnalysis[M, A]    
         }) # λ
       ] {
-        // TODO: needed? optimize away
-        private val generatorFinder: {
-          def findGenerators[A](
-            action: monoid.Action[A]
-          ): FindGeneratorAnalysis[M, A]
-        } =
-          GeneratorFinder.forMonoid(
-            monoid
-          )
-
         private val presentationFinder: {
           def findPresentation[A](
             action: monoid.Action[A]
@@ -53,20 +44,20 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
         override def analyze[A <: ~](
           action: monoid.Action[A]
         ) = 
-          new FiniteSetsActionAnalysis[M, A] with monoid.MonoidSpecificActionAnalysis[A] {
+          new FiniteSetsActionAnalysis[M, A] with
+            monoid.MonoidSpecificActionAnalysis[A] {
 
         private val actionElements =
           action.carrier.elements
 
         // TODO: needed? optimize away
-        override lazy val generators =
-          generatorFinder findGenerators(
-            action
-          ) generators
-
-        // TODO: needed? optimize away
         override lazy val generatorsWithRelators: Seq[GeneratorWithRelators[M, A]] =
           presentationFinder.findPresentation(action)
+
+        lazy val generators =
+          generatorsWithRelators map {
+            _.generator
+          }
 
         override def morphismsTo[B](
           target: monoid.Action[B]
@@ -85,7 +76,9 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
                   if (relator.otherIndex == index)
                     targetElement
                   else
-                    partialMap(generators(relator.otherIndex))
+                    partialMap(
+                      generators(relator.otherIndex)
+                    )
                 target.actionMultiply(
                   targetElement, 
                   relator.selfScalar

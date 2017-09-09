@@ -44,13 +44,6 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
   private val bar = monoidOf3.action(barDot)(scalarMultiply)
 
   "The action analyzer" - {
-    // TODO don't need this test - optimize away
-    "can extract a set of generators for a monoid action" in {
-      analyze(
-        monoidOf3.regularAction
-      ).generators shouldBe Seq(i)
-    }
-
     "can enumerate the morphisms into another action" - {
       "for the trivial action to itself" in {
         val trivialAction: monoidOf3.Action[actionTopos.UNIT] =
