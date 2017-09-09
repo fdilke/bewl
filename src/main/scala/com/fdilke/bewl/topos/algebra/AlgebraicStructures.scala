@@ -30,24 +30,35 @@ trait AlgebraicStructures extends
     val multiply: BinaryOp[M]
     
     trait ActionAnalysis[
-      A <: ~
-    ] extends MorphismEnumerator[A] with ActionExponentiator[A]
+      A <: ~,
+      ANALYSIS[B <: ~] <: ActionAnalysis[B, ANALYSIS]
+    ] extends MorphismEnumerator[A, ANALYSIS] with ActionExponentiator[A, ANALYSIS] {
+      val action: Action[A]
+    }
     
-    trait ActionAnalyzer {
+    trait ActionAnalyzer[
+      ANALYSIS[A <: ~] <: ActionAnalysis[A, ANALYSIS]
+    ] {
       def analyze[A <: ~](
         action: Action[A]
-      ) : ActionAnalysis[A]
+      ) : ANALYSIS[A]
     }
 
-    trait MorphismEnumerator[A <: ~] {
+    trait MorphismEnumerator[
+      A <: ~,
+      ANALYSIS[B <: ~] <: ActionAnalysis[B, ANALYSIS]
+    ] {
       def morphismsTo[B <: ~](
-        target: Action[B] 
+        target: ANALYSIS[B]
       ): Traversable[A > B]
     }
 
-    trait ActionExponentiator[A <: ~] {
+    trait ActionExponentiator[
+      A <: ~,
+      ANALYSIS[B <: ~] <: ActionAnalysis[B, ANALYSIS]
+    ] {
       def rawExponential[B <: ~](
-        target: Action[B] 
+        target: ANALYSIS[B]
       ): RawExponential[A, B]
     }
     

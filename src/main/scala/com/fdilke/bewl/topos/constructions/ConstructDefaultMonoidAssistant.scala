@@ -1,6 +1,6 @@
 package com.fdilke.bewl.topos.constructions
 
-import com.fdilke.bewl.helper.{Memoize, ⊕}
+import com.fdilke.bewl.helper.⊕
 import com.fdilke.bewl.topos._
 import com.fdilke.bewl.topos.algebra.{AlgebraicMachinery, AlgebraicStructures}
 import scala.language.higherKinds
@@ -18,7 +18,10 @@ trait ConstructDefaultMonoidAssistant extends
       M <: ~
     ] (
       monoid: Monoid[M]
-    ): monoid.ActionAnalyzer
+    ): {
+      type ANALYSIS[A <: ~] <: monoid.ActionAnalysis[A, ANALYSIS]
+      val analyzer: monoid.ActionAnalyzer[ANALYSIS]
+    }
   }
 
   object DefaultMonoidAssistant extends MonoidAssistant {
@@ -26,115 +29,144 @@ trait ConstructDefaultMonoidAssistant extends
       M <: ~
     ] (
       monoid: Monoid[M]
-    ) =
-      new monoid.ActionAnalyzer {
-        override def analyze[A <: ~](
-          action: monoid.Action[A]
-        ) = 
-          new monoid.ActionAnalysis[A] {
-            override def morphismsTo[B <: ~](
-              target: monoid.Action[B] 
-            ): Traversable[A > B] = {
-              val product = action.actionCarrier x monoid.carrier
-              action.actionCarrier >> target.actionCarrier filter { arrow =>
-                (
-                  product.biArrow(omega) { (a, m) =>
-                    target.actionCarrier.=?=(
-                      arrow(action.actionMultiply(a, m)),
-                      target.actionMultiply(arrow(a), m)
-                    )
-                  } arrow
-                ) toBool
-              } 
-            }
-            
-            override def rawExponential[B <: ~](
-              target: monoid.Action[B] 
-            ) = {
-              val mXs = monoid.carrier x action.actionCarrier
-              val possibleMorphisms =
-                mXs > target.actionCarrier
-              import possibleMorphisms.{ evaluate => $ }
-                
-              val morphisms: EQUALIZER[M x A → B] =
-                possibleMorphisms.whereAll(
-                  monoid.carrier,
-                  monoid.carrier,
-                  action.actionCarrier
-                ) {
-                  (f, n, m, s) =>
-                    target.actionCarrier.=?=(
-                      $(f, 
-                        mXs.pair(
-                          monoid.multiply(m, n),
-                          action.actionMultiply(s, n)
-                        )
-                      ),
-                      target.actionMultiply(
-                        $(f, 
-                          mXs.pair(m, s)
-                        ),
-                        n
-                      )
-                    )
-                }
-  
-              val morphismMultiply  =
-                morphisms.restrict(
-                  possibleMorphisms.transpose(
-                    morphisms x monoid.carrier
-                  ) {
-                    case (f ⊕ m, n ⊕ s) =>
-                      $(morphisms.inclusion(f),
-                        mXs.pair(
-                          monoid.multiply(m, n), 
-                          s
-                        )
-                      )
-                  }
-                )
+    ): {
+      type ANALYSIS[A <: ~] <: monoid.ActionAnalysis[A, ANALYSIS]
+      val analyzer: monoid.ActionAnalyzer[ANALYSIS]
+    } =
+      new Object {
+        abstract class DefaultActionAnalysis[A <: ~](
+          override val action: monoid.Action[A]
+        ) extends monoid.ActionAnalysis[A, DefaultActionAnalysis]
 
-              new monoid.RawExponential[A, B] {
-                override val exponentialAction =
-                  monoid.Action[M x A → B](
-                    morphisms, 
-                    BiArrow[M x A → B, M, M x A → B](
-                      morphisms x monoid.carrier,
-                      morphismMultiply
-                    )
-                )
-                override val evaluation =
-                  (morphisms x action.actionCarrier).biArrow(
-                      target.actionCarrier
-                  ) {
-                     (f, s) =>
-                       $(
-                          f,
-                          mXs.pair(
-                            monoid.unit(
-                              action.actionCarrier.toI(s)
+        type ANALYSIS[A <: ~] = DefaultActionAnalysis[A]
+        val analyzer: monoid.ActionAnalyzer[ANALYSIS] =
+          new monoid.ActionAnalyzer[DefaultActionAnalysis] {
+            override def analyze[A <: ~](
+              action: monoid.Action[A]
+            ) =
+              new DefaultActionAnalysis[A](
+                action
+              ) {
+                override def morphismsTo[B <: ~](
+                  target: DefaultActionAnalysis[B]
+                ): Traversable[A > B] = {
+                  val targetAction = target.action
+                  val targetCarrier =
+                    targetAction.actionCarrier
+                  val targetMultiply =
+                    targetAction.actionMultiply
+
+                  val product = action.actionCarrier x monoid.carrier
+                  action.actionCarrier >> targetCarrier filter { arrow =>
+                    (
+                      product.biArrow(omega) { (a, m) =>
+                        targetCarrier.=?=(
+                          arrow(action.actionMultiply(a, m)),
+                          targetMultiply(arrow(a), m)
+                        )
+                      } arrow
+                      ) toBool
+                  }
+                }
+
+                override def rawExponential[B <: ~](
+                  target: DefaultActionAnalysis[B]
+                ) = {
+                  val targetAction = target.action
+                  val targetCarrier =
+                    targetAction.actionCarrier
+                  val targetMultiply =
+                    targetAction.actionMultiply
+
+                  val mXs = monoid.carrier x action.actionCarrier
+                  val possibleMorphisms =
+                    mXs > targetCarrier
+                  import possibleMorphisms.{evaluate => $}
+
+                  val morphisms: EQUALIZER[M x A → B] =
+                    possibleMorphisms.whereAll(
+                      monoid.carrier,
+                      monoid.carrier,
+                      action.actionCarrier
+                    ) {
+                      (f, n, m, s) =>
+                        targetCarrier.=?=(
+                          $(
+                            f,
+                            mXs.pair(
+                              monoid.multiply(m, n),
+                              action.actionMultiply(s, n)
+                            )
+                          ),
+                          targetMultiply(
+                            $(
+                              f,
+                              mXs.pair(m, s)
                             ),
-                            s
+                            n
                           )
                         )
-                  }
-                override def transpose[X <: ~](
-                    otherAction: monoid.Action[X],
-                    biArrow: BiArrow[X, A, B]
-                ) = 
-                  morphisms.restrict(
-                    possibleMorphisms.transpose(
-                      otherAction.actionCarrier
-                    ) {
-                      case (x, m ⊕ s) => 
-                        biArrow(
-                          otherAction.actionMultiply(x, m),
-                          s
-                        )
                     }
-                  )
+
+                  val morphismMultiply =
+                    morphisms.restrict(
+                      possibleMorphisms.transpose(
+                        morphisms x monoid.carrier
+                      ) {
+                        case (f ⊕ m, n ⊕ s) =>
+                          $(
+                            morphisms.inclusion(f),
+                            mXs.pair(
+                              monoid.multiply(m, n),
+                              s
+                            )
+                          )
+                      }
+                    )
+
+                  new monoid.RawExponential[A, B] {
+                    override val exponentialAction =
+                      monoid.Action[M x A → B](
+                        morphisms,
+                        BiArrow[M x A → B, M, M x A → B](
+                          morphisms x monoid.carrier,
+                          morphismMultiply
+                        )
+                      )
+                    override val evaluation =
+                      (morphisms x action.actionCarrier).biArrow(
+                        targetCarrier
+                      ) {
+                        (f, s) =>
+                          $(
+                            f,
+                            mXs.pair(
+                              monoid.unit(
+                                action.actionCarrier.toI(s)
+                              ),
+                              s
+                            )
+                          )
+                      }
+
+                    override def transpose[X <: ~](
+                      otherAction: monoid.Action[X],
+                      biArrow: BiArrow[X, A, B]
+                    ) =
+                      morphisms.restrict(
+                        possibleMorphisms.transpose(
+                          otherAction.actionCarrier
+                        ) {
+                          case (x, m ⊕ s) =>
+                            biArrow(
+                              otherAction.actionMultiply(x, m),
+                              s
+                            )
+                        }
+                      )
+                  }
+                }
               }
-            }
           }
     }
   }

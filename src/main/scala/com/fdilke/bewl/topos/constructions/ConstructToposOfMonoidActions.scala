@@ -35,8 +35,14 @@ trait ConstructToposOfMonoidActions extends
     ] {
       import monoid.{ carrier, action, Action }
       
-     val analyzer: monoid.ActionAnalyzer =
+     val analyzerHolder: {
+       type ANALYSIS[A <: ~] <: monoid.ActionAnalysis[A, ANALYSIS]
+       val analyzer: monoid.ActionAnalyzer[ANALYSIS]
+     } =
         assistant.actionAnalyzer(monoid)
+
+      val analyzer =
+        analyzerHolder.analyzer
         
       override type DOT[A <: ~] = ActionDot[A]
       override type >[A <: ~, B <: ~] = ActionArrow[A, B]
@@ -121,7 +127,9 @@ trait ConstructToposOfMonoidActions extends
             S > T
           ] =
             analysis.morphismsTo(
-              target.action
+              analyzer.analyze(
+                target.action
+              )
             ) map { arrow =>
               ActionArrow(
                 actionDot,
@@ -137,7 +145,11 @@ trait ConstructToposOfMonoidActions extends
           ): EXPONENTIAL[S,T] = 
             {
               val rawExponential = 
-                analysis.rawExponential(that.action)
+                analysis.rawExponential(
+                  analyzer.analyze(
+                    that.action
+                  )
+                )
               
               new ActionDot[S → T] (
                 rawExponential.exponentialAction 

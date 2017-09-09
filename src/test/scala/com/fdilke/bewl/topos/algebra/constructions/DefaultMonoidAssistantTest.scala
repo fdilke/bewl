@@ -8,7 +8,7 @@ import org.scalatest.Matchers._
 import com.fdilke.bewl.helper.⊕
 import Function.untupled
 import scala.language.reflectiveCalls
-import scala.language.existentials
+import scala.language.{ higherKinds, existentials }
 
 class DefaultMonoidAssistantTest extends FreeSpec {
   
@@ -24,17 +24,28 @@ class DefaultMonoidAssistantTest extends FreeSpec {
       
   private val bar = monoidOf3.action(barDot)(scalarMultiply)
 
-  private val analyzer =
+  private val analyzerHolder: {
+    type ANALYSIS[A] <: monoidOf3.ActionAnalysis[A, ANALYSIS]
+    val analyzer: monoidOf3.ActionAnalyzer[ANALYSIS]
+  } =
     FiniteSets.DefaultMonoidAssistant.actionAnalyzer(
-      monoidOf3          
+      monoidOf3
     )
+
+  private val analyzer =
+    analyzerHolder.analyzer
+
 
   private val regularAnalysis =
     analyzer.analyze(regularAction)
       
   "The default monoid assistant" - {
     "can enumerate morphisms" in {
-      regularAnalysis.morphismsTo(bar).toSet shouldBe {
+      regularAnalysis.morphismsTo(
+        analyzer.analyze(
+          bar
+        )
+      ).toSet shouldBe {
         elementsOf(barDot).toSet map { (a: String) =>
           regularAction.actionCarrier(barDot) { m => 
             scalarMultiply(a, m)
@@ -48,7 +59,12 @@ class DefaultMonoidAssistantTest extends FreeSpec {
       val baz = monoidOf3.action(bazDot)(scalarMultiply)
       val barAnalysis = analyzer.analyze(bar)
     
-      val rawExponential = barAnalysis.rawExponential(baz)
+      val rawExponential =
+        barAnalysis.rawExponential(
+          analyzer.analyze(
+            baz
+          )
+        )
       rawExponential.exponentialAction.sanityTest()
       rawExponential.evaluation.arrow should have(
         'source(rawExponential.exponentialAction.actionCarrier x barDot),

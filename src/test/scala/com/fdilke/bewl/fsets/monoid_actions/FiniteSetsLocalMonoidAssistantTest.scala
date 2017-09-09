@@ -18,10 +18,16 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
 
   import monoidOf3.regularAction
 
-  private val analyzer =
+  val analyzerHolder: {
+    type ANALYSIS[A] <: monoidOf3.ActionAnalysis[A, ANALYSIS]
+    val analyzer: monoidOf3.ActionAnalyzer[ANALYSIS]
+  } =
     LocalMonoidAssistant.actionAnalyzer(
       monoidOf3
     )
+
+  private val analyzer =
+    analyzerHolder.analyzer
 
   import analyzer.analyze
 
@@ -52,7 +58,9 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
           )
         val morphisms =
           regularAnalysis.morphismsTo(
-            trivialAction
+            analyzer.analyze(
+              trivialAction
+            )
           ) 
           
         morphisms should have size 1
@@ -75,7 +83,9 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
       "for the regular action to itself" in {
         val morphisms =
           regularAnalysis.morphismsTo(
-            regularAction
+            analyzer.analyze(
+              regularAction
+            )
           )
 
         morphisms should have size 3
@@ -166,7 +176,12 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
       val barAnalysis =
         analyze(bar)
 
-      val rawExponential = barAnalysis.rawExponential(baz)
+      val rawExponential =
+        barAnalysis.rawExponential(
+          analyzer.analyze(
+            baz
+          )
+        )
       rawExponential.exponentialAction.sanityTest()
       rawExponential.evaluation.arrow should have(
         'source (rawExponential.exponentialAction.actionCarrier x barDot),
@@ -217,7 +232,9 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
     analyze(
       sourceAction
     ).morphismsTo(
-      targetAction
+      analyzer.analyze(
+        targetAction
+      )
     )
 
     morphisms.forall {
