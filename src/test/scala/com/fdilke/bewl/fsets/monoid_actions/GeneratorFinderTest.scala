@@ -1,13 +1,11 @@
 package com.fdilke.bewl.fsets.monoid_actions
 
 import com.fdilke.bewl.fsets.FiniteSets
-import com.fdilke.bewl.fsets.FiniteSets.{>, LocalMonoidAssistant, ToposOfMonoidActions, bifunctionAsBiArrow, functionAsArrow}
-import com.fdilke.bewl.fsets.FiniteSetsUtilities._
-import com.fdilke.bewl.helper.⊕
+import com.fdilke.bewl.fsets.FiniteSets.ToposOfMonoidActions
 import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
-import com.fdilke.bewl.testutil.CustomMatchers._
+
 import scala.language.reflectiveCalls
 
 class GeneratorFinderTest extends FreeSpec {
@@ -21,15 +19,10 @@ class GeneratorFinderTest extends FreeSpec {
       monoidOf3
     )
 
-  private def analysisFor[A](
-    action: monoidOf3.Action[A]
-  ) =
-    finder.findGenerators(
-      action
-    )
+  import finder.findGenerators
 
   private val regularAnalysis =
-    analysisFor(
+    findGenerators(
       regularAction
     )
 
@@ -90,7 +83,7 @@ class GeneratorFinderTest extends FreeSpec {
           actionTopos.unwrap(
             actionTopos.O
           )
-        analysisFor(
+        findGenerators(
           emptyAction
         ).generators shouldBe empty
       }
@@ -102,7 +95,7 @@ class GeneratorFinderTest extends FreeSpec {
               regularAction
             ).squared
           )
-        analysisFor(
+        findGenerators(
           regularSquared
         ).generators should have size 7
       }
@@ -112,14 +105,14 @@ class GeneratorFinderTest extends FreeSpec {
           actionTopos.unwrap(
             actionTopos.omega
           )
-        analysisFor(
+        findGenerators(
           theOmega
         ).generators should have size 2
       }
     }
 
     "can extract a set of generators for a monoid action" in {
-      analysisFor(
+      findGenerators(
         monoidOf3.regularAction
       ).generators shouldBe Seq(i)
     }

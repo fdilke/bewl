@@ -1,7 +1,5 @@
 package com.fdilke.bewl.helper
 
-import scala.annotation.tailrec
-
 object BuildEquivalence {
   def apply(
     size: Int,

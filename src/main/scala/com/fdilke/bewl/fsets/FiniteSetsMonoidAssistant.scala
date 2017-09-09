@@ -1,10 +1,7 @@
 package com.fdilke.bewl.fsets
 
-import com.fdilke.bewl.fsets.monoid_actions.{GeneratorFinder, GeneratorWithRelators, Relator}
-import com.fdilke.bewl.helper.⊕
-import com.fdilke.bewl.helper.⊕._
+import com.fdilke.bewl.fsets.monoid_actions.{GeneratorFinder, GeneratorWithRelators, PresentationFinder}
 
-import scala.Function.tupled
 import scala.language.{higherKinds, postfixOps, reflectiveCalls}
 
 trait FiniteSetsActionAnalysis[M, A] {
@@ -13,7 +10,7 @@ trait FiniteSetsActionAnalysis[M, A] {
 }
 
 trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
-  Ɛ: GeneratorFinder =>
+  Ɛ: GeneratorFinder with PresentationFinder =>
   
   object LocalMonoidAssistant extends MonoidAssistant {
     override type ACTION_ANALYSIS[M <: ~, A <: ~] = 
@@ -31,12 +28,22 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
               FiniteSetsActionAnalysis[M, A]    
         }) # λ
       ] {
+        // TODO: needed? optimize away
         private val generatorFinder: {
           def findGenerators[A](
             action: monoid.Action[A]
           ): FindGeneratorAnalysis[M, A]
         } =
           GeneratorFinder.forMonoid(
+            monoid
+          )
+
+        private val presentationFinder: {
+          def findPresentation[A](
+            action: monoid.Action[A]
+          ): Seq[GeneratorWithRelators[M, A]]
+        } =
+          PresentationFinder.forMonoid(
             monoid
           )
 
@@ -51,37 +58,15 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
         private val actionElements =
           action.carrier.elements
 
+        // TODO: needed? optimize away
         override lazy val generators =
           generatorFinder findGenerators(
             action
           ) generators
 
+        // TODO: needed? optimize away
         override lazy val generatorsWithRelators: Seq[GeneratorWithRelators[M, A]] =
-          generators.zipWithIndex map tupled { (g, j) =>
-            GeneratorWithRelators[M, A](
-              g,
-              generators.take(j + 1).zipWithIndex
-                flatMap tupled { (h, i) =>
-                  analyze(
-                    monoid.action(
-                      monoid.carrier.squared where {
-                        case m ⊕ n =>
-                          action.actionMultiply(g, m) ==
-                            action.actionMultiply(h, n)
-                      }) {
-                        (pair, m) =>
-                          pair match {
-                            case p ⊕ q =>
-                              monoid.multiply(p, m) ⊕
-                                monoid.multiply(q, m)
-                          }
-                      }
-                    ).generators collect {
-                      case m ⊕ n if !(m == n && i == j) =>
-                        Relator(m, i, n)
-                    }
-                })
-          }
+          presentationFinder.findPresentation(action)
 
         override def morphismsTo[B](
           target: monoid.Action[B]

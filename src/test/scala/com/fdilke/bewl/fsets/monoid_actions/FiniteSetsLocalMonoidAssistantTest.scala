@@ -23,15 +23,10 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
       monoidOf3
     )
 
-  private def analysisFor[A](
-    action: monoidOf3.Action[A]
-  ) =
-    analyzer.analyze(
-      action
-    )
+  import analyzer.analyze
 
-  private val regularAnalysis = 
-    analysisFor(
+  private val regularAnalysis =
+    analyze(
       regularAction
     )
 
@@ -49,52 +44,13 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
   private val bar = monoidOf3.action(barDot)(scalarMultiply)
 
   "The action analyzer" - {
+    // TODO don't need this test - optimize away
     "can extract a set of generators for a monoid action" in {
-      analysisFor(
+      analyze(
         monoidOf3.regularAction
       ).generators shouldBe Seq(i)
     }
 
-    "can extract a presentation" - {
-      "for the regular monoid action" in {
-        canExtractPresentation(monoidOf3.regularAction)
-      }
-      "for an empty monoid action" in {
-        canExtractPresentation(        
-            actionTopos.unwrap(
-              actionTopos.O
-            )
-          )
-      }
-      "for a right ideal action" in {
-        canExtractPresentation(
-          bar
-        )
-      }
-      "for a right ideal squared action" in {
-        canExtractPresentation(
-          bar x bar
-        )
-      }
-      "for the truth object monoid action" in {
-        canExtractPresentation(        
-            actionTopos.unwrap(
-              actionTopos.omega
-            )
-          )
-      }
-      "for a more fancy monoid action" in {
-        canExtractPresentation(        
-            actionTopos.unwrap(
-              actionTopos.omega x
-                actionTopos.makeDot(
-                  monoidOf3.regularAction
-                )
-            )
-          )
-      }
-    }
-     
     "can enumerate the morphisms into another action" - {
       "for the trivial action to itself" in {
         val trivialAction: monoidOf3.Action[actionTopos.UNIT] =
@@ -196,9 +152,11 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
         )
       }
 
-      "for omega squared to itself" ignore {// too slow
+      "for omega squared to itself" ignore { // too slow
         val o2 =
-          actionTopos.unwrap(actionTopos.omega.squared)
+          actionTopos.unwrap(
+            actionTopos.omega.squared
+          )
 
         canEnumerateMorphisms(
           o2,
@@ -213,7 +171,7 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
 
       val baz = monoidOf3.action(bazDot)(scalarMultiply)
       val barAnalysis =
-        analysisFor(bar)
+        analyze(bar)
 
       val rawExponential = barAnalysis.rawExponential(baz)
       rawExponential.exponentialAction.sanityTest()
@@ -263,7 +221,7 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
   ) {
 
   val morphisms =
-    analysisFor(
+    analyze(
       sourceAction
     ).morphismsTo(
       targetAction
@@ -295,40 +253,4 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
       }
     }
   }
-
-  private def canExtractPresentation[A](
-      action: monoidOf3.Action[A]
-    ) {
-      val generatorsWithRelators: Seq[GeneratorWithRelators[Symbol, A]] =
-        analysisFor(
-          action
-        ).generatorsWithRelators
-
-      for {
-        (g, index) <- generatorsWithRelators.zipWithIndex
-      } {
-        g.relators should not contain Relator('i, index, 'i)
-      }
-
-      val presentedAction =
-        FiniteSetsPresentedAction(
-          monoidOf3
-        )(
-          generatorsWithRelators
-        )
-      presentedAction.sanityTest
-
-      // Check this presents the original action
-	    val theProjection: Int > A = 
-	      presentedAction.project(
-          action,
-          generatorsWithRelators map { _.generator }
-        )
-        
-      monoidOf3.actions.isMorphism(
-         presentedAction.action,
-         action,
-         theProjection
-      ) shouldBe true
-    }
 }

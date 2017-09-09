@@ -100,7 +100,6 @@ class ToposOfGroupActionsTest extends GenericToposTests[Any](
   }
 
   describe("Arrow enumeration") {
-    // too slow! Belongs in a worksheet or app (pending optimization)
     it("also works on the fixtures") {
       (omega >> omega) should have size 4
     }
