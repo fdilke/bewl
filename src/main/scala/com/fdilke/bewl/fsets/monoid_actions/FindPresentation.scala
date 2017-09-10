@@ -6,8 +6,8 @@ import ⊕._
 import scala.Function.tupled
 import scala.language.{higherKinds, postfixOps, reflectiveCalls}
 
-trait PresentationFinder extends BaseFiniteSets {
-  Ɛ: GeneratorFinder =>
+trait FindPresentation extends BaseFiniteSets {
+  Ɛ: FindGenerators =>
 
   object FindPresentation {
     def forMonoid[M](
@@ -22,12 +22,12 @@ trait PresentationFinder extends BaseFiniteSets {
         private val monoidElements =
           monoid.carrier.elements
 
-        private val generatorFinder: {
-          def findGenerators[A](
+        private val findGenerators: {
+          def apply[A](
             action: monoid.Action[A]
           ): FindGeneratorAnalysis[M, A]
         } =
-          GeneratorFinder.forMonoid(
+          FindGenerators.forMonoid(
             monoid
           )
 
@@ -40,7 +40,7 @@ trait PresentationFinder extends BaseFiniteSets {
               g,
               generators.take(j + 1).zipWithIndex
                 flatMap tupled { (h, i) =>
-                generatorFinder.findGenerators(
+                findGenerators(
                   monoid.action(
                     monoid.carrier.squared where {
                       case m ⊕ n =>
@@ -58,7 +58,8 @@ trait PresentationFinder extends BaseFiniteSets {
                   case m ⊕ n if !(m == n && i == j) =>
                     Relator(m, i, n)
                 }
-              })
+              }
+            )
           }
         }
       }

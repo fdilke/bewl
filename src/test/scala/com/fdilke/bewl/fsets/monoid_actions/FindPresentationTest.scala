@@ -1,7 +1,7 @@
 package com.fdilke.bewl.fsets.monoid_actions
 
 import com.fdilke.bewl.fsets.FiniteSets
-import com.fdilke.bewl.fsets.FiniteSets.{>, ToposOfMonoidActions, GeneratorFinder, FindGeneratorAnalysis }
+import com.fdilke.bewl.fsets.FiniteSets.{>, ToposOfMonoidActions, FindGenerators, FindGeneratorAnalysis }
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.{dot, setEmptyAction}
 import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
 import org.scalatest.FreeSpec
@@ -15,12 +15,12 @@ class FindPresentationTest extends FreeSpec {
 
   import monoidOf3.{ Action, regularAction }
 
-  private val generatorFinder: {
-    def findGenerators[A](
+  private val findGenerators: {
+    def apply[A](
       action: Action[A]
     ): FindGeneratorAnalysis[Symbol, A]
   } =
-    GeneratorFinder.forMonoid(
+    FindGenerators.forMonoid(
       monoidOf3
     )
 
@@ -34,7 +34,7 @@ class FindPresentationTest extends FreeSpec {
   ): Seq[GeneratorWithRelators[Symbol, A]] =
     findPresentation(
       action,
-      generatorFinder.findGenerators(
+      findGenerators(
         action
       ) generators
     )

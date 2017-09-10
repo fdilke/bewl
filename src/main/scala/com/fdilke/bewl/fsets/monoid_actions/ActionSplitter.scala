@@ -9,7 +9,7 @@ import scala.collection.immutable
 import scala.language.{higherKinds, postfixOps, reflectiveCalls}
 
 trait ActionSplitter extends BaseFiniteSets {
-  Ɛ: GeneratorFinder =>
+  Ɛ: FindGenerators =>
 
 //  trait ActionComponent[A, ACTION[B]] {
 //    val action: ACTION[A]
@@ -39,15 +39,15 @@ trait ActionSplitter extends BaseFiniteSets {
         private val monoidElements =
           monoid.carrier.elements
 
-        private val generatorFinder =
-          GeneratorFinder forMonoid monoid
+        private val findGenerators =
+          FindGenerators forMonoid monoid
 
         def splitAction[A](
           action: monoid.Action[A]
         ) =
           new Object {
             val allGenerators =
-              generatorFinder findGenerators(
+              findGenerators apply(
                 action
               ) generators
 

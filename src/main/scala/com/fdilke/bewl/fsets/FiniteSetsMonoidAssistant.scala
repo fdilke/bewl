@@ -1,11 +1,11 @@
 package com.fdilke.bewl.fsets
 
-import com.fdilke.bewl.fsets.monoid_actions.{GeneratorFinder, GeneratorWithRelators, PresentationFinder}
+import com.fdilke.bewl.fsets.monoid_actions.{FindGenerators, GeneratorWithRelators, FindPresentation}
 
 import scala.language.{higherKinds, postfixOps, reflectiveCalls}
 
 trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
-  Ɛ: GeneratorFinder with PresentationFinder =>
+  Ɛ: FindGenerators with FindPresentation =>
   
   object LocalMonoidAssistant extends MonoidAssistant {
     override def actionAnalyzer[
@@ -35,12 +35,12 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
                 monoid
               )
 
-            private val generatorFinder: {
-              def findGenerators[A](
+            private val findGenerators: {
+              def apply[A](
                 action: monoid.Action[A]
               ): FindGeneratorAnalysis[M, A]
             } =
-              GeneratorFinder.forMonoid(
+              FindGenerators.forMonoid(
                 monoid
               )
 
@@ -58,7 +58,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
               action.carrier.elements
 
             private lazy val generators =
-              generatorFinder.findGenerators(
+              findGenerators(
                 action
               ) generators
 

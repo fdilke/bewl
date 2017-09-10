@@ -17,18 +17,18 @@ trait AbstractCyclics[A] {
   def <<(a: A): AbstractCyclics[A]
 }
 
-trait GeneratorFinder extends BaseFiniteSets {
+trait FindGenerators extends BaseFiniteSets {
 
   trait FindGeneratorAnalysis[M, A] {
     val initialCyclics: AbstractCyclics[A]
     val generators: Seq[A]
   }
 
-  object GeneratorFinder {
+  object FindGenerators {
     def forMonoid[M](
       monoid: Monoid[M]
     ): {
-      def findGenerators[A](
+      def apply[A](
         action: monoid.Action[A]
       ): FindGeneratorAnalysis[M, A]
     } =
@@ -36,7 +36,7 @@ trait GeneratorFinder extends BaseFiniteSets {
         private val monoidElements =
           monoid.carrier.elements
 
-        def findGenerators[A](action: monoid.Action[A]) =
+        def apply[A](action: monoid.Action[A]) =
           new FindGeneratorAnalysis[M, A] {
             private val actionElements =
               action.carrier.elements

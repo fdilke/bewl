@@ -1,14 +1,14 @@
 package com.fdilke.bewl.fsets
 
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.allMaps
-import com.fdilke.bewl.fsets.monoid_actions.{ActionSplitter, GeneratorFinder, PresentationFinder}
+import com.fdilke.bewl.fsets.monoid_actions.{ActionSplitter, FindGenerators, FindPresentation}
 import com.fdilke.bewl.helper.{Memoize, ⊕}
 import com.fdilke.bewl.helper.⊕._
 import com.fdilke.bewl.topos.{Topos, Wrappings}
 
 object FiniteSets extends BaseFiniteSets
-  with GeneratorFinder
-  with PresentationFinder
+  with FindGenerators
+  with FindPresentation
   with ActionSplitter
   with FiniteSetsMonoidAssistant
 

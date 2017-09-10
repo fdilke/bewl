@@ -9,21 +9,21 @@ import com.fdilke.bewl.fsets.FiniteSetsUtilities.setEmptyAction
 
 import scala.language.reflectiveCalls
 
-class GeneratorFinderTest extends FreeSpec {
+class FindGeneratorsTest extends FreeSpec {
 
   private val (i, x, y) = ('i, 'x, 'y)
 
   import monoidOf3.regularAction
 
   private val finder =
-    FiniteSets.GeneratorFinder.forMonoid(
+    FiniteSets.FindGenerators.forMonoid(
       monoidOf3
     )
 
-  import finder.findGenerators
+  import finder.apply
 
   private val regularAnalysis =
-    findGenerators(
+    apply(
       regularAction
     )
 
@@ -80,7 +80,7 @@ class GeneratorFinderTest extends FreeSpec {
       }
 
       "as expected for the empty action" in {
-        findGenerators(
+        apply(
           setEmptyAction(monoidOf3)
         ).generators shouldBe empty
       }
@@ -92,7 +92,7 @@ class GeneratorFinderTest extends FreeSpec {
               regularAction
             ).squared
           )
-        findGenerators(
+        apply(
           regularSquared
         ).generators should have size 7
       }
@@ -102,14 +102,14 @@ class GeneratorFinderTest extends FreeSpec {
           actionTopos.unwrap(
             actionTopos.omega
           )
-        findGenerators(
+        apply(
           theOmega
         ).generators should have size 2
       }
     }
 
     "can extract a set of generators for a monoid action" in {
-      findGenerators(
+      apply(
         monoidOf3.regularAction
       ).generators shouldBe Seq(i)
     }
