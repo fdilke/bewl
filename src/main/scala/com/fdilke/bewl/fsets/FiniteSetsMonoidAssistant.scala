@@ -25,13 +25,13 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
 
         val analyzer: monoid.ActionAnalyzer[ANALYSIS] =
           new monoid.ActionAnalyzer[FiniteSetsActionAnalysis] {
-            private val presentationFinder: {
-              def findPresentation[A](
+            private val findPresentation: {
+              def apply[A](
                 action: monoid.Action[A],
                 generators: Seq[A]
               ): Seq[GeneratorWithRelators[M, A]]
             } =
-              PresentationFinder.forMonoid(
+              FindPresentation.forMonoid(
                 monoid
               )
 
@@ -63,7 +63,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
               ) generators
 
             private lazy val generatorsWithRelators =
-              presentationFinder.findPresentation(
+              findPresentation(
                 action,
                 generators
               )

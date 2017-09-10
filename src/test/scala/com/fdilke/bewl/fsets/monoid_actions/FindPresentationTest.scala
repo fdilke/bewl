@@ -9,7 +9,7 @@ import org.scalatest.Matchers._
 
 import scala.language.{ reflectiveCalls, postfixOps }
 
-class PresentationFinderTest extends FreeSpec {
+class FindPresentationTest extends FreeSpec {
 
   private val (i, x, y) = ('i, 'x, 'y)
 
@@ -24,15 +24,15 @@ class PresentationFinderTest extends FreeSpec {
       monoidOf3
     )
 
-  private val finder =
-    FiniteSets.PresentationFinder.forMonoid(
+  private val findPresentation =
+    FiniteSets.FindPresentation.forMonoid(
       monoidOf3
     )
 
   def findPresentation[A](
     action: Action[A]
-  ) =
-    finder.findPresentation(
+  ): Seq[GeneratorWithRelators[Symbol, A]] =
+    findPresentation(
       action,
       generatorFinder.findGenerators(
         action

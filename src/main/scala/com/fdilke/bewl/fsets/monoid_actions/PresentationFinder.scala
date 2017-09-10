@@ -9,11 +9,11 @@ import scala.language.{higherKinds, postfixOps, reflectiveCalls}
 trait PresentationFinder extends BaseFiniteSets {
   Ɛ: GeneratorFinder =>
 
-  object PresentationFinder {
+  object FindPresentation {
     def forMonoid[M](
       monoid: Monoid[M]
     ): {
-      def findPresentation[A](
+      def apply[A](
         action: monoid.Action[A],
         generators: Seq[A]
       ): Seq[GeneratorWithRelators[M, A]]
@@ -31,7 +31,7 @@ trait PresentationFinder extends BaseFiniteSets {
             monoid
           )
 
-        def findPresentation[A](
+        def apply[A](
           action: monoid.Action[A],
           generators: Seq[A]
         ) = {
