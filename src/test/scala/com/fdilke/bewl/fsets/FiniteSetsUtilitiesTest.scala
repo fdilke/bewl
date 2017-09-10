@@ -6,6 +6,7 @@ import FiniteSetsUtilities.allMaps
 import org.scalatest.{FunSpec, Matchers}
 import Matchers._
 import com.fdilke.bewl.topos.algebra.KnownMonoids
+import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
 
 class FiniteSetsUtilitiesTest extends FunSpec {
   describe("allMaps()") {
@@ -61,9 +62,17 @@ class FiniteSetsUtilitiesTest extends FunSpec {
   }
 
   describe("can construct the empty action for a monoid") {
-    val emptyAction = setEmptyAction(KnownMonoids.monoidOf3)
+    val emptyAction = setEmptyAction(monoidOf3)
 
     emptyAction.actionCarrier.elements shouldBe empty
     emptyAction.sanityTest()
+
+    // and this is isomorphic to the O of the relevant topos
+    val topos =
+      FiniteSets.ToposOfMonoidActions.of(monoidOf3)
+
+    topos.makeDot(
+      emptyAction
+    ).fromO shouldBe 'iso
   }
 }

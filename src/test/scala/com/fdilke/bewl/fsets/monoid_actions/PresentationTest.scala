@@ -24,15 +24,12 @@ class PresentationTest extends FreeSpec {
 	      )(
 		      List[GeneratorWithRelators[Symbol, VOID]]()
 	      )
-
-      val emptyAction: monoidOf3.Action[actionTopos.VOID] =
-        actionTopos.unwrap(
-          actionTopos.O
-        )	      
-	    val emptyProjection: Int > actionTopos.VOID = 
+      val emptyAction =
+        setEmptyAction(monoidOf3)
+	    val emptyProjection: Int > Void =
 	      presentation.project(
           emptyAction,
-          List[actionTopos.VOID]()
+          List[Void]()
         )
       emptyProjection should have(
         'source(presentation.action.actionCarrier),
