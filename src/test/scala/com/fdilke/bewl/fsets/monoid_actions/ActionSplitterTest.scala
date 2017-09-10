@@ -1,7 +1,7 @@
 package com.fdilke.bewl.fsets.monoid_actions
 
 import com.fdilke.bewl.fsets.FiniteSets
-import com.fdilke.bewl.fsets.FiniteSetsUtilities.{ dot, elementsOf, setEmptyAction }
+import com.fdilke.bewl.fsets.FiniteSetsUtilities.{ dot, elementsOf }
 import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
@@ -41,7 +41,7 @@ class ActionSplitterTest extends FreeSpec {
   "The action splitter can extract a coproduct decomposition" - {
     "for the empty monoid action" in {
         components(
-          setEmptyAction(monoidOf3)
+          monoidOf3.voidAction
         ) shouldBe empty
     }
 

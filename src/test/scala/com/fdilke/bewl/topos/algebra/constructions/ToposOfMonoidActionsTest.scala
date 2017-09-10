@@ -4,7 +4,6 @@ package com.fdilke.bewl.topos.algebra.constructions
 import com.fdilke.bewl.fsets.FiniteSets.{ToposOfMonoidActions, ~}
 import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsUtilities}
 import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
-import FiniteSetsUtilities.setEmptyAction
 import com.fdilke.bewl.topos.{GenericToposTests, Topos, ToposWithFixtures, Wrappings}
 import org.scalatest.Matchers._
 
@@ -130,7 +129,7 @@ class ToposOfMonoidActionsTest(
   describe("The O object") {
     it("is isomorphic to the empty action") {
       topos.makeDot(
-        setEmptyAction(monoidOf3)
+        monoidOf3.voidAction
       ).fromO shouldBe 'iso
     }
   }

@@ -60,11 +60,4 @@ class FiniteSetsUtilitiesTest extends FunSpec {
         )
     }
   }
-
-  describe("can construct the empty action for a monoid") {
-    val emptyAction = setEmptyAction(monoidOf3)
-
-    emptyAction.actionCarrier.elements shouldBe empty
-    emptyAction.sanityTest()
-  }
 }

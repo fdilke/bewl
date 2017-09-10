@@ -2,7 +2,7 @@ package com.fdilke.bewl.fsets.monoid_actions
 
 import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSets.{>, ToposOfMonoidActions, FindGenerators, FindGeneratorAnalysis }
-import com.fdilke.bewl.fsets.FiniteSetsUtilities.{dot, setEmptyAction}
+import com.fdilke.bewl.fsets.FiniteSetsUtilities.dot
 import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
@@ -63,7 +63,7 @@ class FindPresentationTest extends FreeSpec {
       }
       "for an empty monoid action" in {
         canExtractPresentation(
-          setEmptyAction(monoidOf3)
+          monoidOf3.voidAction
         )
       }
       "for a right ideal action" in {
