@@ -1,6 +1,5 @@
 package com.fdilke.bewl.topos.algebra
 
-import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
@@ -92,6 +91,26 @@ class AlgebraicStructuresTest extends FunSpec {
     )
 
   describe("Monoid actions") {
+    it("include the off-the-shelf regular action") {
+      val regularAction: monoid4.Action[Symbol] =
+        monoid4.regularAction
+
+      regularAction.sanityTest()
+      regularAction.actionCarrier shouldBe monoid4.carrier
+    }
+
+    it("include the off-the-shelf trivial action") {
+      val sampleCarrier =
+        dot("Lom", "Samazan", "Ky", "Ogar")
+      val trivialAction: monoid4.Action[String] =
+        monoid4.trivialAction(
+          sampleCarrier
+        )
+
+      trivialAction.sanityTest()
+      trivialAction.actionCarrier shouldBe sampleCarrier
+    }
+
     it("can be constructed and validated") {
       monoid4.action[Symbol](
         dot(a, b)

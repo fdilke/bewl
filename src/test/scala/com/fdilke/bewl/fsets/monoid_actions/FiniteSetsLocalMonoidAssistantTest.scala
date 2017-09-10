@@ -170,8 +170,8 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
 
       "for one-plus-one to itself" in {
         val onePlusOne =
-          actionTopos.unwrap(
-            actionTopos.I + actionTopos.I
+          monoidOf3.trivialAction(
+            dot(true, false)
           )
 
         canEnumerateMorphisms(

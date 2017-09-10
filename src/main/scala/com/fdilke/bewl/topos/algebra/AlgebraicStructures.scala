@@ -96,8 +96,20 @@ trait AlgebraicStructures extends
         )
       )
 
-    def regularAction =
-      action(carrier) { multiply(_, _) }
+    lazy val regularAction =
+      action(carrier) {
+        multiply(_, _)
+      }
+
+    def trivialAction[A <: ~](
+      rawCarrier: DOT[A]
+    ) =
+      action(rawCarrier) {
+        (a, m) => a
+      }
+
+    lazy val voidAction: Action[VOID] =
+      trivialAction(O)
 
     case class Action[A <: ~](
       actionCarrier: DOT[A],
