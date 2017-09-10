@@ -24,7 +24,7 @@ trait ActionSplitter extends BaseFiniteSets {
         def splitAction[A](
           action: monoid.Action[A]
         ): Seq[monoid.Action[A]] =
-          ???
+          Seq(action)
       }
   }
 }
