@@ -2,11 +2,24 @@ package com.fdilke.bewl.topos.algebra.constructions
 
 import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsPreArrow}
 import com.fdilke.bewl.topos.{GenericToposTests, ToposWithFixtures}
-
+import FiniteSets.{ >, ToposOfAutomorphisms }
+import ToposOfAutomorphisms.AutomorphismPreArrow
 import scala.Function._
 import org.scalatest.Matchers._
 
-class ToposOfAutomorphismsTest extends GenericToposTests[Any](new ToposWithFixtures[Any] {
+class ToposOfAutomorphismsTest extends GenericToposTests[
+  Any,
+  Any,
+  ({type λ[X] = X > X}) # λ,
+  ({type λ[X, Y] = AutomorphismPreArrow[X, Y]}) # λ,
+  ({type λ[T] = T}) # λ
+](new ToposWithFixtures[
+  Any,
+  Any,
+  ({type λ[X] = X > X}) # λ,
+  ({type λ[X, Y] = AutomorphismPreArrow[X, Y]}) # λ,
+  ({type λ[T] = T}) # λ
+] {
 
   override val topos = FiniteSets.ToposOfAutomorphisms.build
 

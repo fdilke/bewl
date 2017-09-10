@@ -7,19 +7,28 @@ import com.fdilke.bewl.topos.{GenericToposTests, ToposWithFixtures}
 import org.scalatest.Matchers._
 
 import scala.Function.untupled
+import scala.language.higherKinds
+import com.fdilke.bewl.topos.algebra.KnownGroups.twoGroup
 
-class ToposOfGroupActionsTest extends GenericToposTests[Any](
-  new ToposWithFixtures[Any] {
+class ToposOfGroupActionsTest extends GenericToposTests[
+  Any,
+  Any,
+  ({type λ[X] = twoGroup.Action[X]}) # λ,
+  ({type λ[X, Y] = twoGroup.ActionPreArrow[X, Y]}) # λ,
+  ({type λ[T] = T}) # λ
+](
+  new ToposWithFixtures[
+    Any,
+    Any,
+    ({type λ[X] = twoGroup.Action[X]}) # λ,
+    ({type λ[X, Y] = twoGroup.ActionPreArrow[X, Y]}) # λ,
+    ({type λ[T] = T}) # λ
+  ] {
 
     private val (i, a) =
       ('i, 'a)
 
-    val group = FiniteSets.groupOfUnits(monoidFromTable(
-      i, a,
-      a, i
-    ))._1
-
-    override val topos = FiniteSets.ToposOfGroupActions of group
+    override val topos = FiniteSets.ToposOfGroupActions of twoGroup
 
     import topos.{ ~ => _, _ }
 
@@ -27,7 +36,7 @@ class ToposOfGroupActionsTest extends GenericToposTests[Any](
     override type BAR = String
     override type BAZ = Int
 
-    override val foo = makeDot(group.regularAction)
+    override val foo = makeDot(twoGroup.regularAction)
 
     private val barDot: FiniteSets.DOT[String] = FiniteSetsUtilities.dot("x", "x'", "y")
 
@@ -36,7 +45,7 @@ class ToposOfGroupActionsTest extends GenericToposTests[Any](
     private val barMultiply: (String, Symbol) => String =
       (s, m) => if (m == a) barFlip(s) else s
 
-    override val bar = makeDot(group.action(barDot)(barMultiply))
+    override val bar = makeDot(twoGroup.action(barDot)(barMultiply))
 
     private val bazDot: FiniteSets.DOT[Int] = FiniteSetsUtilities.dot(1, 2, 3, 4, 5)
 
@@ -47,7 +56,7 @@ class ToposOfGroupActionsTest extends GenericToposTests[Any](
     private val bazMultiply: (Int, Symbol) => Int =
       (s, m) => if (m == a) bazFlip(s) else s
 
-    override val baz = makeDot(group.action(bazDot)(bazMultiply))
+    override val baz = makeDot(twoGroup.action(bazDot)(bazMultiply))
 
     override val foo2bar = functionAsArrow(foo, bar, Map(i -> "x", a -> "x'"))
     override val foo2ImageOfBar = functionAsArrow(foo, baz, Map(i -> 4, a -> 3))
@@ -58,7 +67,7 @@ class ToposOfGroupActionsTest extends GenericToposTests[Any](
     override val monicBar2baz = functionAsArrow(bar, baz, Map("x" -> 3, "x'" -> 4, "y" -> 5))
 
     override def makeSampleDot(): DOT[String] =
-      makeDot(group.action(barDot)(barMultiply))
+      makeDot(twoGroup.action(barDot)(barMultiply))
 
     override def makeSampleArrow(): Symbol > String =
       functionAsArrow(foo, bar, Map(

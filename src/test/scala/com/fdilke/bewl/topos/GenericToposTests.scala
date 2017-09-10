@@ -4,12 +4,16 @@ import com.fdilke.bewl.helper.⊕
 import com.fdilke.bewl.topos.constructions.ConstructToposOfMonoidActions
 import org.scalatest.Matchers._
 import org.scalatest._
+import scala.language.higherKinds
 
 abstract class ToposFixtureSanityTests[
-  ~, 
-  T <: Topos[~]
+  ~,
+  BASE,
+  PREDOT[_ <: BASE],
+  PREARROW[_ <: BASE, _ <: BASE],
+  WRAPPER[T <: BASE] <: ~
 ] (
-    fixtures: ToposWithFixtures[~]
+  fixtures: ToposWithFixtures[~, BASE, PREDOT, PREARROW, WRAPPER]
 ) extends FunSpec {
   import fixtures._
 
@@ -47,8 +51,14 @@ abstract class ToposFixtureSanityTests[
   }
 }
 
-abstract class ToposWithFixtures[~] {
-  val topos : Topos[~]
+abstract class ToposWithFixtures[
+  ~,
+  BASE,
+  PREDOT[_ <: BASE],
+  PREARROW[_ <: BASE, _ <: BASE],
+  WRAPPER[T <: BASE] <: ~
+] {
+  val topos : Topos[~] with Wrappings[~, BASE, PREDOT, PREARROW, WRAPPER]
 
   type FOO <: ~
   type BAR <: ~
@@ -100,9 +110,15 @@ abstract class ToposWithFixtures[~] {
   final lazy val foo2baz = foo2ImageOfBar // a convenient alias
 }
 
-abstract class GenericToposTests[~](
-  val fixtures: ToposWithFixtures[~]
-) extends ToposFixtureSanityTests(fixtures) {
+abstract class GenericToposTests[
+  ~,
+  BASE,
+  PREDOT[_ <: BASE],
+  PREARROW[_ <: BASE, _ <: BASE],
+  WRAPPER[T <: BASE] <: ~
+](
+  val fixtures: ToposWithFixtures[~, BASE, PREDOT, PREARROW, WRAPPER]
+) extends ToposFixtureSanityTests[~, BASE, PREDOT, PREARROW, WRAPPER](fixtures) {
 
   import fixtures._
   import fixtures.topos.{~ => ~~, _}

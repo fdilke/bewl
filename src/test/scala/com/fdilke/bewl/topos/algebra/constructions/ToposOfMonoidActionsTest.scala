@@ -4,6 +4,7 @@ package com.fdilke.bewl.topos.algebra.constructions
 import com.fdilke.bewl.fsets.FiniteSets.{ToposOfMonoidActions, ~}
 import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsUtilities}
 import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
+import FiniteSetsUtilities.setEmptyAction
 import com.fdilke.bewl.topos.{GenericToposTests, Topos, ToposWithFixtures, Wrappings}
 import org.scalatest.Matchers._
 
@@ -28,8 +29,20 @@ class ToposOfMonoidActionsTest(
     ({type λ[X <: ~, Y <: ~] = monoidOf3.ActionPreArrow[X, Y]}) # λ,
     ({type λ[T <: ~] = T}) # λ
   ]
-) extends GenericToposTests[~](
-  new ToposWithFixtures[~] {
+) extends GenericToposTests[
+  ~,
+  ~,
+  ({type λ[X <: ~] = monoidOf3.Action[X]}) # λ,
+  ({type λ[X <: ~, Y <: ~] = monoidOf3.ActionPreArrow[X, Y]}) # λ,
+  ({type λ[T <: ~] = T}) # λ
+] (
+  new ToposWithFixtures[
+    ~,
+    ~,
+    ({type λ[X <: ~] = monoidOf3.Action[X]}) # λ,
+    ({type λ[X <: ~, Y <: ~] = monoidOf3.ActionPreArrow[X, Y]}) # λ,
+    ({type λ[T <: ~] = T}) # λ
+  ] {
 
     private val (i, x, y) = ('i, 'x, 'y)
 
@@ -113,6 +126,14 @@ class ToposOfMonoidActionsTest(
 ) {
   import fixtures._
   import topos._
+
+  describe("The O object") {
+    it("is isomorphic to the empty action") {
+      topos.makeDot(
+        setEmptyAction(monoidOf3)
+      ).fromO shouldBe 'iso
+    }
+  }
 
   describe("The Boolean property") {
     ignore("fails") { // too slow :( :( :(

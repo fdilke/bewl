@@ -66,13 +66,5 @@ class FiniteSetsUtilitiesTest extends FunSpec {
 
     emptyAction.actionCarrier.elements shouldBe empty
     emptyAction.sanityTest()
-
-    // and this is isomorphic to the O of the relevant topos
-    val topos =
-      FiniteSets.ToposOfMonoidActions.of(monoidOf3)
-
-    topos.makeDot(
-      emptyAction
-    ).fromO shouldBe 'iso
   }
 }
