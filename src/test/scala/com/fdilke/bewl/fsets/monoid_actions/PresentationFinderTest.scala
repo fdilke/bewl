@@ -45,10 +45,15 @@ class PresentationFinderTest extends FreeSpec {
         canExtractPresentation(monoidOf3.regularAction)
       }
       "for an empty monoid action" in {
+        // save literally > 2 seconds by constructing it here -
+        // not in the slow topos
+        val emptyAction =
+          monoidOf3.action(
+            dot[Void]()
+          ){ (void, _) => void }
+        
         canExtractPresentation(
-          actionTopos.unwrap(
-            actionTopos.O
-          )
+          emptyAction
         )
       }
       "for a right ideal action" in {

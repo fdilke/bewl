@@ -167,6 +167,19 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
           thorough=false
         )
       }
+
+      "for one-plus-one to itself" in {
+        val onePlusOne =
+          actionTopos.unwrap(
+            actionTopos.I + actionTopos.I
+          )
+
+        canEnumerateMorphisms(
+          onePlusOne,
+          onePlusOne,
+          thorough=true
+        )
+      }
     }
 
     "can calculate raw exponentials" in {
