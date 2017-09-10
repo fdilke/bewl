@@ -23,8 +23,8 @@ class ActionSplitterTest extends FreeSpec {
     action: Action[A]
   ): Seq[
     {
-      val action: monoidOf3.Action[A]
-      val generators: Seq[A]
+      val componentAction: monoidOf3.Action[A]
+      val componentGenerators: Seq[A]
     }
   ] =
     splitter splitAction(
@@ -53,7 +53,7 @@ class ActionSplitterTest extends FreeSpec {
 
       regularSplitting should have size 1
       elementsOf(
-        regularSplitting.head.action.actionCarrier
+        regularSplitting.head.componentAction.actionCarrier
       ) should have size 3
     }
   }

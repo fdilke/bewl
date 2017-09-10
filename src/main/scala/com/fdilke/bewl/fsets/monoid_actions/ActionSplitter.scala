@@ -29,7 +29,7 @@ trait ActionSplitter extends BaseFiniteSets {
         val allGenerators: Seq[A]
         val components: Seq[
           {
-            val action: monoid.Action[A]
+            val componentAction: monoid.Action[A]
             val componentGenerators: Seq[A]
           }
         ]
@@ -53,7 +53,7 @@ trait ActionSplitter extends BaseFiniteSets {
 
             val components: Seq[
               {
-                val action: monoid.Action[A]
+                val componentAction: monoid.Action[A]
                 val componentGenerators: Seq[A]
               }
             ] = {
@@ -83,7 +83,7 @@ trait ActionSplitter extends BaseFiniteSets {
                     val componentGenerators: Seq[A] =
                       block map allGenerators
 
-                    val action: monoid.Action[A] =
+                    val componentAction: monoid.Action[A] =
                       monoid.action(
                         makeDot(
                           for {
