@@ -14,7 +14,8 @@ trait PresentationFinder extends BaseFiniteSets {
       monoid: Monoid[M]
     ): {
       def findPresentation[A](
-        action: monoid.Action[A]
+        action: monoid.Action[A],
+        generators: Seq[A]
       ): Seq[GeneratorWithRelators[M, A]]
     } =
       new Object {
@@ -30,12 +31,10 @@ trait PresentationFinder extends BaseFiniteSets {
             monoid
           )
 
-        def findPresentation[A](action: monoid.Action[A]) = {
-          val generators =
-          generatorFinder findGenerators(
-            action
-            ) generators
-
+        def findPresentation[A](
+          action: monoid.Action[A],
+          generators: Seq[A]
+        ) = {
           generators.zipWithIndex map tupled { (g, j) =>
             GeneratorWithRelators[M, A](
               g,

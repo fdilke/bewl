@@ -1,26 +1,43 @@
 package com.fdilke.bewl.fsets.monoid_actions
 
 import com.fdilke.bewl.fsets.FiniteSets
-import com.fdilke.bewl.fsets.FiniteSets.{>, ToposOfMonoidActions}
+import com.fdilke.bewl.fsets.FiniteSets.{>, ToposOfMonoidActions, GeneratorFinder, FindGeneratorAnalysis }
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.{dot, setEmptyAction}
 import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
 
-import scala.language.reflectiveCalls
+import scala.language.{ reflectiveCalls, postfixOps }
 
 class PresentationFinderTest extends FreeSpec {
 
   private val (i, x, y) = ('i, 'x, 'y)
 
-  import monoidOf3.regularAction
+  import monoidOf3.{ Action, regularAction }
+
+  private val generatorFinder: {
+    def findGenerators[A](
+      action: Action[A]
+    ): FindGeneratorAnalysis[Symbol, A]
+  } =
+    GeneratorFinder.forMonoid(
+      monoidOf3
+    )
 
   private val finder =
     FiniteSets.PresentationFinder.forMonoid(
       monoidOf3
     )
 
-  import finder.findPresentation
+  def findPresentation[A](
+    action: Action[A]
+  ) =
+    finder.findPresentation(
+      action,
+      generatorFinder.findGenerators(
+        action
+      ) generators
+    )
 
   private val regularAnalysis =
     findPresentation(

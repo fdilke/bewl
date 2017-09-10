@@ -27,10 +27,20 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
           new monoid.ActionAnalyzer[FiniteSetsActionAnalysis] {
             private val presentationFinder: {
               def findPresentation[A](
-                action: monoid.Action[A]
+                action: monoid.Action[A],
+                generators: Seq[A]
               ): Seq[GeneratorWithRelators[M, A]]
             } =
               PresentationFinder.forMonoid(
+                monoid
+              )
+
+            private val generatorFinder: {
+              def findGenerators[A](
+                action: monoid.Action[A]
+              ): FindGeneratorAnalysis[M, A]
+            } =
+              GeneratorFinder.forMonoid(
                 monoid
               )
 
@@ -47,13 +57,16 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
             private val actionElements =
               action.carrier.elements
 
-            private lazy val generatorsWithRelators =
-              presentationFinder.findPresentation(action)
-
             private lazy val generators =
-              generatorsWithRelators map {
-                _.generator
-              }
+              generatorFinder.findGenerators(
+                action
+              ) generators
+
+            private lazy val generatorsWithRelators =
+              presentationFinder.findPresentation(
+                action,
+                generators
+              )
 
             override def morphismsTo[B](
               target: FiniteSetsActionAnalysis[B]
