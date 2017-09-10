@@ -5,6 +5,7 @@ import com.fdilke.bewl.fsets.FiniteSets.ToposOfMonoidActions
 import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
+import com.fdilke.bewl.fsets.FiniteSetsUtilities.setEmptyAction
 
 import scala.language.reflectiveCalls
 
@@ -79,12 +80,8 @@ class GeneratorFinderTest extends FreeSpec {
       }
 
       "as expected for the empty action" in {
-        val emptyAction =
-          actionTopos.unwrap(
-            actionTopos.O
-          )
         findGenerators(
-          emptyAction
+          setEmptyAction(monoidOf3)
         ).generators shouldBe empty
       }
 

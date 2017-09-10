@@ -5,6 +5,7 @@ import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import FiniteSetsUtilities.allMaps
 import org.scalatest.{FunSpec, Matchers}
 import Matchers._
+import com.fdilke.bewl.topos.algebra.KnownMonoids
 
 class FiniteSetsUtilitiesTest extends FunSpec {
   describe("allMaps()") {
@@ -57,5 +58,12 @@ class FiniteSetsUtilitiesTest extends FunSpec {
           ( !f(1) && !f(2) && f(3))
         )
     }
+  }
+
+  describe("can construct the empty action for a monoid") {
+    val emptyAction = setEmptyAction(KnownMonoids.monoidOf3)
+
+    emptyAction.actionCarrier.elements shouldBe empty
+    emptyAction.sanityTest()
   }
 }

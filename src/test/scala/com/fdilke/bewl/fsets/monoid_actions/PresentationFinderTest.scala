@@ -2,7 +2,7 @@ package com.fdilke.bewl.fsets.monoid_actions
 
 import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSets.{>, ToposOfMonoidActions}
-import com.fdilke.bewl.fsets.FiniteSetsUtilities.dot
+import com.fdilke.bewl.fsets.FiniteSetsUtilities.{dot, setEmptyAction}
 import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
@@ -45,15 +45,8 @@ class PresentationFinderTest extends FreeSpec {
         canExtractPresentation(monoidOf3.regularAction)
       }
       "for an empty monoid action" in {
-        // save literally > 2 seconds by constructing it here -
-        // not in the slow topos
-        val emptyAction =
-          monoidOf3.action(
-            dot[Void]()
-          ){ (void, _) => void }
-        
         canExtractPresentation(
-          emptyAction
+          setEmptyAction(monoidOf3)
         )
       }
       "for a right ideal action" in {

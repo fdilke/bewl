@@ -146,4 +146,14 @@ object FiniteSetsUtilities {
         } yield {
             f + (source.head -> choice)
         }
+
+  // optimization to save literally > 2 seconds by constructing it here -
+  // not in the slow topos
+
+  def setEmptyAction[A](
+    monoid: FiniteSets.Monoid[A]
+  ) =
+    monoid.action(
+      dot[Void]()
+    ){ (void, _) => void }
 }
