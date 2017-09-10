@@ -1,12 +1,12 @@
 package com.fdilke.bewl.fsets.monoid_actions
 
 import com.fdilke.bewl.fsets.FiniteSets
-import com.fdilke.bewl.fsets.FiniteSetsUtilities.{ dot, elementsOf }
+import com.fdilke.bewl.fsets.FiniteSetsUtilities.{ dot, elementsOf, setEmptyAction }
 import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
-
-import scala.language.reflectiveCalls
+import monoidOf3.Action
+import scala.language.{ reflectiveCalls, postfixOps }
 
 class ActionSplitterTest extends FreeSpec {
 
@@ -19,12 +19,17 @@ class ActionSplitterTest extends FreeSpec {
       monoidOf3
     )
 
-  import splitter.splitAction
-
-  val regularAnalysis =
-    splitAction(
-      regularAction
-    )
+  def components[A](
+    action: Action[A]
+  ): Seq[
+    {
+      val action: monoidOf3.Action[A]
+      val generators: Seq[A]
+    }
+  ] =
+    splitter splitAction(
+      action
+    ) components
 
   private val scalarMultiply: (String, Symbol) => String =
     (s, m) => monoidOf3.multiply(Symbol(s), m).name
@@ -34,14 +39,22 @@ class ActionSplitterTest extends FreeSpec {
   private val bar = monoidOf3.action(barDot)(scalarMultiply)
 
   "The action splitter can extract a coproduct decomposition" - {
+    "for the empty monoid action" in {
+        components(
+          setEmptyAction(monoidOf3)
+        ) shouldBe empty
+    }
+
     "for the regular monoid action" in {
       val regularSplitting =
-        splitAction(regularAction)
+        components(
+          regularAction
+        )
 
       regularSplitting should have size 1
-      elementsOf(regularSplitting.head.actionCarrier)
+      elementsOf(
+        regularSplitting.head.action.actionCarrier
+      ) should have size 3
     }
-    // TODO add for empty - which should be in AlgebraicConstructions
-    // and check the 0 object in topos-of-actions is this
   }
 }

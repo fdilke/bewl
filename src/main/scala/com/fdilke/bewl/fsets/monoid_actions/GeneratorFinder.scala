@@ -1,6 +1,6 @@
 package com.fdilke.bewl.fsets.monoid_actions
 
-import com.fdilke.bewl.fsets.BaseFiniteSets
+import com.fdilke.bewl.fsets.{BaseFiniteSets, FiniteSets}
 
 import scala.language.{higherKinds, postfixOps}
 
