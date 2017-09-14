@@ -3,6 +3,7 @@ package com.fdilke.bewl.fsets.monoid_actions
 import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.{ dot, elementsOf }
 import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
+import FiniteSets.ActionComponent
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
 import monoidOf3.Action
@@ -22,10 +23,10 @@ class ActionSplitterTest extends FreeSpec {
   def components[A](
     action: Action[A]
   ): Seq[
-    {
-      val componentAction: monoidOf3.Action[A]
-      val componentGenerators: Seq[A]
-    }
+    ActionComponent[
+      A,
+      ({type λ[T] = monoidOf3.Action[T]}) # λ
+    ]
   ] =
     splitter splitAction(
       action

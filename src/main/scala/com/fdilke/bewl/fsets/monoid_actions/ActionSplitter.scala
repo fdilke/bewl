@@ -11,12 +11,18 @@ import scala.language.{higherKinds, postfixOps, reflectiveCalls}
 trait ActionSplitter extends BaseFiniteSets {
   Ɛ: FindGenerators =>
 
-  trait ActionComponent[A, ACTION[B]] {
-    val componentAction: ACTION[A]
-    val componentGenerators: Seq[A]
-  }
+  case class ActionComponent[
+    A,
+    ACTION[B]
+  ](
+    componentGenerators: Seq[A],
+    componentAction: ACTION[A]
+  )
 
-  trait ActionSplitting[A, ACTION[B]] {
+  trait ActionSplitting[
+    A,
+    ACTION[B]
+  ] {
     val allGenerators: Seq[A]
     val components: Seq[
       ActionComponent[A, ACTION]
@@ -79,14 +85,13 @@ trait ActionSplitter extends BaseFiniteSets {
               allGenerators.indices.groupBy(
                 generatorSorts
               ).values map { block =>
-                  new ActionComponent[
+                  val componentGenerators: Seq[A] =
+                    block map allGenerators
+                  ActionComponent[
                     A,
                     ({type λ[T] = monoid.Action[T]}) # λ
-                  ] {
-                    override val componentGenerators: Seq[A] =
-                      block map allGenerators
-
-                    override val componentAction: monoid.Action[A] =
+                  ] (
+                      componentGenerators,
                       monoid.action(
                         makeDot(
                           for {
@@ -98,7 +103,7 @@ trait ActionSplitter extends BaseFiniteSets {
                       ) (
                           actionMultiply
                         )
-                  }
+                  )
               } toSeq
             }
           }
