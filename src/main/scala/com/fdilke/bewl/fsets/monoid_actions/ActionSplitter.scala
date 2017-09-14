@@ -16,8 +16,12 @@ trait ActionSplitter extends BaseFiniteSets {
     val componentGenerators: Seq[A]
   }
 
-//  trait ActionSplitting[A, ACTION[B]] {
-//  }
+  trait ActionSplitting[A, ACTION[B]] {
+    val allGenerators: Seq[A]
+    val components: Seq[
+      ActionComponent[A, ACTION]
+    ]
+  }
 
   object ActionSplitter {
     def forMonoid[M](
@@ -25,15 +29,10 @@ trait ActionSplitter extends BaseFiniteSets {
     ): {
       def splitAction[A](
         action: monoid.Action[A]
-      ): {
-        val allGenerators: Seq[A]
-        val components: Seq[
-          ActionComponent[
-            A,
-            ({type λ[T] = monoid.Action[T]}) # λ
-          ]
+      ): ActionSplitting[
+          A,
+          ({type λ[T] = monoid.Action[T]}) # λ
         ]
-      }
     } =
       new Object {
         private val monoidElements =
@@ -45,11 +44,14 @@ trait ActionSplitter extends BaseFiniteSets {
         def splitAction[A](
           action: monoid.Action[A]
         ) =
-          new Object {
-            val allGenerators =
+          new ActionSplitting[
+            A,
+            ({type λ[T] = monoid.Action[T]}) # λ
+          ] {
+            override val allGenerators =
               findGenerators apply action generators
 
-            val components: Seq[
+            override val components: Seq[
               ActionComponent[
                 A,
                 ({type λ[T] = monoid.Action[T]}) # λ
