@@ -1,13 +1,14 @@
 package com.fdilke.bewl.fsets.monoid_actions
 
 import com.fdilke.bewl.fsets.FiniteSets
-import com.fdilke.bewl.fsets.FiniteSetsUtilities.{ dot, elementsOf }
+import com.fdilke.bewl.fsets.FiniteSets.ActionComponent
+import com.fdilke.bewl.fsets.FiniteSetsUtilities.{dot, elementsOf}
 import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
-import FiniteSets.ActionComponent
+import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3.Action
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
-import monoidOf3.Action
-import scala.language.{ reflectiveCalls, postfixOps }
+
+import scala.language.{postfixOps, reflectiveCalls}
 
 class ActionSplitterTest extends FreeSpec {
 
@@ -15,7 +16,9 @@ class ActionSplitterTest extends FreeSpec {
 
   import monoidOf3.regularAction
 
-  private val splitter =
+  private val splitter: FiniteSets.ActionSplitter[
+    ({ type λ[T] = monoidOf3.Action[T] })#λ
+  ] =
     FiniteSets.ActionSplitter.forMonoid(
       monoidOf3
     )

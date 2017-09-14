@@ -1,11 +1,8 @@
 package com.fdilke.bewl.fsets.monoid_actions
 
-import com.fdilke.bewl.fsets.{BaseFiniteSets, FiniteSets}
-import com.fdilke.bewl.helper.{BuildEquivalence, ⊕}
-import com.fdilke.bewl.helper.⊕._
+import com.fdilke.bewl.fsets.BaseFiniteSets
+import com.fdilke.bewl.helper.BuildEquivalence
 
-import scala.Function.tupled
-import scala.collection.immutable
 import scala.language.{higherKinds, postfixOps, reflectiveCalls}
 
 trait ActionSplitter extends BaseFiniteSets {
@@ -29,25 +26,28 @@ trait ActionSplitter extends BaseFiniteSets {
     ]
   )
 
+  trait ActionSplitter[ACTION[A]] {
+    def splitAction[A](
+      action: ACTION[A]
+    ): ActionSplitting[A, ACTION]
+  }
+
   object ActionSplitter {
     def forMonoid[M](
       monoid: Monoid[M]
-    ): {
-      def splitAction[A](
-        action: monoid.Action[A]
-      ): ActionSplitting[
-          A,
-          ({type λ[T] = monoid.Action[T]}) # λ
-        ]
-    } =
-      new Object {
+    ): ActionSplitter[
+      ({type λ[T] = monoid.Action[T]}) # λ
+    ] =
+      new ActionSplitter[
+        ({type λ[T] = monoid.Action[T]}) # λ
+      ] {
         private val monoidElements =
           monoid.carrier.elements
 
         private val findGenerators =
           FindGenerators forMonoid monoid
 
-        def splitAction[A](
+        override def splitAction[A](
           action: monoid.Action[A]
         ) = {
           val allGenerators: Seq[A] =
@@ -70,36 +70,44 @@ trait ActionSplitter extends BaseFiniteSets {
                 yield i -> j
             )
 
-          new ActionSplitting[
+          val blocks: Seq[Seq[Int]] =
+            allGenerators.indices.groupBy(
+              generatorSorts
+            ).values.toSeq
+
+          val handleBlock: Seq[Int] => ActionComponent[
+            A,
+            ({type λ[T] = monoid.Action[T]}) # λ
+          ] = { block =>
+            val componentGenerators: Seq[A] =
+              block map allGenerators
+            val component: monoid.Action[A] =
+              monoid.action(
+                makeDot(
+                  for {
+                    cg <- componentGenerators
+                    m <- monoidElements
+                  } yield
+                    actionMultiply(cg, m)
+                )
+              )(
+                actionMultiply
+              )
+            ActionComponent[
+              A,
+              ({type λ[T] = monoid.Action[T]})#λ
+            ](
+              componentGenerators,
+              component
+            )
+          }
+
+          ActionSplitting[
             A,
             ({type λ[T] = monoid.Action[T]}) # λ
           ] (
             allGenerators,
-            allGenerators.indices.groupBy(
-              generatorSorts
-            ).values map { (block: Seq[Int]) =>
-              {
-                val componentGenerators: Seq[A] =
-                  block map allGenerators
-                ActionComponent[
-                  A,
-                  ({type λ[T] = monoid.Action[T]}) # λ
-                  ] (
-                  componentGenerators,
-                  monoid.action(
-                    makeDot(
-                      for {
-                        cg <- componentGenerators
-                        m <- monoidElements
-                      } yield
-                        actionMultiply(cg, m)
-                    )
-                  ) (
-                    actionMultiply
-                  )
-                )
-              }
-            } toSeq
+            blocks map handleBlock
           )
         }
       }
