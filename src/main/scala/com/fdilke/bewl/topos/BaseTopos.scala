@@ -461,6 +461,9 @@ trait BaseTopos {
     
     final lazy val isInjective: Boolean =
       singleton isSection
+
+    final lazy val isMinimal: Boolean =
+      >>(omega).size == 2
   }
 
   trait BaseArrow[S <: ~, T <: ~] {

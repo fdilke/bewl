@@ -321,6 +321,15 @@ class DotAndArrowEnrichmentTest extends FunSpec {
     }
   }
 
+  private def equivalenceFrom(
+    identifications: Set[(Symbol, Symbol)]
+  ) (
+    p: Symbol,
+    q: Symbol
+  ): Boolean =
+    identifications contains (p -> q)
+
+
   describe("Coequalizers") {
     it("should give the expected construction for sets") {
       val symbols = dot('A, 'B)
@@ -500,8 +509,8 @@ class DotAndArrowEnrichmentTest extends FunSpec {
 				  val numbers = dot(1, 2, 3)
 				  val section: Symbol > Int =
 				  arrow(symbols, numbers)(
-						  'A -> 2, 'B -> 1
-						  )
+            'A -> 2, 'B -> 1
+          )
 				  section should be a 'section 
 				  val nonsection: Symbol > Int =
 				  arrow(symbols, numbers)(
@@ -534,12 +543,12 @@ class DotAndArrowEnrichmentTest extends FunSpec {
       dot(1) shouldBe 'injective
     }
   }
-    
-  private def equivalenceFrom(
-    identifications: Set[(Symbol, Symbol)]
-  ) (
-    p: Symbol,
-    q: Symbol
-  ): Boolean =
-    identifications contains (p -> q)
+
+  describe("Minimality") {
+    it("is detected properly for sets") {
+      0 to 3 filter { n =>
+        makeDot(0 until n).isMinimal
+      } shouldBe Seq(1)
+    }
+  }
 }
