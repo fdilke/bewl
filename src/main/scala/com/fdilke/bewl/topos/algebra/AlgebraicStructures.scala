@@ -7,7 +7,7 @@ trait AlgebraicStructures extends
   BaseTopos with
   ToposEnrichments with
   ToposStructures with
-  AlgebraicMachinery { builder =>
+  AlgebraicMachinery { Ɛ =>
 
   import NamedLaws._
   import StandardTermsAndOperators._

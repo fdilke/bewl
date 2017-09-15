@@ -5,7 +5,7 @@ import com.fdilke.bewl.topos.BaseTopos
 import ⊕._
 
 trait AlgebraicConstructions {
-  topos: BaseTopos with
+  Ɛ: BaseTopos with
     AlgebraicMachinery with
     AlgebraicStructures  =>
 
