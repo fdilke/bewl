@@ -166,4 +166,15 @@ class ToposOfMonoidActionsTest(
       (foo >> (omega > omega)) should have size 2
     }
   }
+
+  describe("Minimality") {
+    it("should hold for the right objects") {
+      foo shouldNot be('minimal)
+      bar should be('minimal)
+      baz shouldNot be('minimal)
+      O shouldNot be('minimal)
+      I should be('minimal)
+      omega shouldNot be('minimal)
+    }
+  }
 }

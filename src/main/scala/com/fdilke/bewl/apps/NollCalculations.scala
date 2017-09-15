@@ -132,33 +132,38 @@ object NollCalculations extends App {
       ).actionCarrier
     ) size
 
-  def showInjectivity[T](
+  def showProperties[T](
     name: String,
     tune: triadicTopos.DOT[T]
   ) {
-    println(s"$name injective: ")
-//    println(tune.isInjective)
-    val power = tune.power
-    println("calculated power")
-    println("size of omega = " + measure(triadicTopos.omega))
-    println("size of power = " + measure(power))
-    (power >> triadicTopos.I) foreach { to1 =>
-      println("calculated power -> 1")
-    }
-    println("calculated power -> 1... done")
-    val isInjective =
-      (power >> tune) exists { projection =>
-        print("*")
-        val retracts =
-          (projection o tune.singleton) == tune.identity
-        if (retracts)
-          println("!")
-        retracts
+    println(s"$name minimal: " + tune.isMinimal)
+    println(s"$name simple: " + tune.isSimple)
+
+    if (false) {
+      println(s"$name injective: ")
+      //    println(tune.isInjective)
+      val power = tune.power
+      println("calculated power")
+      println("size of omega = " + measure(triadicTopos.omega))
+      println("size of power = " + measure(power))
+      (power >> triadicTopos.I) foreach { to1 =>
+        println("calculated power -> 1")
       }
-    println(isInjective)
+      println("calculated power -> 1... done")
+      val isInjective =
+        (power >> tune) exists { projection =>
+          print("*")
+          val retracts =
+            (projection o tune.singleton) == tune.identity
+          if (retracts)
+            println("!")
+          retracts
+        }
+      println(isInjective)
+    }
   }
 
-  showInjectivity("chord", chord)
-  showInjectivity("cyclic", cyclic)
-  showInjectivity("octave", octave)
+  showProperties("chord", chord)
+  showProperties("cyclic", cyclic)
+  showProperties("octave", octave)
 }

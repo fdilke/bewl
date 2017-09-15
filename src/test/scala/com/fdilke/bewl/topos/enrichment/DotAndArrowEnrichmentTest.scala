@@ -5,7 +5,7 @@ import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 import scala.Function.untupled
-import org.scalatest.Finders
+import com.fdilke.bewl.topos.algebra.KnownGroups.twoGroup
 import com.fdilke.bewl.helper.⊕
 
 class DotAndArrowEnrichmentTest extends FunSpec {
@@ -549,6 +549,31 @@ class DotAndArrowEnrichmentTest extends FunSpec {
       0 to 3 filter { n =>
         makeDot(0 until n).isMinimal
       } shouldBe Seq(1)
+    }
+    it("is detected properly for group actions") {
+      val topos =
+        ToposOfGroupActions of twoGroup
+
+      topos.makeDot(
+        twoGroup.regularAction
+      ) shouldBe 'simple
+    }
+  }
+
+  describe("Simplicity") {
+    it("is detected properly for sets") {
+      0 to 3 filter { n =>
+        makeDot(0 until n).isSimple
+      } shouldBe Seq(2)
+    }
+
+    it("is detected properly for group actions") {
+      val topos =
+        ToposOfGroupActions of twoGroup
+
+      topos.makeDot(
+        twoGroup.regularAction
+      ) shouldBe 'simple
     }
   }
 }

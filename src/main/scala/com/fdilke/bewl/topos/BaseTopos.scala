@@ -464,6 +464,16 @@ trait BaseTopos {
 
     final lazy val isMinimal: Boolean =
       >>(omega).size == 2
+
+    final lazy val isSimple: Boolean =
+      (squared >> omega count { relation =>
+        isEquivalenceRelation(
+          BiArrow(
+            squared,
+            relation
+          ) apply
+        )
+      }) == 2
   }
 
   trait BaseArrow[S <: ~, T <: ~] {
