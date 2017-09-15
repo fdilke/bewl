@@ -144,14 +144,29 @@ object FiniteSetsUtilities {
           f <- allMaps(source.tail, target)
           choice <- target
         } yield {
-            f + (source.head -> choice)
+          f + (source.head -> choice)
         }
 
-  def equivalenceFrom[X](
-    identifications: Set[(X, X)]
+  def equivalenceFrom( // TODO: eliminate use of this
+     identifications: Set[(Symbol, Symbol)]
+   ) (
+     p: Symbol,
+     q: Symbol
+   ): Boolean =
+    identifications contains (p -> q)
+
+  def relationFrom[X, Y](
+    source: DOT[X],
+    target: DOT[Y],
+    identifications: Set[(X, Y)]
   ) (
    p: X,
-   q: X
- ): Boolean =
-    identifications contains (p -> q)
+   q: Y
+ ) =
+    FiniteSets.Relation[X, Y](
+      source,
+      target,
+      (p: X, q: Y) =>
+        identifications contains (p -> q)
+    )
 }
