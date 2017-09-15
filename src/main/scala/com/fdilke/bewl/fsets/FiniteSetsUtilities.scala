@@ -146,4 +146,12 @@ object FiniteSetsUtilities {
         } yield {
             f + (source.head -> choice)
         }
+
+  def equivalenceFrom[X](
+    identifications: Set[(X, X)]
+  ) (
+   p: X,
+   q: X
+ ): Boolean =
+    identifications contains (p -> q)
 }

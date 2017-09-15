@@ -3,7 +3,8 @@ package com.fdilke.bewl.topos
 import com.fdilke.bewl.topos.algebra.{
   AlgebraicConstructions, 
   AlgebraicMachinery, 
-  AlgebraicStructures
+  AlgebraicStructures,
+  RelationalAlgebra
 }
 import com.fdilke.bewl.topos.constructions.{
   ConstructToposOfAutomorphisms, 
@@ -28,7 +29,8 @@ import com.fdilke.bewl.topos.structures.{
 trait ToposAlgebra extends
   AlgebraicMachinery with
   AlgebraicConstructions with
-  AlgebraicStructures
+  AlgebraicStructures with
+  RelationalAlgebra
 
 trait ToposConstructions extends
   BaseTopos with
