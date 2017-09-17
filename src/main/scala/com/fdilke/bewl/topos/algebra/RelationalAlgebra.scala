@@ -1,6 +1,7 @@
 package com.fdilke.bewl.topos.algebra
 
 import com.fdilke.bewl.topos.{BaseTopos, ToposEnrichments, ToposStructures}
+import com.fdilke.bewl.helper.⊕
 
 import scala.language.{higherKinds, postfixOps}
 
@@ -27,6 +28,29 @@ trait RelationalAlgebra extends
         (t, s) =>
           criterion(s, t)
       )
+
+    def o[U <: ~](
+      that: Relation[T, U]
+    ) = {
+      val product = source x that.target
+      val compositeCriterion =
+        BiArrow[S, U, TRUTH](
+          product,
+          product.exists (
+            that.source
+          ) { (su: S x U, t: T) =>
+            val s: S = product.π0(su)
+            val u: U = product.π1(su)
+            criterion(s, t) ∧
+              that.criterion(t, u)
+          }
+        )
+        Relation[S, U](
+          source,
+          that.target,
+          compositeCriterion
+      )
+    }
   }
 
   implicit class EndoRelation[S <: ~](
@@ -38,6 +62,9 @@ trait RelationalAlgebra extends
       (criterion.arrow o
         source.diagonal
       ) toBool
+
+    def isSymmetric: Boolean =
+      inverse == relation
   }
   
   object Relation {

@@ -5,8 +5,6 @@ import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import Relation._
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
-import scala.Function.untupled
-import com.fdilke.bewl.helper.⊕
 
 class RelationalAlgebraTest extends FunSpec {
 
@@ -48,7 +46,35 @@ class RelationalAlgebraTest extends FunSpec {
     }
   }
 
-  describe("The crtierion of reflexivity") {
+  describe("The composite of two relations") {
+    it("is as expected for sets") {
+      val left = dot(0, 1, 2)
+      val mid = dot(Some(true), Some(false), None)
+      val right = dot("cuss", "hiss", "silent")
+
+      relationFrom(
+        left,
+        mid,
+        0 -> Some(true),
+        2 -> Some(false)
+      ) o relationFrom(
+        mid,
+        right,
+        Some(true) -> "cuss",
+        Some(true) -> "hiss",
+        Some(false) -> "silent"
+      ) shouldBe
+        relationFrom(
+          left,
+          right,
+          0 -> "cuss",
+          0 -> "hiss",
+          2 -> "silent"
+        )
+    }
+  }
+
+  describe("The criterion of reflexivity") {
     it("is as expected for sets") {
       val carrier = dot(0, 1)
 
@@ -70,6 +96,30 @@ class RelationalAlgebraTest extends FunSpec {
         0 -> 0,
         0 -> 1
       ).isReflexive shouldBe false
+    }
+  }
+
+  describe("The criterion of symmetry") {
+    it("is as expected for sets") {
+      val carrier = dot(0, 1)
+
+      relationFrom(
+        carrier,
+        carrier,
+        0 -> 0,
+        0 -> 1
+      ).isSymmetric shouldBe false
+
+      relationFrom(
+        carrier,
+        carrier,
+        0 -> 1,
+        1 -> 0
+      ).isSymmetric shouldBe true
+
+      diagonalRelation(
+        carrier
+      ).isSymmetric shouldBe true
     }
   }
 
