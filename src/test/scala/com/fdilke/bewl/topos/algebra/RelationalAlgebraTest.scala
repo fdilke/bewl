@@ -2,7 +2,7 @@ package com.fdilke.bewl.topos.algebra
 
 import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
-import Relation.diagonalRelation
+import Relation._
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 import scala.Function.untupled
@@ -18,6 +18,58 @@ class RelationalAlgebraTest extends FunSpec {
       diag(0, 0) shouldBe true
       diag(0, 1) shouldBe false
       diag(1, 0) shouldBe false
+      diag(1, 1) shouldBe true
+
+      diag shouldBe relationFrom(
+        carrier,
+        carrier,
+        0 -> 0,
+        1 -> 1
+      )
+    }
+  }
+
+  describe("The inverse of a relation") {
+    it("is as expected for sets") {
+      val carrier = dot(0, 1)
+
+      relationFrom(
+        carrier,
+        carrier,
+        0 -> 0,
+        0 -> 1
+      ).inverse shouldBe
+        relationFrom(
+          carrier,
+          carrier,
+          0 -> 0,
+          1 -> 0
+        )
+    }
+  }
+
+  describe("The crtierion of reflexivity") {
+    it("is as expected for sets") {
+      val carrier = dot(0, 1)
+
+      diagonalRelation(
+        carrier
+      ).isReflexive shouldBe true
+
+      relationFrom(
+        carrier,
+        carrier,
+        0 -> 0,
+        1 -> 1,
+        0 -> 1
+      ).isReflexive shouldBe true
+      
+      relationFrom(
+        carrier,
+        carrier,
+        0 -> 0,
+        0 -> 1
+      ).isReflexive shouldBe false
     }
   }
 

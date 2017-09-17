@@ -158,11 +158,8 @@ object FiniteSetsUtilities {
   def relationFrom[X, Y](
     source: DOT[X],
     target: DOT[Y],
-    identifications: Set[(X, Y)]
-  ) (
-   p: X,
-   q: Y
- ) =
+    identifications: (X, Y)*
+  ): FiniteSets.Relation[X, Y] =
     FiniteSets.Relation[X, Y](
       source,
       target,
