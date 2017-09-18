@@ -17,6 +17,7 @@ class ActionSplitterTest extends FreeSpec {
   import monoidOf3.regularAction
 
   private val splitter: FiniteSets.ActionSplitter[
+    Symbol,
     ({ type λ[T] = monoidOf3.Action[T] })#λ
   ] =
     FiniteSets.ActionSplitter.forMonoid(
@@ -27,6 +28,7 @@ class ActionSplitterTest extends FreeSpec {
     action: Action[A]
   ): Seq[
     ActionComponent[
+      Symbol,
       A,
       ({type λ[T] = monoidOf3.Action[T]}) # λ
     ]

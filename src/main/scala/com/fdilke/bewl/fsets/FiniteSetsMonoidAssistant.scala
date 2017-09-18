@@ -18,6 +18,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
           override val action: monoid.Action[A]
         ) extends monoid.ActionAnalysis[A, FiniteSetsActionAnalysis] {
           val actionSplitting: ActionSplitting[
+            M,
             A,
             ({type λ[X <: ~] = monoid.Action[X]}) # λ
           ]
@@ -45,6 +46,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
           )
 
         private val actionSplitter: ActionSplitter[
+          M,
           ({type λ[T] = monoid.Action[T]}) # λ
         ] =
           ActionSplitter.forMonoid(
@@ -60,7 +62,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
           new FiniteSetsActionAnalysis[A](
             action
           ) {
-            override lazy val actionSplitting =
+            override val actionSplitting =
               actionSplitter.splitAction(
                 action
               )
@@ -70,7 +72,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
 
             import actionSplitting.allGenerators
 
-            private lazy val generatorsWithRelators =
+            private val generatorsWithRelators =
               findPresentation(
                 action,
                 allGenerators
@@ -150,8 +152,13 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
               }
             }
 
-            lazy val recursiveImago =
-              analyze(monoid.regularAction x action)
+            lazy val recursiveImago:
+              FiniteSetsActionAnalysis[
+                M x A
+              ] =
+                analyze(
+                  monoid.regularAction x action
+                )
 
             override def rawExponential[B <: ~](
               target: FiniteSetsActionAnalysis[B]

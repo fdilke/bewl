@@ -6,39 +6,46 @@ import com.fdilke.bewl.helper.BuildEquivalence
 import scala.language.{higherKinds, postfixOps, reflectiveCalls}
 
 trait ActionSplitter extends BaseFiniteSets {
-  Ɛ: FindGenerators =>
+  Ɛ: FindGenerators with FindPresentation =>
 
   case class ActionComponent[
+    M,
     A,
     ACTION[B]
   ](
     componentGenerators: Seq[A],
-    componentAction: ACTION[A]
+    componentAction: ACTION[A],
+    componentPresentation: Seq[
+      GeneratorWithRelators[M, A]
+    ]
   )
 
   case class ActionSplitting[
+    M,
     A,
     ACTION[B]
   ] (
     allGenerators: Seq[A],
     components: Seq[
-      ActionComponent[A, ACTION]
+      ActionComponent[M, A, ACTION]
     ]
   )
 
-  trait ActionSplitter[ACTION[A]] {
+  trait ActionSplitter[M, ACTION[A]] {
     def splitAction[A](
       action: ACTION[A]
-    ): ActionSplitting[A, ACTION]
+    ): ActionSplitting[M, A, ACTION]
   }
 
   object ActionSplitter {
     def forMonoid[M](
       monoid: Monoid[M]
     ): ActionSplitter[
+      M,
       ({type λ[T] = monoid.Action[T]}) # λ
     ] =
       new ActionSplitter[
+        M,
         ({type λ[T] = monoid.Action[T]}) # λ
       ] {
         private val monoidElements =
@@ -46,6 +53,9 @@ trait ActionSplitter extends BaseFiniteSets {
 
         private val findGenerators =
           FindGenerators forMonoid monoid
+
+        private val findPresentation =
+          FindPresentation forMonoid monoid
 
         override def splitAction[A](
           action: monoid.Action[A]
@@ -77,12 +87,13 @@ trait ActionSplitter extends BaseFiniteSets {
             ).values.toSeq
 
           val handleBlock: Seq[Int] => ActionComponent[
+            M,
             A,
             ({type λ[T] = monoid.Action[T]}) # λ
           ] = { block =>
             val componentGenerators: Seq[A] =
               block map allGenerators
-            val component: monoid.Action[A] =
+            val componentAction: monoid.Action[A] =
               monoid.action(
                 makeDot(
                   for {
@@ -94,16 +105,24 @@ trait ActionSplitter extends BaseFiniteSets {
               )(
                 actionMultiply
               )
+            val componentPresentation: Seq[GeneratorWithRelators[M, A]] =
+              findPresentation(
+                  componentAction,
+                componentGenerators
+              )
             ActionComponent[
+              M,
               A,
               ({type λ[T] = monoid.Action[T]})#λ
             ](
               componentGenerators,
-              component
+              componentAction,
+              componentPresentation
             )
           }
 
           ActionSplitting[
+            M,
             A,
             ({type λ[T] = monoid.Action[T]}) # λ
           ] (
