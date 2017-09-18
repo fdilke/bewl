@@ -1,7 +1,15 @@
 package com.fdilke.bewl.apps
 
 import com.fdilke.bewl.fsets.FiniteSets
-import com.fdilke.bewl.fsets.FiniteSets.{Monoid, ToposOfMonoidActions, bifunctionAsBiArrow, makeDot, x}
+import com.fdilke.bewl.fsets.FiniteSets.{
+  Monoid,
+  ToposOfMonoidActions,
+  ActionSplitter,
+  Relation,
+  bifunctionAsBiArrow,
+  makeDot,
+  x
+}
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.{elementsOf, makeNullaryOperator}
 import com.fdilke.bewl.helper.⊕
 
@@ -122,6 +130,53 @@ object NollCalculations extends App {
     triadicTopos.makeDot(
       triadicMonoid.regularAction
     )
+
+  if (false) { // too slow, as yet
+    println("Chord square:")
+    val c2 = chord x chord
+    val csAnalysis =
+      ActionSplitter.forMonoid(
+        triadicMonoid
+      ).splitAction(
+        chordAction x chordAction
+      )
+    println(
+      "\tnumber of components: " + (
+        csAnalysis.components.size
+      )
+    )
+    println(
+      "\ttotal generators: " + (
+        csAnalysis.allGenerators.size
+      )
+    )
+    print("c2 >> omega: ")
+    val c2_omega = c2 >> triadicTopos.omega
+    for {
+      arrow <- c2_omega
+    } {
+      print("*")
+
+      val relation =
+        triadicTopos.Relation(
+          chord,
+          chord,
+          triadicTopos.BiArrow(
+            c2,
+            arrow
+          )
+        )
+
+      import triadicTopos.EndoRelation
+
+      print("[")
+      print(if (relation.isReflexive) "R" else "r")
+      print(if (relation.isSymmetric) "S" else "s")
+      print(if (relation.isIdempotent) "I" else "i")
+      print("]")
+    }
+    println(" (" + (c2_omega.size) + ")")
+  }
 
   def measure[T](
     tune: triadicTopos.DOT[T]

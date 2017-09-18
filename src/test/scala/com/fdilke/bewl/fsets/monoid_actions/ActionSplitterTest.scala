@@ -75,7 +75,5 @@ class ActionSplitterTest extends FreeSpec {
         regbarSplitting.head.componentAction.actionCarrier
       ).size shouldBe 12
     }
-
-
   }
 }
