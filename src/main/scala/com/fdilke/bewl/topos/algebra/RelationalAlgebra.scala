@@ -18,8 +18,15 @@ trait RelationalAlgebra extends
     target: DOT[T],
     criterion: BiArrow[S, T, TRUTH]
   ) {
+    lazy val subobject: EQUALIZER[S x T] =
+      criterion.arrow.whereTrue
+
     def apply(s: S, t: T) =
       criterion(s, t)
+
+    def <= (that: Relation[S, T]): Boolean =
+      that.criterion.arrow o
+        subobject.inclusion toBool
 
     def inverse: Relation[T, S] =
       Relation(
@@ -56,6 +63,12 @@ trait RelationalAlgebra extends
 
     def isSymmetric: Boolean =
       inverse == relation
+
+    def isTransitive: Boolean =
+      o(relation) <= relation
+
+    def isIdempotent: Boolean =
+      o(relation) == relation
   }
   
   object Relation {

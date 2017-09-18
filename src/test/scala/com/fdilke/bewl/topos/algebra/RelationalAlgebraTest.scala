@@ -46,6 +46,45 @@ class RelationalAlgebraTest extends FunSpec {
     }
   }
 
+  describe("Comparison of relations") {
+    it("is as expected for sets") {
+      val left = dot(0, 1, 2)
+      val right = dot("cuss", "hiss", "silent")
+
+      relationFrom(
+        left,
+        right,
+        0 -> "cuss",
+        1 -> "hiss",
+        1 -> "silent"
+      ) <= relationFrom(
+        left,
+        right,
+        0 -> "cuss",
+        1 -> "hiss",
+        1 -> "silent",
+        2 -> "cuss"
+      ) shouldBe true
+
+      relationFrom(
+        left,
+        right,
+        0 -> "cuss",
+        1 -> "hiss",
+        1 -> "silent"
+      ) <= relationFrom(
+        left,
+        right,
+        0 -> "cuss",
+        1 -> "silent",
+        2 -> "cuss"
+      ) shouldBe false
+
+      val diag = diagonalRelation(left)
+      diag <= diag shouldBe true
+    }
+  }
+
   describe("The composite of two relations") {
     it("is as expected for sets") {
       val left = dot(0, 1, 2)
@@ -120,6 +159,70 @@ class RelationalAlgebraTest extends FunSpec {
       diagonalRelation(
         carrier
       ).isSymmetric shouldBe true
+    }
+  }
+
+  describe("The criterion of transitivity") {
+    it("is as expected for sets") {
+      val carrier = dot(0, 1, 2)
+
+      relationFrom(
+        carrier,
+        carrier
+      ).isTransitive shouldBe true
+
+      relationFrom(
+        carrier,
+        carrier,
+        0 -> 1,
+        1 -> 2
+      ).isTransitive shouldBe false
+
+      relationFrom(
+        carrier,
+        carrier,
+        0 -> 1,
+        1 -> 2,
+        0 -> 2
+      ).isTransitive shouldBe true
+
+      diagonalRelation(
+        carrier
+      ).isTransitive shouldBe true
+    }
+  }
+
+  describe("The criterion of idempotence") {
+    it("is as expected for sets") {
+      val carrier = dot(0, 1, 2, 3)
+
+      relationFrom(
+        carrier,
+        carrier
+      ).isIdempotent shouldBe true
+
+      relationFrom(
+        carrier,
+        carrier,
+        0 -> 0,
+        0 -> 1,
+        1 -> 1,
+        1 -> 2
+      ).isIdempotent shouldBe false
+
+      relationFrom(
+        carrier,
+        carrier,
+        0 -> 0,
+        0 -> 1,
+        1 -> 1,
+        1 -> 2,
+        0 -> 2
+      ).isIdempotent shouldBe true
+
+      diagonalRelation(
+        carrier
+      ).isIdempotent shouldBe true
     }
   }
 
