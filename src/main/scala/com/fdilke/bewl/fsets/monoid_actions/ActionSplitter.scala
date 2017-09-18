@@ -56,6 +56,7 @@ trait ActionSplitter extends BaseFiniteSets {
             allGenerators.zipWithIndex
           val actionMultiply: BiArrow[A, M, A] =
             action.actionMultiply
+
           val generatorSorts: Seq[Int] =
             BuildEquivalence(
               allGenerators.size,

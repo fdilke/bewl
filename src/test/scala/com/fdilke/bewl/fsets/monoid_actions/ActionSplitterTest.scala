@@ -60,5 +60,20 @@ class ActionSplitterTest extends FreeSpec {
         regularSplitting.head.componentAction.actionCarrier
       ) should have size 3
     }
+
+    "for regularAction x bar" in {
+      val regbarSplitting =
+        components(
+          regularAction x bar
+        )
+
+      regbarSplitting should have size 1
+
+      elementsOf(
+        regbarSplitting.head.componentAction.actionCarrier
+      ).size shouldBe 12
+    }
+
+
   }
 }
