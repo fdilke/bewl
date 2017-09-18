@@ -37,7 +37,7 @@ trait RelationalAlgebra extends
         that.target,
         (source x that.target).existsMid(
           that.source
-        ) { (s : S, t: T, u: U) =>
+        ) { (s, t, u) =>
           criterion(s, t) ∧
             that.criterion(t, u)
         }

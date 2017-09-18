@@ -101,16 +101,6 @@ trait BaseTopos {
         this.forAll(target)(bifunc)
       )
 
-    final def existentially[T <: ~](
-      target: DOT[T]
-    )(
-      bifunc: (L x R, T) => TRUTH
-    ) =
-      BiArrow(
-        this,
-        this.exists(target)(bifunc)
-      )
-
     final def existsMid[T <: ~](
       mid: DOT[T]
     ) (
@@ -821,10 +811,10 @@ trait BaseTopos {
 
       target.power.transpose(
         (arrow.target x target).
-          existentially(
+          existsMid(
             compatibleArrow.source
           ) {
-            case (q ⊕ t, s) =>
+            (q, s, t) =>
               implicit val _ = dot.power
               q(s) ∧ target.=?=(
                 compatibleArrow(s), t

@@ -43,6 +43,38 @@ class DotAndArrowEnrichmentTest extends FunSpec {
       exists o embedEmpty.chi.name should not be truth
       exists o totalSet.identity.chi.name shouldBe truth
     }
+
+    it("can be used over a dot to make an arrow into omega") {
+      val carrier = dot(1,2,3)
+      val containers = dot(Set(1,2), Set(2))
+
+      carrier.exists(containers) {
+        (s, c) =>
+          c contains s
+      } shouldBe {
+        carrier(omega) {
+          _ < 3
+        }
+      }
+    }
+
+    it("can be used inside a biproduct") {
+      val left = dot(true, false)
+      val mid = dot("Johnny", "Wulf", "Gronk")
+      val right = dot(1,2,3,4)
+
+      val product = left x right
+
+      product.existsMid(mid) {
+        (l, m, r) =>
+          l && (m == "Wulf") && (r > 2)
+      } shouldBe {
+        product.biArrow(omega) {
+          (l, r) =>
+            l && (r > 2)
+        }
+      }
+    }
   }
 
   describe("Sequence comprehensions for operators") {
