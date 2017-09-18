@@ -140,7 +140,7 @@ object NollCalculations extends App {
     println(s"$name simple: " + tune.isSimple)
 
     if (false) {
-      println(s"$name injective: ")
+      // println(s"$name injective: ")
       //    println(tune.isInjective)
       val power = tune.power
       println("calculated power")

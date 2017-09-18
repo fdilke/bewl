@@ -35,15 +35,9 @@ trait ConstructToposOfMonoidActions extends
     ] {
       import monoid.{ carrier, action, Action }
       
-     val analyzerHolder: {
-       type ANALYSIS[A <: ~] <: monoid.ActionAnalysis[A, ANALYSIS]
-       val analyzer: monoid.ActionAnalyzer[ANALYSIS]
-     } =
+     val analyzer: monoid.ActionAnalyzer =
         assistant.actionAnalyzer(monoid)
 
-      val analyzer =
-        analyzerHolder.analyzer
-        
       override type DOT[A <: ~] = ActionDot[A]
       override type >[A <: ~, B <: ~] = ActionArrow[A, B]
       override type UNIT = Ɛ.UNIT

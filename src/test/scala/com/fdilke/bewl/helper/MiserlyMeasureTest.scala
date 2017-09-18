@@ -16,19 +16,8 @@ class MiserlyMeasureTest extends FreeSpec {
         0 #:: (
           N map { _ + 1 }
         )
-//      val blowupAfter2 =
-//        new Traversable[Boolean] {
-//          override def foreach[U](
-//            f: (Boolean) => U
-//          ) {
-//            f(true)
-//            f(true)
-//            throw new IllegalArgumentException
-//          }
-//        }
 
       MM(N, 3) shouldBe false
-//      MM(blowupAfter2, 2) shouldBe false
       MM(Seq(1,2,3), 3) shouldBe true
       MM(Seq(1,2,3, 4), 3) shouldBe false
     }

@@ -24,17 +24,10 @@ class DefaultMonoidAssistantTest extends FreeSpec {
       
   private val bar = monoidOf3.action(barDot)(scalarMultiply)
 
-  private val analyzerHolder: {
-    type ANALYSIS[A] <: monoidOf3.ActionAnalysis[A, ANALYSIS]
-    val analyzer: monoidOf3.ActionAnalyzer[ANALYSIS]
-  } =
+  private val analyzer: monoidOf3.ActionAnalyzer =
     FiniteSets.DefaultMonoidAssistant.actionAnalyzer(
       monoidOf3
     )
-
-  private val analyzer =
-    analyzerHolder.analyzer
-
 
   private val regularAnalysis =
     analyzer.analyze(regularAction)

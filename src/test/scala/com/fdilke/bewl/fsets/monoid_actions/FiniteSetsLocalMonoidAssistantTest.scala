@@ -18,16 +18,10 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
 
   import monoidOf3.regularAction
 
-  val analyzerHolder: {
-    type ANALYSIS[A] <: monoidOf3.ActionAnalysis[A, ANALYSIS]
-    val analyzer: monoidOf3.ActionAnalyzer[ANALYSIS]
-  } =
+  private val analyzer: monoidOf3.ActionAnalyzer =
     LocalMonoidAssistant.actionAnalyzer(
       monoidOf3
     )
-
-  private val analyzer =
-    analyzerHolder.analyzer
 
   import analyzer.analyze
 

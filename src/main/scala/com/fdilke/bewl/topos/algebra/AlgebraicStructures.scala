@@ -44,9 +44,8 @@ trait AlgebraicStructures extends
       ): RawExponential[A, B]
     }
     
-    trait ActionAnalyzer[
-      ANALYSIS[A <: ~] <: ActionAnalysis[A, ANALYSIS]
-    ] {
+    trait ActionAnalyzer {
+      type ANALYSIS[A <: ~] <: ActionAnalysis[A, ANALYSIS]
       def analyze[A <: ~](
         action: Action[A]
       ) : ANALYSIS[A]
