@@ -31,26 +31,17 @@ trait RelationalAlgebra extends
 
     def o[U <: ~](
       that: Relation[T, U]
-    ) = {
-      val product = source x that.target
-      val compositeCriterion =
-        BiArrow[S, U, TRUTH](
-          product,
-          product.exists (
-            that.source
-          ) { (su: S x U, t: T) =>
-            val s: S = product.π0(su)
-            val u: U = product.π1(su)
-            criterion(s, t) ∧
-              that.criterion(t, u)
-          }
-        )
-        Relation[S, U](
-          source,
-          that.target,
-          compositeCriterion
+    ) =
+      Relation[S, U](
+        source,
+        that.target,
+        (source x that.target).existsMid(
+          that.source
+        ) { (s : S, t: T, u: U) =>
+          criterion(s, t) ∧
+            that.criterion(t, u)
+        }
       )
-    }
   }
 
   implicit class EndoRelation[S <: ~](

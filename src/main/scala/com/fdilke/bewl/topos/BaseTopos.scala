@@ -71,16 +71,16 @@ trait BaseTopos {
   trait BiproductDot[
     L <: ~,
     R <: ~
-  ] { dot: DOT[L x R] =>
+  ] { product: DOT[L x R] =>
     val left: DOT[L]
     val right: DOT[R]
     def pair(l: L, r: R): L x R
 
     final lazy val π0 =
-      dot(left) { _._1 }
+      product(left) { _._1 }
 
     final lazy val π1 =
-      dot(right) { _._2 }
+      product(right) { _._2 }
 
     final def biArrow[T <: ~](
       target: DOT[T]
@@ -109,6 +109,22 @@ trait BaseTopos {
       BiArrow(
         this,
         this.exists(target)(bifunc)
+      )
+
+    final def existsMid[T <: ~](
+      mid: DOT[T]
+    ) (
+      trifunc: (L, T, R) => TRUTH
+    ): BiArrow[L, R, TRUTH] =
+      BiArrow[L, R, TRUTH](
+        product,
+        exists(
+          mid
+        ) { (lr, t) =>
+          val l = π0(lr)
+          val r = π1(lr)
+          trifunc(l, t, r)
+        }
       )
   }
 
