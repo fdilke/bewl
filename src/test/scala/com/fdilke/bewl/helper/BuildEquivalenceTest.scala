@@ -119,10 +119,38 @@ class BuildEquivalenceTest extends FreeSpec {
           3 -> 3
         )
       ) shouldBe List(
-          2,
+          0,
           1,
-          2,
+          0,
           1 
+      )
+    }
+    "can be calculated for another formerly problematic example" in {
+      BuildEquivalence(
+        4,
+        Traversable(
+          0 -> 0,
+          0 -> 1,
+          0 -> 2,
+          0 -> 3,
+          1 -> 0,
+          1 -> 1,
+          1 -> 2,
+          1 -> 3,
+          2 -> 0,
+          2 -> 1,
+          2 -> 2,
+          2 -> 3,
+          3 -> 0,
+          3 -> 1,
+          3 -> 2,
+          3 -> 3
+        )
+      ) shouldBe List(
+          3,
+          3,
+          3,
+          3
       )
     }
   }
