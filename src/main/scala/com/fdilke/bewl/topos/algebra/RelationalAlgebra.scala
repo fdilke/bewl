@@ -5,13 +5,12 @@ import com.fdilke.bewl.helper.⊕
 
 import scala.language.{higherKinds, postfixOps}
 
-trait RelationalAlgebra extends
-  BaseTopos with
+trait RelationalAlgebra {
+  Ɛ: BaseTopos with
   ToposEnrichments with
   ToposStructures with
-  AlgebraicMachinery {
-
-  Ɛ: AlgebraicStructures =>
+  AlgebraicMachinery with
+  AlgebraicStructures =>
 
   case class Relation[S <: ~, T <: ~](
     source: DOT[S],

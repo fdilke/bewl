@@ -2,13 +2,13 @@ package com.fdilke.bewl.topos.enrichment
 
 import com.fdilke.bewl.helper.⊕
 import com.fdilke.bewl.topos.algebra.AlgebraicStructures
-import com.fdilke.bewl.topos.{BaseTopos, ToposStructures}
+import com.fdilke.bewl.topos.{BaseTopos, ToposAlgebra, ToposStructures}
 
 trait LogicalOperations {
 
   Ɛ: BaseTopos with
     ToposStructures with
-    AlgebraicStructures =>
+    ToposAlgebra =>
 
   lazy val Ω: HeytingAlgebra[TRUTH] = {
     val and =
@@ -33,7 +33,7 @@ trait LogicalOperations {
           case (a ⊕ b, ω) => ((a → ω) ∧ (b → ω)) → ω
         }
       )
-    val falsity =
+    val falsity: UNIT > TRUTH =
       I.forAll(omega) {
         (_, ω) => ω
       }

@@ -1,13 +1,13 @@
 package com.fdilke.bewl.topos.algebra
 
-import com.fdilke.bewl.topos.{BaseTopos, ToposEnrichments, ToposStructures}
+import com.fdilke.bewl.topos.{BaseTopos, ToposAlgebra, ToposEnrichments, ToposStructures}
+
 import scala.language.higherKinds
 
 trait AlgebraicStructures extends
   BaseTopos with
   ToposEnrichments with
-  ToposStructures with
-  AlgebraicMachinery { Ɛ =>
+  ToposStructures { Ɛ: ToposAlgebra =>
 
   import NamedLaws._
   import StandardTermsAndOperators._

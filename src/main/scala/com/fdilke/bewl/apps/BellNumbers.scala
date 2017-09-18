@@ -2,7 +2,22 @@ package com.fdilke.bewl.apps
 
 import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
-import com.fdilke.bewl.helper.⊕
+import scala.language.postfixOps
+
+//  final def isEquivalenceRelation(
+//    equiv: (S, S) => TRUTH
+//  ) = // TODO: rewrite this using first order logic
+//    this.universally { s =>
+//      equiv(s, s)
+//    } &&
+//      squared.universally {
+//        case s ⊕ t =>
+//          equiv(s, t) → equiv(t, s)
+//      } &&
+//      (squared x dot).universally {
+//        case s ⊕ t ⊕ u  =>
+//          equiv(s, t) ∧ equiv(t, u) → equiv(s, u)
+//      }
 
 object BellNumbers extends App {
 
@@ -28,7 +43,9 @@ object BellNumbers extends App {
   }
 
   def bell(n: Int): Int =
-    dot(0 until n :_*).congruences.size
+    dot(
+      0 until n :_*
+    ).congruences size
 
   for {
     n <- 0 to 10

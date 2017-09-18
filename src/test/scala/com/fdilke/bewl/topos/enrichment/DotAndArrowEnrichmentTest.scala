@@ -541,7 +541,7 @@ class DotAndArrowEnrichmentTest extends FunSpec {
 
       topos.makeDot(
         twoGroup.regularAction
-      ) shouldBe 'simple
+      ) shouldBe 'minimal
     }
   }
 

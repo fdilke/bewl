@@ -38,8 +38,7 @@ trait ToposConstructions extends
   ConstructToposOfGroupActions with
   ConstructToposOfAutomorphisms {
 
-  Ɛ: AlgebraicStructures with
-    AlgebraicMachinery with
+  Ɛ: ToposAlgebra with
     ToposEnrichments with
     ToposStructures =>
 }
@@ -57,7 +56,7 @@ trait ToposEnrichments extends
   MonadicPlumbing {
   Ɛ: BaseTopos with
     ToposStructures with
-    AlgebraicStructures =>
+    ToposAlgebra =>
 }
 
 trait MonadConstructions extends
@@ -65,7 +64,7 @@ trait MonadConstructions extends
   MonadOfMonoidActions {
   Ɛ: BaseTopos with
     ToposStructures with
-    AlgebraicStructures =>
+    ToposAlgebra =>
 }
 
 trait Topos[BASE] extends BaseTopos with

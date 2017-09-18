@@ -2,8 +2,8 @@ package com.fdilke.bewl.helper
 
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
-import scala.language.reflectiveCalls
-import scala.language.existentials
+
+import scala.language.{existentials, reflectiveCalls}
 
 class BuildEquivalenceTest extends FreeSpec {
   "Equivalence relations" - {

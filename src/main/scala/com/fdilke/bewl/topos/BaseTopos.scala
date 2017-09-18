@@ -1,6 +1,7 @@
 package com.fdilke.bewl.topos
 
-import com.fdilke.bewl.helper.{IterateToFixed, Memoize, ⊕}
+import com.fdilke.bewl.helper.{IterateToFixed, Memoize, MiserlyMeasure, ⊕}
+import com.fdilke.bewl.topos.algebra.{AlgebraicConstructions, AlgebraicMachinery, AlgebraicStructures, RelationalAlgebra}
 
 import scala.language.{higherKinds, postfixOps}
 
@@ -444,21 +445,6 @@ trait BaseTopos {
         criterion
       }.toBool
 
-    final def isEquivalenceRelation(
-      equiv: (S, S) => TRUTH
-    ) = // TODO: rewrite this using first order logic
-      this.universally { s =>
-        equiv(s, s)
-      } &&
-      squared.universally {
-        case s ⊕ t =>
-          equiv(s, t) → equiv(t, s)
-      } &&
-      (squared x dot).universally {
-        case s ⊕ t ⊕ u  =>
-          equiv(s, t) ∧ equiv(t, u) → equiv(s, u)
-      }
-
     final def /(
       equiv: (S, S) => TRUTH
     ): Quotient[S] =
@@ -468,7 +454,7 @@ trait BaseTopos {
       singleton isSection
 
     final lazy val isMinimal: Boolean =
-      >>(omega).size == 2
+      MiserlyMeasure(>>(omega), 2)
 
     final def congruences: Traversable[Relation[S, S]] =
       squared >> omega map { arrow =>
@@ -480,17 +466,12 @@ trait BaseTopos {
             arrow
           )
         )
+      } filter {
+        _.isEquivalence
       }
 
     final lazy val isSimple: Boolean =
-      (squared >> omega count { relation =>
-        isEquivalenceRelation(
-          BiArrow(
-            squared,
-            relation
-          ) apply
-        )
-      }) == 2
+      MiserlyMeasure(congruences, 2)
   }
 
   trait BaseArrow[S <: ~, T <: ~] {
