@@ -2,16 +2,14 @@ package com.fdilke.bewl.topos.constructions
 
 import com.fdilke.bewl.helper.⊕
 import com.fdilke.bewl.topos._
-import com.fdilke.bewl.topos.algebra.{AlgebraicMachinery, AlgebraicStructures}
-import scala.language.higherKinds
-import scala.language.reflectiveCalls
-import scala.language.postfixOps
+
+import scala.language.{higherKinds, postfixOps, reflectiveCalls}
 
 trait ConstructDefaultMonoidAssistant extends
   BaseTopos with
   ToposEnrichments {
 
-  Ɛ: AlgebraicStructures with AlgebraicMachinery =>
+  Ɛ: ToposAlgebra =>
 
   trait MonoidAssistant {
     def actionAnalyzer[

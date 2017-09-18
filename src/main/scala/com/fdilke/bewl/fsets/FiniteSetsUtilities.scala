@@ -146,15 +146,7 @@ object FiniteSetsUtilities {
         } yield {
           f + (source.head -> choice)
         }
-
-  def equivalenceFrom( // TODO: eliminate use of this
-     identifications: Set[(Symbol, Symbol)]
-   ) (
-     p: Symbol,
-     q: Symbol
-   ): Boolean =
-    identifications contains (p -> q)
-
+  
   def relationFrom[X, Y](
     source: DOT[X],
     target: DOT[Y],
@@ -165,5 +157,15 @@ object FiniteSetsUtilities {
       target,
       (p: X, q: Y) =>
         identifications contains (p -> q)
+    )
+
+  def relationFrom[X](
+    carrier: DOT[X],
+    identifications: (X, X)*
+  ): FiniteSets.Relation[X, X] =
+    relationFrom(
+      carrier,
+      carrier,
+      identifications :_*
     )
 }

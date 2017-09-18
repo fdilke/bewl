@@ -11,7 +11,7 @@ trait ConstructToposOfMonoidActions extends
   BaseTopos with
   ToposEnrichments with  
   ConstructDefaultMonoidAssistant {
-  Ɛ: AlgebraicStructures with AlgebraicMachinery =>
+  Ɛ: ToposAlgebra =>
 
   object ToposOfMonoidActions {
     def of[

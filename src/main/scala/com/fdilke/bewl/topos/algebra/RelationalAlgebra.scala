@@ -69,6 +69,9 @@ trait RelationalAlgebra extends
 
     def isIdempotent: Boolean =
       o(relation) == relation
+
+    def isEquivalence: Boolean =
+      isReflexive && isSymmetric && isIdempotent
   }
   
   object Relation {

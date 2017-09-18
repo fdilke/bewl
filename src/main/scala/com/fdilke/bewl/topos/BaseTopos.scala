@@ -1,14 +1,13 @@
 package com.fdilke.bewl.topos
 
-import com.fdilke.bewl.helper.{IterateToFixed, Memoize, ↔, ⊕}
+import com.fdilke.bewl.helper.{IterateToFixed, Memoize, ⊕}
 
-import scala.Function.tupled
 import scala.language.{higherKinds, postfixOps}
-import ⊕._
 
 trait BaseTopos {
   Ɛ: ToposEnrichments with
-    ToposStructures =>
+    ToposStructures with
+    ToposAlgebra =>
 
   type ~
   type DOT[S <: ~] <: Dot[S]
@@ -470,6 +469,18 @@ trait BaseTopos {
 
     final lazy val isMinimal: Boolean =
       >>(omega).size == 2
+
+    final def congruences: Traversable[Relation[S, S]] =
+      squared >> omega map { arrow =>
+        Relation(
+          dot,
+          dot,
+          BiArrow(
+            squared,
+            arrow
+          )
+        )
+      }
 
     final lazy val isSimple: Boolean =
       (squared >> omega count { relation =>

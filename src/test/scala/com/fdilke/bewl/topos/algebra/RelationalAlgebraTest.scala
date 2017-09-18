@@ -20,7 +20,6 @@ class RelationalAlgebraTest extends FunSpec {
 
       diag shouldBe relationFrom(
         carrier,
-        carrier,
         0 -> 0,
         1 -> 1
       )
@@ -33,12 +32,10 @@ class RelationalAlgebraTest extends FunSpec {
 
       relationFrom(
         carrier,
-        carrier,
         0 -> 0,
         0 -> 1
       ).inverse shouldBe
         relationFrom(
-          carrier,
           carrier,
           0 -> 0,
           1 -> 0
@@ -123,14 +120,12 @@ class RelationalAlgebraTest extends FunSpec {
 
       relationFrom(
         carrier,
-        carrier,
         0 -> 0,
         1 -> 1,
         0 -> 1
       ).isReflexive shouldBe true
       
       relationFrom(
-        carrier,
         carrier,
         0 -> 0,
         0 -> 1
@@ -144,13 +139,11 @@ class RelationalAlgebraTest extends FunSpec {
 
       relationFrom(
         carrier,
-        carrier,
         0 -> 0,
         0 -> 1
       ).isSymmetric shouldBe false
 
       relationFrom(
-        carrier,
         carrier,
         0 -> 1,
         1 -> 0
@@ -167,19 +160,16 @@ class RelationalAlgebraTest extends FunSpec {
       val carrier = dot(0, 1, 2)
 
       relationFrom(
-        carrier,
         carrier
       ).isTransitive shouldBe true
 
       relationFrom(
-        carrier,
         carrier,
         0 -> 1,
         1 -> 2
       ).isTransitive shouldBe false
 
       relationFrom(
-        carrier,
         carrier,
         0 -> 1,
         1 -> 2,
@@ -197,12 +187,10 @@ class RelationalAlgebraTest extends FunSpec {
       val carrier = dot(0, 1, 2, 3)
 
       relationFrom(
-        carrier,
         carrier
       ).isIdempotent shouldBe true
 
       relationFrom(
-        carrier,
         carrier,
         0 -> 0,
         0 -> 1,
@@ -211,7 +199,6 @@ class RelationalAlgebraTest extends FunSpec {
       ).isIdempotent shouldBe false
 
       relationFrom(
-        carrier,
         carrier,
         0 -> 0,
         0 -> 1,
@@ -226,51 +213,54 @@ class RelationalAlgebraTest extends FunSpec {
     }
   }
 
-  describe("Equivalences") {
+  describe("Equivalence relations") {
     it("can be tested for sets") {
       val symbols = dot('A, 'B, 'C)
-      val notReflexive = Set(
-        'A -> 'A
-      )
-      val notSymmetric = Set(
-        'A -> 'A,
-        'B -> 'B,
-        'C -> 'C,
-        'A -> 'B
-      )
-      val notTransitive = Set(
-        'A -> 'A,
-        'B -> 'B,
-        'C -> 'C,
-        'A -> 'B,
-        'B -> 'A,
-        'B -> 'C,
-        'C -> 'B
-      )
-      val identifyBandC = Set(
-        'A -> 'A,
-        'B -> 'B,
-        'C -> 'C,
-        'B -> 'C,
-        'C -> 'B
-      )
+      val notReflexive =
+        relationFrom(
+          symbols,
+          'A -> 'A
+        )
+      val notSymmetric =
+        relationFrom(
+          symbols,
+          'A -> 'A,
+          'B -> 'B,
+          'C -> 'C,
+          'A -> 'B
+        )
+      val notTransitive =
+        relationFrom(
+          symbols,
+          'A -> 'A,
+          'B -> 'B,
+          'C -> 'C,
+          'A -> 'B,
+          'B -> 'A,
+          'B -> 'C,
+          'C -> 'B
+        )
+      val identifyBandC =
+        relationFrom(
+          symbols,
+          'A -> 'A,
+          'B -> 'B,
+          'C -> 'C,
+          'B -> 'C,
+          'C -> 'B
+        )
 
-      symbols.isEquivalenceRelation(
-        equivalenceFrom(notReflexive)
-      ) shouldBe false
+      notReflexive.
+        isEquivalence shouldBe false
 
-      symbols.isEquivalenceRelation(
-        equivalenceFrom(notSymmetric)
-      ) shouldBe false
+      notSymmetric.
+        isEquivalence shouldBe false
 
-      symbols.isEquivalenceRelation(
-        equivalenceFrom(notTransitive)
-      ) shouldBe false
+      notTransitive.
+        isEquivalence shouldBe false
 
-      symbols.isEquivalenceRelation(
-        equivalenceFrom(identifyBandC)
-      ) shouldBe true
+      identifyBandC.
+        isEquivalence shouldBe true
     }
   }
-
 }

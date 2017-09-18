@@ -10,7 +10,7 @@ trait ConstructToposOfAutomorphisms extends
   BaseTopos with
   ToposEnrichments {
 
-  Ɛ: AlgebraicStructures with AlgebraicMachinery =>
+  Ɛ: ToposAlgebra =>
 
   object ToposOfAutomorphisms {
 
