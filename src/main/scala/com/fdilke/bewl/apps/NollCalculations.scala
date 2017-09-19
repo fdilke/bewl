@@ -1,17 +1,9 @@
 package com.fdilke.bewl.apps
 
 import com.fdilke.bewl.fsets.FiniteSets
-import com.fdilke.bewl.fsets.FiniteSets.{
-  Monoid,
-  ToposOfMonoidActions,
-  ActionSplitter,
-  Relation,
-  bifunctionAsBiArrow,
-  makeDot,
-  x
-}
+import com.fdilke.bewl.fsets.FiniteSets.{ActionSplitter, Monoid, Relation, ToposOfMonoidActions, bifunctionAsBiArrow, makeDot, x}
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.{elementsOf, makeNullaryOperator}
-import com.fdilke.bewl.helper.⊕
+import com.fdilke.bewl.helper.{Timed, ⊕}
 
 import scala.language.postfixOps
 
@@ -131,6 +123,44 @@ object NollCalculations extends App {
       triadicMonoid.regularAction
     )
 
+  def triadicSplit[A](
+    dot: triadicTopos.DOT[A]
+  ) =
+    ActionSplitter.forMonoid(
+      triadicMonoid
+    ).splitAction(
+      triadicTopos.unwrap(
+        dot
+      )
+    )
+
+  if(true)  {
+    val cc = cyclic x chord
+    val ccAnalysis =
+      triadicSplit(cc)
+    println(
+      "\tcyclic x chord: number of components: " + (
+        ccAnalysis.components.size
+      )
+    )
+    val pc = Timed("calculating power chord") {
+      chord.power
+    }
+    println("power chord size: " +
+      (elementsOf(triadicTopos.unwrap(pc).actionCarrier).size)
+    )
+
+    val pcAnalysis =
+      Timed("calculating components of power chord") {
+        triadicSplit(pc)
+      }
+    println(
+      "\tpower chord: number of components: " + (
+        pcAnalysis.components.size
+      )
+    )
+  }
+
   if (false) { // too slow, as yet
     println("Chord square:")
     val c2 = chord x chord
@@ -191,12 +221,24 @@ object NollCalculations extends App {
     name: String,
     tune: triadicTopos.DOT[T]
   ) {
-    println(s"$name minimal: " + tune.isMinimal)
-    println(s"$name simple: " + tune.isSimple)
+    val tuneMinimal =
+      Timed(s"calc $name minimal") {
+        tune.isMinimal
+      }
+    println(s"$name minimal: " + tuneMinimal)
+    val tuneSimple =
+      Timed(s"calc $name minimal") {
+        tune.isSimple
+      }
+    println(s"$name minimal: " + tuneSimple)
 
     if (false) {
-      // println(s"$name injective: ")
-      //    println(tune.isInjective)
+      val tuneInjective =
+        Timed(s"calc $name injective") {
+          tune.isInjective
+        }
+      println(s"$name minimal: " + tuneInjective)
+
       val power = tune.power
       println("calculated power")
       println("size of omega = " + measure(triadicTopos.omega))

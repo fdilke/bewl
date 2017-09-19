@@ -1,7 +1,9 @@
 package com.fdilke.bewl.fsets
 
 import com.fdilke.bewl.fsets.monoid_actions.{ActionSplitter, FindGenerators, FindPresentation, GeneratorWithRelators}
+import com.fdilke.bewl.helper.Memoize
 
+import scala.Function.tupled
 import scala.language.{higherKinds, postfixOps, reflectiveCalls}
 
 trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
@@ -152,7 +154,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
               }
             }
 
-            override def morphismsTo[B](
+            private def oldMorphismsTo[B](
               target: FiniteSetsActionAnalysis[B]
             ) = {
               val targetAction = target.action
@@ -177,6 +179,62 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
                     _
                   )
                 }
+            }
+
+            override def morphismsTo[B](
+              target: FiniteSetsActionAnalysis[B]
+            ) = {
+              val srcComponents =
+                actionSplitting.components
+              val tgtComponents =
+                target.actionSplitting.components
+              val targetAction = target.action
+              val targetCarrier =
+                targetAction.actionCarrier
+
+              val blockMaps =
+                Memoize[
+                  (Int, Int),
+                  Traversable[
+                    Map[A, B]
+                    ]
+                ] {
+                tupled {
+                  (i, j) =>
+                    mapsBetween(
+                      srcComponents(i),
+                      tgtComponents(j)
+                    )
+                  }
+                }
+
+              def absorb(
+                partialMaps: Traversable[Map[A, B]],
+                srcIndex: Int
+              ): Traversable[Map[A, B]] =
+                for {
+                  partialMap <- partialMaps
+                  tgtIndex <- tgtComponents.indices
+                  continuation <- blockMaps(
+                    srcIndex,
+                    tgtIndex
+                  )
+                } yield
+                  partialMap ++ continuation
+
+              srcComponents.indices.foldLeft(
+                Traversable(
+                  Map.empty[A, B]
+                )
+              ) {
+                absorb
+              } map {
+                functionAsArrow(
+                  action.actionCarrier,
+                  targetCarrier,
+                  _
+                )
+              }
             }
 
             lazy val recursiveImago:
