@@ -67,9 +67,6 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
                 action
               )
 
-            private val actionElements =
-              action.carrier.elements
-
             import actionSplitting.allGenerators
 
             private val generatorsWithRelators =
@@ -78,21 +75,30 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
                 allGenerators
               )
 
-            override def morphismsTo[B](
-              target: FiniteSetsActionAnalysis[B]
-            ) = {
-              val targetAction = target.action
+            private def mapsBetween[A, B](
+              src: ActionComponent[M, A, ({type λ[T] = monoid.Action[T]}) # λ],
+              tgt: ActionComponent[M, B, ({type λ[T] = monoid.Action[T]}) # λ],
+            ): Traversable[Map[A, B]] = {
+              val srcGenerators =
+                src.componentGenerators
+              val srcAction =
+                src.componentAction
+              val srcPresentation =
+                src.componentPresentation
+
+              val targetAction = tgt.componentAction
               val targetCarrier =
                 targetAction.actionCarrier
               val targetElements =
                 targetCarrier.elements
               val targetMultiply =
                 targetAction.actionMultiply
+
               def compatibleExtensions(
                 partialMap: Map[A, B],
                 index: Int
               ): Traversable[Map[A, B]] = {
-                val gr = generatorsWithRelators(index)
+                val gr = srcPresentation(index)
                 val generator = gr.generator
                 targetElements.filter { targetElement =>
                   gr.relators forall { relator =>
@@ -101,7 +107,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
                         targetElement
                       else
                         partialMap(
-                          allGenerators(relator.otherIndex)
+                          srcGenerators(relator.otherIndex)
                         )
                     targetMultiply(
                       targetElement,
@@ -116,7 +122,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
                     for {
                       m <- monoidElements
                     } yield {
-                      action.actionMultiply(
+                      srcAction.actionMultiply(
                         generator,
                         m
                       ) -> targetMultiply(
@@ -139,17 +145,38 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
                   partialMap ++ extension
                 }
 
-              generatorsWithRelators.indices.foldLeft(
+              srcPresentation.indices.foldLeft(
                 Traversable(Map.empty[A, B])
               ) {
                 absorb
-              } map {
-                functionAsArrow(
-                  action.actionCarrier,
-                  targetCarrier,
-                  _
-                )
               }
+            }
+
+            override def morphismsTo[B](
+              target: FiniteSetsActionAnalysis[B]
+            ) = {
+              val targetAction = target.action
+              val targetCarrier =
+                targetAction.actionCarrier
+
+              mapsBetween(
+                ActionComponent[M, A, ({type λ[T] = monoid.Action[T]}) # λ](
+                  allGenerators,
+                  action,
+                  generatorsWithRelators
+                ),
+                ActionComponent[M, B, ({type λ[T] = monoid.Action[T]}) # λ](
+                  target.actionSplitting.allGenerators,
+                  targetAction,
+                  Seq.empty // don't use 'em
+                )
+              ) map {
+                  functionAsArrow(
+                    action.actionCarrier,
+                    targetCarrier,
+                    _
+                  )
+                }
             }
 
             lazy val recursiveImago:
