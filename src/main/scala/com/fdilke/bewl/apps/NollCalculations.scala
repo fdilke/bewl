@@ -227,17 +227,17 @@ object NollCalculations extends App {
       }
     println(s"$name minimal: " + tuneMinimal)
     val tuneSimple =
-      Timed(s"calc $name minimal") {
+      Timed(s"calc $name simple") {
         tune.isSimple
       }
-    println(s"$name minimal: " + tuneSimple)
+    println(s"$name simple: " + tuneSimple)
 
     if (false) {
       val tuneInjective =
         Timed(s"calc $name injective") {
           tune.isInjective
         }
-      println(s"$name minimal: " + tuneInjective)
+      println(s"$name injective: " + tuneInjective)
 
       val power = tune.power
       println("calculated power")
