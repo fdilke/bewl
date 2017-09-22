@@ -1,7 +1,7 @@
 package com.fdilke.bewl.fsets
 
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.allMaps
-import com.fdilke.bewl.fsets.monoid_actions.{ActionSplitter, FindGenerators, FindPresentation}
+import com.fdilke.bewl.fsets.monoid_actions.{ActionSplitter, FindGenerators, FindPresentation, FiniteSetsMonoidAssistant}
 import com.fdilke.bewl.helper.{Memoize, ⊕}
 import com.fdilke.bewl.helper.⊕._
 import com.fdilke.bewl.topos.{Topos, Wrappings}
@@ -11,6 +11,7 @@ object FiniteSets extends BaseFiniteSets
   with FindPresentation
   with ActionSplitter
   with FiniteSetsMonoidAssistant
+  with FiniteSetsImageFinder
 
 class BaseFiniteSets extends Topos[Any] with Wrappings[
   Any, Any, Traversable, FiniteSetsPreArrow, Wrappings.NO_WRAPPER
@@ -90,7 +91,7 @@ class BaseFiniteSets extends Topos[Any] with Wrappings[
   class FiniteSetsArrow[S, T](
     val source: FiniteSetsDot[S],
     val target: FiniteSetsDot[T],
-    private[BaseFiniteSets] val function: S => T
+    protected[fsets] val function: S => T
   ) extends Arrow[S, T] { self =>
     override def \[U](monic: U > T) =
       source(monic.source) { s =>

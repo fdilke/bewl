@@ -114,6 +114,52 @@ trait BaseTopos {
           trifunc(l, t, r)
         }
       )
+
+    final def existsMidWithImages[T <: ~](
+      mid: DOT[T]
+    ) (
+      trifunc: (L, T, R) => TRUTH
+    ): BiArrow[L, R, TRUTH] = {
+      println("zzz 1")
+      val triproduct =
+        product x mid
+      println("zzz 2")
+
+      val criterion =
+        triproduct.biArrow(omega) { (lr, m) =>
+          val l = π0(lr)
+          val r = π1(lr)
+          trifunc(l, m, r)
+        } arrow
+
+      println("zzz 3")
+
+      val subobj: EQUALIZER[L x R x T] =
+        criterion.whereTrue
+
+      println("zzz 4")
+
+      val kk =
+        triproduct.π0 o subobj.inclusion
+
+      println("zzz 4.5")
+      println("kk = " + kk)
+
+      val subobjLR: EQUALIZER[L x R] =
+        (triproduct.π0 o subobj.inclusion) image
+
+      println("zzz 5")
+
+      val hh =
+        BiArrow[L, R, TRUTH](
+          product,
+          subobjLR.inclusion.chi
+        )
+
+      println("zzz 6")
+
+      hh
+    }
   }
 
   type EQUALIZER[S <: ~] =
@@ -557,14 +603,9 @@ trait BaseTopos {
       )
 
     lazy val image: EQUALIZER[T] =
-      target.exists(
-        source
-      ) { (t, s) =>
-        target.=?=(
-          arrow(s),
-          t
-        )
-      } whereTrue
+      imageFinder.image(
+        arrow
+      )
 
     def factorizeEpiMono: (
       S > T, T > T

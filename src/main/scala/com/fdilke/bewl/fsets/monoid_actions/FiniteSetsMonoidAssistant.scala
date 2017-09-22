@@ -1,6 +1,6 @@
-package com.fdilke.bewl.fsets
+package com.fdilke.bewl.fsets.monoid_actions
 
-import com.fdilke.bewl.fsets.monoid_actions.{ActionSplitter, FindGenerators, FindPresentation, GeneratorWithRelators}
+import com.fdilke.bewl.fsets.BaseFiniteSets
 import com.fdilke.bewl.helper.Memoize
 
 import scala.Function.tupled

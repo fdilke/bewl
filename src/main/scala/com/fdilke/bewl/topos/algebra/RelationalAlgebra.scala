@@ -41,7 +41,7 @@ trait RelationalAlgebra {
       Relation[S, U](
         source,
         that.target,
-        (source x that.target).existsMid(
+        (source x that.target).existsMidWithImages(
           that.source
         ) { (s, t, u) =>
           criterion(s, t) ∧
