@@ -9,7 +9,7 @@ trait ConstructDefaultMonoidAssistant extends
   BaseTopos with
   ToposEnrichments {
 
-  Ɛ: ToposAlgebra =>
+  Ɛ: ToposPrerequisites =>
 
   trait MonoidAssistant {
     def actionAnalyzer[

@@ -1,36 +1,26 @@
 package com.fdilke.bewl.topos
 
-import com.fdilke.bewl.topos.algebra.{
-  AlgebraicConstructions, 
-  AlgebraicMachinery, 
-  AlgebraicStructures,
-  RelationalAlgebra
-}
-import com.fdilke.bewl.topos.constructions.{
-  ConstructToposOfAutomorphisms, 
-  ConstructToposOfGroupActions, 
-  ConstructToposOfMonoidActions
-}
-import com.fdilke.bewl.topos.enrichment.{
-  ElementEnrichments, 
-  LogicalOperations, 
-  MonadicPlumbing
-}
-import com.fdilke.bewl.topos.monads.{
-  ContinuationMonad, 
-  MonadOfMonoidActions
-}
-import com.fdilke.bewl.topos.structures.{
-  MonadCaching, 
-  Monads, 
-  StrongMonads
-}
+import com.fdilke.bewl.topos.algebra.{AlgebraicConstructions, AlgebraicMachinery, AlgebraicStructures, RelationalAlgebra}
+import com.fdilke.bewl.topos.constructions.{ConstructToposOfAutomorphisms, ConstructToposOfGroupActions, ConstructToposOfMonoidActions}
+import com.fdilke.bewl.topos.drivers.ImageFinder
+import com.fdilke.bewl.topos.enrichment.{ElementEnrichments, LogicalOperations, MonadicPlumbing}
+import com.fdilke.bewl.topos.monads.{ContinuationMonad, MonadOfMonoidActions}
+import com.fdilke.bewl.topos.structures.{MonadCaching, Monads, StrongMonads}
+
+trait ToposPrerequisites extends
+  BaseToposDrivers with
+  ToposAlgebra with
+  ToposEnrichments with
+  ToposStructures
 
 trait ToposAlgebra extends
   AlgebraicMachinery with
   AlgebraicConstructions with
   AlgebraicStructures with
-  RelationalAlgebra
+  RelationalAlgebra {
+
+  Ɛ: ToposPrerequisites =>
+}
 
 trait ToposConstructions extends
   BaseTopos with
@@ -38,9 +28,14 @@ trait ToposConstructions extends
   ConstructToposOfGroupActions with
   ConstructToposOfAutomorphisms {
 
-  Ɛ: ToposAlgebra with
-    ToposEnrichments with
-    ToposStructures =>
+  Ɛ: ToposPrerequisites =>
+}
+
+trait BaseToposDrivers extends
+  BaseTopos with
+  ImageFinder {
+
+  Ɛ: ToposPrerequisites =>
 }
 
 trait ToposStructures extends
@@ -70,8 +65,7 @@ trait MonadConstructions extends
 trait Topos[BASE] extends BaseTopos with
   Monads with
   MonadConstructions with
-  ToposEnrichments with
-  ToposAlgebra with
+  ToposPrerequisites with
   ToposConstructions {
   override type ~ = BASE
 }

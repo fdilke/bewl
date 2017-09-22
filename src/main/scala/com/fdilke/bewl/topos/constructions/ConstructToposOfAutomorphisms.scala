@@ -1,8 +1,9 @@
 package com.fdilke.bewl.topos.constructions
 
 import com.fdilke.bewl.helper.Memoize
-import com.fdilke.bewl.topos._
+import com.fdilke.bewl.topos.{ToposAlgebra, ToposEnrichments, ToposStructures, _}
 import com.fdilke.bewl.topos.algebra.{AlgebraicMachinery, AlgebraicStructures}
+
 import scala.language.higherKinds
 import scala.language.reflectiveCalls
 
@@ -10,7 +11,7 @@ trait ConstructToposOfAutomorphisms extends
   BaseTopos with
   ToposEnrichments {
 
-  Ɛ: ToposAlgebra =>
+  Ɛ: ToposPrerequisites =>
 
   object ToposOfAutomorphisms {
 

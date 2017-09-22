@@ -6,7 +6,8 @@ import com.fdilke.bewl.topos._
 
 trait ConstructToposOfGroupActions extends
   BaseTopos with ToposEnrichments {
-  Ɛ: ToposAlgebra =>
+
+  Ɛ: ToposPrerequisites =>
 
   object ToposOfGroupActions {
     def of[G <: ~](group: Ɛ.Group[G]) : Topos[~] with Wrappings[

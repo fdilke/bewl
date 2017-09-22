@@ -1,14 +1,12 @@
 package com.fdilke.bewl.topos
 
 import com.fdilke.bewl.helper.{IterateToFixed, Memoize, MiserlyMeasure, ⊕}
-import com.fdilke.bewl.topos.algebra.{AlgebraicConstructions, AlgebraicMachinery, AlgebraicStructures, RelationalAlgebra}
 
 import scala.language.{higherKinds, postfixOps}
 
 trait BaseTopos {
-  Ɛ: ToposEnrichments with
-    ToposStructures with
-    ToposAlgebra =>
+
+  Ɛ: ToposPrerequisites =>
 
   type ~
   type DOT[S <: ~] <: Dot[S]
@@ -558,18 +556,21 @@ trait BaseTopos {
         that
       )
 
-    lazy val factorizeEpiMono: (
+    lazy val image: EQUALIZER[T] =
+      target.exists(
+        source
+      ) { (t, s) =>
+        target.=?=(
+          arrow(s),
+          t
+        )
+      } whereTrue
+
+    def factorizeEpiMono: (
       S > T, T > T
     ) = {
       val incl =
-        target.exists(
-          source
-        ) { (t, s) =>
-          target.=?=(
-            arrow(s),
-            t
-          )
-        }.whereTrue.inclusion
+        image.inclusion
       (arrow \ incl, incl)
     }
 
