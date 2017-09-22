@@ -197,15 +197,15 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
                   (Int, Int),
                   Traversable[
                     Map[A, B]
-                    ]
+                  ]
                 ] {
-                tupled {
-                  (i, j) =>
-                    mapsBetween(
-                      srcComponents(i),
-                      tgtComponents(j)
-                    )
-                  }
+                  tupled {
+                    (i, j) =>
+                      mapsBetween(
+                        srcComponents(i),
+                        tgtComponents(j)
+                      )
+                    }
                 }
 
               def absorb(

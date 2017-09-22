@@ -486,16 +486,20 @@ trait BaseTopos {
     def sanityTest()
   }
 
-  trait Arrow[S <: ~, T <: ~] extends BaseArrow[S, T] { self: S > T =>
+  trait Arrow[S <: ~, T <: ~] extends BaseArrow[S, T] {
+    arrow: S > T =>
+
     final lazy val name: UNIT > (S → T) =
       (source > target).transpose(I) {
-          (i, x) => this(x)
+          (i, x) => arrow(x)
       }
 
     final def x[U <: ~](
       that: S > U
     ): S > (T x U) = {
-      implicit val product = target x that.target
+      implicit val product: BIPRODUCT[T, U] =
+        target x that.target
+
       source(product) {
         s => this(s) ⊕⊕ that(s)
       }
@@ -504,12 +508,12 @@ trait BaseTopos {
     final def toBool(
       implicit eq: T =:= TRUTH
     ): Boolean =
-      this == source.toTrue
+      arrow == source.toTrue
 
     final def whereTrue(
       implicit eq: T =:= TRUTH
     ): EQUALIZER[S] =
-      self.asInstanceOf[S > TRUTH] ?= source.toTrue
+      arrow.asInstanceOf[S > TRUTH] ?= source.toTrue
 
     final lazy val isMonic: Boolean =
       source.forAll(source) {
@@ -523,7 +527,7 @@ trait BaseTopos {
     final lazy val isEpic: Boolean =
       target.exists(source) {
         (t, s) => target.=?=(
-          t, this(s)
+          t, arrow(s)
         )
       } toBool
 
@@ -532,21 +536,21 @@ trait BaseTopos {
 
     final lazy val isSection: Boolean =
       (target >> source).exists { left: T > S =>
-        (left o self) == source.identity
+        (left o arrow) == source.identity
       }
 
     final lazy val isRetraction: Boolean =
       (target >> source).exists { right: T > S =>
-        (self o right) == target.identity
+        (arrow o right) == target.identity
       }
       
     final lazy val inverse: T > S =
       source.power.transpose(target) {
-          (t, s) => target.=?=(t, this(s))
+          (t, s) => target.=?=(t, arrow(s))
         } \ source.singleton
 
     def /[R <: ~](iso: S > R) : R > T =
-      self o iso.inverse
+      arrow o iso.inverse
 
     def +[U <: ~](that: U > T) =
       (source ⊔ that.source).sum(
@@ -562,11 +566,11 @@ trait BaseTopos {
           source
         ) { (t, s) =>
           target.=?=(
-            self(s),
+            arrow(s),
             t
           )
         }.whereTrue.inclusion
-      (self \ incl, incl)
+      (arrow \ incl, incl)
     }
 
     final def =?( // slow ("pure") coequalizer
@@ -610,7 +614,7 @@ trait BaseTopos {
       implicit val t2 = target.squared
 
       val isEdge: T x T > TRUTH =
-        (self x that).factorizeEpiMono._2.chi
+        (arrow x that).factorizeEpiMono._2.chi
 
       target / BiArrow(
         t2,
@@ -643,7 +647,7 @@ trait BaseTopos {
         exponent > source
       ) { (s_u, u) =>
         implicit val _ = exponent > source
-        self(s_u(u))
+        arrow(s_u(u))
       }
   }
 
