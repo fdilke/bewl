@@ -1,9 +1,5 @@
 package com.fdilke.bewl.fsets
 
-import com.fdilke.bewl.fsets.monoid_actions.{ActionSplitter, FindGenerators, FindPresentation, GeneratorWithRelators}
-import com.fdilke.bewl.helper.Memoize
-
-import scala.Function.tupled
 import scala.language.{higherKinds, postfixOps, reflectiveCalls}
 
 trait FiniteSetsImageFinder extends BaseFiniteSets {

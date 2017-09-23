@@ -4,9 +4,12 @@ import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
+
 import scala.Function.untupled
 import com.fdilke.bewl.topos.algebra.KnownGroups.twoGroup
 import com.fdilke.bewl.helper.⊕
+
+import scala.collection.Traversable
 
 class DotAndArrowEnrichmentTest extends FunSpec {
 
@@ -258,6 +261,8 @@ class DotAndArrowEnrichmentTest extends FunSpec {
         Symbol > Int,
         Int > Int
       ) = anArrow.factorizeEpiMono
+      epic.sanityTest
+      monic.sanityTest
       epic shouldBe 'epic
       monic shouldBe 'monic
       (monic o epic) shouldBe anArrow
@@ -282,6 +287,7 @@ class DotAndArrowEnrichmentTest extends FunSpec {
 
       val quotientArrow : Symbol > QUOTIENT[Symbol] =
         quotient.arrow
+      quotientArrow.sanityTest
       quotientArrow.source shouldBe symbols
       quotientArrow shouldBe 'epic
       quotientArrow('A) should not be quotientArrow('B)
@@ -291,6 +297,13 @@ class DotAndArrowEnrichmentTest extends FunSpec {
         quotientArrow.target
 
       println("zzz quotientObject = " + quotientObject)
+      val Seq(p, q, r) = elementsOf(quotientObject)
+      println(s"p = $p type=" + p.getClass.getName)
+      println(s"q = $q type=" + q.getClass.getName)
+      println(s"r = $r type=" + r.getClass.getName)
+      println("q==r = " + (q == r))
+      println("set size = " + elementsOf(quotientObject).toSet.size)
+      quotientObject.sanityTest
       quotientObject.globals should have size 2
 
       val numbers = dot(1, 2, 3)
