@@ -20,7 +20,9 @@ trait ImageFinder extends
   }
 
   val imageFinder: ImageFinder =
-    new ImageFinder {
+    DefaultImageFinder
+
+  object DefaultImageFinder extends ImageFinder {
       def image[
         S <: ~,
         T <: ~

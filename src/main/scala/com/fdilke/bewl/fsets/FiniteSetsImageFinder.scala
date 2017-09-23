@@ -4,9 +4,9 @@ import scala.language.{higherKinds, postfixOps, reflectiveCalls}
 
 trait FiniteSetsImageFinder extends BaseFiniteSets {
   override val imageFinder: ImageFinder =
-    DefaultImageFinder
+    LocalImageFinder
 
-  object DefaultImageFinder extends ImageFinder {
+  object LocalImageFinder extends ImageFinder {
       def image[
         S <: ~,
         T <: ~
