@@ -120,10 +120,8 @@ trait BaseTopos {
     ) (
       trifunc: (L, T, R) => TRUTH
     ): BiArrow[L, R, TRUTH] = {
-      println("zzz 1")
       val triproduct =
         product x mid
-      println("zzz 2")
 
       val criterion =
         triproduct.biArrow(omega) { (lr, m) =>
@@ -132,33 +130,16 @@ trait BaseTopos {
           trifunc(l, m, r)
         } arrow
 
-      println("zzz 3")
-
       val subobj: EQUALIZER[L x R x T] =
         criterion.whereTrue
-
-      println("zzz 4")
-
-      val kk =
-        triproduct.π0 o subobj.inclusion
-
-      println("zzz 4.5")
-      println("kk = " + kk)
 
       val subobjLR: EQUALIZER[L x R] =
         (triproduct.π0 o subobj.inclusion) image
 
-      println("zzz 5")
-
-      val hh =
-        BiArrow[L, R, TRUTH](
-          product,
-          subobjLR.inclusion.chi
-        )
-
-      println("zzz 6")
-
-      hh
+      BiArrow[L, R, TRUTH](
+        product,
+        subobjLR.inclusion.chi
+      )
     }
   }
 

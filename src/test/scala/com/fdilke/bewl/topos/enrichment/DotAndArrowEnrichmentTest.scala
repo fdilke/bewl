@@ -296,13 +296,6 @@ class DotAndArrowEnrichmentTest extends FunSpec {
       val quotientObject: DOT[QUOTIENT[Symbol]] =
         quotientArrow.target
 
-      println("zzz quotientObject = " + quotientObject)
-      val Seq(p, q, r) = elementsOf(quotientObject)
-      println(s"p = $p type=" + p.getClass.getName)
-      println(s"q = $q type=" + q.getClass.getName)
-      println(s"r = $r type=" + r.getClass.getName)
-      println("q==r = " + (q == r))
-      println("set size = " + elementsOf(quotientObject).toSet.size)
       quotientObject.sanityTest
       quotientObject.globals should have size 2
 
@@ -563,7 +556,6 @@ class DotAndArrowEnrichmentTest extends FunSpec {
   describe("Simplicity") {
     it("is detected properly for sets") {
       0 to 3 filter { n =>
-        println("xxx n = " + n)
         makeDot(0 until n).isSimple
       } shouldBe Seq(2)
     }

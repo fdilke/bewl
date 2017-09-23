@@ -135,7 +135,7 @@ class ToposOfMonoidActionsTest(
   }
 
   describe("The Boolean property") {
-    ignore("fails") { // too slow :( :( :(
+    it("fails") {
       topos should not be 'boolean
     }
   }
@@ -157,13 +157,13 @@ class ToposOfMonoidActionsTest(
       (omega >> omega) should have size 6
     }
 
-    ignore("...optional extras") {
+    it("...optional extras") {
       foo >> foo should have size 3
       foo >> bar should have size 2
       foo >> baz should have size 3
 
       // probably not - that would be if we were only counting isomorphisms
-      (foo >> (omega > omega)) should have size 2
+//      (foo >> (omega > omega)) should have size 2
     }
   }
 
