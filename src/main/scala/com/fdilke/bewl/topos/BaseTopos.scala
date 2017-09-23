@@ -568,11 +568,10 @@ trait BaseTopos {
 
     def factorizeEpiMono: (
       S > T, T > T
-    ) = {
-      val incl =
+    ) = (
+        image.restrict(arrow),
         image.inclusion
-      (arrow \ incl, incl)
-    }
+      )
 
     final def =?( // slow ("pure") coequalizer
       that: S > T

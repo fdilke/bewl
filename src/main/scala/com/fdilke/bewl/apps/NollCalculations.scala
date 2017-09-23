@@ -226,19 +226,19 @@ object NollCalculations extends App {
         tune.isMinimal
       }
     println(s"$name minimal: " + tuneMinimal)
-    val tuneSimple =
-      Timed(s"calc $name simple") {
-        tune.isSimple
+//    val tuneSimple =
+//      Timed(s"calc $name simple") {
+//        tune.isSimple
+//      }
+//    println(s"$name simple: " + tuneSimple)
+
+    val tuneInjective =
+      Timed(s"calc $name injective") {
+        tune.isInjective
       }
-    println(s"$name simple: " + tuneSimple)
+    println(s"$name injective: " + tuneInjective)
 
     if (false) {
-      val tuneInjective =
-        Timed(s"calc $name injective") {
-          tune.isInjective
-        }
-      println(s"$name injective: " + tuneInjective)
-
       val power = tune.power
       println("calculated power")
       println("size of omega = " + measure(triadicTopos.omega))
