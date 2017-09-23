@@ -361,8 +361,45 @@ trait ConstructToposOfMonoidActions extends
             )
           }
         }
-        
-        override def bifunctionAsBiArrow[
+
+      override val imageFinder: ImageFinder =
+        new ImageFinder {
+          def image[
+            S <: ~,
+            T <: ~
+          ](
+            arrow: S > T
+          ): EQUALIZER[T] = {
+            val delegatedImage =
+              arrow.arrow.image
+
+            new ActionDot(
+              action(
+                delegatedImage
+              ){ (s, m) =>
+                arrow.target.action.actionMultiply(
+                  s, m
+                )
+              }
+            ) with EqualizingDot[T] { equalizingDot =>
+              val equalizerTarget = arrow.target
+              def restrict[
+                R <: ~
+              ](
+                actionArrow: ActionArrow[R, T]
+              ) =
+                ActionArrow[R, T](
+                  actionArrow.source,
+                  equalizingDot,
+                  delegatedImage.restrict(
+                    actionArrow.arrow
+                  )
+                )
+            }
+          }
+        }
+
+      override def bifunctionAsBiArrow[
           L <: ~, 
           R <: ~, 
           T <: ~

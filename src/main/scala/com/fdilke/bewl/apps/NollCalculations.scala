@@ -134,7 +134,7 @@ object NollCalculations extends App {
       )
     )
 
-  if(true)  {
+  if(false)  {
     val cc = cyclic x chord
     val ccAnalysis =
       triadicSplit(cc)
@@ -161,7 +161,7 @@ object NollCalculations extends App {
     )
   }
 
-  if (false) { // too slow, as yet
+  if (true) { // too slow, as yet
     println("Chord square:")
     val c2 = chord x chord
     val csAnalysis =
@@ -226,11 +226,12 @@ object NollCalculations extends App {
         tune.isMinimal
       }
     println(s"$name minimal: " + tuneMinimal)
-//    val tuneSimple =
-//      Timed(s"calc $name simple") {
-//        tune.isSimple
-//      }
-//    println(s"$name simple: " + tuneSimple)
+
+    val tuneSimple =
+      Timed(s"calc $name simple") {
+        tune.isSimple
+      }
+    println(s"$name simple: " + tuneSimple)
 
     val tuneInjective =
       Timed(s"calc $name injective") {
