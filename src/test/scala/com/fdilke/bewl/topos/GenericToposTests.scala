@@ -4,6 +4,7 @@ import com.fdilke.bewl.helper.⊕
 import com.fdilke.bewl.topos.constructions.ConstructToposOfMonoidActions
 import org.scalatest.Matchers._
 import org.scalatest._
+
 import scala.language.higherKinds
 
 abstract class ToposFixtureSanityTests[
@@ -381,5 +382,28 @@ abstract class GenericToposTests[
         omega shouldBe 'injective
       }
     }
+
+    if (imageFinder != DefaultImageFinder)
+      it("local image finder behaves as default") {
+        for {
+          s2t <- foo >> bar
+        } {
+          val defaultImage =
+            DefaultImageFinder.image(s2t)
+          val localImage =
+            imageFinder.image(s2t)
+
+          localImage.equalizerTarget shouldBe
+            defaultImage.equalizerTarget
+
+          localImage.restrict(
+            defaultImage.inclusion
+          ) shouldBe 'iso
+
+          defaultImage.restrict(
+            localImage.inclusion
+          ) shouldBe 'iso
+        }
+      }
   }
 }

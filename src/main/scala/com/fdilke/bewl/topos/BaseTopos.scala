@@ -114,6 +114,22 @@ trait BaseTopos {
           trifunc(l, t, r)
         }
       )
+
+    final def existsMidWithImages[T <: ~](
+      mid: DOT[T]
+    ) (
+      trifunc: (L, T, R) => TRUTH
+    ): BiArrow[L, R, TRUTH] =
+      BiArrow[L, R, TRUTH](
+        product,
+        existsViaImage(
+          mid
+        ) { (lr, t) =>
+          val l = π0(lr)
+          val r = π1(lr)
+          trifunc(l, t, r)
+        }
+      )
   }
 
   type EQUALIZER[S <: ~] =
@@ -327,12 +343,41 @@ trait BaseTopos {
     ): R > TRUTH =
       ∃ o power.transpose(source)(bifunc)
 
-    final def exists[T <: ~](
+    final def existsViaE[T <: ~](
       target: DOT[T]
     )(
       g: (S, T) => TRUTH
     ): S > TRUTH =
       target.preExists(this)(g)
+
+    final def exists[T <: ~](
+      target: DOT[T]
+    )(
+      g: (S, T) => TRUTH
+    ): S > TRUTH =
+      existsViaE(target)(g)
+
+    final def existsViaImage[T <: ~](
+      target: DOT[T]
+    )(
+      g: (S, T) => TRUTH
+    ): S > TRUTH = {
+      val dotTarget =
+        dot x target
+
+      val criterion: S x T > TRUTH =
+        dotTarget.biArrow(omega) {
+          g
+        } arrow
+
+      val hh: EQUALIZER[S x T] =
+        criterion.whereTrue
+
+      val kk: EQUALIZER[S] =
+        (dotTarget.π0 o hh.inclusion).image
+
+      kk.inclusion.chi
+    }
 
     final lazy val diagonal: S > (S x S) =
       this(squared) { x =>
@@ -511,7 +556,8 @@ trait BaseTopos {
     final def whereTrue(
       implicit eq: T =:= TRUTH
     ): EQUALIZER[S] =
-      arrow.asInstanceOf[S > TRUTH] ?= source.toTrue
+      arrow.asInstanceOf[S > TRUTH] ?=
+        source.toTrue
 
     final lazy val isMonic: Boolean =
       source.forAll(source) {
@@ -557,14 +603,9 @@ trait BaseTopos {
       )
 
     lazy val image: EQUALIZER[T] =
-      target.exists(
-        source
-      ) { (t, s) =>
-        target.=?=(
-          arrow(s),
-          t
-        )
-      } whereTrue
+      imageFinder.image(
+        arrow
+      )
 
     def factorizeEpiMono: (
       S > T, T > T

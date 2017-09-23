@@ -1,7 +1,7 @@
 package com.fdilke.bewl.fsets
 
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.allMaps
-import com.fdilke.bewl.fsets.monoid_actions.{ActionSplitter, FindGenerators, FindPresentation}
+import com.fdilke.bewl.fsets.monoid_actions.{ActionSplitter, FindGenerators, FindPresentation, FiniteSetsMonoidAssistant}
 import com.fdilke.bewl.helper.{Memoize, ⊕}
 import com.fdilke.bewl.helper.⊕._
 import com.fdilke.bewl.topos.{Topos, Wrappings}
@@ -12,6 +12,7 @@ object FiniteSets extends BaseFiniteSets
   with FindPresentation
   with ActionSplitter
   with FiniteSetsMonoidAssistant
+  with FiniteSetsImageFinder
 
 class BaseFiniteSets extends Topos[Any] with Wrappings[
   Any, Any, Traversable, FiniteSetsPreArrow, Wrappings.NO_WRAPPER
@@ -87,7 +88,7 @@ class BaseFiniteSets extends Topos[Any] with Wrappings[
   class FiniteSetsArrow[S, T](
     val source: FiniteSetsDot[S],
     val target: FiniteSetsDot[T],
-    private[BaseFiniteSets] val function: S => T
+    protected[fsets] val function: S => T
   ) extends Arrow[S, T] { self =>
     override def \[U](monic: U > T) =
       source(monic.source) { s =>
@@ -97,13 +98,16 @@ class BaseFiniteSets extends Topos[Any] with Wrappings[
         } getOrElse {
           throw new IllegalArgumentException(s"Cannot backdivide $self by monic $monic")
       }}
-    override def sanityTest =
-      for { targetElement <- source.elements map function }
-        if (!target.elements.exists( _ == targetElement )) {
+    override def sanityTest {
+      source.sanityTest
+      target.sanityTest
+      for {targetElement <- source.elements map function}
+        if (!target.elements.exists(_ == targetElement)) {
           throw new IllegalArgumentException(
             "Map value " + targetElement + " not in target " + target.elements
           )
         }
+    }
     override def ?=(that: S > T) =
       new FiniteSetsDot[S] (
         source.elements.filter { s => function(s) == that.function(s) }
