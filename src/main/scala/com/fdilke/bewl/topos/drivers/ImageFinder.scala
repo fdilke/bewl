@@ -29,7 +29,7 @@ trait ImageFinder extends
       ] (
         arrow: S > T
       ): EQUALIZER[T] =
-        arrow.target.exists(
+        arrow.target.existsViaE(
           arrow.source
         ) { (t, s) =>
           arrow.target.=?=(
