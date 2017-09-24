@@ -146,7 +146,7 @@ object FiniteSetsUtilities {
         } yield {
           f + (source.head -> choice)
         }
-  
+
   def relationFrom[X, Y](
     source: DOT[X],
     target: DOT[Y],

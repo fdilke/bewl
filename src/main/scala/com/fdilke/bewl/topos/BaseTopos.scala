@@ -1,6 +1,6 @@
 package com.fdilke.bewl.topos
 
-import com.fdilke.bewl.helper.{IterateToFixed, Memoize, MiserlyMeasure, ⊕}
+import com.fdilke.bewl.helper.{IterateToFixed, Memoize, VerifyLength, ⊕}
 
 import scala.language.{higherKinds, postfixOps}
 
@@ -497,7 +497,7 @@ trait BaseTopos {
       singleton isSection
 
     final lazy val isMinimal: Boolean =
-      MiserlyMeasure(>>(omega), 2)
+      VerifyLength(>>(omega).toSeq, 2)
 
     final def congruences: Traversable[Relation[S, S]] =
       squared >> omega map { arrow =>
@@ -514,7 +514,7 @@ trait BaseTopos {
       }
 
     final lazy val isSimple: Boolean =
-      MiserlyMeasure(congruences, 2)
+      VerifyLength(congruences toSeq, 2)
   }
 
   trait BaseArrow[S <: ~, T <: ~] {

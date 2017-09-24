@@ -3,14 +3,14 @@ package com.fdilke.bewl.fsets
 import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import FiniteSetsUtilities.allMaps
-import org.scalatest.{FunSpec, Matchers}
+import org.scalatest.{FreeSpec, FunSpec, Matchers}
 import Matchers._
 import com.fdilke.bewl.topos.algebra.KnownMonoids
 import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
 
-class FiniteSetsUtilitiesTest extends FunSpec {
-  describe("allMaps()") {
-    it("enumerates all maps between two sets") {
+class FiniteSetsUtilitiesTest extends FreeSpec {
+  "allMaps()" - {
+    "enumerates all maps between two sets" in {
       allMaps(Seq(1, 2), Set("a", "b", "c")) map {
         f => Map(1->f(1), 2->f(2))
       } shouldBe Seq(
@@ -20,21 +20,21 @@ class FiniteSetsUtilitiesTest extends FunSpec {
       )
     }
 
-    it("gives sensible results even when the source is empty") {
+    "gives sensible results even when the source is empty" in {
       allMaps(Seq(), Seq(0)).size shouldBe 1
     }
 
-    it("gives sensible results even when the target is empty") {
+    "gives sensible results even when the target is empty" in {
       allMaps(Seq(0), Seq()) shouldBe 'empty
     }
 
-    it("gives sensible results even when both source and target are empty") {
+    "gives sensible results even when both source and target are empty" in {
       allMaps(Seq(), Seq()).size shouldBe 1
     }
   }
 
-  describe("The double characteristic") {
-    it("turns a family of subsets into an arrow from the powerset object to omega") {
+  "The double characteristic" - {
+    "turns a family of subsets into an arrow from the powerset object to omega" in {
       val numbers = dot(1, 2, 3)
 
       val doubleChar =
