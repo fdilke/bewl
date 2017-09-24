@@ -489,10 +489,34 @@ trait BaseTopos {
       }.toBool
 
     final def /(
-      equiv: (S, S) => TRUTH
+      equiv: Relation[S, S]
     ): Quotient[S] =
       new Quotient(dot, equiv)
-    
+
+    final def /(
+      equiv: S x S > TRUTH
+    ): Quotient[S] =
+      dot /
+        relation(
+          equiv
+        )
+
+    final def relation(
+      criterion: S x S > TRUTH
+    ) =
+      Relation(
+        dot,
+        criterion
+      )
+
+    final def relation(
+      bifunc: (S, S) => TRUTH
+    ) =
+      Relation(
+        dot,
+        bifunc
+      )
+
     final lazy val isInjective: Boolean =
       singleton isSection
 
@@ -640,7 +664,7 @@ trait BaseTopos {
             )
         }
 
-      target / { (t, u) =>
+      target / target.relation { (t, u) =>
         t2.⋀(
           congruences.inclusion.chi
         ) (
@@ -657,25 +681,23 @@ trait BaseTopos {
       val isEdge: T x T > TRUTH =
         (arrow x that).factorizeEpiMono._2.chi
 
-      target / BiArrow(
-        t2,
+      target /
         IterateToFixed(
           t2(omega) {
             case p ⊕ q =>
               isEdge(p ⊕⊕ q) ∨
-              isEdge(q ⊕⊕ p) ∨
-              target.=?=(p, q)
+                isEdge(q ⊕⊕ p) ∨
+                target.=?=(p, q)
           }
         ) { s =>
           t2.exists(target) {
             (pr, q) => pr match {
               case p ⊕ r =>
                 s(p ⊕⊕ q) ∧
-                s(q ⊕⊕ r)
+                  s(q ⊕⊕ r)
             }
           }
         }
-      )
     }
     
     // Contravariant exponential functor
@@ -830,18 +852,18 @@ trait BaseTopos {
 
   class Quotient[S <: ~](
     dot: DOT[S],
-    equiv: (S, S) => TRUTH
+    equiv: Relation[S, S]
   ) {
     val arrow: S > QUOTIENT[S] =
       dot.power.transpose(
         dot
       )(
-        equiv
+        equiv.criterion
       ).factorizeEpiMono._1
 
     def lift[
       T <: ~
-    ](
+    ] (
       compatibleArrow: S > T
     ): QUOTIENT[S] > T = {
       val target = compatibleArrow.target

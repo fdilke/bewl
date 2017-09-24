@@ -97,5 +97,32 @@ trait RelationalAlgebra {
           bifunc
         )
       )
+
+    def apply[S <: ~](
+     carrier: DOT[S],
+     bifunc: (S, S) => TRUTH
+   ): Relation[S, S] =
+      Relation(
+        carrier,
+        carrier,
+        carrier.squared.biArrow(
+          omega
+        )(
+          bifunc
+        )
+      )
+
+    def apply[S <: ~](
+     carrier: DOT[S],
+     criterion: S x S > TRUTH
+   ): Relation[S, S] =
+      Relation(
+        carrier,
+        carrier,
+        BiArrow(
+          carrier.squared,
+          criterion
+        )
+      )
   }
 }

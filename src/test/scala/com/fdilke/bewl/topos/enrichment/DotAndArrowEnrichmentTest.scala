@@ -9,8 +9,6 @@ import scala.Function.untupled
 import com.fdilke.bewl.topos.algebra.KnownGroups.twoGroup
 import com.fdilke.bewl.helper.⊕
 
-import scala.collection.Traversable
-
 class DotAndArrowEnrichmentTest extends FunSpec {
 
   describe("The universal quantifier") {
@@ -273,17 +271,17 @@ class DotAndArrowEnrichmentTest extends FunSpec {
     it("give the expected construction for sets") {
       val symbols = dot('A, 'B, 'C)
       val identifyBandC =
-        Set(
+        relationFrom(
+          symbols,
           'A -> 'A,
           'B -> 'B,
           'C -> 'C,
           'B -> 'C,
           'C -> 'B
         )
+
       val quotient =
-          symbols / equivalenceFrom(
-            identifyBandC
-          )
+          symbols / identifyBandC
 
       val quotientArrow : Symbol > QUOTIENT[Symbol] =
         quotient.arrow
@@ -313,15 +311,6 @@ class DotAndArrowEnrichmentTest extends FunSpec {
       lifted o quotientArrow shouldBe arrowToLift
     }
   }
-
-  private def equivalenceFrom(
-    identifications: Set[(Symbol, Symbol)]
-  ) (
-    p: Symbol,
-    q: Symbol
-  ): Boolean =
-    identifications contains (p -> q)
-
 
   describe("Coequalizers") {
     it("should give the expected construction for sets") {
