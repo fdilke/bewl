@@ -690,20 +690,14 @@ trait BaseTopos {
 
       target /
         IterateToFixed(
-          t2(omega) {
-            case p ⊕ q =>
+          t2.relation {
+            (p, q) =>
               isEdge(p ⊕⊕ q) ∨
                 isEdge(q ⊕⊕ p) ∨
                 target.=?=(p, q)
           }
-        ) { s =>
-          t2.exists(target) {
-            (pr, q) => pr match {
-              case p ⊕ r =>
-                s(p ⊕⊕ q) ∧
-                  s(q ⊕⊕ r)
-            }
-          }
+        ) {
+          r => r o r
         }
     }
     

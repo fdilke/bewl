@@ -155,6 +155,27 @@ class RelationalAlgebraTest extends FunSpec {
     }
   }
 
+  describe("The join of relations") {
+    it("is as expected for sets") {
+      val carrier = dot(0, 1, 2)
+
+      relationFrom(
+        carrier,
+        0 -> 0,
+        0 -> 1
+      ) ∨ relationFrom(
+        carrier,
+        0 -> 1,
+        2 -> 1
+      ) shouldBe relationFrom(
+        carrier,
+        0 -> 0,
+        0 -> 1,
+        2 -> 1
+      )
+    }
+  }
+
   describe("The criterion of transitivity") {
     it("is as expected for sets") {
       val carrier = dot(0, 1, 2)
@@ -179,6 +200,38 @@ class RelationalAlgebraTest extends FunSpec {
       diagonalRelation(
         carrier
       ).isTransitive shouldBe true
+    }
+  }
+
+  describe("Generated equivalence relations") {
+    it("fix the diagonal") {
+      val carrier = dot(0, 1, 2)
+      val diag =
+        diagonalRelation(
+          carrier
+        )
+
+        diag.toEquivalence shouldBe diag
+    }
+
+    it("are as expected for sets") {
+      val carrier = dot(0, 1, 2, 3, 4, 5)
+      relationFrom(
+        carrier,
+        1 -> 2,
+        2 -> 3,
+        3 -> 4
+      ).toEquivalence shouldBe
+        relationFrom(
+          carrier,
+          0 -> 0, 1 -> 1, 2 -> 2, 3 -> 3, 4 -> 4, 5 -> 5,
+          1 -> 2, 2 -> 1,
+          2 -> 3, 3 -> 2,
+          3 -> 4, 4 -> 3,
+          1 -> 3, 3 -> 1,
+          1 -> 4, 4 -> 1,
+          2 -> 4, 4 -> 2
+        )
     }
   }
 

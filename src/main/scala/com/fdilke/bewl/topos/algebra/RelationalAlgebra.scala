@@ -1,15 +1,15 @@
 package com.fdilke.bewl.topos.algebra
 
-import com.fdilke.bewl.topos.{BaseTopos, ToposEnrichments, ToposStructures}
-
+import com.fdilke.bewl.helper.IterateToFixed
+import com.fdilke.bewl.topos.{BaseTopos, ToposEnrichments, ToposPrerequisites, ToposStructures}
 import scala.language.{higherKinds, postfixOps}
 
-trait RelationalAlgebra {
-  Ɛ: BaseTopos with
-  ToposEnrichments with
-  ToposStructures with
-  AlgebraicMachinery with
-  AlgebraicStructures =>
+trait RelationalAlgebra extends BaseTopos with
+  ToposEnrichments {
+
+  Ɛ: ToposPrerequisites =>
+
+  import Relation._
 
   case class Relation[S <: ~, T <: ~](
     source: DOT[S],
@@ -32,6 +32,15 @@ trait RelationalAlgebra {
           criterion(s, t)
       }
 
+    def ∨(
+      that: Relation[S, T]
+    ) =
+      criterion.product relation {
+        (s, t) =>
+          criterion(s, t) ∨
+            that.criterion(s, t)
+      }
+
     def o[U <: ~](
       that: Relation[T, U]
     ) =
@@ -51,6 +60,15 @@ trait RelationalAlgebra {
     relation: Relation[S, S]
   ) {
     import relation._
+
+    def toEquivalence: Relation[S, S] =
+      IterateToFixed(
+        relation ∨
+          relation.inverse ∨
+          diagonalRelation(source)
+      ) {
+        r => r o r
+      }
 
     def isReflexive: Boolean =
       (criterion.arrow o
