@@ -1,6 +1,6 @@
 package com.fdilke.bewl.topos
 
-import com.fdilke.bewl.helper.{IterateToFixed, Memoize, VerifyLength, ⊕}
+import com.fdilke.bewl.helper.{Memoize, VerifyLength, ⊕}
 
 import scala.language.{higherKinds, postfixOps}
 
@@ -522,6 +522,14 @@ trait BaseTopos {
           equiv
         )
 
+    final def /(
+      equiv: (S, S) => TRUTH
+    ): Quotient[S] =
+      dot /
+        squared.relation(
+          equiv
+        )
+
     final lazy val isInjective: Boolean =
       singleton isSection
 
@@ -647,10 +655,10 @@ trait BaseTopos {
       that: S > T
     ): Quotient[T] = {
       implicit val t2 = target.squared
-      implicit val _ = t2.power
+      implicit val t2Power = t2.power
 
       val congruences: EQUALIZER[T x T → TRUTH] =
-        t2.power.whereAll(target) {
+        t2Power.whereAll(target) {
           (ssp, t) =>
             ssp(t ⊕⊕ t)
         }.whereAll(target, target) {
@@ -669,8 +677,7 @@ trait BaseTopos {
             )
         }
 
-      target /
-        target.squared.relation {
+      target / {
           (t, u) =>
             t2.⋀(
               congruences.inclusion.chi
@@ -682,25 +689,12 @@ trait BaseTopos {
 
     final def =?!(  // fast ("hybrid") coequalizer
       that: S > T
-    ): Quotient[T] = {
-      implicit val t2 = target.squared
-
-      val isEdge: T x T > TRUTH =
-        (arrow x that).factorizeEpiMono._2.chi
-
+    ): Quotient[T] =
       target /
-        IterateToFixed(
-          t2.relation {
-            (p, q) =>
-              isEdge(p ⊕⊕ q) ∨
-                isEdge(q ⊕⊕ p) ∨
-                target.=?=(p, q)
-          }
-        ) {
-          r => r o r
-        }
-    }
-    
+        target.squared.relation(
+          (arrow x that).image.inclusion chi
+        ).toEquivalence
+
     // Contravariant exponential functor
     final def >[
       U <: ~
