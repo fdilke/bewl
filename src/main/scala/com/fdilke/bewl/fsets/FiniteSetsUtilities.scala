@@ -152,12 +152,10 @@ object FiniteSetsUtilities {
     target: DOT[Y],
     identifications: (X, Y)*
   ): FiniteSets.Relation[X, Y] =
-    FiniteSets.Relation[X, Y](
-      source,
-      target,
-      (p: X, q: Y) =>
-        identifications contains (p -> q)
-    )
+    (source x target) relation {
+      (p, q) =>
+        identifications contains p -> q
+    }
 
   def relationFrom[X](
     carrier: DOT[X],

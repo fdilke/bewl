@@ -89,6 +89,27 @@ trait BaseTopos {
         case x ⊕ y => bifunc(x, y)
       })
 
+    final def relation(
+      bifunc: (L, R) => TRUTH
+    ) : Relation[L, R] =
+      Relation(
+        left,
+        right,
+        biArrow(omega)(bifunc)
+      )
+
+    final def relation(
+      criterion: L x R > TRUTH
+    ) : Relation[L, R] =
+      Relation(
+        left,
+        right,
+        BiArrow(
+          product,
+          criterion
+        )
+      )
+
     final def universally[T <: ~](
       target: DOT[T]
     )(
@@ -497,25 +518,9 @@ trait BaseTopos {
       equiv: S x S > TRUTH
     ): Quotient[S] =
       dot /
-        relation(
+        squared.relation(
           equiv
         )
-
-    final def relation(
-      criterion: S x S > TRUTH
-    ) =
-      Relation(
-        dot,
-        criterion
-      )
-
-    final def relation(
-      bifunc: (S, S) => TRUTH
-    ) =
-      Relation(
-        dot,
-        bifunc
-      )
 
     final lazy val isInjective: Boolean =
       singleton isSection
@@ -664,13 +669,15 @@ trait BaseTopos {
             )
         }
 
-      target / target.relation { (t, u) =>
-        t2.⋀(
-          congruences.inclusion.chi
-        ) (
-          t ⊕⊕ u
-        )
-      }
+      target /
+        target.squared.relation {
+          (t, u) =>
+            t2.⋀(
+              congruences.inclusion.chi
+            ) (
+              t ⊕⊕ u
+            )
+        }
     }
 
     final def =?!(  // fast ("hybrid") coequalizer

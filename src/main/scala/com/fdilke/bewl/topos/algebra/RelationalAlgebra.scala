@@ -1,7 +1,6 @@
 package com.fdilke.bewl.topos.algebra
 
 import com.fdilke.bewl.topos.{BaseTopos, ToposEnrichments, ToposStructures}
-import com.fdilke.bewl.helper.⊕
 
 import scala.language.{higherKinds, postfixOps}
 
@@ -28,12 +27,10 @@ trait RelationalAlgebra {
         subobject.inclusion toBool
 
     def inverse: Relation[T, S] =
-      Relation(
-        target,
-        source,
+      (target x source) relation {
         (t, s) =>
           criterion(s, t)
-      )
+      }
 
     def o[U <: ~](
       that: Relation[T, U]
@@ -81,48 +78,6 @@ trait RelationalAlgebra {
         carrier,
         carrier,
         carrier.=?=
-      )
-
-    def apply[S <: ~, T <: ~](
-     source: DOT[S],
-     target: DOT[T],
-     bifunc: (S, T) => TRUTH
-   ): Relation[S, T] =
-      Relation(
-        source,
-        target,
-        (source x target).biArrow(
-          omega
-        )(
-          bifunc
-        )
-      )
-
-    def apply[S <: ~](
-     carrier: DOT[S],
-     bifunc: (S, S) => TRUTH
-   ): Relation[S, S] =
-      Relation(
-        carrier,
-        carrier,
-        carrier.squared.biArrow(
-          omega
-        )(
-          bifunc
-        )
-      )
-
-    def apply[S <: ~](
-     carrier: DOT[S],
-     criterion: S x S > TRUTH
-   ): Relation[S, S] =
-      Relation(
-        carrier,
-        carrier,
-        BiArrow(
-          carrier.squared,
-          criterion
-        )
       )
   }
 }
