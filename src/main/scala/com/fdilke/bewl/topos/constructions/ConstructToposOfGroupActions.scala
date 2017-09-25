@@ -220,8 +220,8 @@ trait ConstructToposOfGroupActions extends
         override val imageFinder: ImageFinder =
           new ImageFinder {
             def image[
-            S <: ~,
-            T <: ~
+              S <: ~,
+              T <: ~
             ](
               arrow: S > T
             ): EQUALIZER[T] = {
@@ -237,9 +237,9 @@ trait ConstructToposOfGroupActions extends
                   )
                 }
               ) with EqualizingDot[T] { equalizingDot =>
-                val equalizerTarget = arrow.target
-                def restrict[
-                R <: ~
+                override val equalizerTarget = arrow.target
+                override def restrict[
+                  R <: ~
                 ](
                   actionArrow: ActionArrow[R, T]
                 ) =

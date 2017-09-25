@@ -382,8 +382,8 @@ trait ConstructToposOfMonoidActions extends
                 )
               }
             ) with EqualizingDot[T] { equalizingDot =>
-              val equalizerTarget = arrow.target
-              def restrict[
+              override val equalizerTarget = arrow.target
+              override def restrict[
                 R <: ~
               ](
                 actionArrow: ActionArrow[R, T]
