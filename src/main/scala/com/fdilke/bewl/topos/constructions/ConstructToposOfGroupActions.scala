@@ -145,7 +145,7 @@ trait ConstructToposOfGroupActions extends
 
           override def sanityTest = {
             action.actionCarrier.sanityTest
-            action.sanityTest
+            action.sanityTest()
           }
         }
 
@@ -210,10 +210,50 @@ trait ConstructToposOfGroupActions extends
             )
 
           override def sanityTest = {
+            source.sanityTest
+            target.sanityTest
             arrow.sanityTest
             assert(group.actions.isMorphism(source.action, target.action, arrow))
           }
         }
+
+        override val imageFinder: ImageFinder =
+          new ImageFinder {
+            def image[
+            S <: ~,
+            T <: ~
+            ](
+              arrow: S > T
+            ): EQUALIZER[T] = {
+              val delegatedImage =
+                arrow.arrow.image
+
+              new ActionDot(
+                group.action(
+                  delegatedImage
+                ){ (s, m) =>
+                  arrow.target.action.actionMultiply(
+                    s, m
+                  )
+                }
+              ) with EqualizingDot[T] { equalizingDot =>
+                val equalizerTarget = arrow.target
+                def restrict[
+                R <: ~
+                ](
+                  actionArrow: ActionArrow[R, T]
+                ) =
+                  ActionArrow[R, T](
+                    actionArrow.source,
+                    equalizingDot,
+                    delegatedImage.restrict(
+                      actionArrow.arrow
+                    )
+                  )
+              }
+            }
+          }
+
 
         override def functionAsArrow[
           S <: ~,

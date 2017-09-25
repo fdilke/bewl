@@ -384,7 +384,7 @@ abstract class GenericToposTests[
     }
 
     if (imageFinder != DefaultImageFinder)
-      it("local image finder behaves as default") {
+      it("has a local image finder behaving as default") {
         for {
           s2t <- foo >> bar
         } {
