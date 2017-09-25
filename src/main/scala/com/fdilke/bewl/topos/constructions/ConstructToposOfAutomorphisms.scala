@@ -174,8 +174,54 @@ trait ConstructToposOfAutomorphisms extends
             )
         }
 
-        private def trivialAutomorphism[X <: ~](dot: Ɛ.DOT[X]) =
-          Automorphism(dot.identity, dot.identity)
+        private def trivialAutomorphism[
+          X <: ~
+        ](
+          dot: Ɛ.DOT[X]
+        ) =
+          Automorphism(
+            dot.identity,
+            dot.identity
+          )
+
+        override val imageFinder: ImageFinder =
+          new ImageFinder {
+            def image[
+              S <: ~,
+              T <: ~
+            ](
+              anArrow: S > T
+            ): EQUALIZER[T] = {
+              val delegatedImage =
+                anArrow.arrow.image
+
+              new Automorphism(
+                delegatedImage.restrict(
+                  anArrow.target.arrow o delegatedImage.inclusion
+                ),
+                delegatedImage.restrict(
+                  anArrow.target.inverse o delegatedImage.inclusion
+                )
+              ) with EqualizingDot[T] { equalizingDot =>
+
+                override val equalizerTarget: DOT[T] =
+                  anArrow.target
+
+                override def restrict[
+                  R <: ~
+                ](
+                  actionArrow: AutomorphismArrow[R, T]
+                ) =
+                  AutomorphismArrow[R, T](
+                    actionArrow.source,
+                    equalizingDot,
+                    delegatedImage.restrict(
+                      actionArrow.arrow
+                    )
+                  )
+              }
+            }
+          }
 
         override def functionAsArrow[ // TODO: looks redundant, take out of API?
           S <: ~,
