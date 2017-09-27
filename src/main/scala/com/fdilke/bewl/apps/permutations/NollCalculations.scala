@@ -40,7 +40,7 @@ object NollCalculations extends App {
       cyclic > triadicTopos.omega
     }
     println("nub size: " +
-      (elementsOf(triadicTopos.unwrap(nub).actionCarrier).size)
+      triadicTopos.unwrap(nub).actionCarrier.size
     )
 
     val nubAnalysis =
@@ -67,7 +67,7 @@ object NollCalculations extends App {
       chord.power
     }
     println("power chord size: " +
-      (elementsOf(triadicTopos.unwrap(pc).actionCarrier).size)
+      triadicTopos.unwrap(pc).actionCarrier.size
     )
 
     val pcAnalysis =
@@ -129,11 +129,9 @@ object NollCalculations extends App {
   def measure[T](
     tune: triadicTopos.DOT[T]
   ) =
-    elementsOf(
-      triadicTopos.unwrap(
-        tune
-      ).actionCarrier
-    ) size
+    triadicTopos.unwrap(
+      tune
+    ).actionCarrier size
 
   def showProperties[T](
     name: String,

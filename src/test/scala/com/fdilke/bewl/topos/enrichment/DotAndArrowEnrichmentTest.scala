@@ -169,7 +169,7 @@ class DotAndArrowEnrichmentTest extends FunSpec {
     it("should have the correct attributes for finite sets") {
       val set = dot(0, 1)
       val pac = set.pac
-      pac.classifier.globals should have size 3
+      pac.classifier should have size 3
       pac.include should have (
         'source(set),
         'target(pac.classifier)
@@ -208,7 +208,7 @@ class DotAndArrowEnrichmentTest extends FunSpec {
       val bar = dot('a, 'b, 'c)
       val coproduct = foo + bar
 
-      coproduct.globals should have size 5
+      coproduct should have size 5
       foo +- bar should have (
         'source(foo),
         'target(coproduct),
@@ -295,7 +295,7 @@ class DotAndArrowEnrichmentTest extends FunSpec {
         quotientArrow.target
 
       quotientObject.sanityTest
-      quotientObject.globals should have size 2
+      quotientObject should have size 2
 
       val numbers = dot(1, 2, 3)
       val arrowToLift =

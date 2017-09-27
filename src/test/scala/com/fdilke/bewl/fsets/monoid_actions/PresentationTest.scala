@@ -197,9 +197,8 @@ class PresentationTest extends FreeSpec {
           )
 	      )
 
-      elementsOf(
-        presentation.action.actionCarrier
-      ) should have size 3
+
+      presentation.action.actionCarrier should have size 3
 		}
 		// note: should probably add a more sophisticated
 		// example, with multiple interacting generators

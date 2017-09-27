@@ -887,7 +887,7 @@ trait BaseTopos {
   }
 
   // TODO: shouldn't need this, hack to get round bug in Scala 2.12.0-M4
-  protected def tempConst[A <: ~](dot: DOT[A])(a: A) =
+  def tempConst[A <: ~](dot: DOT[A])(a: A) =
     I(dot) { _ => a}
 }
 

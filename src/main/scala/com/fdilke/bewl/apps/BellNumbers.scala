@@ -39,7 +39,7 @@ object BellNumbers extends App {
         ssp(y ⊕⊕ z) →
         ssp(x ⊕⊕ z)
     }
-    elementsOf(eqRelns).size
+    eqRelns size
   }
 
   def bell(n: Int): Int =

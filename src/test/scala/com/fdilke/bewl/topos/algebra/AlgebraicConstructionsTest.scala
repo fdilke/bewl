@@ -15,28 +15,28 @@ class AlgebraicConstructionsTest extends FunSpec {
       val endosOf0 = endomorphismMonoid(dot()).monoid
       endosOf0 shouldBe an[Monoid[_]]
       endosOf0.sanityTest
-      endosOf0.carrier.globals.size shouldBe 1
+      endosOf0.carrier.size shouldBe 1
       endosOf0 shouldBe 'commutative
     }
 
     it("for a 1-element set") {
       val endosOf1 = endomorphismMonoid(dot('x)).monoid
       endosOf1.sanityTest
-      endosOf1.carrier.globals.size shouldBe 1
+      endosOf1.carrier.size shouldBe 1
       endosOf1 shouldBe 'commutative
     }
 
     it("for a 2-element set") {
       val endosOf2 = endomorphismMonoid(dot('x, 'y)).monoid
       endosOf2.sanityTest
-      endosOf2.carrier.globals.size shouldBe 4
+      endosOf2.carrier.size shouldBe 4
       endosOf2 should not be 'commutative
     }
 
     it("for a 3-element set") {
       val endosOf3 = endomorphismMonoid(dot('x, 'y, 'z)).monoid
       endosOf3.sanityTest
-      endosOf3.carrier.globals.size shouldBe 27
+      endosOf3.carrier.size shouldBe 27
       endosOf3 should not be 'commutative
     }
 
@@ -63,8 +63,8 @@ class AlgebraicConstructionsTest extends FunSpec {
       val monoid = monoidFromTable('o)
       val (group, inject) = groupOfUnits(monoid)
       group shouldBe a[Group[_]]
-      group.sanityTest()
-      group.carrier.globals.size shouldBe 1
+      group.sanityTest
+      group.carrier.size shouldBe 1
       inject should have(
         'source(group.carrier),
         'target(monoid.carrier),
@@ -78,8 +78,8 @@ class AlgebraicConstructionsTest extends FunSpec {
         'x, 'x
       )
       val (group, inject) = groupOfUnits(monoid)
-      group.sanityTest()
-      group.carrier.globals.size shouldBe 1
+      group.sanityTest
+      group.carrier.size shouldBe 1
       group shouldBe 'commutative
       inject should have(
         'source(group.carrier),
@@ -97,7 +97,7 @@ class AlgebraicConstructionsTest extends FunSpec {
       )
       val (group, inject) = groupOfUnits(monoid)
       group.sanityTest
-      group.carrier.globals.size shouldBe 2
+      group.carrier.size shouldBe 2
       group shouldBe 'commutative
       inject should have(
         'source(group.carrier),
@@ -113,8 +113,8 @@ class AlgebraicConstructionsTest extends FunSpec {
           endomorphismMonoid(dot(1,2,3)).monoid
         )._1
       group.sanityTest
-      group.carrier.globals.size shouldBe 6
-      group should not be('commutative)
+      group.carrier.size shouldBe 6
+      group should not be 'commutative
     }
   }
 }

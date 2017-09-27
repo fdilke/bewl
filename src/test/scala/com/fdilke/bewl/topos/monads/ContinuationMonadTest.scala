@@ -22,9 +22,9 @@ class ContinuationMonadTest extends FreeSpec {
     }
 
     "free objects have the right size" in {
-      continuation(O).free.globals should have size 2
-      continuation(I).free.globals should have size 4
-      continuation(omega).free.globals should have size 16
+      continuation(O).free should have size 2
+      continuation(I).free should have size 4
+      continuation(omega).free should have size 16
     }
 
     "embedding (eta) works" in {
@@ -194,7 +194,7 @@ class ContinuationMonadTest extends FreeSpec {
           oo
         ) shouldBe oo(id)
 
-      continuation.home.sanityTest()
+      continuation.home.sanityTest
     }
   }
 }

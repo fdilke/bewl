@@ -95,7 +95,7 @@ class AlgebraicStructuresTest extends FunSpec {
       val regularAction: monoid4.Action[Symbol] =
         monoid4.regularAction
 
-      regularAction.sanityTest()
+      regularAction.sanityTest
       regularAction.actionCarrier shouldBe monoid4.carrier
     }
 
@@ -107,7 +107,7 @@ class AlgebraicStructuresTest extends FunSpec {
           sampleCarrier
         )
 
-      trivialAction.sanityTest()
+      trivialAction.sanityTest
       trivialAction.actionCarrier shouldBe sampleCarrier
     }
 
@@ -231,7 +231,7 @@ class AlgebraicStructuresTest extends FunSpec {
         unit,
         product,
         inverse
-      ).sanityTest()
+      ).sanityTest
     }
 
     it("must have inverses for every element") {
@@ -246,7 +246,12 @@ class AlgebraicStructuresTest extends FunSpec {
         (y, i) -> y, (y, x) -> y, (y, y) -> y
       )
       intercept[IllegalArgumentException] {
-        new Group[Symbol](carrier, unit, product, inverse).sanityTest()
+        new Group[Symbol](
+          carrier,
+          unit,
+          product,
+          inverse
+        ).sanityTest
       }.getMessage shouldBe "left inverse law failed"
     }
 
@@ -278,8 +283,8 @@ class AlgebraicStructuresTest extends FunSpec {
         r, b, c, a, s, i,
         s, c, a, b, i, r
       ))._1
-      group.sanityTest()
-      group.carrier.globals.size shouldBe 6
+      group.sanityTest
+      group.carrier.size shouldBe 6
       group should not be 'commutative
     }
 
@@ -287,7 +292,7 @@ class AlgebraicStructuresTest extends FunSpec {
       val largerMonoid = endomorphismMonoid(dot(1, 2, 3)).monoid
       val (group, inject) = groupOfUnits(largerMonoid)
       val monoid = group.asMonoid
-      monoid.sanityTest()
+      monoid.sanityTest
       monoids.isMorphism(monoid, largerMonoid, inject) shouldBe true
     }
   }
@@ -306,7 +311,7 @@ class AlgebraicStructuresTest extends FunSpec {
         top,
         meet,
         join
-      ).sanityTest()
+      ).sanityTest
     }
   }
 
@@ -336,7 +341,7 @@ class AlgebraicStructuresTest extends FunSpec {
         meet,
         join,
         implies
-      ).sanityTest()
+      ).sanityTest
     }
   }
 }

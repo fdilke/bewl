@@ -46,7 +46,7 @@ object TriadicFixtures {
       )
     }
 
-  elementsOf(triadicMapsDot) should have size 8
+  triadicMapsDot should have size 8
 
   def affineMapMultiply(
     ab: Int x Int,
@@ -74,21 +74,21 @@ object TriadicFixtures {
       )
     )
 
-  triadicMonoid.sanityTest()
+  triadicMonoid.sanityTest
 
   val octaveAction =
     triadicMonoid.action(
       octaveDot
     ) ( affineMapApply )
 
-  octaveAction.sanityTest()
+  octaveAction.sanityTest
 
   val chordAction =
     triadicMonoid.action(
       chordDot
     ) ( affineMapApply )
 
-  chordAction.sanityTest()
+  chordAction.sanityTest
 
   // now construct the topos and some dots in it
 

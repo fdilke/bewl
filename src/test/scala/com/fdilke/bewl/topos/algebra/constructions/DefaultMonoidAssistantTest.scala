@@ -58,7 +58,7 @@ class DefaultMonoidAssistantTest extends FreeSpec {
             baz
           )
         )
-      rawExponential.exponentialAction.sanityTest()
+      rawExponential.exponentialAction.sanityTest
       rawExponential.evaluation.arrow should have(
         'source(rawExponential.exponentialAction.actionCarrier x barDot),
         'target(bazDot)
@@ -82,7 +82,7 @@ class DefaultMonoidAssistantTest extends FreeSpec {
       val exponentialDot = 
         rawExponential.exponentialAction.actionCarrier
       val foo2bar2baz = rawExponential.transpose(foo, foobar2baz)
-      foo2bar2baz.sanityTest()
+      foo2bar2baz.sanityTest
       foo2bar2baz should have(
         'source(foo.actionCarrier),
         'target(exponentialDot)

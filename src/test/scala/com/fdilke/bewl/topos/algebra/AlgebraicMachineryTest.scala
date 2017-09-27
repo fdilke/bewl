@@ -219,7 +219,7 @@ class AlgebraicMachineryTest extends FunSpec {
         intercept[IllegalArgumentException] {
           new pointedSets.Algebra[Int](
             carrier
-          )(o := badZero).sanityTest()
+          )(o := badZero).sanityTest
         }
       }
       it("for valid unary operators") {
@@ -250,7 +250,7 @@ class AlgebraicMachineryTest extends FunSpec {
             carrier
           )(
             * := combineBadRange
-          ).sanityTest()
+          ).sanityTest
         }
       }
       it("for scalar constants") {
@@ -262,7 +262,7 @@ class AlgebraicMachineryTest extends FunSpec {
         intercept[IllegalArgumentException] {
           new weakSetsOverAPointedSet.Algebra[String](
             dot("")
-          )().sanityTest()
+          )().sanityTest
         }
       }
       it("for right scalar multiplications") {
@@ -281,7 +281,7 @@ class AlgebraicMachineryTest extends FunSpec {
             carrier
           )(
             ** := badScalarRightMultiplication
-          ).sanityTest()
+          ).sanityTest
         }
       }
       it("for scalar multiplications") {
@@ -299,7 +299,7 @@ class AlgebraicMachineryTest extends FunSpec {
             dot(true)
           )(
             *** := badScalarMultiplication
-          ).sanityTest()
+          ).sanityTest
         }
       }
     }
@@ -465,14 +465,14 @@ class AlgebraicMachineryTest extends FunSpec {
           carrier,
           okUnit,
           commutativeOp
-        ).sanityTest()
+        ).sanityTest
 
         intercept[IllegalArgumentException] {
           new CommutativeMagmaWith1[Boolean](
             carrier,
             okUnit,
             nonCommutativeOp
-          ).sanityTest()
+          ).sanityTest
         }.getMessage shouldBe "commutative law failed"
 
         intercept[IllegalArgumentException] {
@@ -480,7 +480,7 @@ class AlgebraicMachineryTest extends FunSpec {
             carrier,
             notOkUnit,
             commutativeOp
-          ).sanityTest()
+          ).sanityTest
         }.getMessage shouldBe "unit law failed"
     }
     
@@ -503,12 +503,12 @@ class AlgebraicMachineryTest extends FunSpec {
       val c2 = integersMod(2)
       val c3 = integersMod(3)
       val c6 = integersMod(6)
-      c2.sanityTest()
-      c3.sanityTest()
-      c6.sanityTest()
+      c2.sanityTest
+      c3.sanityTest
+      c6.sanityTest
       val c2xc3: Group[Int x Int] =
         c2 x c3
-      c2xc3.sanityTest()
+      c2xc3.sanityTest
       val product =
         c2.carrier x c3.carrier
       c2xc3.carrier shouldBe ( product )
@@ -543,7 +543,7 @@ class AlgebraicMachineryTest extends FunSpec {
       val product: monoidOf3.Action[String x Symbol] =
         bar x regularAction
       val underlyingProduct = barDot x regularAction.actionCarrier
-      product.sanityTest()
+      product.sanityTest
       product.carrier shouldBe underlyingProduct
       product.operatorAssignments.lookup(II).get(()) shouldEqual 'i
       monoidOf3.actions.isMorphism[String x Symbol, String](
@@ -557,7 +557,8 @@ class AlgebraicMachineryTest extends FunSpec {
         underlyingProduct.π1
       )
 
-      val operatorsUsed = product.operatorAssignments.assignments map {
+      val operatorsUsed =
+        product.operatorAssignments.assignments map {
           _.operator
         }
         

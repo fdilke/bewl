@@ -28,7 +28,7 @@ object GraphComponents extends App {
   val components =
     coequalizer.arrow.target
 
-  val numComponents = components.globals.size
+  val numComponents = components.size
   println(s"$numComponents components")
 
   import vertices.power.{ evaluate => $ }

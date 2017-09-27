@@ -122,6 +122,7 @@ class ToposOfAutomorphismsTest extends GenericToposTests[
       foo >> baz should have size 16
 
       (foo >> (omega > omega)) should have size 16
+      (foo x omega) >> omega should have size 16
     }
   }
 }

@@ -70,15 +70,15 @@ class FiniteSetsTest extends GenericToposTests[
     }
   }
 
-  describe("Global element enumeration") {
+  describe("Sizing") {
     it("works on the built-ins") {
-      omega.globals should have size 2
+      omega should have size 2
     }
 
     it("works on the fixtures") {
-      foo.globals should have size 2
-      bar.globals should have size 3
-      baz.globals should have size 4
+      foo should have size 2
+      bar should have size 3
+      baz should have size 4
     }
   }
 }

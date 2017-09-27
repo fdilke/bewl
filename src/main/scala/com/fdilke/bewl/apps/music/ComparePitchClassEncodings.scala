@@ -26,7 +26,7 @@ object ComparePitchClassEncodings extends App {
     )
   println("PCE 2")
 
-  affineMaps.sanityTest()
+  affineMaps.sanityTest
 
   println("PCE 3")
 
@@ -47,7 +47,7 @@ object ComparePitchClassEncodings extends App {
 
   println("PCE 4")
 
-  elementsOf(informalGroup) should have size 48
+  informalGroup should have size 48
 
   val circle5Encoding = Seq(0, 1, 4)
   val semitoneEncoding = Seq(0, 4, 7)

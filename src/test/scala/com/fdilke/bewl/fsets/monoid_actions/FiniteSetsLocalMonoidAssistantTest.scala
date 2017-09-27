@@ -107,7 +107,7 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
       }
 
       "for the regular action to itself, another way" in {
-        canEnumerateMorphisms(
+        enumeratesMorphisms(
           regularAction,
           regularAction,
           thorough=false // true passes, but takes too long
@@ -115,7 +115,7 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
       }
 
       "for regularAction x bar to bar" in {
-        canEnumerateMorphisms(
+        enumeratesMorphisms(
           regularAction x bar,
           regularAction,
           thorough=true
@@ -123,7 +123,7 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
       }
 
       "for bar x bar to bar" in {
-        canEnumerateMorphisms(
+        enumeratesMorphisms(
           bar x bar,
           bar,
           thorough=true
@@ -131,7 +131,7 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
       }
 
       "and for bar x bar to regularAction" in {
-        canEnumerateMorphisms(
+        enumeratesMorphisms(
           bar x bar,
           regularAction,
           thorough=true
@@ -142,7 +142,7 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
         val o2 =
           actionTopos.unwrap(actionTopos.omega)
 
-        canEnumerateMorphisms(
+        enumeratesMorphisms(
           o2,
           o2,
           thorough=false
@@ -155,7 +155,7 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
             actionTopos.omega.squared
           )
 
-        canEnumerateMorphisms(
+        enumeratesMorphisms(
           o2,
           o2,
           thorough=false
@@ -168,7 +168,7 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
             dot(true, false)
           )
 
-        canEnumerateMorphisms(
+        enumeratesMorphisms(
           onePlusOne,
           onePlusOne,
           thorough=true
@@ -189,7 +189,7 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
             baz
           )
         )
-      rawExponential.exponentialAction.sanityTest()
+      rawExponential.exponentialAction.sanityTest
       rawExponential.evaluation.arrow should have(
         'source (rawExponential.exponentialAction.actionCarrier x barDot),
         'target (bazDot)
@@ -214,7 +214,7 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
         rawExponential.exponentialAction.actionCarrier
       val foo2bar2baz = rawExponential.transpose(foo, foobar2baz)
 
-      foo2bar2baz.sanityTest()
+      foo2bar2baz.sanityTest
       foo2bar2baz should have(
         'source(foo.actionCarrier),
         'target(exponentialDot)
@@ -222,14 +222,14 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
       (foo.actionCarrier x barDot)(bazDot) {
         case f ⊕ b =>
           rawExponential.evaluation(
-            foo2bar2baz(f), 
+            foo2bar2baz(f),
             b
           )
       } shouldBe foobar2baz.arrow
     }
   }
 
-  def canEnumerateMorphisms[X, Y](
+  def enumeratesMorphisms[X, Y](
     sourceAction: monoidOf3.Action[X],
     targetAction: monoidOf3.Action[Y],
     thorough: Boolean
