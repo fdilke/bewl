@@ -216,7 +216,7 @@ trait BaseTopos {
     def xUncached[T <: ~](that: DOT[T]): BIPRODUCT[S, T]
     def `>Uncached`[T <: ~](that: DOT[T]): EXPONENTIAL[S, T]
     def apply[T <: ~](target: DOT[T])(f: S => T) : S > T
-    def sanityTest()
+    def sanityTest: Unit
   }
 
   trait Dot[S <: ~] extends BaseDot[S] {
@@ -553,6 +553,13 @@ trait BaseTopos {
 
     final lazy val isSimple: Boolean =
       VerifyLength(congruences toSeq, 2)
+
+    def size(): Int =
+      optionalGenerator map {
+        _ >> dot size
+      } getOrElse {
+        throw new IllegalArgumentException("Cannot size dots in this topos - no generator available")
+      }
   }
 
   trait BaseArrow[S <: ~, T <: ~] {
@@ -564,7 +571,7 @@ trait BaseTopos {
     def ?=(that: S > T): EQUALIZER[S]
     def o[R <: ~](that: R > S) : R > T
     def \[U <: ~](monic: U > T) : S > U
-    def sanityTest()
+    def sanityTest: Unit
   }
 
   trait Arrow[S <: ~, T <: ~] extends BaseArrow[S, T] {
@@ -737,8 +744,8 @@ trait BaseTopos {
     ): S > T =
       arrow o (l x r)
 
-    def sanityTest() =
-      arrow.sanityTest()
+    def sanityTest =
+      arrow.sanityTest
   }
 
   // Helper methods for triple products (this could obviously be extended).

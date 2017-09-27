@@ -4,8 +4,7 @@ import com.fdilke.bewl.helper.Memoize
 import com.fdilke.bewl.topos.{ToposAlgebra, ToposEnrichments, ToposStructures, _}
 import com.fdilke.bewl.topos.algebra.{AlgebraicMachinery, AlgebraicStructures}
 
-import scala.language.higherKinds
-import scala.language.reflectiveCalls
+import scala.language.{higherKinds, postfixOps, reflectiveCalls}
 
 trait ConstructToposOfAutomorphisms extends
   BaseTopos with
@@ -54,10 +53,14 @@ trait ConstructToposOfAutomorphisms extends
           arrow: Ɛ.>[X, X],
           inverse: Ɛ.>[X, X]
         ) extends Dot[X] { automorphism =>
-          val carrier = arrow.source
+          val carrier: Ɛ.DOT[X] =
+            arrow.source
 
           override lazy val toI =
             AutomorphismArrow(automorphism, I, carrier.toI)
+
+          override def size(): Int =
+            carrier.size
 
           override def sanityTest {
             arrow.sanityTest

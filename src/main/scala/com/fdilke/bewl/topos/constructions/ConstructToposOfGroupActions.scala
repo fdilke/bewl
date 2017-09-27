@@ -145,9 +145,9 @@ trait ConstructToposOfGroupActions extends
               ) { f }
             )
 
-          override def sanityTest = {
+          override def sanityTest {
             action.actionCarrier.sanityTest
-            action.sanityTest()
+            action.sanityTest
           }
         }
 
@@ -211,7 +211,7 @@ trait ConstructToposOfGroupActions extends
               arrow \ monic.arrow
             )
 
-          override def sanityTest = {
+          override def sanityTest {
             source.sanityTest
             target.sanityTest
             arrow.sanityTest

@@ -214,7 +214,7 @@ trait ConstructToposOfMonoidActions extends
             }
           }
             
-          override def sanityTest(): Unit = {
+          override def sanityTest {
             action.actionCarrier.sanityTest
             action.sanityTest
           }
@@ -352,7 +352,7 @@ trait ConstructToposOfMonoidActions extends
               arrow o that.arrow
             )
             
-          override def sanityTest() {
+          override def sanityTest {
             arrow.sanityTest
             assert(
               monoid.actions.isMorphism(

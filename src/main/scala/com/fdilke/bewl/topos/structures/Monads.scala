@@ -32,9 +32,9 @@ trait Monads {
       lazy val carrier = structure target
       lazy val local = apply(carrier)
 
-      def sanityTest() =
+      def sanityTest =
         (structure o local.eta) shouldBe carrier.identity
-      def sanityTest2() =
+      def sanityTest2 =
         (structure o map(structure)) shouldBe (structure o local.mu)
     }
   }
