@@ -152,6 +152,18 @@ class ToposOfMonoidActionsTest(
     }
   }
 
+  describe("Sizing") {
+    it("works on the built-ins") {
+      omega should have size 3
+    }
+
+    it("works on the fixtures") {
+      foo should have size 3
+      bar should have size 2
+      baz should have size 3
+    }
+  }
+
   describe("Arrow enumeration") {
     it("also works on the fixtures") {
       (omega >> omega) should have size 6
