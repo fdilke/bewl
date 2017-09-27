@@ -21,6 +21,7 @@ trait BaseTopos {
   type TRUTH <: ~
   val omega: DOT[TRUTH]
   val truth: UNIT > TRUTH
+  val optionalGenerator: Option[DOT[_ <: ~]]
 
   type EXPONENTIAL[S <: ~, T <: ~] =
     ExponentialDot[S, T] with DOT[S → T]
@@ -879,7 +880,7 @@ trait BaseTopos {
   }
 
   // TODO: shouldn't need this, hack to get round bug in Scala 2.12.0-M4
-  def tempConst[A <: ~](dot: DOT[A])(a: A) =
+  protected def tempConst[A <: ~](dot: DOT[A])(a: A) =
     I(dot) { _ => a}
 }
 

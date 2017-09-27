@@ -32,6 +32,8 @@ trait ConstructToposOfGroupActions extends
 
         override val I: DOT[UNIT] =
           ActionDot(Ɛ.I) { (i, g) => i }
+        override lazy val optionalGenerator =
+          Some(new ActionDot(group.regularAction))
 
         override lazy val omega: DOT[TRUTH] =
           ActionDot(Ɛ.omega) { (ω, g) => ω }

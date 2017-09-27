@@ -26,6 +26,7 @@ class BaseFiniteSets extends Topos[Any] with Wrappings[
   override lazy val I = makeDot(Traversable(()))
   override lazy val omega = makeDot(Traversable(true, false))
   override lazy val truth = I(omega) { _ => true }
+  override lazy val optionalGenerator = Some(I)
 
   class FiniteSetsDot[S](
       protected[fsets] val elements: Traversable[S]

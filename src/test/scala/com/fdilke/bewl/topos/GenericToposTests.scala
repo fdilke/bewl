@@ -308,6 +308,30 @@ abstract class GenericToposTests[
       bar >> baz should contain(monicBar2baz)
     }
 
+    optionalGenerator map { generator =>
+      it("has a generator") {
+        def distinguishesMapsBetween[
+          A <: ~,
+          B <: ~
+        ] (
+          source: DOT[A],
+          target: DOT[B]
+        ) =
+          for {
+            anArrow <- source >> target
+            anotherArrow <- source >> target if anotherArrow != anArrow
+          } {
+            generator >> source exists { g =>
+              (anArrow o g) != (anotherArrow o g)
+            } shouldBe true
+          }
+
+        distinguishesMapsBetween(foo, bar)
+        distinguishesMapsBetween(bar, baz)
+        distinguishesMapsBetween(baz, foo)
+      }
+    }
+
     it("can tell if an arrow is monic") {
 
       if (!inActionTopos) { // reluctantly skip, too slow with current technology

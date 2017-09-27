@@ -47,6 +47,8 @@ trait ConstructToposOfAutomorphisms extends
         override val I = trivialAutomorphism(Ɛ.I)
         override val omega = trivialAutomorphism(Ɛ.omega)
         override val truth = AutomorphismArrow(I, omega, Ɛ.truth)
+        override val optionalGenerator =
+          None // no can do, would have to be infinite
 
         case class Automorphism[X <: ~](
           arrow: Ɛ.>[X, X],

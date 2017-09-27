@@ -9,7 +9,7 @@ import org.scalatest.Matchers._
 
 import scala.Function.untupled
 
-class GenericToposOfActionsTest extends ToposOfMonoidActionsTest(
+class UnoptimizedToposOfActionsTest extends ToposOfMonoidActionsTest(
   ToposOfMonoidActions of (
     monoidOf3,
     FiniteSets.DefaultMonoidAssistant

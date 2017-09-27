@@ -53,7 +53,9 @@ trait ConstructToposOfMonoidActions extends
             (i, m) => i
           }
         )
-  
+      override lazy val optionalGenerator =
+        Some(new ActionDot(monoid.regularAction))
+
       private object Ideals {
         private val possibleIdeals = carrier.power
         import possibleIdeals.{ evaluate => $ }
