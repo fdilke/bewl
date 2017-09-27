@@ -1,11 +1,11 @@
-package com.fdilke.bewl.apps
+package com.fdilke.bewl.apps.music
 
 import com.fdilke.bewl.fsets.FiniteSets
-import FiniteSets.{EQUALIZER, groupOfUnits, ActionSplitter, Monoid, Relation, ToposOfMonoidActions, bifunctionAsBiArrow, makeDot, x}
+import com.fdilke.bewl.fsets.FiniteSets.{EQUALIZER, Monoid, bifunctionAsBiArrow, x}
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.{elementsOf, makeNullaryOperator}
-import com.fdilke.bewl.helper.{Timed, ⊕}
-import com.fdilke.bewl.music.TriadicFixtures._
+import com.fdilke.bewl.apps.permutations.TriadicFixtures._
 import org.scalatest.Matchers._
+
 import scala.language.postfixOps
 
 object ComparePitchClassEncodings extends App {

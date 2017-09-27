@@ -1,10 +1,10 @@
-package com.fdilke.bewl.apps
+package com.fdilke.bewl.apps.permutations
 
 import com.fdilke.bewl.fsets.FiniteSets
-import FiniteSets.{ActionSplitter, Monoid, Relation, ToposOfMonoidActions, bifunctionAsBiArrow, makeDot, x}
-import com.fdilke.bewl.fsets.FiniteSetsUtilities.{elementsOf, makeNullaryOperator}
-import com.fdilke.bewl.helper.{Timed, ⊕}
-import com.fdilke.bewl.music.TriadicFixtures._
+import com.fdilke.bewl.fsets.FiniteSets.ActionSplitter
+import com.fdilke.bewl.fsets.FiniteSetsUtilities.elementsOf
+import com.fdilke.bewl.helper.Timed
+import TriadicFixtures._
 
 import scala.language.postfixOps
 
@@ -83,8 +83,6 @@ object NollCalculations extends App {
             arrow
           )
         )
-
-      import triadicTopos.EndoRelation
 
       print("[")
       print(if (relation.isReflexive) "R" else "r")

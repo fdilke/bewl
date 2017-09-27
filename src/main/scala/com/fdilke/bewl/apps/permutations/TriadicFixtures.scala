@@ -1,10 +1,9 @@
-package com.fdilke.bewl.music
+package com.fdilke.bewl.apps.permutations
 
 import com.fdilke.bewl.fsets.FiniteSets
-import com.fdilke.bewl.fsets.FiniteSets.{ActionSplitter, EQUALIZER, FiniteSetsDot, Monoid, Relation, ToposOfMonoidActions, bifunctionAsBiArrow, makeDot, x}
+import com.fdilke.bewl.fsets.FiniteSets.{EQUALIZER, FiniteSetsDot, Monoid, ToposOfMonoidActions, bifunctionAsBiArrow, makeDot, x}
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.{elementsOf, makeNullaryOperator}
-import com.fdilke.bewl.helper.{Timed, ⊕}
-import com.fdilke.bewl.music.TriadicFixtures.triadicTopos
+import com.fdilke.bewl.helper.⊕
 import com.fdilke.bewl.topos.{Topos, Wrappings}
 import org.scalatest.Matchers._
 
