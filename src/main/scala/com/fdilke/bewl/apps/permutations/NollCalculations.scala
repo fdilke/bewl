@@ -1,10 +1,11 @@
 package com.fdilke.bewl.apps.permutations
 
 import com.fdilke.bewl.fsets.FiniteSets
-import com.fdilke.bewl.fsets.FiniteSets.ActionSplitter
+import FiniteSets.ActionSplitter
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.elementsOf
 import com.fdilke.bewl.helper.Timed
-import TriadicFixtures._
+import TriadicFixtures.{triadicTopos, _}
+import triadicTopos.EndoRelation
 
 import scala.language.postfixOps
 
@@ -12,7 +13,12 @@ object NollCalculations extends App {
 
   def triadicSplit[A](
     dot: triadicTopos.DOT[A]
-  ) =
+  ): FiniteSets.ActionSplitting[
+    FiniteSets.x[Int, Int],
+    A,
+    ({ type λ[T] =
+      triadicMonoid.Action[T] })#λ
+  ] =
     ActionSplitter.forMonoid(
       triadicMonoid
     ).splitAction(
@@ -20,6 +26,33 @@ object NollCalculations extends App {
         dot
       )
     )
+
+  if(true)  {
+    val cc = cyclic x cyclic
+    val ccAnalysis =
+      triadicSplit(cc)
+    println(
+      "\tcyclic x cyclic: number of components: " + (
+        ccAnalysis.components.size
+      )
+    )
+    val nub = Timed("calculating the nub") {
+      cyclic > triadicTopos.omega
+    }
+    println("nub size: " +
+      (elementsOf(triadicTopos.unwrap(nub).actionCarrier).size)
+    )
+
+    val nubAnalysis =
+      Timed("calculating components of the nub") {
+        triadicSplit(nub)
+      }
+    println(
+      "\tnub: number of components: " + (
+        nubAnalysis.components.size
+      )
+    )
+  }
 
   if(false)  {
     val cc = cyclic x chord
