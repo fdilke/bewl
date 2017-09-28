@@ -27,6 +27,31 @@ object NollCalculations extends App {
       )
     )
 
+  if (true) {
+    for {
+      n <- elementsOf(chordDot)
+    } {
+      val generated =
+        elementsOf(triadicMonoid.carrier).map {
+          a => affineMapApply(n, a)
+        }.toSeq.distinct.sorted
+
+      println(n + " -> " + generated.mkString(","))
+    }
+    println("#chord subobjects = " +
+      (chord >> triadicTopos.omega).size)
+
+    for {
+      chi <- chord >> triadicTopos.omega
+    } {
+      val sub = chi.whereTrue
+      println("sub> " + elementsOf(
+        triadicTopos.unwrap(sub).actionCarrier
+      ).toSeq.sorted.mkString(","))
+    }
+    System.exit(0)
+  }
+
   if(true)  {
     val cc = cyclic x cyclic
     val ccAnalysis =
