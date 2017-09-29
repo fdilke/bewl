@@ -27,7 +27,7 @@ object NollCalculations extends App {
       )
     )
 
-  if (true) {
+  if (false) {
     for {
       n <- elementsOf(chordDot)
     } {
@@ -52,7 +52,7 @@ object NollCalculations extends App {
     System.exit(0)
   }
 
-  if(true)  {
+  if(false)  {
     val cc = cyclic x cyclic
     val ccAnalysis =
       triadicSplit(cc)
@@ -106,7 +106,7 @@ object NollCalculations extends App {
     )
   }
 
-  if (true) { // too slow, as yet
+  if (false) { // too slow, as yet
     println("Chord square:")
     val c2 = chord x chord
     val csAnalysis =
@@ -168,6 +168,31 @@ object NollCalculations extends App {
       }
     println(s"$name minimal: " + tuneMinimal)
 
+    if (true) {
+      println("calculating power of " + name)
+      val power = tune.power
+      println("size of omega = " + triadicTopos.omega.size)
+      println("size of power = " + measure(power))
+      if (false) {
+        (power >> triadicTopos.I) foreach { to1 =>
+          println("calculated power -> 1")
+        }
+        println("calculated power -> 1... done")
+      }
+      val isInjective =
+        Timed("calculating injectivity of " + name) {
+          (power >> tune) exists { projection =>
+            print("*")
+            val retracts =
+              (projection o tune.singleton) == tune.identity
+            if (retracts)
+              println("!")
+            retracts
+          }
+        }
+      println(isInjective)
+    }
+
     val tuneSimple =
       Timed(s"calc $name simple") {
         tune.isSimple
@@ -179,27 +204,6 @@ object NollCalculations extends App {
         tune.isInjective
       }
     println(s"$name injective: " + tuneInjective)
-
-    if (false) {
-      val power = tune.power
-      println("calculated power")
-      println("size of omega = " + measure(triadicTopos.omega))
-      println("size of power = " + measure(power))
-      (power >> triadicTopos.I) foreach { to1 =>
-        println("calculated power -> 1")
-      }
-      println("calculated power -> 1... done")
-      val isInjective =
-        (power >> tune) exists { projection =>
-          print("*")
-          val retracts =
-            (projection o tune.singleton) == tune.identity
-          if (retracts)
-            println("!")
-          retracts
-        }
-      println(isInjective)
-    }
   }
 
   showProperties("chord", chord)
