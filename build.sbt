@@ -6,6 +6,8 @@ scalaVersion := "2.12.3"
 
 scalacOptions ++= Seq("-feature", "-deprecation")
 
+resolvers += "Maven central" at "http://repo1.maven.org/maven2/"
+
 parallelExecution in Test := false
 
 libraryDependencies ++= Seq(
@@ -16,7 +18,8 @@ libraryDependencies ++= Seq(
   	"org.scala-lang.modules", "scala-xml_2.12"
 	),
   "org.scala-lang.modules" %% "scala-xml" % "1.0.6",
-  "javax.xml.bind" % "jaxb-api" % "2.3.0"
+//  "javax.xml.bind" % "jaxb-api" % "2.3.0"
+  "com.danielasfregola" %% "twitter4s" % "5.1"
 ) map {
   _ withSources() withJavadoc()
 }

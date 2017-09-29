@@ -4,6 +4,7 @@ nohup.out
 
 scratch/
 .DS_Store
+config/
 
 # IDEA specific
 .idea/

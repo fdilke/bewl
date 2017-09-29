@@ -1,5 +1,7 @@
 package com.fdilke.bewl.apps.music
 
+import com.fdilke.bewl.apps.TwitterHack
+import com.fdilke.bewl.apps.TwitterHack.tweetMe
 import com.fdilke.bewl.apps.music.TriadicFixtures.{triadicTopos, _}
 import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSets.ActionSplitter
@@ -44,17 +46,22 @@ object NollCalculations extends App {
     for {
       sub <- subobjs map { _.whereTrue }
       subelts = elementsOf(triadicTopos.unwrap(sub).actionCarrier)
-        if subelts.size < 4
+        if subelts.size < 400
     } {
       val name = "[" + subelts.mkString(",") + "]"
+
+      tweetMe("calc injectivity of " + name)
 
       val isInjective = Timed("calc injectivity of " + name) {
         sub.isInjective
       }
-      if (isInjective)
+      if (isInjective) {
+        tweetMe("INJECTIVE!" + name)
         println("INJECTIVE")
+      }
     }
     println("subobjs: done")
+    tweetMe("subobjs: done")
     System.exit(0)
   }
 
