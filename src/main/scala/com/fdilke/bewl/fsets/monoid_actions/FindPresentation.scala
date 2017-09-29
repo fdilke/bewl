@@ -35,28 +35,30 @@ trait FindPresentation extends BaseFiniteSets {
           generators.zipWithIndex map tupled { (g, j) =>
             GeneratorWithRelators[M, A](
               g,
-              // TODO: Relators.cull(j, ...
-              generators.take(j + 1).zipWithIndex
-                flatMap tupled { (h, i) =>
-                  findGenerators(
-                    monoid.action(
-                      monoid.carrier.squared where {
-                        case m ⊕ n =>
-                          action.actionMultiply(g, m) ==
-                            action.actionMultiply(h, n)
+              CullRelators(
+                j,
+                generators.take(j + 1).zipWithIndex
+                  flatMap tupled { (h, i) =>
+                    findGenerators(
+                      monoid.action(
+                        monoid.carrier.squared where {
+                          case m ⊕ n =>
+                            action.actionMultiply(g, m) ==
+                              action.actionMultiply(h, n)
+                        }
+                      ) { (pair, m) =>
+                        pair match {
+                          case p ⊕ q =>
+                            monoid.multiply(p, m) ⊕
+                              monoid.multiply(q, m)
+                        }
                       }
-                    ) { (pair, m) =>
-                      pair match {
-                        case p ⊕ q =>
-                          monoid.multiply(p, m) ⊕
-                            monoid.multiply(q, m)
-                      }
+                    ).generators map {
+                      case m ⊕ n =>
+                        Relator(m, i, n)
                     }
-                  ).generators collect {
-                    case m ⊕ n if !(m == n && i == j) =>
-                      Relator(m, i, n)
-                  }
-              }
+                }
+              )
             )
           }
         }
