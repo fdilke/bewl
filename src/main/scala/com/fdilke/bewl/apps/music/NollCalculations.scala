@@ -1,11 +1,11 @@
-package com.fdilke.bewl.apps.permutations
+package com.fdilke.bewl.apps.music
 
+import com.fdilke.bewl.apps.music.TriadicFixtures.{triadicTopos, _}
 import com.fdilke.bewl.fsets.FiniteSets
-import FiniteSets.ActionSplitter
+import com.fdilke.bewl.fsets.FiniteSets.ActionSplitter
+import triadicTopos.EndoRelation
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.elementsOf
 import com.fdilke.bewl.helper.Timed
-import TriadicFixtures.{triadicTopos, _}
-import triadicTopos.EndoRelation
 
 import scala.language.postfixOps
 

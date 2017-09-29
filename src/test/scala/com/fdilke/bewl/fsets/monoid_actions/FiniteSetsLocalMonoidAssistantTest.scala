@@ -7,12 +7,11 @@ import com.fdilke.bewl.helper.⊕
 import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
 import org.scalatest.FreeSpec
 import org.scalatest.Matchers._
-import com.fdilke.bewl.testutil.CustomMatchers._
 
 import scala.Function.untupled
 import scala.language.{existentials, postfixOps, reflectiveCalls, higherKinds}
 
-class FiniteSetsMonoidAssistantTest extends FreeSpec {
+class FiniteSetsLocalMonoidAssistantTest extends FreeSpec {
   
   private val (i, x, y) = ('i, 'x, 'y)
 
@@ -44,7 +43,7 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
   private val bar = monoidOf3.action(barDot)(scalarMultiply)
 
   "The action analyzer" - {
-    "can enumerate the morphisms into another action" - {
+    "enumerates the morphisms into another action" - {
       "for the trivial action to itself" in {
         val trivialAction: monoidOf3.Action[actionTopos.UNIT] =
           actionTopos.unwrap(
@@ -233,41 +232,12 @@ class FiniteSetsMonoidAssistantTest extends FreeSpec {
     sourceAction: monoidOf3.Action[X],
     targetAction: monoidOf3.Action[Y],
     thorough: Boolean
-  ) {
-
-  val morphisms =
-    analyze(
-      sourceAction
-    ).morphismsTo(
-      analyzer.analyze(
-        targetAction
-      )
+  ): Unit =
+    CheckLocalMorphismEnumerator(
+      monoidOf3
+    ) (
+      sourceAction,
+      targetAction,
+      thorough
     )
-
-    morphisms.forall {
-      monoidOf3.actions.isMorphism(
-        sourceAction,
-        targetAction,
-        _
-      )
-    } shouldBe true
-
-    if (thorough) {
-      morphisms should not(containDuplicates)
-      morphisms.toSet map { (morphism: X > Y) =>
-        actionTopos.makeArrow(
-          new monoidOf3.ActionPreArrow[X, Y](
-            sourceAction,
-            targetAction,
-            x => morphism(x)
-          )
-        )
-      } shouldBe {
-        (
-          actionTopos.makeDot(sourceAction) >>
-            actionTopos.makeDot(targetAction)
-          ) toSet
-      }
-    }
-  }
 }

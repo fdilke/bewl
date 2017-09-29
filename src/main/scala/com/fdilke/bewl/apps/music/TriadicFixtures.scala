@@ -1,8 +1,8 @@
-package com.fdilke.bewl.apps.permutations
+package com.fdilke.bewl.apps.music
 
 import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSets.{EQUALIZER, FiniteSetsDot, Monoid, ToposOfMonoidActions, bifunctionAsBiArrow, makeDot, x}
-import com.fdilke.bewl.fsets.FiniteSetsUtilities.{elementsOf, makeNullaryOperator}
+import com.fdilke.bewl.fsets.FiniteSetsUtilities.makeNullaryOperator
 import com.fdilke.bewl.helper.⊕
 import com.fdilke.bewl.topos.{Topos, Wrappings}
 import org.scalatest.Matchers._

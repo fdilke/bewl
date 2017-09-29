@@ -3,7 +3,7 @@ package com.fdilke.bewl.apps.music
 import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSets.{EQUALIZER, Monoid, bifunctionAsBiArrow, x}
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.{elementsOf, makeNullaryOperator}
-import com.fdilke.bewl.apps.permutations.TriadicFixtures._
+import TriadicFixtures._
 import org.scalatest.Matchers._
 
 import scala.language.postfixOps
