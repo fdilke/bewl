@@ -27,6 +27,37 @@ object NollCalculations extends App {
       )
     )
 
+  if (true) {
+    val subobjs = Timed("calculating subobjects of the octave") {
+      octave >> triadicTopos.omega
+    }
+    println("#subobjs: " + subobjs.size)
+    println("Number of each size:")
+    val sizeGroups =
+      subobjs map { _.whereTrue } groupBy { sub =>
+        elementsOf(triadicTopos.unwrap(sub).actionCarrier).size
+      }
+
+    for { size <- sizeGroups.keySet.toSeq.sorted }
+     println("size " + size + " : " + sizeGroups(size).size)
+
+    for {
+      sub <- subobjs map { _.whereTrue }
+      subelts = elementsOf(triadicTopos.unwrap(sub).actionCarrier)
+        if subelts.size < 4
+    } {
+      val name = "[" + subelts.mkString(",") + "]"
+
+      val isInjective = Timed("calc injectivity of " + name) {
+        sub.isInjective
+      }
+      if (isInjective)
+        println("INJECTIVE")
+    }
+    println("subobjs: done")
+    System.exit(0)
+  }
+
   if (false) {
     for {
       n <- elementsOf(chordDot)
