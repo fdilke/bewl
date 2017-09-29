@@ -19,9 +19,6 @@ trait FindPresentation extends BaseFiniteSets {
       ): Seq[GeneratorWithRelators[M, A]]
     } =
       new Object {
-        private val monoidElements =
-          monoid.carrier.elements
-
         private val findGenerators: {
           def apply[A](
             action: monoid.Action[A]
@@ -38,26 +35,27 @@ trait FindPresentation extends BaseFiniteSets {
           generators.zipWithIndex map tupled { (g, j) =>
             GeneratorWithRelators[M, A](
               g,
+              // TODO: Relators.cull(j, ...
               generators.take(j + 1).zipWithIndex
                 flatMap tupled { (h, i) =>
-                findGenerators(
-                  monoid.action(
-                    monoid.carrier.squared where {
-                      case m ⊕ n =>
-                        action.actionMultiply(g, m) ==
-                          action.actionMultiply(h, n)
-                    }) {
-                    (pair, m) =>
+                  findGenerators(
+                    monoid.action(
+                      monoid.carrier.squared where {
+                        case m ⊕ n =>
+                          action.actionMultiply(g, m) ==
+                            action.actionMultiply(h, n)
+                      }
+                    ) { (pair, m) =>
                       pair match {
                         case p ⊕ q =>
                           monoid.multiply(p, m) ⊕
                             monoid.multiply(q, m)
                       }
+                    }
+                  ).generators collect {
+                    case m ⊕ n if !(m == n && i == j) =>
+                      Relator(m, i, n)
                   }
-                ).generators collect {
-                  case m ⊕ n if !(m == n && i == j) =>
-                    Relator(m, i, n)
-                }
               }
             )
           }

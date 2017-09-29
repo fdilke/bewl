@@ -5,11 +5,10 @@ import FiniteSets.{>, LocalMonoidAssistant, ToposOfMonoidActions, bifunctionAsBi
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import com.fdilke.bewl.helper.⊕
 import TriadicFixtures._
-import com.fdilke.bewl.fsets.monoid_actions.CheckLocalMorphismEnumerator
+import com.fdilke.bewl.fsets.monoid_actions.{CheckExtractPresentation, CheckLocalMorphismEnumerator}
 import org.scalatest.{FreeSpec, Ignore}
 import org.scalatest.Matchers._
 
-@Ignore
 class TriadicFixturesTest extends FreeSpec {
 
   def enumeratesMorphisms[X, Y](
@@ -36,5 +35,9 @@ class TriadicFixturesTest extends FreeSpec {
       omegaAction,
       thorough = true
     )
+  }
+
+  "the chord can be presented" in {
+    CheckExtractPresentation(triadicMonoid)(chordAction)
   }
 }

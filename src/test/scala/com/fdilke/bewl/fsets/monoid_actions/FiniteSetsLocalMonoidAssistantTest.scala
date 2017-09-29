@@ -24,12 +24,7 @@ class FiniteSetsLocalMonoidAssistantTest extends FreeSpec {
 
   import analyzer.analyze
 
-  private val regularAnalysis =
-    analyze(
-      regularAction
-    )
-
-  private val actionTopos = 
+  private val actionTopos =
     ToposOfMonoidActions of(
       monoidOf3,
       FiniteSets.DefaultMonoidAssistant
@@ -45,67 +40,17 @@ class FiniteSetsLocalMonoidAssistantTest extends FreeSpec {
   "The action analyzer" - {
     "enumerates the morphisms into another action" - {
       "for the trivial action to itself" in {
-        val trivialAction: monoidOf3.Action[actionTopos.UNIT] =
-          actionTopos.unwrap(
-            actionTopos.I
+        val trivialAction =
+          monoidOf3.trivialAction(dot(()))
+
+          enumeratesMorphisms(
+            regularAction,
+            regularAction,
+            thorough=true
           )
-        val morphisms =
-          regularAnalysis.morphismsTo(
-            analyzer.analyze(
-              trivialAction
-            )
-          ) 
-          
-        morphisms should have size 1
-        val morphism: Symbol > actionTopos.UNIT =
-          morphisms.head
-        morphism should have {
-          'source(regularAction.actionCarrier)
-          'target(
-            trivialAction.actionCarrier
-          )
-        }
-        monoidOf3.actions.isMorphism(
-          regularAction, 
-          trivialAction, 
-          morphism
-        ) shouldBe true
-        morphism.sanityTest
       }
 
       "for the regular action to itself" in {
-        val morphisms =
-          regularAnalysis.morphismsTo(
-            analyzer.analyze(
-              regularAction
-            )
-          )
-
-        morphisms should have size 3
-
-        def leftMultiplication(
-          l: Symbol
-        ) =
-          functionAsArrow[Symbol, Symbol](
-            regularAction.actionCarrier,
-            regularAction.actionCarrier,
-            { regularAction.actionMultiply(l, _) }
-          )
-
-        morphisms.toSet shouldBe {
-          elementsOf(monoidOf3.carrier).toSet map leftMultiplication
-        }
-
-        morphisms.forall {
-          monoidOf3.actions.isMorphism(
-            regularAction,
-            regularAction,
-            _
-          )
-        } shouldBe true
-      }
-
-      "for the regular action to itself, another way" in {
         enumeratesMorphisms(
           regularAction,
           regularAction,

@@ -116,7 +116,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
                       relator.selfScalar
                     ) == targetMultiply(
                       otherTarget,
-                      relator.selfScalar
+                      relator.otherScalar
                     )
                   }
                 }.map { targetElement =>
@@ -136,21 +136,17 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
                 }.toSeq distinct
               }
 
-              def absorb(
-                partialMaps: Traversable[Map[A, B]],
-                index: Int
-              ) =
-                for {
-                  partialMap <- partialMaps
-                  extension <- compatibleExtensions(partialMap, index)
-                } yield {
-                  partialMap ++ extension
-                }
-
               srcPresentation.indices.foldLeft(
                 Traversable(Map.empty[A, B])
-              ) {
-                absorb
+              ) { (partialMaps, index) =>
+                for {
+                  partialMap <- partialMaps
+                  extension <- compatibleExtensions(
+                    partialMap,
+                    index
+                  )
+                } yield
+                  partialMap ++ extension
               }
             }
 

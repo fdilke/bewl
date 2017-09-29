@@ -39,11 +39,6 @@ class FindPresentationTest extends FreeSpec {
       ) generators
     )
 
-  private val regularAnalysis =
-    findPresentation(
-      regularAction
-    )
-
   private val actionTopos =
     ToposOfMonoidActions of(
       monoidOf3,
@@ -97,39 +92,6 @@ class FindPresentationTest extends FreeSpec {
 
   private def canExtractPresentation[A](
     action: monoidOf3.Action[A]
-  ) {
-    val generatorsWithRelators: Seq[GeneratorWithRelators[Symbol, A]] =
-      findPresentation(
-        action
-      )
-
-    for {
-      (g, index) <- generatorsWithRelators.zipWithIndex
-    } {
-      g.relators should not contain Relator('i, index, 'i)
-    }
-
-    val presentedAction =
-      FiniteSetsPresentedAction(
-        monoidOf3
-      )(
-        generatorsWithRelators
-      )
-    presentedAction.sanityTest
-
-    // Check this presents the original action
-    val theProjection: Int > A =
-      presentedAction.project(
-        action,
-        generatorsWithRelators map {
-          _.generator
-        }
-      )
-
-    monoidOf3.actions.isMorphism(
-      presentedAction.action,
-      action,
-      theProjection
-    ) shouldBe true
-  }
+  ) =
+    CheckExtractPresentation(monoidOf3)(action)
 }

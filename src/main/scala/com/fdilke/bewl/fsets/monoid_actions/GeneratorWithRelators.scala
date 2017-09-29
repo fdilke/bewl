@@ -6,8 +6,8 @@ case class GeneratorWithRelators[M, A](
 )
 
 case class Relator[M](
-    selfScalar: M,
-    otherIndex: Int,
-    otherScalar: M
+  selfScalar: M,
+  otherIndex: Int,
+  otherScalar: M
 )
 
