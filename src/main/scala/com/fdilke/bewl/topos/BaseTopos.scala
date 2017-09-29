@@ -422,7 +422,8 @@ trait BaseTopos {
         dot(target) { s =>
           implicit val _ = dot > target
           global(dot toI s)(s)
-        }}
+        }
+      }
 
     final lazy val fromO: VOID > S =
       InitialDot fromO dot
