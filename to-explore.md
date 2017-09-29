@@ -8,4 +8,6 @@
 - Akka / streams
 - Lurie talk about categorization of Fourier
 - scalaz
-- macros. paradise library? Can port scala-workflow?
+- macros. paradise library?
+- Can port [scala-workflow](http://www.cse.chalmers.se/~evgenyk/papers/scala-workflow.pdf)?
+- Mazzolla book
