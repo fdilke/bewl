@@ -30,23 +30,31 @@ object NollCalculations extends App {
     )
 
   if (true) {
-    val subobjs = Timed("calculating subobjects of the octave") {
-      octave >> triadicTopos.omega
-    }
-    println("#subobjs: " + subobjs.size)
-    println("Number of each size:")
-    val sizeGroups =
-      subobjs map { _.whereTrue } groupBy { sub =>
-        elementsOf(triadicTopos.unwrap(sub).actionCarrier).size
+    val subobjs: Traversable[triadicTopos.>[Int, triadicTopos.TRUTH]] =
+      Timed("calculating subobjects of the octave") {
+        octave >> triadicTopos.omega
       }
+    println("#subobjs: " + subobjs.size)
 
-    for { size <- sizeGroups.keySet.toSeq.sorted }
+    def subSize[A](sub: triadicTopos.EQUALIZER[A]) =
+      elementsOf(triadicTopos.unwrap(sub).actionCarrier).size
+
+    println("Number of each size:")
+
+    val sizeGroups: Map[Int, Traversable[triadicTopos.EQUALIZER[Int]]] =
+      subobjs map { _.whereTrue } groupBy subSize
+
+    val sortedSizes: Seq[Int] =
+      sizeGroups.keySet.toSeq.sorted
+
+    for { size <- sortedSizes }
      println("size " + size + " : " + sizeGroups(size).size)
 
     for {
-      sub <- subobjs map { _.whereTrue }
+      size <- sortedSizes
+      sizeGroup = sizeGroups(size)
+      sub <- sizeGroup
       subelts = elementsOf(triadicTopos.unwrap(sub).actionCarrier)
-        if subelts.size < 400
     } {
       val name = "[" + subelts.mkString(",") + "]"
 
