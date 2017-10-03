@@ -29,7 +29,7 @@ object NollCalculations extends App {
       )
     )
 
-  if (true) {
+  if (false) {
     val subobjs: Traversable[triadicTopos.>[Int, triadicTopos.TRUTH]] =
       Timed("calculating subobjects of the octave") {
         octave >> triadicTopos.omega
@@ -58,6 +58,7 @@ object NollCalculations extends App {
     } {
       val name = "[" + subelts.mkString(",") + "]"
 
+//      println("! " + name)
       tweetMe("calc injectivity of " + name)
 
       val isInjective = Timed("calc injectivity of " + name) {
@@ -71,6 +72,20 @@ object NollCalculations extends App {
     println("subobjs: done")
     tweetMe("subobjs: done")
     System.exit(0)
+  }
+
+  if (true) {
+    for {
+      n <- elementsOf(octaveDot)
+    } {
+      val generated =
+        elementsOf(triadicMonoid.carrier).map {
+          a => affineMapApply(n, a)
+        }.toSeq.distinct.sorted
+
+      println(n + " -> " + generated.mkString(","))
+    }
+    System exit 0
   }
 
   if (false) {
