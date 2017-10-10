@@ -74,7 +74,7 @@ object NollCalculations extends App {
     System.exit(0)
   }
 
-  if (true) {
+  if (false) {
     for {
       n <- elementsOf(octaveDot)
     } {
@@ -167,7 +167,7 @@ object NollCalculations extends App {
     )
   }
 
-  if (false) { // too slow, as yet
+  if (true) { // too slow, as yet
     println("Chord square:")
     val c2 = chord x chord
     val csAnalysis =
