@@ -22,8 +22,11 @@ To see the current to-do list and state of play, you can view this [Trello board
 
 # Presentations explaining the project
 
-[This one](https://github.com/fdilke/bewl/blob/master/notes/StateOfTheBewlJan2016.pdf) explains the project and describes
-the overall state of play as of January 2016.
+Using Bewl to do musical calculations - [putting the chord of C major under the microscope](https://github.com/fdilke/bewl/blob/master/notes/ChordUnderMicroscope.pdf)
+
+
+Overall [state of play](https://github.com/fdilke/bewl/blob/master/notes/StateOfTheBewlJan2016.pdf)
+as of January 2016.
 
 See [this presentation](https://www.evernote.com/shard/s141/sh/8e6b9d94-bc20-4fde-b2bf-9e844f486f76/d11244bad0729071fa00d19eaad312ce)
 for an attempt at "the internal language for dummies"
