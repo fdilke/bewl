@@ -271,3 +271,13 @@ object NollCalculations extends App {
   showProperties("cyclic", cyclic)
   showProperties("octave", octave)
 }
+
+object ChordRelationsSlow extends App {
+  val diag =
+    triadicTopos.Relation.diagonalRelation(chord)
+
+  val ans =
+    Timed("Composing the diagonal") {
+      diag o diag
+    }
+}
