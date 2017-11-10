@@ -273,25 +273,65 @@ object NollCalculations extends App {
 }
 
 object LogicalOperationsSlow extends App {
-//  val omegaElements: Traversable[triadicTopos.TRUTH] =
-//    elementsOf(triadicTopos.unwrap(
-//      triadicTopos.omega
-//    ).actionCarrier)
-//
-//  import triadicTopos.OmegaEnrichments
-//
-//  for {
-//    ω <- omegaElements
-//    ξ <- omegaElements
-//  } {
-//    println("Next ∧ calculation:")
-//    println("ω, ξ = " + ω + "," + ξ)
-//    println("ω ∧ ξ = " + (ω ∧ ξ))
-//  }
-  val delazify = triadicTopos
-  println("computing Ω...")
-  val o = triadicTopos.Ω
-  println("computing Ω... done")
+  if (false) {
+    val omegaElements: Traversable[triadicTopos.TRUTH] =
+      elementsOf(triadicTopos.unwrap(
+        triadicTopos.omega
+      ).actionCarrier)
+
+    import triadicTopos.OmegaEnrichments
+
+    for {
+      ω <- omegaElements
+      ξ <- omegaElements
+    } {
+      println("Next ∧ calculation:")
+      println("ω, ξ = " + ω + "," + ξ)
+      println("ω ∧ ξ = " + (ω ∧ ξ))
+    }
+  }
+  if (false) {
+    val delazify = triadicTopos
+    println("computing Ω...")
+    val o = triadicTopos.Ω
+    println("computing Ω... done")
+  }
+  if (true) {
+    val oo = triadicTopos.omega
+    for {
+      arrow <- oo.squared >> oo
+    } {
+      println("\t" + arrow)
+    }
+  }
+
+  if (false) {
+    def triadicSplit[A](
+                         dot: triadicTopos.DOT[A]
+                       ): FiniteSets.ActionSplitting[
+      FiniteSets.x[Int, Int],
+      A,
+      ({type λ[T] =
+        triadicMonoid.Action[T]})#λ
+      ] =
+      ActionSplitter.forMonoid(
+        triadicMonoid
+      ).splitAction(
+        triadicTopos.unwrap(
+          dot
+        )
+      )
+
+    val omegaSplit =
+      triadicSplit(
+        triadicTopos.omega.squared // x triadicTopos.optionalGenerator.get
+      )
+    val generators =
+      omegaSplit.allGenerators
+    println("Components(" + omegaSplit.components.size + ")")
+    println("Generators (" + generators.size + "):")
+    println(generators)
+  }
 }
 
 object ChordRelationsSlow extends App {
