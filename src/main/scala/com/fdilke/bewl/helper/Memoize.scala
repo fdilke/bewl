@@ -12,7 +12,7 @@ object Memoize {
 
   class MemoizedFunction[INPUT, OUTPUT](
       function: INPUT => OUTPUT
-  ) {
+  ) extends (INPUT => OUTPUT) {
     private val resultMap = 
       scala.collection.mutable.Map[INPUT, OUTPUT]()
 

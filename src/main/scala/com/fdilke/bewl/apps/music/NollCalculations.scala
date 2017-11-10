@@ -272,6 +272,28 @@ object NollCalculations extends App {
   showProperties("octave", octave)
 }
 
+object LogicalOperationsSlow extends App {
+//  val omegaElements: Traversable[triadicTopos.TRUTH] =
+//    elementsOf(triadicTopos.unwrap(
+//      triadicTopos.omega
+//    ).actionCarrier)
+//
+//  import triadicTopos.OmegaEnrichments
+//
+//  for {
+//    ω <- omegaElements
+//    ξ <- omegaElements
+//  } {
+//    println("Next ∧ calculation:")
+//    println("ω, ξ = " + ω + "," + ξ)
+//    println("ω ∧ ξ = " + (ω ∧ ξ))
+//  }
+  val delazify = triadicTopos
+  println("computing Ω...")
+  val o = triadicTopos.Ω
+  println("computing Ω... done")
+}
+
 object ChordRelationsSlow extends App {
   val diag =
     triadicTopos.Relation.diagonalRelation(chord)
