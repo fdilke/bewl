@@ -4,8 +4,9 @@ import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSets.{EQUALIZER, Monoid, bifunctionAsBiArrow, x}
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.{elementsOf, makeNullaryOperator}
 import TriadicFixtures._
-import com.fdilke.bewl.helper.⊕
+import com.fdilke.bewl.helper.{IterateToFixed, ⊕}
 import org.scalatest.Matchers._
+import ⊕._
 
 import scala.language.postfixOps
 
@@ -80,4 +81,38 @@ object StabilizerSanity extends App {
   println("c == g ? " + (stab(c) == stab(g)))
   println("e == g ? " + (stab(e) == stab(g)))
   println("e == e ? " + (stab(e) == stab(e)))
+}
+
+object TriadicGenerators extends App {
+  for {
+    i <- elementsOf(triadicMonoid.carrier)
+    j <- elementsOf(triadicMonoid.carrier)
+  } {
+    val submonoid =
+      IterateToFixed(
+        Set(triadicMonoid.unit(()), i, j)
+      ) { set =>
+        set.union(
+          for { i <- set ; j <- set } yield {
+            triadicMonoid.multiply(i, j)
+          }
+        )
+      }
+    val size = submonoid.size
+    if (size == triadicMonoid.carrier.size)
+      println(s"M = <$i, $j>")
+  }
+}
+
+object GeneratorsOnChord extends App {
+  val p = 3 ⊕ 1
+  val q = 8 ⊕ 4
+
+  for {
+    a <- elementsOf(chordDot)
+  } {
+    val ap = affineMapApply(a, p)
+    val aq = affineMapApply(a, q)
+    println(s"$a -p-> ${ap} ; -q-> ${aq}")
+  }
 }

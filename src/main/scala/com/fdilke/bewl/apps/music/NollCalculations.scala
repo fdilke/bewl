@@ -7,7 +7,7 @@ import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSets.ActionSplitter
 import triadicTopos.EndoRelation
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.elementsOf
-import com.fdilke.bewl.helper.{Timed, ⊕}
+import com.fdilke.bewl.helper.{IterateToFixed, Timed, ⊕}
 
 import scala.language.postfixOps
 
@@ -366,3 +366,4 @@ object ChordRelationsSlow extends App {
       diag o diag
     }
 }
+
