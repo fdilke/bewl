@@ -17,7 +17,7 @@ object TriadicFixtures {
 
   private val inChord: FiniteSets.>[Int, Boolean] =
     octaveDot(FiniteSets.omega) {
-      Seq(0, 4, 7).contains(_)
+      Seq(0, 1, 4).contains(_)
     }
 
   val chordDot: EQUALIZER[Int] =

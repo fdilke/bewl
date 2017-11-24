@@ -8,6 +8,8 @@ trait BaseTopos {
 
   Ɛ: ToposPrerequisites =>
 
+  val name: String
+
   type ~
   type DOT[S <: ~] <: Dot[S]
   type >[S <: ~, T <: ~] <: Arrow[S, T]

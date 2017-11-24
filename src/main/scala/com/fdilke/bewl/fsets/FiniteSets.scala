@@ -17,6 +17,7 @@ object FiniteSets extends BaseFiniteSets
 class BaseFiniteSets extends Topos[Any] with Wrappings[
   Any, Any, Traversable, FiniteSetsPreArrow, Wrappings.NO_WRAPPER
 ] {
+  override val name = "FiniteSets"
   override type DOT[S] = FiniteSetsDot[S]
   override type >[S, T] = FiniteSetsArrow[S, T]
   override type UNIT = Unit

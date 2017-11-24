@@ -1,6 +1,6 @@
 package com.fdilke.bewl.topos.enrichment
 
-import com.fdilke.bewl.helper.⊕
+import com.fdilke.bewl.helper.{Timed, ⊕}
 import com.fdilke.bewl.topos.algebra.AlgebraicStructures
 import com.fdilke.bewl.topos.{BaseTopos, ToposAlgebra, ToposStructures}
 
@@ -17,7 +17,7 @@ trait LogicalOperations {
     val falsity: UNIT > TRUTH
   }
 
-  object DefaultLogicalOperations extends LogicalOperations {
+  class DefaultLogicalOperations extends LogicalOperations {
     override lazy val and =
       BiArrow(
         omega.squared,
@@ -37,7 +37,8 @@ trait LogicalOperations {
       BiArrow(
         omega.squared,
         omega.squared.forAll(omega) {
-          case (a ⊕ b, ω) => ((a → ω) ∧ (b → ω)) → ω
+          case (a ⊕ b, ω) =>
+            (a → ω ∧ (b → ω)) → ω
         }
       )
 
@@ -48,7 +49,7 @@ trait LogicalOperations {
   }
 
   val logicalOperations: LogicalOperations =
-    DefaultLogicalOperations
+    new DefaultLogicalOperations
 
   lazy val Ω: HeytingAlgebra[TRUTH] =
     new HeytingAlgebra[TRUTH](

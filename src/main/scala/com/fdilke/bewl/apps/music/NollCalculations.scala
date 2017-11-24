@@ -167,7 +167,7 @@ object NollCalculations extends App {
     )
   }
 
-  if (true) { // too slow, as yet
+  if (true) { // fast enough now
     println("Chord square:")
     val c2 = chord x chord
     val csAnalysis =
@@ -207,9 +207,13 @@ object NollCalculations extends App {
       print(if (relation.isReflexive) "R" else "r")
       print(if (relation.isSymmetric) "S" else "s")
       print(if (relation.isIdempotent) "I" else "i")
-      print("]")
+      println("]")
+      if (relation.isEquivalence) {
+        println("criterion = " + relation.criterion.arrow)
+      }
     }
     println(" (" + (c2_omega.size) + ")")
+    System exit 0
   }
 
   def measure[T](
@@ -229,6 +233,12 @@ object NollCalculations extends App {
       }
     println(s"$name minimal: " + tuneMinimal)
 
+    val tuneSimple =
+      Timed(s"calc $name simple") {
+        tune.isSimple
+      }
+    println(s"$name simple: " + tuneSimple)
+
     if (true) {
       println("calculating power of " + name)
       val power = tune.power
@@ -239,32 +249,26 @@ object NollCalculations extends App {
           println("calculated power -> 1")
         }
         println("calculated power -> 1... done")
-      }
-      val isInjective =
-        Timed("calculating injectivity of " + name) {
-          (power >> tune) exists { projection =>
-            print("*")
-            val retracts =
-              (projection o tune.singleton) == tune.identity
-            if (retracts)
-              println("!")
-            retracts
+        val isInjective =
+          Timed("calculating injectivity of " + name) {
+            (power >> tune) exists { projection =>
+              print("*")
+              val retracts =
+                (projection o tune.singleton) == tune.identity
+              if (retracts)
+                println("!")
+              retracts
+            }
           }
+        println(isInjective)
+      }
+
+      val tuneInjective =
+        Timed(s"calc $name injective") {
+          tune.isInjective
         }
-      println(isInjective)
+      println(s"$name injective: " + tuneInjective)
     }
-
-    val tuneSimple =
-      Timed(s"calc $name simple") {
-        tune.isSimple
-      }
-    println(s"$name simple: " + tuneSimple)
-
-    val tuneInjective =
-      Timed(s"calc $name injective") {
-        tune.isInjective
-      }
-    println(s"$name injective: " + tuneInjective)
   }
 
   showProperties("chord", chord)

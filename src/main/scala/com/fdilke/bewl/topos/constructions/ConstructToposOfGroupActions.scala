@@ -24,6 +24,8 @@ trait ConstructToposOfGroupActions extends
         ({type λ[X <: ~, Y <: ~] = group.ActionPreArrow[X, Y]}) # λ,
         ({type λ[T <: ~] = T}) # λ
       ] {
+        override val name = "GroupActions in " + Ɛ.name
+
         override type DOT[X <: ~] = ActionDot[X]
         override type >[X <: ~, Y <: ~] = ActionArrow[X, Y]
         override type UNIT = Ɛ.UNIT

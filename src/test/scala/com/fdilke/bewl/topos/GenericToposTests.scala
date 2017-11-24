@@ -127,7 +127,7 @@ abstract class GenericToposTests[
   private lazy val inActionTopos =
     topos.getClass.getName.contains(classOf[ConstructToposOfMonoidActions].getSimpleName)
 
-  describe(s"The topos ${topos.getClass.getSimpleName}") {
+  describe(s"The topos ${topos.name}") {
 
     it("wraps dots and arrows with relatively sane equality semantics") {
       makeSampleDot().sanityTest
@@ -436,6 +436,16 @@ abstract class GenericToposTests[
             localImage.inclusion
           ) shouldBe 'iso
         }
+      }
+
+    if (logicalOperations.getClass.getSimpleName != "DefaultLogicalOperations")
+      it("has local logical operations behaving as default") {
+        val default = new topos.DefaultLogicalOperations
+
+        default.and shouldBe logicalOperations.and
+        default.or shouldBe logicalOperations.or
+        default.implies shouldBe logicalOperations.implies
+        default.falsity shouldBe logicalOperations.falsity
       }
   }
 }

@@ -37,6 +37,8 @@ trait ConstructToposOfAutomorphisms extends
         ({type λ[X <: ~, Y <: ~] = AutomorphismPreArrow[X, Y]}) # λ,
         ({type λ[T <: ~] = T}) # λ
       ] {
+        override val name = "Aut_" + Ɛ.name
+
         override type UNIT = Ɛ.UNIT
         override type DOT[X <: ~] = Automorphism[X]
         override type >[S <: ~, T <: ~] = AutomorphismArrow[S, T]
