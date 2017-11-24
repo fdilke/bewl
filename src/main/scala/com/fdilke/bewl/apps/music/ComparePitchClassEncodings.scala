@@ -4,31 +4,13 @@ import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSets.{EQUALIZER, Monoid, bifunctionAsBiArrow, x}
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.{elementsOf, makeNullaryOperator}
 import TriadicFixtures._
+import com.fdilke.bewl.helper.⊕
 import org.scalatest.Matchers._
 
 import scala.language.postfixOps
 
 object ComparePitchClassEncodings extends App {
 
-  println("PCE 1")
-  val affineMaps =
-    new Monoid[Int x Int](
-      affineMapsDot,
-      makeNullaryOperator(
-        affineMapsDot,
-        affineMapsDot.pair(1, 0)
-      ),
-      bifunctionAsBiArrow(
-        affineMapsDot
-      )(
-        affineMapMultiply
-      )
-    )
-  println("PCE 2")
-
-  affineMaps.sanityTest
-
-  println("PCE 3")
 
 // TODO fix: too slow!
 //  val affineGroup =
@@ -36,7 +18,7 @@ object ComparePitchClassEncodings extends App {
 //      affineMaps
 //    )._1
 
-  println("PCE 4")
+  println("PCE 1")
 
   val informalGroup: EQUALIZER[FiniteSets.x[Int, Int]] =
     affineMapsDot(FiniteSets.omega) { m =>
@@ -45,7 +27,7 @@ object ComparePitchClassEncodings extends App {
       }.toSet.size == octaveLength
     } whereTrue
 
-  println("PCE 4")
+  println("PCE 2")
 
   informalGroup should have size 48
 
@@ -68,4 +50,34 @@ object ComparePitchClassEncodings extends App {
   isomorphicTriads should contain(
     semitoneEncoding
   )
+}
+
+object StabilizerSanity extends App {
+  // verify that:
+  // stab(C), stab(E) < stab(E)
+  // where the stabilizer of an element of an action is:
+  // stab(a) = the congruence identifying p, q whenever ap = aq
+  // i.e. kernel of left multiplication by a, an algebra morphism M -> aM
+
+  println("StabilizerSanity")
+  affineMapsDot
+  println("StabilizerSanity 2")
+  affineMapsDot.squared
+  println("StabilizerSanity 3")
+
+  def stab(a: Int) =
+    elementsOf(affineMapsDot.squared) filter {
+      case p ⊕ q =>
+        affineMapApply(a, p) == affineMapApply(a, q)
+    } toSet
+
+  val (c,e,g) = (0,4,1)
+  println("stab(c) size =" + stab(c).size)
+  println("stab(e) size =" + stab(e).size)
+  println("stab(g) size =" + stab(g).size)
+  println
+  println("c == e ? " + (stab(c) == stab(e)))
+  println("c == g ? " + (stab(c) == stab(g)))
+  println("e == g ? " + (stab(e) == stab(g)))
+  println("e == e ? " + (stab(e) == stab(e)))
 }

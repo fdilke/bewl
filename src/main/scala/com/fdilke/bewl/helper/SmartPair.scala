@@ -3,7 +3,10 @@ package com.fdilke.bewl.helper
 case class ⊕[A, B](
   _1: A,
   _2: B
-)
+) {
+  override def toString =
+    _1 + " ⊕ " + _2
+}
 
 object ⊕ {
   def tupled[A, B, C](

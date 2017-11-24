@@ -7,7 +7,7 @@ import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSets.ActionSplitter
 import triadicTopos.EndoRelation
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.elementsOf
-import com.fdilke.bewl.helper.Timed
+import com.fdilke.bewl.helper.{Timed, ⊕}
 
 import scala.language.postfixOps
 
@@ -209,7 +209,26 @@ object NollCalculations extends App {
       print(if (relation.isIdempotent) "I" else "i")
       println("]")
       if (relation.isEquivalence) {
-        println("criterion = " + relation.criterion.arrow)
+        import ⊕._
+//        val relationObject =
+//          relation.criterion.arrow.whereTrue
+        val congruence = // Int x Int > TRUTH
+          relation.criterion.arrow
+        val nameTruth =
+          triadicMonoid.carrier.toTrue.name(())
+        println("global name of truth = " + nameTruth)
+        val pairs =
+          for {
+            i <- elementsOf(chordDot)
+            j <- elementsOf(chordDot) if {
+              i < j && (
+                congruence(i ⊕ j) == nameTruth
+              )
+            }
+          } yield {
+            i -> j
+          }
+        println("criterion = " + pairs)
       }
     }
     println(" (" + (c2_omega.size) + ")")

@@ -34,6 +34,22 @@ object TriadicFixtures {
         (p * a + q) % octaveLength
     }
 
+  val affineMaps =
+    new Monoid[Int x Int](
+      affineMapsDot,
+      makeNullaryOperator(
+        affineMapsDot,
+        affineMapsDot.pair(1, 0)
+      ),
+      bifunctionAsBiArrow(
+        affineMapsDot
+      )(
+        affineMapMultiply
+      )
+    )
+
+  // affineMaps.sanityTest Takes too long :0
+
   private val triadicMapsDot: EQUALIZER[FiniteSets.x[Int, Int]] =
     affineMapsDot.whereAll(
       chordDot
