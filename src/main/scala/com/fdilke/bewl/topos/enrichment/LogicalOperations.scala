@@ -10,14 +10,21 @@ trait LogicalOperations {
     ToposStructures with
     ToposAlgebra =>
 
-  lazy val Ω: HeytingAlgebra[TRUTH] = {
-    val and =
+  trait LogicalOperations {
+    val and: BiArrow[TRUTH, TRUTH, TRUTH]
+    val implies: BiArrow[TRUTH, TRUTH, TRUTH]
+    val or: BiArrow[TRUTH, TRUTH, TRUTH]
+    val falsity: UNIT > TRUTH
+  }
+
+  object DefaultLogicalOperations extends LogicalOperations {
+    override lazy val and =
       BiArrow(
         omega.squared,
         (truth x truth).chi
       )
 
-    val implies =
+    override lazy val implies =
       BiArrow(
         omega.squared,
         omega.=?=(
@@ -26,30 +33,35 @@ trait LogicalOperations {
         )
       )
 
-    val or: BiArrow[TRUTH, TRUTH, TRUTH] =
+    override lazy val or: BiArrow[TRUTH, TRUTH, TRUTH] =
       BiArrow(
         omega.squared,
         omega.squared.forAll(omega) {
           case (a ⊕ b, ω) => ((a → ω) ∧ (b → ω)) → ω
         }
       )
-    val falsity: UNIT > TRUTH =
+
+    override lazy val falsity: UNIT > TRUTH =
       I.forAll(omega) {
         (_, ω) => ω
       }
-
-    new HeytingAlgebra[TRUTH](
-      omega,
-      falsity,
-      truth,
-      and,
-      or,
-      implies
-    )
   }
 
+  val logicalOperations: LogicalOperations =
+    DefaultLogicalOperations
+
+  lazy val Ω: HeytingAlgebra[TRUTH] =
+    new HeytingAlgebra[TRUTH](
+      omega,
+      logicalOperations.falsity,
+      truth,
+      logicalOperations.and,
+      logicalOperations.or,
+      logicalOperations.implies
+    )
+
   lazy val falsity: UNIT > TRUTH =
-    Ω.bottom
+    logicalOperations.falsity
 
   def isBoolean =
     (truth + falsity).isIso

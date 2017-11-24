@@ -174,7 +174,9 @@ class BaseFiniteSets extends Topos[Any] with Wrappings[
   ) (
     bifunc: (L, R) => T
   ): BiArrow[L, R, T] =
-    (left x right).biArrow(target) { bifunc }
+    (left x right).biArrow(target) {
+      bifunc
+    }
 }
 
 case class FiniteSetsPreArrow[S, T](
