@@ -1,8 +1,9 @@
 package com.fdilke.bewl.apps.permutations
 
 import com.fdilke.bewl.apps.permutations.Permutations.Permutation
-import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsPreArrow}
+import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsPreArrow, FiniteSetsUtilities}
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.elementsOf
+import com.fdilke.bewl.helper.⊕
 
 import scala.language.postfixOps
 
@@ -92,6 +93,43 @@ object Permutations {
         )
       else
         throw new IllegalArgumentException
+  }
+
+  def of(n: Int): FiniteSets.Group[FiniteSets.→[Int, Int]] = {
+    val permutations =
+      new Iterable[FiniteSets.→[Int, Int]] {
+        override def iterator =
+          (1 to n).permutations map {
+            _.zipWithIndex map {
+              case (x, i) => x -> (i + 1)
+            } toMap
+          }
+      }
+    val permutationCarrier =
+      FiniteSets.makeDot(permutations)
+    val the1: FiniteSets.→[Int, Int] =
+      (1 to n) map {
+        i => i -> i
+      } toMap
+    val mul = FiniteSets.bifunctionAsBiArrow(
+      permutationCarrier
+    ) { (p, q) =>
+      (1 to n) map {
+        i => i -> p(q(i))
+      } toMap
+    }
+    val inv =
+      permutationCarrier(permutationCarrier) { p =>
+        (1 to n) map {
+          i => p(i) -> i
+        } toMap
+      }
+    new FiniteSets.Group[FiniteSets.→[Int, Int]](
+      permutationCarrier,
+      FiniteSetsUtilities.makeNullaryOperator(permutationCarrier, the1),
+      mul,
+      inv
+    )
   }
 }
 

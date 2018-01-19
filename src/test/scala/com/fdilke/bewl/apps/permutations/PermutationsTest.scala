@@ -6,7 +6,6 @@ import com.fdilke.bewl.fsets.FiniteSets
 import org.scalatest.FunSpec
 import org.scalatest.Matchers._
 
-import scala.collection.Seq
 import scala.language.postfixOps
 
 class PermutationsTest extends FunSpec {
@@ -71,6 +70,15 @@ class PermutationsTest extends FunSpec {
 //      groupCarrier.carrier.foreach { x =>
 //         groupCarrier.send(x) shouldBe x
 //      }
+    }
+
+    it("can construct the symmetric group") {
+      val group: FiniteSets.Group[FiniteSets.→[Int, Int]] =
+        Permutations.of(4)
+
+      group.sanityTest
+      group.carrier.size shouldBe 24
+      group.isCommutative shouldBe false
     }
   }
 }
