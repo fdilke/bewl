@@ -2,8 +2,8 @@
 
 ## a programming language for topos theory
 
-more precisely, a Scala DSL for the Mitchell-Benabou 
-internal language of a topos, 
+more precisely, a Scala DSL 
+for the Mitchell-Benabou internal language of a topos, 
 with some topos implementations
 
 ---
@@ -18,8 +18,8 @@ escaping the limitations of set-based math
 - It needs a "four function calculator": 
 this is why I wrote Bewl 
 
-- Engineering compromises: doing topos theory
-on a finite machine
+- Engineering compromises: 
+Topos theory on a finite machine
 
 - What can Bewl do so far?
 
@@ -31,8 +31,8 @@ on a finite machine
 
 - I'm not an academic
 
-- I'm a software developer on the team that
-maintains link.springer.com
+- I'm a software developer on SpringerLink
+(link.springer.com)
 
 - Bewl is my 10% time project at Springer Nature
 
@@ -40,8 +40,8 @@ maintains link.springer.com
 real-world software developers with an interest in science
 
 - So, this talk will be informal, even impressionistic, 
-riddled with analogies between software and math, and 
-I apologize in advance to domain experts if I seem to
+with many speculative analogies between software and math, 
+and I apologize in advance to domain experts if I seem to
 be making wild claims.
 
 - Bewl is test-driven Scala code, open source on GitHub 
@@ -53,25 +53,25 @@ be making wild claims.
 A whole talk in itself, but briefly:
 
 Colin McLarty's book on topoi has led me to see set theory 
-as a legacy platform like MS-DOS. Examples of anomalies: 
+as a legacy platform like MS-DOS. 
+
+It has many limitations and anomalies which topos theory 
+can explain and perhaps alleviate. Examples: 
+
+- Large cardinals: advanced set theory perishing (IMHO)
+of its own contradictions, without useful application
+to mainstream math
 
 - Permutation parity: an unexplained feature of the topos of sets
 (another motivation for Bewl was to explain parity).
-
-- Large cardinals: advanced set theory perishing of its own
-contradictions, without useful application to mainstream math
-
-- Ultrafilters: chimerical objects we can't construct
-
-Topos theory can explain and perhaps alleviate these issues.
 
 ---
 
 ## Topos theory
 
-- A topos is a category with all the optional extras
-(finite products, equalizers, exponents, and subobject 
-classifier)
+- A topos is a category with all the optional extras -
+finite products, equalizers, exponents, 
+subobject classifier
 
 - Inside a topos, one can define algebraic structures, 
 quantifiers and a near-classical internal logic. So the 
@@ -84,29 +84,29 @@ of the same work in a much wider context.
 - Driving metaphor: a topos is a "virtual machine, for math"
 
 - Definitions, constructions, theorems "run" in a topos just as
-apps run on a VM, or SQL runs on a database
+apps run on a VM, or SQL statements run on a database
 
 ---
 
 ## The promise
 
-- Understand and escape limitations of set-based reasoning
-
 - Cleanly separate language from implementation
 (just as webdesigners separate HTML from business logic)
+
+- A lot of math can easily be "refactored" to apply
+in a much wider context
 
 - Example: Schur's lemma (that the endomorphisms of a 
 simple module form a division ring) can be expressed 
 in topos-valid form
 
-- A lot of math can easily be "refactored" to apply
-in a much wider context
+- Understand and escape limitations of set-based reasoning
 
 ---
 
 ## Examples of topoi
 
-- Sets
+- Sets. Also finite sets (foundational for Bewl)
 
 - Smooth sets (a workspace for synthetic differential geometry)
 
@@ -114,7 +114,7 @@ in a much wider context
 
 - Sheaves (workspaces for algebraic geometry)
 
-- Fuzzy sets (relative to a Heyting algebra)
+- Fuzzy sets (with equality taking values in a Heyting algebra)
 
 - Diagrams of a given shape: 
 
@@ -133,16 +133,16 @@ of a simple module form a division ring
 unit: 1 -> R, subject to certain laws as arrow equalities
 
 - Similarly an R-module has an abelian group structure and
-conditioned scalar multiplication *: R x M -> M
+conditioned scalar multiplication **: R x M -> M
  
-- "M is simple" is then expressed using a quantifier over M,
-saying that all submodules of M, i.e. subsets of M obeying 
-certain closure laws, are equal to either 0 or M  
+- "M is simple" is then expressed using a quantifier over M:
+all submodules of M, i.e. subobjects of M obeying certain 
+closure laws, are equal to either 0 or M  
 
 - One can then formally construct the ring of endomorphisms
 as a subset of the exponential object M ^ M, and show that it
 obeys a law "for all x, either x = 0 or x has an inverse" in
-topos terms
+topos terms, making it a division ring.
 
 ---
 
@@ -153,22 +153,36 @@ language, which interprets logical formulas as statements about
 equality between arrows in the topos. A soundness result 
 formalizes the proof as pure symbol-manipulation.
 
-So now we have Schur's lemma for graphs, sheaves, monoid 
-actions, etc.
+So now we have Schur's lemma for graphs, sheaves, 
+fuzzy sets, monoid actions, etc.
 
-Huge blocks of math translate similarly without much change. 
-As a fancier example, one can do the same for the Los 
-ultraproduct theorem (Volger 1975).
+We've also separated the language (abstract strings of symbols)
+from the implementation (specific topoi).
 
-Already, many Bewl library methods are near-verbatim software 
-transcriptions of proofs and definitions from math textbooks. 
+Arguably, we have a cleaner and more definitive version
+of the original result.
 
 ---
 
-## This all seems to point to:  
+## Refactoring math
 
-An ambitious, Hilbertian programme of 
-"aggressively refactoring the foundations of math".
+Large blocks of math translate similarly without much change. 
+As a more elaborate example, one can do the same for the Los 
+ultraproduct theorem (Volger 1975).
+
+Once can also do topology in a topos, using Manes' theorem
+(the algebra of compact Hausdorff spaces) as a starting point.
+
+This points to an ambitious, Hilbertian program to refactor 
+math - realized, I believe, in homotopy type theory (HoTT) 
+
+Bewl is just a DSL ("four function calculator"), but 
+already many of its library methods are software versions
+of definitions and constructions from math textbooks. 
+
+---
+
+## Aggressivelu refactoring the foundations of math:
 
 Obstacles:
 
@@ -183,7 +197,7 @@ Example: number theory
 numbers don't have immediately clear analogues
 
 There are potential answers to these, and they involve
-fascinating conceptual questions.
+fascinating conceptual questions (see HoTT).
 
 - But most of all: How do you do the calculations?
 
@@ -213,8 +227,8 @@ In particular, I verified that the C major chord
 
 ## Engineering challenges
 
-To model topoi on a finite computer, I had to make
-some compromises.
+To model topoi on a finite computer, some 
+compromises and trade-offs were needed.
 
 - Although this isn't an iron rule, Bewl's topoi are
 locally finite, i.e. every |Hom(A, B)| < ∞
@@ -223,8 +237,8 @@ locally finite, i.e. every |Hom(A, B)| < ∞
 implies it has unique injective hulls. This result seems 
 new. I wrote it up as a pure math paper on arXiv
 
-- I also cache products and exponents. For objects A and B,
-Bewl lazily computes A x B and B ^ A just once.
+- Bewl also caches products and exponents. For objects A and B,
+A x B and B ^ A are computed just once.
 
 - The word "object" is overloaded in computing, so in Bewl,
 there are "dots" and "arrows".
@@ -236,10 +250,10 @@ there are "dots" and "arrows".
 - I use the 'cake' pattern to define a trait _Topos_ as a
 stack of traits adding helper methods on top of _BaseTopos_
 
-- For example, Bewl can calculate coproducts from the other
-topos operations. This is a verbatim transcript of 
-constructions in McLarty/Moerdijk & Maclane from
-pure math into software.
+- For example, Bewl can calculate coproducts and
+coequalizers from the other topos operations. 
+This is a verbatim transcript of constructions 
+in McLarty/Moerdijk & Maclane from pure math into software.
 
 - Every dot has a type attached to it. So a DOT[T] 
 can be loosely thought of as ranging over values of type T.
@@ -279,17 +293,17 @@ We can also apply arrows directly as if they were functions:
 - A topos object (or "dot") in Bewl is a DOT[A], and 
 calculations with it involve manipulating values of 
 type A, as if the dot somehow ranged over values 
-of type A.
+of type A. But dots are not sets, and don't have
+elements. 
 
 - These values have meaning only inside the scope 
-of an arrow definition, but it's all consistent with
+of an arrow definition. It's all consistent with
 the very precise definition of the internal language
 as described in McLarty's book.
 
 - An earlier version of the DSL interpreted the values
-a: A over which a DOT[A] "ranges" as arrows R > A, for
-some globally fixed "domain of definition" object R.
-Now they are pure syntax.
+a: A of a DOT[A] as arrows R > A, for some "domain of 
+definition" object R. Now they are pure syntax.
 
 ---
 
@@ -298,16 +312,16 @@ Now they are pure syntax.
 - Scala enables nice DSLs
 
 - Some quite involved categorical calculations - for
-example, the tensorial strength axioms for strong monads 
-- can be described elegantly and concisely in Bewl.
+example, the tensorial strength axioms for strong 
+monads - can be described elegantly in Bewl.
 
-- I've considered integrating the DSL with the language 
-even deeper, using Scala implicit magic to make 
-types and dots interchangeable.
+- I've considered even deeper integration of the DSL with 
+the language, using Scala implicit magic to make types 
+interchangeable with dots, and functions with arrows.
 
 - In summary, this all works a bit like the (mythical) 
-"""category Hask""", where objects and types are 
-the same.
+"""category Hask""", a meeting ground of software with 
+math.
  
 ---
 
@@ -356,11 +370,48 @@ rings, actions, modules, lattices and Heyting algebras.
 
 ## Algebraic structures (2)
 
+Definition of a group in Bewl:
+
+```
+lazy val groups = AlgebraicTheory(ι, ~, *)(
+    "left unit" law ( ι * α := α ),
+    "right unit" law ( α * ι := α ),
+    "left inverse" law ( (~α) * α := ι ),
+    "associative" law ( (α * β) * γ := α * (β * γ ) )
+  )
+```
+
+As in the previous example, there's also a case class 
+*Group* to add syntactic sugar.
+
+---
+
+## Algebraic structures (3)
+
+There are helper functions for building structures:
+
+```
+  private val (i, x, y) = ('i, 'x, 'y)
+
+  val monoidOf3 =
+    monoidFromTable(
+      i, x, y,
+      x, x, y,
+      y, x, y
+    ) // right-dominant on two generators
+```
+
+Bewl can also extract the group of units from a monoid. 
+
+---
+
+## Algebraic structures (4)
+
 - Actions and modules are slightly more involved - they 
 define a new structure within the context of an 
-existing one (monoids/groups and rings, 
-respectively). The DSL caters for this via a concept 
-of 'auxiliary scalars'. 
+existing one (monoids / groups and rings, 
+respectively). The DSL caters for this via a 
+concept of 'auxiliary scalars'. 
 
 - There are methods to calculate endomorphism monoids 
 and automorphism groups, as algebraic structures in 
@@ -438,17 +489,17 @@ to compute:
 
 - is an arrow monic / epic / iso?
 
+- the inverse of an arrow, if it has one
+
 - is an object injective?
 
-- 0, the initial object (coterminator)  
+- Coterminator (0), coproducts, coequalizers  
 
 - the arrow to any object from 0
 
-- the inverse of an arrow, if it has one
-
 - epi-mono factorizations
 
-These work in any topos and for me, act as a 
+These work in any topos and for me, are a 
 major proof-of-concept validation for Bewl.
 
 ---
@@ -463,7 +514,7 @@ efficient and DSL-compliant, thanks to the caching of
 common operations such as product and exponent.
 
 Most of the required optimizations don't break any
-abstract layers and have been harmlessly packed away into
+abstract layers and have been neatly packed away into
 'driver extensions' for specific topoi. 
 
 ---
@@ -488,13 +539,13 @@ criterion for finite generating sets of an monoid action.
 
 ## Who might use this project?
 
-Bewl definitely needs users. Some possibilities:
+Bewl definitely needs users. Some possible interest groups:
 
 - People who want to use it as a learning aid to understand
 category theory. On the GitHub repo, I explain how to quickly
 set up a command-line REPL for this.
 
-- Music theorists, continuing the Noll approach.
+- Music theorists, continuing the Noll approach
 
 - Monoid and semigroup theorists, to explore the possibilities
  of topos-theoretic reasoning with actions
@@ -515,7 +566,7 @@ There is much more to do, but I'd especially like to add
 - construct the double-exponential monad for an algebra 
 
 These are in principle fairly mechanical, and perhaps the 
-hardest part is to construct decent test fixtures.
+hardest part is to set up decent test fixtures.
 
 Volunteers welcome!
 
