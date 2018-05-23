@@ -53,14 +53,14 @@ be making wild claims.
 A whole talk in itself, but briefly:
 
 Colin McLarty's book on topoi has led me to see set theory 
-as a legacy platform like MS-DOS. 
+as a legacy platform like MS-DOS (!) with many limitations 
+and anomalies which topos theory can explain and perhaps 
+alleviate. Examples: 
 
-It has many limitations and anomalies which topos theory 
-can explain and perhaps alleviate. Examples: 
+- Large cardinals: a theory peculiar to sets, 
+with unclear application to mainstream math.
 
-- Large cardinals: advanced set theory perishing (IMHO)
-of its own contradictions, without useful application
-to mainstream math
+- Ultrafilters: chimerical objects
 
 - Permutation parity: an unexplained feature of the topos of sets
 (another motivation for Bewl was to explain parity).
@@ -140,7 +140,7 @@ all submodules of M, i.e. subobjects of M obeying certain
 closure laws, are equal to either 0 or M  
 
 - One can then formally construct the ring of endomorphisms
-as a subset of the exponential object M ^ M, and show that it
+as a subobject of the exponential object M ^ M, and show it
 obeys a law "for all x, either x = 0 or x has an inverse" in
 topos terms, making it a division ring.
 
@@ -159,8 +159,8 @@ fuzzy sets, monoid actions, etc.
 We've also separated the language (abstract strings of symbols)
 from the implementation (specific topoi).
 
-Arguably, we have a cleaner and more definitive version
-of the original result.
+Arguably, this yields a cleaner and more definitive 
+version of the original result.
 
 ---
 
@@ -178,11 +178,11 @@ math - realized, I believe, in homotopy type theory (HoTT)
 
 Bewl is just a DSL ("four function calculator"), but 
 already many of its library methods are software versions
-of definitions and constructions from math textbooks. 
+of definitions and constructions from topos theory. 
 
 ---
 
-## Aggressivelu refactoring the foundations of math:
+## Aggressively refactoring the foundations of math:
 
 Obstacles:
 
@@ -213,13 +213,13 @@ fascinating conceptual questions (see HoTT).
 
 (a book on SpringerLink)
 
-Noll explores music theory through the topos of
-actions over the "triadic monoid"
+Noll explores music theory by defining a "triadic monoid" 
+and working in the topos of actions over it. 
 
 He had to do all these calculations by hand, for example
 enumerating topologies on the triadic topos.
 
-Bewl can now do some of these computations itself.
+Bewl can now do many of these computations itself.
 In particular, I verified that the C major chord 
 (modelled as an object in Noll's topos) is not injective.
 
@@ -227,7 +227,7 @@ In particular, I verified that the C major chord
 
 ## Engineering challenges
 
-To model topoi on a finite computer, some 
+To model topoi on a finite computer, various 
 compromises and trade-offs were needed.
 
 - Although this isn't an iron rule, Bewl's topoi are
@@ -237,8 +237,8 @@ locally finite, i.e. every |Hom(A, B)| < ∞
 implies it has unique injective hulls. This result seems 
 new. I wrote it up as a pure math paper on arXiv
 
-- Bewl also caches products and exponents. For objects A and B,
-A x B and B ^ A are computed just once.
+- Bewl also caches products and exponents. For objects A 
+and B, A x B and B ^ A are computed just once.
 
 - The word "object" is overloaded in computing, so in Bewl,
 there are "dots" and "arrows".
@@ -255,12 +255,12 @@ coequalizers from the other topos operations.
 This is a verbatim transcript of constructions 
 in McLarty/Moerdijk & Maclane from pure math into software.
 
-- Every dot has a type attached to it. So a DOT[T] 
+- Every dot in Bewl has a type attached to it. So a DOT[T] 
 can be loosely thought of as ranging over values of type T.
 Functions of type T => U are easily interchangeable with 
 arrows T > U (Scala sugar for the Bewl type >[T, U]).
 
-- The main differences between functions and arrows are
+- The main difference between functions and arrows is
 that arrows know their source and target, and can be 
 compared for equality.
 
@@ -268,9 +268,9 @@ compared for equality.
 
 ## Engineering challenges (3)
 
-- With its terse style, many expressive idioms, and advanced 
-type system, Scala was an almost perfect fit for Bewl
-(I first tried writing it in Java, then Clojure)
+- Scala was an almost perfect fit because of its terse 
+style, expressive idioms, and advanced type system.
+(I first tried writing Bewl in Java, then Clojure)
 
 For example, if dotA is a DOT[A] and dotB is a DOT[B],
 we can construct a new arrow like this:
@@ -309,7 +309,7 @@ definition" object R. Now they are pure syntax.
 
 ## Tight integration
 
-- Scala enables nice DSLs
+- Scala supports expressive DSLs
 
 - Some quite involved categorical calculations - for
 example, the tensorial strength axioms for strong 
@@ -320,8 +320,8 @@ the language, using Scala implicit magic to make types
 interchangeable with dots, and functions with arrows.
 
 - In summary, this all works a bit like the (mythical) 
-"""category Hask""", a meeting ground of software with 
-math.
+"""category Hask""", as a meeting ground of software 
+with math.
  
 ---
 
@@ -373,12 +373,16 @@ rings, actions, modules, lattices and Heyting algebras.
 Definition of a group in Bewl:
 
 ```
-lazy val groups = AlgebraicTheory(ι, ~, *)(
+lazy val groups = AlgebraicTheory(
+    ι, ~, *
+)(
     "left unit" law ( ι * α := α ),
     "right unit" law ( α * ι := α ),
     "left inverse" law ( (~α) * α := ι ),
-    "associative" law ( (α * β) * γ := α * (β * γ ) )
-  )
+    "associative" law ( 
+        (α * β) * γ := α * (β * γ ) 
+    )
+)
 ```
 
 As in the previous example, there's also a case class 
@@ -417,9 +421,9 @@ concept of 'auxiliary scalars'.
 and automorphism groups, as algebraic structures in 
 the topos.
 
-- The library can easily be extended to add many familiar 
+- The library could be extended to add many familiar 
 algebraic constructions (e.g. abelianizing a group) 
-which translate easily in Bewl.
+which translate naturally in Bewl.
 
 ---
 
@@ -441,7 +445,7 @@ There are four built-in implementations:
 
 ## Topos implementations (2)
 
-The last three all work in an existing topos.
+The last three all work inside an existing topos.
 
 So if Ɛ is a topos, we can construct a new topos
 Aut(Ɛ) consisting of all the dots-with-a-single-
@@ -458,7 +462,7 @@ computed automatically.
 
 ---
 
-## Some example helper methods
+## Sample helper methods
 
 Calculating the "name" of an arrow (see McLarty):
 ```
@@ -470,7 +474,7 @@ Calculating the "name" of an arrow (see McLarty):
           }
     }
 ```
-From the same class, tell if an arrow is epic:
+From the same class, a method to tell if an arrow is epic:
 ```
     final lazy val isEpic: Boolean =
       target.exists(source) {
@@ -482,10 +486,10 @@ From the same class, tell if an arrow is epic:
  
 ---
 
-## Some example helper methods (2)
+## Sample helper methods (2)
 
-Similarly concise, generic library code uses the DSL 
-to compute:
+Similarly concise, generic library code uses the 
+DSL to compute:
 
 - is an arrow monic / epic / iso?
 
@@ -499,15 +503,16 @@ to compute:
 
 - epi-mono factorizations
 
-These work in any topos and for me, are a 
-major proof-of-concept validation for Bewl.
+These work in any topos and for me, are a major 
+proof-of-concept validation for Bewl.
 
 ---
 
 ## Performance
 
 Better than you'd think, although there are no
-grounds for complacency.
+grounds for complacency. Simple calculations
+with small sets and monoid actions are fast.
 
 I have largely managed to write code that is clean, 
 efficient and DSL-compliant, thanks to the caching of 
