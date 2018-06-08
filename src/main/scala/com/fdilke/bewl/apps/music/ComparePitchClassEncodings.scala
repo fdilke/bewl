@@ -60,11 +60,11 @@ object StabilizerSanity extends App {
   // stab(a) = the congruence identifying p, q whenever ap = aq
   // i.e. kernel of left multiplication by a, an algebra morphism M -> aM
 
-  println("StabilizerSanity")
-  affineMapsDot
-  println("StabilizerSanity 2")
-  affineMapsDot.squared
-  println("StabilizerSanity 3")
+//  println("StabilizerSanity")
+//  affineMapsDot
+//  println("StabilizerSanity 2")
+//  affineMapsDot.squared
+//  println("StabilizerSanity 3")
 
   def stab(a: Int) =
     elementsOf(affineMapsDot.squared) filter {
