@@ -22,8 +22,18 @@ To see the current to-do list and state of play, you can view this [Trello board
 
 # Presentations explaining the project
 
-Using Bewl to do musical calculations - [putting the chord of C major under the microscope](https://github.com/fdilke/bewl/blob/master/notes/ChordUnderMicroscope.pdf)
+Some of these are more accessible than others: pick one that's right for you.
 
+In May 2018, I gave a talk about Bewl for [S-REPLS 9](http://users.sussex.ac.uk/~mfb21/srepls9/) at the University of Sussex 
+([slides](http://users.sussex.ac.uk/~mfb21/srepls9/felixD-slides.pdf), 
+[video](http://users.sussex.ac.uk/~mfb21/srepls9/video/felixD-presentation.mp4))
+Requires some math. 
+
+My attempt at explaining Bewl for a general audience on *cruft.io* : 
+[Towards an arithmetic of sets](https://cruft.io/posts/bewl-arithmetic-of-sets)
+
+Using Bewl to do musical calculations - 
+[putting the chord of C major under the microscope](https://github.com/fdilke/bewl/blob/master/notes/ChordUnderMicroscope.pdf)
 
 Overall [state of play](https://github.com/fdilke/bewl/blob/master/notes/StateOfTheBewlJan2016.pdf)
 as of January 2016.
@@ -32,7 +42,8 @@ See [this presentation](https://www.evernote.com/shard/s141/sh/8e6b9d94-bc20-4fd
 for an attempt at "the internal language for dummies"
 
 I've had to keep re-implementing Bewl in successively more powerful programming languages (Java, Clojure and now Scala). 
-Really it should be in Haskell or Idris but I'm not ready for those yet.
+Now learning [Idris](https://www.idris-lang.org/), which is an amazing language and may be
+the next logical step.
 
 [This presentation](http://prezi.com/dwrz2mft3y-g/?utm_campaign=share&utm_medium=copy&rc=ex0share) explains the new "intrinsic" Bewl 2.0 DSL and why it's better than the previous "diagrammatic" 1.0 one.
 

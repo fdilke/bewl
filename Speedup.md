@@ -1,6 +1,7 @@
 # Bewl
 
-For programmers, the Bewl DSL looks like a kind of new programming language, implemented within Scala.
+For programmers, the Bewl DSL looks like a kind of new programming language, 
+implemented within Scala.
 Like Haskell, it is 'pure' (without side effects).
 There are still types and functions, but:
 
