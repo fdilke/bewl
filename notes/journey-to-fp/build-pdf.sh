@@ -12,8 +12,9 @@ OPTIONS="\
 FILES="\
     title.txt \
     contents.md \
-    journey-to-fp.md \
-    scratchpad.md"
+    journey-to-fp.md"
+
+#    scratchpad.md
 
 
 $PANDOC $OPTIONS $FILES
