@@ -51,9 +51,10 @@ The first book I want to tell you about is not an example of this.
 
 Actually, has anybody here even heard of it?
 
-Orwell fought in the Spanish Civil War, for a splinter which was (unfairly) 
-discredited, suppressed and imprisoned by its own allies. He also worked in the BBC's 
-Ministry of Information during WW2. So he knew all about government propaganda.
+Orwell fought in the Spanish Civil War. There was much in-fighting on his side, and
+Orwell's faction was (unfairly) discredited and suppressed by its own allies. 
+He also worked in the BBC's  Ministry of Information during WW2. 
+So he knew all about government propaganda.
 
 \newpage
 
@@ -129,7 +130,7 @@ Only they can see the future, and they are taking us with them.
 
 \newpage
 
-# A new book, but an instant favourite  
+# A new book, but (for me) an instant favourite  
 
 "The Big Four" by Scott Galloway (2018)
 
@@ -140,7 +141,7 @@ Only they can see the future, and they are taking us with them.
 This is a New York Times bestseller - which is ironic because:
 
 Galloway is a former NYT board member. He describes advising the company 
-on how to fend off the threat from Google/Facebook, and how they didn't listen.
+on how to fend off the threat from Google/Facebook (they didn't listen)
 
 He's a former Morgan Stanley analyst who also founded a bunch of companies 
 including L2, a business intelligence group which is now part of Gartner. 
@@ -153,7 +154,7 @@ So he does know about business analysis.
 As business books go, this one stands out as being funny, shocking and insightful -
 also very relevant and topical. 
 
-I'll just share a few gems from it, and then wind up.
+I'll just share a few choice bits from it, and then wind up.
 
 # Bubbling under
 
