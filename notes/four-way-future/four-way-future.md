@@ -131,7 +131,7 @@ Only they can see the future, and they are taking us with them.
 
 \newpage
 
-# The book I originally planned to give a talk about 
+# A new book, but an instant favourite  
 
 "The Big Four" by Scott Galloway (2018)
 
@@ -144,20 +144,24 @@ This is a New York Times bestseller - which is ironic because:
 Galloway is a former NYT board member. He describes advising the company 
 on how to fend off the threat from Google/Facebook, and how they didn't listen.
 
-He 's a former Morgan Stanley analyst who also founded a bunch of companies 
+He's a former Morgan Stanley analyst who also founded a bunch of companies 
 including L2, a business intelligence group which is now part of Gartner. 
 So he does know about business analysis. 
 
 \newpage
 
-# An instant favourite 
+# Edited highlights
 
 As business books go, this one stands out as being funny, shocking and insightful -
 also very relevant and topical. 
 
 I'll just share a few gems from it, and then wind up.
 
-\newpage
+# Bubbling under
+
+IMHO, the best chapter is about the 'runners up' - companies which could
+conceivably compete with the "big four". These include Uber, Alibaba, Airbnb,
+Tesla and some other interesting cases. But to concentrate on the main players:
 
 # Facebook
 
