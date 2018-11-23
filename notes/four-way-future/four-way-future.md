@@ -10,16 +10,15 @@
 
 - in the past, people used to read "books", a now-forgotten
 legacy media format, rendered obsolete by the massively multiplayer
-hatestreaming platforms we know and love
+misinfotainstreaming platforms we know and love
 
 - in the future, the world will be divided into four parts
 
 - I know this because of three books I've read and re-read so often
 that I almost know them by heart.
 
-- They all predict the same thing: a  future world dominated by four players
+- They all predict the same thing: a future world dominated by four players
 
-- Seems an odd coincidence - hence, this talk 
 
 # So let me tell you about these books and the four-way futures they predict:
 
@@ -29,7 +28,9 @@ that I almost know them by heart.
 
 \newpage
 
-# A shining window into the future 
+# Not everybody likes SF... 
+
+but it's our shining window into the future.
 
 SF can inspire and amaze by showing us possible worlds  
 that warm the heart and touch the imagination. 
@@ -50,10 +51,9 @@ The first book I want to tell you about is not an example of this.
 
 Actually, has anybody here even heard of it?
 
-Orwell fought in the Spanish Civil War, for a Communist faction which was (unfairly) 
+Orwell fought in the Spanish Civil War, for a splinter which was (unfairly) 
 discredited, suppressed and imprisoned by its own allies. He also worked in the BBC's 
-Ministry of Information during WW2.
-So he knew all about government propaganda.
+Ministry of Information during WW2. So he knew all about government propaganda.
 
 \newpage
 
@@ -63,10 +63,10 @@ Today dystopia is a cliche - novels, and especially movies about the world
 going to s**t have become yet another wearisome multiplex genre. 
 But "1984" was (I'd argue) the founding masterwork
 
-- Written in 1948, it predicts a straight continuation of the trends of the
+- it's a straight extrapolation of the trends of the
 first half of the 20th century. That is...
 
-- ...the rapid and terrifying spread of political repression on a global scale
+- ...the rapid and terrifying spread of political repression
 
 - In "1984" democracy, truth and freedom are gone - the world is ruled by a small number 
 of impregnable and despotic super-states, from which there can be no escape
@@ -76,16 +76,14 @@ can now only dimly imagine how that was ever on the cards
 
 \newpage
 
-# Still, "1984" is remembered for its vivid and surreal images of hate propaganda... 
+# "1984" is still remembered for its vivid and surreal images of hate propaganda... 
 
 ...a warped world of swiftly advancing media-savvy authoritarianism where the 
 notion of "objective truth" has been lost
 
 ![](images/trump.jpg)\
 
-I'm sure this will never happen. 
-
-Next book...
+It's OK, we know this will never happen. Next book.
 
 \newpage
 
@@ -183,17 +181,22 @@ found a profitable business outside of advertising. This makes it vulnerable to 
 
 # Amazon
 
-Institutionally disruptive. Can borrow more patient capital than anyone else, and go
-deeper with a bigger oxygen tank.
+Institutionally disruptive. Can borrow more patient capital than anyone else, 
+cross-subsidise businesses where it has no intention of making money, and generally
+"go deeper with a bigger oxygen tank". There is a stronger sense of grand strategy
+than with the others, a sense of doing something never tried before. Phrases like
+"apex predator" seem appropriate.
 
-They will spin out AWS as a separate company, thereby getting ahead of any
+His admiration of Amazon is also tempered with calls for the company to be broken up.
+
+Prediction: They will spin out AWS as a separate company, thereby getting ahead of any
 trustbusting action. It will be one of the most successful IPOs ever, because
 this is the only way for investors to place direct bets on cloud computing.
 
-He also comments that they're rapidly moving in on the other three:
- 
+Galloway also comments that they're rapidly moving in on the other three. He says:
+
 "Amazon has all the momentum... My next book will be called The Big One."
 
-![](images/shark-tiling.jpg)\
+![](images/shark-tiling.jpg){#id .class width=800 height=350px}\
 
 # THANK YOU
