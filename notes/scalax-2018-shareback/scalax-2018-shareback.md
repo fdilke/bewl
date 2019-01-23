@@ -12,7 +12,7 @@ Such is the munificence of Springer Nature
 
 - There were more than a few interesting talks, so I picked the
 5-6 most notable, did a thumbnail sketch of those, and crammed
-it all into 23 slides.
+it all into 22 slides.
 
 - I'll skate lightly over the technical talks, and dwell more
 on the high-level and touchy-feely ones.
@@ -197,7 +197,7 @@ scientist when she grows up.
 
 \newpage
 
-# A worthy goal
+# Eugenia Cheng pursues a worthy goal
 
 - Motivation: find out why people get turned off maths, fix it!
 
@@ -253,6 +253,12 @@ can effectively teach this curriculum.
 # What is volunteer teaching actually like?
 
 ![](images/187.jpg){#id .class width=1200 height=500px}\
+
+\newpage
+
+# Schools vary of course
+
+![](images/grade-scale.jpg){#id .class width=1200 height=500px}\
 
 \newpage
 
