@@ -61,14 +61,23 @@ object UseTransfer extends App {
 
   val the1 = group.unit(())
 
-  def isTransposition(p: PERMUTATION): Boolean =
+  def isInvolution(p: PERMUTATION): Boolean =
     (p != the1) && (group.multiply(p, p) == the1)
 
+  def prettyPrint(map: Map[Int, Int]): String =
+    (1 to n).filter { i =>
+      map(i) != i
+    } map { i =>
+      i -> map(i)
+    } map {
+      _.toString
+    } mkString ""
+
   for {
-    t <- elementsOf(group.carrier) if isTransposition(t)
+    i <- elementsOf(group.carrier) filter isInvolution
   } {
-    print("> " + t)
-    val subgroup = dot(the1, t)
+    print("> " + prettyPrint(i))
+    val subgroup = dot(the1, i)
     val transfer = Transfer(group, subgroup)
     println("\t => " + transfer.image.size)
   }
