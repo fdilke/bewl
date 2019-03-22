@@ -162,7 +162,7 @@ should be achievable, but for now, this seems to be the stuff of CompSci PhD the
 
 Meanwhile, here is my not-too-chronically-slow compromise solution: 
 
-![](images/shuffle-algorithm.png){#id .class width=400 height=300px}\ 
+![](images/shuffle-algorithm.png){#id .class width=700 height=400px}\ 
   
 \newpage
 
