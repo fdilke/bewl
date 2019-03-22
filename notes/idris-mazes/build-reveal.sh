@@ -17,7 +17,7 @@ OPTIONS="\
     -t revealjs \
     -s \
     -o idris-mazes.html \
-    -V theme=beige \
+    -V theme=simple \
     -V transition=cube \
     -V revealjs-url=./reveal.js"
 

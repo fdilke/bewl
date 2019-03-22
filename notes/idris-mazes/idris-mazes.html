@@ -10,7 +10,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
   <link rel="stylesheet" href="./reveal.js/css/reveal.css">
   <style type="text/css">code{white-space: pre;}</style>
-  <link rel="stylesheet" href="./reveal.js/css/theme/beige.css" id="theme">
+  <link rel="stylesheet" href="./reveal.js/css/theme/simple.css" id="theme">
   <!-- Printing and PDF exports -->
   <script>
     var link = document.createElement( 'link' );
@@ -59,8 +59,14 @@
 <h2>How do you generate a maze?</h2>
 <p>Abstracting away the irrelevant details, the structure of the maze is:</p>
 <p><img src="images/skeleton-maze.jpg" id="id" class="class" width="200" height="200" /><br />
-It's a rectangular grid of cells with just enough connections between adjacent cells to make it one piece,</p>
-<p>or, equivalently: as many connections as possible without forming a circuit.</p>
+It's a rectangular grid of cells with connections added between adjacent cells to form a <em>tree</em>.</p>
+
+</section>
+<section id="trees---a-concept-from-graph-theory" class="slide level2">
+<h2>Trees - a concept from graph theory</h2>
+<p><img src="images/about-trees.png" id="id" class="class" width="600" height="200" /><br />
+A <em>tree</em> is a graph with just enough edges to make it one piece, or, equivalently, as many edges as possible without forming a circuit.</p>
+<p>Poetically, a graph consisting of a bunch of trees is called a <em>forest</em>.</p>
 
 </section>
 <section id="compsci-description-of-the-problem" class="slide level2">
@@ -93,31 +99,38 @@ This was hard too, but in a good way.</p>
 </section>
 <section id="debugging-the-mazes" class="slide level2">
 <h2>Debugging the mazes</h2>
-<p><img src="images/mangled-maze.jpg" id="id" class="class" width="430" height="200" /><br />
-After staring at this for hours, I realized that</p>
-<ol type="1">
-<li><p>the bottom and right edges were mangled because of a fencepost error (easily fixed)</p></li>
-<li><p>the randomizer wasn't working properly.</p></li>
-</ol>
-<p>But all it had to do was shuffle the list of edges, i.e. generate a uniformly random permutation.</p>
+<p><img src="images/mangled-maze.jpg" id="id" class="class" width="400" height="300" /><br />
+After staring at this for hours, I realized that the bottom and right edges were mangled because of a fencepost error (easily fixed)</p>
+<p>Also the randomizer wasn't working properly. But all it had to do was shuffle the list of edges...?</p>
 
 </section>
 <section id="why-is-randomness-so-hard" class="slide level2">
 <h2>Why is randomness so hard?</h2>
 <p><img src="images/roulette-wheel.png" id="id" class="class" width="400" height="300" /><br />
-It isn't functional! A function that returns random numbers isn't allowed in Idris because it can return a different value on every call, violating the semantics. Same goes for a function that returns the date and time.</p>
-<p>You have to generate random numbers in the context of a special monad, and use the Effects library to get it to interoperate with all the other monads you have to use for anything else that is not strictly functional.</p>
-<p>Yes, I know this is why not everyone would want to use languages like Idris.</p>
+It isn't functional! A function that returns random numbers isn't allowed in Idris because it can return a different value on every call, violating the semantics. Same goes for calculating the date and time.</p>
+
+</section>
+<section id="into-the-dark-heart-of-the-effects-monad" class="slide level2">
+<h2>Into the dark heart of the effects monad</h2>
+<p>You have to generate random numbers in the context of a special monad, and use the Effects library to get it to interoperate with all the other monads you have to use for anything else that is not strictly functional...Yes, I know this is why not everyone would want to use languages like Idris.</p>
 <p>Also, it turned out there was a <em>bug</em> in the run time library which was interacting adversely with the perhaps overcomplicated &quot;Godel numbering scheme for permutations&quot; I had decided to use, which was fun to implement but not, as it turned out, practical.</p>
 
 </section>
-<section id="why-is-randomness-so-hard-continued" class="slide level2">
-<h2>Why is randomness so hard? (continued)</h2>
-<p>Instead, the solution was to look up &quot;generating uniformly random permutations&quot; on Wikipedia which tells you to use the Knuth shuffle.</p>
+<section id="the-solution..." class="slide level2">
+<h2>The solution...</h2>
+<p>... was to look up &quot;generating uniformly random permutations&quot; on Wikipedia which tells you to use the Knuth shuffle.</p>
 <p>But even that is hard! The algorithm involves swapping successive pairs of elements in an array to generate the permutation by composing transpositions. And that's non-functional - arrays are not mutable in Idris.</p>
 <p>I managed to write a recursive algorithm to do it by disassembling and recombining the array, but it was very slow for mazes of any size.</p>
+
+</section>
+<section id="optimizing-the-shuffle" class="slide level2">
+<h2>Optimizing the shuffle</h2>
 <p>I searched the web to find out how Haskellers get round this problem, and it turns out they do it by using a special hack to mutate the array, because Haskell is a more mature (and possibly more pragmatic) language than Idris.</p>
 <p>I conjecture that generating random permutations in an efficient yet functionally pure way should be achievable, but for now, this seems to be the stuff of CompSci PhD theses.</p>
+
+</section>
+<section id="an-expedient-hack" class="slide level2">
+<h2>An expedient hack</h2>
 <p>Meanwhile, here is my not-too-chronically-slow compromise solution:</p>
 <p><img src="images/shuffle-algorithm.png" id="id" class="class" width="400" height="300" /> </p>
 

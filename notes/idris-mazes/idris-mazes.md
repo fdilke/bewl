@@ -38,10 +38,18 @@ maze is:
 
 ![](images/skeleton-maze.jpg){#id .class width=200 height=200px}\
  
-It's a rectangular grid of cells with just enough
-connections between adjacent cells to make it one piece, 
+It's a rectangular grid of cells with connections added between adjacent cells to form a *tree*.
 
-or, equivalently: as many connections as possible without forming a circuit.
+\newpage
+
+## Trees - a concept from graph theory
+
+![](images/about-trees.png){#id .class width=600 height=200px}\
+
+A *tree* is a graph with just enough edges to make it one piece, or, equivalently, 
+as many edges as possible without forming a circuit.
+
+Poetically, a graph consisting of a bunch of trees is called a *forest*.
 
 \newpage
 
@@ -92,17 +100,13 @@ all of which took a while.
 
 ## Debugging the mazes
 
-![](images/mangled-maze.jpg){#id .class width=430 height=200px}\
+![](images/mangled-maze.jpg){#id .class width=400 height=300px}\
 
-After staring at this for hours, I realized that 
-
-(1) the bottom and right edges were
+After staring at this for hours, I realized that the bottom and right edges were
 mangled because of a fencepost error (easily fixed)
 
-(2) the randomizer wasn't working properly.
-
-But all it had to do was shuffle the list of edges, i.e. 
-generate a uniformly random permutation.
+Also the randomizer wasn't working properly. 
+But all it had to do was shuffle the list of edges...?
 
 \newpage
 
@@ -112,13 +116,16 @@ generate a uniformly random permutation.
 
 It isn't functional! A function that returns random numbers isn't allowed in
 Idris because it can return a different value on every call, violating the semantics.
-Same goes for a function that returns the date and time.
+Same goes for calculating the date and time.
+
+\newpage
+
+## Into the dark heart of the effects monad
 
 You have to generate random numbers in the context of a special monad, and use the 
 Effects library to get it to interoperate with all the other monads you have to use for
-anything else that is not strictly functional.
-
-Yes, I know this is why not everyone would want to use languages like Idris. 
+anything else that is not strictly functional...Yes, I know this is why not everyone 
+would want to use languages like Idris. 
 
 Also, it turned out there was a *bug* in the run time library which was interacting
 adversely with the perhaps overcomplicated "Godel numbering scheme for permutations"
@@ -126,9 +133,9 @@ I had decided to use, which was fun to implement but not, as it turned out, prac
 
 \newpage
 
-## Why is randomness so hard? (continued)
+## The solution...
 
-Instead, the solution was to look up "generating uniformly random permutations" on
+... was to look up "generating uniformly random permutations" on
 Wikipedia which tells you to use the Knuth shuffle.
 
 But even that is hard! The algorithm involves swapping successive pairs of elements in an 
@@ -138,12 +145,20 @@ are not mutable in Idris.
 I managed to write a recursive algorithm to do it by disassembling and recombining the array,
 but it was very slow for mazes of any size.
 
+\newpage
+
+## Optimizing the shuffle
+
 I searched the web to find out how Haskellers get round this problem, and it turns out they do it by
 using a special hack to mutate the array, because Haskell is a more mature (and possibly more pragmatic) 
 language than Idris.
 
 I conjecture that generating random permutations in an efficient yet functionally pure way 
 should be achievable, but for now, this seems to be the stuff of CompSci PhD theses. 
+
+\newpage
+
+## An expedient hack
 
 Meanwhile, here is my not-too-chronically-slow compromise solution: 
 
