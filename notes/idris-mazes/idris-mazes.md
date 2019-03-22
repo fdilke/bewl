@@ -1,8 +1,10 @@
-![](images/dark-labyrinth.jpg)\
+## Mazes hold continuing fascination...
+
+![](images/dark-labyrinth.jpg){#id .class width=400 height=400px}\
 
 \newpage
 
-## Generating mazes
+## ... so let's write a program to generate them
 
 - I've been trying to learn Idris, a somewhat bleeding-edge programming language 
 which is like Haskell but more so
@@ -10,38 +12,36 @@ which is like Haskell but more so
 - I (wrongly) decided I understood it well enough to try writing a program to 
 generate mazes
 
-- Counterintuitively, the hard things turned out to be simple, 
+- The hard things turned out to be simple, 
 but the simple things were hard...
 
 \newpage
 
-## The mission, should you choose to accept it
+## The mission
 
-The idea is that the maze will look like this:
+How about a maze that looks like this:
 
  
 ![](images/my-maze.png)\
 
 
-I also decided to output this in text mode using quarter-square graphics.
+Let's output this in text mode using quarter-square graphics.
 
-Once the basic algorithm is done, it can output bigger and badder mazes.
+Once the basic algorithm is done, it can scale up to do bigger and badder mazes.
 
 \newpage
 
-## How do you generate a maze, anyway?
+## How do you generate a maze?
 
-Abstracting away all the irrelevant details, the underlying skeleton of the
-maze is something like this: 
+Abstracting away the irrelevant details, the structure of the
+maze is: 
 
 ![](images/skeleton-maze.jpg){#id .class width=200 height=200px}\
  
-This is a rectangular grid of cells where we've connected just enough
-pairs of adjacent cells for the whole graph to be one piece, 
+It's a rectangular grid of cells with just enough
+connections between adjacent cells to make it one piece, 
 
-or, equivalently:
-
-as many pairs of adjacent cells as we can without forming a circuit.
+or, equivalently: as many connections as possible without forming a circuit.
 
 \newpage
 
@@ -57,42 +57,47 @@ only adding ones that don't create a circuit.
 
 \newpage
 
-## But, here's what happens if you do that 
+## But if you do that... 
 
 ![](images/boring-maze.jpg){#id .class width=200 height=200px}\
 
-which is not an acceptable solution because it's the same boring maze each time.
+Not an acceptable solution: the same boring maze each time.
 
 We have to introduce randomness, i.e. present the edges in a random order.
 
-Absurdly, it turned out this was the hardest part of the project,
-for reasons you may find amusing even if languages like Idris are not your bag.
+Absurdly, this was the hardest part of the project.
 
 \newpage
 
-## So I'm going to skate lightly over the actual Spanning Forest algorithm
+## Skating lightly over the algorithm
 
-but here it is, anyway: 
+Here it is, anyway: 
 
-![](images/spanning-forest.png){#id .class width=400 height=300px}\
+![](images/spanning-forest.png){#id .class width=600 height=400px}\
 
 This was hard too, but in a good way. 
 
+\newpage
+
+## Let me unpack that for you
+
 It's basically just a fold - accumulating a list of edges - but
 you have to efficiently keep track of which cells are connected.
-You also have to use the right data structures in Idris, and figure out how to test-drive it...
+
+You also have to use the right data structures in Idris, 
+and figure out how to test-drive it...
 all of which took a while.
 
 \newpage
 
-## But then, my mazes kept looking like this:
+## Debugging the mazes
 
-![](images/mangled-maze.jpg){#id .class width=400 height=300px}\
+![](images/mangled-maze.jpg){#id .class width=430 height=200px}\
 
 After staring at this for hours, I realized that 
 
 (1) the bottom and right edges were
-mangled because of a fencepost error, which was easily fixed
+mangled because of a fencepost error (easily fixed)
 
 (2) the randomizer wasn't working properly.
 
@@ -105,11 +110,11 @@ generate a uniformly random permutation.
 
 ![](images/roulette-wheel.png){#id .class width=400 height=300px}\
 
-It isn't functional! A method that returns random numbers isn't permissible in
+It isn't functional! A function that returns random numbers isn't allowed in
 Idris because it can return a different value on every call, violating the semantics.
 Same goes for a function that returns the date and time.
 
-So you have to generate random numbers in the context of a special monad, and use the 
+You have to generate random numbers in the context of a special monad, and use the 
 Effects library to get it to interoperate with all the other monads you have to use for
 anything else that is not strictly functional.
 

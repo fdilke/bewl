@@ -10,7 +10,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
   <link rel="stylesheet" href="./reveal.js/css/reveal.css">
   <style type="text/css">code{white-space: pre;}</style>
-  <link rel="stylesheet" href="./reveal.js/css/theme/moon.css" id="theme">
+  <link rel="stylesheet" href="./reveal.js/css/theme/beige.css" id="theme">
   <!-- Printing and PDF exports -->
   <script>
     var link = document.createElement( 'link' );
@@ -32,36 +32,35 @@
   <p class="author">Felix Dilke</p>
 </section>
 
-<section class="slide level2">
-
-<p><img src="images/dark-labyrinth.jpg" /><br />
+<section id="mazes-hold-continuing-fascination..." class="slide level2">
+<h2>Mazes hold continuing fascination...</h2>
+<p><img src="images/dark-labyrinth.jpg" id="id" class="class" width="400" height="400" /><br />
 </p>
 </section>
-<section id="generating-mazes" class="slide level2">
-<h2>Generating mazes</h2>
+<section id="so-lets-write-a-program-to-generate-them" class="slide level2">
+<h2>... so let's write a program to generate them</h2>
 <ul>
 <li><p>I've been trying to learn Idris, a somewhat bleeding-edge programming language which is like Haskell but more so</p></li>
 <li><p>I (wrongly) decided I understood it well enough to try writing a program to generate mazes</p></li>
-<li><p>Counterintuitively, the hard things turned out to be simple, but the simple things were hard...</p></li>
+<li><p>The hard things turned out to be simple, but the simple things were hard...</p></li>
 </ul>
 
 </section>
-<section id="the-mission-should-you-choose-to-accept-it" class="slide level2">
-<h2>The mission, should you choose to accept it</h2>
-<p>The idea is that the maze will look like this:</p>
+<section id="the-mission" class="slide level2">
+<h2>The mission</h2>
+<p>How about a maze that looks like this:</p>
 <p><img src="images/my-maze.png" /><br />
 </p>
-<p>I also decided to output this in text mode using quarter-square graphics.</p>
-<p>Once the basic algorithm is done, it can output bigger and badder mazes.</p>
+<p>Let's output this in text mode using quarter-square graphics.</p>
+<p>Once the basic algorithm is done, it can scale up to do bigger and badder mazes.</p>
 
 </section>
-<section id="how-do-you-generate-a-maze-anyway" class="slide level2">
-<h2>How do you generate a maze, anyway?</h2>
-<p>Abstracting away all the irrelevant details, the underlying skeleton of the maze is something like this:</p>
+<section id="how-do-you-generate-a-maze" class="slide level2">
+<h2>How do you generate a maze?</h2>
+<p>Abstracting away the irrelevant details, the structure of the maze is:</p>
 <p><img src="images/skeleton-maze.jpg" id="id" class="class" width="200" height="200" /><br />
-This is a rectangular grid of cells where we've connected just enough pairs of adjacent cells for the whole graph to be one piece,</p>
-<p>or, equivalently:</p>
-<p>as many pairs of adjacent cells as we can without forming a circuit.</p>
+It's a rectangular grid of cells with just enough connections between adjacent cells to make it one piece,</p>
+<p>or, equivalently: as many connections as possible without forming a circuit.</p>
 
 </section>
 <section id="compsci-description-of-the-problem" class="slide level2">
@@ -71,28 +70,33 @@ This is a rectangular grid of cells where we've connected just enough pairs of a
 <p>This is pretty simple: you just accumulate a list of edges, only adding ones that don't create a circuit.</p>
 
 </section>
-<section id="but-heres-what-happens-if-you-do-that" class="slide level2">
-<h2>But, here's what happens if you do that</h2>
+<section id="but-if-you-do-that..." class="slide level2">
+<h2>But if you do that...</h2>
 <p><img src="images/boring-maze.jpg" id="id" class="class" width="200" height="200" /><br />
-which is not an acceptable solution because it's the same boring maze each time.</p>
+Not an acceptable solution: the same boring maze each time.</p>
 <p>We have to introduce randomness, i.e. present the edges in a random order.</p>
-<p>Absurdly, it turned out this was the hardest part of the project, for reasons you may find amusing even if languages like Idris are not your bag.</p>
+<p>Absurdly, this was the hardest part of the project.</p>
 
 </section>
-<section id="so-im-going-to-skate-lightly-over-the-actual-spanning-forest-algorithm" class="slide level2">
-<h2>So I'm going to skate lightly over the actual Spanning Forest algorithm</h2>
-<p>but here it is, anyway:</p>
-<p><img src="images/spanning-forest.png" id="id" class="class" width="400" height="300" /><br />
+<section id="skating-lightly-over-the-algorithm" class="slide level2">
+<h2>Skating lightly over the algorithm</h2>
+<p>Here it is, anyway:</p>
+<p><img src="images/spanning-forest.png" id="id" class="class" width="600" height="400" /><br />
 This was hard too, but in a good way.</p>
-<p>It's basically just a fold - accumulating a list of edges - but you have to efficiently keep track of which cells are connected. You also have to use the right data structures in Idris, and figure out how to test-drive it... all of which took a while.</p>
 
 </section>
-<section id="but-then-my-mazes-kept-looking-like-this" class="slide level2">
-<h2>But then, my mazes kept looking like this:</h2>
-<p><img src="images/mangled-maze.jpg" id="id" class="class" width="400" height="300" /><br />
+<section id="let-me-unpack-that-for-you" class="slide level2">
+<h2>Let me unpack that for you</h2>
+<p>It's basically just a fold - accumulating a list of edges - but you have to efficiently keep track of which cells are connected.</p>
+<p>You also have to use the right data structures in Idris, and figure out how to test-drive it... all of which took a while.</p>
+
+</section>
+<section id="debugging-the-mazes" class="slide level2">
+<h2>Debugging the mazes</h2>
+<p><img src="images/mangled-maze.jpg" id="id" class="class" width="430" height="200" /><br />
 After staring at this for hours, I realized that</p>
 <ol type="1">
-<li><p>the bottom and right edges were mangled because of a fencepost error, which was easily fixed</p></li>
+<li><p>the bottom and right edges were mangled because of a fencepost error (easily fixed)</p></li>
 <li><p>the randomizer wasn't working properly.</p></li>
 </ol>
 <p>But all it had to do was shuffle the list of edges, i.e. generate a uniformly random permutation.</p>
@@ -101,8 +105,8 @@ After staring at this for hours, I realized that</p>
 <section id="why-is-randomness-so-hard" class="slide level2">
 <h2>Why is randomness so hard?</h2>
 <p><img src="images/roulette-wheel.png" id="id" class="class" width="400" height="300" /><br />
-It isn't functional! A method that returns random numbers isn't permissible in Idris because it can return a different value on every call, violating the semantics. Same goes for a function that returns the date and time.</p>
-<p>So you have to generate random numbers in the context of a special monad, and use the Effects library to get it to interoperate with all the other monads you have to use for anything else that is not strictly functional.</p>
+It isn't functional! A function that returns random numbers isn't allowed in Idris because it can return a different value on every call, violating the semantics. Same goes for a function that returns the date and time.</p>
+<p>You have to generate random numbers in the context of a special monad, and use the Effects library to get it to interoperate with all the other monads you have to use for anything else that is not strictly functional.</p>
 <p>Yes, I know this is why not everyone would want to use languages like Idris.</p>
 <p>Also, it turned out there was a <em>bug</em> in the run time library which was interacting adversely with the perhaps overcomplicated &quot;Godel numbering scheme for permutations&quot; I had decided to use, which was fun to implement but not, as it turned out, practical.</p>
 

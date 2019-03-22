@@ -17,7 +17,7 @@ OPTIONS="\
     -t revealjs \
     -s \
     -o idris-mazes.html \
-    -V theme=moon \
+    -V theme=beige \
     -V transition=cube \
     -V revealjs-url=./reveal.js"
 
@@ -26,3 +26,10 @@ FILES="\
     idris-mazes.md"
 
 $PANDOC $OPTIONS $FILES
+
+
+#    -V margin=0 \
+#    -V minScale=1 \
+#    -V maxScale=1 \
+#    -V width="100\%" \
+#    -V height="100\%" \
