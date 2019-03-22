@@ -2,8 +2,8 @@
 
 # Generating mazes
 
-- I've been trying to learn Idris, a programming language which is 
-like Haskell but more so
+- I've been trying to learn Idris, a somewhat bleeding-edge programming language 
+which is like Haskell but more so
 
 - I (wrongly) decided I understood it well enough to try writing a program to 
 generate mazes
@@ -61,11 +61,12 @@ only adding ones that don't create a circuit.
 
 ![](images/boring-maze.jpg){#id .class width=200 height=200px}\
 
-which is not an acceptable solution because it's a boring maze.
+which is not an acceptable solution because it's the same boring maze each time.
 
 We have to introduce randomness, i.e. present the edges in a random order.
 
-It turned out this was the hardest part of the project.
+Absurdly, it turned out this was the hardest part of the project,
+for reasons you may find amusing even if languages like Idris are not your bag.
 
 \newpage
 
@@ -110,11 +111,11 @@ Same goes for a function that returns the date and time.
 
 So you have to generate random numbers in the context of a special monad, and use the 
 Effects library to get it to interoperate with all the other monads you have to use for
-anything that is not strictly functional.
+anything else that is not strictly functional.
 
 Yes, I know this is why not everyone would want to use languages like Idris. 
 
-Also, it turned out there was a BUG in the run time library which was interacting
+Also, it turned out there was a *bug* in the run time library which was interacting
 adversely with the perhaps overcomplicated "Godel numbering scheme for permutations"
 I had decided to use, which was fun to implement but not, as it turned out, practical.
 
