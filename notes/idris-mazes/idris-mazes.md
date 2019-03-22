@@ -22,7 +22,7 @@ but the simple things were hard...
 How about a maze that looks like this:
 
  
-![](images/my-maze.png)\
+![](images/my-maze.png){#id .class width=300 height=300px}\
 
 
 Let's output this in text mode using quarter-square graphics.
