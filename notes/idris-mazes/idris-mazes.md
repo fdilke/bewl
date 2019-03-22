@@ -1,6 +1,8 @@
+![](images/dark-labyrinth.jpg)\
+
 \newpage
 
-# Generating mazes
+## Generating mazes
 
 - I've been trying to learn Idris, a somewhat bleeding-edge programming language 
 which is like Haskell but more so
@@ -8,16 +10,14 @@ which is like Haskell but more so
 - I (wrongly) decided I understood it well enough to try writing a program to 
 generate mazes
 
-- The simple things were hard, and the hard things were simple...
-
-![](images/dark-labyrinth.jpg)\
+- Counterintuitively, the hard things turned out to be simple, 
+but the simple things were hard...
 
 \newpage
 
-# The mission, should you choose to accept it
+## The mission, should you choose to accept it
 
 The idea is that the maze will look like this:
-
 
  
 ![](images/my-maze.png)\
@@ -29,7 +29,7 @@ Once the basic algorithm is done, it can output bigger and badder mazes.
 
 \newpage
 
-# How do you generate a maze, anyway?
+## How do you generate a maze, anyway?
 
 Abstracting away all the irrelevant details, the underlying skeleton of the
 maze is something like this: 
@@ -45,7 +45,7 @@ as many pairs of adjacent cells as we can without forming a circuit.
 
 \newpage
 
-# CompSci description of the problem
+## CompSci description of the problem
 
 Given a rectangular grid of cells, make it into a graph by connecting
 every pair of adjacent cells with an edge.
@@ -57,7 +57,7 @@ only adding ones that don't create a circuit.
 
 \newpage
 
-# But, here's what happens if you do that 
+## But, here's what happens if you do that 
 
 ![](images/boring-maze.jpg){#id .class width=200 height=200px}\
 
@@ -70,7 +70,7 @@ for reasons you may find amusing even if languages like Idris are not your bag.
 
 \newpage
 
-# So I'm going to skate lightly over the actual Spanning Forest algorithm
+## So I'm going to skate lightly over the actual Spanning Forest algorithm
 
 but here it is, anyway: 
 
@@ -85,7 +85,7 @@ all of which took a while.
 
 \newpage
 
-# But then, my mazes kept looking like this:
+## But then, my mazes kept looking like this:
 
 ![](images/mangled-maze.jpg){#id .class width=400 height=300px}\
 
@@ -101,7 +101,7 @@ generate a uniformly random permutation.
 
 \newpage
 
-# Why is randomness so hard?
+## Why is randomness so hard?
 
 ![](images/roulette-wheel.png){#id .class width=400 height=300px}\
 
@@ -121,7 +121,7 @@ I had decided to use, which was fun to implement but not, as it turned out, prac
 
 \newpage
 
-# Why is randomness so hard? (continued)
+## Why is randomness so hard? (continued)
 
 Instead, the solution was to look up "generating uniformly random permutations" on
 Wikipedia which tells you to use the Knuth shuffle.
@@ -146,7 +146,7 @@ Meanwhile, here is my not-too-chronically-slow compromise solution:
   
 \newpage
 
-# ... which finally makes it possible ...
+## ... which finally makes it possible ...
 
 ... to generate mazes in Idris
 
