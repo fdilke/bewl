@@ -36,7 +36,7 @@ Once the basic algorithm is done, it can scale up to do bigger and badder mazes.
 Abstracting away the irrelevant details, the structure of the
 maze is: 
 
-![](images/skeleton-maze.jpg){#id .class width=200 height=200px}\
+![](images/skeleton-maze.jpg){#id .class width=300 height=300px}\
  
 It's a rectangular grid of cells with connections added between adjacent cells to form a *tree*.
 
