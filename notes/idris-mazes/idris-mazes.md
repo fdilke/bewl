@@ -25,7 +25,7 @@ How about a maze that looks like this:
 ![](images/my-maze.png){#id .class width=300 height=300px}\
 
 
-Let's output this in text mode using quarter-square graphics.
+Let's output this +in text mode using quarter-square graphics.
 
 Once the basic algorithm is done, it can scale up to do bigger and badder mazes.
 
