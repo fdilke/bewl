@@ -2,7 +2,7 @@ package com.fdilke.bewl.topos
 
 import com.fdilke.bewl.helper.⊕
 import com.fdilke.bewl.topos.constructions.ConstructToposOfMonoidActions
-import com.fdilke.bewl.helper.StandardSymbols.{iso, injective, epic, monic}
+import com.fdilke.bewl.helper.StandardSymbols.{iso, injective, epic, monic, source, target}
 import org.scalatest.matchers.should.Matchers._
 
 import org.scalatest._
@@ -158,8 +158,8 @@ abstract class GenericToposTests[
 
       productArrow.sanityTest
       productArrow should have (
-        'source (foo),
-        'target (bar x baz),
+        source (foo),
+        target (bar x baz),
         'sanityTest (null)
       )
 
@@ -237,8 +237,8 @@ abstract class GenericToposTests[
         (bar > baz) transpose foobar2baz
       foo2bar2baz.sanityTest
       foo2bar2baz should have(
-        'source(foo),
-        'target(bar > baz)
+        source(foo),
+        target(bar > baz)
       )
 
       implicit val anonImplicit = bar > baz
@@ -347,38 +347,38 @@ abstract class GenericToposTests[
     it("can tell if an arrow is monic") {
 
       if (!inActionTopos) { // reluctantly skip, too slow with current technology
-        monicBar2baz shouldBe 'monic
+        monicBar2baz shouldBe monic
 
-        (foo x foo).π0 should not be 'monic
-        foo.=?=.arrow should not be 'monic
+        (foo x foo).π0 should not be monic
+        foo.=?=.arrow should not be monic
 
-        foo.diagonal shouldBe 'monic
-        foo.singleton shouldBe 'monic
+        foo.diagonal shouldBe monic
+        foo.singleton shouldBe monic
       }
 
-      I.identity shouldBe 'monic
-      truth shouldBe 'monic
-      falsity shouldBe 'monic
+      I.identity shouldBe monic
+      truth shouldBe monic
+      falsity shouldBe monic
 
-      foo.toI should not be 'monic
-      foo.fromO shouldBe 'monic
+      foo.toI should not be monic
+      foo.fromO shouldBe monic
     }
 
     it("can tell if a arrow is epic") {
   
-      I.identity shouldBe 'epic
-      O.identity shouldBe 'epic
-      I.diagonal shouldBe 'epic
-      truth should not be 'epic
-      foo.toI shouldBe 'epic
+      I.identity shouldBe epic
+      O.identity shouldBe epic
+      I.diagonal shouldBe epic
+      truth should not be epic
+      foo.toI shouldBe epic
 
       if (!inActionTopos) { // reluctantly skip, too slow with current technology
-        foo.identity shouldBe 'epic
-        (foo x foo).π0 shouldBe 'epic
-        foo.diagonal should not be 'epic
-        omega.diagonal should not be 'epic
+        foo.identity shouldBe epic
+        (foo x foo).π0 shouldBe epic
+        foo.diagonal should not be epic
+        omega.diagonal should not be epic
 
-        monicBar2baz should not be 'epic
+        monicBar2baz should not be epic
       }
     }
 

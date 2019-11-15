@@ -1,10 +1,9 @@
 package com.fdilke.bewl.topos.algebra
 
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.monoidFromTable
+import com.fdilke.bewl.helper.StandardSymbols.{i, x, y}
 
 object KnownMonoids {
-
-  private val (i, x, y) = ('i, 'x, 'y)
 
   val monoidOf3 =
     monoidFromTable(
@@ -12,5 +11,4 @@ object KnownMonoids {
       x, x, y,
       y, x, y
     ) // right-dominant on two generators
-
 }

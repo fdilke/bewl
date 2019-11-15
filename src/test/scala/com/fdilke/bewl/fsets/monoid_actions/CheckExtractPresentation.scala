@@ -14,7 +14,7 @@ object CheckExtractPresentation {
     monoid: Monoid[M]
   ) (
     action: monoid.Action[A]
-  ) {
+  ) : Unit = {
     val generatorsWithRelators: Seq[GeneratorWithRelators[M, A]] =
       FindPresentation.forMonoid(
         monoid

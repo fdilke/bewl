@@ -5,7 +5,7 @@ import com.fdilke.bewl.fsets.FiniteSets.{>, ToposOfMonoidActions, VOID}
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
 import org.scalatest.freespec.AnyFreeSpec
-import com.fdilke.bewl.helper.StandardSymbols.{i, x, y, a, b, c, r, s, source, target}
+import com.fdilke.bewl.helper.StandardSymbols.{i, x, y, a, b, c, r, s, source, target, iso}
 import org.scalatest.matchers.should.Matchers._
 
 import scala.language.{existentials, reflectiveCalls}
@@ -39,7 +39,7 @@ class PresentationTest extends AnyFreeSpec {
         emptyAction,
         emptyProjection
       ) shouldBe true
-      emptyProjection shouldBe 'iso
+      emptyProjection shouldBe iso
 		}
 		"works for a single generator with no relators" in {
 			val presentation = 
@@ -72,7 +72,7 @@ class PresentationTest extends AnyFreeSpec {
         regularAction,
         regularProjection
       ) shouldBe true
-      regularProjection shouldBe 'iso
+      regularProjection shouldBe iso
 		}
 		"works for presenting a cyclic right ideal { x, y }" in {
 			val presentation = 
@@ -111,12 +111,12 @@ class PresentationTest extends AnyFreeSpec {
         idealAction,
         idealProjection
       ) shouldBe true
-      idealProjection shouldBe 'iso
+      idealProjection shouldBe iso
 		}
 		"works for presenting 2 over its endomorphism monoid" in {
-		  val ¬ = '¬
-		  val O = 'O
-		  val I = 'I
+		  val ¬ = Symbol("¬")
+		  val O = Symbol("O")
+		  val I = Symbol("I")
       val end2 =
         monoidFromTable(
           i, ¬, O, I,
@@ -170,7 +170,7 @@ class PresentationTest extends AnyFreeSpec {
         twoAction,
         twoProjection
       ) shouldBe true
-      twoProjection shouldBe 'iso
+      twoProjection shouldBe iso
 		}
 		"works for a cyclic action over a group" in {
       val group = monoidFromTable(

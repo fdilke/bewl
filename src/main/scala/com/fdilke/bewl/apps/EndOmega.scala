@@ -28,10 +28,6 @@ object EndOmega extends App {
     assert( ideals.size == 3 )
     val Seq(_m, _i, _o) = ideals
 
-//    "M" -> Map('y -> true, 'x -> true, 'i -> true),
-//    "I" -> Map('y -> true, 'x -> true, 'i -> false),
-//    "O"  -> Map('y -> false, 'x -> false, 'i -> false)
-
     val idealToName: Map[IDEAL, String] =
       Map(
         _m -> "M",
