@@ -7,7 +7,9 @@ scalaVersion := "2.13.1"
 scalacOptions ++= Seq("-feature", "-deprecation")
 
 resolvers += "Maven central" at "http://repo1.maven.org/maven2/"
-resolvers += Resolver.sonatypeRepo("releases")
+//resolvers += Resolver.sonatypeRepo("releases")
+resolvers +=
+  "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 
 parallelExecution in Test := false
 
