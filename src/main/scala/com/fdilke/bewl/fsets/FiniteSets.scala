@@ -5,7 +5,6 @@ import com.fdilke.bewl.fsets.monoid_actions.{ActionSplitter, FindGenerators, Fin
 import com.fdilke.bewl.helper.{Memoize, ⊕}
 import com.fdilke.bewl.helper.⊕._
 import com.fdilke.bewl.topos.{Topos, Wrappings}
-import org.scalatest.Matchers._
 
 object FiniteSets extends BaseFiniteSets
   with FindGenerators
@@ -84,7 +83,7 @@ class BaseFiniteSets extends Topos[Any] with Wrappings[
       s"FiniteSetsDot[$elements]"
 
     override def sanityTest =
-      elements.toSet.size shouldBe elements.size
+      assert(elements.toSet.size == elements.size)
   }
 
   class FiniteSetsArrow[S, T](

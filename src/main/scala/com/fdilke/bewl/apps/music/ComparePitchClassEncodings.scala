@@ -5,7 +5,6 @@ import com.fdilke.bewl.fsets.FiniteSets.{EQUALIZER, Monoid, bifunctionAsBiArrow,
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.{elementsOf, makeNullaryOperator}
 import TriadicFixtures._
 import com.fdilke.bewl.helper.{IterateToFixed, ⊕}
-import org.scalatest.Matchers._
 import ⊕._
 
 import scala.language.postfixOps
@@ -30,7 +29,7 @@ object ComparePitchClassEncodings extends App {
 
   println("PCE 2")
 
-  informalGroup should have size 48
+  assert(informalGroup.size == 48)
 
   val circle5Encoding = Seq(0, 1, 4)
   val semitoneEncoding = Seq(0, 4, 7)
@@ -48,9 +47,9 @@ object ComparePitchClassEncodings extends App {
     println(triad mkString ",")
   }
 
-  isomorphicTriads should contain(
+  assert(isomorphicTriads.contains(
     semitoneEncoding
-  )
+  ))
 }
 
 object StabilizerSanity extends App {

@@ -64,7 +64,7 @@ object TwitterHack {
   def tweetMe(message: String) {
     //        println("user details: " + user)
     //        println("user name: " + user.data.name)
-    client.createDirectMessage(felixId, message).onComplete {
+    client.createDirectMessageEvent(felixId, message).onComplete {
       case Success(dm) =>
 //        println("Sent DM! " + dm)
 
