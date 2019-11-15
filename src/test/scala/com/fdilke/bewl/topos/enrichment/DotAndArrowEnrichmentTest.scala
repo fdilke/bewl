@@ -2,12 +2,13 @@ package com.fdilke.bewl.topos.enrichment
 
 import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
-import org.scalatest.matchers.should.Matchers._
 
 import scala.Function.untupled
 import com.fdilke.bewl.topos.algebra.KnownGroups.twoGroup
 import com.fdilke.bewl.helper.⊕
 import org.scalatest.funspec.AnyFunSpec
+import com.fdilke.bewl.helper.StandardSymbols.{injective, source, target, b, monic, epic, minimal, simple, section, retraction}
+import org.scalatest.matchers.should.Matchers._
 
 class DotAndArrowEnrichmentTest extends AnyFunSpec {
 
@@ -19,8 +20,8 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
       val embed = subset(totalSet) { x => x }
       val ∀ = totalSet.∀
       ∀ should have(
-        'source(totalSet > omega),
-        'target(omega)
+        source(totalSet > omega),
+        target(omega)
       )
       ∀ o embed.chi.name should not be truth
       ∀ o totalSet.identity.chi.name shouldBe truth
@@ -37,8 +38,8 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
       val embedEmpty = emptySet(totalSet) { x => x}
       val exists = totalSet.∃
       exists should have(
-        'source(totalSet > omega),
-        'target(omega)
+        source(totalSet > omega),
+        target(omega)
       )
       exists o embed.chi.name shouldBe truth
       exists o embedEmpty.chi.name should not be truth
@@ -171,13 +172,13 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
       val pac = set.pac
       pac.classifier should have size 3
       pac.include should have (
-        'source(set),
-        'target(pac.classifier)
+        source(set),
+        target(pac.classifier)
       )
       pac.include shouldBe 'monic
       pac.⏊ should have (
-        'source(I),
-        'target(pac.classifier)
+        source(I),
+        target(pac.classifier)
       )
       pac.⏊ shouldBe pac.extend(O.toI, set.fromO)
       Seq(0, 1) map pac.⏊(()) shouldBe Seq(false, false)
@@ -189,16 +190,16 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
 
       val foo2setStar = pac.extend(inclusion, subFoo2set)
       foo2setStar should have (
-        'source(foo),
-        'target(pac.classifier)
+        source(foo),
+        target(pac.classifier)
       )
       val imageOf0 = pac.include(0)
       val imageOf1 = pac.include(1)
       foo2setStar('a) shouldBe imageOf1
 
-      foo2setStar('b) shouldBe pac.⏊(())
-      foo2setStar('b) should not be imageOf0
-      foo2setStar('b) should not be imageOf1
+      foo2setStar(b) shouldBe pac.⏊(())
+      foo2setStar(b) should not be imageOf0
+      foo2setStar(b) should not be imageOf1
     }
   }
 
@@ -210,24 +211,24 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
 
       coproduct should have size 5
       foo +- bar should have (
-        'source(foo),
-        'target(coproduct),
-        'monic(true)
+        source(foo),
+        target(coproduct),
+        monic(true)
       )
       foo -+ bar should have (
-        'source(bar),
-        'target(coproduct),
-        'monic(true)
+        source(bar),
+        target(coproduct),
+        monic(true)
       )
 
-      val target = dot("P", "Q", "R")
-      val foo2target = arrow(foo, target)(0 -> "Q", 1 -> "P")
-      val bar2target = arrow(bar, target)('a -> "R", 'b -> "P", 'c -> "Q")
+      val tgt = dot("P", "Q", "R")
+      val foo2target = arrow(foo, tgt)(0 -> "Q", 1 -> "P")
+      val bar2target = arrow(bar, tgt)('a -> "R", 'b -> "P", 'c -> "Q")
       val sum = foo2target + bar2target
 
       sum should have (
-        'source(coproduct),
-        'target(target)
+        source(coproduct),
+        target(tgt)
       )
       foo2target shouldBe (sum o (foo +- bar))
       bar2target shouldBe (sum o (foo -+ bar))
@@ -253,17 +254,17 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
         'C -> 3
       )
       val (
-        epic,
-        monic
+        theEpic,
+        theMonic
       ) : (
         Symbol > Int,
         Int > Int
       ) = anArrow.factorizeEpiMono
-      epic.sanityTest
-      monic.sanityTest
-      epic shouldBe 'epic
-      monic shouldBe 'monic
-      (monic o epic) shouldBe anArrow
+      theEpic.sanityTest
+      theMonic.sanityTest
+      theEpic shouldBe epic
+      theMonic shouldBe monic
+      (theMonic o theEpic) shouldBe anArrow
     }
   }
 
@@ -287,7 +288,7 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
         quotient.arrow
       quotientArrow.sanityTest
       quotientArrow.source shouldBe symbols
-      quotientArrow shouldBe 'epic
+      quotientArrow shouldBe epic
       quotientArrow('A) should not be quotientArrow('B)
       quotientArrow('B) shouldBe quotientArrow('C)
 
@@ -489,16 +490,16 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
 	  it("are detected correctly for sets") {
 		  val symbols = dot('A, 'B)
 				  val numbers = dot(1, 2, 3)
-				  val section: Symbol > Int =
+				  val theSection: Symbol > Int =
 				  arrow(symbols, numbers)(
             'A -> 2, 'B -> 1
           )
-				  section should be a 'section 
+				  theSection should be a section
 				  val nonsection: Symbol > Int =
 				  arrow(symbols, numbers)(
 						  'A -> 2, 'B -> 2
 						  )
-				  nonsection should not be a ('section) 
+				  nonsection should not be a (section)
 	  }
   }
   
@@ -510,19 +511,19 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
       arrow(symbols, numbers)(
       		'A -> 2, 'B -> 1, 'C -> 1
       		)
-      section should be a 'retraction 
+      section should be a retraction
       val nonsection: Symbol > Int =
         arrow(symbols, numbers)(
           'A -> 2, 'B -> 2, 'C -> 2
         )
-        nonsection should not be a ('retraction) 
+        nonsection should not be a (retraction)
     }
   }
   
   describe("Injective objects") {
     it("are detected properly for sets") {
-    	dot[VOID]() should not be 'injective
-      dot(1) shouldBe 'injective
+    	dot[VOID]() should not be injective
+      dot(1) shouldBe injective
     }
   }
 
@@ -538,7 +539,7 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
 
       topos.makeDot(
         twoGroup.regularAction
-      ) shouldBe 'minimal
+      ) shouldBe minimal
     }
   }
 
@@ -555,7 +556,7 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
 
       topos.makeDot(
         twoGroup.regularAction
-      ) shouldBe 'simple
+      ) shouldBe simple
     }
   }
 }

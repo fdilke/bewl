@@ -2,7 +2,7 @@ package com.fdilke.bewl.topos
 
 import com.fdilke.bewl.helper.⊕
 import com.fdilke.bewl.topos.constructions.ConstructToposOfMonoidActions
-import com.fdilke.bewl.helper.StandardSymbols.{iso, injective, epic, monic, source, target}
+import com.fdilke.bewl.helper.StandardSymbols.{iso, injective, epic, monic, source, target, left, right, sanityTest}
 import org.scalatest.matchers.should.Matchers._
 
 import org.scalatest._
@@ -151,8 +151,8 @@ abstract class GenericToposTests[
     it("can construct biproduct diagrams") {
       (bar x baz).sanityTest
       (bar x baz) should have(
-        'left (bar),
-        'right (baz)
+        left (bar),
+        right (baz)
       )
       val productArrow = foo2bar x foo2baz
 
@@ -160,7 +160,7 @@ abstract class GenericToposTests[
       productArrow should have (
         source (foo),
         target (bar x baz),
-        'sanityTest (null)
+        sanityTest (null)
       )
 
       (bar x baz).π0.sanityTest

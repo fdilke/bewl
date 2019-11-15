@@ -351,4 +351,4 @@ can get rid of "anonImplicit" which used to be "_" ?
 look up "implicit best practices" ?
 get rid of Traversable - should be Iterable
 get rid of all the warnings in "sbt clean test"
- 
+get rid of all symbols - note conflict between "a, the letter" and "should be a" :( Maybe just use an.

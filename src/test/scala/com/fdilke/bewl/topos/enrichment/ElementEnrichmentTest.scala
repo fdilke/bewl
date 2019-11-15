@@ -4,13 +4,14 @@ import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers._
+import com.fdilke.bewl.helper.StandardSymbols.{a, b}
 
 import scala.language.{implicitConversions, postfixOps}
 
 class ElementEnrichmentTest extends AnyFreeSpec {
   "Exponential element enrichments" - {
     "allow internal composition" in {
-      val symbols = dot('a, 'b)
+      val symbols = dot(a, b)
       val ints = dot(1, 2, 3)
       val bools = dot(true, false)
 
@@ -39,7 +40,7 @@ class ElementEnrichmentTest extends AnyFreeSpec {
     }
 
     "allow partly internal composition" in {
-      val symbols = dot('a, 'b)
+      val symbols = dot(a, b)
       val ints = dot(1, 2, 3)
       val bools = dot(true, false)
 

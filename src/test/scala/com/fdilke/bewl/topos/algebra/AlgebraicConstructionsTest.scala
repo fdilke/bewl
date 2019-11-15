@@ -4,6 +4,7 @@ import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
+import com.fdilke.bewl.helper.StandardSymbols.{source, target, iso, x, y, z, commutative}
 
 class AlgebraicConstructionsTest extends AnyFunSpec {
 
@@ -16,32 +17,32 @@ class AlgebraicConstructionsTest extends AnyFunSpec {
       endosOf0 shouldBe an[Monoid[_]]
       endosOf0.sanityTest
       endosOf0.carrier.size shouldBe 1
-      endosOf0 shouldBe 'commutative
+      endosOf0 shouldBe commutative
     }
 
     it("for a 1-element set") {
       val endosOf1 = endomorphismMonoid(dot('x)).monoid
       endosOf1.sanityTest
       endosOf1.carrier.size shouldBe 1
-      endosOf1 shouldBe 'commutative
+      endosOf1 shouldBe commutative
     }
 
     it("for a 2-element set") {
       val endosOf2 = endomorphismMonoid(dot('x, 'y)).monoid
       endosOf2.sanityTest
       endosOf2.carrier.size shouldBe 4
-      endosOf2 should not be 'commutative
+      endosOf2 should not be commutative
     }
 
     it("for a 3-element set") {
       val endosOf3 = endomorphismMonoid(dot('x, 'y, 'z)).monoid
       endosOf3.sanityTest
       endosOf3.carrier.size shouldBe 27
-      endosOf3 should not be 'commutative
+      endosOf3 should not be commutative
     }
 
     it("and has a 'home' action on the original object") {
-      val three: FiniteSetsDot[Symbol] = dot('x, 'y, 'z)
+      val three: FiniteSetsDot[Symbol] = dot(x, y, z)
       val endosOf3 = endomorphismMonoid(three)
       import endosOf3.homeAction
       homeAction.carrier shouldBe three
@@ -66,9 +67,9 @@ class AlgebraicConstructionsTest extends AnyFunSpec {
       group.sanityTest
       group.carrier.size shouldBe 1
       inject should have(
-        'source(group.carrier),
-        'target(monoid.carrier),
-        'iso(true)
+        source(group.carrier),
+        target(monoid.carrier),
+        iso(true)
       )
     }
 
@@ -80,7 +81,7 @@ class AlgebraicConstructionsTest extends AnyFunSpec {
       val (group, inject) = groupOfUnits(monoid)
       group.sanityTest
       group.carrier.size shouldBe 1
-      group shouldBe 'commutative
+      group shouldBe commutative
       inject should have(
         'source(group.carrier),
         'target(monoid.carrier),
@@ -98,7 +99,7 @@ class AlgebraicConstructionsTest extends AnyFunSpec {
       val (group, inject) = groupOfUnits(monoid)
       group.sanityTest
       group.carrier.size shouldBe 2
-      group shouldBe 'commutative
+      group shouldBe commutative
       inject should have(
         'source(group.carrier),
         'target(monoid.carrier),
@@ -114,7 +115,7 @@ class AlgebraicConstructionsTest extends AnyFunSpec {
         )._1
       group.sanityTest
       group.carrier.size shouldBe 6
-      group should not be 'commutative
+      group should not be commutative
     }
   }
 }
