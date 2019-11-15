@@ -7,14 +7,13 @@ import com.fdilke.bewl.helper.⊕
 import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers._
+import com.fdilke.bewl.helper.StandardSymbols.{i, x, y}
 
 import scala.Function.untupled
 import scala.language.{existentials, postfixOps, reflectiveCalls}
 
 class FiniteSetsLocalMonoidAssistantTest extends AnyFreeSpec {
   
-  private val (i, x, y) = ('i, 'x, 'y)
-
   import monoidOf3.regularAction
 
   private val analyzer: monoidOf3.ActionAnalyzer =

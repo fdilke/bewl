@@ -4,6 +4,7 @@ import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.dot
 import org.scalatest.matchers.should.Matchers._
 import org.scalatest.freespec.AnyFreeSpec
+import com.fdilke.bewl.helper.StandardSymbols.{iso, source, target}
 
 class MonadicPlumbingTest extends AnyFreeSpec {
 
@@ -16,13 +17,13 @@ class MonadicPlumbingTest extends AnyFreeSpec {
         symbols,
         numbers
       ) should have(
-        'source(
+        source(
           symbols x numbers
         ),
-        'target(
+        target(
           numbers x symbols
         ),
-        'iso(
+        iso(
           true
         )
       )
@@ -44,13 +45,13 @@ class MonadicPlumbingTest extends AnyFreeSpec {
         numbers,
         strings
       ) should have(
-        'source(
+        source(
           (symbols x numbers) x strings
         ),
-        'target(
+        target(
           symbols x (numbers x strings)
         ),
-        'iso(
+        iso(
           true
         )
       )
@@ -68,13 +69,13 @@ class MonadicPlumbingTest extends AnyFreeSpec {
         numbers,
         strings
       ) should have(
-        'source(
+        source(
           symbols x (numbers x strings)
         ),
-        'target(
+        target(
           (symbols x numbers) x strings
         ),
-        'iso(
+        iso(
           true
         )
       )

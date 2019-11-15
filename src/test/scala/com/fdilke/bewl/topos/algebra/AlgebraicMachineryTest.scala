@@ -4,6 +4,7 @@ import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
+import com.fdilke.bewl.helper.StandardSymbols.q
 
 class AlgebraicMachineryTest extends AnyFunSpec {
 
@@ -375,13 +376,13 @@ class AlgebraicMachineryTest extends AnyFunSpec {
     }
 
     it("can validate morphisms preserving mixed operations with scalars") {
-      val scalars = dot[Symbol]('q)
-      val pointScalar = makeNullaryOperator(scalars, 'q)
+      val scalars = dot[Symbol](q)
+      val pointScalar = makeNullaryOperator(scalars, q)
       val carrier = dot[Boolean](true, false)
       val multiplication = bifunctionAsBiArrow(carrier, scalars, carrier) {
         Function untupled Map(
-          (true, 'q) -> false,
-          (false, 'q) -> true
+          (true, q) -> false,
+          (false, q) -> true
         )
       }
 

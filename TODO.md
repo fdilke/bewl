@@ -350,4 +350,5 @@ Then:
 can get rid of "anonImplicit" which used to be "_" ?
 look up "implicit best practices" ?
 get rid of Traversable - should be Iterable
+get rid of all the warnings in "sbt clean test"
  
