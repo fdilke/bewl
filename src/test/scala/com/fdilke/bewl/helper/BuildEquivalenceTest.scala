@@ -1,11 +1,11 @@
 package com.fdilke.bewl.helper
 
-import org.scalatest.FreeSpec
-import org.scalatest.Matchers._
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.should.Matchers._
 
 import scala.language.{existentials, reflectiveCalls}
 
-class BuildEquivalenceTest extends FreeSpec {
+class BuildEquivalenceTest extends AnyFreeSpec {
   "Equivalence relations" - {
     "can be calculated over an empty set" in {
       BuildEquivalence(

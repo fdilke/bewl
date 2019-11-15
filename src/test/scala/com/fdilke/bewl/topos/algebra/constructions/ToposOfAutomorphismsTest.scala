@@ -5,7 +5,7 @@ import com.fdilke.bewl.topos.{GenericToposTests, ToposWithFixtures}
 import FiniteSets.{ >, ToposOfAutomorphisms }
 import ToposOfAutomorphisms.AutomorphismPreArrow
 import scala.Function._
-import org.scalatest.Matchers._
+import org.scalatest.matchers.should.Matchers._
 
 class ToposOfAutomorphismsTest extends GenericToposTests[
   Any,

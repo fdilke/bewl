@@ -72,24 +72,24 @@ object Permutations {
     lazy val asArrow =
       Permutations.topos unwrap permutation
 
-    lazy val carrier =
+    lazy val carrier: Set[T] =
       elementsOf(asArrow.source) toSet
 
-    lazy val asMap =
+    lazy val asMap: Map[T, T] =
       carrier map { e =>
         e -> asArrow(e)
       } toMap
 
-    lazy val parity =
+    lazy val parity: Int =
       Parity of asMap
 
-    def send(key: T) =
+    def send(key: T): T =
       asMap(key)
 
     def *(that: RichPermutation[T]): Permutation[T] =
       if (carrier == that.carrier)
         dot(
-          asMap mapValues that.asMap
+          (asMap.view mapValues that.asMap).toMap
         )
       else
         throw new IllegalArgumentException

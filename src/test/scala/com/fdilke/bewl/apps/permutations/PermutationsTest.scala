@@ -3,12 +3,13 @@ package com.fdilke.bewl.apps.permutations
 import com.fdilke.bewl.apps.permutations.Parity.{EVEN, ODD}
 import com.fdilke.bewl.apps.permutations.Permutations._
 import com.fdilke.bewl.fsets.FiniteSets
-import org.scalatest.FunSpec
-import org.scalatest.Matchers._
+import org.scalatest.matchers.should.Matchers._
+
+import org.scalatest.funspec.AnyFunSpec
 
 import scala.language.postfixOps
 
-class PermutationsTest extends FunSpec {
+class PermutationsTest extends AnyFunSpec {
 
   describe("Permutations") {
     it("can be defined, unwrapped, and examined as maps") {

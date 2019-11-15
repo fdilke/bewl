@@ -3,8 +3,6 @@ package com.fdilke.bewl.topos.structures
 import com.fdilke.bewl.helper.Memoize
 import com.fdilke.bewl.topos.BaseTopos
 
-import scala.language.higherKinds
-
 trait MonadCaching {
   Ɛ: BaseTopos with
     Monads with

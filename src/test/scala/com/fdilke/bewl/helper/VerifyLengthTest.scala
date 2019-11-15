@@ -1,11 +1,9 @@
 package com.fdilke.bewl.helper
 
-import org.scalatest.FreeSpec
-import org.scalatest.Matchers._
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.should.Matchers._
 
-import scala.collection.mutable.ListBuffer
-
-class VerifyLengthTest extends FreeSpec {
+class VerifyLengthTest extends AnyFreeSpec {
 
   "Verifying a sequence length" - {
     "works on empty sequences" in {

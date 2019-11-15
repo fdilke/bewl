@@ -3,14 +3,13 @@ package com.fdilke.bewl.fsets.monoid_actions
 import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSets.ToposOfMonoidActions
 import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
-import org.scalatest.FreeSpec
-import org.scalatest.Matchers._
+import org.scalatest.matchers.should.Matchers._
+import com.fdilke.bewl.helper.StandardSymbols.{i, x, y}
+import org.scalatest.freespec.AnyFreeSpec
 
 import scala.language.reflectiveCalls
 
-class FindGeneratorsTest extends FreeSpec {
-
-  private val (i, x, y) = ('i, 'x, 'y)
+class FindGeneratorsTest extends AnyFreeSpec {
 
   import monoidOf3.regularAction
 

@@ -4,13 +4,13 @@ import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSets.bifunctionAsBiArrow
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import com.fdilke.bewl.helper.⊕
-import org.scalatest.FreeSpec
-import org.scalatest.Matchers._
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.should.Matchers._
 
 import scala.Function.untupled
-import scala.language.{existentials, higherKinds, reflectiveCalls}
+import scala.language.{existentials, reflectiveCalls}
 
-class DefaultMonoidAssistantTest extends FreeSpec {
+class DefaultMonoidAssistantTest extends AnyFreeSpec {
   
   private val (i, x, y) = ('i, 'x, 'y)
 

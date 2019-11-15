@@ -2,7 +2,7 @@ package com.fdilke.bewl.topos
 
 import com.fdilke.bewl.helper.{Memoize, VerifyLength, ⊕}
 
-import scala.language.{higherKinds, postfixOps}
+import scala.language.postfixOps
 
 trait BaseTopos {
 
@@ -280,10 +280,11 @@ trait BaseTopos {
 
     final lazy val ∃ : S → TRUTH > TRUTH =
       power.forAll(omega) { (f, w) =>
-        implicit val _: EXPONENTIAL[S, TRUTH] = power
+        implicit val anonImplicit: EXPONENTIAL[S, TRUTH] = power
         (power x omega).universally(dot) {
-          case (f ⊕ w, x) =>
+          case (f ⊕ w, x) => {
             f(x) → w
+          }
         }(f, w) → w
       }
 
@@ -405,7 +406,7 @@ trait BaseTopos {
 
     final lazy val diagonal: S > (S x S) =
       this(squared) { x =>
-        implicit val _ = squared
+        implicit val anonImplicit : BIPRODUCT[S, S] = squared
         x ⊕⊕ x
       }
 
@@ -422,7 +423,7 @@ trait BaseTopos {
     ] =
       (dot > target).globals map { global =>
         dot(target) { s =>
-          implicit val _ = dot > target
+          implicit val anonImplicit = dot > target
           global(dot toI s)(s)
         }
       }
@@ -486,7 +487,7 @@ trait BaseTopos {
       (arrow.source > dot).transpose(
         arrow.target > dot
       ) { (s_u, t) =>
-        implicit val _ = arrow.target > dot 
+        implicit val anonImplicit = arrow.target > dot
         s_u(arrow(t))
       }
 
@@ -495,7 +496,7 @@ trait BaseTopos {
     ): S > TRUTH =
       forAll(family.whereTrue) {
         (s, g) =>
-          implicit val _ = power
+          implicit val anonImplicit = power
           g(s)
       }
 
@@ -715,7 +716,7 @@ trait BaseTopos {
       (exponent > target).transpose(
         exponent > source
       ) { (s_u, u) =>
-        implicit val _ = exponent > source
+        implicit val anonImplicit = exponent > source
         arrow(s_u(u))
       }
   }
@@ -735,7 +736,7 @@ trait BaseTopos {
       r: R
     ): T =
       arrow {
-        implicit val _ = product
+        implicit val anonImplicit: BIPRODUCT[L, R] = product
         l ⊕⊕ r
       }
 
@@ -773,7 +774,7 @@ trait BaseTopos {
     val classifier =
       dot.power.forAll(dot, dot) {
         (f, a, b) =>
-          implicit val _ = dot.power
+          implicit val anonImplicit = dot.power
           (f(a) ∧ f(b)) → dot.=?=(a, b)
       } whereTrue
 
@@ -880,7 +881,7 @@ trait BaseTopos {
             compatibleArrow.source
           ) {
             (q, s, t) =>
-              implicit val _ = dot.power
+              implicit val anonImplicit = dot.power
               q(s) ∧ target.=?=(
                 compatibleArrow(s), t
               )

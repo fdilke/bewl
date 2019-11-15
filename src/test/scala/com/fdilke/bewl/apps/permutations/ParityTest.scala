@@ -3,12 +3,12 @@ package com.fdilke.bewl.apps.permutations
 import com.fdilke.bewl.apps.permutations.Permutations.topos.DOT
 import com.fdilke.bewl.apps.permutations.Permutations.{RichPermutation, π}
 import com.fdilke.bewl.fsets.FiniteSets
-import org.scalatest.FunSpec
-import org.scalatest.Matchers._
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers._
 
 import scala.language.postfixOps
 
-class ParityTest extends FunSpec {
+class ParityTest extends AnyFunSpec {
 
   describe("Permutations expressed as maps") {
     it("can be tested on their parity") {

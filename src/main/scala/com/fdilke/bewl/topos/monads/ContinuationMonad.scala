@@ -39,7 +39,7 @@ trait ContinuationMonad {
         override lazy val eta =
           doubleExp.transpose(dash) {
             (x, f) =>
-              implicit val _ = dash > dot
+              implicit val anonImplicit = dash > dot
               f(x)
           }
 
@@ -76,7 +76,7 @@ trait ContinuationMonad {
             xys
           ) =>
             implicit val dashDaa = dash x daa
-            implicit val _ = daa > dot > dot
+            implicit val anonImplicit = daa > dot > dot
             yss(
               (dot > daa(dashDaa) {
                   y => x ⊕⊕ y

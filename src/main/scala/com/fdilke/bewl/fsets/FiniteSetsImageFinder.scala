@@ -1,6 +1,6 @@
 package com.fdilke.bewl.fsets
 
-import scala.language.{higherKinds, postfixOps, reflectiveCalls}
+import scala.language.{postfixOps, reflectiveCalls}
 
 trait FiniteSetsImageFinder extends BaseFiniteSets {
   override val imageFinder: ImageFinder =

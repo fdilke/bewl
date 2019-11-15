@@ -4,7 +4,7 @@ import com.fdilke.bewl.fsets.BaseFiniteSets
 import com.fdilke.bewl.helper.⊕
 import ⊕._
 import scala.Function.tupled
-import scala.language.{higherKinds, postfixOps, reflectiveCalls}
+import scala.language.{postfixOps, reflectiveCalls}
 
 trait FindPresentation extends BaseFiniteSets {
   Ɛ: FindGenerators =>

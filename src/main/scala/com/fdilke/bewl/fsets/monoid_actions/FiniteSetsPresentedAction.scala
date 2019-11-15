@@ -2,11 +2,9 @@ package com.fdilke.bewl.fsets.monoid_actions
 
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import com.fdilke.bewl.helper.BuildEquivalence
-import scala.language.higherKinds
 import scala.language.postfixOps
 import com.fdilke.bewl.fsets.FiniteSets
-import FiniteSets.{ >, x, makeDot }
-import com.fdilke.bewl.helper.⊕
+import FiniteSets.{ >, makeDot }
 
 object FiniteSetsPresentedAction {
   def apply[M, A](

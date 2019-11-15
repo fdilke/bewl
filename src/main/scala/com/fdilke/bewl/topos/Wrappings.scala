@@ -1,7 +1,5 @@
 package com.fdilke.bewl.topos
 
-import scala.language.higherKinds
-
 trait Wrappings[
   ~~,
   BASE,

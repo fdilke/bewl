@@ -3,7 +3,7 @@ package com.fdilke.bewl.topos.constructions
 import com.fdilke.bewl.helper.⊕
 import com.fdilke.bewl.topos._
 
-import scala.language.{higherKinds, postfixOps, reflectiveCalls}
+import scala.language.{postfixOps, reflectiveCalls}
 
 trait ConstructDefaultMonoidAssistant extends
   BaseTopos with

@@ -5,7 +5,7 @@ import com.fdilke.bewl.fsets.FiniteSets.{EQUALIZER, FiniteSetsDot, Monoid, Topos
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.makeNullaryOperator
 import com.fdilke.bewl.helper.⊕
 import com.fdilke.bewl.topos.{Topos, Wrappings}
-import org.scalatest.Matchers._
+import org.scalatest.matchers.should.Matchers._
 
 import scala.language.postfixOps
 
@@ -62,7 +62,7 @@ object TriadicFixtures {
       )
     }
 
-  triadicMapsDot should have size 8
+  triadicMapsDot should (have size 8)
 
   def affineMapMultiply(
     ab: Int x Int,

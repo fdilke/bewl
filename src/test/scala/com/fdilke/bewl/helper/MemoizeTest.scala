@@ -1,10 +1,9 @@
 package com.fdilke.bewl.helper
 
-import org.scalatest.{Matchers, FunSpec}
-import Matchers._
-import scala.language.higherKinds
+import org.scalatest.funspec._
+import org.scalatest.matchers.should.Matchers._
 
-class MemoizeTest extends FunSpec {
+class MemoizeTest extends AnyFunSpec {
 
   private case class Input[T](seq: Seq[T])
   private case class Output[T](seq: Seq[T])
@@ -12,7 +11,7 @@ class MemoizeTest extends FunSpec {
   private class Counterize[I, O](func: I => O) {
     private var count = 0
 
-    def check(verify: => Unit) {
+    def check(verify: => Unit) : Unit = {
       count shouldBe 0
       verify
       count shouldBe 1
@@ -29,7 +28,7 @@ class MemoizeTest extends FunSpec {
   private class CounterizeGeneric[I[T], O[T]](func: I[_] => O[_]) {
     private var count = 0
 
-    def check(verify: => Unit) {
+    def check(verify: => Unit) : Unit = {
       count shouldBe 0
       verify
       count shouldBe 1
@@ -46,7 +45,7 @@ class MemoizeTest extends FunSpec {
   private class CounterizeGenericWithBase[BASE, I[T <: BASE], O[T <: BASE]](func: I[BASE] => O[BASE]) {
     private var count = 0
 
-    def check(verify: => Unit) {
+    def check(verify: => Unit) : Unit = {
       count shouldBe 0
       verify
       count shouldBe 1

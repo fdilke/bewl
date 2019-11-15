@@ -1,11 +1,10 @@
 package com.fdilke.bewl.fsets.monoid_actions
 
-import org.scalatest.FreeSpec
-import org.scalatest.Matchers._
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.should.Matchers._
+import com.fdilke.bewl.helper.StandardSymbols.{x,y,z}
 
-class CullRelatorsTest extends FreeSpec {
-  val (x, y, z) = ('x, 'y, 'z)
-
+class CullRelatorsTest extends AnyFreeSpec {
   "Culling relators" - {
     "preserves irredundant sets" in {
       CullRelators(

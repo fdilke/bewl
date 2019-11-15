@@ -4,10 +4,9 @@ package com.fdilke.bewl.topos.algebra.constructions
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsUtilities}
 import com.fdilke.bewl.topos.{GenericToposTests, ToposWithFixtures}
-import org.scalatest.Matchers._
+import org.scalatest.matchers.should.Matchers._
 
 import scala.Function.untupled
-import scala.language.higherKinds
 import com.fdilke.bewl.topos.algebra.KnownGroups.twoGroup
 
 class ToposOfGroupActionsTest extends GenericToposTests[

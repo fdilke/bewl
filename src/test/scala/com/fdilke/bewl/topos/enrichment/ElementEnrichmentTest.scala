@@ -2,12 +2,12 @@ package com.fdilke.bewl.topos.enrichment
 
 import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
-import org.scalatest.FreeSpec
-import org.scalatest.Matchers._
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.should.Matchers._
 
-import scala.language.{postfixOps, implicitConversions}
+import scala.language.{implicitConversions, postfixOps}
 
-class ElementEnrichmentTest extends FreeSpec {
+class ElementEnrichmentTest extends AnyFreeSpec {
   "Exponential element enrichments" - {
     "allow internal composition" in {
       val symbols = dot('a, 'b)

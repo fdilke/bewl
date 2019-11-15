@@ -1,11 +1,10 @@
 package com.fdilke.bewl.fsets
 
-import com.fdilke.bewl.topos.{GenericToposTests, ToposWithFixtures, Wrappings}
-import FiniteSetsUtilities._
+import com.fdilke.bewl.fsets.FiniteSetsUtilities._
+import com.fdilke.bewl.helper.StandardSymbols.boolean
 import com.fdilke.bewl.topos.Wrappings.NO_WRAPPER
-import org.scalatest.Matchers._
-
-import scala.language.higherKinds
+import com.fdilke.bewl.topos.{GenericToposTests, ToposWithFixtures}
+import org.scalatest.matchers.should.Matchers._
 
 class FiniteSetsTest extends GenericToposTests[
     Any, Any, Traversable, FiniteSetsPreArrow, NO_WRAPPER
@@ -66,7 +65,7 @@ class FiniteSetsTest extends GenericToposTests[
 
   describe("The Boolean property") {
     it("holds") {
-      topos shouldBe 'boolean
+      topos shouldBe boolean
     }
   }
 

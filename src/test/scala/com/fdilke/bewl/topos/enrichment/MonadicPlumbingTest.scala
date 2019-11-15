@@ -2,10 +2,10 @@ package com.fdilke.bewl.topos.enrichment
 
 import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.dot
-import org.scalatest.FreeSpec
-import org.scalatest.Matchers._
+import org.scalatest.matchers.should.Matchers._
+import org.scalatest.freespec.AnyFreeSpec
 
-class MonadicPlumbingTest extends FreeSpec {
+class MonadicPlumbingTest extends AnyFreeSpec {
 
   "The twist map" - {
     "is calculated properly for sets" in {

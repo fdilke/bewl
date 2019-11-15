@@ -2,10 +2,10 @@ package com.fdilke.bewl.topos.algebra
 
 import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
-import org.scalatest.FunSpec
-import org.scalatest.Matchers._
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers._
 
-class AlgebraicConstructionsTest extends FunSpec {
+class AlgebraicConstructionsTest extends AnyFunSpec {
 
   private val topos = com.fdilke.bewl.fsets.FiniteSets
   import topos._

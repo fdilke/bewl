@@ -1,17 +1,16 @@
 package com.fdilke.bewl.fsets.monoid_actions
 
 import com.fdilke.bewl.fsets.FiniteSets
-import com.fdilke.bewl.fsets.FiniteSets.{>, ToposOfMonoidActions, FindGenerators, FindGeneratorAnalysis }
+import com.fdilke.bewl.fsets.FiniteSets.{>, FindGeneratorAnalysis, FindGenerators, ToposOfMonoidActions}
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.dot
 import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
-import org.scalatest.FreeSpec
-import org.scalatest.Matchers._
+import com.fdilke.bewl.helper.StandardSymbols.{i, x, y}
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.should.Matchers._
 
-import scala.language.{ reflectiveCalls, postfixOps }
+import scala.language.{postfixOps, reflectiveCalls}
 
-class FindPresentationTest extends FreeSpec {
-
-  private val (i, x, y) = ('i, 'x, 'y)
+class FindPresentationTest extends AnyFreeSpec {
 
   import monoidOf3.{ Action, regularAction }
 

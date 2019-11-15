@@ -1,9 +1,10 @@
 package com.fdilke.bewl.topos.structures
 
 import com.fdilke.bewl.topos.BaseTopos
-import org.scalatest.Matchers._
+import org.scalatest.matchers._
+import org.scalatest.matchers.should.Matchers._
 
-import scala.language.{higherKinds, postfixOps, reflectiveCalls}
+import scala.language.{postfixOps, reflectiveCalls}
 
 trait Monads {
   Ɛ: BaseTopos =>
@@ -32,10 +33,13 @@ trait Monads {
       lazy val carrier = structure target
       lazy val local = apply(carrier)
 
-      def sanityTest =
-        (structure o local.eta) shouldBe carrier.identity
-      def sanityTest2 =
-        (structure o map(structure)) shouldBe (structure o local.mu)
+      def sanityTest : Unit = {
+        (structure o local.eta).shouldBe( carrier.identity )
+      }
+
+      def sanityTest2: Unit = {
+        (structure o map(structure)).shouldBe (structure o local.mu)
+      }
     }
   }
 

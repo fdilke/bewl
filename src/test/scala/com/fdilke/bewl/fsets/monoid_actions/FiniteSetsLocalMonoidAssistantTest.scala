@@ -5,13 +5,13 @@ import com.fdilke.bewl.fsets.FiniteSets.{>, LocalMonoidAssistant, ToposOfMonoidA
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import com.fdilke.bewl.helper.⊕
 import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
-import org.scalatest.FreeSpec
-import org.scalatest.Matchers._
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.should.Matchers._
 
 import scala.Function.untupled
-import scala.language.{existentials, postfixOps, reflectiveCalls, higherKinds}
+import scala.language.{existentials, postfixOps, reflectiveCalls}
 
-class FiniteSetsLocalMonoidAssistantTest extends FreeSpec {
+class FiniteSetsLocalMonoidAssistantTest extends AnyFreeSpec {
   
   private val (i, x, y) = ('i, 'x, 'y)
 

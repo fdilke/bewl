@@ -1,14 +1,12 @@
 package com.fdilke.bewl.fsets
 
 import com.fdilke.bewl.fsets.FiniteSets._
-import com.fdilke.bewl.fsets.FiniteSetsUtilities._
-import FiniteSetsUtilities.allMaps
-import org.scalatest.{FreeSpec, FunSpec, Matchers}
-import Matchers._
-import com.fdilke.bewl.topos.algebra.KnownMonoids
-import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
+import com.fdilke.bewl.fsets.FiniteSetsUtilities.{allMaps, _}
+import com.fdilke.bewl.helper.StandardSymbols.{source, target}
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.should.Matchers._
 
-class FiniteSetsUtilitiesTest extends FreeSpec {
+class FiniteSetsUtilitiesTest extends AnyFreeSpec {
   "allMaps()" - {
     "enumerates all maps between two sets" in {
       allMaps(Seq(1, 2), Set("a", "b", "c")) map {
@@ -25,7 +23,7 @@ class FiniteSetsUtilitiesTest extends FreeSpec {
     }
 
     "gives sensible results even when the target is empty" in {
-      allMaps(Seq(0), Seq()) shouldBe 'empty
+      allMaps(Seq(0), Seq()) shouldBe empty
     }
 
     "gives sensible results even when both source and target are empty" in {
@@ -46,8 +44,8 @@ class FiniteSetsUtilitiesTest extends FreeSpec {
         )
 
       doubleChar should have(
-        'source(numbers.power),
-        'target(omega)
+        source(numbers.power),
+        target(omega)
       )
 
       for {

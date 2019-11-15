@@ -2,10 +2,13 @@ package com.fdilke.bewl.topos
 
 import com.fdilke.bewl.helper.⊕
 import com.fdilke.bewl.topos.constructions.ConstructToposOfMonoidActions
-import org.scalatest.Matchers._
-import org.scalatest._
+import com.fdilke.bewl.helper.StandardSymbols.{iso, injective, epic, monic}
+import org.scalatest.matchers.should.Matchers._
 
-import scala.language.higherKinds
+import org.scalatest._
+import org.scalatest.funspec.AnyFunSpec
+
+import org.scalatest.matchers.should.Matchers._
 
 abstract class ToposFixtureSanityTests[
   ~,
@@ -15,7 +18,7 @@ abstract class ToposFixtureSanityTests[
   WRAPPER[T <: BASE] <: ~
 ] (
   fixtures: ToposWithFixtures[~, BASE, PREDOT, PREARROW, WRAPPER]
-) extends FunSpec {
+) extends AnyFunSpec {
   import fixtures._
 
   describe(s"The fixtures for ${fixtures.topos.getClass.getSimpleName}") {
@@ -171,7 +174,8 @@ abstract class GenericToposTests[
         x => productArrow(x)._2
       } shouldBe foo2baz
 
-      val fooXbar = foo x bar
+      val fooXbar: BIPRODUCT[FOO, BAR] =
+        foo x bar
       fooXbar(fooXbar) {
         ⊕ tupled fooXbar.pair
       } shouldBe fooXbar.identity
@@ -237,7 +241,7 @@ abstract class GenericToposTests[
         'target(bar > baz)
       )
 
-      implicit val _ = bar > baz
+      implicit val anonImplicit = bar > baz
       (foo x bar)(baz) {
         case f ⊕ b =>
           foo2bar2baz(f)(b)
@@ -380,17 +384,17 @@ abstract class GenericToposTests[
 
     it("can tell if an arrow is iso and if so, calculate the inverse") {
       val iI = I.identity
-      iI shouldBe 'iso
+      iI shouldBe iso
       iI.inverse shouldBe iI
 
-      I.diagonal shouldBe 'iso
+      I.diagonal shouldBe iso
 
       val fooI = foo.identity
-      fooI shouldBe 'iso
+      fooI shouldBe iso
       fooI.inverse shouldBe fooI
 
-      I -* foo shouldBe 'iso
-      foo *- I shouldBe 'iso
+      I -* foo shouldBe iso
+      foo *- I shouldBe iso
     }
 
     it("can do epic-mono factorizations (images)") {
@@ -402,16 +406,16 @@ abstract class GenericToposTests[
         BAR > BAR
       ) = foo2bar.factorizeEpiMono
 
-      epic shouldBe 'epic
-      monic shouldBe 'monic
+      epic shouldBe epic
+      monic shouldBe monic
       (monic o epic) shouldBe foo2bar
     }
     
     if (!inActionTopos) { // reluctantly skip, too slow with current technology
       it("has sane injectives") {
-      	O should not be 'injective
-      	I shouldBe 'injective
-        omega shouldBe 'injective
+      	O should not be injective
+      	I shouldBe injective
+        omega shouldBe injective
       }
     }
 
@@ -430,11 +434,11 @@ abstract class GenericToposTests[
 
           localImage.restrict(
             defaultImage.inclusion
-          ) shouldBe 'iso
+          ) shouldBe iso
 
           defaultImage.restrict(
             localImage.inclusion
-          ) shouldBe 'iso
+          ) shouldBe iso
         }
       }
 

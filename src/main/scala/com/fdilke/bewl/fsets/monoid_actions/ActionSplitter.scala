@@ -3,7 +3,7 @@ package com.fdilke.bewl.fsets.monoid_actions
 import com.fdilke.bewl.fsets.BaseFiniteSets
 import com.fdilke.bewl.helper.BuildEquivalence
 
-import scala.language.{higherKinds, postfixOps, reflectiveCalls}
+import scala.language.{postfixOps, reflectiveCalls}
 
 trait ActionSplitter extends BaseFiniteSets {
   Ɛ: FindGenerators with FindPresentation =>

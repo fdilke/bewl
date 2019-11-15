@@ -345,5 +345,9 @@ Then:
 - Get rid of the 'maskables' code
 - Complete the 'alt' construction of ToposOfActions, which will now need less wrapping.
 
- 
+# fixes from upgrading to Scala 2.13.1
+
+can get rid of "anonImplicit" which used to be "_" ?
+look up "implicit best practices" ?
+get rid of Traversable - should be Iterable
  

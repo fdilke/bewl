@@ -4,7 +4,7 @@ import com.fdilke.bewl.helper.Memoize
 import com.fdilke.bewl.topos.{ToposAlgebra, ToposEnrichments, ToposStructures, _}
 import com.fdilke.bewl.topos.algebra.{AlgebraicMachinery, AlgebraicStructures}
 
-import scala.language.{higherKinds, postfixOps, reflectiveCalls}
+import scala.language.{postfixOps, reflectiveCalls}
 
 trait ConstructToposOfAutomorphisms extends
   BaseTopos with

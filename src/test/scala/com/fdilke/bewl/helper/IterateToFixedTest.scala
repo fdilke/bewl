@@ -1,11 +1,11 @@
 package com.fdilke.bewl.helper
 
-import org.scalatest.FreeSpec
-import org.scalatest.Matchers._
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.should.Matchers._
 
 import scala.collection.mutable.ListBuffer
 
-class IterateToFixedTest extends FreeSpec {
+class IterateToFixedTest extends AnyFreeSpec {
 
   "Iterating to a fixed point"- {
     "works" in {

@@ -1,12 +1,13 @@
 package com.fdilke.bewl.fsets.monoid_actions
 
 import com.fdilke.bewl.fsets.FiniteSets
-import com.fdilke.bewl.fsets.FiniteSets.{>, ToposOfMonoidActions, FindGenerators, FindGeneratorAnalysis, Monoid, FindPresentation }
+import com.fdilke.bewl.fsets.FiniteSets.{>, FindGeneratorAnalysis, FindGenerators, FindPresentation, Monoid, ToposOfMonoidActions}
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.dot
-import org.scalatest.FreeSpec
-import org.scalatest.Matchers._
+import com.fdilke.bewl.helper.StandardSymbols
+import com.fdilke.bewl.helper.StandardSymbols.{i, iso}
+import org.scalatest.matchers.should.Matchers._
 
-import scala.language.{ reflectiveCalls, postfixOps }
+import scala.language.{postfixOps, reflectiveCalls}
 
 object CheckExtractPresentation {
   def apply[M, A](
@@ -29,7 +30,7 @@ object CheckExtractPresentation {
     for {
       (g, index) <- generatorsWithRelators.zipWithIndex
     } {
-      g.relators should not contain Relator('i, index, 'i)
+      g.relators should not contain Relator(i, index, i)
     }
 
     val presentedAction =
@@ -55,6 +56,6 @@ object CheckExtractPresentation {
       theProjection
     ) shouldBe true
 
-    theProjection shouldBe 'iso
+    theProjection shouldBe iso
   }
 }

@@ -4,15 +4,14 @@ import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSets.{>, ToposOfMonoidActions, VOID}
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
-import org.scalatest.FreeSpec
-import org.scalatest.Matchers._
+import org.scalatest.freespec.AnyFreeSpec
+import com.fdilke.bewl.helper.StandardSymbols.{i, x, y, a, b, c, r, s, source, target}
+import org.scalatest.matchers.should.Matchers._
 
 import scala.language.{existentials, reflectiveCalls}
 
-class PresentationTest extends FreeSpec {
+class PresentationTest extends AnyFreeSpec {
 
-  private val (i, x, y, a, b, c, r, s) = ('i, 'x, 'y, 'a, 'b, 'c, 'r, 's)
-  
   private val actionTopos =
       ToposOfMonoidActions of monoidOf3
       
@@ -32,8 +31,8 @@ class PresentationTest extends FreeSpec {
           Seq[VOID]()
         )
       emptyProjection should have(
-        'source(presentation.action.actionCarrier),
-        'target(emptyAction.actionCarrier)
+        source(presentation.action.actionCarrier),
+        target(emptyAction.actionCarrier)
       )
 	    monoidOf3.actions.isMorphism(
         presentation.action,
@@ -65,8 +64,8 @@ class PresentationTest extends FreeSpec {
           )
         )
       regularProjection should have(
-        'source(presentation.action.actionCarrier),
-        'target(regularAction.actionCarrier)
+        source(presentation.action.actionCarrier),
+        target(regularAction.actionCarrier)
       )
 	    monoidOf3.actions.isMorphism(
         presentation.action,
@@ -104,8 +103,8 @@ class PresentationTest extends FreeSpec {
           )
         )
       idealProjection should have(
-        'source(presentation.action.actionCarrier),
-        'target(idealCarrier)
+        source(presentation.action.actionCarrier),
+        target(idealCarrier)
       )
 	    monoidOf3.actions.isMorphism(
         presentation.action,
@@ -163,8 +162,8 @@ class PresentationTest extends FreeSpec {
           )
         )
       twoProjection should have(
-        'source(presentation.action.actionCarrier),
-        'target(twoCarrier)
+        source(presentation.action.actionCarrier),
+        target(twoCarrier)
       )
 	    end2.actions.isMorphism(
         presentation.action,

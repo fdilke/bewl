@@ -1,7 +1,5 @@
 package com.fdilke.bewl.helper
 
-import scala.language.higherKinds
-
 object Memoize {
   def apply[INPUT, OUTPUT](
     function: INPUT => OUTPUT

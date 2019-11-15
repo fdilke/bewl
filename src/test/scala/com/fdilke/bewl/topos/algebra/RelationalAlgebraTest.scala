@@ -3,10 +3,10 @@ package com.fdilke.bewl.topos.algebra
 import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import Relation._
-import org.scalatest.FunSpec
-import org.scalatest.Matchers._
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers._
 
-class RelationalAlgebraTest extends FunSpec {
+class RelationalAlgebraTest extends AnyFunSpec {
 
   describe("The diagonal relation") {
     it("is as expected for sets") {

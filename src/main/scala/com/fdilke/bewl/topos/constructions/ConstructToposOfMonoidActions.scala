@@ -4,7 +4,6 @@ import com.fdilke.bewl.topos._
 import com.fdilke.bewl.helper.Memoize
 import com.fdilke.bewl.topos.algebra.{AlgebraicStructures, AlgebraicMachinery}
 import com.fdilke.bewl.helper.{Memoize, ⊕}
-import scala.language.higherKinds
 import scala.language.reflectiveCalls
 
 trait ConstructToposOfMonoidActions extends

@@ -5,7 +5,7 @@ import com.fdilke.bewl.fsets.FiniteSets.{ToposOfMonoidActions, ~}
 import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsUtilities}
 import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
 import com.fdilke.bewl.topos.{GenericToposTests, Topos, ToposWithFixtures, Wrappings}
-import org.scalatest.Matchers._
+import org.scalatest.matchers.should.Matchers._
 
 import scala.Function.untupled
 

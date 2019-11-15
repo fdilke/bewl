@@ -4,12 +4,12 @@ import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import com.fdilke.bewl.helper.ContinuousIntegration.notOnCI
 import com.fdilke.bewl.helper.⊕._
-import org.scalatest.FreeSpec
-import org.scalatest.Matchers._
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.should.Matchers._
 
 import scala.language.{implicitConversions, postfixOps, reflectiveCalls}
 
-class ContinuationMonadTest extends FreeSpec {
+class ContinuationMonadTest extends AnyFreeSpec {
   private val two = dot('x, 'y)
 
   import FiniteSets._

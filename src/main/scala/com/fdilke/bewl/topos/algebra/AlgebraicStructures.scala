@@ -2,8 +2,6 @@ package com.fdilke.bewl.topos.algebra
 
 import com.fdilke.bewl.topos._
 
-import scala.language.higherKinds
-
 trait AlgebraicStructures extends
   BaseTopos with
   ToposEnrichments with

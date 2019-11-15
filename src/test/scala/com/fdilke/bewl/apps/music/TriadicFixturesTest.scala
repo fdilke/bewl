@@ -6,10 +6,10 @@ import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import com.fdilke.bewl.helper.⊕
 import TriadicFixtures._
 import com.fdilke.bewl.fsets.monoid_actions.{CheckExtractPresentation, CheckLocalMorphismEnumerator}
-import org.scalatest.{FreeSpec, Ignore}
-import org.scalatest.Matchers._
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.should.Matchers._
 
-class TriadicFixturesTest extends FreeSpec {
+class TriadicFixturesTest extends AnyFreeSpec {
 
   def enumeratesMorphisms[X, Y](
     sourceAction: triadicMonoid.Action[X],

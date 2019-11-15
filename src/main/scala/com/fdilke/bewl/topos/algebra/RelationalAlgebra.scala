@@ -2,7 +2,7 @@ package com.fdilke.bewl.topos.algebra
 
 import com.fdilke.bewl.helper.IterateToFixed
 import com.fdilke.bewl.topos.{BaseTopos, ToposEnrichments, ToposPrerequisites, ToposStructures}
-import scala.language.{higherKinds, postfixOps}
+import scala.language.postfixOps
 
 trait RelationalAlgebra extends BaseTopos with
   ToposEnrichments {

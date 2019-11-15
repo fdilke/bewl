@@ -2,7 +2,7 @@ package com.fdilke.bewl.fsets.monoid_actions
 
 import com.fdilke.bewl.fsets.{BaseFiniteSets, FiniteSets}
 
-import scala.language.{higherKinds, postfixOps}
+import scala.language.postfixOps
 
 trait AbstractCyclic[A] {
   val generator: A

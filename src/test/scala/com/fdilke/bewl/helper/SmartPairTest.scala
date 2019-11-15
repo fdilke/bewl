@@ -1,10 +1,10 @@
 package com.fdilke.bewl.helper
 
-import org.scalatest.FreeSpec
-import org.scalatest.Matchers._
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.should.Matchers._
 import ⊕._
 
-class SmartPairTest extends FreeSpec {
+class SmartPairTest extends AnyFreeSpec {
 
   "Smart pairs"- {
     "allow their components to be accessed" in {

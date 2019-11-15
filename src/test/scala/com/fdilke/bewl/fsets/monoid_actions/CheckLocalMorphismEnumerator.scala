@@ -2,7 +2,7 @@ package com.fdilke.bewl.fsets.monoid_actions
 
 import com.fdilke.bewl.fsets.FiniteSets
 import FiniteSets.{Monoid, >, DefaultMonoidAssistant, LocalMonoidAssistant, ToposOfMonoidActions, bifunctionAsBiArrow, functionAsArrow}
-import org.scalatest.Matchers._
+import org.scalatest.matchers.should.Matchers._
 import com.fdilke.bewl.testutil.CustomMatchers._
 
 object CheckLocalMorphismEnumerator {
@@ -12,7 +12,7 @@ object CheckLocalMorphismEnumerator {
     sourceAction: monoid.Action[X],
     targetAction: monoid.Action[Y],
     thorough: Boolean
-  ) {
+  ) : Unit = {
     val localAnalyzer: monoid.ActionAnalyzer =
       LocalMonoidAssistant.actionAnalyzer(
         monoid

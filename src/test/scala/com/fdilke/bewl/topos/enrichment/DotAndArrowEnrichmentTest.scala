@@ -2,14 +2,14 @@ package com.fdilke.bewl.topos.enrichment
 
 import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
-import org.scalatest.FunSpec
-import org.scalatest.Matchers._
+import org.scalatest.matchers.should.Matchers._
 
 import scala.Function.untupled
 import com.fdilke.bewl.topos.algebra.KnownGroups.twoGroup
 import com.fdilke.bewl.helper.⊕
+import org.scalatest.funspec.AnyFunSpec
 
-class DotAndArrowEnrichmentTest extends FunSpec {
+class DotAndArrowEnrichmentTest extends AnyFunSpec {
 
   describe("The universal quantifier") {
     it("detects whether a subobject is the whole object") {

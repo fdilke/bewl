@@ -5,15 +5,13 @@ import com.fdilke.bewl.fsets.FiniteSets.ActionComponent
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.{dot, elementsOf}
 import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
 import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3.Action
-import org.scalatest.FreeSpec
-import org.scalatest.Matchers._
+import org.scalatest.matchers.should.Matchers._
 
+import org.scalatest.freespec.AnyFreeSpec
+import com.fdilke.bewl.helper.StandardSymbols.{i,x,y}
 import scala.language.{postfixOps, reflectiveCalls}
 
-class ActionSplitterTest extends FreeSpec {
-
-  private val (i, x, y) = ('i, 'x, 'y)
-
+class ActionSplitterTest extends AnyFreeSpec {
   import monoidOf3.regularAction
 
   private val splitter: FiniteSets.ActionSplitter[
