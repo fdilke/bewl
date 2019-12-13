@@ -5,16 +5,18 @@ import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import com.fdilke.bewl.helper.ContinuousIntegration.notOnCI
 import com.fdilke.bewl.helper.⊕._
 import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.matchers.should.Matchers.{ a => _, _ }
+import com.fdilke.bewl.helper.StandardSymbols._
 
 import scala.language.{implicitConversions, postfixOps, reflectiveCalls}
 
 class ContinuationMonadTest extends AnyFreeSpec {
-  private val two = dot('x, 'y)
+  private val two = dot(x, y)
 
   import FiniteSets._
 
-  val continuation = continuationMonad(omega)
+  private val continuation: ContinuationMonad[TRUTH] =
+    continuationMonad(omega)
 
   "For the continuation (double-exponential) monad on sets" - {
     "values at a dot are cached" in {
@@ -28,20 +30,22 @@ class ContinuationMonadTest extends AnyFreeSpec {
     }
 
     "embedding (eta) works" in {
-      val eta: Symbol > (Symbol → TRUTH → TRUTH) = continuation(two).eta
+      val eta: Symbol > (Symbol → TRUTH → TRUTH) =
+        continuation(two).eta
+
       for {
         f <- elementsOf(two > omega)
-        symbol <- Seq('x, 'y)
+        symbol <- Seq(x, y)
       }
         eta(symbol)(f) shouldBe f(symbol)
     }
 
     "functoriality (map) works" in {
-      val symbols = dot('a, 'b)
+      val symbols = dot(a, b)
       val ints = dot(1, 2, 3)
       val f: Symbol > Int = arrow(symbols, ints)(
-        'a -> 2,
-        'b -> 1
+        a -> 2,
+        b -> 1
       )
       val map: (
         Symbol → TRUTH → TRUTH
@@ -49,7 +53,8 @@ class ContinuationMonadTest extends AnyFreeSpec {
         Int → TRUTH → TRUTH
       ) = continuation map f
 
-      implicit val forSoo = symbols > omega > omega
+      implicit val forSoo: EXPONENTIAL[Symbol → TRUTH, TRUTH] =
+        symbols > omega > omega
 
       for {
         soo <- elementsOf(symbols > omega > omega)
@@ -60,7 +65,7 @@ class ContinuationMonadTest extends AnyFreeSpec {
 
     "tensorial strength is calculated correctly" in notOnCI {
       val ints = dot(1, 2)
-      val symbols = dot('a, 'b)
+      val symbols = dot(a, b)
 
       val mSymbols = continuation(symbols).free
 
@@ -78,8 +83,8 @@ class ContinuationMonadTest extends AnyFreeSpec {
         )
 
       strength should have (
-        'source(ints x mSymbols),
-        'target(
+        source(ints x mSymbols),
+        target(
           continuation(
             ints x symbols
           ).free
@@ -109,7 +114,7 @@ class ContinuationMonadTest extends AnyFreeSpec {
 
     "functorial strength is calculated correctly" in {
       val ints = dot(1)
-      val symbols = dot('a, 'b)
+      val symbols = dot(a, b)
 
       val mInts = continuation(ints).free
       val mSymbols = continuation(symbols).free
@@ -128,8 +133,8 @@ class ContinuationMonadTest extends AnyFreeSpec {
         )
 
       strength should have (
-        'source(ints > symbols),
-        'target(mInts > mSymbols)
+        source(ints > symbols),
+        target(mInts > mSymbols)
       )
 
       for {
@@ -178,8 +183,8 @@ class ContinuationMonadTest extends AnyFreeSpec {
 
     "defines a valid home algebra structure map" in {
       continuation.home.structure should have (
-        'source(omega > omega > omega),
-        'target(omega)
+        source(omega > omega > omega),
+        target(omega)
       )
 
       val id: TRUTH → TRUTH =

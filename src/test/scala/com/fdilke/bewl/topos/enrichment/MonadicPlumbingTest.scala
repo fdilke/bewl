@@ -2,15 +2,15 @@ package com.fdilke.bewl.topos.enrichment
 
 import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.dot
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.matchers.should.Matchers.{ a => _, _ }
 import org.scalatest.freespec.AnyFreeSpec
-import com.fdilke.bewl.helper.StandardSymbols.{iso, source, target}
+import com.fdilke.bewl.helper.StandardSymbols.{a, b, iso, source, target}
 
 class MonadicPlumbingTest extends AnyFreeSpec {
 
   "The twist map" - {
     "is calculated properly for sets" in {
-      val symbols = dot('A, 'B)
+      val symbols = dot(a, b)
       val numbers = dot(1, 2, 3)
 
       twist(
@@ -36,7 +36,7 @@ class MonadicPlumbingTest extends AnyFreeSpec {
 
   "The associator" - {
     "is calculated properly for sets" in {
-      val symbols = dot('A, 'B)
+      val symbols = dot(a, b)
       val numbers = dot(1, 2)
       val strings = dot("foo", "bar")
 
@@ -60,7 +60,7 @@ class MonadicPlumbingTest extends AnyFreeSpec {
 
   "The coassociator" - {
     "is calculated properly for sets" in {
-      val symbols = dot('A, 'B)
+      val symbols = dot(a, b)
       val numbers = dot(1, 2)
       val strings = dot("foo", "bar")
 

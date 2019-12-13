@@ -469,7 +469,7 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
 
   describe("The intersection operator ⋀") {
     it("is correctly calculated for sets") {
-      val symbols = dot('A, 'B, 'C)
+      val symbols = dot(a, b, c)
 
       val intersection: Symbol > TRUTH =
         symbols.⋀(

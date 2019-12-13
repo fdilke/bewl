@@ -18,7 +18,7 @@ class VerifyLengthTest extends AnyFreeSpec {
       ) shouldBe false
     }
     "takes no more than it needs" in {
-      lazy val N: Stream[Int] =
+      lazy val N: LazyList[Int] =
         0 #:: (
           N map { _ + 1 }
         )
