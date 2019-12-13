@@ -2,12 +2,9 @@ package com.fdilke.bewl.topos.algebra
 
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.funspec.AnyFunSpec
-import org.scalatest.matchers.dsl.MatcherWords.be
-import org.scalatest.matchers.should.Matchers.not
-import org.scalatest.matchers.should.Matchers.convertToStringShouldWrapper
-import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
-
+import org.scalatest.matchers.should.Matchers.{ a => _, _ }
 import com.fdilke.bewl.helper.StandardSymbols.{i, x, y, a, b, c, d, e, f, f2, g, g2, r, s, commutative}
+
 class AlgebraicStructuresTest extends AnyFunSpec {
 
   import com.fdilke.bewl.fsets.FiniteSets._

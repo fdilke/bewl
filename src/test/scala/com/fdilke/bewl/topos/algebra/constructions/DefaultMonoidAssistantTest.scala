@@ -9,11 +9,10 @@ import org.scalatest.matchers.should.Matchers._
 
 import scala.Function.untupled
 import scala.language.{existentials, reflectiveCalls}
+import com.fdilke.bewl.helper.StandardSymbols.{i, x, y, source, target}
 
 class DefaultMonoidAssistantTest extends AnyFreeSpec {
   
-  private val (i, x, y) = ('i, 'x, 'y)
-
   import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
   import monoidOf3.regularAction
   
@@ -60,8 +59,8 @@ class DefaultMonoidAssistantTest extends AnyFreeSpec {
         )
       rawExponential.exponentialAction.sanityTest
       rawExponential.evaluation.arrow should have(
-        'source(rawExponential.exponentialAction.actionCarrier x barDot),
-        'target(bazDot)
+        source(rawExponential.exponentialAction.actionCarrier x barDot),
+        target(bazDot)
       )
       monoidOf3.actions.isMorphism(
         rawExponential.exponentialAction x bar, 
@@ -84,8 +83,8 @@ class DefaultMonoidAssistantTest extends AnyFreeSpec {
       val foo2bar2baz = rawExponential.transpose(foo, foobar2baz)
       foo2bar2baz.sanityTest
       foo2bar2baz should have(
-        'source(foo.actionCarrier),
-        'target(exponentialDot)
+        source(foo.actionCarrier),
+        target(exponentialDot)
       )
       (foo.actionCarrier x barDot)(bazDot) {
         case f ⊕ b =>

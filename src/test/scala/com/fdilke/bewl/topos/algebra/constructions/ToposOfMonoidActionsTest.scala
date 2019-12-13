@@ -5,7 +5,8 @@ import com.fdilke.bewl.fsets.FiniteSets.{ToposOfMonoidActions, ~}
 import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsUtilities}
 import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
 import com.fdilke.bewl.topos.{GenericToposTests, Topos, ToposWithFixtures, Wrappings}
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.matchers.should.Matchers.{ a => _, _ }
+import com.fdilke.bewl.helper.StandardSymbols.{i, x, y, minimal, boolean, iso }
 
 import scala.Function.untupled
 
@@ -42,8 +43,6 @@ class ToposOfMonoidActionsTest(
     ({type λ[X <: ~, Y <: ~] = monoidOf3.ActionPreArrow[X, Y]}) # λ,
     ({type λ[T <: ~] = T}) # λ
   ] {
-
-    private val (i, x, y) = ('i, 'x, 'y)
 
     override val topos = actionTopos
     import topos._
@@ -100,7 +99,7 @@ class ToposOfMonoidActionsTest(
 
       val foo2wiz =
         functionAsArrow(foo, wiz, Map(
-          'i -> 1, 'x -> 1, 'y -> 2
+          i -> 1, x -> 1, y -> 2
         ))
 
       type WIZ = Int
@@ -130,13 +129,13 @@ class ToposOfMonoidActionsTest(
     it("is isomorphic to the empty action") {
       topos.makeDot(
         monoidOf3.voidAction
-      ).fromO shouldBe 'iso
+      ).fromO shouldBe iso
     }
   }
 
   describe("The Boolean property") {
     it("fails") {
-      topos should not be 'boolean
+      topos should not be boolean
     }
   }
 
@@ -146,9 +145,9 @@ class ToposOfMonoidActionsTest(
     }
 
     it("works on the fixtures") {
-      foo.globals shouldBe 'empty
-      bar.globals shouldBe 'empty
-      baz.globals shouldBe 'empty
+      foo.globals shouldBe empty
+      bar.globals shouldBe empty
+      baz.globals shouldBe empty
     }
   }
 
@@ -181,12 +180,12 @@ class ToposOfMonoidActionsTest(
 
   describe("Minimality") {
     it("should hold for the right objects") {
-      foo shouldNot be('minimal)
-      bar should be('minimal)
-      baz shouldNot be('minimal)
-      O shouldNot be('minimal)
-      I should be('minimal)
-      omega shouldNot be('minimal)
+      foo shouldNot be(minimal)
+      bar should be(minimal)
+      baz shouldNot be(minimal)
+      O shouldNot be(minimal)
+      I should be(minimal)
+      omega shouldNot be(minimal)
     }
   }
 }

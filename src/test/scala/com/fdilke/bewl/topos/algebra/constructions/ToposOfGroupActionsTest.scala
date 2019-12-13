@@ -1,13 +1,13 @@
 
 package com.fdilke.bewl.topos.algebra.constructions
 
-import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsUtilities}
+import com.fdilke.bewl.helper.StandardSymbols.{a, boolean, i}
+import com.fdilke.bewl.topos.algebra.KnownGroups.twoGroup
 import com.fdilke.bewl.topos.{GenericToposTests, ToposWithFixtures}
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.matchers.should.Matchers.{a => _, _}
 
 import scala.Function.untupled
-import com.fdilke.bewl.topos.algebra.KnownGroups.twoGroup
 
 class ToposOfGroupActionsTest extends GenericToposTests[
   Any,
@@ -24,12 +24,9 @@ class ToposOfGroupActionsTest extends GenericToposTests[
     ({type λ[T] = T}) # λ
   ] {
 
-    private val (i, a) =
-      ('i, 'a)
-
     override val topos = FiniteSets.ToposOfGroupActions of twoGroup
 
-    import topos.{ ~ => _, _ }
+    import topos.{~ => _, _}
 
     override type FOO = Symbol
     override type BAR = String
@@ -91,7 +88,7 @@ class ToposOfGroupActionsTest extends GenericToposTests[
 
   describe("The Boolean property") {
     it("holds") {
-      topos shouldBe 'boolean
+      topos shouldBe boolean
     }
   }
 
@@ -101,7 +98,7 @@ class ToposOfGroupActionsTest extends GenericToposTests[
     }
 
     it("works on the fixtures") {
-      foo.globals shouldBe 'empty
+      foo.globals shouldBe empty
       bar.globals should have size 1
       baz.globals should have size 1
     }

@@ -7,8 +7,9 @@ import scala.Function.untupled
 import com.fdilke.bewl.topos.algebra.KnownGroups.twoGroup
 import com.fdilke.bewl.helper.⊕
 import org.scalatest.funspec.AnyFunSpec
-import com.fdilke.bewl.helper.StandardSymbols.{injective, source, target, b, monic, epic, minimal, simple, section, retraction}
-import org.scalatest.matchers.should.Matchers._
+import com.fdilke.bewl.helper.StandardSymbols.{a, b, c, epic, injective, minimal, monic, retraction, section, simple, source, target}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.matchers.should.Matchers.{a => _, _}
 
 class DotAndArrowEnrichmentTest extends AnyFunSpec {
 
@@ -147,21 +148,21 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
 
   describe("Functional relations") {
     it("can be converted to arrows") {
-      val symbols = dot('A, 'B, 'C)
+      val symbols = dot(a, b, c)
       val numbers = dot(1, 2, 3)
       symbols.arrowFromFunctionalRelation(
         numbers
       )(
         untupled(
           Map(
-            ('A, 1) -> false, ('A, 2) -> true,  ('A, 3) -> false,
-            ('B, 1) -> true,  ('B, 2) -> false, ('B, 3) -> false,
-            ('C, 1) -> true,  ('C, 2) -> false, ('C, 3) -> false
+            (a, 1) -> false, (a, 2) -> true,  (a, 3) -> false,
+            (b, 1) -> true,  (b, 2) -> false, (b, 3) -> false,
+            (c, 1) -> true,  (c, 2) -> false, (c, 3) -> false
           )
         )
       ) shouldBe
         arrow(symbols, numbers)(
-          'A -> 2, 'B -> 1, 'C -> 1
+          a -> 2, b -> 1, c -> 1
         )
     }
   }
@@ -175,7 +176,7 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
         source(set),
         target(pac.classifier)
       )
-      pac.include shouldBe 'monic
+      pac.include shouldBe monic
       pac.⏊ should have (
         source(I),
         target(pac.classifier)
@@ -183,9 +184,9 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
       pac.⏊ shouldBe pac.extend(O.toI, set.fromO)
       Seq(0, 1) map pac.⏊(()) shouldBe Seq(false, false)
 
-      val foo = dot('a, 'b)
+      val foo = dot(a, b)
       val subFoo = dot(true)
-      val inclusion = arrow(subFoo, foo)(true -> 'a)
+      val inclusion = arrow(subFoo, foo)(true -> a)
       val subFoo2set = arrow(subFoo, set)(true -> 1)
 
       val foo2setStar = pac.extend(inclusion, subFoo2set)
@@ -195,7 +196,7 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
       )
       val imageOf0 = pac.include(0)
       val imageOf1 = pac.include(1)
-      foo2setStar('a) shouldBe imageOf1
+      foo2setStar(a) shouldBe imageOf1
 
       foo2setStar(b) shouldBe pac.⏊(())
       foo2setStar(b) should not be imageOf0
@@ -206,7 +207,7 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
   describe("Coproducts") {
     it("should give the expected construction for sets") {
       val foo = dot(0, 1)
-      val bar = dot('a, 'b, 'c)
+      val bar = dot(a, b, c)
       val coproduct = foo + bar
 
       coproduct should have size 5
@@ -223,7 +224,7 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
 
       val tgt = dot("P", "Q", "R")
       val foo2target = arrow(foo, tgt)(0 -> "Q", 1 -> "P")
-      val bar2target = arrow(bar, tgt)('a -> "R", 'b -> "P", 'c -> "Q")
+      val bar2target = arrow(bar, tgt)(a -> "R", b -> "P", c -> "Q")
       val sum = foo2target + bar2target
 
       sum should have (
@@ -237,21 +238,21 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
 
   describe("Universality of a predicate") {
     it("can be tested for sets") {
-      val symbols = dot('A, 'B, 'C)
+      val symbols = dot(a, b, c)
 
       symbols.universally { _ => true } shouldBe true
-      symbols.universally { _ == 'A } shouldBe false
+      symbols.universally { _ == a } shouldBe false
     }
   }
 
   describe("Epi-mono factorizations") {
     it("give the expected result for sets") {
-      val symbols = dot('A, 'B, 'C)
+      val symbols = dot(a, b, c)
       val numbers = dot(1, 2, 3, 4)
       val anArrow = arrow(symbols, numbers)(
-        'A -> 2,
-        'B -> 2,
-        'C -> 3
+        a -> 2,
+        b -> 2,
+        c -> 3
       )
       val (
         theEpic,
@@ -270,15 +271,15 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
 
   describe("Quotients") {
     it("give the expected construction for sets") {
-      val symbols = dot('A, 'B, 'C)
+      val symbols = dot(a, b, c)
       val identifyBandC =
         relationFrom(
           symbols,
-          'A -> 'A,
-          'B -> 'B,
-          'C -> 'C,
-          'B -> 'C,
-          'C -> 'B
+          a -> a,
+          b -> b,
+          c -> c,
+          b -> c,
+          c -> b
         )
 
       val quotient =
@@ -289,8 +290,8 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
       quotientArrow.sanityTest
       quotientArrow.source shouldBe symbols
       quotientArrow shouldBe epic
-      quotientArrow('A) should not be quotientArrow('B)
-      quotientArrow('B) shouldBe quotientArrow('C)
+      quotientArrow(a) should not be quotientArrow(b)
+      quotientArrow(b) shouldBe quotientArrow(c)
 
       val quotientObject: DOT[QUOTIENT[Symbol]] =
         quotientArrow.target
@@ -301,9 +302,9 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
       val numbers = dot(1, 2, 3)
       val arrowToLift =
         arrow(symbols, numbers) (
-          'A -> 2,
-          'B -> 3,
-          'C -> 3
+          a -> 2,
+          b -> 3,
+          c -> 3
         )
       val lifted: QUOTIENT[Symbol] > Int =
         quotient.lift(arrowToLift)
@@ -315,16 +316,16 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
 
   describe("Coequalizers") {
     it("should give the expected construction for sets") {
-      val symbols = dot('A, 'B)
+      val symbols = dot(a, b)
       val numbers = dot(1, 2, 3, 4)
 
       val f1 = arrow(symbols, numbers)(
-        'A -> 1,
-        'B -> 3
+        a -> 1,
+        b -> 3
       )
       val f2 = arrow(symbols, numbers)(
-        'A -> 2,
-        'B -> 4
+        a -> 2,
+        b -> 4
       )
       val coequalizer =
         f1 =? f2
@@ -352,16 +353,16 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
     }
 
     it("should give the expected construction for sets (fast version)") {
-      val symbols = dot('A, 'B)
+      val symbols = dot(a, b)
       val numbers = dot(1, 2, 3, 4)
 
       val f1 = arrow(symbols, numbers)(
-        'A -> 1,
-        'B -> 3
+        a -> 1,
+        b -> 3
       )
       val f2 = arrow(symbols, numbers)(
-        'A -> 2,
-        'B -> 4
+        a -> 2,
+        b -> 4
       )
       val coequalizer =
         f1 =?! f2
@@ -391,7 +392,7 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
 
   describe("The projection operations *-, -*") {
     it("are correctly calculated for sets") {
-      val symbols = dot('A, 'B, 'C)
+      val symbols = dot(a, b, c)
       val numbers = dot(1, 2, 3)
 
       symbols *- numbers shouldBe
@@ -409,11 +410,11 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
   describe("The contravariant exponential functor H ^ _") {
   	it("behaves as expected") {
   		val h = dot(true, false)
-  				val symbols = dot('A, 'B, 'C)
+  				val symbols = dot(a, b, c)
   				val numbers = dot(1, 2, 3)
   				val f: Symbol > Int =
   				arrow(symbols, numbers)(
-  						'A -> 2, 'B -> 1, 'C -> 1
+  						a -> 2, b -> 1, c -> 1
   						)
   				val h_f: (Int → Boolean) > (Symbol → Boolean) =
   				h > f
@@ -429,11 +430,11 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
   describe("The covariant exponential functor _ ^ H") {
     it("behaves as expected") {
       val h = dot(true, false)
-      val symbols = dot('A, 'B, 'C)
+      val symbols = dot(a, b, c)
       val numbers = dot(1, 2, 3)
       val f: Symbol > Int =
         arrow(symbols, numbers)(
-          'A -> 2, 'B -> 1, 'C -> 1
+          a -> 2, b -> 1, c -> 1
         )
       val f_h: (Boolean → Symbol) > (Boolean → Int) =
         f > h
@@ -475,48 +476,48 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
           doubleCharacteristic(
             symbols
           )(
-            Set('A, 'B),
-            Set('A, 'C)
+            Set(a, b),
+            Set(a, c)
           )
         )
       intersection shouldBe
         symbols(omega) {
-          _ == 'A
+          _ == a
         }
     }
   }
 
   describe("Sections") {
 	  it("are detected correctly for sets") {
-		  val symbols = dot('A, 'B)
+		  val symbols = dot(a, b)
 				  val numbers = dot(1, 2, 3)
 				  val theSection: Symbol > Int =
 				  arrow(symbols, numbers)(
-            'A -> 2, 'B -> 1
+            a -> 2, b -> 1
           )
 				  theSection should be a section
 				  val nonsection: Symbol > Int =
 				  arrow(symbols, numbers)(
-						  'A -> 2, 'B -> 2
-						  )
-				  nonsection should not be a (section)
+						  a -> 2, b -> 2
+          )
+				  nonsection should not be Matchers.a (section)
 	  }
   }
   
   describe("Retractions") {
     it("are detected correctly for sets") {
-      val symbols = dot('A, 'B, 'C)
+      val symbols = dot(a, b, c)
       val numbers = dot(1, 2)
       val section: Symbol > Int =
       arrow(symbols, numbers)(
-      		'A -> 2, 'B -> 1, 'C -> 1
-      		)
+      		a -> 2, b -> 1, c -> 1
+      )
       section should be a retraction
       val nonsection: Symbol > Int =
         arrow(symbols, numbers)(
-          'A -> 2, 'B -> 2, 'C -> 2
+          a -> 2, b -> 2, c -> 2
         )
-        nonsection should not be a (retraction)
+      nonsection should not be Matchers.a (retraction)
     }
   }
   

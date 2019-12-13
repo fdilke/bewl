@@ -6,6 +6,7 @@ import FiniteSets.{ >, ToposOfAutomorphisms }
 import ToposOfAutomorphisms.AutomorphismPreArrow
 import scala.Function._
 import org.scalatest.matchers.should.Matchers._
+import com.fdilke.bewl.helper.StandardSymbols.{a, b, c, d, boolean}
 
 class ToposOfAutomorphismsTest extends GenericToposTests[
   Any,
@@ -29,7 +30,6 @@ class ToposOfAutomorphismsTest extends GenericToposTests[
   override type BAR = Int
   override type BAZ = String
 
-  private val (a, b, c, d) = ('a, 'b, 'c, 'd)
   override val foo = dot(a, b, c, d)(a -> c, b -> d, c -> a, d -> b)
 
   override val bar = dot(1, 2)(1 -> 2, 2 -> 1)
@@ -93,7 +93,7 @@ class ToposOfAutomorphismsTest extends GenericToposTests[
 
   describe("The Boolean property") {
     it("holds") { // too slow :( :( :(
-      topos shouldBe 'boolean
+      topos shouldBe boolean
     }
   }
 
@@ -105,8 +105,8 @@ class ToposOfAutomorphismsTest extends GenericToposTests[
     }
 
     it("works on the fixtures") {
-      foo.globals shouldBe 'empty
-      bar.globals shouldBe 'empty
+      foo.globals shouldBe empty
+      bar.globals shouldBe empty
       baz.globals should have size 2
     }
   }
