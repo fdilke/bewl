@@ -61,7 +61,7 @@ object TwitterHack {
       5 seconds
     ).data.id
 
-  def tweetMe(message: String) {
+  def tweetMe(message: String) : Unit = {
     //        println("user details: " + user)
     //        println("user name: " + user.data.name)
     client.createDirectMessageEvent(felixId, message).onComplete {

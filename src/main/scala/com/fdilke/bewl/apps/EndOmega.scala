@@ -3,6 +3,7 @@ package com.fdilke.bewl.apps
 import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.elementsOf
 import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
+import scala.language.existentials
 
 object EndOmega extends App {
   val topos =
@@ -21,10 +22,10 @@ object EndOmega extends App {
 
   // trick to get round 'cyclic dependency' issue: abstract the type
 
-  def doIt[IDEAL](
+  private def doIt[IDEAL](
     ideals: Iterable[IDEAL],
     mappings: Iterable[IDEAL > IDEAL]
-  ) {
+  ): Unit = {
     assert( ideals.size == 3 )
     val Seq(_m, _i, _o) = ideals
 

@@ -245,7 +245,7 @@ object NollCalculations extends App {
   def showProperties[T](
     name: String,
     tune: triadicTopos.DOT[T]
-  ) {
+  ) : Unit = {
     val tuneMinimal =
       Timed(s"calc $name minimal") {
         tune.isMinimal

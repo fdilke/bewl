@@ -23,7 +23,7 @@ object BuildEquivalence {
     def equate(
       i: Int,
       j: Int
-    ) {
+    ) : Unit = {
       if (i != j)
         array(i) = j
     }
@@ -40,6 +40,6 @@ object BuildEquivalence {
       array(i) =
           trackUp(array(i))
 
-    array
+    array.toIndexedSeq
   }
 }

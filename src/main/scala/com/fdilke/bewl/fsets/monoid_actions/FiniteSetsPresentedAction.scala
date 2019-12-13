@@ -71,7 +71,7 @@ object FiniteSetsPresentedAction {
               m
             )
       }
-      override def sanityTest {
+      override def sanityTest : Unit = {
         for {
           (gr, i) <- generatorsWithRelators.zipWithIndex
           relator <- gr.relators

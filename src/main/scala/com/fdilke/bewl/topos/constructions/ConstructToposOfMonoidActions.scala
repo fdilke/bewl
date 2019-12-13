@@ -230,7 +230,7 @@ trait ConstructToposOfMonoidActions extends
           }
         }
 
-        override def sanityTest {
+        override def sanityTest : Unit = {
           action.actionCarrier.sanityTest
           action.sanityTest
         }
@@ -368,7 +368,7 @@ trait ConstructToposOfMonoidActions extends
             arrow o that.arrow
           )
 
-        override def sanityTest {
+        override def sanityTest : Unit = {
           arrow.sanityTest
           assert(
             monoid.actions.isMorphism(
@@ -441,7 +441,7 @@ trait ConstructToposOfMonoidActions extends
         right: ActionDot[R],
         target: ActionDot[T]
       )(
-        bifunc: (L, R) ⇒ T
+        bifunc: (L, R) => T
       ): BiArrow[L,R,T] = // no wrappings: generic version will do
         (left x right).biArrow(target) { bifunc }
 
@@ -451,7 +451,7 @@ trait ConstructToposOfMonoidActions extends
       ](
         source: ActionDot[S],
         target: ActionDot[T],
-        f: S ⇒ T
+        f: S => T
       ): ActionArrow[S,T] = // no wrappings: generic version will do
         source(target){ f }
 

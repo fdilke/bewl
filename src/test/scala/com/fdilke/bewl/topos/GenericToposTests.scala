@@ -98,7 +98,7 @@ abstract class ToposWithFixtures[
     s: M > T,
     t: M > T) {
 
-    def sanityTest {
+    def sanityTest : Unit = {
       r.sanityTest
       s.sanityTest
       t.sanityTest
@@ -256,7 +256,7 @@ abstract class GenericToposTests[
       // minor hackery required to extract the types
       def runTest[S <: ~, M <: ~, T <: ~](
         situation: EqualizerSituation[S, M, T]
-      ) {
+      ) : Unit = {
           import situation._
           val equalizer = s ?= t
           val e = equalizer.inclusion

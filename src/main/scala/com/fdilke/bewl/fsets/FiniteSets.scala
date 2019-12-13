@@ -99,7 +99,7 @@ class BaseFiniteSets extends Topos[Any] with Wrappings[
         } getOrElse {
           throw new IllegalArgumentException(s"Cannot backdivide $self by monic $monic")
       }}
-    override def sanityTest {
+    override def sanityTest : Unit = {
       source.sanityTest
       target.sanityTest
       for {targetElement <- source.elements map function}

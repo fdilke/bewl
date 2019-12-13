@@ -5,7 +5,7 @@ case class ⊕[A, B](
   _2: B
 ) {
   override def toString =
-    _1 + " ⊕ " + _2
+    _1.toString + " ⊕ " + _2.toString
 }
 
 object ⊕ {

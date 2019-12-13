@@ -64,7 +64,7 @@ trait ConstructToposOfAutomorphisms extends
           override def size(): Int =
             carrier.size
 
-          override def sanityTest {
+          override def sanityTest : Unit = {
             arrow.sanityTest
             inverse.sanityTest
             if (carrier != arrow.target)
@@ -147,7 +147,7 @@ trait ConstructToposOfAutomorphisms extends
           override def \[U <: ~](monic: U > T): S > U =
             AutomorphismArrow(source, monic.source, arrow \ monic.arrow)
 
-          override def sanityTest {
+          override def sanityTest : Unit = {
             source.sanityTest
             target.sanityTest
             arrow.sanityTest

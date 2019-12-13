@@ -236,7 +236,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     def lookupRightScalarBinaryOp: Option[RightScalarBinaryOp[T, S]] = None
     def lookupScalarBinaryOp: Option[BinaryOp[S]] = None
 
-    final def sanityTest {
+    final def sanityTest : Unit = {
       lookupPrincipalConstant foreach{ _.sanityTest }
       lookupUnaryOp foreach{ _.sanityTest }
       lookupBinaryOp foreach{ _.sanityTest }
@@ -824,7 +824,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
             law.freeVariables
           )
 
-      def sanityTest {
+      def sanityTest : Unit = {
         if (!operatorAssignments.hasPrecisely(operators))
           bail("Assignments do not match signature of theory")
 
