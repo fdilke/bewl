@@ -2,14 +2,15 @@ package com.fdilke.bewl.topos.algebra
 
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.funspec.AnyFunSpec
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.matchers.dsl.MatcherWords.be
+import org.scalatest.matchers.should.Matchers.not
+import org.scalatest.matchers.should.Matchers.convertToStringShouldWrapper
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 
+import com.fdilke.bewl.helper.StandardSymbols.{i, x, y, a, b, c, d, e, f, f2, g, g2, r, s, commutative}
 class AlgebraicStructuresTest extends AnyFunSpec {
 
   import com.fdilke.bewl.fsets.FiniteSets._
-
-  private val (i, x, y, a, b, c, d, e, f, f2, g, g2, r, s) =
-    ('i,'x,'y,'a,'b,'c,'d,'e,'f,'f2,'g,'g2, 'r, 's)
 
   describe("Monoids") {
     it("can be constructed and verified") {
@@ -74,12 +75,12 @@ class AlgebraicStructuresTest extends AnyFunSpec {
         i, a, b,
         a, a, b,
         b, b, b
-      ) should be('commutative)
+      ) should be(commutative)
       monoidFromTable(
         i, a, b,
         a, a, a,
         b, b, b
-      ) should not be('commutative)
+      ) should not be(commutative)
     }
   }
 
@@ -150,7 +151,6 @@ class AlgebraicStructuresTest extends AnyFunSpec {
 
     it("can validate arrows as morphisms") {
       val monoid1x = {
-        val (i, x) = ('i, 'x)
         val carrier = dot(i, x)
         val unit = makeNullaryOperator(carrier, i)
         val product = makeBinaryOperator(carrier,
@@ -196,7 +196,7 @@ class AlgebraicStructuresTest extends AnyFunSpec {
       }
       rightAction2.sanityTest
       val actionMorphism = arrow(rightAction.carrier, rightAction2.carrier)(
-        'a -> 'd, 'b -> 'c
+        a -> d, b -> c
       )
       monoid1x.actions.isMorphism(rightAction, rightAction2, actionMorphism) shouldBe true
       val nonActionMorphism =
@@ -204,7 +204,7 @@ class AlgebraicStructuresTest extends AnyFunSpec {
           rightAction.carrier,
           rightAction2.carrier
         )(
-          'a -> 'c, 'b -> 'c
+          a -> c, b -> c
         )
       monoid1x.actions.isMorphism(
         rightAction,
@@ -271,7 +271,7 @@ class AlgebraicStructuresTest extends AnyFunSpec {
         unit,
         product,
         inverse
-      ) shouldBe 'commutative
+      ) shouldBe commutative
     }
 
     it("can tell if a group is not commutative") {
@@ -285,7 +285,7 @@ class AlgebraicStructuresTest extends AnyFunSpec {
       ))._1
       group.sanityTest
       group.carrier.size shouldBe 6
-      group should not be 'commutative
+      group should not be commutative
     }
 
     it("can be regarded as monoids") {

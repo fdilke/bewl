@@ -4,7 +4,11 @@ import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import Relation._
 import org.scalatest.funspec.AnyFunSpec
-import org.scalatest.matchers.should.Matchers._
+import org.scalatest.matchers.dsl.MatcherWords.be
+import org.scalatest.matchers.should.Matchers.not
+import org.scalatest.matchers.should.Matchers.convertToStringShouldWrapper
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import com.fdilke.bewl.helper.StandardSymbols.{i, x, y, a, b, c, d, e, f, f2, g, g2, r, s, commutative}
 
 class RelationalAlgebraTest extends AnyFunSpec {
 
@@ -268,39 +272,39 @@ class RelationalAlgebraTest extends AnyFunSpec {
 
   describe("Equivalence relations") {
     it("can be tested for sets") {
-      val symbols = dot('A, 'B, 'C)
+      val symbols = dot(a, b, c)
       val notReflexive =
         relationFrom(
           symbols,
-          'A -> 'A
+          a -> a
         )
       val notSymmetric =
         relationFrom(
           symbols,
-          'A -> 'A,
-          'B -> 'B,
-          'C -> 'C,
-          'A -> 'B
+          a -> a,
+          b -> b,
+          c -> c,
+          a -> b
         )
       val notTransitive =
         relationFrom(
           symbols,
-          'A -> 'A,
-          'B -> 'B,
-          'C -> 'C,
-          'A -> 'B,
-          'B -> 'A,
-          'B -> 'C,
-          'C -> 'B
+          a -> a,
+          b -> b,
+          c -> c,
+          a -> b,
+          b -> a,
+          b -> c,
+          c -> b
         )
       val identifyBandC =
         relationFrom(
           symbols,
-          'A -> 'A,
-          'B -> 'B,
-          'C -> 'C,
-          'B -> 'C,
-          'C -> 'B
+          a -> a,
+          b -> b,
+          c -> c,
+          b -> c,
+          c -> b
         )
 
       notReflexive.

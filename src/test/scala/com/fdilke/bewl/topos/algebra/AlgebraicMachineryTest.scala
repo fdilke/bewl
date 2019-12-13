@@ -60,7 +60,7 @@ class AlgebraicMachineryTest extends AnyFunSpec {
         source(context.root),
         target(carrier)
       )
-      context.evaluate(α) x context.evaluate(β) shouldBe 'iso
+      context.evaluate(α) x context.evaluate(β) shouldBe iso
     }
 
     it("for one term can evaluate constants") {
@@ -516,7 +516,7 @@ class AlgebraicMachineryTest extends AnyFunSpec {
       c2xc3.carrier shouldBe ( product )
       c6.carrier(c2xc3.carrier) {
         a => product.pair(a % 2, a % 3)
-      } shouldBe 'iso
+      } shouldBe iso
       
       groups.isMorphism(
         c2xc3, 
