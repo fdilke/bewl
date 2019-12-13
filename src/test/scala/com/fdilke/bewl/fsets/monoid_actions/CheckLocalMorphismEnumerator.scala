@@ -20,7 +20,7 @@ object CheckLocalMorphismEnumerator {
 
     def enumerateMorphisms(
       analyzer: monoid.ActionAnalyzer
-    ): Traversable[X > Y] =
+    ): Iterable[X > Y] =
       analyzer.analyze(
         sourceAction
       ).morphismsTo(

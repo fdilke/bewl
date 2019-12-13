@@ -7,10 +7,10 @@ import com.fdilke.bewl.topos.{GenericToposTests, ToposWithFixtures}
 import org.scalatest.matchers.should.Matchers._
 
 class FiniteSetsTest extends GenericToposTests[
-    Any, Any, Traversable, FiniteSetsPreArrow, NO_WRAPPER
+    Any, Any, Iterable, FiniteSetsPreArrow, NO_WRAPPER
   ] (
   new ToposWithFixtures[
-    Any, Any, Traversable, FiniteSetsPreArrow, NO_WRAPPER
+    Any, Any, Iterable, FiniteSetsPreArrow, NO_WRAPPER
   ] {
     val topos = FiniteSets
 

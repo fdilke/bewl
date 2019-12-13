@@ -37,7 +37,7 @@ trait AlgebraicStructures extends
 
       def morphismsTo[B <: ~](
         target: ANALYSIS[B]
-      ): Traversable[A > B]
+      ): Iterable[A > B]
 
       def rawExponential[B <: ~](
         target: ANALYSIS[B]

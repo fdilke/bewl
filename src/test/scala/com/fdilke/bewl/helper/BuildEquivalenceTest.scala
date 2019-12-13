@@ -32,7 +32,7 @@ class BuildEquivalenceTest extends AnyFreeSpec {
     "can be calculated over a doubleton with only trivial relators" in {
       BuildEquivalence(
           2, 
-          Traversable(
+          Iterable(
             0 -> 0,
             1 -> 1
           )
@@ -44,7 +44,7 @@ class BuildEquivalenceTest extends AnyFreeSpec {
     "can be calculated over a doubleton with a relator equating the elements" in {
       BuildEquivalence(
         2, 
-        Traversable(
+        Iterable(
           0 -> 1
         )
       ) shouldBe List(
@@ -55,7 +55,7 @@ class BuildEquivalenceTest extends AnyFreeSpec {
     "can be calculated for a nontrivial example" in {
       BuildEquivalence(
         4, 
-        Traversable(
+        Iterable(
           1 -> 2
         )
       ) shouldBe List(
@@ -68,7 +68,7 @@ class BuildEquivalenceTest extends AnyFreeSpec {
     "can be calculated for a bigger example" in {
       BuildEquivalence(
         6, 
-        Traversable(
+        Iterable(
           1 -> 2,
           2 -> 3
         )
@@ -84,7 +84,7 @@ class BuildEquivalenceTest extends AnyFreeSpec {
     "can be calculated for a yet bigger example" in {
       BuildEquivalence(
         10, 
-        Traversable(
+        Iterable(
           1 -> 2,
           7 -> 0,
           4 -> 3,
@@ -108,7 +108,7 @@ class BuildEquivalenceTest extends AnyFreeSpec {
     "can be calculated for a formerly problematic example" in {
       BuildEquivalence(
         4, 
-        Traversable(
+        Iterable(
           2 -> 0,
           3 -> 1,
           2 -> 2,
@@ -128,7 +128,7 @@ class BuildEquivalenceTest extends AnyFreeSpec {
     "can be calculated for another formerly problematic example" in {
       BuildEquivalence(
         4,
-        Traversable(
+        Iterable(
           0 -> 0,
           0 -> 1,
           0 -> 2,

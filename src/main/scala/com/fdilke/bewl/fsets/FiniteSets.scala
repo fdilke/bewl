@@ -14,7 +14,7 @@ object FiniteSets extends BaseFiniteSets
   with FiniteSetsImageFinder
 
 class BaseFiniteSets extends Topos[Any] with Wrappings[
-  Any, Any, Traversable, FiniteSetsPreArrow, Wrappings.NO_WRAPPER
+  Any, Any, Iterable, FiniteSetsPreArrow, Wrappings.NO_WRAPPER
 ] {
   override val name = "FiniteSets"
   override type DOT[S] = FiniteSetsDot[S]
@@ -23,18 +23,18 @@ class BaseFiniteSets extends Topos[Any] with Wrappings[
   override type TRUTH = Boolean
   override type →[T <: ~, U <: ~] = Map[T, U] with ~
   
-  override lazy val I = makeDot(Traversable(()))
-  override lazy val omega = makeDot(Traversable(true, false))
+  override lazy val I = makeDot(Iterable(()))
+  override lazy val omega = makeDot(Iterable(true, false))
   override lazy val truth = I(omega) { _ => true }
   override lazy val optionalGenerator = Some(I)
 
   class FiniteSetsDot[S](
-      protected[fsets] val elements: Traversable[S]
+      protected[fsets] val elements: Iterable[S]
   )
     extends Dot[S] { outerDot =>
     override lazy val toI = this(I) { _ => () }
 
-    override lazy val globals: Traversable[UNIT > S] =
+    override lazy val globals: Iterable[UNIT > S] =
       elements map { s =>
         new FiniteSetsArrow(I, this, (_: UNIT) => s)
       }
@@ -148,7 +148,7 @@ class BaseFiniteSets extends Topos[Any] with Wrappings[
   }
 
   private val memoizedDotWrapper = {
-    def wrap[T](elements: Traversable[T]) =
+    def wrap[T](elements: Iterable[T]) =
       new FiniteSetsDot(elements)
     Memoize generic wrap
   }
@@ -163,7 +163,7 @@ class BaseFiniteSets extends Topos[Any] with Wrappings[
       prearrow.function
     )
 
-  override def makeDot[T](predot: Traversable[T]): FiniteSetsDot[T] =
+  override def makeDot[T](predot: Iterable[T]): FiniteSetsDot[T] =
     memoizedDotWrapper(predot)
 
   // unusually simple generic definition for this topos because WRAPPER is trivial
@@ -180,8 +180,8 @@ class BaseFiniteSets extends Topos[Any] with Wrappings[
 }
 
 case class FiniteSetsPreArrow[S, T](
-  source: Traversable[S],
-  target: Traversable[T],
+  source: Iterable[S],
+  target: Iterable[T],
   function: S => T
 )
 

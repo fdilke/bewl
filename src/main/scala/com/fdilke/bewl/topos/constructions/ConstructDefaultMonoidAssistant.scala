@@ -40,7 +40,7 @@ trait ConstructDefaultMonoidAssistant extends
           ) {
             override def morphismsTo[B <: ~](
               target: DefaultActionAnalysis[B]
-            ): Traversable[A > B] = {
+            ): Iterable[A > B] = {
               val targetAction = target.action
               val targetCarrier =
                 targetAction.actionCarrier

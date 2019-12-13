@@ -4,8 +4,8 @@ import org.scalatest.matchers.{MatchResult, Matcher}
 
 object CustomMatchers {
   def containDuplicates[T] =
-    new Matcher[Traversable[T]]{
-      override def apply(collection: Traversable[T]) = {
+    new Matcher[Iterable[T]]{
+      override def apply(collection: Iterable[T]) = {
         val failureMessageSuffix =
           "collection contains duplicates: " + collection
 

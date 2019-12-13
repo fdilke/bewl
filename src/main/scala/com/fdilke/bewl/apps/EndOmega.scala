@@ -22,8 +22,8 @@ object EndOmega extends App {
   // trick to get round 'cyclic dependency' issue: abstract the type
 
   def doIt[IDEAL](
-    ideals: Traversable[IDEAL],
-    mappings: Traversable[IDEAL > IDEAL]
+    ideals: Iterable[IDEAL],
+    mappings: Iterable[IDEAL > IDEAL]
   ) {
     assert( ideals.size == 3 )
     val Seq(_m, _i, _o) = ideals

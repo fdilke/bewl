@@ -136,7 +136,7 @@ trait ConstructToposOfMonoidActions extends
 
         override def >>[T <: ~](
           target: ActionDot[T]
-        ): Traversable[
+        ): Iterable[
           S > T
         ] =
           analysis.morphismsTo(
@@ -209,7 +209,7 @@ trait ConstructToposOfMonoidActions extends
             ) { f }
           )
 
-        override lazy val globals: Traversable[UNIT > S] = {
+        override lazy val globals: Iterable[UNIT > S] = {
           val fixedPoints =
             action.actionCarrier.whereAll(
                 carrier

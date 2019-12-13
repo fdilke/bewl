@@ -80,7 +80,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
             private def mapsBetween[A, B](
               src: ActionComponent[M, A, ({type λ[T] = monoid.Action[T]}) # λ],
               tgt: ActionComponent[M, B, ({type λ[T] = monoid.Action[T]}) # λ],
-            ): Traversable[Map[A, B]] = {
+            ): Iterable[Map[A, B]] = {
               val srcGenerators =
                 src.componentGenerators
               val srcAction =
@@ -99,7 +99,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
               def compatibleExtensions(
                 partialMap: Map[A, B],
                 index: Int
-              ): Traversable[Map[A, B]] = {
+              ): Iterable[Map[A, B]] = {
                 val gr = srcPresentation(index)
                 val generator = gr.generator
                 targetElements.filter { targetElement =>
@@ -137,7 +137,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
               }
 
               srcPresentation.indices.foldLeft(
-                Traversable(Map.empty[A, B])
+                Iterable(Map.empty[A, B])
               ) { (partialMaps, index) =>
                 for {
                   partialMap <- partialMaps
@@ -191,7 +191,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
               val blockMaps =
                 Memoize[
                   (Int, Int),
-                  Traversable[
+                  Iterable[
                     Map[A, B]
                   ]
                 ] {
@@ -205,9 +205,9 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
                 }
 
               def absorb(
-                partialMaps: Traversable[Map[A, B]],
+                partialMaps: Iterable[Map[A, B]],
                 srcIndex: Int
-              ): Traversable[Map[A, B]] =
+              ): Iterable[Map[A, B]] =
                 for {
                   partialMap <- partialMaps
                   tgtIndex <- tgtComponents.indices
@@ -219,7 +219,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
                   partialMap ++ continuation
 
               srcComponents.indices.foldLeft(
-                Traversable(
+                Iterable(
                   Map.empty[A, B]
                 )
               ) {

@@ -9,7 +9,7 @@ object BuildEquivalence {
 
   def apply(
     size: Int,
-    relators: Traversable[(Int, Int)]
+    relators: Iterable[(Int, Int)]
   ): Seq[Int] = {
     val range =
       0 until size

@@ -30,7 +30,7 @@ object NollCalculations extends App {
     )
 
   if (false) {
-    val subobjs: Traversable[triadicTopos.>[Int, triadicTopos.TRUTH]] =
+    val subobjs: Iterable[triadicTopos.>[Int, triadicTopos.TRUTH]] =
       Timed("calculating subobjects of the octave") {
         octave >> triadicTopos.omega
       }
@@ -41,7 +41,7 @@ object NollCalculations extends App {
 
     println("Number of each size:")
 
-    val sizeGroups: Map[Int, Traversable[triadicTopos.EQUALIZER[Int]]] =
+    val sizeGroups: Map[Int, Iterable[triadicTopos.EQUALIZER[Int]]] =
       subobjs map { _.whereTrue } groupBy subSize
 
     val sortedSizes: Seq[Int] =
@@ -297,7 +297,7 @@ object NollCalculations extends App {
 
 object LogicalOperationsSlow extends App {
   if (false) {
-    val omegaElements: Traversable[triadicTopos.TRUTH] =
+    val omegaElements: Iterable[triadicTopos.TRUTH] =
       elementsOf(triadicTopos.unwrap(
         triadicTopos.omega
       ).actionCarrier)

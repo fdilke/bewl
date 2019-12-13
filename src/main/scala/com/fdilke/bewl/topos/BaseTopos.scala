@@ -214,7 +214,7 @@ trait BaseTopos {
   
   trait BaseDot[S <: ~] { self: DOT[S] =>
     val toI: S > UNIT
-    val globals: Traversable[UNIT > S]
+    val globals: Iterable[UNIT > S]
     def xUncached[T <: ~](that: DOT[T]): BIPRODUCT[S, T]
     def `>Uncached`[T <: ~](that: DOT[T]): EXPONENTIAL[S, T]
     def apply[T <: ~](target: DOT[T])(f: S => T) : S > T
@@ -418,7 +418,7 @@ trait BaseTopos {
 
     def >>[T <: ~](
       target: DOT[T]
-    ): Traversable[
+    ): Iterable[
       S > T
     ] =
       (dot > target).globals map { global =>
@@ -541,7 +541,7 @@ trait BaseTopos {
     final lazy val isMinimal: Boolean =
       VerifyLength(>>(omega).toSeq, 2)
 
-    final def congruences: Traversable[Relation[S, S]] =
+    final def congruences: Iterable[Relation[S, S]] =
       squared >> omega map { arrow =>
         Relation(
           dot,

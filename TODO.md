@@ -352,3 +352,25 @@ look up "implicit best practices" ?
 get rid of Traversable - should be Iterable
 get rid of all the warnings in "sbt clean test"
 get rid of all symbols - note conflict between "a, the letter" and "should be a" :( Maybe just use an.
+
+# sort equalizers as prep for deeper integration of implicits, "x : DOT"
+
+note: Do I need to do anything about coequalizers?
+
+change how equalizers work: They need to generate a new type, not re-use an existing one.
+and will have to reintroduce the "inclusion" arrow which can't be baked in anymore
+
+In BaseArrow[S, T]:
+        def ?=(that: S > T): EQUALIZER[S]
+where 
+  type EQUALIZER[S <: ~] =
+    EqualizingDot[S] with DOT[S]
+Instead, it'll have to return something like EQUALIZER[_, S] where
+  type EQUALIZER[R <: ~, S <: ~] =
+    EqualizingDot[R, S] with DOT[R]
+
+Ideally an R would come with an implicit conversion to an S, or there'd be a
+class inside the EQUALIZER which would do this.
+the topoi will now need to create a new type... how did they get away without this before? 
+check implementation of ?=, e.g. for finite sets...
+

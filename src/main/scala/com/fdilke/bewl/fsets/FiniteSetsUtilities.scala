@@ -37,7 +37,7 @@ object FiniteSetsUtilities {
 
   def elementsOf[X](
     dot: DOT[X]
-  ): Traversable[X] =
+  ): Iterable[X] =
     dot.globals map {
       _(())
     }
@@ -134,11 +134,11 @@ object FiniteSetsUtilities {
   }
 
   def allMaps[A, B](
-    source: Traversable[A],
-    target: Traversable[B]
-  ) : Traversable[Map[A, B]] =
+    source: Iterable[A],
+    target: Iterable[B]
+  ) : Iterable[Map[A, B]] =
       if (source.isEmpty)
-        Traversable { Map.empty }
+        Iterable { Map.empty }
       else
         for {
           f <- allMaps(source.tail, target)
