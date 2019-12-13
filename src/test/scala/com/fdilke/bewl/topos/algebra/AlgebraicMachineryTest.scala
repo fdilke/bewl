@@ -4,7 +4,7 @@ import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
-import com.fdilke.bewl.helper.StandardSymbols.q
+import com.fdilke.bewl.helper.StandardSymbols.{q, i, x, source, target, iso}
 
 class AlgebraicMachineryTest extends AnyFunSpec {
 
@@ -42,9 +42,9 @@ class AlgebraicMachineryTest extends AnyFunSpec {
       val algebra = new unstructuredSets.Algebra[Boolean](carrier)()
       val context = algebra.EvaluationContext[Boolean](Seq(α))
       context.evaluate(α) should have (
-        'source(context.root),
-        'target(carrier),
-        'iso(true)
+        source(context.root),
+        target(carrier),
+        iso(true)
       )
     }
 
@@ -53,12 +53,12 @@ class AlgebraicMachineryTest extends AnyFunSpec {
       val algebra = new unstructuredSets.Algebra[Boolean](carrier)()
       val context = algebra.EvaluationContext[Boolean](Seq(α, β))
       context.evaluate(α) should have (
-        'source(context.root),
-        'target(carrier)
+        source(context.root),
+        target(carrier)
       )
       context.evaluate(β) should have (
-        'source(context.root),
-        'target(carrier)
+        source(context.root),
+        target(carrier)
       )
       context.evaluate(α) x context.evaluate(β) shouldBe 'iso
     }
@@ -146,6 +146,7 @@ class AlgebraicMachineryTest extends AnyFunSpec {
       val interpretO = theO o context.root.toI
       val interpretI = makeNullaryOperator(carrier, "i") o context.root.toI
 
+      context.evaluate(o) shouldBe interpretO
       context.evaluate(o ** II) shouldBe interpretI
       context.evaluate((α ** II) ** II) shouldBe context.evaluate(α)
     }
@@ -155,9 +156,9 @@ class AlgebraicMachineryTest extends AnyFunSpec {
       val scalar1 = makeNullaryOperator(scalars, 1)
       val scalar2 = makeNullaryOperator(scalars, 2)
       val weakActsReferencingAMonoid = AlgebraicTheoryWithScalars(scalars)(II := scalar1)(**, ***)()
-      val act = dot('a)
+      val act = dot(x)
       val algebra = new weakActsReferencingAMonoid.Algebra[Symbol](act)(
-        ** := (act x scalars).biArrow(act) { (_, _) => 'a },
+        ** := (act x scalars).biArrow(act) { (_, _) => x },
         *** := bifunctionAsBiArrow(scalars) {
           (x, y) => (x + y) % 3
         }
@@ -530,8 +531,6 @@ class AlgebraicMachineryTest extends AnyFunSpec {
     }
 
     it("support binary multiplication of their algebras, even with scalar extensions") {
-      val (i, x, y) = ('i, 'x, 'y)
-
       import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
       import monoidOf3.regularAction
   
@@ -546,7 +545,7 @@ class AlgebraicMachineryTest extends AnyFunSpec {
       val underlyingProduct = barDot x regularAction.actionCarrier
       product.sanityTest
       product.carrier shouldBe underlyingProduct
-      product.operatorAssignments.lookup(II).get(()) shouldEqual 'i
+      product.operatorAssignments.lookup(II).get(()) shouldEqual i
       monoidOf3.actions.isMorphism[String x Symbol, String](
         product, 
         bar, 
