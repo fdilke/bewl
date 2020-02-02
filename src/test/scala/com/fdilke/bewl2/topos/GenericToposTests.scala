@@ -37,17 +37,17 @@ abstract class GenericToposTests[
     t: M => T
   ) {
 
-    def doSanityTest : Unit = {
-      sanityTest[S]
-      sanityTest[M]
-      sanityTest[T]
-    }
+    def sanityTest : Unit = {
+      topos.sanityTest[S]
+      topos.sanityTest[M]
+      topos.sanityTest[T]
 
-    if (s =?= t) {
-      throw new IllegalArgumentException("equalizing two arrows that are already equal!")
-    }
+      if (s =?= t) {
+        throw new IllegalArgumentException("equalizing two arrows that are already equal!")
+      }
 
-    (s o r) ==?== (t o r)
+      (s o r) ==?== (t o r)
+    }
   }
 
   private implicit class FunctionComparisonHelper[S: DOT, T:DOT](
@@ -92,7 +92,7 @@ abstract class GenericToposTests[
       source(monicBar2baz) shouldBe bar
       target(monicBar2baz) shouldBe baz
 
-//      equalizerSituation.sanityTest
+      equalizerSituation.sanityTest
     }
   }
 
