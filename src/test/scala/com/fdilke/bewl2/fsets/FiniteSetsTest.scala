@@ -1,5 +1,6 @@
 package com.fdilke.bewl2.fsets
 
+import com.fdilke.bewl.fsets.FiniteSetsUtilities.arrow
 import com.fdilke.bewl2.fsets.FiniteSets._
 import com.fdilke.bewl2.topos.GenericToposTests
 
@@ -24,5 +25,11 @@ class FiniteSetsTest extends GenericToposTests[Set, Boolean, String, Int] {
     "X" -> 2,
     "Y" -> 3,
     "Z" -> 1
+  )
+
+  override val equalizerSituation = new EqualizerSituation[Boolean, String, Int](
+    foo2bar,
+    Map("X" -> 1, "Y" -> 2, "Z" -> 3),
+    Map("X" -> 1, "Y" -> 2, "Z" -> 1)
   )
 }

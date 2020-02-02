@@ -398,4 +398,5 @@ Comment out all the product stuff initially, then fix it later.
 
 It's going to be a minor pain that we need a special operator to 
 test functional equality. Also a matcher. How about =?=, should=?= ?
-For now the highly lame name shouldFnBe. If we can have ?=, why not should=?= ?   
+For now the highly lame name shouldFnBe. If we can have ?=, why not should=?= ?
+and o becomes compose. Maybe have o as an alias. Yes.   

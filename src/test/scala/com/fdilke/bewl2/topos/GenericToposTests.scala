@@ -22,16 +22,39 @@ abstract class GenericToposTests[
 
   private final lazy val foo2baz = foo2ImageOfBar // a convenient alias
 
-  // TODO: equalizer situation, with sanity tests
+  val equalizerSituation: EqualizerSituation[_, _, _]
 
   private val topos: Topos[DOT] = implicitly[Topos[DOT]]
   import topos._
 
+  case class EqualizerSituation[
+    S : DOT,
+    M : DOT,
+    T : DOT
+  ](
+    r: S => M,
+    s: M => T,
+    t: M => T
+  ) {
+
+    def doSanityTest : Unit = {
+      sanityTest[S]
+      sanityTest[M]
+      sanityTest[T]
+    }
+
+    if (s =?= t) {
+      throw new IllegalArgumentException("equalizing two arrows that are already equal!")
+    }
+
+    (s o r) ==?== (t o r)
+  }
+
   private implicit class FunctionComparisonHelper[S: DOT, T:DOT](
     function: S => T
   ) {
-    def shouldFnBe(function2: S => T) =
-      assert(compareFunctions(function, function2))
+    def ==?==(function2: S => T) =
+      assert(function =?= function2)
   }
   private val foo: DOT[FOO] = implicitly[DOT[FOO]]
   private val bar: DOT[BAR] = implicitly[DOT[BAR]]
@@ -88,9 +111,9 @@ abstract class GenericToposTests[
 
     it("has identity arrows which can be composed") {
       val identityFoo: FOO => FOO = identity
-      id[FOO] shouldFnBe identityFoo
-      foo2bar compose id[FOO] shouldFnBe foo2bar
-      id[BAR] compose foo2bar shouldFnBe foo2bar
+      id[FOO]  ==?== identityFoo
+      (foo2bar o id[FOO])  ==?== foo2bar
+      (id[BAR] o foo2bar) ==?== foo2bar
     }
 
     /*
