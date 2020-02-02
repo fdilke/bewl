@@ -374,3 +374,25 @@ class inside the EQUALIZER which would do this.
 the topoi will now need to create a new type... how did they get away without this before? 
 check implementation of ?=, e.g. for finite sets...
 
+# Bewl 2 - reimplementing with typeclasses
+
+Abolished topos fixtures. Also source, target may not be so relevant anymore -
+it's all baked into the types, thoughtcrime has become impossible.
+
+Sanity tests may be irrelevant too. The objects are typically things like
+a Set[Boolean], what can be so wrong with that? But leave it in the topos for now.
+Not only is FiniteSet a typeclass but Topos is a typeclass :))
+
+May not need source, target either. Typically will work at the level of types.
+
+A bit of an experiment to not bother with arrows A > B, only functions A => B.
+Will have to see if this works. There will be an implicit helper or something
+that lets you do f === g. And that had better not conflict with matchers.
+
+So now what to do about product arrows (A, B) => C ?
+There'll just have to be minor plumbing to make this viewable as an
+A x B => C for comparison purposes.
+And maybe an implicit helper to generate the dot for (A, B) when we 
+already have one for A and B? 
+Comment out all the product stuff initially, then fix it later. 
+
