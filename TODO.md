@@ -399,4 +399,36 @@ Comment out all the product stuff initially, then fix it later.
 It's going to be a minor pain that we need a special operator to 
 test functional equality. Also a matcher. How about =?=, should=?= ?
 For now the highly lame name shouldFnBe. If we can have ?=, why not should=?= ?
-and o becomes compose. Maybe have o as an alias. Yes.   
+Can use "==?==" for now. or is should_=?= allowable?
+and o becomes compose. Maybe have o as an alias. Yes.
+
+Equalizers... Would be easiest to continue with EQUALIZER_DOT,
+but this assumes we can always extend the container class.
+It turns out we can extend immutable.Set, so that's ok.
+May have to consider alternatives.
+Should think now about how this will work for topos of actions?
+
+Recap:there are 4 topos implementations...
+sets, monoid actions, group actions, automorphisms. 
+Containers respectively:
+Set[X], monoid.Action[X], group.Action[X], Automorphism[X]
+the last 3 all being case classes. But can work something out.
+
+This is really a dress rehearsal for products which will be more of 
+a challenge. Hope to follow pattern BiproductDot extends DOT etc.
+Will also incidentally fix wrinkle where the equalizer object carried
+the same type. For now will make bold assumption that it inherits.
+Of course could be the same, and probably will be, but don't assume this.
+Does it need to be a DOT? Don't we mostly care about the type?
+Could it just be a case class?
+Check syntactic use of equalizers in Bewl1...
+Looks like use is only local, and "?=" might as well return a case class. 
+Products will be harder... 
+When there is A:DOT and B:DOT, we want there to implicitly be a (A, B): DOT,
+but for other operations to exist as well - projection, multiplication of arrows.
+Perhaps clever stuff is in where the product is looked up.
+Or perhaps: we implicitly drum up a DOT[(A, B)] ... just easier if it's a product?
+Danger of things being implicitly autocalculated over and over when there's no need.
+Could there be a trait whereby things like Action know automatically how to multiply
+instances of themselves? Nice to build into definition of algebraic structure.
+ 

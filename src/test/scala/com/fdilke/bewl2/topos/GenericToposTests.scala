@@ -1,5 +1,8 @@
 package com.fdilke.bewl2.topos
 
+import java.util.concurrent.atomic.AtomicInteger
+
+import org.scalatest
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
 
@@ -22,7 +25,13 @@ abstract class GenericToposTests[
 
   private final lazy val foo2baz = foo2ImageOfBar // a convenient alias
 
-  val equalizerSituation: EqualizerSituation[_, _, _]
+  trait EqualizerSituationReceiver[X] {
+    def apply[S : DOT, M : DOT, T : DOT](
+      equalizerSituation: EqualizerSituation[S, M, T]
+    ): X
+  }
+
+  def provideEqualizerSituation[X](receiver: EqualizerSituationReceiver[X]): X
 
   private val topos: Topos[DOT] = implicitly[Topos[DOT]]
   import topos._
@@ -92,7 +101,12 @@ abstract class GenericToposTests[
       source(monicBar2baz) shouldBe bar
       target(monicBar2baz) shouldBe baz
 
-      equalizerSituation.sanityTest
+      provideEqualizerSituation(new EqualizerSituationReceiver[Unit] {
+        def apply[S: DOT, M: DOT, T: DOT](
+          equalizerSituation: EqualizerSituation[S, M, T]
+        ): Unit =
+          equalizerSituation.sanityTest
+      })
     }
   }
 
@@ -114,6 +128,30 @@ abstract class GenericToposTests[
       id[FOO]  ==?== identityFoo
       (foo2bar o id[FOO])  ==?== foo2bar
       (id[BAR] o foo2bar) ==?== foo2bar
+    }
+
+    ignore("has equalizers") {
+      // 2 levels of fancy footwork required to extract the types
+      provideEqualizerSituation(new EqualizerSituationReceiver[scalatest.Assertion] {
+        def apply[S : DOT, M : DOT, T : DOT](
+          equalizerSituation: EqualizerSituation[S, M, T]
+        ): scalatest.Assertion = {
+          import equalizerSituation._
+          val numCalls: AtomicInteger =
+            new AtomicInteger(0)
+          (s ?= t) (
+            new EqualizerReceiver[M, Boolean] {
+              override def apply[R <: M : DOT](restrictor: Restrictor[M, R]): Boolean = {
+                val inclusion: R => M = identity
+                (s o inclusion) ==?== (t o inclusion)
+                (inclusion o restrictor(r)) ==?== r
+                true
+              }
+            }
+          ) shouldBe true
+          numCalls.get shouldBe 1
+        }
+      })
     }
 
     /*
@@ -221,20 +259,6 @@ abstract class GenericToposTests[
       (foo > bar) shouldBe (foo > bar)
     }
 
-    it("has equalizers", Tag("eq")) {
-      // minor hackery required to extract the types
-      def runTest[S <: ~, M <: ~, T <: ~](
-                                           situation: EqualizerSituation[S, M, T]
-                                         ) : Unit = {
-        import situation._
-        val equalizer = s ?= t
-        val e = equalizer.inclusion
-
-        (s o e) shouldBe (t o e)
-        (e o equalizer.restrict(r)) shouldBe r
-      }
-      runTest(equalizerSituation)
-    }
 
     it("has a truth object (subobject classifier)") {
       omega.sanityTest

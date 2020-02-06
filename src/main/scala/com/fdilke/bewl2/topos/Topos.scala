@@ -8,15 +8,42 @@ trait Topos[DOT[_]] {
 
   def compareFunctions[S:DOT, T:DOT](func: S=> T, func2: S => T): Boolean
 
+//  abstract class Equalizer[
+//    S: DOT,
+//    R <: S : DOT
+//  ] {
+//    implicit val dot: Any = Topos.this.dot[R]
+//    def restrict[Q: DOT](
+//      function: Q => S
+//    ): Q => R
+//  }
+  trait Restrictor[S, R <: S] {
+    def apply[Q: DOT](arrow: Q => S): Q => R
+  }
+
+  abstract class EqualizerReceiver[S: DOT, X] {
+    def apply[R <: S : DOT](
+      restrictor: Restrictor[S, R]
+    ): X
+  }
+
+  def equalize[S:DOT, T:DOT, X](
+    func1: S => T,
+    func2: S => T
+  ): EqualizerReceiver[S, X] => X
+
   // TODO: put this helper code in a separate class
 
   @inline implicit class RichFunction[S: DOT, T:DOT](
     function: S => T
   ) {
-    @inline def =?=(function2: S => T) =
+    @inline def =?=(function2: S => T): Boolean =
       compareFunctions(function, function2)
 
-    @inline def o[R: DOT](function2: R => S) =
+    @inline def ?=[X](function2: S => T): EqualizerReceiver[S, X] => X =
+      equalize(function, function2)
+
+    @inline def o[R: DOT](function2: R => S): R => T =
       function compose function2
   }
 

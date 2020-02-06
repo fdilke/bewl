@@ -1,5 +1,6 @@
 package com.fdilke.bewl2.fsets
 
+import com.fdilke.bewl2.fsets.FiniteSets.FiniteSetsTopos
 import com.fdilke.bewl2.topos.Topos
 
 object FiniteSets {
@@ -17,6 +18,21 @@ object FiniteSets {
       dot[S] forall { s =>
         func(s) == func2(s)
       }
+
+    override def equalize[
+      S: Set,
+      T: Set,
+      X
+    ](
+      func: S => T,
+      func2: S => T
+    ): EqualizerReceiver[S, X] => X = {
+      _(new Restrictor[S, S] {
+        override def apply[Q: Set](arrow: Q => S): Q => S = {
+          throw new RuntimeException("Omigod")
+        }
+      })
+    }
   }
 }
 

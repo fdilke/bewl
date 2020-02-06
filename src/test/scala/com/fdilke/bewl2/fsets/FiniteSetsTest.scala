@@ -27,9 +27,14 @@ class FiniteSetsTest extends GenericToposTests[Set, Boolean, String, Int] {
     "Z" -> 1
   )
 
-  override val equalizerSituation = new EqualizerSituation[Boolean, String, Int](
-    foo2bar,
-    Map("X" -> 1, "Y" -> 2, "Z" -> 3),
-    Map("X" -> 1, "Y" -> 2, "Z" -> 1)
-  )
+  override def provideEqualizerSituation[X](
+    receiver: EqualizerSituationReceiver[X]
+ ): X =
+    receiver(
+      new EqualizerSituation[Boolean, String, Int](
+        foo2bar,
+        Map("X" -> 1, "Y" -> 2, "Z" -> 3),
+        Map("X" -> 1, "Y" -> 2, "Z" -> 1)
+      )
+    )
 }
