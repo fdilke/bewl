@@ -66,7 +66,7 @@ Let's create a dot that might represent a set of techies who work at Springer:
 
 and an arrow from it to omega that might express membership of a team:
 
-    val inTeam = arrow(techies, omega, "Felix" -> true, "Artur" -> true, "Tom" -> false)
+    val inTeam = arrow(techies, omega)("Felix" -> true, "Artur" -> true, "Tom" -> false)
 
 You can verify that this is epic, but not monic.
 
@@ -99,7 +99,7 @@ So `inTeam.toBool` is `false`, but `(truth o techies.toI).toBool` is `true`.
 
 Let's construct an isomorphism between `team` and `omega`:
 
-    val myIso = arrow(team, omega, "Felix" -> false, "Artur" -> true)
+    val myIso = arrow(team, omega)("Felix" -> false, "Artur" -> true)
 
 You can verify this is iso:
 
@@ -151,7 +151,7 @@ Let's construct another dot to illustrate this:
 
     val three = dot(1, 2, 3)
 
-    val even = arrow(three, omega, 1 -> false, 2 -> true, 3 -> false)
+    val even = arrow(three, omega)(1 -> false, 2 -> true, 3 -> false)
 
 So `even: three -> omega` just tells whether numbers are even. 
 We could define it another way:
