@@ -8,22 +8,16 @@ trait Topos[DOT[_]] {
 
   def compareFunctions[S:DOT, T:DOT](func: S=> T, func2: S => T): Boolean
 
-//  abstract class Equalizer[
-//    S: DOT,
-//    R <: S : DOT
-//  ] {
-//    implicit val dot: Any = Topos.this.dot[R]
-//    def restrict[Q: DOT](
-//      function: Q => S
-//    ): Q => R
-//  }
-  trait Restrictor[S, R <: S] {
-    def apply[Q: DOT](arrow: Q => S): Q => R
+  trait Equalizer[S, R] {
+    def include(r: R):S
+    def restrict[Q: DOT](
+      arrow: Q => S
+    ): Q => R
   }
 
   abstract class EqualizerReceiver[S: DOT, X] {
     def apply[R <: S : DOT](
-      restrictor: Restrictor[S, R]
+      equalizer: Equalizer[S, R]
     ): X
   }
 

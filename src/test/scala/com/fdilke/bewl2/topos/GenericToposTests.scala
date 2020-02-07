@@ -130,26 +130,27 @@ abstract class GenericToposTests[
       (id[BAR] o foo2bar) ==?== foo2bar
     }
 
-    ignore("has equalizers") {
+    it("has equalizers") {
       // 2 levels of fancy footwork required to extract the types
       provideEqualizerSituation(new EqualizerSituationReceiver[scalatest.Assertion] {
         def apply[S : DOT, M : DOT, T : DOT](
           equalizerSituation: EqualizerSituation[S, M, T]
         ): scalatest.Assertion = {
           import equalizerSituation._
-          val numCalls: AtomicInteger =
-            new AtomicInteger(0)
           (s ?= t) (
-            new EqualizerReceiver[M, Boolean] {
-              override def apply[R <: M : DOT](restrictor: Restrictor[M, R]): Boolean = {
-                val inclusion: R => M = identity
+            new EqualizerReceiver[M, Int] {
+              private val numCalls: AtomicInteger =
+                new AtomicInteger(0)
+              override def apply[R:DOT](
+                equalizer: topos.Equalizer[M, R]
+              ): Int = {
+                val inclusion: R => M = equalizer.include
                 (s o inclusion) ==?== (t o inclusion)
-                (inclusion o restrictor(r)) ==?== r
-                true
+                (inclusion o equalizer.restrict(r)) ==?== r
+                numCalls.incrementAndGet()
               }
             }
-          ) shouldBe true
-          numCalls.get shouldBe 1
+          ) shouldBe 1
         }
       })
     }

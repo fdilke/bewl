@@ -24,14 +24,20 @@ object FiniteSets {
       T: Set,
       X
     ](
-      func: S => T,
+      func1: S => T,
       func2: S => T
     ): EqualizerReceiver[S, X] => X = {
-      _(new Restrictor[S, S] {
-        override def apply[Q: Set](arrow: Q => S): Q => S = {
-          throw new RuntimeException("Omigod")
-        }
-      })
+      @inline type R = S
+      val subset: Set[R] = dot[S] filter { s =>
+        func1(s) == func2(s)
+      }
+      _(new Equalizer[S, R] {
+        override def include(r: R): S = r
+        override def restrict[Q: Set](
+          arrow: Q => S
+        ): Q => R =
+          arrow
+      })(subset)
     }
   }
 }
