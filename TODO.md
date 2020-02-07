@@ -432,3 +432,11 @@ Danger of things being implicitly autocalculated over and over when there's no n
 Could there be a trait whereby things like Action know automatically how to multiply
 instances of themselves? Nice to build into definition of algebraic structure.
  
+Products will be much simpler. We really only have to implicitly make
+(A, B): DOT whenever A : DOT and B : DOT. The rest is inherent. There
+should also be a lot less faffing around with left/right and multiplying
+functions, since none of it matters at all or does anything until we
+compare arrows. In fact there can be 22 different overloaded comparison
+operators like f =?= g where f, g: X x Y x Z => W, etc. So possibly the
+hypothetical working Bewl user never has to think about products at all,
+and the DSL is all baked in even further.
