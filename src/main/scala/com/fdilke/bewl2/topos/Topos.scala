@@ -7,6 +7,7 @@ trait Topos[DOT[_]] {
   def sanityTest[S: DOT, T:DOT](arrow: S => T): Unit
 
   def compareFunctions[S:DOT, T:DOT](func: S=> T, func2: S => T): Boolean
+  def functionAsString[S: Set, T: Set](arrow: S => T): String
 
   trait Equalizer[S, R] {
     def include(r: R):S

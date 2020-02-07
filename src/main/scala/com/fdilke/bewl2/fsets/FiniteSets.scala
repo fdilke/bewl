@@ -3,13 +3,27 @@ package com.fdilke.bewl2.fsets
 import com.fdilke.bewl2.fsets.FiniteSets.FiniteSetsTopos
 import com.fdilke.bewl2.topos.Topos
 
+import scala.language.postfixOps
+
 object FiniteSets {
   implicit object FiniteSetsTopos extends Topos[Set] {
     override def sanityTest[S: Set]: Unit =
       println(s"Sanity testing ${ implicitly[Set[S]] }")
 
     override def sanityTest[S: Set, T: Set](arrow: S => T): Unit =
-      println(s"Sanity testing a function of sets... how?")
+      for { s <- dot[S] }
+        if (!dot[T].contains(arrow(s)))
+          throw new IllegalArgumentException(
+            "Broken arrow: " + functionAsString(arrow) +
+              s" maps value $s outside domain ${dot[S]}"
+          )
+
+    override def functionAsString[S: Set, T: Set](
+      arrow: S => T
+    ): String =
+      (dot[S].map {
+        s => s -> arrow(s)
+      } toMap) toString
 
     override def compareFunctions[S: Set, T: Set](
       func: S=> T,
