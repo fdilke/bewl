@@ -2,7 +2,7 @@ package com.fdilke.bewl2.topos
 
 import com.fdilke.bewl.helper.Memoize
 
-trait Topos[DOT[_]] {
+trait Topos[DOT[_]] { topos =>
   val name: String = getClass.getSimpleName
 
   def sanityTest[S: DOT]: Unit
@@ -32,7 +32,7 @@ trait Topos[DOT[_]] {
 
   // TODO: put this helper code in a separate class
 
-  @inline implicit class RichFunction[S: DOT, T:DOT](
+  @inline implicit class RichFunction[S: DOT, T:DOT] (
     function: S => T
   ) {
     @inline def =?=(function2: S => T): Boolean =
@@ -43,6 +43,12 @@ trait Topos[DOT[_]] {
 
     @inline def o[R: DOT](function2: R => S): R => T =
       function compose function2
+
+    @inline def x[U: DOT](function2: S => U): S => (T, U) =
+      s => (function(s), function2(s))
+
+    @inline def sanityTest =
+      topos.sanityTest(function)
   }
 
   // anticipate these will not be used very much...
@@ -93,4 +99,9 @@ trait Topos[DOT[_]] {
 
   implicit def productDot[A: DOT, B: DOT]: DOT[(A, B)] =
     extras[A].productDot[B]
+
+  implicit def multiFunction2function[A: DOT, B: DOT, C: DOT](
+    mf: (A, B) => C
+  ): ((A, B)) => C =
+    Function.tupled(mf)
 }

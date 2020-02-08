@@ -82,22 +82,15 @@ abstract class GenericToposTests[
     }
 
     it("include sane arrows whose sources and targets match their names") {
-      sanityTest(foo2bar)
+      foo2bar.sanityTest
       source(foo2bar) shouldBe foo
       target(foo2bar) shouldBe bar
 
-      sanityTest(foo2baz)
+      foo2baz.sanityTest
       source(foo2baz) shouldBe foo
       target(foo2baz) shouldBe baz
 
-//      foobar2baz.arrow.sanityTest
-//      foobar2baz.product shouldBe (foo x bar)
-//      foobar2baz.product.left shouldBe foo
-//      foobar2baz.product.right shouldBe bar
-//      foobar2baz.arrow.source shouldBe (foo x bar)
-//      foobar2baz.arrow.target shouldBe baz
-
-      sanityTest(monicBar2baz)
+      monicBar2baz.sanityTest
       source(monicBar2baz) shouldBe bar
       target(monicBar2baz) shouldBe baz
 
@@ -162,17 +155,21 @@ abstract class GenericToposTests[
 //        left (bar),
 //        right (baz)
 //      )
-//      val productArrow = foo2bar x foo2baz
-//
-//      productArrow.sanityTest
+      val productArrow: FOO => (BAR, BAZ) =
+        foo2bar x foo2baz
+
+      productArrow.sanityTest
 //      productArrow should have (
 //        source (foo),
 //        target (bar x baz),
 //        sanityTest (null)
 //      )
 //
-//      (bar x baz).π0.sanityTest
-//      (bar x baz).π1.sanityTest
+      def π0(x: BAR, y: BAZ): BAR = x
+      (π0 : ((BAR, BAZ)) => BAR).sanityTest
+
+      def π1(x: BAR, y: BAZ): BAZ = y
+      (π1 : ((BAR, BAZ)) => BAZ).sanityTest
 //
 //      foo(bar) {
 //        x => productArrow(x)._1
