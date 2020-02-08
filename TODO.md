@@ -459,3 +459,15 @@ and things like lazy square can go in here too.
 Maybe 'extras' more descriptive than 'helper'
 Maybe need an implicit version of Memoize.generic
     but for now we internalize the machinery this needs, factor it out later
+    - tried, we can't until Dotty! No matter, it is not that inelegant.
+
+This is probably how I should not handle multifunctions:
+  implicit def multiFunction2function[A: DOT, B: DOT, C: DOT](
+    mf: (A, B) => C
+  ): ((A, B)) => C =
+    Function.tupled(mf)
+i.e. regarding them as functions. Instead have RichMultifunction
+which will do equality and maybe let us compose them nicely too:
+    f2(f, f) could be a unary function if f is unary, f2 multiary.
+    
+    
