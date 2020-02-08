@@ -1,5 +1,7 @@
 package com.fdilke.bewl2.topos
 
+import com.fdilke.bewl.helper.Memoize
+
 trait Topos[DOT[_]] {
   val name: String = getClass.getSimpleName
 
@@ -55,6 +57,40 @@ trait Topos[DOT[_]] {
   final def id[S: DOT]: S => S =
     identity
 
+  final private class DotExtras[A: DOT] {
+    final private def makeProduct[B](
+      dot: DOT[B]
+    ): DOT[(A, B)] = {
+      implicit val theDot: DOT[B] = dot
+      productUncached[A, B]
+    }
+
+    final private val memoizedProduct =
+      Memoize.generic[
+        DOT,
+        ({ type λ[B] = DOT[(A, B)]}) # λ,
+      ] (makeProduct)
+
+    def productDot[B : DOT]: DOT[(A, B)] =
+      memoizedProduct(dot[B])
+  }
+
+  final private def makeDotExtras[A](
+    dot: DOT[A]
+  ): DotExtras[A] = {
+    implicit val theDot: DOT[A] = dot
+    new DotExtras[A]
+  }
+
+  final private val memoizedExtras =
+    Memoize.generic[
+      DOT,
+      DotExtras
+    ] (makeDotExtras)
+
+  final private def extras[A: DOT]: DotExtras[A] =
+    memoizedExtras(dot[A])
+
   implicit def productDot[A: DOT, B: DOT]: DOT[(A, B)] =
-    productUncached[A, B] // TODO: cache it!
+    extras[A].productDot[B]
 }

@@ -446,3 +446,16 @@ and the DSL is all baked in even further.
 Don't even need names for the projection arrows and other machinery.
 
 Also can't think of a reason to NOT have Void instead of VOID, Unit for UNIT.
+
+Need some more machinery: in Bewl 1, each DOT[A] had a cache of memoized
+product dots DOT{(A, B)] inside it, once for each DOT[B]. Have to somehow
+replicate this structure.
+
+We'll have a memoized DotHelper[A] for each DOT[A], and inside this a
+cache B => DOT[(A, B)] for each B as in the previous scheme.
+Exponentials can work this way too. "eval" wil be inherent, with an
+exponential type A → B (or maybe use > for this?), also coproducts.
+and things like lazy square can go in here too.
+Maybe 'extras' more descriptive than 'helper'
+Maybe need an implicit version of Memoize.generic
+    but for now we internalize the machinery this needs, factor it out later
