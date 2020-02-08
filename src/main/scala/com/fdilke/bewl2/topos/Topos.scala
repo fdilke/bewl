@@ -2,6 +2,8 @@ package com.fdilke.bewl2.topos
 
 import com.fdilke.bewl.helper.Memoize
 
+import scala.Function.tupled
+
 trait Topos[DOT[_]] { topos =>
   val name: String = getClass.getSimpleName
 
@@ -100,8 +102,14 @@ trait Topos[DOT[_]] { topos =>
   implicit def productDot[A: DOT, B: DOT]: DOT[(A, B)] =
     extras[A].productDot[B]
 
-  implicit def multiFunction2function[A: DOT, B: DOT, C: DOT](
-    mf: (A, B) => C
-  ): ((A, B)) => C =
-    Function.tupled(mf)
+  // Projection operators
+  def π0[A : DOT, B : DOT]: ((A, B)) => A =
+    tupled { (a, b) => a }
+  def π1[A : DOT, B : DOT]: ((A, B)) => B =
+    tupled { (a, b) => b }
+
+  //  implicit def multiFunction2function[A: DOT, B: DOT, C: DOT](
+//    mf: (A, B) => C
+//  ): ((A, B)) => C =
+//    Function.tupled(mf)
 }

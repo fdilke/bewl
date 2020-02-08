@@ -165,25 +165,19 @@ abstract class GenericToposTests[
 //        sanityTest (null)
 //      )
 //
-      def π0(x: BAR, y: BAZ): BAR = x
-      (π0 : ((BAR, BAZ)) => BAR).sanityTest
 
-      def π1(x: BAR, y: BAZ): BAZ = y
-      (π1 : ((BAR, BAZ)) => BAZ).sanityTest
-//
-//      foo(bar) {
-//        x => productArrow(x)._1
-//      } shouldBe foo2bar
-//
-//      foo(baz) {
-//        x => productArrow(x)._2
-//      } shouldBe foo2baz
-//
-//      val fooXbar: BIPRODUCT[FOO, BAR] =
-//        foo x bar
-//      fooXbar(fooXbar) {
-//        ⊕ tupled fooXbar.pair
-//      } shouldBe fooXbar.identity
+      foo2bar ==?== { (x: FOO) => productArrow(x)._1 }
+      foo2baz ==?== { (x: FOO) => productArrow(x)._2 }
+
+      val swapFooBar: ((FOO, BAR)) => (BAR, FOO) =
+        Function.tupled { (x, y) => (y, x) }
+
+      val swapBarFoo: ((BAR, FOO)) => (FOO, BAR) =
+        Function.tupled { (y, x) => (x, y) }
+
+      id[(BAR, FOO)] ==?== (swapFooBar o swapBarFoo)
+      id[(FOO, BAR)] ==?== (swapBarFoo o swapFooBar)
+      id[(FOO, BAR)] ==?== (π0[FOO, BAR] x π1[FOO, BAR])
     }
 /*
     it("has a terminator") {
