@@ -7,7 +7,8 @@ trait Topos[DOT[_]] {
   def sanityTest[S: DOT, T:DOT](arrow: S => T): Unit
 
   def compareFunctions[S:DOT, T:DOT](func: S=> T, func2: S => T): Boolean
-  def functionAsString[S: Set, T: Set](arrow: S => T): String
+  def functionAsString[S: DOT, T: DOT](arrow: S => T): String
+  def productUncached[A : DOT, B : DOT]: DOT[(A, B)]
 
   trait Equalizer[S, R] {
     def include(r: R):S
@@ -53,4 +54,7 @@ trait Topos[DOT[_]] {
     dot[T]
   final def id[S: DOT]: S => S =
     identity
+
+  implicit def productDot[A: DOT, B: DOT]: DOT[(A, B)] =
+    productUncached[A, B] // TODO: cache it!
 }

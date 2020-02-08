@@ -155,40 +155,40 @@ abstract class GenericToposTests[
       })
     }
 
-    /*
-    it("can construct biproduct diagrams") {
-      (bar x baz).sanityTest
-      (bar x baz) should have(
-        left (bar),
-        right (baz)
-      )
-      val productArrow = foo2bar x foo2baz
-
-      productArrow.sanityTest
-      productArrow should have (
-        source (foo),
-        target (bar x baz),
-        sanityTest (null)
-      )
-
-      (bar x baz).π0.sanityTest
-      (bar x baz).π1.sanityTest
-
-      foo(bar) {
-        x => productArrow(x)._1
-      } shouldBe foo2bar
-
-      foo(baz) {
-        x => productArrow(x)._2
-      } shouldBe foo2baz
-
-      val fooXbar: BIPRODUCT[FOO, BAR] =
-        foo x bar
-      fooXbar(fooXbar) {
-        ⊕ tupled fooXbar.pair
-      } shouldBe fooXbar.identity
+    it("can construct biproduct diagrams, with everything mostly inherent") {
+      val barbaz: DOT[(BAR, BAZ)] = dot[(BAR, BAZ)]
+      topos.sanityTest(barbaz)
+//      (bar x baz) should have(
+//        left (bar),
+//        right (baz)
+//      )
+//      val productArrow = foo2bar x foo2baz
+//
+//      productArrow.sanityTest
+//      productArrow should have (
+//        source (foo),
+//        target (bar x baz),
+//        sanityTest (null)
+//      )
+//
+//      (bar x baz).π0.sanityTest
+//      (bar x baz).π1.sanityTest
+//
+//      foo(bar) {
+//        x => productArrow(x)._1
+//      } shouldBe foo2bar
+//
+//      foo(baz) {
+//        x => productArrow(x)._2
+//      } shouldBe foo2baz
+//
+//      val fooXbar: BIPRODUCT[FOO, BAR] =
+//        foo x bar
+//      fooXbar(fooXbar) {
+//        ⊕ tupled fooXbar.pair
+//      } shouldBe fooXbar.identity
     }
-
+/*
     it("has a terminator") {
       I.sanityTest
       val fooToI = foo.toI

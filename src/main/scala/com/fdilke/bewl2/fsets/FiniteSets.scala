@@ -53,6 +53,14 @@ object FiniteSets {
           arrow
       })(subset)
     }
+
+    override def productUncached[A : Set, B : Set]: Set[(A, B)] =
+      for {
+        a <- dot[A]
+        b <- dot[B]
+      } yield {
+        a -> b
+      }
   }
 }
 

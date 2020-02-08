@@ -422,7 +422,10 @@ Of course could be the same, and probably will be, but don't assume this.
 Does it need to be a DOT? Don't we mostly care about the type?
 Could it just be a case class?
 Check syntactic use of equalizers in Bewl1...
-Looks like use is only local, and "?=" might as well return a case class. 
+Looks like use is only local, and "?=" might as well return a case class.
+The mechanism of calling an EqualizerReceiver, which picks up the implicit
+DOT[E], involves annoying boilerplate but otherwise works ok.
+ 
 Products will be harder... 
 When there is A:DOT and B:DOT, we want there to implicitly be a (A, B): DOT,
 but for other operations to exist as well - projection, multiplication of arrows.
@@ -432,7 +435,7 @@ Danger of things being implicitly autocalculated over and over when there's no n
 Could there be a trait whereby things like Action know automatically how to multiply
 instances of themselves? Nice to build into definition of algebraic structure.
  
-Products will be much simpler. We really only have to implicitly make
+Actually simple. We really only have to implicitly make
 (A, B): DOT whenever A : DOT and B : DOT. The rest is inherent. There
 should also be a lot less faffing around with left/right and multiplying
 functions, since none of it matters at all or does anything until we
@@ -440,3 +443,6 @@ compare arrows. In fact there can be 22 different overloaded comparison
 operators like f =?= g where f, g: X x Y x Z => W, etc. So possibly the
 hypothetical working Bewl user never has to think about products at all,
 and the DSL is all baked in even further.
+Don't even need names for the projection arrows and other machinery.
+
+Also can't think of a reason to NOT have Void instead of VOID, Unit for UNIT.
