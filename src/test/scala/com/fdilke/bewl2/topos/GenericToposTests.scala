@@ -2,6 +2,7 @@ package com.fdilke.bewl2.topos
 
 import java.util.concurrent.atomic.AtomicInteger
 
+import com.fdilke.bewl2.topos.FunctionalPlumbing.EqualizerReceiver
 import org.scalatest
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
@@ -131,11 +132,11 @@ abstract class GenericToposTests[
         ): scalatest.Assertion = {
           import equalizerSituation._
           (s ?= t) (
-            new EqualizerReceiver[M, Int] {
+            new EqualizerReceiver[DOT, M, Int] {
               private val numCalls: AtomicInteger =
                 new AtomicInteger(0)
               override def apply[R:DOT](
-                equalizer: topos.Equalizer[M, R]
+                equalizer: FunctionalPlumbing.Equalizer[DOT, M, R]
               ): Int = {
                 val inclusion: R => M = equalizer.include
                 (s o inclusion) ==?== (t o inclusion)

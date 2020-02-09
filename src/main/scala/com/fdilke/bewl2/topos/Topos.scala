@@ -1,6 +1,7 @@
 package com.fdilke.bewl2.topos
 
 import com.fdilke.bewl.helper.Memoize
+import com.fdilke.bewl2.topos.FunctionalPlumbing.EqualizerReceiver
 
 import scala.Function.tupled
 
@@ -16,23 +17,10 @@ trait Topos[DOT[_]] { topos =>
   def functionAsString[S: DOT, T: DOT](arrow: S => T): String
   def productUncached[A : DOT, B : DOT]: DOT[(A, B)]
 
-  trait Equalizer[S, R] {
-    def include(r: R):S
-    def restrict[Q: DOT](
-      arrow: Q => S
-    ): Q => R
-  }
-
-  abstract class EqualizerReceiver[S: DOT, X] {
-    def apply[R <: S : DOT](
-      equalizer: Equalizer[S, R]
-    ): X
-  }
-
   def equalize[S:DOT, T:DOT, X](
     func1: S => T,
     func2: S => T
-  ): EqualizerReceiver[S, X] => X
+  ): EqualizerReceiver[DOT, S, X] => X
 
   // TODO: put this helper code in a separate class
 
@@ -42,7 +30,7 @@ trait Topos[DOT[_]] { topos =>
     @inline final def =?=(function2: S => T): Boolean =
       compareFunctions(function, function2)
 
-    @inline final def ?=[X](function2: S => T): EqualizerReceiver[S, X] => X =
+    @inline final def ?=[X](function2: S => T): EqualizerReceiver[DOT, S, X] => X =
       equalize(function, function2)
 
     @inline final def o[R: DOT](function2: R => S): R => T =
