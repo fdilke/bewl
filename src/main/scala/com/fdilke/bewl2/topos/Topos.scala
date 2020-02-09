@@ -10,6 +10,8 @@ trait Topos[DOT[_]] { topos =>
 
   implicit val terminator : DOT[Unit]
   def to1[S: DOT]: S => Unit
+  implicit val initial : DOT[Void]
+  def from0[S: DOT]: Void => S
   def sanityTest[S: DOT]: Unit
   def sanityTest[S: DOT, T:DOT](arrow: S => T): Unit
 

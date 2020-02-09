@@ -517,3 +517,9 @@ Can there be RichType[T: DOT] extends AnyVal? Maybe wouldn't make any sense.
 arrange the contents of Topos into neat little cakelets
 is there a way to make implicit objects anonymous, so we don't have to name them?
 maybe give them deliberately terrible names like `1` or `_`?
+
+we'll have allMaps[FOO, BAR] and arguably it should return objects wrapped so they can
+be distinguished with sane equality semantics. also maybe there should be
+    FunctionKey { (a: A) => B }
+    
+    

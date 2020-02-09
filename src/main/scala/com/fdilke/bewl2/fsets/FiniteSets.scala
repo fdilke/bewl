@@ -68,6 +68,12 @@ object FiniteSets {
 
     override def to1[S: Set]: S => Unit =
       _ => {}
+
+    override implicit val initial: Set[Void] =
+      Set[Void]()
+
+    override def from0[S: Set]: Void => S =
+      _ => throw new IllegalArgumentException("You passed a Void")
   }
 }
 
