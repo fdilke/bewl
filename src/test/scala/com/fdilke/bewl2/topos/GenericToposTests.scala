@@ -205,10 +205,11 @@ abstract class GenericToposTests[
       to1[Void] ==?== from0[Unit]
     }
 
+    it("caches products") {
+      dot[(FOO, BAR)] shouldBe dot[(FOO, BAR)]
+    }
+
     /*
-        it("has standardized products") {
-          (foo x bar) shouldBe (foo x bar)
-        }
 
         it("can chain products") {
           val barXfooXbaz = bar x foo x baz
