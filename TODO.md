@@ -478,6 +478,16 @@ sink below the level of 'everyday Bewl use'.
 note so far no tests for arrows not being equal... do we need ==!?== ?
 check under 'sane semantics of equality'
 also move EqualizerXx out of Topos and into FunctionalPlumbing
+can it use type lambdas? note Settings/Code Style/Scala/Folding/Type Lambdas
+or Settings/Editor/Code Folding now?
+after experimenting with monstrosities like this, gave up:
+
+  type Simpler = ({ type µ = Set[String] => Int }) # µ
+  type Simpler0[R] = ({ type µ = Set[R] => Int }) # µ
+  type Simpler2 = ([R]{ type µ = Set[R] => Int }) # µ
+  type Simpler1[R <: Serializable] = ({ type µ[R] = Set[R] => Int }) # µ
+  type EqualizerReceiver[DOT[_], S, X, R <: S] = ({ type µ[P] = DOT[P] => X }) # µ
+
 Can there be RichType[T: DOT] extends AnyVal? Maybe wouldn't make any sense.
 
 arrange the contents of Topos into neat little cakelets
