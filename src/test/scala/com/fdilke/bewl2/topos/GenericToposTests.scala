@@ -209,19 +209,24 @@ abstract class GenericToposTests[
       dot[(FOO, BAR)] shouldBe dot[(FOO, BAR)]
     }
 
+    // TODO: consider abolishing products in favour of "multiary plumbing" then come back to this
+//    it("can chain products") {
+//      val barXfooXbaz = bar x foo x baz
+//      val productArrow: FOO => ((BAR, FOO), BAZ) =
+//        foo2bar x id[FOO] x foo2baz
+//      val xxx = dot[(BAR, FOO)]
+//      val xxxy = dot[((BAR, FOO), BAZ)]
+//      productArrow.sanityTest
+//      productArrow.source shouldBe foo
+//      productArrow.target shouldBe dot[((BAR, FOO), BAZ)]
+//
+//      (π0[(BAR, FOO), BAZ] o productArrow) ==?== foo2bar
+//      midProjection(bar, foo, baz) o productArrow shouldBe foo.identity
+//      rightProjection(bar, foo, baz) o productArrow shouldBe foo2baz
+//    }
+
     /*
 
-        it("can chain products") {
-          val barXfooXbaz = bar x foo x baz
-          val productArrow = foo2bar x foo.identity x foo2baz
-          productArrow.sanityTest
-          productArrow.source shouldBe foo
-          productArrow.target shouldBe barXfooXbaz
-
-          leftProjection(bar, foo, baz) o productArrow shouldBe foo2bar
-          midProjection(bar, foo, baz) o productArrow shouldBe foo.identity
-          rightProjection(bar, foo, baz) o productArrow shouldBe foo2baz
-        }
 
         it("can construct exponential diagrams") {
           // Check evaluation maps baz^bar x bar -> baz

@@ -520,6 +520,46 @@ maybe give them deliberately terrible names like `1` or `_`?
 
 we'll have allMaps[FOO, BAR] and arguably it should return objects wrapped so they can
 be distinguished with sane equality semantics. also maybe there should be
+
     FunctionKey { (a: A) => B }
     
+next it turns out this sort of thing is problematic:
+
+    dot[((BAR, FOO), BAZ)]    
     
+"diverging implicit expansion" because the compiler thinks it might be going
+down an infinite rabbit hole, because of reinvoking the same implicit twice.
+
+Possible solution: start using triples, (A, B, C) and multiply functions with x(f, g, ...)
+with appropriate functional plumbing, this should work.
+
+bolder scheme: can we eliminate products, specifically the construction of
+product objects, entirely? after all, with exponentials,
+
+    (A x B => C) is just (A => (B => C))
+    
+but the alternative is to construct even more cumbersome exponentials.
+Should FiniteSets actually be a Topos[Iterable] not Topos[Set] ?
+Then we're only enumerating things, not storing a huge list of them.
+There could be an optimization where if the list is small, we do cache it.
+But that will happen automatically if we just use real sets for small Iterables.
+
+It would also be nice to be able to regard a DOT[S] as a DOT[T], whenever
+S and T are "evidentially equivalent" i.e. there is an implicit user-supplied bijection. 
+
+so: do we need there to be a real DOT[(A, B)] or can it all be done with
+multiary plumbing? For Iterable and possibly future types it's all equivalent anyway.
+
+Good to know that we can overload methods with only (different numbers of) type parameters:
+
+      def π0[A: DOT, B: DOT, C: DOT]: (((A, B), C)) => A = { ... }
+
+but the definition of this is horrific because we have to spell it all out longhand
+to avoid errors about diverging implicit expansions. This seems to point towards
+multiary plumbing and away from products.
+
+It's tempting to abolish "materialized products", given we have to have
+DOT[A > B] anyway, although starting to wonder if there might be a way to abolish that too.
+
+Do some other features, like exponentials/truth object, then come back to this.
+

@@ -101,6 +101,22 @@ trait Topos[DOT[_]] { topos =>
   def π1[A : DOT, B : DOT]: ((A, B)) => B =
     tupled { (a, b) => b }
 
+  // TODO: this works but is monstrous. Remedy is to abolish
+  //  materialized products in favour of multiary plumbing?
+  def π0[A: DOT, B: DOT, C: DOT]: (((A, B), C)) => A = {
+    val k: (((A, B), C)) => (A, B) = π0[(A, B), C]
+    val l: ((A, B)) => A = π0[A, B]
+
+    val t: (((A, B), C)) => A = {
+      (abc: ((A, B), C)) =>
+        val ab: (A, B) = k(abc)
+        val a: A = l(ab)
+        a
+    }
+    t
+  }
+//    π0[A, B] o π0[(A, B), C]
+
   //  implicit def multiFunction2function[A: DOT, B: DOT, C: DOT](
 //    mf: (A, B) => C
 //  ): ((A, B)) => C =
