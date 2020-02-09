@@ -61,6 +61,12 @@ object FiniteSets {
       } yield {
         a -> b
       }
+
+    override implicit val terminator: Set[Unit] =
+      Set({})
+
+    override def to1[S: Set]: S => Unit =
+      _ => {}
   }
 }
 

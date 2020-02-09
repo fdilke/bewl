@@ -83,16 +83,16 @@ abstract class GenericToposTests[
 
     it("include sane arrows whose sources and targets match their names") {
       foo2bar.sanityTest
-      source(foo2bar) shouldBe foo
-      target(foo2bar) shouldBe bar
+      foo2bar.source shouldBe foo
+      foo2bar.target shouldBe bar
 
       foo2baz.sanityTest
-      source(foo2baz) shouldBe foo
-      target(foo2baz) shouldBe baz
+      foo2baz.source shouldBe foo
+      foo2baz.target shouldBe baz
 
       monicBar2baz.sanityTest
-      source(monicBar2baz) shouldBe bar
-      target(monicBar2baz) shouldBe baz
+      monicBar2baz.source shouldBe bar
+      monicBar2baz.target shouldBe baz
 
       provideEqualizerSituation(new EqualizerSituationReceiver[Unit] {
         def apply[S: DOT, M: DOT, T: DOT](
@@ -179,17 +179,18 @@ abstract class GenericToposTests[
       id[(FOO, BAR)] ==?== (swapBarFoo o swapFooBar)
       id[(FOO, BAR)] ==?== (π0[FOO, BAR] x π1[FOO, BAR])
     }
-/*
+
     it("has a terminator") {
-      I.sanityTest
-      val fooToI = foo.toI
+      sanityTest[Unit]
+      val fooToI: FOO => Unit = to1[FOO]
       fooToI.sanityTest
       fooToI.source shouldBe foo
-      fooToI.target shouldBe topos.I
+      fooToI.target shouldBe dot[Unit]
 
-      bar.toI o foo2bar shouldBe fooToI
+      (to1[BAR] o foo2bar) ==?== fooToI
     }
 
+/*
     it("has a (derived) initial object") {
       O.sanityTest
       val fooFromO = foo.fromO

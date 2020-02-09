@@ -470,4 +470,16 @@ i.e. regarding them as functions. Instead have RichMultifunction
 which will do equality and maybe let us compose them nicely too:
     f2(f, f) could be a unary function if f is unary, f2 multiary.
     
-    
+next the terminator and the following statement is true:
+"I does not need a name". In fact why would you even need to
+talk about the arrow FOO => Unit. So prepare for some of this to
+sink below the level of 'everyday Bewl use'.
+
+note so far no tests for arrows not being equal... do we need ==!?== ?
+check under 'sane semantics of equality'
+also move EqualizerXx out of Topos and into FunctionalPlumbing
+Can there be RichType[T: DOT] extends AnyVal? Maybe wouldn't make any sense.
+
+arrange the contents of Topos into neat little cakelets
+is there a way to make implicit objects anonymous, so we don't have to name them?
+maybe give them deliberately terrible names like `1` or `_`?

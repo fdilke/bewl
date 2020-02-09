@@ -7,6 +7,8 @@ import scala.Function.tupled
 trait Topos[DOT[_]] { topos =>
   val name: String = getClass.getSimpleName
 
+  implicit val terminator : DOT[Unit]
+  def to1[S: DOT]: S => Unit
   def sanityTest[S: DOT]: Unit
   def sanityTest[S: DOT, T:DOT](arrow: S => T): Unit
 
@@ -37,20 +39,25 @@ trait Topos[DOT[_]] { topos =>
   @inline implicit class RichFunction[S: DOT, T:DOT] (
     function: S => T
   ) {
-    @inline def =?=(function2: S => T): Boolean =
+    @inline final def =?=(function2: S => T): Boolean =
       compareFunctions(function, function2)
 
-    @inline def ?=[X](function2: S => T): EqualizerReceiver[S, X] => X =
+    @inline final def ?=[X](function2: S => T): EqualizerReceiver[S, X] => X =
       equalize(function, function2)
 
-    @inline def o[R: DOT](function2: R => S): R => T =
+    @inline final def o[R: DOT](function2: R => S): R => T =
       function compose function2
 
-    @inline def x[U: DOT](function2: S => U): S => (T, U) =
+    @inline final def x[U: DOT](function2: S => U): S => (T, U) =
       s => (function(s), function2(s))
 
-    @inline def sanityTest =
+    @inline final def sanityTest =
       topos.sanityTest(function)
+
+    @inline final def source: DOT[S] =
+      dot[S]
+    @inline final def target: DOT[T] =
+      dot[T]
   }
 
   // anticipate these will not be used very much...
@@ -58,10 +65,6 @@ trait Topos[DOT[_]] { topos =>
   @inline final def dot[S:DOT]: DOT[S] =
     implicitly[DOT[S]]
 
-  final def source[S:DOT, T:DOT](arrow: S => T): DOT[S] =
-    dot[S]
-  final def target[S:DOT, T:DOT](arrow: S => T): DOT[T] =
-    dot[T]
   final def id[S: DOT]: S => S =
     identity
 
