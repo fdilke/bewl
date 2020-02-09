@@ -8,8 +8,6 @@ object FunctionalPlumbing {
     ): Q => R
   }
 
-  // TODO: make this work as a replacement
-  // type EqualizerReceiver[DOT[_], S: DOT, X] = ({ def µ[R <: S : DOT]: X }) # µ
   abstract class EqualizerReceiver[DOT[_], S: DOT, X] {
     def apply[R <: S : DOT](
       equalizer: Equalizer[DOT, S, R]

@@ -487,6 +487,30 @@ after experimenting with monstrosities like this, gave up:
   type Simpler2 = ([R]{ type µ = Set[R] => Int }) # µ
   type Simpler1[R <: Serializable] = ({ type µ[R] = Set[R] => Int }) # µ
   type EqualizerReceiver[DOT[_], S, X, R <: S] = ({ type µ[P] = DOT[P] => X }) # µ
+  
+final defeat:
+
+    type EqRec[DOT[_], S, X] = { def apply[R <: S : DOT]: X }
+    type EqRec[DOT[_], S, X] = { def apply[_ <: S : DOT]: X }
+    Error:(13, 36) Parameter type in structural refinement may not refer to an abstract type defined outside that refinement
+      type EqRec[DOT[_], S, X] = { def apply[R <: S : DOT]: X }
+
+actually this kind of thing shows the way, but it would mean
+exposing more plumbing with DOTs than I want to. Better to use 
+existing scheme with ":" even if it is superficially clunkier
+
+      type EqualizerReceiver[DOT[_], X] = DOT[_] => X
+      trait SubTopos[DOT[_]] {
+        def equalize[S:DOT, T:DOT, X](
+                                       func1: S => T,
+                                       func2: S => T
+                                     ): EqualizerReceiver[DOT, X] => X
+      }
+      private def experiment[DOT[_]: SubTopos, S: DOT, T: DOT](arrow: S => T): Unit = {
+        implicitly[SubTopos[DOT]].equalize(arrow, arrow) ({
+          
+        })
+      }
 
 Can there be RichType[T: DOT] extends AnyVal? Maybe wouldn't make any sense.
 
