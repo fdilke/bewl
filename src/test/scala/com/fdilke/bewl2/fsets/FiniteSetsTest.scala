@@ -4,6 +4,8 @@ import com.fdilke.bewl.fsets.FiniteSetsUtilities.arrow
 import com.fdilke.bewl2.fsets.FiniteSets._
 import com.fdilke.bewl2.topos.GenericToposTests
 
+import scala.Function.untupled
+
 private object Fixtures {
   implicit val foo: Set[Boolean] = Set(true, false)
   implicit val bar: Set[String] = Set("X", "Y", "Z")
@@ -25,6 +27,14 @@ class FiniteSetsTest extends GenericToposTests[Set, Boolean, String, Int] {
     "X" -> 2,
     "Y" -> 3,
     "Z" -> 1
+  )
+
+  override val foobar2baz = untupled(
+    Map(
+      (true, "X") -> 2, (false, "X") -> 3,
+      (true, "Y") -> 1, (false, "Y") -> 2,
+      (true, "Z") -> 2, (false, "Z") -> 3
+    )
   )
 
   override def provideEqualizerSituation[X](

@@ -8,6 +8,8 @@ import scala.Function.tupled
 trait Topos[DOT[_]] { topos =>
   val name: String = getClass.getSimpleName
 
+  type >[A, B] <: A => B
+
   implicit val terminator : DOT[Unit]
   def to1[S: DOT]: S => Unit
   implicit val initial : DOT[Void]
@@ -18,6 +20,11 @@ trait Topos[DOT[_]] { topos =>
   def compareFunctions[S:DOT, T:DOT](func: S=> T, func2: S => T): Boolean
   def functionAsString[S: DOT, T: DOT](arrow: S => T): String
   def productUncached[A : DOT, B : DOT]: DOT[(A, B)]
+  def exponentialUncached[A : DOT, B : DOT]: DOT[A > B]
+
+  def transpose[A:DOT, B:DOT, C:DOT](
+    arrow: (A, B) => C
+  ): A => (B > C)
 
   def equalize[S:DOT, T:DOT, X](
     func1: S => T,
@@ -50,6 +57,16 @@ trait Topos[DOT[_]] { topos =>
       dot[T]
   }
 
+  @inline implicit class RichBiFunction[S: DOT, T:DOT, U: DOT] (
+   function: (S, T) => U
+ ) {
+    @inline final def =?=(function2: (S, T) => U): Boolean =
+      topos.transpose(function) =?= topos.transpose(function2)
+
+    @inline final def transpose: S => (T > U) =
+      topos.transpose(function)
+  }
+
   // anticipate these will not be used very much...
   // as it's all baked into the types and thoughtcrime is impossible. remove?
   @inline final def dot[S:DOT]: DOT[S] =
@@ -74,6 +91,22 @@ trait Topos[DOT[_]] { topos =>
 
     def productDot[B : DOT]: DOT[(A, B)] =
       memoizedProduct(dot[B])
+
+    final private def makeExponential[B](
+      dot: DOT[B]
+    ): DOT[A > B] = {
+      implicit val theDot: DOT[B] = dot
+      exponentialUncached[A, B]
+    }
+
+    final private val memoizedExponential =
+      Memoize.generic[
+        DOT,
+        ({ type λ[B] = DOT[A > B]}) # λ,
+      ] (makeExponential)
+
+    def exponential[B : DOT]: DOT[A > B] =
+      memoizedExponential(dot[B])
   }
 
   final private def makeDotExtras[A](
@@ -94,6 +127,9 @@ trait Topos[DOT[_]] { topos =>
 
   implicit def productDot[A: DOT, B: DOT]: DOT[(A, B)] =
     extras[A].productDot[B]
+
+  implicit def exponentialDot[A: DOT, B: DOT]: DOT[A > B] =
+    extras[A].exponential[B]
 
   // Projection operators
   def π0[A : DOT, B : DOT]: ((A, B)) => A =

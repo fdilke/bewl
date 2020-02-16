@@ -560,6 +560,8 @@ multiary plumbing and away from products.
 
 It's tempting to abolish "materialized products", given we have to have
 DOT[A > B] anyway, although starting to wonder if there might be a way to abolish that too.
-
 Do some other features, like exponentials/truth object, then come back to this.
+Looks more and more feasible. We will need an implicit helper for function types like (A, B) => C
+so we can do sanity tests on them. Leave a marker TODO for this. 
+Memo to fix all the TODOs and leave GenericToposTests in a tidy state.
 

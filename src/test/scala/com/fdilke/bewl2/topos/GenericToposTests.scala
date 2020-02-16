@@ -22,6 +22,7 @@ abstract class GenericToposTests[
   //    BAR,
   //    BAZ
   //  ]
+  val foobar2baz: (FOO, BAR) => BAZ
   val monicBar2baz: BAR => BAZ
 
   private final lazy val foo2baz = foo2ImageOfBar // a convenient alias
@@ -66,6 +67,12 @@ abstract class GenericToposTests[
     def ==?==(function2: S => T) =
       assert(function =?= function2)
   }
+  private implicit class BifunctionComparisonHelper[S: DOT, T:DOT, U:DOT](
+    function: (S, T) => U
+  ) {
+    def ==?==(function2: (S, T) => U) =
+      assert(function =?= function2)
+  }
   private val foo: DOT[FOO] = implicitly[DOT[FOO]]
   private val bar: DOT[BAR] = implicitly[DOT[BAR]]
   private val baz: DOT[BAZ] = implicitly[DOT[BAZ]]
@@ -94,6 +101,9 @@ abstract class GenericToposTests[
       monicBar2baz.sanityTest
       monicBar2baz.source shouldBe bar
       monicBar2baz.target shouldBe baz
+
+      // TODO: make this work (without products!)
+      // foobar2baz.sanityTest
 
       provideEqualizerSituation(new EqualizerSituationReceiver[Unit] {
         def apply[S: DOT, M: DOT, T: DOT](
@@ -225,34 +235,33 @@ abstract class GenericToposTests[
 //      rightProjection(bar, foo, baz) o productArrow shouldBe foo2baz
 //    }
 
+        it("can construct exponential diagrams") {
+          sanityTest[BAR > BAZ]
+
+//          val evaluation = exponential.evaluation
+//          evaluation.product.sanityTest
+//          evaluation.product.left shouldBe (bar > baz)
+//          evaluation.product.right shouldBe bar
+//          evaluation.arrow.sanityTest
+//          evaluation.arrow.target shouldBe baz
+
+          val transposed: FOO => (BAR > BAZ) =
+            foobar2baz.transpose
+
+          transposed.sanityTest
+          transposed.source shouldBe foo
+          transposed.target shouldBe dot[BAR > BAZ]
+
+          val untransposed: (FOO, BAR) => BAZ = {
+            (f, b) => transposed(f)(b)
+          }
+
+          untransposed ==?== foobar2baz
+        }
+
     /*
 
 
-        it("can construct exponential diagrams") {
-          // Check evaluation maps baz^bar x bar -> baz
-          val exponential = bar > baz
-          exponential.sanityTest
-          val evaluation = exponential.evaluation
-          evaluation.product.sanityTest
-          evaluation.product.left shouldBe (bar > baz)
-          evaluation.product.right shouldBe bar
-          evaluation.arrow.sanityTest
-          evaluation.arrow.target shouldBe baz
-
-          val foo2bar2baz: FOO > (BAR → BAZ) =
-            (bar > baz) transpose foobar2baz
-          foo2bar2baz.sanityTest
-          foo2bar2baz should have(
-            source(foo),
-            target(bar > baz)
-          )
-
-          implicit val anonImplicit = bar > baz
-          (foo x bar)(baz) {
-            case f ⊕ b =>
-              foo2bar2baz(f)(b)
-          } shouldBe foobar2baz.arrow
-        }
 
         it("has standardized exponentials") {
           (foo > bar) shouldBe (foo > bar)

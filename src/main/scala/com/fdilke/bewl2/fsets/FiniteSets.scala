@@ -1,6 +1,7 @@
 package com.fdilke.bewl2.fsets
 
 import com.fdilke.bewl2.fsets.FiniteSets.FiniteSetsTopos
+import com.fdilke.bewl2.fsets.FiniteSetsUtilities.allMaps
 import com.fdilke.bewl2.topos.FunctionalPlumbing.{Equalizer, EqualizerReceiver}
 import com.fdilke.bewl2.topos.Topos
 
@@ -74,6 +75,17 @@ object FiniteSets {
 
     override def from0[S: Set]: Void => S =
       _ => throw new IllegalArgumentException("You passed a Void")
+
+    override type >[A, B] = Map[A, B] // n rather than A => B, to get semantics of equality
+
+    override def exponentialUncached[A: Set, B: Set]: Set[A > B] =
+      allMaps(dot[A], dot[B]).toSet // TODO: switch to Seq or Iterable throughout?
+
+    override def transpose[A: Set, B: Set, C: Set](
+      arrow: (A, B) => C
+    ): A => B > C = {
+      a => dot[B] map { b => b -> arrow(a, b) } toMap
+    }
   }
 }
 
