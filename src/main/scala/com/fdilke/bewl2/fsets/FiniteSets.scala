@@ -4,6 +4,7 @@ import com.fdilke.bewl2.fsets.FiniteSets.FiniteSetsTopos
 import com.fdilke.bewl2.fsets.FiniteSetsUtilities.allMaps
 import com.fdilke.bewl2.topos.FunctionalPlumbing.{Equalizer, EqualizerReceiver}
 import com.fdilke.bewl2.topos.Topos
+import com.fdilke.bewl2.util.FunctionWithEquality
 
 import scala.language.postfixOps
 
@@ -80,14 +81,15 @@ object FiniteSets {
     override def from0[S: Iterable]: Void => S =
       _ => throw new IllegalArgumentException("You passed a Void")
 
-    override type >[A, B] = Map[A, B] // n rather than A => B, to get semantics of equality
-    // TODO: fix this to have function with equality
+    override type >[A, B] = FunctionWithEquality[A, B]
 
     override def exponentialUncached[
       A: Iterable,
       B: Iterable
     ]: Iterable[A > B] =
-      allMaps(dot[A], dot[B])
+      allMaps(dot[A], dot[B]) map { f =>
+        new FunctionWithEquality[A, B](dot[A], f)
+      }
 
     override def transpose[
       A: Iterable,
@@ -95,9 +97,13 @@ object FiniteSets {
       C: Iterable
     ](
       arrow: (A, B) => C
-    ): A => B > C = {
-      a => dot[B] map { b => b -> arrow(a, b) } toMap
-    }
+    ): A => B > C =
+      a =>
+        new FunctionWithEquality[B, C](
+          dot[B],
+          arrow(a, _)
+        )
   }
 }
+
 
