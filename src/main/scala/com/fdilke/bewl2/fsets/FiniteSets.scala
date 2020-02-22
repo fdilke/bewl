@@ -103,6 +103,20 @@ object FiniteSets {
           dot[B],
           arrow(a, _)
         )
+
+    override type Ω = Boolean
+    override implicit val omega: Iterable[Boolean] =
+      Iterable(true, false)
+    override val truth: Unit => Boolean =
+      _ => true
+
+    override def chi[S: Iterable, T: Iterable](
+      monic: S => T
+    ): T => Boolean =
+      t =>
+        dot[S].exists {
+          monic(_) == t
+        }
   }
 }
 

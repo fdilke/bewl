@@ -9,13 +9,25 @@ trait Topos[DOT[_]] { topos =>
   val name: String = getClass.getSimpleName
 
   type >[A, B] <: A => B
+  type Ω
+
+  implicit val initial : DOT[Void]
+  def from0[S: DOT]: Void => S
 
   implicit val terminator : DOT[Unit]
   def to1[S: DOT]: S => Unit
-  implicit val initial : DOT[Void]
-  def from0[S: DOT]: Void => S
+
+  implicit val omega : DOT[Ω]
+  val truth: Unit => Ω
+  def chi[S: DOT, T: DOT](
+    monic: S => T
+  ): T => Ω
+
   def sanityTest[S: DOT]: Unit
   def sanityTest[S: DOT, T:DOT](arrow: S => T): Unit
+
+  def toTrue[S: DOT]: S => Ω =
+    truth o to1[S]
 
   def compareFunctions[S:DOT, T:DOT](func: S=> T, func2: S => T): Boolean
   def functionAsString[S: DOT, T: DOT](arrow: S => T): String
@@ -50,6 +62,9 @@ trait Topos[DOT[_]] { topos =>
 
     @inline final def sanityTest =
       topos.sanityTest(function)
+
+    @inline final def chi: T => Ω =
+      topos.chi(function)
 
     @inline final def source: DOT[S] =
       dot[S]

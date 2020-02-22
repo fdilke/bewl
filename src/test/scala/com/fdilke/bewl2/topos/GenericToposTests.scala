@@ -16,12 +16,6 @@ abstract class GenericToposTests[
 
   val foo2bar : FOO => BAR
   val foo2ImageOfBar : FOO => BAZ
-  //  TODO: sort this out
-  //  val foobar2baz : BiArrow[
-  //    FOO,
-  //    BAR,
-  //    BAZ
-  //  ]
   val foobar2baz: (FOO, BAR) => BAZ
   val monicBar2baz: BAR => BAZ
 
@@ -33,9 +27,13 @@ abstract class GenericToposTests[
     ): X
   }
 
-  def provideEqualizerSituation[X](receiver: EqualizerSituationReceiver[X]): X
+  def provideEqualizerSituation[X](
+    receiver: EqualizerSituationReceiver[X]
+  ): X
 
-  private val topos: Topos[DOT] = implicitly[Topos[DOT]]
+  private val topos: Topos[DOT] =
+    implicitly[Topos[DOT]]
+
   import topos._
 
   case class EqualizerSituation[
@@ -259,35 +257,32 @@ abstract class GenericToposTests[
           untransposed ==?== foobar2baz
         }
 
-    /*
-
-
-
         it("has standardized exponentials") {
-          (foo > bar) shouldBe (foo > bar)
+          dot[FOO > BAR] shouldBe dot[FOO > BAR]
         }
 
-
         it("has a truth object (subobject classifier)") {
-          omega.sanityTest
+          sanityTest[Ω]
           truth.sanityTest
-          truth.source shouldBe I
-          truth.target shouldBe omega
+          truth.source shouldBe dot[Unit]
+          truth.target shouldBe dot[Ω]
 
-          falsity.sanityTest
+// TODO: sort this out
+//          falsity.sanityTest
 
-          val char = monicBar2baz.chi
+          val char: BAZ => Ω = monicBar2baz.chi
           char.sanityTest
-          char.source shouldBe baz
-          char.target shouldBe omega
+          char.source shouldBe dot[BAZ]
+          char.target shouldBe dot[Ω]
 
-          char o monicBar2baz shouldBe bar.toTrue
+          (char o monicBar2baz) ==?== toTrue[BAR]
 
-          val restriction = foo2ImageOfBar \ monicBar2baz
-          restriction.sanityTest
-          restriction.source shouldBe foo
-          restriction.target shouldBe bar
-          monicBar2baz o restriction shouldBe foo2ImageOfBar
+// TODO: sort this out
+//          val restriction = foo2ImageOfBar \ monicBar2baz
+//          restriction.sanityTest
+//          restriction.source shouldBe foo
+//          restriction.target shouldBe bar
+//          monicBar2baz o restriction shouldBe foo2ImageOfBar
 
           // Note behaviour is not defined for these pathological cases:
           // construct a non-monic arrow, have chi throw a NotMonicException
@@ -295,6 +290,7 @@ abstract class GenericToposTests[
           // It's up to the caller to check. There could be a safe backdivide
         }
 
+    /*
         it("expresses the subobject classifier as the carrier of a Heyting algebra") {
           if (!inActionTopos) {
             // reluctantly skip, too slow with current technology
