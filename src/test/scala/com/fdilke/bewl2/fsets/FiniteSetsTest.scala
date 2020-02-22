@@ -7,14 +7,14 @@ import com.fdilke.bewl2.topos.GenericToposTests
 import scala.Function.untupled
 
 private object Fixtures {
-  implicit val foo: Set[Boolean] = Set(true, false)
-  implicit val bar: Set[String] = Set("X", "Y", "Z")
-  implicit val baz: Set[Int] = Set(1, 2, 3, 4)
+  implicit val foo: Iterable[Boolean] = Iterable(true, false)
+  implicit val bar: Iterable[String] = Iterable("X", "Y", "Z")
+  implicit val baz: Iterable[Int] = Iterable(1, 2, 3, 4)
 }
 
 import Fixtures._
 
-class FiniteSetsTest extends GenericToposTests[Set, Boolean, String, Int] {
+class FiniteSetsTest extends GenericToposTests[Iterable, Boolean, String, Int] {
   override val foo2bar = Map(
     true -> "X",
     false -> "Y"

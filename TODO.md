@@ -565,3 +565,19 @@ Looks more and more feasible. We will need an implicit helper for function types
 so we can do sanity tests on them. Leave a marker TODO for this. 
 Memo to fix all the TODOs and leave GenericToposTests in a tidy state.
 
+We need products because THIS is a staggeringly bad idea:
+
+    @inline implicit class RichBiFunction[S: DOT, T:DOT, U: DOT] (
+        function: (S, T) => U
+    ) {
+        @inline final def =?=(function2: (S, T) => U): Boolean =
+            topos.transpose(function) =?= topos.transpose(function2)
+
+except actually, if the typeclass argument is Iterable and not Set then the
+construction is lazy, so maybe this is ok.
+Quite like idea of doing without products entirely, so that (A, B): DOT is
+not even a concept in our world.
+
+Refactor to use Iterable not Set.
+Note also for finite sets, > = Map is bad news: should be FunctionWithEquality.
+
