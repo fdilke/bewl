@@ -581,3 +581,8 @@ not even a concept in our world.
 Refactor to use Iterable not Set.
 Note also for finite sets, > = Map is bad news: should be FunctionWithEquality.
 
+also: get a bit further, then experiment with changing the above to
+use products and see if it's a significant optimization. If it is, then
+maybe we need to keep products after all.
+
+
