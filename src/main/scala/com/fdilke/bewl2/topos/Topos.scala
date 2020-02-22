@@ -1,7 +1,7 @@
 package com.fdilke.bewl2.topos
 
 import com.fdilke.bewl.helper.Memoize
-import com.fdilke.bewl2.topos.FunctionalPlumbing.EqualizerReceiver
+import com.fdilke.bewl2.topos.FunctionalPlumbing.{CharacteristicArrow, EqualizerReceiver}
 
 import scala.Function.tupled
 
@@ -21,7 +21,7 @@ trait Topos[DOT[_]] { topos =>
   val truth: Unit => Ω
   def chi[S: DOT, T: DOT](
     monic: S => T
-  ): T => Ω
+  ): CharacteristicArrow[DOT, S, T, Ω]
 
   def sanityTest[S: DOT]: Unit
   def sanityTest[S: DOT, T:DOT](arrow: S => T): Unit
@@ -63,7 +63,7 @@ trait Topos[DOT[_]] { topos =>
     @inline final def sanityTest =
       topos.sanityTest(function)
 
-    @inline final def chi: T => Ω =
+    @inline final def chi: CharacteristicArrow[DOT, S, T, Ω] =
       topos.chi(function)
 
     @inline final def source: DOT[S] =

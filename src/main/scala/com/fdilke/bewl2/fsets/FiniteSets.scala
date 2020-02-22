@@ -2,7 +2,7 @@ package com.fdilke.bewl2.fsets
 
 import com.fdilke.bewl2.fsets.FiniteSets.FiniteSetsTopos
 import com.fdilke.bewl2.fsets.FiniteSetsUtilities.allMaps
-import com.fdilke.bewl2.topos.FunctionalPlumbing.{Equalizer, EqualizerReceiver}
+import com.fdilke.bewl2.topos.FunctionalPlumbing.{CharacteristicArrow, Equalizer, EqualizerReceiver}
 import com.fdilke.bewl2.topos.Topos
 import com.fdilke.bewl2.util.FunctionWithEquality
 
@@ -112,11 +112,25 @@ object FiniteSets {
 
     override def chi[S: Iterable, T: Iterable](
       monic: S => T
-    ): T => Boolean =
-      t =>
-        dot[S].exists {
-          monic(_) == t
-        }
+    ): CharacteristicArrow[Iterable, S, T, Boolean] =
+      new CharacteristicArrow[Iterable, S, T, Boolean] {
+        override val chi: T => Boolean =
+          t =>
+            dot[S].exists {
+              monic(_) == t
+            }
+
+        override def restrict[R: Iterable](
+          arrow: R => T
+        ): R => S =
+          r => {
+            val target = arrow(r)
+            dot[S].find {
+              monic(_) == target
+            }.get
+          }
+      }
+
   }
 }
 

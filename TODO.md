@@ -585,4 +585,23 @@ also: get a bit further, then experiment with changing the above to
 use products and see if it's a significant optimization. If it is, then
 maybe we need to keep products after all.
 
+also why did I put this in to Bewl 1:
 
+    trait BaseArrow[S <: ~, T <: ~] {
+        ...    
+        def \[U <: ~](monic: U > T) : S > U
+        ...
+    }
+
+backdivision by a monic? where is this used?
+nowhere very essential. We shouldn't need it for Bewl 2.
+
+But do need to have the characteristic arrow form one edge of a pullback:
+given monic S => T, then for
+
+    S => T
+    v    v
+    1 => Ω
+    
+to be a pullback, we do have to be able to factor any suitably conditioned
+R => T through the monic. So should return a CharacteristicArrow[S, T] here.

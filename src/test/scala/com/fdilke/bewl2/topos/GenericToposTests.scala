@@ -2,7 +2,7 @@ package com.fdilke.bewl2.topos
 
 import java.util.concurrent.atomic.AtomicInteger
 
-import com.fdilke.bewl2.topos.FunctionalPlumbing.EqualizerReceiver
+import com.fdilke.bewl2.topos.FunctionalPlumbing.{CharacteristicArrow, EqualizerReceiver}
 import org.scalatest
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
@@ -270,19 +270,20 @@ abstract class GenericToposTests[
 // TODO: sort this out
 //          falsity.sanityTest
 
-          val char: BAZ => Ω = monicBar2baz.chi
-          char.sanityTest
-          char.source shouldBe dot[BAZ]
-          char.target shouldBe dot[Ω]
+          val chi: CharacteristicArrow[DOT, BAR, BAZ, Ω] =
+            monicBar2baz.chi
+          chi.chi.sanityTest
+          chi.chi.source shouldBe baz
+          chi.chi.target shouldBe omega
 
-          (char o monicBar2baz) ==?== toTrue[BAR]
+          (chi.chi o monicBar2baz) ==?== toTrue[BAR]
 
-// TODO: sort this out
-//          val restriction = foo2ImageOfBar \ monicBar2baz
-//          restriction.sanityTest
-//          restriction.source shouldBe foo
-//          restriction.target shouldBe bar
-//          monicBar2baz o restriction shouldBe foo2ImageOfBar
+          val restriction: FOO => BAR =
+            chi.restrict(foo2ImageOfBar)
+          restriction.sanityTest
+          restriction.source shouldBe dot[FOO]
+          restriction.target shouldBe dot[BAR]
+          (monicBar2baz o restriction) ==?== foo2ImageOfBar
 
           // Note behaviour is not defined for these pathological cases:
           // construct a non-monic arrow, have chi throw a NotMonicException

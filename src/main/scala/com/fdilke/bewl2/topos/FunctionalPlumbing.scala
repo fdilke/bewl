@@ -13,4 +13,11 @@ object FunctionalPlumbing {
       equalizer: Equalizer[DOT, S, R]
     ): X
   }
+
+  abstract class CharacteristicArrow[DOT[_], S: DOT, T: DOT, Ω] {
+    val chi: T => Ω
+    def restrict[R: DOT](
+      arrow: R => T
+    ): R => S
+  }
 }
