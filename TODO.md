@@ -605,3 +605,39 @@ given monic S => T, then for
     
 to be a pullback, we do have to be able to factor any suitably conditioned
 R => T through the monic. So should return a CharacteristicArrow[S, T] here.
+
+Algebraic structures: I'm inclined to make thee a lot simpler, and not
+bother with the whole DSL for defining algebraic laws. In fact I might
+as well skip straight to models. Anticipating having laws like this:
+e.g. for groups:
+    forAll[A] { a =>
+        a * unit =??= a
+    }
+with maybe a bit of machinery just to register this as a
+"left unit law" so there is an informative message if it fails.
+Note type is Ω, so we'll have to autoconvert that to Bool.
+
+Bothering me slightly that Unit => A is not really distinguishable from A,
+or perhaps "lazy A". Does this mean we should consider A > B as an 
+annotated A => B ? Given A > B is a strictly richer type.
+
+    from A => B, take its name Unit => A > B, effectively an A > B
+    given A > B, it forgetfully cn be regarded as an A => B
+    Do these two implied maps form a retraction and section? Probably.
+    
+So maybe for Bewl 3 we'll go back to having a primary type > again.
+
+Be good to port these over:
+
+    final lazy val ∀ = toTrue.name.chi
+    final lazy val ∃ : S → TRUTH > TRUTH =
+      power.forAll(omega) { (f, w) =>
+        implicit val anonImplicit: EXPONENTIAL[S, TRUTH] = power
+        (power x omega).universally(dot) {
+          case (f ⊕ w, x) => {
+            f(x) → w
+          }
+        }(f, w) → w
+      }
+
+DotAndArrowEnrichmentTests is the model. Test quantifiers, logical operators etc.
