@@ -4,6 +4,7 @@ import com.fdilke.bewl.helper.Memoize
 import com.fdilke.bewl2.topos.FunctionalPlumbing.{CharacteristicArrow, EqualizerReceiver}
 
 import scala.Function.tupled
+import scala.language.postfixOps
 
 trait Topos[DOT[_]] { topos =>
   val name: String = getClass.getSimpleName
@@ -70,6 +71,11 @@ trait Topos[DOT[_]] { topos =>
       dot[S]
     @inline final def target: DOT[T] =
       dot[T]
+
+    @inline final def name: Unit => (S > T) =
+      { (_: Unit, s: S) =>
+        function(s)
+      } transpose
   }
 
   @inline implicit class RichBiFunction[S: DOT, T:DOT, U: DOT] (
@@ -122,6 +128,9 @@ trait Topos[DOT[_]] { topos =>
 
     def exponential[B : DOT]: DOT[A > B] =
       memoizedExponential(dot[B])
+
+    lazy val `∀`: ((A > Ω) => Ω) =
+      toTrue[A].name.chi.chi
   }
 
   final private def makeDotExtras[A](
@@ -145,6 +154,9 @@ trait Topos[DOT[_]] { topos =>
 
   implicit def exponentialDot[A: DOT, B: DOT]: DOT[A > B] =
     extras[A].exponential[B]
+
+  @inline final def ∀[A: DOT]: (A > Ω) => Ω =
+    extras[A].`∀`
 
   // Projection operators
   def π0[A : DOT, B : DOT]: ((A, B)) => A =
