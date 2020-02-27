@@ -72,7 +72,7 @@ class EnrichmentTests extends AnyFunSpec {
     it("has the correct binary operations for binary operations") {
       LogicalOperations.and shouldBeFn { _ & _ }
       LogicalOperations.implies shouldBeFn { !_ | _ }
-//      LogicalOperations.or shouldBeFn { _ | _ }
+      LogicalOperations.or shouldBeFn { _ | _ }
       LogicalOperations.falsity shouldBe false
     }
   }

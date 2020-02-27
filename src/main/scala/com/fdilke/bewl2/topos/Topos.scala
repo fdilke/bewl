@@ -226,26 +226,36 @@ trait Topos[DOT[_]] { topos =>
       }
 
     lazy val implies: (Ω, Ω) => Ω =
-        (and ?= { (a, _) => a })(
-          new EqualizerReceiver[DOT, (Ω, Ω), (Ω, Ω) => Ω] {
-            override def apply[R <: (Ω, Ω) : DOT](
-              equalizer: Equalizer[DOT, (Ω, Ω), R]
-            ): (Ω, Ω) => Ω =
-              untupled(
-                equalizer.include.chi.chi
-              )
-          }
-        )
+      (and ?= { (a, _) => a }) (
+        new EqualizerReceiver[DOT, (Ω, Ω), (Ω, Ω) => Ω] {
+          override def apply[R <: (Ω, Ω) : DOT](
+                                                 equalizer: Equalizer[DOT, (Ω, Ω), R]
+                                               ): (Ω, Ω) => Ω =
+            untupled(
+              equalizer.include.chi.chi
+            )
+        }
+      )
 
-      lazy val falsity: Ω = {
-        val ff: Ω => Ω = id[Ω]
-        val fff: (Ω => Ω) => Ω = ∀∀[Ω]
-        fff(ff)
-      }
+    lazy val falsity: Ω = {
+      val ff: Ω => Ω = id[Ω]
+      val fff: (Ω => Ω) => Ω = ∀∀[Ω]
+      fff(ff)
+    }
 
     lazy val or: (Ω, Ω) => Ω =
-        ???
-//        ∀[Ω] { f: Ω > Ω =>
-//        }
+      (a : Ω, b: Ω) => {
+      def ff: Ω => Ω = ω =>
+        implies(
+          and(
+            implies(a, ω),
+            implies(b, ω)
+          ),
+          ω
+        )
+
+      val fff: (Ω => Ω) => Ω = ∀∀[Ω]
+      fff(ff)
     }
+  }
 }
