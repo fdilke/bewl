@@ -16,8 +16,8 @@ class EnrichmentTests extends AnyFunSpec {
       forall.source shouldBe dot[Int > Ω]
       forall.target shouldBe dot[Ω]
 
-      ((forall o embed.chi.chi.name) =?= truth) shouldBe false
-      ((forall o id[Int].chi.chi.name) =?= truth) shouldBe true
+      (forall o embed.chi.chi.name) shouldNotBeFn truth
+      (forall o id[Int].chi.chi.name) shouldBeFn truth
     }
   }
 /*

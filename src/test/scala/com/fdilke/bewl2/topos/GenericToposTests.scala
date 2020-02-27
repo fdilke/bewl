@@ -55,20 +55,14 @@ abstract class GenericToposTests[
         throw new IllegalArgumentException("equalizing two arrows that are already equal!")
       }
 
-      (s o r) ==?== (t o r)
+      (s o r) shouldBeFn (t o r)
     }
   }
 
-  private implicit class FunctionComparisonHelper[S: DOT, T:DOT](
-    function: S => T
-  ) {
-    def ==?==(function2: S => T) =
-      assert(function =?= function2)
-  }
   private implicit class BifunctionComparisonHelper[S: DOT, T:DOT, U:DOT](
     function: (S, T) => U
   ) {
-    def ==?==(function2: (S, T) => U) =
+    def shouldBeFn(function2: (S, T) => U) =
       assert(function =?= function2)
   }
   private val foo: DOT[FOO] = implicitly[DOT[FOO]]
@@ -127,9 +121,9 @@ abstract class GenericToposTests[
 
     it("has identity arrows which can be composed") {
       val identityFoo: FOO => FOO = identity
-      id[FOO]  ==?== identityFoo
-      (foo2bar o id[FOO])  ==?== foo2bar
-      (id[BAR] o foo2bar) ==?== foo2bar
+      id[FOO]  shouldBeFn identityFoo
+      (foo2bar o id[FOO])  shouldBeFn foo2bar
+      (id[BAR] o foo2bar) shouldBeFn foo2bar
     }
 
     it("has equalizers") {
@@ -147,8 +141,8 @@ abstract class GenericToposTests[
                 equalizer: FunctionalPlumbing.Equalizer[DOT, M, R]
               ): Int = {
                 val inclusion: R => M = equalizer.include
-                (s o inclusion) ==?== (t o inclusion)
-                (inclusion o equalizer.restrict(r)) ==?== r
+                (s o inclusion) shouldBeFn (t o inclusion)
+                (inclusion o equalizer.restrict(r)) shouldBeFn r
                 numCalls.incrementAndGet()
               }
             }
@@ -175,8 +169,8 @@ abstract class GenericToposTests[
 //      )
 //
 
-      foo2bar ==?== { (x: FOO) => productArrow(x)._1 }
-      foo2baz ==?== { (x: FOO) => productArrow(x)._2 }
+      foo2bar shouldBeFn { (x: FOO) => productArrow(x)._1 }
+      foo2baz shouldBeFn { (x: FOO) => productArrow(x)._2 }
 
       val swapFooBar: ((FOO, BAR)) => (BAR, FOO) =
         Function.tupled { (x, y) => (y, x) }
@@ -184,9 +178,9 @@ abstract class GenericToposTests[
       val swapBarFoo: ((BAR, FOO)) => (FOO, BAR) =
         Function.tupled { (y, x) => (x, y) }
 
-      id[(BAR, FOO)] ==?== (swapFooBar o swapBarFoo)
-      id[(FOO, BAR)] ==?== (swapBarFoo o swapFooBar)
-      id[(FOO, BAR)] ==?== (π0[FOO, BAR] x π1[FOO, BAR])
+      id[(BAR, FOO)] shouldBeFn (swapFooBar o swapBarFoo)
+      id[(FOO, BAR)] shouldBeFn (swapBarFoo o swapFooBar)
+      id[(FOO, BAR)] shouldBeFn (π0[FOO, BAR] x π1[FOO, BAR])
     }
 
     it("has a terminator") {
@@ -196,7 +190,7 @@ abstract class GenericToposTests[
       fooToI.source shouldBe foo
       fooToI.target shouldBe dot[Unit]
 
-      (to1[BAR] o foo2bar) ==?== fooToI
+      (to1[BAR] o foo2bar) shouldBeFn fooToI
     }
 
     it("has a (derived) initial object") {
@@ -206,11 +200,11 @@ abstract class GenericToposTests[
       fooFromO.source shouldBe dot[Void]
       fooFromO.target shouldBe foo
 
-      (foo2bar o fooFromO) ==?== from0[BAR]
+      (foo2bar o fooFromO) shouldBeFn from0[BAR]
     }
 
     it("consistently calculates arrows from the initial to the terminal") {
-      to1[Void] ==?== from0[Unit]
+      to1[Void] shouldBeFn from0[Unit]
     }
 
     it("caches products") {
@@ -228,7 +222,7 @@ abstract class GenericToposTests[
 //      productArrow.source shouldBe foo
 //      productArrow.target shouldBe dot[((BAR, FOO), BAZ)]
 //
-//      (π0[(BAR, FOO), BAZ] o productArrow) ==?== foo2bar
+//      (π0[(BAR, FOO), BAZ] o productArrow) shouldBeFn foo2bar
 //      midProjection(bar, foo, baz) o productArrow shouldBe foo.identity
 //      rightProjection(bar, foo, baz) o productArrow shouldBe foo2baz
 //    }
@@ -254,7 +248,7 @@ abstract class GenericToposTests[
             (f, b) => transposed(f)(b)
           }
 
-          untransposed ==?== foobar2baz
+          untransposed shouldBeFn foobar2baz
         }
 
         it("has standardized exponentials") {
@@ -276,14 +270,14 @@ abstract class GenericToposTests[
           chi.chi.source shouldBe baz
           chi.chi.target shouldBe omega
 
-          (chi.chi o monicBar2baz) ==?== toTrue[BAR]
+          (chi.chi o monicBar2baz) shouldBeFn toTrue[BAR]
 
           val restriction: FOO => BAR =
             chi.restrict(foo2ImageOfBar)
           restriction.sanityTest
           restriction.source shouldBe dot[FOO]
           restriction.target shouldBe dot[BAR]
-          (monicBar2baz o restriction) ==?== foo2ImageOfBar
+          (monicBar2baz o restriction) shouldBeFn foo2ImageOfBar
 
           // Note behaviour is not defined for these pathological cases:
           // construct a non-monic arrow, have chi throw a NotMonicException
@@ -453,7 +447,7 @@ abstract class GenericToposTests[
     it("can enumerate maps between two types") {
       val maps: Seq(FOO => Void) = allMaps[Void, FOO]
       maps should have size 1
-      maps.head ==?== fooFromO
+      maps.head shouldBeFn fooFromO
     }
 
          */

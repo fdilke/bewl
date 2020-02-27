@@ -2,6 +2,8 @@ package com.fdilke.bewl2.topos
 
 import com.fdilke.bewl.helper.Memoize
 import com.fdilke.bewl2.topos.FunctionalPlumbing.{CharacteristicArrow, EqualizerReceiver}
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.matchers.{MatchResult, Matcher}
 
 import scala.Function.tupled
 import scala.language.postfixOps
@@ -51,6 +53,17 @@ trait Topos[DOT[_]] { topos =>
   ) {
     @inline final def =?=(function2: S => T): Boolean =
       compareFunctions(function, function2)
+
+    def shouldBeFn: Matcher[S => T] =
+      function2 =>
+        MatchResult(
+          =?=(function2),
+          "functions do not match",
+          "functions match"
+        )
+
+    def shouldNotBeFn: Matcher[S => T] =
+      Matchers.not(shouldBeFn)
 
     @inline final def ?=[X](function2: S => T): EqualizerReceiver[DOT, S, X] => X =
       equalize(function, function2)
