@@ -184,6 +184,14 @@ trait Topos[DOT[_]] { topos =>
   @inline final def ∀[A: DOT]: (A > Ω) => Ω =
     extras[A].`∀`
 
+  @inline final def ∀∀[A: DOT]: (A => Ω) => Ω =
+    (f: A => Ω) => {
+      val xx: A > Ω = f.name({})
+      val aa: (A > Ω) => Ω = ∀[A]
+      val yy: Ω =  aa(xx)
+      yy
+    }
+
   // Projection operators
   def π0[A : DOT, B : DOT]: ((A, B)) => A =
     tupled { (a, b) => a }
@@ -228,5 +236,16 @@ trait Topos[DOT[_]] { topos =>
               )
           }
         )
+
+      lazy val falsity: Ω = {
+        val ff: Ω => Ω = id[Ω]
+        val fff: (Ω => Ω) => Ω = ∀∀[Ω]
+        fff(ff)
+      }
+
+    lazy val or: (Ω, Ω) => Ω =
+        ???
+//        ∀[Ω] { f: Ω > Ω =>
+//        }
     }
 }
