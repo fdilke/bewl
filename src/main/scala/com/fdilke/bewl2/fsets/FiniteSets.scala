@@ -82,14 +82,14 @@ object FiniteSets {
     override def from0[S: Iterable]: Void => S =
       _ => throw new IllegalArgumentException("You passed a Void")
 
-    override type >[A, B] = FunctionWithEquality[A, B]
+    override type >[A, B] = FunctionWithEquality[Iterable, A, B]
 
     override def exponentialUncached[
       A: Iterable,
       B: Iterable
     ]: Iterable[A > B] =
       allMaps(dot[A], dot[B]) map { f =>
-        new FunctionWithEquality[A, B](dot[A], f)
+        new FunctionWithEquality[Iterable, A, B](f)
       }
 
     override def transpose[
@@ -100,8 +100,7 @@ object FiniteSets {
       arrow: (A, B) => C
     ): A => B > C =
       a =>
-        new FunctionWithEquality[B, C](
-          dot[B],
+        new FunctionWithEquality[Iterable, B, C](
           arrow(a, _)
         )
 
