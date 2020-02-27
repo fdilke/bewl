@@ -4,7 +4,54 @@ import org.scalatest.funspec.AnyFunSpec
 import com.fdilke.bewl2.fsets.FiniteSets.FiniteSetsTopos._
 import org.scalatest.matchers.should.Matchers._
 
+import scala.Function.untupled
+
 class EnrichmentTests extends AnyFunSpec {
+
+  describe("Function comparisons") {
+    it("work for unary functions") {
+      val theId: Boolean => Boolean = id[Boolean]
+      val constT: Boolean => Boolean = {
+         _ => true
+      }
+      (theId =?= theId) shouldBe true
+      (theId =?= id[Boolean]) shouldBe true
+      (theId =?= constT) shouldBe false
+
+      theId shouldBeFn theId
+      theId shouldBeFn id[Boolean]
+      theId shouldNotBeFn constT
+
+      intercept[IllegalArgumentException] { theId shouldNotBeFn theId }
+      intercept[IllegalArgumentException] { theId shouldNotBeFn id[Boolean] }
+      intercept[IllegalArgumentException] { theId shouldBeFn constT }
+    }
+
+    it("work for binary functions") {
+      val pi0: (Boolean, Boolean) => Boolean = { (x, _) => x }
+      val and: (Boolean, Boolean) => Boolean = { _ & _ }
+      val otherAnd: (Boolean, Boolean) => Boolean = { (x, y) => if (x) y else false }
+      val xor: (Boolean, Boolean) => Boolean = { _ ^ _ }
+
+      (pi0 =?= pi0) shouldBe true
+      (pi0 =?= untupled(π0[Boolean, Boolean])) shouldBe true
+      (pi0 =?= xor) shouldBe false
+      (and =?= xor) shouldBe false
+      (and =?= otherAnd) shouldBe true
+
+      pi0 shouldBeFn pi0
+      pi0 shouldBeFn untupled(π0[Boolean, Boolean])
+      pi0 shouldNotBeFn xor
+      and shouldNotBeFn xor
+      and shouldBeFn otherAnd
+
+      intercept[IllegalArgumentException] { pi0 shouldNotBeFn pi0 }
+      intercept[IllegalArgumentException] { pi0 shouldNotBeFn untupled(π0[Boolean, Boolean]) }
+      intercept[IllegalArgumentException] { pi0 shouldBeFn xor }
+      intercept[IllegalArgumentException] { and shouldBeFn xor }
+      intercept[IllegalArgumentException] { and shouldNotBeFn otherAnd }
+    }
+  }
 
   describe("The universal quantifier") {
     it("detects whether a subobject is the whole object") {
@@ -20,6 +67,18 @@ class EnrichmentTests extends AnyFunSpec {
       (forall o id[Int].chi.chi.name) shouldBeFn truth
     }
   }
+
+  describe("The truth object") {
+    it("has the correct binary operations for binary operations") {
+      LogicalOperations.and shouldBeFn { _ & _ }
+//      Ω.join shouldBe theBinOp { _ | _ }
+//      Ω.implies shouldBe theBinOp { !_ | _ }
+//      falsity shouldBe I(omega) {
+//        _ => false
+//      }
+    }
+  }
+
 /*
   describe("The existential quantifier") {
     it("detects whether a subobject is NOT empty") {
@@ -104,23 +163,6 @@ class EnrichmentTests extends AnyFunSpec {
     }
   }
 
-  describe("The truth object") {
-    def theBinOp(binop: (Boolean, Boolean) => Boolean): BinaryOp[TRUTH] =
-      for {
-        i <- omega
-        j <- omega
-      }
-        yield binop(i, j)
-
-    it("has the correct binary operations for binary operations") {
-      Ω.meet shouldBe theBinOp { _ & _ }
-      Ω.join shouldBe theBinOp { _ | _ }
-      Ω.implies shouldBe theBinOp { !_ | _ }
-      falsity shouldBe I(omega) {
-        _ => false
-      }
-    }
-  }
 
   describe("The equality comparison arrow") {
     it("should have the correct value for finite sets") {

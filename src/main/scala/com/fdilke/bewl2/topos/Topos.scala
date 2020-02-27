@@ -2,10 +2,11 @@ package com.fdilke.bewl2.topos
 
 import com.fdilke.bewl.helper.Memoize
 import com.fdilke.bewl2.topos.FunctionalPlumbing.{CharacteristicArrow, EqualizerReceiver}
+import org.scalatest.exceptions.TestFailedException
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.{MatchResult, Matcher}
 
-import scala.Function.tupled
+import scala.Function.{tupled, untupled}
 import scala.language.postfixOps
 
 trait Topos[DOT[_]] { topos =>
@@ -54,16 +55,16 @@ trait Topos[DOT[_]] { topos =>
     @inline final def =?=(function2: S => T): Boolean =
       compareFunctions(function, function2)
 
-    def shouldBeFn: Matcher[S => T] =
-      function2 =>
-        MatchResult(
-          =?=(function2),
-          "functions do not match",
-          "functions match"
-        )
+    def shouldBeFn(function2: S => T): Unit =
+      if (! =?=(function2)) {
+          throw new IllegalArgumentException("functions do not match")
+      }
 
-    def shouldNotBeFn: Matcher[S => T] =
-      Matchers.not(shouldBeFn)
+    def shouldNotBeFn(function2: S => T): Unit =
+      if (=?=(function2)) {
+          throw new IllegalArgumentException("functions do not match")
+      }
+
 
     @inline final def ?=[X](function2: S => T): EqualizerReceiver[DOT, S, X] => X =
       equalize(function, function2)
@@ -95,10 +96,19 @@ trait Topos[DOT[_]] { topos =>
    function: (S, T) => U
  ) {
     @inline final def =?=(function2: (S, T) => U): Boolean =
+//      tupled(function) =?= tupled(function2)
       topos.transpose(function) =?= topos.transpose(function2)
 
     @inline final def transpose: S => (T > U) =
       topos.transpose(function)
+
+    def shouldBeFn(function2: (S, T) => U): Unit =
+      if (! =?=(function2))
+        throw new IllegalArgumentException("functions do not match")
+
+    def shouldNotBeFn(function2: (S, T) => U): Unit =
+      if (=?=(function2))
+        throw new IllegalArgumentException("functions match")
   }
 
   // anticipate these will not be used very much...
@@ -197,4 +207,11 @@ trait Topos[DOT[_]] { topos =>
 //    mf: (A, B) => C
 //  ): ((A, B)) => C =
 //    Function.tupled(mf)
+
+  object LogicalOperations {
+    lazy val and: (Ω, Ω) => Ω =
+      untupled {
+        (truth x truth).chi.chi
+      }
+  }
 }
