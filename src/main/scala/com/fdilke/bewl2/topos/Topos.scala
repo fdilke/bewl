@@ -224,7 +224,7 @@ trait Topos[DOT[_]] { topos =>
               equalizer: Equalizer[DOT, (Ω, Ω), R]
             ): (Ω, Ω) => Ω =
               untupled(
-                (equalizer.include: R => (Ω, Ω)).chi.chi
+                equalizer.include.chi.chi
               )
           }
         )

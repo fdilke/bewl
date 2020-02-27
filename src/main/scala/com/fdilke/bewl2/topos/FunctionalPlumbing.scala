@@ -2,7 +2,7 @@ package com.fdilke.bewl2.topos
 
 object FunctionalPlumbing {
   trait Equalizer[DOT[_], S, R] {
-    def include(r: R):S
+    val include: R => S
     def restrict[Q: DOT](
       arrow: Q => S
     ): Q => R

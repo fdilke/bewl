@@ -50,7 +50,8 @@ object FiniteSets {
         func1(s) == func2(s)
       }
       _(new Equalizer[Iterable, S, R] {
-        override def include(r: R): S = r
+        override val include: R => S =
+          identity
         override def restrict[Q: Iterable](
           arrow: Q => S
         ): Q => R =
