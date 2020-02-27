@@ -1,7 +1,7 @@
 package com.fdilke.bewl2.topos
 
 import com.fdilke.bewl.helper.Memoize
-import com.fdilke.bewl2.topos.FunctionalPlumbing.{CharacteristicArrow, EqualizerReceiver}
+import com.fdilke.bewl2.topos.FunctionalPlumbing.{CharacteristicArrow, Equalizer, EqualizerReceiver}
 import org.scalatest.exceptions.TestFailedException
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.{MatchResult, Matcher}
@@ -101,6 +101,9 @@ trait Topos[DOT[_]] { topos =>
 
     @inline final def transpose: S => (T > U) =
       topos.transpose(function)
+
+    @inline final def ?=[X](function2: (S, T) => U): EqualizerReceiver[DOT, (S, T), X] => X =
+      equalize(tupled(function), tupled(function2))
 
     def shouldBeFn(function2: (S, T) => U): Unit =
       if (! =?=(function2))
@@ -213,5 +216,17 @@ trait Topos[DOT[_]] { topos =>
       untupled {
         (truth x truth).chi.chi
       }
-  }
+
+    lazy val implies: (Ω, Ω) => Ω =
+        (and ?= { (a, _) => a })(
+          new EqualizerReceiver[DOT, (Ω, Ω), (Ω, Ω) => Ω] {
+            override def apply[R <: (Ω, Ω) : DOT](
+              equalizer: Equalizer[DOT, (Ω, Ω), R]
+            ): (Ω, Ω) => Ω =
+              untupled(
+                (equalizer.include: R => (Ω, Ω)).chi.chi
+              )
+          }
+        )
+    }
 }
