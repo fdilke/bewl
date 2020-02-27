@@ -59,12 +59,6 @@ abstract class GenericToposTests[
     }
   }
 
-  private implicit class BifunctionComparisonHelper[S: DOT, T:DOT, U:DOT](
-    function: (S, T) => U
-  ) {
-    def shouldBeFn(function2: (S, T) => U) =
-      assert(function =?= function2)
-  }
   private val foo: DOT[FOO] = implicitly[DOT[FOO]]
   private val bar: DOT[BAR] = implicitly[DOT[BAR]]
   private val baz: DOT[BAZ] = implicitly[DOT[BAZ]]
