@@ -1,7 +1,7 @@
 package com.fdilke.bewl2.topos
 
 import com.fdilke.bewl.helper.Memoize
-import com.fdilke.bewl2.topos.FunctionalPlumbing.{CharacteristicArrow, Equalizer, EqualizerReceiver, withUnit}
+import com.fdilke.bewl2.topos.FunctionalPlumbing.{CharacteristicArrow, Equalizer, EqualizerReceiver, collapse, withUnit}
 import org.scalatest.exceptions.TestFailedException
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.{MatchResult, Matcher}
@@ -260,11 +260,11 @@ trait Topos[DOT[_]] { topos =>
       }
 
     lazy val or: (Ω, Ω) => Ω =
-      (a : Ω, b: Ω) =>
-          withUnit(a)(
+      collapse {
+        (a: Ω, b: Ω) =>
             ∀ { (ω: Ω) =>
               (a → ω) ∧ (b → ω) → ω
             }
-          )
+      }
   }
 }

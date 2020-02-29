@@ -40,4 +40,25 @@ object FunctionalPlumbing {
         s
       )
     )
+
+  @inline def collapse[
+    DOT[_]: Topos,
+    A: DOT,
+    B: DOT
+  ](
+     f: A => (Unit => B)
+   ): A => B =
+    a =>
+      withUnit(a)(f(a))
+
+  @inline def collapse[
+    DOT[_]: Topos,
+    A: DOT,
+    B: DOT,
+    C: DOT
+  ](
+     f: (A, B) => (Unit => C)
+   ): (A, B) => C =
+    (a, b) =>
+      withUnit(a)(f(a, b))
 }

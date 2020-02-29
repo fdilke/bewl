@@ -661,3 +661,6 @@ Extract Quantifier later, when ∀, ∃, LT all in place. Triangulate.
 Memo move the enrichments to a separate package and use AnyVal.
 In fact decompose all the stuff in Topos. Maybe without cakes.
 
+> Memo: investigate the "recursive topos" https://ncatlab.org/nlab/show/topos+of+recursive+sets
+
+
