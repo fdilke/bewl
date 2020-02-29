@@ -641,3 +641,20 @@ Be good to port these over:
       }
 
 DotAndArrowEnrichmentTests is the model. Test quantifiers, logical operators etc.
+
+Quantifiers: Maybe time to get systematic about these.
+We have ∀, ∃ and eventually the L-T topologies too. What if:
+- ∀, ∃, LT(...) extend Quantifier
+- for S: DOT, Q[S] is an arrow (A > Ω) => Ω, 
+    in fact an element of β(A) - sort of cousin of ultrafilter?
+    or an integration symbol ∫: (A > Ω) => Ω?
+We want to use it 3 different ways:
+    - Q[A} { A => Ω } : 1 => Ω    
+    - Q[A} { A => Ω } : Bool = above composed with toBool    
+    - Q[A} { A > Ω } : Ω and here we're "in scope"    
+McLarty says quantifiers are adjoints - read up
+Need to map the > version to the 1 => Ω version...
+given f: A => Ω turn it into 1 => (A > Ω), then compose to get 1 => Ω.
+But, we also want to have lazy versions of ∀[S] stored for each S. Still can.
+Extract Quantifier later, when ∀, ∃, LT all in place. Triangulate.
+

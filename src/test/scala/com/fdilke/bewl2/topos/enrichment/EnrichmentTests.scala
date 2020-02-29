@@ -59,7 +59,7 @@ class EnrichmentTests extends AnyFunSpec {
       implicit val part: Iterable[Seq[Int]] = Iterable(Seq(1), Seq(3))
 
       val embed: Seq[Int] => Int = _.head
-      val forall = ∀[Int]
+      val forall: (Int > Ω) => Ω = ∀[Int]
       forall.source shouldBe dot[Int > Ω]
       forall.target shouldBe dot[Ω]
 
@@ -73,7 +73,7 @@ class EnrichmentTests extends AnyFunSpec {
       LogicalOperations.and shouldBeFn { _ & _ }
       LogicalOperations.implies shouldBeFn { !_ | _ }
       LogicalOperations.or shouldBeFn { _ | _ }
-      LogicalOperations.falsity shouldBe false
+      LogicalOperations.falsity shouldBeFn { _ => false }
     }
   }
 

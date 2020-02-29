@@ -155,7 +155,7 @@ trait Topos[DOT[_]] { topos =>
     def exponential[B : DOT]: DOT[A > B] =
       memoizedExponential(dot[B])
 
-    lazy val `∀`: ((A > Ω) => Ω) =
+    lazy val `∀`: (A > Ω) => Ω =
       toTrue[A].name.chi.chi
   }
 
@@ -181,12 +181,12 @@ trait Topos[DOT[_]] { topos =>
   implicit def exponentialDot[A: DOT, B: DOT]: DOT[A > B] =
     extras[A].exponential[B]
 
-  @inline final def ∀[A: DOT]: (A > Ω) => Ω =
-    extras[A].`∀`
+  @inline final def ∀[A: DOT](f: A > Ω): Ω =
+    extras[A].`∀`(f)
 
-  @inline final def ∀∀[A: DOT]: (A => Ω) => Ω =
-    (f: A => Ω) => {
-      val xx: A > Ω = f.name({})
+  @inline final def ∀[A: DOT](f: A => Ω): (Unit => Ω) =
+    u => {
+      val xx: A > Ω = f.name(u)
       val aa: (A > Ω) => Ω = ∀[A]
       val yy: Ω =  aa(xx)
       yy
@@ -229,18 +229,18 @@ trait Topos[DOT[_]] { topos =>
       (and ?= { (a, _) => a }) (
         new EqualizerReceiver[DOT, (Ω, Ω), (Ω, Ω) => Ω] {
           override def apply[R <: (Ω, Ω) : DOT](
-                                                 equalizer: Equalizer[DOT, (Ω, Ω), R]
-                                               ): (Ω, Ω) => Ω =
+            equalizer: Equalizer[DOT, (Ω, Ω), R]
+          ): (Ω, Ω) => Ω =
             untupled(
               equalizer.include.chi.chi
             )
         }
       )
 
-    lazy val falsity: Ω = {
+    lazy val falsity: Unit => Ω = {
       val ff: Ω => Ω = id[Ω]
-      val fff: (Ω => Ω) => Ω = ∀∀[Ω]
-      fff(ff)
+//      val fff: (Ω => Ω) => Ω = ∀[Ω]
+      ∀[Ω](ff)
     }
 
     lazy val or: (Ω, Ω) => Ω =
@@ -254,8 +254,8 @@ trait Topos[DOT[_]] { topos =>
           ω
         )
 
-      val fff: (Ω => Ω) => Ω = ∀∀[Ω]
-      fff(ff)
+      val fixthis: Unit => Ω = ∀[Ω](ff)
+      fixthis({})
     }
   }
 }
