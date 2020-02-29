@@ -1,7 +1,7 @@
 package com.fdilke.bewl2.topos
 
 import com.fdilke.bewl.helper.Memoize
-import com.fdilke.bewl2.topos.FunctionalPlumbing.{CharacteristicArrow, Equalizer, EqualizerReceiver}
+import com.fdilke.bewl2.topos.FunctionalPlumbing.{CharacteristicArrow, Equalizer, EqualizerReceiver, withUnit}
 import org.scalatest.exceptions.TestFailedException
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.{MatchResult, Matcher}
@@ -10,6 +10,8 @@ import scala.Function.{tupled, untupled}
 import scala.language.postfixOps
 
 trait Topos[DOT[_]] { topos =>
+  implicit val selfContext: Topos[DOT] = topos
+
   val name: String = getClass.getSimpleName
 
   type >[A, B] <: A => B
@@ -258,14 +260,11 @@ trait Topos[DOT[_]] { topos =>
       }
 
     lazy val or: (Ω, Ω) => Ω =
-      (a : Ω, b: Ω) => {
-      def ff: Ω => Ω = ω =>
-          ((a → ω) ∧ (b → ω)) → ω
-
-      val fixthis: Unit => Ω = ∀[Ω](ff)
-      val tou: Ω => Unit = to1[Ω]
-      val u: Unit = tou(a)
-      fixthis(u)
-    }
+      (a : Ω, b: Ω) =>
+          withUnit(a)(
+            ∀ { (ω: Ω) =>
+              (a → ω) ∧ (b → ω) → ω
+            }
+          )
   }
 }

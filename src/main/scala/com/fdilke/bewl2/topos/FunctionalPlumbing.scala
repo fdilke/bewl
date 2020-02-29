@@ -20,4 +20,24 @@ object FunctionalPlumbing {
       arrow: R => T
     ): R => S
   }
+
+  // I'm sure a logician could tell you why this particularly twisty bit of
+  // functional plumbing is necessary.
+  @inline def withUnit[
+    DOT[_]: Topos,
+    S: DOT,
+    T: DOT
+  ](
+     s: S
+   )(
+     f: Unit => T
+   ): T =
+    f(
+      (implicitly[
+        Topos[DOT]
+      ].to1[S]:
+        S => Unit)(
+        s
+      )
+    )
 }
