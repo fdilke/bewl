@@ -658,3 +658,6 @@ given f: A => Ω turn it into 1 => (A > Ω), then compose to get 1 => Ω.
 But, we also want to have lazy versions of ∀[S] stored for each S. Still can.
 Extract Quantifier later, when ∀, ∃, LT all in place. Triangulate.
 
+Memo move the enrichments to a separate package and use AnyVal.
+In fact decompose all the stuff in Topos. Maybe without cakes.
+

@@ -69,11 +69,19 @@ class EnrichmentTests extends AnyFunSpec {
   }
 
   describe("The truth object") {
-    it("has the correct binary operations for binary operations") {
-      LogicalOperations.and shouldBeFn { _ & _ }
-      LogicalOperations.implies shouldBeFn { !_ | _ }
-      LogicalOperations.or shouldBeFn { _ | _ }
-      LogicalOperations.falsity shouldBeFn { _ => false }
+    it("has the correct binary operations for logical operations") {
+      import LogicalOperations._
+
+      and shouldBeFn { _ & _ }
+      implies shouldBeFn { !_ | _ }
+      or shouldBeFn { _ | _ }
+      falsity shouldBeFn { _ => false }
+    }
+
+    it("has the correct binary operations for logical operations as enrichments") {
+      { (_:Ω) ∧ (_:Ω) } shouldBeFn { _ & _ }
+      { (_:Ω) → (_:Ω) } shouldBeFn { !_ | _ }
+      { (_:Ω) ∨ (_:Ω) } shouldBeFn { _ | _ }
     }
   }
 

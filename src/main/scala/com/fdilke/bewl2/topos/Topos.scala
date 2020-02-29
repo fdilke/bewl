@@ -114,6 +114,21 @@ trait Topos[DOT[_]] { topos =>
         throw new IllegalArgumentException("functions match")
   }
 
+  @inline implicit class RichBewlean (
+    bewlean: Ω
+  ) {
+    import LogicalOperations._
+
+    @inline def →(that: Ω) =
+      implies(bewlean, that)
+
+    @inline def ∧(that: Ω) =
+      and(bewlean, that)
+
+    @inline def ∨(that: Ω) =
+      or(bewlean, that)
+  }
+
   // anticipate these will not be used very much...
   // as it's all baked into the types and thoughtcrime is impossible. remove?
   @inline final def dot[S:DOT]: DOT[S] =
@@ -237,25 +252,20 @@ trait Topos[DOT[_]] { topos =>
         }
       )
 
-    lazy val falsity: Unit => Ω = {
-      val ff: Ω => Ω = id[Ω]
-//      val fff: (Ω => Ω) => Ω = ∀[Ω]
-      ∀[Ω](ff)
-    }
+    lazy val falsity: Unit => Ω =
+      ∀ { (ω: Ω) =>
+        ω
+      }
 
     lazy val or: (Ω, Ω) => Ω =
       (a : Ω, b: Ω) => {
       def ff: Ω => Ω = ω =>
-        implies(
-          and(
-            implies(a, ω),
-            implies(b, ω)
-          ),
-          ω
-        )
+          ((a → ω) ∧ (b → ω)) → ω
 
       val fixthis: Unit => Ω = ∀[Ω](ff)
-      fixthis({})
+      val tou: Ω => Unit = to1[Ω]
+      val u: Unit = tou(a)
+      fixthis(u)
     }
   }
 }
