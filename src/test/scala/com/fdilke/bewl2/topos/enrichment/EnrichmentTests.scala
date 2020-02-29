@@ -2,6 +2,7 @@ package com.fdilke.bewl2.topos.enrichment
 
 import org.scalatest.funspec.AnyFunSpec
 import com.fdilke.bewl2.fsets.FiniteSets.FiniteSetsTopos._
+import com.fdilke.bewl2.util.FunctionWithEquality
 import org.scalatest.matchers.should.Matchers._
 
 import scala.Function.untupled
@@ -85,25 +86,24 @@ class EnrichmentTests extends AnyFunSpec {
     }
   }
 
-/*
   describe("The existential quantifier") {
     it("detects whether a subobject is NOT empty") {
-      val totalSet = dot(1, 2, 3, 4)
-      val subset = dot(1, 3)
-      val emptySet = dot[Int]()
+      implicit val totalSet: Iterable[Int] = Iterable(1, 2, 3, 4)
+      implicit val subset: Iterable[Option[Int]] = Iterable(Some(1), Some(3))
+      implicit val emptySet: Iterable[String] = Iterable()
 
-      val embed = subset(totalSet) { x => x}
-      val embedEmpty = emptySet(totalSet) { x => x}
-      val exists = totalSet.∃
-      exists should have(
-        source(totalSet > omega),
-        target(omega)
-      )
-      exists o embed.chi.name shouldBe truth
-      exists o embedEmpty.chi.name should not be truth
-      exists o totalSet.identity.chi.name shouldBe truth
+      val embed: Option[Int] => Int = { _.get }
+      val embedEmpty: String => Int = { _.length }
+      val exists: (Int > Boolean) => Boolean = ∃[Int]
+      exists.source shouldBe dot[Int > Boolean]
+      exists.target shouldBe dot[Boolean]
+
+      (exists o embed.chi.chi.name) shouldBeFn truth
+      (exists o embedEmpty.chi.chi.name) shouldNotBeFn truth
+      (exists o id[Int].chi.chi.name) shouldBeFn truth
     }
-
+  }
+/*
     it("can be used over a dot to make an arrow into omega") {
       val carrier = dot(1,2,3)
       val containers = dot(Set(1,2), Set(2))

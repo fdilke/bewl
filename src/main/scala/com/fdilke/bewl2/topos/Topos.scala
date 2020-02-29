@@ -174,6 +174,20 @@ trait Topos[DOT[_]] { topos =>
 
     lazy val `∀`: (A > Ω) => Ω =
       toTrue[A].name.chi.chi
+
+    lazy val `∃`: (A > Ω) => Ω =
+      collapse {
+        f =>
+          topos.∀ { (w: Ω) =>
+            val pp: A => Ω = { (x: A) =>
+              val t: Ω = f(x)
+              t → w
+            }
+            val k: Unit => Ω =
+              topos.∀[A](pp: A => Ω)
+            k({}) → w
+          }
+      }
   }
 
   final private def makeDotExtras[A](
@@ -201,6 +215,10 @@ trait Topos[DOT[_]] { topos =>
   @inline final def ∀[A: DOT](f: A > Ω): Ω =
     extras[A].`∀`(f)
 
+  @inline final def ∃[A: DOT](f: A > Ω): Ω =
+    extras[A].`∃`(f)
+
+  // TODO: FIX!!
   @inline final def ∀[A: DOT](f: A => Ω): (Unit => Ω) =
     u => {
       val xx: A > Ω = f.name(u)
