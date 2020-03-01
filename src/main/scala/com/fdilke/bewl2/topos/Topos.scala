@@ -172,19 +172,19 @@ trait Topos[DOT[_]] { topos =>
     def exponential[B : DOT]: DOT[A > B] =
       memoizedExponential(dot[B])
 
-    lazy val `∀`: (A > Ω) => Ω =
+    lazy val `_∀`: (A > Ω) => Ω =
       toTrue[A].name.chi.chi
 
-    lazy val `∃`: (A > Ω) => Ω =
+    lazy val `_∃`: (A > Ω) => Ω =
       collapse {
         f =>
-          topos.∀ { (w: Ω) =>
+          ∀ { (w: Ω) =>
             val pp: A => Ω = { (x: A) =>
               val t: Ω = f(x)
               t → w
             }
             val k: Unit => Ω =
-              topos.∀[A](pp: A => Ω)
+              ∀[A](pp: A => Ω)
             k({}) → w
           }
       }
@@ -213,10 +213,10 @@ trait Topos[DOT[_]] { topos =>
     extras[A].exponential[B]
 
   @inline final def ∀[A: DOT](f: A > Ω): Ω =
-    extras[A].`∀`(f)
+    extras[A].`_∀`(f)
 
   @inline final def ∃[A: DOT](f: A > Ω): Ω =
-    extras[A].`∃`(f)
+    extras[A].`_∃`(f)
 
   // TODO: FIX!!
   @inline final def ∀[A: DOT](f: A => Ω): (Unit => Ω) =
