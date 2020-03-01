@@ -176,16 +176,15 @@ trait Topos[DOT[_]] { topos =>
       toTrue[A].name.chi.chi
 
     lazy val `_∃`: (A > Ω) => Ω =
-      collapse {
-        f =>
-          ∀ { (w: Ω) =>
-            val pp: A => Ω = { (x: A) =>
-              val t: Ω = f(x)
-              t → w
+      collapse { f =>
+          val tt: Ω => Ω =
+            collapse { (w: Ω) =>
+              ∀ { (x: A) =>
+                f(x) → w
+              }
             }
-            val k: Unit => Ω =
-              ∀[A](pp: A => Ω)
-            k({}) → w
+          ∀ { (w: Ω) =>
+            tt(w) → w
           }
       }
   }
@@ -235,14 +234,17 @@ trait Topos[DOT[_]] { topos =>
   // TODO: this works but is monstrous. Remedy is to abolish
   //  materialized products in favour of multiary plumbing?
   def π0[A: DOT, B: DOT, C: DOT]: (((A, B), C)) => A = {
-      (abc: ((A, B), C)) =>
-        (π0[A, B] : ((A, B)) => A) (
-          (π0[(A, B), C] : (((A, B), C)) => (A, B)) (
-            abc
-          )
-        )
-    }
+    val k: (((A, B), C)) => (A, B) = π0[(A, B), C]
+    val l: ((A, B)) => A = π0[A, B]
 
+    val t: (((A, B), C)) => A = {
+      (abc: ((A, B), C)) =>
+        val ab: (A, B) = k(abc)
+        val a: A = l(ab)
+        a
+    }
+    t
+  }
 //    π0[A, B] o π0[(A, B), C]
 
   //  implicit def multiFunction2function[A: DOT, B: DOT, C: DOT](
