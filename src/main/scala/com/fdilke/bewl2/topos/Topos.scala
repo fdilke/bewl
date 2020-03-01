@@ -215,17 +215,16 @@ trait Topos[DOT[_]] { topos =>
   @inline final def ∀[A: DOT](f: A > Ω): Ω =
     extras[A].`_∀`(f)
 
+  @inline final def ∀[A: DOT](
+    f: A => Ω
+  ): (Unit => Ω) =
+    u =>
+      (∀[A])(
+        f.name(u)
+      )
+
   @inline final def ∃[A: DOT](f: A > Ω): Ω =
     extras[A].`_∃`(f)
-
-  // TODO: FIX!!
-  @inline final def ∀[A: DOT](f: A => Ω): (Unit => Ω) =
-    u => {
-      val xx: A > Ω = f.name(u)
-      val aa: (A > Ω) => Ω = ∀[A]
-      val yy: Ω =  aa(xx)
-      yy
-    }
 
   // Projection operators
   def π0[A : DOT, B : DOT]: ((A, B)) => A =
