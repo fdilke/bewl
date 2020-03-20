@@ -1,5 +1,7 @@
 package com.fdilke.bewl2.compacta
 
+import java.util.function.{Consumer, Supplier}
+
 import com.fdilke.bewl2.compacta.CantorianADTs.InexhaustibleIterator
 
 object CantorianADTs {
@@ -60,24 +62,20 @@ object Cantorian {
       override def tail: Cantorian = t
     }
 
-  implicit class DeferredCantorian(
-    deferred: () => Cantorian
-  ) {
+  implicit class DeferredCantorian (
+    val deferred: () => Cantorian
+  ) extends AnyVal {
     def #::(head: Boolean): () => Cantorian =
       () => Cantorian(head, deferred())
   }
 
-  def cycle(values: Boolean*): Cantorian = {
-    def loop(): Cantorian = {
-      val hh: () => Cantorian =
-        values.foldLeft[() => Cantorian](loop) { (c: (() => Cantorian), b: Boolean) =>
-          val kk: () => Cantorian =
-            b #:: new DeferredCantorian(c)
-          kk
-        }
-      hh()
-    }
-
-    loop
-  }
+  def cycle(values: Boolean*): Cantorian =
+    new Supplier[Cantorian] {
+      override def get(): Cantorian =
+        values.foldLeft[() => Cantorian](
+          () => get()
+        ) { (c: () => Cantorian, b: Boolean) =>
+          b #:: new DeferredCantorian(c)
+        }()
+    }.get()
 }
