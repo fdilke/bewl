@@ -4,6 +4,8 @@ import java.util.function.{Consumer, Supplier}
 
 import com.fdilke.bewl2.compacta.CantorianADTs.InexhaustibleIterator
 
+import scala.language.postfixOps
+
 object CantorianADTs {
   trait InexhaustibleIterator[T, U <: InexhaustibleIterator[T, U]] {
     val head: T
@@ -71,11 +73,11 @@ object Cantorian {
 
   def cycle(values: Boolean*): Cantorian =
     new Supplier[Cantorian] {
-      override def get(): Cantorian =
+      override def get: Cantorian =
         values.foldLeft[() => Cantorian](
-          () => get()
+          () => get
         ) { (c: () => Cantorian, b: Boolean) =>
           b #:: new DeferredCantorian(c)
         }()
-    }.get()
+    } get
 }
