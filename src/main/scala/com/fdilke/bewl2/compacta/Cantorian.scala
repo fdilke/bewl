@@ -63,14 +63,11 @@ object Cantorian {
   implicit class DeferredCantorian(
     deferred: () => Cantorian
   ) {
-    def #::(head: Boolean): () => Cantorian = {
-      println("VVV x: head = " + head)
+    def #::(head: Boolean): () => Cantorian =
       () => Cantorian(head, deferred())
-    }
   }
 
   def cycle(values: Boolean*): Cantorian = {
-    println("VVV entering the cycle")
     def loop(): Cantorian = {
       val hh: () => Cantorian =
         values.foldLeft[() => Cantorian](loop) { (c: (() => Cantorian), b: Boolean) =>

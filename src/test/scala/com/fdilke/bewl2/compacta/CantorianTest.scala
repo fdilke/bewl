@@ -1,40 +1,23 @@
 package com.fdilke.bewl2.compacta
 
+import com.fdilke.bewl2.compacta.Cantorian.cycle
 import com.fdilke.bewl2.compacta.CantorianADTs.GroundedTree
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
 
 class CantorianTest extends AnyFunSpec {
 
-  if (false) {
-//    println("VVV 01")
-//
-//    private val allTrue: Cantorian =
-//    Cantorian.cycle(true)
-//
-//    println("VVV 02")
-//
-//    private val allFalse: Cantorian =
-//    Cantorian.cycle(false)
-//
-//    println("VVV 03")
-//
-//    private val trueFalseAlternate: Cantorian =
-//    Cantorian.cycle(true, false)
-//    //    lazy val loop: LazyList[Boolean] =
-//    //      true #:: false #:: loop
-//    //    loop
-//    //  }
-//
-//    println("VVV 04")
-//
-//    private val falseTrueAlternate: Cantorian =
-//    Cantorian.cycle(false, true)
-//    //    lazy val loop: LazyList[Boolean] =
-//    //      false #:: true #:: loop
-//    //    loop
-//    //  }
-  }
+  private val allTrue: Cantorian =
+    cycle(true)
+
+  private val allFalse: Cantorian =
+    cycle(false)
+
+  private val trueFalseAlternate: Cantorian =
+    cycle(true, false)
+
+  private val falseTrueAlternate: Cantorian =
+    cycle(false, true)
 
   private val tree35: GroundedTree[Int] =
     GroundedTree[Int](
@@ -63,7 +46,7 @@ class CantorianTest extends AnyFunSpec {
   describe("Cyclic Cantorians") {
     it("work as expected, and can be converted to iterators") {
       val cantorianTFT: Cantorian =
-        Cantorian.cycle(true, false, true)
+        cycle(true, false, true)
 
       cantorianTFT.asIterable.take(5).toList shouldBe Seq(
         true, false, true, true, false
