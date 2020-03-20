@@ -39,19 +39,12 @@ trait Cantorian extends
   def asIterable: Iterable[Boolean] =
     new Iterable[Boolean] {
       override def iterator: Iterator[Boolean] =
-        new Iterator[Boolean] {
-          private var root: Cantorian =
-            cantorian
-
-          override def hasNext: Boolean =
-            true
-
-          override def next(): Boolean = {
-            val theNext: Boolean =
-              root.head
-            root = root.tail
-            theNext
-          }
+        Iterator.iterate(
+          cantorian
+        ) {
+          _.tail
+        } map {
+          _.head
         }
     }
 }
