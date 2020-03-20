@@ -669,4 +669,25 @@ to be one that expresses InexhaustibleIterator[Boolean] properly,
 ditto GroundedTree[T] and also I want to clarify that they are
 "algebraic data types" & get them under the appropriate roof 
 as generic (and somehow reciprocal) structures.
-Corollary: I now have to iomplement "#::"
+Corollary: I now have to implement "#::"
+
+later, learn map on Iterables is problematic, which is why there
+isn't an Iterable.iterate() (having tried to write one):
+
+    trait Cantorian extends
+      InexhaustibleIterator[Boolean, Cantorian] { cantorian =>
+      def asIterable: Iterable[Boolean] =
+        new Iterable[Cantorian] {
+          override def iterator: Iterator[Cantorian] =
+            Iterator.iterate(
+              cantorian
+            ) {
+              _.tail
+            }
+        } map {
+          _.head
+        }
+    }
+
+This loops infinitely.
+I'm sure there should be a tailrec or two here somewhere.

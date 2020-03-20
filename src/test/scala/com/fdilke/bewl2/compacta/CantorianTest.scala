@@ -61,21 +61,12 @@ class CantorianTest extends AnyFunSpec {
   }
 
   describe("Cyclic Cantorians") {
-    ignore("work as expected, and can be converted to iterators") {
-      println("VVV 1")
-
+    it("work as expected, and can be converted to iterators") {
       val cantorianTFT: Cantorian =
-        Cantorian.cycle(true, false) // , true)
-      println("VVV 2")
-      val a = cantorianTFT.asIterable
-      println("VVV 3")
-      val b = a.take(6)
-      println("VVV 4")
+        Cantorian.cycle(true, false, true)
 
-      val c = b.toList
-
-      cantorianTFT.asIterable.take(6).toList shouldBe Seq(
-        true, false, true, false, true
+      cantorianTFT.asIterable.take(5).toList shouldBe Seq(
+        true, false, true, true, false
       )
     }
   }

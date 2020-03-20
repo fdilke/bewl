@@ -60,9 +60,6 @@ object Cantorian {
       override def tail: Cantorian = t
     }
 
-//  implicit def toDeferred](private val l:=> Cantorian): DeferredCantorian =
-//    new DeferredCantorian(() => l)
-
   implicit class DeferredCantorian(
     deferred: () => Cantorian
   ) {
@@ -75,25 +72,15 @@ object Cantorian {
   def cycle(values: Boolean*): Cantorian = {
     println("VVV entering the cycle")
     def loop(): Cantorian = {
-      def ttt(c: () => Cantorian, b: Boolean): () => Cantorian =
-        b #:: new DeferredCantorian(c)
-
-      if (false) {
       val hh: () => Cantorian =
         values.foldLeft[() => Cantorian](loop) { (c: (() => Cantorian), b: Boolean) =>
           val kk: () => Cantorian =
             b #:: new DeferredCantorian(c)
           kk
         }
-
-      (values.foldLeft[() => Cantorian](loop)(ttt)) ()
+      hh()
     }
 
-      ttt(ttt(loop, false), true)()
-//      hh()
-    }
-    //      cycle.foldLeft(loop) { _ #:: _ }
-    println("VVV loop done")
     loop
   }
 }
