@@ -663,4 +663,10 @@ In fact decompose all the stuff in Topos. Maybe without cakes.
 
 > Memo: investigate the "recursive topos" https://ncatlab.org/nlab/show/topos+of+recursive+sets
 
-
+Cantorian stuff: this is getting a bit messy because I 
+don't want to re-use the Scala collections: there doesn't seem
+to be one that expresses InexhaustibleIterator[Boolean] properly,
+ditto GroundedTree[T] and also I want to clarify that they are
+"algebraic data types" & get them under the appropriate roof 
+as generic (and somehow reciprocal) structures.
+Corollary: I now have to iomplement "#::"
