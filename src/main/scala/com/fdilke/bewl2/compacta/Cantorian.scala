@@ -64,20 +64,16 @@ object Cantorian {
       override def tail: Cantorian = t
     }
 
-  implicit class DeferredCantorian (
-    val deferred: () => Cantorian
-  ) extends AnyVal {
-    def #::(head: Boolean): () => Cantorian =
-      () => Cantorian(head, deferred())
-  }
-
   def cycle(values: Boolean*): Cantorian =
     new Supplier[Cantorian] {
       override def get: Cantorian =
         values.foldLeft[() => Cantorian](
           () => get
         ) { (c: () => Cantorian, b: Boolean) =>
-          b #:: new DeferredCantorian(c)
+          () => new Cantorian {
+            override val head: Boolean = b
+            override def tail: Cantorian = c()
+          }
         }()
     } get
 }
