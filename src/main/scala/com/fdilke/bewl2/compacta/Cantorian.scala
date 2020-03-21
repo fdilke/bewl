@@ -15,16 +15,17 @@ object CantorianADTs {
     def tail: PITCHER
   }
 
-  class Catcher[
+  trait Catcher[
     SELF <: Catcher[SELF, T, U],
     T,
     U
-  ](
-    val either: Either[
+  ] { self: SELF =>
+
+    def either: Either[
       U,
       T => SELF
     ]
-  ) { self: SELF =>
+
     final def apply[
       PITCHER <: Pitcher[PITCHER, T]
     ] (
@@ -37,16 +38,27 @@ object CantorianADTs {
       }
 }
 
-sealed trait GroundedCatcher[T, U]
-  extends Catcher[GroundedCatcher[T, U], T, U]
-  with Function[Pitcher[_, T], U]
+class GroundedCatcher[T, U](
+  val either: Either[U, T => GroundedCatcher[T, U]]
+) extends Catcher[GroundedCatcher[T, U], T, U]
+//  with Function[Pitcher[_, T], U]
+
+//case class LeafCatcher[T, U](
+//  leaf: T
+//) extends GroundedCatcher[T, U] {
+////  def apply(cantorian: Cantorian): T =
+////    leaf
+//}
 
   sealed trait GroundedTree[T]
-    extends Function[Cantorian, T]
+    extends GroundedCatcher[Boolean, T]
+      with Function[Cantorian, T]
 
   case class LeafNode[T](
     leaf: T
-  ) extends GroundedTree[T] {
+  ) extends GroundedCatcher[Boolean, T](
+    Left(leaf)
+  ) with GroundedTree[T] {
     def apply(cantorian: Cantorian): T =
       leaf
   }
@@ -54,21 +66,11 @@ sealed trait GroundedCatcher[T, U]
   case class BranchNode[T](
     left: GroundedTree[T],
     right: GroundedTree[T]
-  ) extends GroundedTree[T] {
-    def apply(cantorian: Cantorian): T = {
-      val side: GroundedTree[T] = (
-        if (cantorian.head)
-        left
-      else
-        right
-      )
-
-      val t: T = side.apply(
-        cantorian.tail
-      )
-
-      t
-    }
+  ) extends GroundedCatcher[Boolean, T](
+    Right(boolean => if (boolean) left else right)
+  ) with GroundedTree[T] {
+    def apply(cantorian: Cantorian): T =
+      this.apply[Cantorian](cantorian)
   }
 
   object GroundedTree {
