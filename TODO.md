@@ -691,3 +691,14 @@ isn't an Iterable.iterate() (having tried to write one):
 
 This loops infinitely.
 I'm sure there should be a tailrec or two here somewhere.
+also judicious use of AnyVals
+
+Very rough roadmap:
+- model compact and Hausdorff properties, C^H and H^C
+- extract a Catcher[T, U] from a Pitcher[T] => U
+- figure out 'dual monadic structure' of Cantorians,
+    (K, K) => T to K => K => T to K => Tree[T] to Tree[Tree[T]]
+        to Tree[T] to K => T. Same as interleave?
+- cryptomorphisms with dyadic music
+- abstract recursion schemes, and express Pitcher, Catcher as those.
+    Be good if that was 100% efficient. Maybe sort AnyVal/tailrec first.        

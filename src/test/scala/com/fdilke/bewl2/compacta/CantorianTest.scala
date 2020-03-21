@@ -1,7 +1,6 @@
 package com.fdilke.bewl2.compacta
 
 import com.fdilke.bewl2.compacta.Cantorian.cycle
-import com.fdilke.bewl2.compacta.CantorianADTs.{BranchNode, GroundedTree, LeafNode}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
 
