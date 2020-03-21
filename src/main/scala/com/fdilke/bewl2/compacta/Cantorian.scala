@@ -2,7 +2,7 @@ package com.fdilke.bewl2.compacta
 
 import java.util.function.{Consumer, Supplier}
 
-import com.fdilke.bewl2.compacta.CantorianADTs.InexhaustibleIterator
+import com.fdilke.bewl2.compacta.CantorianADTs.{GroundedTree, InexhaustibleIterator}
 
 import scala.language.postfixOps
 
@@ -12,27 +12,43 @@ object CantorianADTs {
     def tail: U
   }
 
-  sealed trait GroundedTree[T] {
-    //  def
-    // refactor...
-  }
+  sealed trait GroundedTree[T]
+    extends Function[Cantorian, T]
 
   case class LeafNode[T](
     leaf: T
-  ) extends GroundedTree[T]
+  ) extends GroundedTree[T] {
+    def apply(cantorian: Cantorian): T =
+      leaf
+  }
 
   case class BranchNode[T](
     left: GroundedTree[T],
     right: GroundedTree[T]
-  ) extends GroundedTree[T]
+  ) extends GroundedTree[T] {
+    def apply(cantorian: Cantorian): T = {
+      val side: GroundedTree[T] = (
+        if (cantorian.head)
+        left
+      else
+        right
+      )
+
+      val t: T = side.apply(
+        cantorian.tail
+      )
+
+      t
+    }
+  }
 
   object GroundedTree {
     def apply[T](leaf: T): GroundedTree[T] =
       LeafNode(leaf)
 
     def apply[T](
-      left: =>GroundedTree[T],
-      right: => GroundedTree[T]
+      left: GroundedTree[T],
+      right: GroundedTree[T]
     ): GroundedTree[T] =
       BranchNode(left, right)
   }
@@ -54,7 +70,6 @@ trait Cantorian extends
 }
 
 object Cantorian {
-
   def apply(
     h: Boolean,
     t: => Cantorian
@@ -67,9 +82,9 @@ object Cantorian {
   def cycle(values: Boolean*): Cantorian =
     new Supplier[Cantorian] {
       override def get: Cantorian =
-        values.foldLeft[() => Cantorian](
+        values.foldRight[() => Cantorian](
           () => get
-        ) { (c: () => Cantorian, b: Boolean) =>
+        ) { (b: Boolean, c: () => Cantorian) =>
           () => new Cantorian {
             override val head: Boolean = b
             override def tail: Cantorian = c()

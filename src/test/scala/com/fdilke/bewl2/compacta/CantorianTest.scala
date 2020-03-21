@@ -1,7 +1,7 @@
 package com.fdilke.bewl2.compacta
 
 import com.fdilke.bewl2.compacta.Cantorian.cycle
-import com.fdilke.bewl2.compacta.CantorianADTs.GroundedTree
+import com.fdilke.bewl2.compacta.CantorianADTs.{BranchNode, GroundedTree, LeafNode}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
 
@@ -46,28 +46,43 @@ class CantorianTest extends AnyFunSpec {
   describe("Cyclic Cantorians") {
     it("work as expected, and can be converted to iterators") {
       val cantorianTFT: Cantorian =
-        cycle(true, false, true)
+        cycle(true, false, false)
 
       cantorianTFT.asIterable.take(5).toList shouldBe Seq(
-        true, false, true, true, false
+        true, false, false, true, false
       )
     }
   }
 
-//  describe("Cantorians") {
-//    it("can operate on trees -leaf node case") {
-//      allTrue(GroundedTree[Int](2)) shouldBe 2
-//      allFalse(GroundedTree[Int](2)) shouldBe 2
-//      falseTrueAlternate(GroundedTree[Int](2)) shouldBe 2
-//    }
-//
-//    it("can operate on trees - branch node case") {
-//      allTrue(tree35) shouldBe 3
-//      falseTrueAlternate(tree35) shouldBe 5
-//      trueFalseAlternate(tree35) shouldBe 3
-//    }
-//  }
-//
+  describe("Cantorians") {
+    it("can be operated on by trees -leaf node case") {
+      GroundedTree[Int](2)(allTrue) shouldBe 2
+      GroundedTree[Int](2)(allFalse) shouldBe 2
+      GroundedTree[Int](2)(falseTrueAlternate) shouldBe 2
+    }
+
+    it("can be operated on by trees - simple branch node case") {
+      tree35(allTrue) shouldBe 3
+      tree35(trueFalseAlternate) shouldBe 3
+      tree35(falseTrueAlternate) shouldBe 5
+    }
+
+    it("can be operated on by trees - complex branch node case") {
+      val complexTree =
+        BranchNode(
+          BranchNode(
+            LeafNode("x"),
+            LeafNode("y")
+          ),
+          LeafNode("z")
+        )
+      complexTree(allTrue) shouldBe "x"
+      complexTree(trueFalseAlternate) shouldBe "y"
+      complexTree(allFalse) shouldBe "z"
+      complexTree(falseTrueAlternate) shouldBe "z"
+    }
+  }
+
 ////  describe("Analyzing co-cantorians") {
 ////    it("works on trivial cases") {
 ////      Tree.from { f => true } shouldBe Tree(true)
