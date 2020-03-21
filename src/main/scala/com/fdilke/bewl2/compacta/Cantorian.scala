@@ -35,8 +35,8 @@ object CantorianADTs {
       pitcher: PITCHER
     ): U =
       either match {
-        case Left(u: U) => u
-        case Right(t2self: (T => SELF)) =>
+        case Left(u) => u
+        case Right(t2self) =>
           t2self(pitcher.head)(pitcher.tail)
       }
   }
