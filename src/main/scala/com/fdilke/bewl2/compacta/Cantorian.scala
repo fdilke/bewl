@@ -8,34 +8,38 @@ import scala.language.postfixOps
 
 object CantorianADTs {
   trait Pitcher[
-    SELF <: Pitcher[SELF, T],
+    PITCHER <: Pitcher[PITCHER, T],
     T
   ] {
     val head: T
-    def tail: SELF
+    def tail: PITCHER
   }
 
-  type Catcher[
+  class Catcher[
     SELF <: Catcher[SELF, T, U],
     T,
     U
-  ] = Either[
-    U,
-    T => SELF
-  ]
+  ](
+    val either: Either[
+      U,
+      T => SELF
+    ]
+  ) { self: SELF =>
+    final def apply[
+      PITCHER <: Pitcher[PITCHER, T]
+    ] (
+      pitcher: PITCHER
+    ): U =
+      either match {
+        case Left(u: U) => u
+        case Right(t2self: (T => SELF)) =>
+          t2self(pitcher.head)(pitcher.tail)
+      }
+}
 
-//  trait Catcher[
-//    SELF <: Catcher[SELF, T],
-//    T,
-//    U
-//  ] extends Either[
-//    U,
-//    T => SELF
-//  ]
-
-//  sealed trait GroundedCatcher[T, U]
-//    extends Catcher[GroundedCatcher[T, U], T, U]
-//    with Function[Pitcher[_, T], U]
+sealed trait GroundedCatcher[T, U]
+  extends Catcher[GroundedCatcher[T, U], T, U]
+  with Function[Pitcher[_, T], U]
 
   sealed trait GroundedTree[T]
     extends Function[Cantorian, T]
