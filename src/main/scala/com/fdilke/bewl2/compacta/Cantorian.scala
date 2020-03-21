@@ -2,14 +2,17 @@ package com.fdilke.bewl2.compacta
 
 import java.util.function.{Consumer, Supplier}
 
-import com.fdilke.bewl2.compacta.CantorianADTs.{GroundedTree, InexhaustibleIterator}
+import com.fdilke.bewl2.compacta.CantorianADTs.{GroundedTree, Pitcher}
 
 import scala.language.postfixOps
 
 object CantorianADTs {
-  trait InexhaustibleIterator[T, U <: InexhaustibleIterator[T, U]] {
+  trait Pitcher[
+    SELF <: Pitcher[SELF, T],
+    T
+  ] {
     val head: T
-    def tail: U
+    def tail: SELF
   }
 
   sealed trait GroundedTree[T]
@@ -55,7 +58,7 @@ object CantorianADTs {
 }
 
 trait Cantorian extends
-  InexhaustibleIterator[Boolean, Cantorian] { cantorian =>
+  Pitcher[Cantorian, Boolean] { cantorian =>
   def asIterable: Iterable[Boolean] =
     new Iterable[Boolean] {
       override def iterator: Iterator[Boolean] =
