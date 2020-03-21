@@ -15,6 +15,28 @@ object CantorianADTs {
     def tail: SELF
   }
 
+  type Catcher[
+    SELF <: Catcher[SELF, T, U],
+    T,
+    U
+  ] = Either[
+    U,
+    T => SELF
+  ]
+
+//  trait Catcher[
+//    SELF <: Catcher[SELF, T],
+//    T,
+//    U
+//  ] extends Either[
+//    U,
+//    T => SELF
+//  ]
+
+//  sealed trait GroundedCatcher[T, U]
+//    extends Catcher[GroundedCatcher[T, U], T, U]
+//    with Function[Pitcher[_, T], U]
+
   sealed trait GroundedTree[T]
     extends Function[Cantorian, T]
 
