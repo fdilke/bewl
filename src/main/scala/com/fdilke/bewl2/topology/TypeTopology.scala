@@ -1,7 +1,8 @@
 package com.fdilke.bewl2.topology
 
 import Compact._
-import scala.language.implicitConversions
+
+import scala.language.{implicitConversions, postfixOps}
 
 trait Compact[T] {
   def find(
@@ -32,12 +33,16 @@ object Compact {
   @inline def exists[T : Compact](
     predicate: T => Boolean
   ): Boolean =
-    find[T](predicate).isDefined
+    find[T](
+      predicate
+    ) isDefined
 
   @inline def forAll[T : Compact](
     predicate: T => Boolean
   ): Boolean =
-    !exists[T](predicate)
+    ! exists[T] {
+      !predicate(_)
+    }
 }
 
 trait Hausdorff[T] {

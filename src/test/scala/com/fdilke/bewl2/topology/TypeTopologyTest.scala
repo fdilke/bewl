@@ -58,7 +58,7 @@ class TypeTopologyTest extends AnyFunSpec {
 
       forAll[StrontiumDog] { sd =>
         preferredWeapon(sd) contains ' '
-      } shouldBe false
+      } shouldBe true
 
       forAll[StrontiumDog] { sd =>
         sd.toString.toCharArray.count(_.isUpper) == 1
@@ -87,11 +87,23 @@ class TypeTopologyTest extends AnyFunSpec {
           TheGronk -> Sunday
         ),
         Map(
+          Johnny -> Monday,
+          Wulf -> Thursday,
+          TheGronk -> Sunday
+        )
+      ) shouldBe false
+      equalH[StrontiumDog => Weekday](
+        Map(
+          Johnny -> Monday,
+          Wulf -> Tuesday,
+          TheGronk -> Sunday
+        ),
+        Map(
           TheGronk -> Sunday,
           Wulf -> Tuesday,
           Johnny -> Monday
         )
-      ) shouldBe false
+      ) shouldBe true
     }
   }
 }
