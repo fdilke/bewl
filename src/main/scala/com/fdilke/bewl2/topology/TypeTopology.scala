@@ -16,10 +16,19 @@ object Compact {
       enum.values find (predicate) map {
         v => () => v
       }
+
+  @inline def find[T : Compact](
+    predicate: T => Boolean
+  ): Option[
+    () => T
+  ] =
+    implicitly[Compact[T]] find(
+      predicate
+    )
 }
 
 trait Hausdorff[T] {
-  def equal(
+  def equalH(
     t1: T,
     t2: T
   ): Boolean
@@ -30,4 +39,13 @@ object Hausdorff {
     enum: ENUM
   ): Hausdorff[enum.Value] =
       _ == _
+
+  @inline def equalH[T : Hausdorff](
+    t1: T,
+    t2: T
+  ): Boolean =
+    implicitly[Hausdorff[T]] equalH(
+      t1, t2
+    )
+//  implicit def xx[C : Compact, H : Hausdorff]:
 }
