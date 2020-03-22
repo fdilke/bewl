@@ -26,8 +26,13 @@ trait Hausdorff[T] {
 }
 
 object Hausdorff {
-  def hausdorffFor(
-    enum: Enumeration
-  ): Hausdorff[enum.Value] =
-    _ == _
+  implicit class HausdorffForEnum[ENUM <: Enumeration](
+    enum: ENUM
+  ) extends Hausdorff[ENUM#Value] {
+    override def equal(
+      t1: ENUM#Value,
+      t2: ENUM#Value
+    ): Boolean =
+      t1 == t2
+  }
 }

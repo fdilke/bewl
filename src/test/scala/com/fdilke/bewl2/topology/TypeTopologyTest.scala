@@ -43,10 +43,8 @@ class TypeTopologyTest extends AnyFunSpec {
     }
 
     it("can be made Hausdorff") {
-      val hsd = hausdorffFor(SampleEnumeration)
-
-      hsd equal(Johnny, Wulf) shouldBe false
-      hsd equal(TheGronk, TheGronk) shouldBe true
+      SampleEnumeration equal(Johnny, Wulf) shouldBe false
+      SampleEnumeration equal(TheGronk, TheGronk) shouldBe true
     }
   }
 }
