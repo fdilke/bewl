@@ -4,6 +4,7 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
 import com.fdilke.bewl2.topology.Compact
 import Compact._
+import Hausdorff._
 
 class TypeTopologyTest extends AnyFunSpec {
 
@@ -40,8 +41,12 @@ class TypeTopologyTest extends AnyFunSpec {
         _()
       } shouldBe None
     }
-  }
 
-  val xx: SampleEnumeration.ValueSet = SampleEnumeration.values
-  xx.find(preferredWeapon(_) == "Der Happy Stick")
+    it("can be made Hausdorff") {
+      val hsd = hausdorffFor(SampleEnumeration)
+
+      hsd equal(Johnny, Wulf) shouldBe false
+      hsd equal(TheGronk, TheGronk) shouldBe true
+    }
+  }
 }

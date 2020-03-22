@@ -701,4 +701,5 @@ Very rough roadmap:
         to Tree[T] to K => T. Same as interleave?
 - cryptomorphisms with dyadic music
 - abstract recursion schemes, and express Pitcher, Catcher as those.
-    Be good if that was 100% efficient. Maybe sort AnyVal/tailrec first.        
+    Be good if that was 100% efficient. Maybe sort AnyVal/tailrec first.
+- (fix scalafmt, take gatekeeper code as guide)
