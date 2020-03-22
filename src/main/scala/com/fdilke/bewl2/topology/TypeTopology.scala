@@ -9,11 +9,11 @@ trait Compact[T] {
 }
 
 object Compact {
-  def compactnessFor(
-    enum: Enumeration
+  implicit def CompactnessForEnum[ENUM <: Enumeration](
+    enum: ENUM
   ): Compact[enum.Value] =
     (predicate: enum.Value => Boolean) =>
-      enum.values find(predicate) map {
+      enum.values find (predicate) map {
         v => () => v
       }
 }
@@ -26,13 +26,8 @@ trait Hausdorff[T] {
 }
 
 object Hausdorff {
-  implicit class HausdorffForEnum[ENUM <: Enumeration](
+  implicit def HausdorffForEnum[ENUM <: Enumeration](
     enum: ENUM
-  ) extends Hausdorff[ENUM#Value] {
-    override def equal(
-      t1: ENUM#Value,
-      t2: ENUM#Value
-    ): Boolean =
-      t1 == t2
-  }
+  ): Hausdorff[enum.Value] =
+      _ == _
 }

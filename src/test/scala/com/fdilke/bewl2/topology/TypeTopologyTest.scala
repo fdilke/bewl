@@ -27,15 +27,13 @@ class TypeTopologyTest extends AnyFunSpec {
 
   describe("Enumerations") {
     it("can be made compact") {
-      val csd = compactnessFor(SampleEnumeration)
-
-      csd find {
+      SampleEnumeration find {
         preferredWeapon(_) == "Der Happy Stick"
       } map {
         _()
       } shouldBe Some(Wulf)
 
-      csd find {
+      SampleEnumeration find {
         preferredWeapon(_) == "Time Bomb"
       } map {
         _()
