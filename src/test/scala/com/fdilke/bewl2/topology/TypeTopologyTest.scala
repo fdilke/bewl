@@ -18,6 +18,7 @@ class TypeTopologyTest extends AnyFunSpec {
     type StrontiumDog = Value
   }
   import StrontiumDogEnumeration._
+  import WeekdayEnumeration._
 
   private def preferredWeapon(sd: StrontiumDog): String =
     sd match {
@@ -27,7 +28,7 @@ class TypeTopologyTest extends AnyFunSpec {
     }
 
   describe("Enumerations") {
-    it("can be made compact") {
+    it("can be made implicitly compact") {
       implicit val compactSD: Compact[StrontiumDog] =
         StrontiumDogEnumeration
       find[StrontiumDog] {
@@ -43,7 +44,28 @@ class TypeTopologyTest extends AnyFunSpec {
       } shouldBe None
     }
 
-    it("can be made Hausdorff") {
+    it("allow use of quantifiers once implicitly compact") {
+      implicit val compactSD: Compact[StrontiumDog] =
+        StrontiumDogEnumeration
+
+      exists[StrontiumDog] { sd =>
+        preferredWeapon(sd) startsWith "No.4"
+      } shouldBe true
+
+      exists[StrontiumDog] { sd =>
+        sd.toString.length < 3
+      } shouldBe false
+
+      forAll[StrontiumDog] { sd =>
+        preferredWeapon(sd) contains ' '
+      } shouldBe false
+
+      forAll[StrontiumDog] { sd =>
+        sd.toString.toCharArray.count(_.isUpper) == 1
+      } shouldBe false
+    }
+
+    it("can be made implicitly Hausdorff") {
       implicit val hausdorffSD: Hausdorff[StrontiumDog] =
         StrontiumDogEnumeration
 
@@ -52,9 +74,24 @@ class TypeTopologyTest extends AnyFunSpec {
     }
   }
 
-//  description("Hausdorff ^ compact is implicitly Hausdorff") {
-//    it() {
-//      find[Weekday => StrontiumDog]
-//    }
-//  }
+  describe("Derived topologies") {
+    it("Hausdorff ^ compact is implicitly Hausdorff") {
+      implicit val compactSD: Compact[StrontiumDog] =
+        StrontiumDogEnumeration
+      implicit val hausdorffWeekday: Hausdorff[Weekday] =
+        WeekdayEnumeration
+      equalH[StrontiumDog => Weekday](
+        Map(
+          Johnny -> Monday,
+          Wulf -> Tuesday,
+          TheGronk -> Sunday
+        ),
+        Map(
+          TheGronk -> Sunday,
+          Wulf -> Tuesday,
+          Johnny -> Monday
+        )
+      ) shouldBe false
+    }
+  }
 }

@@ -1,5 +1,8 @@
 package com.fdilke.bewl2.topology
 
+import Compact._
+import scala.language.implicitConversions
+
 trait Compact[T] {
   def find(
     predicate: T => Boolean
@@ -25,6 +28,16 @@ object Compact {
     implicitly[Compact[T]] find(
       predicate
     )
+
+  @inline def exists[T : Compact](
+    predicate: T => Boolean
+  ): Boolean =
+    find[T](predicate).isDefined
+
+  @inline def forAll[T : Compact](
+    predicate: T => Boolean
+  ): Boolean =
+    !exists[T](predicate)
 }
 
 trait Hausdorff[T] {
@@ -47,5 +60,18 @@ object Hausdorff {
     implicitly[Hausdorff[T]] equalH(
       t1, t2
     )
-//  implicit def xx[C : Compact, H : Hausdorff]:
+
+  implicit def hausdorffExponential[
+    C : Compact,
+    H : Hausdorff
+  ]: Hausdorff[
+    C => H
+  ] =
+    (f, g) =>
+      forAll[C] { c =>
+        equalH(
+          f(c),
+          g(c)
+        )
+      }
 }
