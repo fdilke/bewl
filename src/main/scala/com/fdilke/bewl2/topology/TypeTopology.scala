@@ -1,7 +1,7 @@
 package com.fdilke.bewl2.topology
 
 import Compact._
-import com.fdilke.bewl2.util.EnumReflection
+import com.fdilke.bewl2.util.FindEnum
 
 import scala.reflect.runtime.universe._
 import scala.language.{implicitConversions, postfixOps}
@@ -18,14 +18,11 @@ object Compact {
 
   implicit def CompactnessForEnum[
     ENUM <: Enumeration : TypeTag
-  ]: Compact[ENUM#Value] = {
-    val enum: ENUM = EnumReflection.enumContainerFor[ENUM#Value].asInstanceOf[ENUM]
-
+  ]: Compact[ENUM#Value] =
     (predicate: ENUM#Value => Boolean) =>
-      enum.values find (predicate) map {
+      FindEnum[ENUM].values find predicate map {
         v => () => v
       }
-  }
 
   @inline def find[T : Compact](
     predicate: T => Boolean
