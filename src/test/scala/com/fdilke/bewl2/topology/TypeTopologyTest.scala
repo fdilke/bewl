@@ -5,20 +5,13 @@ import org.scalatest.matchers.should.Matchers._
 import com.fdilke.bewl2.topology.Compact
 import Compact._
 import Hausdorff._
+import com.fdilke.bewl2.topology.{StrontiumDogEnumeration, WeekdayEnumeration}
 
 class TypeTopologyTest extends AnyFunSpec {
 
-  object WeekdayEnumeration extends Enumeration {
-    val Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday = Value
-    type Weekday = Value
-  }
 
-  object StrontiumDogEnumeration extends Enumeration {
-    val Johnny, Wulf, TheGronk = Value
-    type StrontiumDog = Value
-  }
-  import StrontiumDogEnumeration._
-  import WeekdayEnumeration._
+  import com.fdilke.bewl2.topology.StrontiumDogEnumeration._
+  import com.fdilke.bewl2.topology.WeekdayEnumeration._
 
   private def preferredWeapon(sd: StrontiumDog): String =
     sd match {
@@ -29,8 +22,10 @@ class TypeTopologyTest extends AnyFunSpec {
 
   describe("Enumerations") {
     it("can be made implicitly compact") {
-      implicit val compactSD: Compact[StrontiumDog] =
-        StrontiumDogEnumeration
+//      implicit val compactSD: Compact[StrontiumDog] =
+//        StrontiumDogEnumeration
+
+      println("VVV SD class = " + StrontiumDogEnumeration.getClass.getName)
       find[StrontiumDog] {
         preferredWeapon(_) == "Der Happy Stick"
       } map {
@@ -45,8 +40,8 @@ class TypeTopologyTest extends AnyFunSpec {
     }
 
     it("allow use of quantifiers once implicitly compact") {
-      implicit val compactSD: Compact[StrontiumDog] =
-        StrontiumDogEnumeration
+//      implicit val compactSD: Compact[StrontiumDog] =
+//        StrontiumDogEnumeration
 
       exists[StrontiumDog] { sd =>
         preferredWeapon(sd) startsWith "No.4"
@@ -76,8 +71,8 @@ class TypeTopologyTest extends AnyFunSpec {
 
   describe("Derived topologies") {
     it("Hausdorff ^ compact is implicitly Hausdorff") {
-      implicit val compactSD: Compact[StrontiumDog] =
-        StrontiumDogEnumeration
+//      implicit val compactSD: Compact[StrontiumDog] =
+//        StrontiumDogEnumeration
       implicit val hausdorffWeekday: Hausdorff[Weekday] =
         WeekdayEnumeration
       equalH[StrontiumDog => Weekday](
