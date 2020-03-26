@@ -1,5 +1,7 @@
 package com.fdilke.bewl2.topology
 
+import java.util
+
 import Compact._
 import com.fdilke.bewl2.util.FindSingleton
 

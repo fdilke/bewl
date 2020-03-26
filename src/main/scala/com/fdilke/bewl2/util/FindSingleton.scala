@@ -9,7 +9,12 @@ object FindSingleton {
     SINGLETON : TypeTag
   ]: SINGLETON = {
     val enumType: ru.Type = typeOf[SINGLETON]
-    val className = enumType.typeSymbol.asClass.fullName + "$"
-    getClass.getClassLoader.loadClass(className).getField("MODULE$").get(null).asInstanceOf[SINGLETON]
+    if (enumType.isInstanceOf[SingletonType]) {
+      val className = enumType.typeSymbol.asClass.fullName + "$"
+      getClass.getClassLoader.loadClass(className).getField("MODULE$").get(null).asInstanceOf[SINGLETON]
+    } else
+      throw new IllegalArgumentException(
+        enumType.typeSymbol.toString + " is not a singleton"
+      )
   }
 }
