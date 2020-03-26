@@ -7,6 +7,16 @@ import Compact._
 import Hausdorff._
 import com.fdilke.bewl2.topology.{StrontiumDogEnumeration, WeekdayEnumeration}
 
+object WeekdayEnumeration extends Enumeration {
+  val Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday = Value
+  type Weekday = Value
+}
+
+object StrontiumDogEnumeration extends Enumeration {
+  val Johnny, Wulf, TheGronk = Value
+  type StrontiumDog = Value
+}
+
 class TypeTopologyTest extends AnyFunSpec {
 
 
