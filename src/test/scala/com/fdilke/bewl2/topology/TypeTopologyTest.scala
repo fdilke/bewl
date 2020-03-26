@@ -52,9 +52,6 @@ class TypeTopologyTest extends AnyFunSpec {
     }
 
     it("can be made implicitly Hausdorff") {
-      implicit val hausdorffSD: Hausdorff[StrontiumDog] =
-        StrontiumDogEnumeration
-
       equalH(Johnny, Wulf) shouldBe false
       equalH(TheGronk, TheGronk) shouldBe true
     }
@@ -62,10 +59,6 @@ class TypeTopologyTest extends AnyFunSpec {
 
   describe("Derived topologies") {
     it("Hausdorff ^ compact is implicitly Hausdorff") {
-//      implicit val compactSD: Compact[StrontiumDog] =
-//        StrontiumDogEnumeration
-      implicit val hausdorffWeekday: Hausdorff[Weekday] =
-        WeekdayEnumeration
       equalH[StrontiumDog => Weekday](
         Map(
           Johnny -> Monday,

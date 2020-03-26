@@ -56,10 +56,11 @@ trait Hausdorff[T] {
 }
 
 object Hausdorff {
-  implicit def HausdorffForEnum[ENUM <: Enumeration](
-    enum: ENUM
-  ): Hausdorff[enum.Value] =
-      _ == _
+
+  implicit def HausdorffnessForEnum[
+    ENUM <: Enumeration
+  ]: Hausdorff[ENUM#Value] =
+    _ == _
 
   @inline def equalH[T : Hausdorff](
     t1: T,
