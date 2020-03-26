@@ -1,7 +1,7 @@
 package com.fdilke.bewl2.topology
 
 import Compact._
-import com.fdilke.bewl2.util.FindEnum
+import com.fdilke.bewl2.util.FindSingleton
 
 import scala.reflect.runtime.universe._
 import scala.language.{implicitConversions, postfixOps}
@@ -20,7 +20,7 @@ object Compact {
     ENUM <: Enumeration : TypeTag
   ]: Compact[ENUM#Value] =
     (predicate: ENUM#Value => Boolean) =>
-      FindEnum[ENUM].values find predicate map {
+      FindSingleton[ENUM].values find predicate map {
         v => () => v
       }
 

@@ -4,12 +4,12 @@ import scala.reflect.runtime.universe._
 import scala.reflect.runtime.{universe => ru}
 import scala.language.{implicitConversions, postfixOps}
 
-object FindEnum {
+object FindSingleton {
   def apply[
-    ENUM <: Enumeration : TypeTag
-  ]: ENUM = {
-    val enumType: ru.Type = typeOf[ENUM]
+    SINGLETON : TypeTag
+  ]: SINGLETON = {
+    val enumType: ru.Type = typeOf[SINGLETON]
     val className = enumType.typeSymbol.asClass.fullName + "$"
-    getClass.getClassLoader.loadClass(className).getField("MODULE$").get(null).asInstanceOf[ENUM]
+    getClass.getClassLoader.loadClass(className).getField("MODULE$").get(null).asInstanceOf[SINGLETON]
   }
 }
