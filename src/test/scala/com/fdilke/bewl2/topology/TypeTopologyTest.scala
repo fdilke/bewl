@@ -6,21 +6,10 @@ import com.fdilke.bewl2.topology.Compact
 import Compact._
 import Hausdorff._
 
-object WeekdayEnumeration extends Enumeration {
-  val Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday = Value
-  type Weekday = Value
-}
-
-object StrontiumDogEnumeration extends Enumeration {
-  val Johnny, Wulf, TheGronk = Value
-  type StrontiumDog = Value
-}
+import StrontiumDogEnumeration._
+import WeekdayEnumeration._
 
 class TypeTopologyTest extends AnyFunSpec {
-
-
-  import com.fdilke.bewl2.topology.StrontiumDogEnumeration._
-  import com.fdilke.bewl2.topology.WeekdayEnumeration._
 
   private def preferredWeapon(sd: StrontiumDog): String =
     sd match {
