@@ -5,7 +5,6 @@ import org.scalatest.matchers.should.Matchers._
 import com.fdilke.bewl2.topology.Compact
 import Compact._
 import Hausdorff._
-import com.fdilke.bewl2.topology.{StrontiumDogEnumeration, WeekdayEnumeration}
 
 object WeekdayEnumeration extends Enumeration {
   val Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday = Value
@@ -32,10 +31,6 @@ class TypeTopologyTest extends AnyFunSpec {
 
   describe("Enumerations") {
     it("can be made implicitly compact") {
-//      implicit val compactSD: Compact[StrontiumDog] =
-//        StrontiumDogEnumeration
-
-      println("VVV SD class = " + StrontiumDogEnumeration.getClass.getName)
       find[StrontiumDog] {
         preferredWeapon(_) == "Der Happy Stick"
       } map {
@@ -50,9 +45,6 @@ class TypeTopologyTest extends AnyFunSpec {
     }
 
     it("allow use of quantifiers once implicitly compact") {
-//      implicit val compactSD: Compact[StrontiumDog] =
-//        StrontiumDogEnumeration
-
       exists[StrontiumDog] { sd =>
         preferredWeapon(sd) startsWith "No.4"
       } shouldBe true
