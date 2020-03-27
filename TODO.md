@@ -706,4 +706,10 @@ Very rough roadmap:
 
 # Updated roadmap
 
-- move Pitcher, Catcher to their own module 
+- move Pitcher, Catcher to their own module
+- add 'empty enumeration' case
+- should 'find' include some way to capture intermediate results, e.g.
+    find[C] { c => f(c).isOk } but now we want to have saved f(c)
+    so it's a 'predicate that also remembers a R, for some R'
+    actually return value is Option[() => (C, R)]
+    

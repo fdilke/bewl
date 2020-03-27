@@ -35,5 +35,22 @@ class HausdorffToCompactPredicateSolverTest extends AnyFunSpec {
         Map.empty
       ) shouldBe GivenUp
     }
+
+    it("solves in one go for the Johnny-on-Wednesday predicate on an empty map") {
+      def johnnyOnWed(calendar: Weekday => StrontiumDog): Boolean =
+        calendar(Wednesday) == Johnny
+
+      val solver =
+        new HausdorffToCompactPredicateSolver(
+          johnnyOnWed
+        )
+
+      solver.tryMap(
+        Map.empty
+      ) shouldBe
+        solver.ThatWorks(Map(
+          Wednesday -> Johnny
+        ))
+    }
   }
 }
