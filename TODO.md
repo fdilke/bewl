@@ -703,3 +703,7 @@ Very rough roadmap:
 - abstract recursion schemes, and express Pitcher, Catcher as those.
     Be good if that was 100% efficient. Maybe sort AnyVal/tailrec first.
 - (fix scalafmt, take gatekeeper code as guide)
+
+# Updated roadmap
+
+- move Pitcher, Catcher to their own module 
