@@ -86,12 +86,15 @@ class HausdorffToCompactPredicateSolver[
   }
 
   val solutionMap: Option[Map[H, C]] =
-    tryMap(
-      Map.empty
-    ) match {
-      case GivenUp => None
-      case ThatWorks(map) => Some(map)
-    }
+    if (inhabited[C]) // || !inhabited[H])
+      tryMap(
+        Map.empty
+      ) match {
+        case GivenUp => None
+        case ThatWorks(map) => Some(map)
+      }
+    else
+      None
 
   case class StumpedAtException(
     h: H

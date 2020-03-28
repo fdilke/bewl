@@ -6,6 +6,7 @@ import Compact._
 import Hausdorff._
 import StrontiumDogEnumeration._
 import WeekdayEnumeration._
+import EmptyEnumeration._
 import com.fdilke.bewl2.topology.HausdorffToCompactPredicateSolver.solve
 
 class HausdorffToCompactPredicateSolverTest extends AnyFunSpec {
@@ -48,7 +49,7 @@ class HausdorffToCompactPredicateSolverTest extends AnyFunSpec {
         calendar(Tuesday) == calendar(Wednesday)
 
       solve(
-          tueSameWed
+        tueSameWed
       ) match {
         case Some(map) =>
           map.keySet shouldBe Set(Tuesday, Wednesday)
@@ -57,9 +58,9 @@ class HausdorffToCompactPredicateSolverTest extends AnyFunSpec {
       }
     }
     it("finds effective solutions for various predicates") {
-      val samplePredicates: Seq[ (Weekday => StrontiumDog) => Boolean ] =
+      val samplePredicates: Seq[(Weekday => StrontiumDog) => Boolean] =
         Seq(
-          f => f(Friday) == f(Monday) && ( f(Wednesday).toString startsWith "The" ),
+          f => f(Friday) == f(Monday) && (f(Wednesday).toString startsWith "The"),
           f => f(Friday) != f(Monday),
           f => Set(f(Monday), f(Tuesday), f(Wednesday)).size == 2
         )
@@ -71,6 +72,35 @@ class HausdorffToCompactPredicateSolverTest extends AnyFunSpec {
             fail("Solver failed")
         }
       }
+    }
+    it("can diagnose when there is no solution for a predicate") {
+      val samplePredicates: Seq[(Weekday => StrontiumDog) => Boolean] =
+        Seq(
+          f => f(Wednesday).toString startsWith "Stix",
+          f => WeekdayEnumeration.values.map(f).size > StrontiumDogEnumeration.values.size,
+          f => forAll[Weekday] { wd1 =>
+            forAll[Weekday] { wd2 =>
+              (f(wd1) != f(wd2)) || (wd1 == wd2)
+            }
+          }
+        )
+      samplePredicates.foreach { pred =>
+        solve(pred) shouldBe None
+      }
+    }
+    it("can diagnose when there is no solution for a predicate because target is empty") {
+      def rubberstamp(youWish: StrontiumDog => Impossibility): Boolean =
+        true
+
+      solve(rubberstamp) shouldBe None
+    }
+    // Can't do this without compactness or some other condition on the source
+    ignore("can diagnose when there is trivially a solution for a predicate because source and target are both empty") {
+      def rubberstamp(youWish: Impossibility => Impossibility): Boolean =
+        true
+
+      solve(rubberstamp) shouldBe
+        Some(Map.empty)
     }
   }
 }

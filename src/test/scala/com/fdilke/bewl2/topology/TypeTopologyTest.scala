@@ -5,9 +5,9 @@ import org.scalatest.matchers.should.Matchers._
 import com.fdilke.bewl2.topology.Compact
 import Compact._
 import Hausdorff._
-
 import StrontiumDogEnumeration._
 import WeekdayEnumeration._
+import com.fdilke.bewl2.topology.EmptyEnumeration.Impossibility
 
 class TypeTopologyTest extends AnyFunSpec {
 
@@ -49,6 +49,9 @@ class TypeTopologyTest extends AnyFunSpec {
       forAll[StrontiumDog] { sd =>
         sd.toString.toCharArray.count(_.isUpper) == 1
       } shouldBe false
+
+      inhabited[StrontiumDog] shouldBe true
+      inhabited[Impossibility] shouldBe false
     }
 
     it("can be made implicitly Hausdorff") {

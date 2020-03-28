@@ -9,3 +9,7 @@ object StrontiumDogEnumeration extends Enumeration {
   val Johnny, Wulf, TheGronk = Value
   type StrontiumDog = Value
 }
+
+object EmptyEnumeration extends Enumeration {
+  type Impossibility = Value
+}

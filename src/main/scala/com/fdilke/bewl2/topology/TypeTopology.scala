@@ -48,6 +48,9 @@ object Compact {
     ! exists[T] {
       !predicate(_)
     }
+
+  @inline def inhabited[T : Compact]: Boolean =
+    exists[T] { _ => true }
 }
 
 trait Hausdorff[T] {
