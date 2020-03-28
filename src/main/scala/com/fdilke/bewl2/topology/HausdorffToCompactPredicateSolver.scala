@@ -25,10 +25,6 @@ class HausdorffToCompactPredicateSolver[
     map: Map[H, C]
   ) extends TryMapResult
 
-//  case class StumpedOn(
-//    h: H
-//  ) extends LearnerState
-
   // TODO: make this tail recursive
   def tryMap(
     map: Map[H, C]

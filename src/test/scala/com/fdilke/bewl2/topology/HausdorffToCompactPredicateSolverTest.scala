@@ -52,5 +52,24 @@ class HausdorffToCompactPredicateSolverTest extends AnyFunSpec {
           Wednesday -> Johnny
         ))
     }
+
+    it("solves for the Tuesday-same-as-Wednesday predicate on an empty map") {
+      def tueSameWed(calendar: Weekday => StrontiumDog): Boolean =
+        calendar(Tuesday) == calendar(Wednesday)
+
+      val solver =
+        new HausdorffToCompactPredicateSolver(
+          tueSameWed
+        )
+
+      solver.tryMap(
+        Map.empty
+      ) match {
+        case solver.ThatWorks(map) =>
+          map.keySet shouldBe Set(Tuesday, Wednesday)
+          map.values.toSet.size shouldBe 1
+        case other => fail("Solver gave wrong result: " + other)
+      }
+    }
   }
 }

@@ -704,6 +704,10 @@ Very rough roadmap:
     Be good if that was 100% efficient. Maybe sort AnyVal/tailrec first.
 - (fix scalafmt, take gatekeeper code as guide)
 
+# Handy: run just one test
+
+    sbt "testOnly *HausdorffToCompactPredicateSolverTest"
+    
 # Updated roadmap
 
 - move Pitcher, Catcher to their own module
@@ -712,4 +716,6 @@ Very rough roadmap:
     find[C] { c => f(c).isOk } but now we want to have saved f(c)
     so it's a 'predicate that also remembers a R, for some R'
     actually return value is Option[() => (C, R)]
-    
+    Already have the technology to do this assuming it's not abused in 
+        too many places :() i.e. the exception hack
+        
