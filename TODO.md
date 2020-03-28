@@ -718,4 +718,5 @@ Very rough roadmap:
     actually return value is Option[() => (C, R)]
     Already have the technology to do this assuming it's not abused in 
         too many places :() i.e. the exception hack
-        
+- refactor HausdorffXxxTest because we only ever use new Hxx(_).tryMap(empty)
+         

@@ -71,5 +71,26 @@ class HausdorffToCompactPredicateSolverTest extends AnyFunSpec {
         case other => fail("Solver gave wrong result: " + other)
       }
     }
+    it("finds effective solutions for various predicates") {
+      val samplePredicates: Seq[ (Weekday => StrontiumDog) => Boolean ] =
+        Seq(
+          f => f(Friday) == f(Monday) && ( f(Wednesday).toString startsWith "The" ),
+          f => f(Friday) != f(Monday),
+          f => Set(f(Monday), f(Tuesday), f(Wednesday)).size == 2
+        )
+      samplePredicates.foreach { pred =>
+        val solver =
+          new HausdorffToCompactPredicateSolver(pred)
+
+        solver.tryMap(
+          Map.empty
+        ) match {
+          case solver.ThatWorks(map) =>
+            pred(map) shouldBe true
+          case other =>
+            fail("Solver gave wrong result: " + other)
+        }
+      }
+    }
   }
 }

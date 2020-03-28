@@ -1,5 +1,7 @@
 package com.fdilke.bewl2.topology
 
+import java.util.concurrent.atomic.AtomicReference
+
 import Compact._
 import Hausdorff._
 
@@ -25,21 +27,29 @@ class HausdorffToCompactPredicateSolver[
     map: Map[H, C]
   ) extends TryMapResult
 
-  // TODO: make this tail recursive
-  def tryMap(
+  @tailrec final def tryMap(
     map: Map[H, C]
   ): TryMapResult = {
     val learner: Learner =
       new Learner(map)
-    try {
-      if (predicate(learner(_)))
-        ThatWorks(learner.updatedMap)
-      else learner.state match {
-        case Virgin => GivenUp
+    val holder = new AtomicReference[H]
+    val xx: Either[TryMapResult, H] =
+      try {
+        Left(
+          if (predicate(learner(_)))
+            ThatWorks(learner.updatedMap)
+          else learner.state match {
+            case Virgin => GivenUp
+          }
+        )
+      } catch { case StumpedAtException(h) =>
+        Right(h)
       }
-    } catch { case StumpedAtException(h) =>
+    xx match {
+      case Left(result) => result
+      case Right(h) =>
         find[C] { c =>
-          tryMap(map + (h -> c)) != GivenUp
+          tryMapNonTailRec(map + (h -> c)) != GivenUp
         } map {
           _()
         } match {
@@ -47,9 +57,13 @@ class HausdorffToCompactPredicateSolver[
             tryMap(map + (h -> c))
           case None => GivenUp
         }
-// TODO: is there  KeepTrying(learner.updatedMap) ?
-      }
+    }
   }
+
+  def tryMapNonTailRec(
+    map: Map[H, C]
+  ): TryMapResult =
+    tryMap(map)
 
   class Learner(map: Map[H, C]) {
     var updatedMap: Map[H, C] =
@@ -64,7 +78,9 @@ class HausdorffToCompactPredicateSolver[
       )
   }
 
-  case class StumpedAtException(h: H) extends Exception
+  case class StumpedAtException(
+    h: H
+  ) extends Exception
 }
 
 
