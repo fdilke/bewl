@@ -719,4 +719,4 @@ Very rough roadmap:
     Already have the technology to do this assuming it's not abused in 
         too many places :() i.e. the exception hack
 - refactor HausdorffXxxTest because we only ever use new Hxx(_).tryMap(empty)
-         
+- have a Soiled state for LearnerState and make sure it's used         

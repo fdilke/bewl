@@ -13,6 +13,16 @@ object GivenUp extends TryMapResult
 sealed trait LearnerState
 object Virgin extends LearnerState
 
+object HausdorffToCompactPredicateSolver {
+  def solve[
+    H: Hausdorff,
+    C: Compact
+  ](
+     predicate: (H => C) => Boolean
+   ): Option[Map[H, C]] =
+    new HausdorffToCompactPredicateSolver(predicate).solutionMap
+}
+
 class HausdorffToCompactPredicateSolver[
   H: Hausdorff,
   C: Compact
@@ -23,29 +33,26 @@ class HausdorffToCompactPredicateSolver[
     map: Map[H, C]
   ) extends TryMapResult
 
-  case class KeepTrying(
-    map: Map[H, C]
-  ) extends TryMapResult
+//  case class KeepTrying(
+//    map: Map[H, C]
+//  ) extends TryMapResult
 
-  @tailrec final def tryMap(
+  @tailrec private final def tryMap(
     map: Map[H, C]
   ): TryMapResult = {
     val learner: Learner =
       new Learner(map)
-    val holder = new AtomicReference[H]
-    val xx: Either[TryMapResult, H] =
-      try {
-        Left(
-          if (predicate(learner(_)))
-            ThatWorks(learner.updatedMap)
-          else learner.state match {
-            case Virgin => GivenUp
-          }
-        )
-      } catch { case StumpedAtException(h) =>
-        Right(h)
-      }
-    xx match {
+    (try {
+      Left(
+        if (predicate(learner(_)))
+          ThatWorks(learner.updatedMap)
+        else learner.state match {
+          case Virgin => GivenUp
+        }
+      )
+    } catch { case StumpedAtException(h) =>
+      Right(h)
+    }) match {
       case Left(result) => result
       case Right(h) =>
         find[C] { c =>
@@ -60,7 +67,7 @@ class HausdorffToCompactPredicateSolver[
     }
   }
 
-  def tryMapNonTailRec(
+  private def tryMapNonTailRec(
     map: Map[H, C]
   ): TryMapResult =
     tryMap(map)
@@ -77,6 +84,14 @@ class HausdorffToCompactPredicateSolver[
         throw StumpedAtException(h)
       )
   }
+
+  val solutionMap: Option[Map[H, C]] =
+    tryMap(
+      Map.empty
+    ) match {
+      case GivenUp => None
+      case ThatWorks(map) => Some(map)
+    }
 
   case class StumpedAtException(
     h: H
