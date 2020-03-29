@@ -1,4 +1,4 @@
-package com.fdilke.bewl2.compacta
+package com.fdilke.bewl2.cantorians
 
 object CompactExponentialAlgo {
   def special[A](

@@ -1,4 +1,4 @@
-package com.fdilke.bewl2.compacta
+package com.fdilke.bewl2.cantorians
 
 import java.util.function.Predicate
 

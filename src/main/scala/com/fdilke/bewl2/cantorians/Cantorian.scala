@@ -1,46 +1,10 @@
-package com.fdilke.bewl2.compacta
+package com.fdilke.bewl2.cantorians
 
 import java.util.function.Supplier
-
-import com.fdilke.bewl2.compacta.CantorianADTs.{Catcher, Pitcher}
+import com.fdilke.bewl2.cantorians.{Catcher, Pitcher}
 
 import scala.language.postfixOps
 
-object CantorianADTs {
-
-  trait Pitcher[
-    PITCHER <: Pitcher[PITCHER, T],
-    T
-  ] {
-    val head: T
-
-    def tail: PITCHER
-  }
-
-  trait Catcher[
-    SELF <: Catcher[SELF, T, U],
-    T,
-    U
-  ] {
-    self: SELF =>
-
-    def either: Either[
-      U,
-      T => SELF
-    ]
-
-    final def apply[
-      PITCHER <: Pitcher[PITCHER, T]
-    ](
-      pitcher: PITCHER
-    ): U =
-      either match {
-        case Left(u) => u
-        case Right(t2self) =>
-          t2self(pitcher.head)(pitcher.tail)
-      }
-  }
-}
 
 class GroundedCatcher[T, U](
   val either: Either[U, T => GroundedCatcher[T, U]]

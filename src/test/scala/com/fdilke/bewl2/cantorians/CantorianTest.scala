@@ -1,6 +1,6 @@
-package com.fdilke.bewl2.compacta
+package com.fdilke.bewl2.cantorians
 
-import com.fdilke.bewl2.compacta.Cantorian.cycle
+import com.fdilke.bewl2.cantorians.Cantorian.cycle
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
 
