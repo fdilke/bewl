@@ -1,13 +1,9 @@
 package com.fdilke.bewl2.topology
 
-import java.util.concurrent.atomic.AtomicReference
-
 import Compact._
 
 import scala.annotation.tailrec
-
-sealed trait TryMapResult
-object GivenUp extends TryMapResult
+import scala.language.postfixOps
 
 object HausdorffToCompactPredicateSolver {
   def solveMap[
@@ -16,7 +12,10 @@ object HausdorffToCompactPredicateSolver {
   ](
      predicate: (H => C) => Boolean
    ): Option[Map[H, C]] =
-    new HausdorffToCompactPredicateSolver(predicate).solveMap
+    new HausdorffToCompactPredicateSolver(
+      predicate
+    ) tryMap
+      Map.empty
 }
 
 class HausdorffToCompactPredicateSolver[
@@ -25,21 +24,20 @@ class HausdorffToCompactPredicateSolver[
 ](
   predicate: (H => C) => Boolean
 ) {
-  case class ThatWorks(
-    map: Map[H, C]
-  ) extends TryMapResult
-
   @tailrec private final def tryMap(
     map: Map[H, C]
-  ): TryMapResult = {
-    val learner: Learner =
-      new Learner(map)
+  ): Option[Map[H, C]] = {
     (try {
       Left(
-        if (predicate(learner(_)))
-          ThatWorks(learner.updatedMap)
+        if (predicate(h =>
+          map.getOrElse(
+            h,
+            throw StumpedAtException(h)
+          )
+        ))
+          Some(map)
         else
-          GivenUp
+          None
       )
     } catch { case StumpedAtException(h) =>
       Right(h)
@@ -47,41 +45,25 @@ class HausdorffToCompactPredicateSolver[
       case Left(result) => result
       case Right(h) =>
         find[C] { c =>
-          tryMapNonTailRec(map + (h -> c)) != GivenUp
+          tryMapNonTailRec(
+            map + (h -> c)
+          ) isDefined
         } map {
           _()
-        } match {
+        } match { // exercise for the student, why can't this be a flatmap?
           case Some(c) => // TODO: enhance find so we don't do this calculation twice
             tryMap(map + (h -> c))
-          case None => GivenUp
+          case None => None
         }
     }
   }
 
   private def tryMapNonTailRec(
     map: Map[H, C]
-  ): TryMapResult =
+  ): Option[Map[H, C]] =
     tryMap(map)
 
-  class Learner(map: Map[H, C]) {
-    var updatedMap: Map[H, C] =
-      map
-
-    def apply(h: H): C =
-      map.getOrElse(
-        h,
-        throw StumpedAtException(h)
-      )
-  }
-
-  val solveMap: Option[Map[H, C]] =
-      tryMap(
-        Map.empty
-      ) match {
-        case GivenUp => None
-        case ThatWorks(map) => Some(map)
-      }
-
+  // May eventually have to add a sequence number to this, to identify the scope
   case class StumpedAtException(
     h: H
   ) extends Exception
