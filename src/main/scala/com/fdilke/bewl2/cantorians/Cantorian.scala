@@ -1,7 +1,6 @@
 package com.fdilke.bewl2.cantorians
 
 import java.util.function.Supplier
-import com.fdilke.bewl2.cantorians.{Catcher, Pitcher}
 
 import scala.language.postfixOps
 
@@ -70,15 +69,12 @@ object Cantorian {
     }
 
   def cycle(values: Boolean*): Cantorian =
-    new Supplier[Cantorian] {
+    new Supplier[Cantorian] { supplier =>
       override def get: Cantorian =
-        values.foldRight[() => Cantorian](
-          () => get
-        ) { (b: Boolean, c: () => Cantorian) =>
-          () => new Cantorian {
-            override val head: Boolean = b
-            override def tail: Cantorian = c()
-          }
-        }()
+        values.foldRight[Supplier[Cantorian]](
+          supplier
+        ) { (b: Boolean, c: Supplier[Cantorian]) =>
+          () => Cantorian(b, c.get)
+        } get
     } get
 }

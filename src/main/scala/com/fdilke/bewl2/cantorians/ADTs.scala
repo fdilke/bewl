@@ -5,7 +5,6 @@ trait Pitcher[
   T
 ] {
   val head: T
-
   def tail: PITCHER
 }
 
@@ -13,8 +12,7 @@ trait Catcher[
   SELF <: Catcher[SELF, T, U],
   T,
   U
-] {
-  self: SELF =>
+] { self: SELF =>
 
   def either: Either[
     U,
