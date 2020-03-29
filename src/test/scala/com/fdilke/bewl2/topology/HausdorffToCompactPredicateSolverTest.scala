@@ -7,7 +7,7 @@ import Hausdorff._
 import StrontiumDogEnumeration._
 import WeekdayEnumeration._
 import EmptyEnumeration._
-import com.fdilke.bewl2.topology.HausdorffToCompactPredicateSolver.solve
+import com.fdilke.bewl2.topology.HausdorffToCompactPredicateSolver.solveMap
 
 class HausdorffToCompactPredicateSolverTest extends AnyFunSpec {
   describe("The predicate solver can act on maps") {
@@ -15,7 +15,7 @@ class HausdorffToCompactPredicateSolverTest extends AnyFunSpec {
       def rubberstampPredicate(calendar: Weekday => StrontiumDog): Boolean =
         true
 
-      solve(
+      solveMap(
         rubberstampPredicate
       ) shouldBe
         Some(Map.empty)
@@ -25,7 +25,7 @@ class HausdorffToCompactPredicateSolverTest extends AnyFunSpec {
       def drNoPredicate(calendar: Weekday => StrontiumDog): Boolean =
         false
 
-      solve(
+      solveMap(
         drNoPredicate
       ) shouldBe
         None
@@ -35,7 +35,7 @@ class HausdorffToCompactPredicateSolverTest extends AnyFunSpec {
       def johnnyOnWed(calendar: Weekday => StrontiumDog): Boolean =
         calendar(Wednesday) == Johnny
 
-      solve(
+      solveMap(
         johnnyOnWed
       ) shouldBe Some(
         Map(
@@ -48,7 +48,7 @@ class HausdorffToCompactPredicateSolverTest extends AnyFunSpec {
       def tueSameWed(calendar: Weekday => StrontiumDog): Boolean =
         calendar(Tuesday) == calendar(Wednesday)
 
-      solve(
+      solveMap(
         tueSameWed
       ) match {
         case Some(map) =>
@@ -65,7 +65,7 @@ class HausdorffToCompactPredicateSolverTest extends AnyFunSpec {
           f => Set(f(Monday), f(Tuesday), f(Wednesday)).size == 2
         )
       samplePredicates.foreach { pred =>
-        solve(pred) match {
+        solveMap(pred) match {
           case Some(map) =>
             pred(map) shouldBe true
           case other =>
@@ -85,21 +85,22 @@ class HausdorffToCompactPredicateSolverTest extends AnyFunSpec {
           }
         )
       samplePredicates.foreach { pred =>
-        solve(pred) shouldBe None
+        solveMap(pred) shouldBe None
       }
     }
-    it("can diagnose when there is no solution for a predicate because target is empty") {
+    // making this part of the 'solve for function' logic as it doesn't really apply to maps
+    ignore("can diagnose when there is no solution for a predicate because target is empty") {
       def rubberstamp(youWish: StrontiumDog => Impossibility): Boolean =
         true
 
-      solve(rubberstamp) shouldBe None
+      solveMap(rubberstamp) shouldBe None
     }
     // Can't do this without compactness or some other condition on the source
     ignore("can diagnose when there is trivially a solution for a predicate because source and target are both empty") {
       def rubberstamp(youWish: Impossibility => Impossibility): Boolean =
         true
 
-      solve(rubberstamp) shouldBe
+      solveMap(rubberstamp) shouldBe
         Some(Map.empty)
     }
   }

@@ -711,9 +711,9 @@ Very rough roadmap:
 # Updated roadmap
 
 - move Pitcher, Catcher to their own module
-- add 'empty enumeration' case
+- add 'empty enumeration' case: Note problematic because we can't tell if H=0
 - should 'find' include some way to capture intermediate results, e.g.
-    find[C] { c => f(c).isOk } but now we want to have saved f(c)
+    find[C] { c => f(c).isOk } but now we want to have saved f(c),
     so it's a 'predicate that also remembers a R, for some R'
     actually return value is Option[() => (C, R)]
     Already have the technology to do this assuming it's not abused in 
@@ -721,4 +721,8 @@ Very rough roadmap:
 - refactor HausdorffXxxTest because we only ever use new Hxx(_).tryMap(empty)
 - have a Soiled state for LearnerState and make sure it's used
 - have some impossible predicates to make sure we diagnose them as such
-- have cases where H isn't compact and C isn't Hausdorff         
+- have cases where H isn't compact and C isn't Hausdorff
+- express the compactness of H => C using the solver
+- express the compactness of the Cantorian
+- knowledge of genetic codes?
+- machinery of abstract recursion schemes? use/learn from shapeless?

@@ -3,24 +3,20 @@ package com.fdilke.bewl2.topology
 import java.util.concurrent.atomic.AtomicReference
 
 import Compact._
-import Hausdorff._
 
 import scala.annotation.tailrec
 
 sealed trait TryMapResult
 object GivenUp extends TryMapResult
 
-sealed trait LearnerState
-object Virgin extends LearnerState
-
 object HausdorffToCompactPredicateSolver {
-  def solve[
+  def solveMap[
     H: Hausdorff,
     C: Compact
   ](
      predicate: (H => C) => Boolean
    ): Option[Map[H, C]] =
-    new HausdorffToCompactPredicateSolver(predicate).solutionMap
+    new HausdorffToCompactPredicateSolver(predicate).solveMap
 }
 
 class HausdorffToCompactPredicateSolver[
@@ -33,10 +29,6 @@ class HausdorffToCompactPredicateSolver[
     map: Map[H, C]
   ) extends TryMapResult
 
-//  case class KeepTrying(
-//    map: Map[H, C]
-//  ) extends TryMapResult
-
   @tailrec private final def tryMap(
     map: Map[H, C]
   ): TryMapResult = {
@@ -46,9 +38,8 @@ class HausdorffToCompactPredicateSolver[
       Left(
         if (predicate(learner(_)))
           ThatWorks(learner.updatedMap)
-        else learner.state match {
-          case Virgin => GivenUp
-        }
+        else
+          GivenUp
       )
     } catch { case StumpedAtException(h) =>
       Right(h)
@@ -75,8 +66,6 @@ class HausdorffToCompactPredicateSolver[
   class Learner(map: Map[H, C]) {
     var updatedMap: Map[H, C] =
       map
-    var state: LearnerState =
-      Virgin
 
     def apply(h: H): C =
       map.getOrElse(
@@ -85,16 +74,13 @@ class HausdorffToCompactPredicateSolver[
       )
   }
 
-  val solutionMap: Option[Map[H, C]] =
-    if (inhabited[C]) // || !inhabited[H])
+  val solveMap: Option[Map[H, C]] =
       tryMap(
         Map.empty
       ) match {
         case GivenUp => None
         case ThatWorks(map) => Some(map)
       }
-    else
-      None
 
   case class StumpedAtException(
     h: H
