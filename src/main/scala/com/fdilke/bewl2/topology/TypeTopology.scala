@@ -1,6 +1,7 @@
 package com.fdilke.bewl2.topology
 
 import com.fdilke.bewl2.topology.Compact._
+import com.fdilke.bewl2.topology.HausdorffToCompactPredicateSolver.solveFunction
 import com.fdilke.bewl2.util.FindSingleton
 
 import scala.language.{implicitConversions, postfixOps}
@@ -54,6 +55,16 @@ object Compact {
 
   @inline def inhabited[T : Compact]: Boolean =
     exists[T] { _ => true }
+
+  implicit def compactExponential[
+    H : Hausdorff,
+    C : Compact
+  ]: Compact[
+    H => C
+  ] = predicate =>
+    solveFunction(
+      predicate
+    ) map { fn => () => fn }
 }
 
 trait Hausdorff[T] {
