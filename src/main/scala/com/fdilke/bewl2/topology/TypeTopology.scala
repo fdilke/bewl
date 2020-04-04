@@ -86,6 +86,21 @@ object Hausdorff {
   ]: Hausdorff[Int] =
     standardHausdorff[Int]
 
+  class Key[H](
+    h: H
+  )(
+    implicit hausdorff: Hausdorff[H]
+  ) {
+    override def hashCode(): Int =
+      hausdorff.intKey(h)
+
+    override def equals(h2: Any): Boolean =
+      hausdorff.equalH(h, h2.asInstanceOf[H])
+
+    override def toString: String =
+      h.toString
+  }
+
   @inline def equalH[T : Hausdorff](
     t1: T,
     t2: T
