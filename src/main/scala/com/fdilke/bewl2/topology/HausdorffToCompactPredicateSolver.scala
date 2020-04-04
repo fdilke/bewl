@@ -26,7 +26,10 @@ object HausdorffToCompactPredicateSolver {
      predicate: (H => C) => Boolean
   ): Option[H => C] =
      solveMap(predicate) map { map =>
-      h => map(new Key(h))
+      h => map.getOrElse(
+        new Key(h),
+        optional[C].get
+      )
     }
 }
 

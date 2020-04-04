@@ -35,9 +35,11 @@ object Compact {
   ): Option[
     () => T
   ] =
-    implicitly[Compact[T]] find(
+    implicitly[Compact[T]] find
       predicate
-    )
+
+  @inline def optional[T : Compact]: Option[T] =
+    implicitly[Compact[T]] optional
 
   @inline def exists[T : Compact](
     predicate: T => Boolean
@@ -54,7 +56,7 @@ object Compact {
     }
 
   @inline def inhabited[T : Compact]: Boolean =
-    exists[T] { _ => true }
+    optional[T].isDefined
 
   implicit def compactExponential[
     H : Hausdorff,

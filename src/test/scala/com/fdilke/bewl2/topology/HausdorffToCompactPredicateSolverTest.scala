@@ -88,6 +88,22 @@ class HausdorffToCompactPredicateSolverTest extends AnyFunSpec {
         solveFunction(pred) shouldBe None
       }
     }
+    it("returns a function that can be evaluated on all arguments") {
+      solveFunction[Int, StrontiumDog] { dogOfTheDay =>
+        dogOfTheDay(2) == Johnny
+      } match {
+        case None => fail("no solution found")
+        case Some(dogOfTheDay) =>
+          dogOfTheDay(22) shouldBe a[StrontiumDog]
+          dogOfTheDay(-842) shouldBe a[Weekday]
+      }
+    }
+    // need to decide what to do about the case when target is empty
+    // logically we can return a function which, if ever called, will blow up
+    // but if source was compact, we could tell if it was empty and if so return a
+    // function we know will never be called (because no one can call it with a valid arg)
+    // for now, just do what's easiest and don't even enforce this in tests
+
     // making this part of the 'solve for function' logic as it doesn't really apply to maps
     ignore("can diagnose when there is no solution for a predicate because target is empty") {
       def rubberstamp(youWish: StrontiumDog => Impossibility): Boolean =

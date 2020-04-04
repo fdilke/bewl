@@ -9,6 +9,8 @@ import StrontiumDogEnumeration._
 import WeekdayEnumeration._
 import com.fdilke.bewl2.topology.EmptyEnumeration.Impossibility
 
+import scala.language.postfixOps
+
 class TypeTopologyTest extends AnyFunSpec {
 
   private def preferredWeapon(sd: StrontiumDog): String =
@@ -50,7 +52,9 @@ class TypeTopologyTest extends AnyFunSpec {
         sd.toString.toCharArray.count(_.isUpper) == 1
       } shouldBe false
 
+      StrontiumDogEnumeration.values should contain ( optional[StrontiumDog].get )
       inhabited[StrontiumDog] shouldBe true
+      optional[Impossibility] shouldBe None
       inhabited[Impossibility] shouldBe false
     }
 
@@ -166,6 +170,14 @@ class TypeTopologyTest extends AnyFunSpec {
           fail("Incorrect solution found")
         case _ =>
       }
+    }
+    it("compactness of compact ^ Hausdorff returns real functions") {
+      val dogSeq: Int => StrontiumDog =
+        (find[Int => StrontiumDog] { dogSeq =>
+          dogSeq(3) == TheGronk
+        } get)()
+      dogSeq(3) shouldBe TheGronk
+      dogSeq(77) shouldBe a[Weekday]
     }
   }
 }
