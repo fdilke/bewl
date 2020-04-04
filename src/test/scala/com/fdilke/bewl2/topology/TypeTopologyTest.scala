@@ -140,5 +140,32 @@ class TypeTopologyTest extends AnyFunSpec {
         case _ =>
       }
     }
+    it("compact ^ Hausdorff is implicitly compact - with Int") {
+      find[Int => Weekday] { specialDay =>
+        specialDay(3) == Monday
+      } match {
+        case Some(prefunc) =>
+          prefunc()(3) shouldBe Monday
+        case _ =>
+          fail("No solution found")
+      }
+      find[Int => Weekday] { specialDay =>
+        specialDay(7).id - specialDay(22).id == 1
+      } match {
+        case Some(preSpecialDay) =>
+          val specialDay: Int => Weekday =
+            preSpecialDay()
+          specialDay(7).id - specialDay(22).id shouldBe 1
+        case _ =>
+          fail("No solution found")
+      }
+      find[Int => Weekday] { specialDay =>
+        specialDay(88).id - specialDay(-100).id == 72
+      } match {
+        case Some(_) =>
+          fail("Incorrect solution found")
+        case _ =>
+      }
+    }
   }
 }
