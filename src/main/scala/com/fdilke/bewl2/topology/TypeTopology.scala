@@ -87,7 +87,7 @@ object Hausdorff {
     standardHausdorff[Int]
 
   class Key[H](
-    h: H
+    val h: H
   )(
     implicit hausdorff: Hausdorff[H]
   ) {
@@ -95,7 +95,7 @@ object Hausdorff {
       hausdorff.intKey(h)
 
     override def equals(h2: Any): Boolean =
-      hausdorff.equalH(h, h2.asInstanceOf[H])
+      hausdorff.equalH(h, h2.asInstanceOf[Key[H]].h)
 
     override def toString: String =
       h.toString

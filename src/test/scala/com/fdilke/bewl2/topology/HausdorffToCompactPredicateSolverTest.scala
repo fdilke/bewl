@@ -7,7 +7,7 @@ import Hausdorff._
 import StrontiumDogEnumeration._
 import WeekdayEnumeration._
 import EmptyEnumeration._
-import com.fdilke.bewl2.topology.HausdorffToCompactPredicateSolver.solveMap
+import com.fdilke.bewl2.topology.HausdorffToCompactPredicateSolver.{ solveMap, solveFunction }
 
 class HausdorffToCompactPredicateSolverTest extends AnyFunSpec {
   describe("The predicate solver can act on maps") {
@@ -39,7 +39,7 @@ class HausdorffToCompactPredicateSolverTest extends AnyFunSpec {
         johnnyOnWed
       ) shouldBe Some(
         Map(
-          Wednesday -> Johnny
+          new Key(Wednesday) -> Johnny
         )
       )
     }
@@ -48,13 +48,13 @@ class HausdorffToCompactPredicateSolverTest extends AnyFunSpec {
       def tueSameWed(calendar: Weekday => StrontiumDog): Boolean =
         calendar(Tuesday) == calendar(Wednesday)
 
-      solveMap(
+      solveFunction(
         tueSameWed
       ) match {
-        case Some(map) =>
-          map.keySet shouldBe Set(Tuesday, Wednesday)
-          map.values.toSet.size shouldBe 1
-        case other => fail("Solver failed")
+        case Some(function) =>
+          function(Tuesday) shouldBe function(Wednesday)
+        case _ =>
+          fail("Solver failed")
       }
     }
     it("finds effective solutions for various predicates") {
@@ -65,9 +65,9 @@ class HausdorffToCompactPredicateSolverTest extends AnyFunSpec {
           f => Set(f(Monday), f(Tuesday), f(Wednesday)).size == 2
         )
       samplePredicates.foreach { pred =>
-        solveMap(pred) match {
-          case Some(map) =>
-            pred(map) shouldBe true
+        solveFunction(pred) match {
+          case Some(fn) =>
+            pred(fn) shouldBe true
           case other =>
             fail("Solver failed")
         }
@@ -85,7 +85,7 @@ class HausdorffToCompactPredicateSolverTest extends AnyFunSpec {
           }
         )
       samplePredicates.foreach { pred =>
-        solveMap(pred) shouldBe None
+        solveFunction(pred) shouldBe None
       }
     }
     // making this part of the 'solve for function' logic as it doesn't really apply to maps
@@ -93,7 +93,7 @@ class HausdorffToCompactPredicateSolverTest extends AnyFunSpec {
       def rubberstamp(youWish: StrontiumDog => Impossibility): Boolean =
         true
 
-      solveMap(rubberstamp) shouldBe None
+      solveFunction(rubberstamp) shouldBe None
     }
     // Can't do this without compactness or some other condition on the source
     ignore("can diagnose when there is trivially a solution for a predicate because source and target are both empty") {
