@@ -12,6 +12,11 @@ trait Compact[T] {
   ): Option[
     () => T
   ]
+
+  lazy val optional: Option[T] =
+    find { _ => true } map {
+      _()
+    }
 }
 
 object Compact {
@@ -56,14 +61,30 @@ trait Hausdorff[T] {
     t1: T,
     t2: T
   ): Boolean
+
+  def intKey(t: T): Int
 }
 
 object Hausdorff {
 
+  def standardHausdorff[T]: Hausdorff[T] =
+    new Hausdorff[T] {
+      override def equalH(t1: T, t2: T): Boolean =
+        t1 == t2
+
+      override def intKey(t: T): Int =
+        t.hashCode
+    }
+
   implicit def HausdorffnessForEnum[
     ENUM <: Enumeration
   ]: Hausdorff[ENUM#Value] =
-    _ == _
+    standardHausdorff[ENUM#Value]
+
+  implicit def HausdorffnessForInt[
+    Int
+  ]: Hausdorff[Int] =
+    standardHausdorff[Int]
 
   @inline def equalH[T : Hausdorff](
     t1: T,
@@ -78,12 +99,25 @@ object Hausdorff {
     H : Hausdorff
   ]: Hausdorff[
     C => H
-  ] =
-    (f, g) =>
+  ] = new Hausdorff[C => H] {
+    override def equalH(
+      f: C => H,
+      g: C => H
+    ): Boolean =
       forAll[C] { c =>
-        equalH(
+        implicitly[Hausdorff[H]].equalH(
           f(c),
           g(c)
         )
       }
+
+    override def intKey(f: C => H): Int =
+      implicitly[Compact[C]].optional match {
+        case None => 0
+        case Some(c) =>
+          implicitly[Hausdorff[H]].intKey(
+            f(c)
+          )
+      }
+  }
 }

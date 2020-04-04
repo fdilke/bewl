@@ -87,5 +87,31 @@ class TypeTopologyTest extends AnyFunSpec {
         )
       ) shouldBe true
     }
+    it("Hausdorff ^ compact is implicitly Hausdorff - with H = Int") {
+      equalH[StrontiumDog => Int](
+        Map(
+          Johnny -> 1,
+          Wulf -> 2,
+          TheGronk -> 0
+        ),
+        Map(
+          Johnny -> 1,
+          Wulf -> 4,
+          TheGronk -> 0
+        )
+      ) shouldBe false
+      equalH[StrontiumDog => Int](
+        Map(
+          Johnny -> 1,
+          Wulf -> 2,
+          TheGronk -> 0
+        ),
+        Map(
+          TheGronk -> 0,
+          Wulf -> 2,
+          Johnny -> 1
+        )
+      ) shouldBe true
+    }
   }
 }
