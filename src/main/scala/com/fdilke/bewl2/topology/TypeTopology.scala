@@ -1,7 +1,7 @@
 package com.fdilke.bewl2.topology
 
 import com.fdilke.bewl2.topology.Compact._
-import com.fdilke.bewl2.topology.HausdorffToCompactPredicateSolver.solveFunction
+import com.fdilke.bewl2.topology.HausdorffToCompactPredicateSolver.{solveMap, functionFromMap}
 import com.fdilke.bewl2.util.FindSingleton
 
 import scala.language.{implicitConversions, postfixOps}
@@ -64,9 +64,11 @@ object Compact {
   ]: Compact[
     H => C
   ] = predicate =>
-    solveFunction(
+    solveMap(
       predicate
-    ) map { fn => () => fn }
+    ) map { map =>
+      () => functionFromMap(map)
+    }
 }
 
 trait Hausdorff[T] {

@@ -25,12 +25,20 @@ object HausdorffToCompactPredicateSolver {
   ](
      predicate: (H => C) => Boolean
   ): Option[H => C] =
-     solveMap(predicate) map { map =>
-      h => map.getOrElse(
-        new Key(h),
-        optional[C].get
-      )
-    }
+     solveMap(predicate) map {
+       functionFromMap(_)
+     }
+
+  @inline def functionFromMap[
+    H: Hausdorff,
+    C: Compact
+  ] (
+    map: Map[Key[H], C]
+  ): H => C =
+    h => map.getOrElse(
+          new Key(h),
+          optional[C].get
+        )
 }
 
 class HausdorffToCompactPredicateSolver[
