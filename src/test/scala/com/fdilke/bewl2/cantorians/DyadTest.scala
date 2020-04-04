@@ -41,5 +41,14 @@ class DyadTest extends AnyFunSpec {
         Dyad(7, 7, 7, 7, 7, 7, 7)
       }
     }
+    it("have sane equality semantics") {
+      Dyad("A", "B") shouldBe Dyad("A", "B")
+      Dyad("A", "B") shouldNot be( Dyad("A") )
+      Dyad("B") shouldNot be( Dyad("A") )
+      Dyad("A", "B") shouldNot be( Dyad("B", "A") )
+    }
+//    it("are instantiated using canonical form") {
+//      Dyad("A", "B", "C", "D", "A", "B", "C", "D") shouldBe Dyad("A", "B", "C", "D")
+//    }
   }
 }

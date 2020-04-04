@@ -43,6 +43,10 @@ object Dyad {
       new Dyad(cycle)
 }
 
-class Dyad[T] private(cycle: Seq[T]) {
+class Dyad[T] private(val cycle: Seq[T]) {
+  override def hashCode(): Int =
+    cycle.hashCode()
 
+  override def equals(obj: Any): Boolean =
+    obj.asInstanceOf[Dyad[T]].cycle == cycle
 }
