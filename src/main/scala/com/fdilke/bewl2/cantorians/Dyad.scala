@@ -38,9 +38,12 @@ object Dyad {
 
   def apply[T](cycle: T*) =
     if (!isPowerOf2(cycle.length))
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException(
+        s"Cycle length ${cycle.length} is not a power of 2")
     else
-      new Dyad(cycle)
+      new Dyad(
+        canonical(cycle :_*)
+      )
 }
 
 class Dyad[T] private(val cycle: Seq[T]) {

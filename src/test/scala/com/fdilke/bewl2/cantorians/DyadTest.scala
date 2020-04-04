@@ -17,6 +17,7 @@ class DyadTest extends AnyFunSpec {
     }
     it("can get a dyadic sequence into canonical form") {
       canonical("x") shouldBe Seq("x")
+      canonical("A", "A") shouldBe Seq("A")
       canonical(true, true) shouldBe Seq(true)
       canonical(1.0, 2.0) shouldBe Seq(1.0, 2.0)
       canonical(1.0, 2.0, 1.0, 2.0) shouldBe Seq(1.0, 2.0)
@@ -47,8 +48,11 @@ class DyadTest extends AnyFunSpec {
       Dyad("B") shouldNot be( Dyad("A") )
       Dyad("A", "B") shouldNot be( Dyad("B", "A") )
     }
-//    it("are instantiated using canonical form") {
-//      Dyad("A", "B", "C", "D", "A", "B", "C", "D") shouldBe Dyad("A", "B", "C", "D")
-//    }
+    it("are instantiated using canonical form") {
+      Dyad("A", "A") shouldBe Dyad("A")
+      Dyad("A", "A", "A", "A") shouldBe Dyad("A")
+      Dyad("A", "B", "C", "D", "A", "B", "C", "D") shouldBe Dyad("A", "B", "C", "D")
+      Dyad("A", "B", "A", "B", "A", "B", "A", "B") shouldBe Dyad("A", "B")
+    }
   }
 }
