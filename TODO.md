@@ -707,22 +707,33 @@ Very rough roadmap:
 # Handy: run just one test
 
     sbt "testOnly *HausdorffToCompactPredicateSolverTest"
-    
-# Updated roadmap
 
+# Done
+    
 - move Pitcher, Catcher to their own module
 - add 'empty enumeration' case: Note problematic because we can't tell if H=0
+- refactor HausdorffXxxTest because we only ever use new Hxx(_).tryMap(empty)
+- have a Soiled state for LearnerState and make sure it's used: Not needed
+- have some impossible predicates to make sure we diagnose them as such
+- have cases where H isn't compact
+- express the compactness of H => C using the solver
+
+# Updated roadmap
+
+- have cases where C isn't Hausdorff
 - should 'find' include some way to capture intermediate results, e.g.
     find[C] { c => f(c).isOk } but now we want to have saved f(c),
     so it's a 'predicate that also remembers a R, for some R'
     actually return value is Option[() => (C, R)]
     Already have the technology to do this assuming it's not abused in 
         too many places :() i.e. the exception hack
-- refactor HausdorffXxxTest because we only ever use new Hxx(_).tryMap(empty)
-- have a Soiled state for LearnerState and make sure it's used
-- have some impossible predicates to make sure we diagnose them as such
-- have cases where H isn't compact and C isn't Hausdorff
-- express the compactness of H => C using the solver
 - express the compactness of the Cantorian
+- Hausdorffness of the catcher
+- Compactness of the pitcher
+- implement density / sorting (generalization of Euclidean rhythms)
 - knowledge of genetic codes?
 - machinery of abstract recursion schemes? use/learn from shapeless?
+- airtight way to make sure dyads are canonical
+- check monadicity of the dyad
+- be able to play a Dyad[LogicalNote] at a given speed/pitch
+
