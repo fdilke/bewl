@@ -1,6 +1,6 @@
 package com.fdilke.bewl2.cantorians
 
-import com.fdilke.bewl2.cantorians.Dyad.{canonical, isPowerOf2}
+import com.fdilke.bewl2.cantorians.Dyad.{canonical, isPowerOf2, η, μ}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
 
@@ -16,20 +16,20 @@ class DyadTest extends AnyFunSpec {
       )
     }
     it("can get a dyadic sequence into canonical form") {
-      canonical("x") shouldBe Seq("x")
-      canonical("A", "A") shouldBe Seq("A")
-      canonical(true, true) shouldBe Seq(true)
-      canonical(1.0, 2.0) shouldBe Seq(1.0, 2.0)
-      canonical(1.0, 2.0, 1.0, 2.0) shouldBe Seq(1.0, 2.0)
-      canonical(1.0, 2.0, 3.0, 4.0) shouldBe Seq(1.0, 2.0, 3.0, 4.0)
-      canonical(4.0, 4.0, 4.0, 4.0) shouldBe Seq(4.0)
-      canonical(10, 15, 10, 15, 10, 15, 10, 15) shouldBe Seq(10, 15)
-      canonical(6, 5, 0, 2, 6, 5, 0, 2) shouldBe Seq(6, 5, 0, 2)
+      canonical("x") shouldBe (Seq("x"), 1)
+      canonical("A", "A") shouldBe (Seq("A"), 1)
+      canonical(true, true) shouldBe (Seq(true), 1)
+      canonical(1.0, 2.0) shouldBe (Seq(1.0, 2.0), 2)
+      canonical(1.0, 2.0, 1.0, 2.0) shouldBe (Seq(1.0, 2.0), 2)
+      canonical(1.0, 2.0, 3.0, 4.0) shouldBe (Seq(1.0, 2.0, 3.0, 4.0), 4)
+      canonical(4.0, 4.0, 4.0, 4.0) shouldBe (Seq(4.0), 1)
+      canonical(10, 15, 10, 15, 10, 15, 10, 15) shouldBe (Seq(10, 15), 2)
+      canonical(6, 5, 0, 2, 6, 5, 0, 2) shouldBe (Seq(6, 5, 0, 2), 4)
     }
   }
   describe("Dyads") {
     it("can't be instantiated using 'new'") {
-      "new Dyad(2)" shouldNot compile
+      """new Dyad[String](Seq("X", "Y"), 2)""" shouldNot compile
     }
     it("can be instantiated using a companion factory method") {
       Dyad(2).getClass shouldBe classOf[Dyad[_]]
@@ -48,6 +48,9 @@ class DyadTest extends AnyFunSpec {
       Dyad("B") shouldNot be( Dyad("A") )
       Dyad("A", "B") shouldNot be( Dyad("B", "A") )
     }
+    it("have a presentable toString method") {
+      Dyad("A", "B").toString shouldBe "Dyad(A,B)"
+    }
     it("are instantiated using canonical form") {
       Dyad("A", "A") shouldBe Dyad("A")
       Dyad("A", "A", "A", "A") shouldBe Dyad("A")
@@ -57,6 +60,74 @@ class DyadTest extends AnyFunSpec {
     it("support map which coalesces the result into canonical form") {
       Dyad("foo", "barbaz") map { _.length } shouldBe Dyad(3, 6)
       Dyad(1,2,3,4) map { _ % 2 } shouldBe Dyad(1, 0)
+    }
+    it("have a length") {
+      Dyad(1).length shouldBe 1
+      Dyad(1, 7).length shouldBe 2
+      Dyad(1, 7, 1, 7).length shouldBe 2
+      Dyad(1, 7, 7, 1).length shouldBe 4
+    }
+    it("can be treated as (doubly infinite) sequences") {
+      val dyad: Dyad[String] =
+        Dyad("along", "came", "a", "spider")
+
+      dyad(0) shouldBe "along"
+      dyad(4) shouldBe "along"
+      dyad(2) shouldBe "a"
+      dyad(-3) shouldBe "came"
+      dyad(287) shouldBe "spider"
+      dyad(-666) shouldBe "a"
+    }
+    it("have a η and μ obeying the monad identity laws") {
+      val dyad: Dyad[Int] =
+        Dyad(1,2,3,4)
+
+      μ[Int](
+        η[Dyad[Int]](dyad)
+      ) shouldBe dyad
+      μ[Int](
+        dyad map { η[Int] }
+      ) shouldBe dyad
+    }
+    it("also μ obeys the monad associativity law") {
+      val dyad: Dyad[Dyad[Dyad[Int]]] =
+        Dyad(
+          Dyad(
+            Dyad(7, 2, 3, 4),
+            Dyad(1, 8)
+          ),
+          Dyad(
+            Dyad(5, 3, 2, 1)
+          ),
+        )
+
+      μ[Int](
+        dyad map { μ[Int] }
+      ) shouldBe
+        μ[Int](
+          μ[Dyad[Int]](dyad)
+        )
+    }
+    it("can be used in for-comprehensions to exploit the monad operations") {
+      (for {
+        x <- Dyad("one", "at", "too", "on")
+      } yield {
+        x.length
+      }) shouldBe
+        Dyad(3, 2)
+
+      (for {
+        x <- Dyad("post", "captain")
+        y <- Dyad("by", "Patrick", "O", "Brian")
+      } yield {
+        x + " " + y
+      }) shouldBe
+        Dyad(
+          "post by",
+          "captain Patrick",
+          "post O",
+          "captain Brian"
+        )
     }
   }
 }
