@@ -11,7 +11,7 @@ import com.fdilke.bewl2.topology.StrontiumDogEnumeration
 
 class CompactVanillaPitcherTest extends AnyFunSpec {
   ignore("Vanilla pitchers of compact things... (working towards Cantorians)") {
-    it("are implicitly compact: can find solution pitechers where they exist") {
+    it("are implicitly compact: can find solution pitchers where they exist") {
       val solvablePredicates: Seq[(VanillaPitcher[Int => StrontiumDog]) => Boolean] = Seq(
         _.head(0) == Johnny,
         p => p.head(0) != p.tail.head(1),

@@ -15,7 +15,7 @@ import scala.collection.Iterator.iterate
 import scala.language.postfixOps
 
 class VanillaPitcherPredicateSolverTest extends AnyFunSpec {
-  describe("The predicate solver can act on maps") {
+  ignore("The predicate solver can act on maps") {
     it("detects immediate success for the rubberstamp predicate on an empty map") {
       def rubberstampPredicate(calendar: VanillaPitcher[StrontiumDog]): Boolean =
         true
