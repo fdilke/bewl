@@ -22,6 +22,10 @@ trait Compact[T] {
 
 object Compact {
 
+  def apply[T](
+    implicit compact: Compact[T]
+  ): Compact[T] = compact
+
   implicit def CompactnessForEnum[
     ENUM <: Enumeration : TypeTag
   ]: Compact[ENUM#Value] =
@@ -35,11 +39,11 @@ object Compact {
   ): Option[
     () => T
   ] =
-    implicitly[Compact[T]] find
+    Compact[T] find
       predicate
 
   @inline def optional[T : Compact]: Option[T] =
-    implicitly[Compact[T]] optional
+    Compact[T] optional
 
   @inline def exists[T : Compact](
     predicate: T => Boolean
@@ -82,6 +86,10 @@ trait Hausdorff[T] {
 
 object Hausdorff {
 
+  def apply[T](
+    implicit hausdorff: Hausdorff[T]
+  ): Hausdorff[T] = hausdorff
+
   def standardHausdorff[T]: Hausdorff[T] =
     new Hausdorff[T] {
       override def equalH(t1: T, t2: T): Boolean =
@@ -120,7 +128,7 @@ object Hausdorff {
     t1: T,
     t2: T
   ): Boolean =
-    implicitly[Hausdorff[T]] equalH(
+    Hausdorff[T] equalH(
       t1, t2
     )
 
@@ -135,17 +143,17 @@ object Hausdorff {
       g: C => H
     ): Boolean =
       forAll[C] { c =>
-        implicitly[Hausdorff[H]].equalH(
+        Hausdorff[H].equalH(
           f(c),
           g(c)
         )
       }
 
     override def intKey(f: C => H): Int =
-      implicitly[Compact[C]].optional match {
+      Compact[C].optional match {
         case None => 0
         case Some(c) =>
-          implicitly[Hausdorff[H]].intKey(
+          Hausdorff[H].intKey(
             f(c)
           )
       }

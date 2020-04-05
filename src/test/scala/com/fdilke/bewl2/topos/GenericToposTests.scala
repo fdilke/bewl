@@ -59,9 +59,9 @@ abstract class GenericToposTests[
     }
   }
 
-  private val foo: DOT[FOO] = implicitly[DOT[FOO]]
-  private val bar: DOT[BAR] = implicitly[DOT[BAR]]
-  private val baz: DOT[BAZ] = implicitly[DOT[BAZ]]
+  private val foo: DOT[FOO] = dot[FOO]
+  private val bar: DOT[BAR] = dot[BAR]
+  private val baz: DOT[BAZ] = dot[BAZ]
 
   describe(s"The fixtures for $name") {
     it("include distinct sane objects") {
