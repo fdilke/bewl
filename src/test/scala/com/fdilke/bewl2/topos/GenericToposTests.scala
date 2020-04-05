@@ -32,7 +32,7 @@ abstract class GenericToposTests[
   ): X
 
   private val topos: Topos[DOT] =
-    implicitly[Topos[DOT]]
+    Topos[DOT]
 
   import topos._
 

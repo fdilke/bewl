@@ -13,7 +13,7 @@ class FunctionWithEquality[
   override def apply(s: S): T =
     innerFunction(s)
 
-  private val topos: Topos[DOT] = implicitly
+  private val topos: Topos[DOT] = Topos[DOT]
   import topos._
 
   // logically necessary: so don't use these wrapped functions as the keys of hash

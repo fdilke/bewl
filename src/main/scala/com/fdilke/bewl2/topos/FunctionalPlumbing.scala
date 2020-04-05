@@ -33,9 +33,7 @@ object FunctionalPlumbing {
      f: Unit => T
    ): T =
     f(
-      (implicitly[
-        Topos[DOT]
-      ].to1[S]:
+      (Topos[DOT].to1[S]:
         S => Unit)(
         s
       )

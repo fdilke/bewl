@@ -9,6 +9,12 @@ import org.scalatest.matchers.{MatchResult, Matcher}
 import scala.Function.{tupled, untupled}
 import scala.language.postfixOps
 
+object Topos {
+  def apply[DOT[_]](
+    implicit topos: Topos[DOT]
+  ): Topos[DOT] = topos
+}
+
 trait Topos[DOT[_]] { topos =>
   implicit val selfContext: Topos[DOT] = topos
 
@@ -133,8 +139,9 @@ trait Topos[DOT[_]] { topos =>
 
   // anticipate these will not be used very much...
   // as it's all baked into the types and thoughtcrime is impossible. remove?
-  @inline final def dot[S:DOT]: DOT[S] =
-    implicitly[DOT[S]]
+  @inline final def dot[S](
+    implicit dot: DOT[S]
+  ): DOT[S] = dot
 
   final def id[S: DOT]: S => S =
     identity
