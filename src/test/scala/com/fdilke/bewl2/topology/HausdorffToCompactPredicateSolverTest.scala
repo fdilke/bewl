@@ -94,8 +94,8 @@ class HausdorffToCompactPredicateSolverTest extends AnyFunSpec {
       } match {
         case None => fail("no solution found")
         case Some(dogOfTheDay) =>
-          dogOfTheDay(22) shouldBe a[StrontiumDog]
-          dogOfTheDay(-842) shouldBe a[Weekday]
+          StrontiumDogEnumeration.values should contain(dogOfTheDay(22))
+          StrontiumDogEnumeration.values should contain(dogOfTheDay(-842))
       }
     }
     // need to decide what to do about the case when target is empty

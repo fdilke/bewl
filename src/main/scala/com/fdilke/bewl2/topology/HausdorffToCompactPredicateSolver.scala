@@ -83,7 +83,6 @@ class HausdorffToCompactPredicateSolver[
   ): Option[Map[Key[H], C]] =
     tryMap(map)
 
-  // May eventually have to add a sequence number to this, to identify the scope
   case class StumpedAtException(
     h: H
   ) extends Exception

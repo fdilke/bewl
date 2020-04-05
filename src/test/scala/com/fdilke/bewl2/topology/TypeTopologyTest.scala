@@ -173,7 +173,7 @@ class TypeTopologyTest extends AnyFunSpec {
           dogSeq(3) == TheGronk
         } get)()
       dogSeq(3) shouldBe TheGronk
-      dogSeq(77) shouldBe a[Weekday]
+      StrontiumDogEnumeration.values should contain(dogSeq(77))
     }
   }
 }

@@ -8,6 +8,8 @@ object WeekdayEnumeration extends Enumeration {
 object StrontiumDogEnumeration extends Enumeration {
   val Johnny, Wulf, TheGronk = Value
   type StrontiumDog = Value
+  val NUM_STRONTIES: Int =
+    values.size
 }
 
 object EmptyEnumeration extends Enumeration {
