@@ -52,4 +52,7 @@ class Dyad[T] private(val cycle: Seq[T]) {
 
   override def equals(obj: Any): Boolean =
     obj.asInstanceOf[Dyad[T]].cycle == cycle
+
+  def map[U](f: T => U): Dyad[U] =
+    Dyad(cycle map f :_*)
 }

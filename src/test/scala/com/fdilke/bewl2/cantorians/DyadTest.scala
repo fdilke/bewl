@@ -54,5 +54,9 @@ class DyadTest extends AnyFunSpec {
       Dyad("A", "B", "C", "D", "A", "B", "C", "D") shouldBe Dyad("A", "B", "C", "D")
       Dyad("A", "B", "A", "B", "A", "B", "A", "B") shouldBe Dyad("A", "B")
     }
+    it("support map which coalesces the result into canonical form") {
+      Dyad("foo", "barbaz") map { _.length } shouldBe Dyad(3, 6)
+      Dyad(1,2,3,4) map { _ % 2 } shouldBe Dyad(1, 0)
+    }
   }
 }
