@@ -22,16 +22,12 @@ class TypeTopologyTest extends AnyFunSpec {
 
   describe("Enumerations") {
     it("can be made implicitly compact") {
-      find[StrontiumDog] {
+      determine[StrontiumDog] {
         preferredWeapon(_) == "Der Happy Stick"
-      } map {
-        _()
       } shouldBe Some(Wulf)
 
-      find[StrontiumDog] {
+      determine[StrontiumDog] {
         preferredWeapon(_) == "Time Bomb"
-      } map {
-        _()
       } shouldBe None
     }
 

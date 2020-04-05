@@ -1,5 +1,7 @@
 package com.fdilke.bewl2.cantorians
 
+import com.fdilke.bewl2.topology.Compact
+
 trait Pitcher[
   PITCHER <: Pitcher[PITCHER, T],
   T
@@ -29,4 +31,15 @@ trait Catcher[
       case Right(t2self) =>
         t2self(pitcher.head)(pitcher.tail)
     }
+}
+
+trait VanillaPitcher[T] extends
+  Pitcher[VanillaPitcher[T], T]
+
+object VanillaPitcher {
+  implicit def compactVanillaPitcher[
+    C: Compact
+  ]: Compact[VanillaPitcher[C]] =
+    predicate =>
+      ???
 }

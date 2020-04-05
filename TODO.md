@@ -736,6 +736,7 @@ Very rough roadmap:
 - airtight way to make sure dyads are canonical
 - check monadicity of the dyad
 - be able to play a Dyad[LogicalNote] at a given speed/pitch
-- use some of the simplifying techniques here e.g. lose "implicitly":
+- use some simplifying techniques here e.g. lose "implicitly":
     https://scalac.io/typeclasses-in-scala/
-    
+- use 'search[]' to be like "find" but more proactive: executes the thing too?
+    or use another name, "determine" ?

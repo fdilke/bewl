@@ -1,6 +1,7 @@
 package com.fdilke.bewl2.cantorians
 
 import com.fdilke.bewl2.cantorians.Cantorian.cycle
+import com.fdilke.bewl2.topology.StrontiumDogEnumeration.StrontiumDog
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
 
@@ -24,6 +25,17 @@ class CantorianTest extends AnyFunSpec {
       GroundedTree(5)
     )
 
+  describe("Cyclic Cantorians") {
+    it("work as expected, and can be converted to iterators") {
+      val cantorianTFT: Cantorian =
+        cycle(true, false, false)
+
+      cantorianTFT.asIterable.take(5).toList shouldBe Seq(
+        true, false, false, true, false
+      )
+    }
+  }
+
   describe("Cantorians") {
     it("can be converted to iterators") {
       object cantorianTF extends Cantorian {
@@ -40,20 +52,7 @@ class CantorianTest extends AnyFunSpec {
         true, false, true, false, true
       )
     }
-  }
 
-  describe("Cyclic Cantorians") {
-    it("work as expected, and can be converted to iterators") {
-      val cantorianTFT: Cantorian =
-        cycle(true, false, false)
-
-      cantorianTFT.asIterable.take(5).toList shouldBe Seq(
-        true, false, false, true, false
-      )
-    }
-  }
-
-  describe("Cantorians") {
     it("can be operated on by trees -leaf node case") {
       GroundedTree[Int](2)(allTrue) shouldBe 2
       GroundedTree[Int](2)(allFalse) shouldBe 2

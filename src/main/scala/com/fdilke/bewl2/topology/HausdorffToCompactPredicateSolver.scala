@@ -67,12 +67,10 @@ class HausdorffToCompactPredicateSolver[
     }) match {
       case Left(result) => result
       case Right(h) =>
-        find[C] { c =>
+        determine[C] { c =>
           tryMapNonTailRec(
             map + (new Key(h) -> c)
           ) isDefined
-        } map {
-          _()
         } match { // exercise for the student, why can't this be a flatmap?
           case Some(c) => // TODO: enhance find so we don't do this calculation twice
             tryMap(map + (new Key(h) -> c))

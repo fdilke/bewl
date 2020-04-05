@@ -15,9 +15,7 @@ trait Compact[T] {
   ]
 
   lazy val optional: Option[T] =
-    find { _ => true } map {
-      _()
-    }
+    determine[T] { _ => true }(this)
 }
 
 object Compact {
@@ -41,6 +39,15 @@ object Compact {
   ] =
     Compact[T] find
       predicate
+
+  @inline def determine[T : Compact](
+    predicate: T => Boolean
+  ): Option[T] =
+    find[T](
+      predicate
+    ) map {
+      _()
+    }
 
   @inline def optional[T : Compact]: Option[T] =
     Compact[T] optional
