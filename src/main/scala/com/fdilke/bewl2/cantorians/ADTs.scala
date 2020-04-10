@@ -3,17 +3,17 @@ package com.fdilke.bewl2.cantorians
 import com.fdilke.bewl2.topology.Compact
 
 trait Pitcher[
-  PITCHER <: Pitcher[PITCHER, T],
-  T
+    PITCHER <: Pitcher[PITCHER, T],
+    T
 ] {
   val head: T
   def tail: PITCHER
 }
 
 trait Catcher[
-  SELF <: Catcher[SELF, T, U],
-  T,
-  U
+    SELF <: Catcher[SELF, T, U],
+    T,
+    U
 ] { self: SELF =>
 
   def either: Either[
@@ -22,10 +22,10 @@ trait Catcher[
   ]
 
   final def apply[
-    PITCHER <: Pitcher[PITCHER, T]
+      PITCHER <: Pitcher[PITCHER, T]
   ](
-     pitcher: PITCHER
-   ): U =
+      pitcher: PITCHER
+  ): U =
     either match {
       case Left(u) => u
       case Right(t2self) =>
@@ -33,13 +33,11 @@ trait Catcher[
     }
 }
 
-trait VanillaPitcher[T] extends
-  Pitcher[VanillaPitcher[T], T]
+trait VanillaPitcher[T] extends Pitcher[VanillaPitcher[T], T]
 
 object VanillaPitcher {
   implicit def compactVanillaPitcher[
-    C: Compact
+      C: Compact
   ]: Compact[VanillaPitcher[C]] =
-    predicate =>
-      ???
+    predicate => ???
 }

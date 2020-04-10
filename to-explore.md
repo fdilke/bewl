@@ -16,3 +16,15 @@
 - Caching in Idris: It might be possible to have a purely functional SortedTree structure that did caching.    
 - Mazzolla book
 - Schwarz-Christoffel
+
+ # ScalaFmt
+ 
+ how to disable formatting:
+ 
+     // format: off
+     val identity = Array(1, 0, 0,
+                          0, 1, 0,
+                          0, 0, 1)
+     // format: on
+
+     

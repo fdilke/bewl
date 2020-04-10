@@ -8,10 +8,10 @@ import scala.language.postfixOps
 
 object HausdorffToCompactPredicateSolver {
   def solveMap[
-    H: Hausdorff,
-    C: Compact
+      H: Hausdorff,
+      C: Compact
   ](
-     predicate: (H => C) => Boolean
+      predicate: (H => C) => Boolean
   ): Option[Map[Key[H], C]] =
     new HausdorffToCompactPredicateSolver(
       predicate
@@ -20,50 +20,52 @@ object HausdorffToCompactPredicateSolver {
     }
 
   def solveFunction[
-    H: Hausdorff,
-    C: Compact
+      H: Hausdorff,
+      C: Compact
   ](
-     predicate: (H => C) => Boolean
+      predicate: (H => C) => Boolean
   ): Option[H => C] =
-     solveMap(predicate) map {
-       functionFromMap(_)
-     }
+    solveMap(predicate) map {
+      functionFromMap(_)
+    }
 
   @inline def functionFromMap[
-    H: Hausdorff,
-    C: Compact
-  ] (
-    map: Map[Key[H], C]
+      H: Hausdorff,
+      C: Compact
+  ](
+      map: Map[Key[H], C]
   ): H => C =
-    h => map.getOrElse(
-          new Key(h),
-          optional[C].get
-        )
+    h =>
+      map.getOrElse(
+        new Key(h),
+        optional[C].get
+      )
 }
 
 class HausdorffToCompactPredicateSolver[
-  H: Hausdorff,
-  C: Compact
+    H: Hausdorff,
+    C: Compact
 ](
-  predicate: (H => C) => Boolean
+    predicate: (H => C) => Boolean
 ) {
   @tailrec private final def tryMap(
-    map: Map[Key[H], C]
+      map: Map[Key[H], C]
   ): Option[Map[Key[H], C]] =
     (try {
       Left(
         if (predicate(h =>
-          map.getOrElse(
-            new Key(h),
-            throw StumpedAtException(h)
-          )
-        ))
+            map.getOrElse(
+              new Key(h),
+              throw StumpedAtException(h)
+            )
+          ))
           Some(map)
         else
           None
       )
-    } catch { case StumpedAtException(h) =>
-      Right(h)
+    } catch {
+      case StumpedAtException(h) =>
+        Right(h)
     }) match {
       case Left(result) => result
       case Right(h) =>
@@ -79,14 +81,11 @@ class HausdorffToCompactPredicateSolver[
     }
 
   private def tryMapNonTailRec(
-    map: Map[Key[H], C]
+      map: Map[Key[H], C]
   ): Option[Map[Key[H], C]] =
     tryMap(map)
 
   case class StumpedAtException(
-    h: H
+      h: H
   ) extends Exception
 }
-
-
-

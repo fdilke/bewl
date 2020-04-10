@@ -1,7 +1,13 @@
 package com.fdilke.bewl2.topos
 
 import com.fdilke.bewl.helper.Memoize
-import com.fdilke.bewl2.topos.FunctionalPlumbing.{CharacteristicArrow, Equalizer, EqualizerReceiver, collapse, withUnit}
+import com.fdilke.bewl2.topos.FunctionalPlumbing.{
+  CharacteristicArrow,
+  Equalizer,
+  EqualizerReceiver,
+  collapse,
+  withUnit
+}
 import org.scalatest.exceptions.TestFailedException
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.{MatchResult, Matcher}
@@ -11,7 +17,7 @@ import scala.language.postfixOps
 
 object Topos {
   def apply[DOT[_]](
-    implicit topos: Topos[DOT]
+      implicit topos: Topos[DOT]
   ): Topos[DOT] = topos
 }
 
@@ -23,57 +29,55 @@ trait Topos[DOT[_]] { topos =>
   type >[A, B] <: A => B
   type Ω
 
-  implicit val initial : DOT[Void]
+  implicit val initial: DOT[Void]
   def from0[S: DOT]: Void => S
 
-  implicit val terminator : DOT[Unit]
+  implicit val terminator: DOT[Unit]
   def to1[S: DOT]: S => Unit
 
-  implicit val omega : DOT[Ω]
+  implicit val omega: DOT[Ω]
   val truth: Unit => Ω
   def chi[S: DOT, T: DOT](
-    monic: S => T
+      monic: S => T
   ): CharacteristicArrow[DOT, S, T, Ω]
 
   def sanityTest[S: DOT]: Unit
-  def sanityTest[S: DOT, T:DOT](arrow: S => T): Unit
+  def sanityTest[S: DOT, T: DOT](arrow: S => T): Unit
 
   def toTrue[S: DOT]: S => Ω =
     truth o to1[S]
 
-  def compareFunctions[S:DOT, T:DOT](func: S=> T, func2: S => T): Boolean
+  def compareFunctions[S: DOT, T: DOT](func: S => T, func2: S => T): Boolean
   def functionAsString[S: DOT, T: DOT](arrow: S => T): String
-  def productUncached[A : DOT, B : DOT]: DOT[(A, B)]
-  def exponentialUncached[A : DOT, B : DOT]: DOT[A > B]
+  def productUncached[A: DOT, B: DOT]: DOT[(A, B)]
+  def exponentialUncached[A: DOT, B: DOT]: DOT[A > B]
 
-  def transpose[A:DOT, B:DOT, C:DOT](
-    arrow: (A, B) => C
+  def transpose[A: DOT, B: DOT, C: DOT](
+      arrow: (A, B) => C
   ): A => (B > C)
 
-  def equalize[S:DOT, T:DOT, X](
-    func1: S => T,
-    func2: S => T
+  def equalize[S: DOT, T: DOT, X](
+      func1: S => T,
+      func2: S => T
   ): EqualizerReceiver[DOT, S, X] => X
 
   // TODO: put this helper code in a separate class
 
-  @inline implicit class RichFunction[S: DOT, T:DOT] (
-    function: S => T
+  @inline implicit class RichFunction[S: DOT, T: DOT](
+      function: S => T
   ) {
     @inline final def =?=(function2: S => T): Boolean =
       compareFunctions(function, function2)
 
     def shouldBeFn(function2: S => T): Unit =
       if (! =?=(function2)) {
-          throw new IllegalArgumentException("functions do not match")
+        throw new IllegalArgumentException("functions do not match")
       }
 
     def shouldNotBeFn(function2: S => T): Unit =
       if (=?=(function2)) {
-          throw new IllegalArgumentException("functions do not match")
+        throw new IllegalArgumentException("functions do not match")
       }
-
-
     @inline final def ?=[X](function2: S => T): EqualizerReceiver[DOT, S, X] => X =
       equalize(function, function2)
 
@@ -94,15 +98,12 @@ trait Topos[DOT[_]] { topos =>
     @inline final def target: DOT[T] =
       dot[T]
 
-    @inline final def name: Unit => (S > T) =
-      { (_: Unit, s: S) =>
-        function(s)
-      } transpose
+    @inline final def name: Unit => (S > T) = { (_: Unit, s: S) => function(s) } transpose
   }
 
-  @inline implicit class RichBiFunction[S: DOT, T:DOT, U: DOT] (
-   function: (S, T) => U
- ) {
+  @inline implicit class RichBiFunction[S: DOT, T: DOT, U: DOT](
+      function: (S, T) => U
+  ) {
     @inline final def =?=(function2: (S, T) => U): Boolean =
 //      tupled(function) =?= tupled(function2)
       topos.transpose(function) =?= topos.transpose(function2)
@@ -122,8 +123,8 @@ trait Topos[DOT[_]] { topos =>
         throw new IllegalArgumentException("functions match")
   }
 
-  @inline implicit class RichBewlean (
-    bewlean: Ω
+  @inline implicit class RichBewlean(
+      bewlean: Ω
   ) {
     import LogicalOperations._
 
@@ -140,7 +141,7 @@ trait Topos[DOT[_]] { topos =>
   // anticipate these will not be used very much...
   // as it's all baked into the types and thoughtcrime is impossible. remove?
   @inline final def dot[S](
-    implicit dot: DOT[S]
+      implicit dot: DOT[S]
   ): DOT[S] = dot
 
   final def id[S: DOT]: S => S =
@@ -148,7 +149,7 @@ trait Topos[DOT[_]] { topos =>
 
   final private class DotExtras[A: DOT] {
     final private def makeProduct[B](
-      dot: DOT[B]
+        dot: DOT[B]
     ): DOT[(A, B)] = {
       implicit val theDot: DOT[B] = dot
       productUncached[A, B]
@@ -157,14 +158,14 @@ trait Topos[DOT[_]] { topos =>
     final private val memoizedProduct =
       Memoize.generic[
         DOT,
-        ({ type λ[B] = DOT[(A, B)]}) # λ,
-      ] (makeProduct)
+        ({ type λ[B] = DOT[(A, B)] })#λ,
+      ](makeProduct)
 
-    def productDot[B : DOT]: DOT[(A, B)] =
+    def productDot[B: DOT]: DOT[(A, B)] =
       memoizedProduct(dot[B])
 
     final private def makeExponential[B](
-      dot: DOT[B]
+        dot: DOT[B]
     ): DOT[A > B] = {
       implicit val theDot: DOT[B] = dot
       exponentialUncached[A, B]
@@ -173,31 +174,25 @@ trait Topos[DOT[_]] { topos =>
     final private val memoizedExponential =
       Memoize.generic[
         DOT,
-        ({ type λ[B] = DOT[A > B]}) # λ,
-      ] (makeExponential)
+        ({ type λ[B] = DOT[A > B] })#λ,
+      ](makeExponential)
 
-    def exponential[B : DOT]: DOT[A > B] =
+    def exponential[B: DOT]: DOT[A > B] =
       memoizedExponential(dot[B])
 
-    lazy val `_∀`: (A > Ω) => Ω =
+    lazy val `_∀` : (A > Ω) => Ω =
       toTrue[A].name.chi.chi
 
-    lazy val `_∃`: (A > Ω) => Ω =
+    lazy val `_∃` : (A > Ω) => Ω =
       collapse { f =>
-          val tt: Ω => Ω =
-            collapse { (w: Ω) =>
-              ∀ { (x: A) =>
-                f(x) → w
-              }
-            }
-          ∀ { (w: Ω) =>
-            tt(w) → w
-          }
+        val tt: Ω => Ω =
+          collapse { (w: Ω) => ∀ { (x: A) => f(x) → w } }
+        ∀ { (w: Ω) => tt(w) → w }
       }
   }
 
   final private def makeDotExtras[A](
-    dot: DOT[A]
+      dot: DOT[A]
   ): DotExtras[A] = {
     implicit val theDot: DOT[A] = dot
     new DotExtras[A]
@@ -207,7 +202,7 @@ trait Topos[DOT[_]] { topos =>
     Memoize.generic[
       DOT,
       DotExtras
-    ] (makeDotExtras)
+    ](makeDotExtras)
 
   final private def extras[A: DOT]: DotExtras[A] =
     memoizedExtras(dot[A])
@@ -222,7 +217,7 @@ trait Topos[DOT[_]] { topos =>
     extras[A].`_∀`(f)
 
   @inline final def ∀[A: DOT](
-    f: A => Ω
+      f: A => Ω
   ): (Unit => Ω) =
     u =>
       (∀[A])(
@@ -233,9 +228,9 @@ trait Topos[DOT[_]] { topos =>
     extras[A].`_∃`(f)
 
   // Projection operators
-  def π0[A : DOT, B : DOT]: ((A, B)) => A =
+  def π0[A: DOT, B: DOT]: ((A, B)) => A =
     tupled { (a, b) => a }
-  def π1[A : DOT, B : DOT]: ((A, B)) => B =
+  def π1[A: DOT, B: DOT]: ((A, B)) => B =
     tupled { (a, b) => b }
 
   // TODO: this works but is monstrous. Remedy is to abolish
@@ -244,11 +239,10 @@ trait Topos[DOT[_]] { topos =>
     val k: (((A, B), C)) => (A, B) = π0[(A, B), C]
     val l: ((A, B)) => A = π0[A, B]
 
-    val t: (((A, B), C)) => A = {
-      (abc: ((A, B), C)) =>
-        val ab: (A, B) = k(abc)
-        val a: A = l(ab)
-        a
+    val t: (((A, B), C)) => A = { (abc: ((A, B), C)) =>
+      val ab: (A, B) = k(abc)
+      val a: A = l(ab)
+      a
     }
     t
   }
@@ -266,10 +260,12 @@ trait Topos[DOT[_]] { topos =>
       }
 
     lazy val implies: (Ω, Ω) => Ω =
-      (and ?= { (a, _) => a }) (
+      (and ?= { (a, _) => a })(
         new EqualizerReceiver[DOT, (Ω, Ω), (Ω, Ω) => Ω] {
-          override def apply[R <: (Ω, Ω) : DOT](
-            equalizer: Equalizer[DOT, (Ω, Ω), R]
+          override def apply[R <: (Ω, Ω)](
+              equalizer: Equalizer[DOT, (Ω, Ω), R]
+          )(
+              implicit dot: DOT[R]
           ): (Ω, Ω) => Ω =
             untupled(
               equalizer.include.chi.chi
@@ -278,16 +274,9 @@ trait Topos[DOT[_]] { topos =>
       )
 
     lazy val falsity: Unit => Ω =
-      ∀ { (ω: Ω) =>
-        ω
-      }
+      ∀ { (ω: Ω) => ω }
 
     lazy val or: (Ω, Ω) => Ω =
-      collapse {
-        (a: Ω, b: Ω) =>
-            ∀ { (ω: Ω) =>
-              (a → ω) ∧ (b → ω) → ω
-            }
-      }
+      collapse { (a: Ω, b: Ω) => ∀ { (ω: Ω) => (a → ω) ∧ (b → ω) → ω } }
   }
 }

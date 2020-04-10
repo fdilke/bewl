@@ -7,7 +7,7 @@ import Hausdorff._
 import StrontiumDogEnumeration._
 import WeekdayEnumeration._
 import EmptyEnumeration._
-import com.fdilke.bewl2.topology.HausdorffToCompactPredicateSolver.{ solveMap, solveFunction }
+import com.fdilke.bewl2.topology.HausdorffToCompactPredicateSolver.{solveMap, solveFunction}
 
 class HausdorffToCompactPredicateSolverTest extends AnyFunSpec {
   describe("The predicate solver can act on maps") {
@@ -78,20 +78,13 @@ class HausdorffToCompactPredicateSolverTest extends AnyFunSpec {
         Seq(
           f => f(Wednesday).toString startsWith "Stix",
           f => WeekdayEnumeration.values.map(f).size > StrontiumDogEnumeration.values.size,
-          f => forAll[Weekday] { wd1 =>
-            forAll[Weekday] { wd2 =>
-              (f(wd1) != f(wd2)) || (wd1 == wd2)
-            }
-          }
+          f =>
+            forAll[Weekday] { wd1 => forAll[Weekday] { wd2 => (f(wd1) != f(wd2)) || (wd1 == wd2) } }
         )
-      samplePredicates.foreach { pred =>
-        solveFunction(pred) shouldBe None
-      }
+      samplePredicates.foreach { pred => solveFunction(pred) shouldBe None }
     }
     it("returns a function that can be evaluated on all arguments") {
-      solveFunction[Int, StrontiumDog] { dogOfTheDay =>
-        dogOfTheDay(2) == Johnny
-      } match {
+      solveFunction[Int, StrontiumDog] { dogOfTheDay => dogOfTheDay(2) == Johnny } match {
         case None => fail("no solution found")
         case Some(dogOfTheDay) =>
           StrontiumDogEnumeration.values should contain(dogOfTheDay(22))
@@ -112,7 +105,9 @@ class HausdorffToCompactPredicateSolverTest extends AnyFunSpec {
       solveFunction(rubberstamp) shouldBe None
     }
     // Can't do this without compactness or some other condition on the source
-    ignore("can diagnose when there is trivially a solution for a predicate because source and target are both empty") {
+    ignore(
+      "can diagnose when there is trivially a solution for a predicate because source and target are both empty"
+    ) {
       def rubberstamp(youWish: Impossibility => Impossibility): Boolean =
         true
 

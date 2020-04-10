@@ -9,10 +9,10 @@ import scala.language.postfixOps
 
 object VanillaPitcherPredicateSolver {
   def solveMap[
-    C: Compact
+      C: Compact
   ](
-     predicate: VanillaPitcher[C] => Boolean
-   ): Option[DraftPitcher[C]] =
+      predicate: VanillaPitcher[C] => Boolean
+  ): Option[DraftPitcher[C]] =
     new VanillaPitcherPredicateSolver(
       predicate
     ) tryMap {
@@ -20,41 +20,42 @@ object VanillaPitcherPredicateSolver {
     }
 
   def solveFunction[
-    C: Compact
+      C: Compact
   ](
-     predicate: VanillaPitcher[C] => Boolean
-   ): Option[VanillaPitcher[C]] =
+      predicate: VanillaPitcher[C] => Boolean
+  ): Option[VanillaPitcher[C]] =
     solveMap(predicate) map {
       functionFromMap(_)
     }
 
   @inline def functionFromMap[
-    C: Compact
-  ] (
+      C: Compact
+  ](
       draft: DraftPitcher[C]
-    ): VanillaPitcher[C] =
+  ): VanillaPitcher[C] =
     draft.asPitcher
 }
 
 class VanillaPitcherPredicateSolver[
-  C: Compact
+    C: Compact
 ](
-  predicate: VanillaPitcher[C] => Boolean
+    predicate: VanillaPitcher[C] => Boolean
 ) {
   @tailrec private final def tryMap(
-    draft: DraftPitcher[C]
+      draft: DraftPitcher[C]
   ): Option[DraftPitcher[C]] =
     (try {
       Left(
         if (predicate(
-          draft.asPitcher
-        ))
+            draft.asPitcher
+          ))
           Some(draft)
         else
           None
       )
-    } catch { case StumpedAtException(n) =>
-      Right(n)
+    } catch {
+      case StumpedAtException(n) =>
+        Right(n)
     }) match {
       case Left(result) => result
       case Right(n) =>
@@ -70,12 +71,12 @@ class VanillaPitcherPredicateSolver[
     }
 
   private def tryMapNonTailRec(
-    draft: DraftPitcher[C]
+      draft: DraftPitcher[C]
   ): Option[DraftPitcher[C]] =
     tryMap(draft)
 
   case class StumpedAtException(
-    n: Int
+      n: Int
   ) extends Exception
 }
 
@@ -91,4 +92,3 @@ class DraftPitcher[C: Compact] {
   def wIth(n: Int, c: C): DraftPitcher[C] =
     ???
 }
-
