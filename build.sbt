@@ -1,3 +1,9 @@
+// import Settings._
+
+lazy val root = (project in file(".")).settings(
+  scalafmtOnCompile := true
+)
+
 name := "bewl"
 
 version := "1.0"
@@ -32,3 +38,4 @@ libraryDependencies ++= Seq(
 ) map {
   _ withSources() withJavadoc()
 }
+
