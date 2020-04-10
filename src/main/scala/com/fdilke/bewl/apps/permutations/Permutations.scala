@@ -23,21 +23,23 @@ class PermutationBuilder[T](
 ) {
   def apply(cycle: T*) =
     new PermutationBuilder(
-      cycles :+ Cycle(cycle :_*)
+      cycles :+ Cycle(cycle: _*)
     )
 
   private def allMappings: Map[T, T] =
     Map(
-      cycles.map {
-        _.mappings
-      }.fold (
-        Seq.empty
-      ) (
-        _ ++ _
-      ) :_*
+      cycles
+        .map {
+          _.mappings
+        }
+        .fold(
+          Seq.empty
+        )(
+          _ ++ _
+        ): _*
     )
 
-  def π : Permutation[T] =
+  def π: Permutation[T] =
     Permutations.dot(
       allMappings
     )
@@ -76,9 +78,7 @@ object Permutations {
       elementsOf(asArrow.source) toSet
 
     lazy val asMap: Map[T, T] =
-      carrier map { e =>
-        e -> asArrow(e)
-      } toMap
+      carrier map { e => e -> asArrow(e) } toMap
 
     lazy val parity: Int =
       Parity of asMap
@@ -108,22 +108,12 @@ object Permutations {
     val permutationCarrier =
       FiniteSets.makeDot(permutations)
     val the1: FiniteSets.→[Int, Int] =
-      (1 to n) map {
-        i => i -> i
-      } toMap
+      (1 to n) map { i => i -> i } toMap
     val mul = FiniteSets.bifunctionAsBiArrow(
       permutationCarrier
-    ) { (p, q) =>
-      (1 to n) map {
-        i => i -> p(q(i))
-      } toMap
-    }
+    ) { (p, q) => (1 to n) map { i => i -> p(q(i)) } toMap }
     val inv =
-      permutationCarrier(permutationCarrier) { p =>
-        (1 to n) map {
-          i => p(i) -> i
-        } toMap
-      }
+      permutationCarrier(permutationCarrier) { p => (1 to n) map { i => p(i) -> i } toMap }
     new FiniteSets.Group[FiniteSets.→[Int, Int]](
       permutationCarrier,
       FiniteSetsUtilities.makeNullaryOperator(permutationCarrier, the1),
@@ -148,4 +138,3 @@ object Parity {
           -of(permutation - px + (x -> permutation(px)))
     }
 }
-

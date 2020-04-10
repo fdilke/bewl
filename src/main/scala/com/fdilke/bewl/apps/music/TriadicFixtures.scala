@@ -1,7 +1,15 @@
 package com.fdilke.bewl.apps.music
 
 import com.fdilke.bewl.fsets.FiniteSets
-import com.fdilke.bewl.fsets.FiniteSets.{EQUALIZER, FiniteSetsDot, Monoid, ToposOfMonoidActions, bifunctionAsBiArrow, makeDot, x}
+import com.fdilke.bewl.fsets.FiniteSets.{
+  EQUALIZER,
+  FiniteSetsDot,
+  Monoid,
+  ToposOfMonoidActions,
+  bifunctionAsBiArrow,
+  makeDot,
+  x
+}
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.makeNullaryOperator
 import com.fdilke.bewl.helper.⊕
 import com.fdilke.bewl.topos.{Topos, Wrappings}
@@ -95,26 +103,27 @@ object TriadicFixtures {
   val octaveAction =
     triadicMonoid.action(
       octaveDot
-    ) ( affineMapApply )
+    )(affineMapApply)
 
   octaveAction.sanityTest
 
   val chordAction =
     triadicMonoid.action(
       chordDot
-    ) ( affineMapApply )
+    )(affineMapApply)
 
   chordAction.sanityTest
 
   // now construct the topos and some dots in it
 
-  val triadicTopos: Topos[Any] with Wrappings[
-    Any,
-    Any,
-    ({type λ[X] = triadicMonoid.Action[X]}) # λ,
-    ({type λ[X, Y] = triadicMonoid.ActionPreArrow[X, Y]}) # λ,
-    ({type λ[T] = T}) # λ
-  ] =
+  val triadicTopos: Topos[Any]
+    with Wrappings[
+      Any,
+      Any,
+      ({ type λ[X] = triadicMonoid.Action[X] })#λ,
+      ({ type λ[X, Y] = triadicMonoid.ActionPreArrow[X, Y] })#λ,
+      ({ type λ[T] = T })#λ
+    ] =
     ToposOfMonoidActions of triadicMonoid
 
   val octave: triadicTopos.DOT[Int] =

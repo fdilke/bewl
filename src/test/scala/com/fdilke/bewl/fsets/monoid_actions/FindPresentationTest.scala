@@ -1,7 +1,12 @@
 package com.fdilke.bewl.fsets.monoid_actions
 
 import com.fdilke.bewl.fsets.FiniteSets
-import com.fdilke.bewl.fsets.FiniteSets.{>, FindGeneratorAnalysis, FindGenerators, ToposOfMonoidActions}
+import com.fdilke.bewl.fsets.FiniteSets.{
+  >,
+  FindGeneratorAnalysis,
+  FindGenerators,
+  ToposOfMonoidActions
+}
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.dot
 import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
 import com.fdilke.bewl.helper.StandardSymbols.{i, x, y}
@@ -12,7 +17,7 @@ import scala.language.{postfixOps, reflectiveCalls}
 
 class FindPresentationTest extends AnyFreeSpec {
 
-  import monoidOf3.{ Action, regularAction }
+  import monoidOf3.{Action, regularAction}
 
   private val findGenerators: {
     def apply[A](
@@ -39,10 +44,10 @@ class FindPresentationTest extends AnyFreeSpec {
     )
 
   private val actionTopos =
-    ToposOfMonoidActions of(
+    ToposOfMonoidActions of (
       monoidOf3,
       FiniteSets.DefaultMonoidAssistant
-    )
+  )
 
   private val scalarMultiply: (String, Symbol) => String =
     (s, m) => monoidOf3.multiply(Symbol(s), m).name
@@ -52,42 +57,42 @@ class FindPresentationTest extends AnyFreeSpec {
   private val bar = monoidOf3.action(barDot)(scalarMultiply)
 
   "The presentation finder can extract a presentation" - {
-      "for the regular monoid action" in {
-        canExtractPresentation(monoidOf3.regularAction)
-      }
-      "for an empty monoid action" in {
-        canExtractPresentation(
-          monoidOf3.voidAction
-        )
-      }
-      "for a right ideal action" in {
-        canExtractPresentation(
-          bar
-        )
-      }
-      "for a right ideal squared action" in {
-        canExtractPresentation(
-          bar x bar
-        )
-      }
-      "for the truth object monoid action" in {
-        canExtractPresentation(
-          actionTopos.unwrap(
-            actionTopos.omega
-          )
-        )
-      }
-      "for a more fancy monoid action" in {
-        canExtractPresentation(
-          actionTopos.unwrap(
-            actionTopos.omega x
-              actionTopos.makeDot(
-                monoidOf3.regularAction
-              )
-          )
-        )
-      }
+    "for the regular monoid action" in {
+      canExtractPresentation(monoidOf3.regularAction)
     }
+    "for an empty monoid action" in {
+      canExtractPresentation(
+        monoidOf3.voidAction
+      )
+    }
+    "for a right ideal action" in {
+      canExtractPresentation(
+        bar
+      )
+    }
+    "for a right ideal squared action" in {
+      canExtractPresentation(
+        bar x bar
+      )
+    }
+    "for the truth object monoid action" in {
+      canExtractPresentation(
+        actionTopos.unwrap(
+          actionTopos.omega
+        )
+      )
+    }
+    "for a more fancy monoid action" in {
+      canExtractPresentation(
+        actionTopos.unwrap(
+          actionTopos.omega x
+            actionTopos.makeDot(
+              monoidOf3.regularAction
+            )
+        )
+      )
+    }
+  }
 
   private def canExtractPresentation[A](
     action: monoidOf3.Action[A]

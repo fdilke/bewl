@@ -8,9 +8,7 @@ import org.scalatest.matchers.should.Matchers._
 import scala.language.reflectiveCalls
 
 trait StrongMonads {
-  Ɛ: BaseTopos with
-    ToposStructures with
-    MonadicPlumbing =>
+  Ɛ: BaseTopos with ToposStructures with MonadicPlumbing =>
 
   trait StrongMonad[
     M[X <: ~] <: ~
@@ -18,7 +16,7 @@ trait StrongMonads {
 
     def apply[
       X <: ~
-    ] (
+    ](
       dot: DOT[X]
     ): StrongMonad.At[M, X]
 
@@ -54,23 +52,24 @@ trait StrongMonads {
       y: DOT[Y]
     ): (X → Y) > (
       M[X] → M[Y]
-      ) = (
-      T(x) > T(y)
+    ) =
+      (
+        T(x) > T(y)
       ).transpose(
-      x > y
-    ) { (x2y, mx) =>
-      implicit val anonImplicit: BIPRODUCT[X → Y, M[X]] = (x > y) x T(x)
-      map(
-        (x > y).evaluation.arrow
-      )(
-        tensorialStrength(
-          x > y,
-          x
+        x > y
+      ) { (x2y, mx) =>
+        implicit val anonImplicit: BIPRODUCT[X → Y, M[X]] = (x > y) x T(x)
+        map(
+          (x > y).evaluation.arrow
         )(
-          x2y ⊕⊕ mx
+          tensorialStrength(
+            x > y,
+            x
+          )(
+            x2y ⊕⊕ mx
+          )
         )
-      )
-    }
+      }
 
     private def T[
       A <: ~
@@ -118,7 +117,8 @@ trait StrongMonads {
     ](
       a: DOT[A],
       b: DOT[B]
-    ): Unit = (
+    ): Unit =
+      (
         tensorialStrength(a, b) o (
           (a *- b) x (
             η(b) o (a -* b)
@@ -136,18 +136,18 @@ trait StrongMonads {
       a: DOT[A],
       b: DOT[B],
       c: DOT[C]
-    ) : Unit = {
+    ): Unit = {
       val a_btc = a x (b x T(c))
       val stBC = tensorialStrength(b, c)
 
       (tensorialStrength(a, b x c) o
         (a_btc.π0 x (stBC o a_btc.π1)) o
         associator(a, b, T(c))) shouldBe (
-          map(
-            associator(a, b, c)
-          ) o
+        map(
+          associator(a, b, c)
+        ) o
           tensorialStrength(a x b, c)
-        )
+      )
     }
 
     def sanityTest6[
@@ -156,7 +156,7 @@ trait StrongMonads {
     ](
       a: DOT[A],
       b: DOT[B]
-    ) : Unit = {
+    ): Unit = {
       val stAB = tensorialStrength(a, b)
       val stATB = tensorialStrength(a, T(b))
       val axttb = a x T(T(b))
@@ -176,8 +176,7 @@ trait StrongMonads {
         Y <: ~
       ](
         dash: DOT[Y]
-      ):
-      X x M[Y] > M[X x Y]
+      ): X x M[Y] > M[X x Y]
     }
   }
 }

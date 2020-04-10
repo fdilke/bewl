@@ -23,7 +23,7 @@ class ElementEnrichmentTest extends AnyFreeSpec {
         ints > bools
 
       for {
-        f : (Symbol → Int) <- elementsOf(symbols > ints)
+        f: (Symbol → Int) <- elementsOf(symbols > ints)
         g: (Int → Boolean) <- elementsOf(ints > bools)
       } {
         // TODO: make this work properly (Scala 2.12.0-M4 bug?)
@@ -34,8 +34,7 @@ class ElementEnrichmentTest extends AnyFreeSpec {
 
         for {
           s <- elementsOf(symbols)
-        }
-          gof(s) shouldBe g(f(s))
+        } gof(s) shouldBe g(f(s))
       }
     }
 
@@ -49,7 +48,7 @@ class ElementEnrichmentTest extends AnyFreeSpec {
         ints > bools
 
       for {
-        f : (Symbol > Int) <- symbols >> ints
+        f: (Symbol > Int) <- symbols >> ints
         g: (Int → Boolean) <- elementsOf(ints > bools)
       } {
         // TODO: make this work properly (Scala 2.12.0-M4 bug?)
@@ -60,8 +59,7 @@ class ElementEnrichmentTest extends AnyFreeSpec {
 
         for {
           s <- elementsOf(symbols)
-        }
-          gof(s) shouldBe g(f(s))
+        } gof(s) shouldBe g(f(s))
       }
     }
   }

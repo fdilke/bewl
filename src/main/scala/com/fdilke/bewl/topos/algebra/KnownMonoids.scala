@@ -7,8 +7,14 @@ object KnownMonoids {
 
   val monoidOf3 =
     monoidFromTable(
-      i, x, y,
-      x, x, y,
-      y, x, y
+      i,
+      x,
+      y,
+      x,
+      x,
+      y,
+      y,
+      x,
+      y
     ) // right-dominant on two generators
 }

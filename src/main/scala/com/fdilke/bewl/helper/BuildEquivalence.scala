@@ -23,22 +23,19 @@ object BuildEquivalence {
     def equate(
       i: Int,
       j: Int
-    ) : Unit = {
+    ): Unit = {
       if (i != j)
         array(i) = j
     }
 
     for {
       (j, k) <- relators
-    }
-      equate(
-        trackUp(j),
-        trackUp(k)
-      )
+    } equate(
+      trackUp(j),
+      trackUp(k)
+    )
 
-    for { i <- range }
-      array(i) =
-          trackUp(array(i))
+    for { i <- range } array(i) = trackUp(array(i))
 
     array.toIndexedSeq
   }

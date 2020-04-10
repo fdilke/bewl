@@ -2,7 +2,17 @@ package com.fdilke.bewl.topos
 
 import com.fdilke.bewl.helper.⊕
 import com.fdilke.bewl.topos.constructions.ConstructToposOfMonoidActions
-import com.fdilke.bewl.helper.StandardSymbols.{iso, injective, epic, monic, source, target, left, right, sanityTest}
+import com.fdilke.bewl.helper.StandardSymbols.{
+  iso,
+  injective,
+  epic,
+  monic,
+  source,
+  target,
+  left,
+  right,
+  sanityTest
+}
 import org.scalatest.matchers.should.Matchers._
 
 import org.scalatest._
@@ -16,7 +26,7 @@ abstract class ToposFixtureSanityTests[
   PREDOT[_ <: BASE],
   PREARROW[_ <: BASE, _ <: BASE],
   WRAPPER[T <: BASE] <: ~
-] (
+](
   fixtures: ToposWithFixtures[~, BASE, PREDOT, PREARROW, WRAPPER]
 ) extends AnyFunSpec {
   import fixtures._
@@ -62,7 +72,7 @@ abstract class ToposWithFixtures[
   PREARROW[_ <: BASE, _ <: BASE],
   WRAPPER[T <: BASE] <: ~
 ] {
-  val topos : Topos[~] with Wrappings[~, BASE, PREDOT, PREARROW, WRAPPER]
+  val topos: Topos[~] with Wrappings[~, BASE, PREDOT, PREARROW, WRAPPER]
 
   type FOO <: ~
   type BAR <: ~
@@ -74,13 +84,13 @@ abstract class ToposWithFixtures[
   def makeSampleDot(): DOT[_ <: ~]
   def makeSampleArrow(): >[_ <: ~, _ <: ~]
 
-  val foo : DOT[FOO]
-  val bar : DOT[BAR]
-  val baz : DOT[BAZ]
+  val foo: DOT[FOO]
+  val bar: DOT[BAR]
+  val baz: DOT[BAZ]
 
-  val foo2bar : FOO > BAR
-  val foo2ImageOfBar : FOO > BAZ
-  val foobar2baz : BiArrow[
+  val foo2bar: FOO > BAR
+  val foo2ImageOfBar: FOO > BAZ
+  val foobar2baz: BiArrow[
     FOO,
     BAR,
     BAZ
@@ -93,12 +103,9 @@ abstract class ToposWithFixtures[
     _ <: ~
   ]
 
-  case class EqualizerSituation[S <: ~, M <: ~, T <: ~](
-    r: S > M,
-    s: M > T,
-    t: M > T) {
+  case class EqualizerSituation[S <: ~, M <: ~, T <: ~](r: S > M, s: M > T, t: M > T) {
 
-    def sanityTest : Unit = {
+    def sanityTest: Unit = {
       r.sanityTest
       s.sanityTest
       t.sanityTest
@@ -151,27 +158,27 @@ abstract class GenericToposTests[
     it("can construct biproduct diagrams") {
       (bar x baz).sanityTest
       (bar x baz) should have(
-        left (bar),
-        right (baz)
+        left(bar),
+        right(baz)
       )
       val productArrow = foo2bar x foo2baz
 
       productArrow.sanityTest
-      productArrow should have (
-        source (foo),
-        target (bar x baz),
-        sanityTest (null)
+      productArrow should have(
+        source(foo),
+        target(bar x baz),
+        sanityTest(null)
       )
 
       (bar x baz).π0.sanityTest
       (bar x baz).π1.sanityTest
 
-      foo(bar) {
-        x => productArrow(x)._1
+      foo(bar) { x =>
+        productArrow(x)._1
       } shouldBe foo2bar
 
-      foo(baz) {
-        x => productArrow(x)._2
+      foo(baz) { x =>
+        productArrow(x)._2
       } shouldBe foo2baz
 
       val fooXbar: BIPRODUCT[FOO, BAR] =
@@ -233,7 +240,7 @@ abstract class GenericToposTests[
       evaluation.arrow.sanityTest
       evaluation.arrow.target shouldBe baz
 
-      val foo2bar2baz: FOO > (BAR → BAZ) = 
+      val foo2bar2baz: FOO > (BAR → BAZ) =
         (bar > baz) transpose foobar2baz
       foo2bar2baz.sanityTest
       foo2bar2baz should have(
@@ -256,13 +263,13 @@ abstract class GenericToposTests[
       // minor hackery required to extract the types
       def runTest[S <: ~, M <: ~, T <: ~](
         situation: EqualizerSituation[S, M, T]
-      ) : Unit = {
-          import situation._
-          val equalizer = s ?= t
-          val e = equalizer.inclusion
+      ): Unit = {
+        import situation._
+        val equalizer = s ?= t
+        val e = equalizer.inclusion
 
-          (s o e) shouldBe (t o e)
-          (e o equalizer.restrict(r)) shouldBe r
+        (s o e) shouldBe (t o e)
+        (e o equalizer.restrict(r)) shouldBe r
       }
       runTest(equalizerSituation)
     }
@@ -317,7 +324,7 @@ abstract class GenericToposTests[
         def distinguishesMapsBetween[
           A <: ~,
           B <: ~
-        ] (
+        ](
           source: DOT[A],
           target: DOT[B]
         ) =
@@ -365,7 +372,7 @@ abstract class GenericToposTests[
     }
 
     it("can tell if a arrow is epic") {
-  
+
       I.identity shouldBe epic
       O.identity shouldBe epic
       I.diagonal shouldBe epic
@@ -401,7 +408,7 @@ abstract class GenericToposTests[
       val (
         epic,
         monic
-      ) : (
+      ): (
         FOO > BAR,
         BAR > BAR
       ) = foo2bar.factorizeEpiMono
@@ -410,11 +417,11 @@ abstract class GenericToposTests[
       monic shouldBe monic
       (monic o epic) shouldBe foo2bar
     }
-    
+
     if (!inActionTopos) { // reluctantly skip, too slow with current technology
       it("has sane injectives") {
-      	O should not be injective
-      	I shouldBe injective
+        O should not be injective
+        I shouldBe injective
         omega shouldBe injective
       }
     }

@@ -6,7 +6,7 @@ object IterateToFixed {
 
   def apply[T](
     initial: T
-  ) (
+  )(
     fn: T => T
   ) = {
     @tailrec def iterateOn(

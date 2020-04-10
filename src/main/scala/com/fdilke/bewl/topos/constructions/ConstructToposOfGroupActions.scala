@@ -4,26 +4,27 @@ import com.fdilke.bewl.helper.{Memoize, ⊕}
 import com.fdilke.bewl.topos.algebra.{AlgebraicMachinery, AlgebraicStructures}
 import com.fdilke.bewl.topos._
 
-trait ConstructToposOfGroupActions extends
-  BaseTopos with ToposEnrichments {
+trait ConstructToposOfGroupActions extends BaseTopos with ToposEnrichments {
 
   Ɛ: ToposPrerequisites =>
 
   object ToposOfGroupActions {
-    def of[G <: ~](group: Ɛ.Group[G]) : Topos[~] with Wrappings[
-      ~,
-      ~,
-      ({type λ[X <: ~] = group.Action[X]}) # λ,
-      ({type λ[X <: ~, Y <: ~] = group.ActionPreArrow[X, Y]}) # λ,
-      ({type λ[T <: ~] = T}) # λ
-    ] = {
-      new Topos[~] with Wrappings[
+    def of[G <: ~](group: Ɛ.Group[G]): Topos[~]
+      with Wrappings[
         ~,
         ~,
-        ({type λ[X <: ~] = group.Action[X]}) # λ,
-        ({type λ[X <: ~, Y <: ~] = group.ActionPreArrow[X, Y]}) # λ,
-        ({type λ[T <: ~] = T}) # λ
-      ] {
+        ({ type λ[X <: ~] = group.Action[X] })#λ,
+        ({ type λ[X <: ~, Y <: ~] = group.ActionPreArrow[X, Y] })#λ,
+        ({ type λ[T <: ~] = T })#λ
+      ] = {
+      new Topos[~]
+        with Wrappings[
+          ~,
+          ~,
+          ({ type λ[X <: ~] = group.Action[X] })#λ,
+          ({ type λ[X <: ~, Y <: ~] = group.ActionPreArrow[X, Y] })#λ,
+          ({ type λ[T <: ~] = T })#λ
+        ] {
         override val name = "GroupActions in " + Ɛ.name
 
         override type DOT[X <: ~] = ActionDot[X]
@@ -45,7 +46,7 @@ trait ConstructToposOfGroupActions extends
 
         class ActionDot[
           S <: ~
-        ] (
+        ](
           val action: group.Action[S]
         ) extends Dot[S] { dot =>
 
@@ -56,8 +57,8 @@ trait ConstructToposOfGroupActions extends
             val fixedPoints =
               action.actionCarrier.whereAll(
                 group.carrier
-              ) {
-                (a, g) => action.actionCarrier.=?=(
+              ) { (a, g) =>
+                action.actionCarrier.=?=(
                   a,
                   action.actionMultiply(a, g)
                 )
@@ -91,20 +92,22 @@ trait ConstructToposOfGroupActions extends
             val exp_x_G = exponentialDot x group.carrier
             new ActionDot[S → T](
               group.action(exponentialDot) {
-                case (f, g) => exponentialDot.transpose(exp_x_G) {
-                  case (f ⊕ g, a) => that.action.actionMultiply(
-                    exponentialDot.evaluate(
-                      f,
-                      dot.action.actionMultiply(
-                        a,
-                        group.inverse(g)
+                case (f, g) =>
+                  exponentialDot.transpose(exp_x_G) {
+                    case (f ⊕ g, a) =>
+                      that.action.actionMultiply(
+                        exponentialDot.evaluate(
+                          f,
+                          dot.action.actionMultiply(
+                            a,
+                            group.inverse(g)
+                          )
+                        ),
+                        g
                       )
-                    ),
-                    g
+                  }(
+                    exp_x_G.pair(f, g)
                   )
-                }(
-                  exp_x_G.pair(f, g)
-                )
               }
             ) with ExponentialDot[S, T] {
               override val source = dot
@@ -122,13 +125,13 @@ trait ConstructToposOfGroupActions extends
                     biArrow(_, _)
                   }
                 )
-                
-               override def evaluate(
-                function: S → T, 
+
+              override def evaluate(
+                function: S → T,
                 arg: S
-              ): T = 
+              ): T =
                 exponentialDot.evaluate(
-                  function, 
+                  function,
                   arg
                 )
             }
@@ -138,7 +141,7 @@ trait ConstructToposOfGroupActions extends
             target: DOT[T]
           )(
             f: S => T
-          ) : S > T =
+          ): S > T =
             ActionArrow(
               this,
               target,
@@ -147,7 +150,7 @@ trait ConstructToposOfGroupActions extends
               ) { f }
             )
 
-          override def sanityTest : Unit = {
+          override def sanityTest: Unit = {
             action.actionCarrier.sanityTest
             action.sanityTest
           }
@@ -156,10 +159,10 @@ trait ConstructToposOfGroupActions extends
         object ActionDot {
           def apply[
             A <: ~
-          ] (
-             actionCarrier: Ɛ.DOT[A]
-          ) (
-             actionMultiply: (A, G) => A
+          ](
+            actionCarrier: Ɛ.DOT[A]
+          )(
+            actionMultiply: (A, G) => A
           ) =
             new ActionDot(
               group.action(actionCarrier)(actionMultiply)
@@ -206,14 +209,14 @@ trait ConstructToposOfGroupActions extends
               arrow o that.arrow
             )
 
-          override def \[U <: ~](monic: U > T) : S > U =
+          override def \[U <: ~](monic: U > T): S > U =
             ActionArrow(
               source,
               monic.source,
               arrow \ monic.arrow
             )
 
-          override def sanityTest : Unit = {
+          override def sanityTest: Unit = {
             source.sanityTest
             target.sanityTest
             arrow.sanityTest
@@ -235,9 +238,10 @@ trait ConstructToposOfGroupActions extends
               new ActionDot(
                 group.action(
                   delegatedImage
-                ){ (s, m) =>
+                ) { (s, m) =>
                   arrow.target.action.actionMultiply(
-                    s, m
+                    s,
+                    m
                   )
                 }
               ) with EqualizingDot[T] { equalizingDot =>
@@ -258,7 +262,6 @@ trait ConstructToposOfGroupActions extends
             }
           }
 
-
         override def functionAsArrow[
           S <: ~,
           T <: ~
@@ -272,10 +275,10 @@ trait ConstructToposOfGroupActions extends
         override def makeArrow[
           S <: ~,
           T <: ~
-        ] (
+        ](
           prearrow: group.ActionPreArrow[S, T]
         ): ActionArrow[S, T] = {
-          import prearrow.{ source, target, function }
+          import prearrow.{source, target, function}
           new ActionArrow(
             makeDot(source),
             makeDot(target),
@@ -286,19 +289,17 @@ trait ConstructToposOfGroupActions extends
         }
 
         private val memoizedDotWrapper =
-          Memoize.generic withLowerBound[
-            ({
-              type λ[T <: ~] = group.Action[T]
-            }) # λ,
-            ActionDot,
-            ~
-          ] {
+          Memoize.generic withLowerBound [({
+            type λ[T <: ~] = group.Action[T]
+          })#λ,
+          ActionDot,
+          ~] {
             new ActionDot(_)
           }
 
         override def makeDot[
           T <: ~
-        ] (
+        ](
           predot: group.Action[T]
         ) =
           memoizedDotWrapper(predot)
@@ -307,11 +308,11 @@ trait ConstructToposOfGroupActions extends
           L <: ~,
           R <: ~,
           T <: ~
-        ] (
+        ](
           left: ActionDot[L],
           right: ActionDot[R],
           target: ActionDot[T]
-        ) (
+        )(
           bifunc: (L, R) => T
         ): BiArrow[L, R, T] =
           (left x right).biArrow(

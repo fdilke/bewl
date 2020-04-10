@@ -5,16 +5,14 @@ import com.fdilke.bewl.topos._
 
 import scala.language.{postfixOps, reflectiveCalls}
 
-trait ConstructDefaultMonoidAssistant extends
-  BaseTopos with
-  ToposEnrichments {
+trait ConstructDefaultMonoidAssistant extends BaseTopos with ToposEnrichments {
 
   Ɛ: ToposPrerequisites =>
 
   trait MonoidAssistant {
     def actionAnalyzer[
       M <: ~
-    ] (
+    ](
       monoid: Monoid[M]
     ): monoid.ActionAnalyzer
   }
@@ -22,7 +20,7 @@ trait ConstructDefaultMonoidAssistant extends
   object DefaultMonoidAssistant extends MonoidAssistant {
     override def actionAnalyzer[
       M <: ~
-    ] (
+    ](
       monoid: Monoid[M]
     ): monoid.ActionAnalyzer =
       new monoid.ActionAnalyzer {
@@ -50,9 +48,10 @@ trait ConstructDefaultMonoidAssistant extends
               val product = action.actionCarrier x monoid.carrier
               action.actionCarrier >> targetCarrier filter { arrow =>
                 (
-                  product.biArrow(omega) { (a, m) =>
-                    targetCarrier.=?=(
-                      arrow(action.actionMultiply(a, m)),
+                  product
+                    .biArrow(omega) { (a, m) =>
+                      targetCarrier.=?=(
+                        arrow(action.actionMultiply(a, m)),
                       targetMultiply(arrow(a), m)
                     )
                   } arrow
@@ -79,24 +78,23 @@ trait ConstructDefaultMonoidAssistant extends
                   monoid.carrier,
                   monoid.carrier,
                   action.actionCarrier
-                ) {
-                  (f, n, m, s) =>
-                    targetCarrier.=?=(
+                ) { (f, n, m, s) =>
+                  targetCarrier.=?=(
+                    $(
+                      f,
+                      mXs.pair(
+                        monoid.multiply(m, n),
+                        action.actionMultiply(s, n)
+                      )
+                    ),
+                    targetMultiply(
                       $(
                         f,
-                        mXs.pair(
-                          monoid.multiply(m, n),
-                          action.actionMultiply(s, n)
-                        )
+                        mXs.pair(m, s)
                       ),
-                      targetMultiply(
-                        $(
-                          f,
-                          mXs.pair(m, s)
-                        ),
-                        n
-                      )
+                      n
                     )
+                  )
                 }
 
               val morphismMultiply =
@@ -127,17 +125,16 @@ trait ConstructDefaultMonoidAssistant extends
                 override val evaluation =
                   (morphisms x action.actionCarrier).biArrow(
                     targetCarrier
-                  ) {
-                    (f, s) =>
-                      $(
-                        f,
-                        mXs.pair(
-                          monoid.unit(
-                            action.actionCarrier.toI(s)
-                          ),
-                          s
-                        )
+                  ) { (f, s) =>
+                    $(
+                      f,
+                      mXs.pair(
+                        monoid.unit(
+                          action.actionCarrier.toI(s)
+                        ),
+                        s
                       )
+                    )
                   }
 
                 override def transpose[X <: ~](
@@ -158,9 +155,9 @@ trait ConstructDefaultMonoidAssistant extends
               }
             }
           }
-    }
+      }
   }
-  
-  val monoidAssistant: MonoidAssistant = 
-    DefaultMonoidAssistant    
+
+  val monoidAssistant: MonoidAssistant =
+    DefaultMonoidAssistant
 }

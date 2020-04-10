@@ -12,9 +12,7 @@ class EnrichmentTests extends AnyFunSpec {
   describe("Function comparisons") {
     it("work for unary functions") {
       val theId: Boolean => Boolean = id[Boolean]
-      val constT: Boolean => Boolean = {
-         _ => true
-      }
+      val constT: Boolean => Boolean = { _ => true }
       (theId =?= theId) shouldBe true
       (theId =?= id[Boolean]) shouldBe true
       (theId =?= constT) shouldBe false
@@ -80,9 +78,9 @@ class EnrichmentTests extends AnyFunSpec {
     }
 
     it("has the correct binary operations for logical operations as enrichments") {
-      { (_:Ω) ∧ (_:Ω) } shouldBeFn { _ & _ }
-      { (_:Ω) → (_:Ω) } shouldBeFn { !_ | _ }
-      { (_:Ω) ∨ (_:Ω) } shouldBeFn { _ | _ }
+      { (_: Ω) ∧ (_: Ω) } shouldBeFn { _ & _ }
+      { (_: Ω) → (_: Ω) } shouldBeFn { !_ | _ }
+      { (_: Ω) ∨ (_: Ω) } shouldBeFn { _ | _ }
     }
   }
 
@@ -103,7 +101,7 @@ class EnrichmentTests extends AnyFunSpec {
       (exists o id[Int].chi.chi.name) shouldBeFn truth
     }
   }
-/*
+  /*
     it("can be used over a dot to make an arrow into omega") {
       val carrier = dot(1,2,3)
       val containers = dot(Set(1,2), Set(2))
@@ -602,4 +600,3 @@ class EnrichmentTests extends AnyFunSpec {
   }
  */
 }
-

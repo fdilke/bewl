@@ -44,9 +44,9 @@ class DyadTest extends AnyFunSpec {
     }
     it("have sane equality semantics") {
       Dyad("A", "B") shouldBe Dyad("A", "B")
-      Dyad("A", "B") shouldNot be( Dyad("A") )
-      Dyad("B") shouldNot be( Dyad("A") )
-      Dyad("A", "B") shouldNot be( Dyad("B", "A") )
+      Dyad("A", "B") shouldNot be(Dyad("A"))
+      Dyad("B") shouldNot be(Dyad("A"))
+      Dyad("A", "B") shouldNot be(Dyad("B", "A"))
     }
     it("have a presentable toString method") {
       Dyad("A", "B").toString shouldBe "Dyad(A,B)"
@@ -59,7 +59,7 @@ class DyadTest extends AnyFunSpec {
     }
     it("support map which coalesces the result into canonical form") {
       Dyad("foo", "barbaz") map { _.length } shouldBe Dyad(3, 6)
-      Dyad(1,2,3,4) map { _ % 2 } shouldBe Dyad(1, 0)
+      Dyad(1, 2, 3, 4) map { _ % 2 } shouldBe Dyad(1, 0)
     }
     it("have a length") {
       Dyad(1).length shouldBe 1
@@ -80,7 +80,7 @@ class DyadTest extends AnyFunSpec {
     }
     it("have a η and μ obeying the monad identity laws") {
       val dyad: Dyad[Int] =
-        Dyad(1,2,3,4)
+        Dyad(1, 2, 3, 4)
 
       μ[Int](
         η[Dyad[Int]](dyad)
@@ -98,7 +98,7 @@ class DyadTest extends AnyFunSpec {
           ),
           Dyad(
             Dyad(5, 3, 2, 1)
-          ),
+          )
         )
 
       μ[Int](

@@ -1,18 +1,26 @@
 package com.fdilke.bewl.fsets.monoid_actions
 
 import com.fdilke.bewl.fsets.FiniteSets
-import FiniteSets.{Monoid, >, DefaultMonoidAssistant, LocalMonoidAssistant, ToposOfMonoidActions, bifunctionAsBiArrow, functionAsArrow}
+import FiniteSets.{
+  Monoid,
+  >,
+  DefaultMonoidAssistant,
+  LocalMonoidAssistant,
+  ToposOfMonoidActions,
+  bifunctionAsBiArrow,
+  functionAsArrow
+}
 import org.scalatest.matchers.should.Matchers._
 import com.fdilke.bewl.testutil.CustomMatchers._
 
 object CheckLocalMorphismEnumerator {
   def apply[M, X, Y](
     monoid: Monoid[M]
-  ) (
+  )(
     sourceAction: monoid.Action[X],
     targetAction: monoid.Action[Y],
     thorough: Boolean
-  ) : Unit = {
+  ): Unit = {
     val localAnalyzer: monoid.ActionAnalyzer =
       LocalMonoidAssistant.actionAnalyzer(
         monoid
@@ -21,13 +29,15 @@ object CheckLocalMorphismEnumerator {
     def enumerateMorphisms(
       analyzer: monoid.ActionAnalyzer
     ): Iterable[X > Y] =
-      analyzer.analyze(
-        sourceAction
-      ).morphismsTo(
-        analyzer.analyze(
-          targetAction
+      analyzer
+        .analyze(
+          sourceAction
         )
-      )
+        .morphismsTo(
+          analyzer.analyze(
+            targetAction
+          )
+        )
 
     val localMorphisms =
       enumerateMorphisms(

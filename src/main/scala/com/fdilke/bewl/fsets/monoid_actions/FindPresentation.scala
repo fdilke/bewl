@@ -57,7 +57,7 @@ trait FindPresentation extends BaseFiniteSets {
                       case m ⊕ n =>
                         Relator(m, i, n)
                     }
-                }
+                  }
               )
             )
           }

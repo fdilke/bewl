@@ -8,10 +8,10 @@ import scala.language.postfixOps
 
 object HausdorffToCompactPredicateSolver {
   def solveMap[
-      H: Hausdorff,
-      C: Compact
+    H: Hausdorff,
+    C: Compact
   ](
-      predicate: (H => C) => Boolean
+    predicate: (H => C) => Boolean
   ): Option[Map[Key[H], C]] =
     new HausdorffToCompactPredicateSolver(
       predicate
@@ -20,20 +20,20 @@ object HausdorffToCompactPredicateSolver {
     }
 
   def solveFunction[
-      H: Hausdorff,
-      C: Compact
+    H: Hausdorff,
+    C: Compact
   ](
-      predicate: (H => C) => Boolean
+    predicate: (H => C) => Boolean
   ): Option[H => C] =
     solveMap(predicate) map {
       functionFromMap(_)
     }
 
   @inline def functionFromMap[
-      H: Hausdorff,
-      C: Compact
+    H: Hausdorff,
+    C: Compact
   ](
-      map: Map[Key[H], C]
+    map: Map[Key[H], C]
   ): H => C =
     h =>
       map.getOrElse(
@@ -43,13 +43,13 @@ object HausdorffToCompactPredicateSolver {
 }
 
 class HausdorffToCompactPredicateSolver[
-    H: Hausdorff,
-    C: Compact
+  H: Hausdorff,
+  C: Compact
 ](
-    predicate: (H => C) => Boolean
+  predicate: (H => C) => Boolean
 ) {
   @tailrec private final def tryMap(
-      map: Map[Key[H], C]
+    map: Map[Key[H], C]
   ): Option[Map[Key[H], C]] =
     (try {
       Left(
@@ -81,11 +81,11 @@ class HausdorffToCompactPredicateSolver[
     }
 
   private def tryMapNonTailRec(
-      map: Map[Key[H], C]
+    map: Map[Key[H], C]
   ): Option[Map[Key[H], C]] =
     tryMap(map)
 
   case class StumpedAtException(
-      h: H
+    h: H
   ) extends Exception
 }

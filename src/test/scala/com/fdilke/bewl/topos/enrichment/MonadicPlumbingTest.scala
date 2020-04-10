@@ -2,7 +2,7 @@ package com.fdilke.bewl.topos.enrichment
 
 import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.dot
-import org.scalatest.matchers.should.Matchers.{ a => _, _ }
+import org.scalatest.matchers.should.Matchers.{a => _, _}
 import org.scalatest.freespec.AnyFreeSpec
 import com.fdilke.bewl.helper.StandardSymbols.{a, b, iso, source, target}
 
@@ -30,7 +30,7 @@ class MonadicPlumbingTest extends AnyFreeSpec {
 
       twist(symbols, numbers) o
         twist(numbers, symbols) shouldBe
-          (numbers x symbols).identity
+        (numbers x symbols).identity
     }
   }
 

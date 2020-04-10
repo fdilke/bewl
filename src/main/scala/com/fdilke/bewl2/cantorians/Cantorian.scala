@@ -5,13 +5,13 @@ import java.util.function.Supplier
 import scala.language.postfixOps
 
 class GroundedCatcher[T, U](
-    val either: Either[U, T => GroundedCatcher[T, U]]
+  val either: Either[U, T => GroundedCatcher[T, U]]
 ) extends Catcher[GroundedCatcher[T, U], T, U]
 
 sealed trait GroundedTree[T] extends GroundedCatcher[Boolean, T] with Function[Cantorian, T]
 
 case class LeafNode[T](
-    leaf: T
+  leaf: T
 ) extends GroundedCatcher[Boolean, T](
       Left(leaf)
     )
@@ -21,8 +21,8 @@ case class LeafNode[T](
 }
 
 case class BranchNode[T](
-    left: GroundedTree[T],
-    right: GroundedTree[T]
+  left: GroundedTree[T],
+  right: GroundedTree[T]
 ) extends GroundedCatcher[Boolean, T](
       Right(boolean => if (boolean) left else right)
     )
@@ -36,8 +36,8 @@ object GroundedTree {
     LeafNode(leaf)
 
   def apply[T](
-      left: GroundedTree[T],
-      right: GroundedTree[T]
+    left: GroundedTree[T],
+    right: GroundedTree[T]
   ): GroundedTree[T] =
     BranchNode(left, right)
 }
@@ -58,8 +58,8 @@ trait Cantorian extends Pitcher[Cantorian, Boolean] { cantorian =>
 
 object Cantorian {
   def apply(
-      h: Boolean,
-      t: => Cantorian
+    h: Boolean,
+    t: => Cantorian
   ): Cantorian =
     new Cantorian {
       override val head: Boolean = h

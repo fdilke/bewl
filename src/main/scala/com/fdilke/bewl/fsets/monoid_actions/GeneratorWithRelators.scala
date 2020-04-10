@@ -23,15 +23,17 @@ object CullRelators {
         _.otherIndex == index
       }
 
-    val covered : Seq[Relator[M]] =
-      iRelators.filter {
-        r => r.selfScalar != r.otherScalar
-      }.map {
-        case Relator(m, _, n) =>
-          Set(m, n)
-      }.distinct.map {
-        _.toSeq
-      } map {
+    val covered: Seq[Relator[M]] =
+      iRelators
+        .filter { r => r.selfScalar != r.otherScalar }
+        .map {
+          case Relator(m, _, n) =>
+            Set(m, n)
+        }
+        .distinct
+        .map {
+          _.toSeq
+        } map {
         case Seq(m, n) =>
           Relator(m, index, n)
       }
@@ -39,4 +41,3 @@ object CullRelators {
     otherRelators ++ covered
   }
 }
-

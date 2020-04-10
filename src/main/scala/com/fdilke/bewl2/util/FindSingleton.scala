@@ -6,7 +6,7 @@ import scala.language.{implicitConversions, postfixOps}
 
 object FindSingleton {
   def apply[
-      SINGLETON: TypeTag
+    SINGLETON: TypeTag
   ]: SINGLETON = {
     val enumType: ru.Type = typeOf[SINGLETON]
     if (enumType.isInstanceOf[SingletonTypeApi]) {

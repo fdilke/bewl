@@ -8,12 +8,12 @@ trait ContinuationMonad {
 
   def continuationMonad[
     S <: ~
-  ] (
+  ](
     dot: DOT[S]
   ) =
-    new ContinuationMonad(dot) with
-      CachingStrongMonad[
-        ({type λ[X <: ~] = X → S → S}) # λ
+    new ContinuationMonad(dot)
+      with CachingStrongMonad[
+        ({ type λ[X <: ~] = X → S → S })#λ
       ]
 
   class ContinuationMonad[
@@ -21,13 +21,13 @@ trait ContinuationMonad {
   ](
     dot: DOT[S]
   ) extends StrongMonad[
-    ({type λ[X <: ~] = X → S → S}) # λ
-  ] {
+        ({ type λ[X <: ~] = X → S → S })#λ
+      ] {
     override def apply[X <: ~](
       dash: DOT[X]
     ) =
       new StrongMonad.At[
-        ({type λ[X <: ~] = X → S → S}) # λ,
+        ({ type λ[X <: ~] = X → S → S })#λ,
         X
       ] {
         private lazy val doubleExp: EXPONENTIAL[X → S, S] =
@@ -37,10 +37,9 @@ trait ContinuationMonad {
           doubleExp
 
         override lazy val eta =
-          doubleExp.transpose(dash) {
-            (x, f) =>
-              implicit val anonImplicit = dash > dot
-              f(x)
+          doubleExp.transpose(dash) { (x, f) =>
+            implicit val anonImplicit = dash > dot
+            f(x)
           }
 
         override lazy val mu = {
@@ -48,14 +47,11 @@ trait ContinuationMonad {
           implicit val dashDotDotDotDot = dashDotDot > dot > dot
           (dash > dot > dot).transpose(
             dashDotDotDotDot
-          ) {
-            (ffff, f) => ffff(
+          ) { (ffff, f) =>
+            ffff(
               (dash > dot > dot > dot).transpose(
                 dash > dot
-              ) {
-                (x, f) =>
-                  f(x)
-              }(
+              ) { (x, f) => f(x) }(
                 f
               )
             )
@@ -66,25 +62,24 @@ trait ContinuationMonad {
           Y <: ~
         ](
           daa: DOT[Y]
-        ) = (
-          (dash x daa) > dot > dot
+        ) =
+          (
+            (dash x daa) > dot > dot
           ).transpose {
-          dash x (daa > dot > dot)
-        } {
-          case (
-            x ⊕ yss,
-            xys
-          ) =>
-            implicit val dashDaa = dash x daa
-            implicit val anonImplicit = daa > dot > dot
-            yss(
-              (dot > daa(dashDaa) {
-                  y => x ⊕⊕ y
-              }) (
+            dash x (daa > dot > dot)
+          } {
+            case (
+                x ⊕ yss,
                 xys
+                ) =>
+              implicit val dashDaa = dash x daa
+              implicit val anonImplicit = daa > dot > dot
+              yss(
+                (dot > daa(dashDaa) { y => x ⊕⊕ y })(
+                  xys
+                )
               )
-            )
-        }
+          }
       }
 
     override def map[

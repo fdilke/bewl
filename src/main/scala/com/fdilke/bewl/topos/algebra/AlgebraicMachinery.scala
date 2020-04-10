@@ -17,12 +17,12 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   type RightScalarBinaryOp[X <: ~, S <: ~] = BiArrow[X, S, X]
 
   case class Law(
-    left: Term[Principal],
-    right: Term[Principal],
-    name: Option[String] = None
+      left: Term[Principal],
+      right: Term[Principal],
+      name: Option[String] = None
   ) {
     def isSatisfiedIn(
-      context: Algebra#EvaluationContext
+        context: Algebra#EvaluationContext
     ) =
       context.evaluate(left) ==
         context.evaluate(right)
@@ -32,9 +32,9 @@ trait AlgebraicMachinery { topos: BaseTopos =>
         name.getOrElse("Unnamed") + " law failed"
       )
 
-    val freeVariables = 
+    val freeVariables =
       (left.freeVariables ++
-       right.freeVariables) distinct
+        right.freeVariables) distinct
 
     def named(name: String) =
       Law(left, right, Some(name))
@@ -42,7 +42,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   object NamedLaws {
     implicit class NamedLaw(
-      name: String
+        name: String
     ) {
       def law(unnamedLaw: Law) =
         unnamedLaw.named(name)
@@ -50,12 +50,12 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   }
 
   sealed trait Term[
-    X <: AlgebraicSort
+      X <: AlgebraicSort
   ] extends Dynamic {
     def applyDynamic(
-      name: String
+        name: String
     )(
-      other: Term[X]
+        other: Term[X]
     ) =
       BinaryOpTerm(
         this,
@@ -73,9 +73,9 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       applyDynamic("→")(other)
 
     def **(
-      other: Term[Scalar]
+        other: Term[Scalar]
     )(
-      implicit eq: =:=[X, Principal]
+        implicit eq: =:=[X, Principal]
     ) =
       BinaryRightScalarOpTerm(
         this.asInstanceOf[Term[Principal]], // cast justified by =:=
@@ -84,9 +84,9 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       )
 
     def ***(
-      other: Term[Scalar]
+        other: Term[Scalar]
     )(
-      implicit eq: =:=[X, Scalar]
+        implicit eq: =:=[X, Scalar]
     ) =
       BinaryScalarOpTerm(
         this.asInstanceOf[Term[Scalar]], // cast justified by =:=
@@ -97,12 +97,12 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     def unary_~ : Term[X] =
       UnaryOpTerm(StandardTermsAndOperators.~, this)
 
-    val freeVariables : Seq[VariableTerm[_ <: AlgebraicSort]]
+    val freeVariables: Seq[VariableTerm[_ <: AlgebraicSort]]
 
     def :=(
-      that: Term[Principal]
+        that: Term[Principal]
     )(
-      implicit eq: =:=[X, Principal]
+        implicit eq: =:=[X, Principal]
     ) =
       Law(
         this.asInstanceOf[Term[Principal]], // cast justified by =:=
@@ -111,22 +111,22 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   }
 
   case class Operator(
-    name: String,
-    arity: Int
+      name: String,
+      arity: Int
   )
 
   case class VariableTerm[
-    S <: AlgebraicSort
+      S <: AlgebraicSort
   ](
-    symbol: String,
-    isScalar : Boolean
+      symbol: String,
+      isScalar: Boolean
   ) extends Term[S] { term =>
     override val freeVariables = Seq(term)
   }
 
   object PrincipalTerm {
     def apply(
-      symbol: String
+        symbol: String
     ) =
       VariableTerm[Principal](
         symbol,
@@ -136,7 +136,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   object ScalarTerm {
     def apply(
-      symbol: String
+        symbol: String
     ) =
       VariableTerm[Scalar](
         symbol,
@@ -145,59 +145,60 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   }
 
   case class BinaryOpTerm[S <: AlgebraicSort](
-    left: Term[S],
-    op: AbstractBinaryOp,
-    right: Term[S]
+      left: Term[S],
+      op: AbstractBinaryOp,
+      right: Term[S]
   ) extends Term[S] {
     override val freeVariables =
       (left.freeVariables ++ right.freeVariables).distinct
   }
 
   case class BinaryRightScalarOpTerm(
-    left: Term[Principal],
-    op: AbstractRightScalarBinaryOp,
-    right: Term[Scalar]
+      left: Term[Principal],
+      op: AbstractRightScalarBinaryOp,
+      right: Term[Scalar]
   ) extends Term[Principal] {
     override val freeVariables =
       (left.freeVariables ++ right.freeVariables).distinct
   }
 
   case class BinaryScalarOpTerm(
-    left: Term[Scalar],
-    op: AbstractScalarBinaryOp,
-    right: Term[Scalar]
+      left: Term[Scalar],
+      op: AbstractScalarBinaryOp,
+      right: Term[Scalar]
   ) extends Term[Scalar] {
     override val freeVariables =
       (left.freeVariables ++ right.freeVariables).distinct
   }
 
   case class UnaryOpTerm[S <: AlgebraicSort](
-    op: AbstractUnaryOp,
-    innerTerm: Term[S]
+      op: AbstractUnaryOp,
+      innerTerm: Term[S]
   ) extends Term[S] {
     override val freeVariables =
       innerTerm.freeVariables
   }
 
   class ConstantOperator[
-    X <: AlgebraicSort
+      X <: AlgebraicSort
   ](
-    name: String
-  ) extends Operator(name, 0) with Term[X] {
+      name: String
+  ) extends Operator(name, 0)
+      with Term[X] {
     override val freeVariables =
       Nil
   }
 
   class PrincipalConstant(
-    name: String
+      name: String
   ) extends ConstantOperator[Principal](
-    name
-  ) {
+        name
+      ) {
     def :=[
-      S <: ~,
-      T <: ~
+        S <: ~,
+        T <: ~
     ](
-      nullaryOp: NullaryOp[T]
+        nullaryOp: NullaryOp[T]
     ) =
       new OperatorAssignment[T, S](this) {
         override def lookupPrincipalConstant =
@@ -206,15 +207,15 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   }
 
   class ScalarConstant(
-    name: String
+      name: String
   ) extends ConstantOperator[Scalar](
-    name
-  ) {
+        name
+      ) {
     def :=[
-      S <: ~,
-      T <: ~
+        S <: ~,
+        T <: ~
     ](
-      nullaryOp: NullaryOp[T]
+        nullaryOp: NullaryOp[T]
     ) =
       new OperatorAssignment[S, T](this) {
         override def lookupScalarConstant =
@@ -223,10 +224,10 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   }
 
   abstract case class OperatorAssignment[
-    T <: ~,
-    S <: ~
+      T <: ~,
+      S <: ~
   ](
-    operator: Operator
+      operator: Operator
   ) {
     // TODO: refactor this to be table-driven
     def lookupPrincipalConstant: Option[NullaryOp[T]] = None
@@ -236,158 +237,150 @@ trait AlgebraicMachinery { topos: BaseTopos =>
     def lookupRightScalarBinaryOp: Option[RightScalarBinaryOp[T, S]] = None
     def lookupScalarBinaryOp: Option[BinaryOp[S]] = None
 
-    final def sanityTest : Unit = {
-      lookupPrincipalConstant foreach{ _.sanityTest }
-      lookupUnaryOp foreach{ _.sanityTest }
-      lookupBinaryOp foreach{ _.sanityTest }
-      lookupScalarConstant foreach{ _.sanityTest }
-      lookupRightScalarBinaryOp foreach{ _.sanityTest }
-      lookupScalarBinaryOp foreach{ _.sanityTest }
+    final def sanityTest: Unit = {
+      lookupPrincipalConstant foreach { _.sanityTest }
+      lookupUnaryOp foreach { _.sanityTest }
+      lookupBinaryOp foreach { _.sanityTest }
+      lookupScalarConstant foreach { _.sanityTest }
+      lookupRightScalarBinaryOp foreach { _.sanityTest }
+      lookupScalarBinaryOp foreach { _.sanityTest }
     }
   }
 
   case class OperatorAssignments[
-    T <: ~,
-    S <: ~
+      T <: ~,
+      S <: ~
   ](
-    assignments: Seq[OperatorAssignment[T, S]]
+      assignments: Seq[OperatorAssignment[T, S]]
   ) {
     private def doLookup[OP](
-      op: Operator
+        op: Operator
     )(
-      handleAssignment: OperatorAssignment[T, S] => Option[OP]
+        handleAssignment: OperatorAssignment[T, S] => Option[OP]
     ): Option[OP] =
       assignments find {
         _.operator == op
-      } flatMap 
+      } flatMap
         handleAssignment
 
     def lookup(
-      principalConstant: PrincipalConstant
+        principalConstant: PrincipalConstant
     ): Option[NullaryOp[T]] =
       doLookup(principalConstant) {
         _.lookupPrincipalConstant
       }
 
     def lookup(
-      scalarConstant: ScalarConstant
+        scalarConstant: ScalarConstant
     ): Option[NullaryOp[S]] =
       doLookup(scalarConstant) {
         _.lookupScalarConstant
       }
 
     def lookup(
-      unaryOp: AbstractUnaryOp
+        unaryOp: AbstractUnaryOp
     ): Option[UnaryOp[T]] =
       doLookup(unaryOp) {
         _.lookupUnaryOp
       }
 
     def lookup(
-      binaryOp: AbstractBinaryOp
+        binaryOp: AbstractBinaryOp
     ): Option[BinaryOp[T]] =
       doLookup(binaryOp) {
         _.lookupBinaryOp
       }
 
     def lookup(
-      op: AbstractRightScalarBinaryOp
+        op: AbstractRightScalarBinaryOp
     ): Option[RightScalarBinaryOp[T, S]] =
       doLookup(op) {
         _.lookupRightScalarBinaryOp
       }
 
     def lookup(
-      op: AbstractScalarBinaryOp
+        op: AbstractScalarBinaryOp
     ): Option[BinaryOp[S]] =
       doLookup(op) {
         _.lookupScalarBinaryOp
       }
 
     def hasPrecisely(
-      operators: Seq[Operator]
+        operators: Seq[Operator]
     ): Boolean =
-        assignments.map {
-          _.operator
-        }.toSet ==
-          operators.toSet
+      assignments.map {
+        _.operator
+      }.toSet ==
+        operators.toSet
 
     def crossedWith[U <: ~](
-      that: OperatorAssignments[U, S],
-      productCarrier: BIPRODUCT[T, U],
-      scalars: DOT[S]
+        that: OperatorAssignments[U, S],
+        productCarrier: BIPRODUCT[T, U],
+        scalars: DOT[S]
     ): Seq[OperatorAssignment[T x U, S]] =
       assignments map { assignment =>
         import assignment.operator
-        that.doLookup(operator) {
-          thatAssignment => Some(
+        that.doLookup(operator) { thatAssignment =>
+          Some(
             new OperatorAssignment[T x U, S](operator) {
-              override def lookupUnaryOp: Option[UnaryOp[T x U]] = 
+              override def lookupUnaryOp: Option[UnaryOp[T x U]] =
                 for {
                   op <- assignment.lookupUnaryOp
                   thatOp <- thatAssignment.lookupUnaryOp
-                } yield
-                  productCarrier(productCarrier){ 
-                    tu =>
-                      val t = productCarrier.π0(tu)
-                      val u = productCarrier.π1(tu)
-                      productCarrier.pair(
-                          op(t),
-                          thatOp(u)
-                      )
-                  }
+                } yield productCarrier(productCarrier) { tu =>
+                  val t = productCarrier.π0(tu)
+                  val u = productCarrier.π1(tu)
+                  productCarrier.pair(
+                    op(t),
+                    thatOp(u)
+                  )
+                }
 
-              override def lookupPrincipalConstant: Option[NullaryOp[T x U]] = 
+              override def lookupPrincipalConstant: Option[NullaryOp[T x U]] =
                 for {
                   op <- assignment.lookupPrincipalConstant
                   thatOp <- thatAssignment.lookupPrincipalConstant
-                } yield
-                  I(productCarrier){ 
-                    __ =>
-                      productCarrier.pair(
-                          op(__),
-                          thatOp(__)
-                      )
-                  }
-              
-              override def lookupBinaryOp: Option[BinaryOp[T x U]] = 
+                } yield I(productCarrier) { __ =>
+                  productCarrier.pair(
+                    op(__),
+                    thatOp(__)
+                  )
+                }
+
+              override def lookupBinaryOp: Option[BinaryOp[T x U]] =
                 for {
                   op <- assignment.lookupBinaryOp
                   thatOp <- thatAssignment.lookupBinaryOp
-                } yield
-                  productCarrier.squared.biArrow(productCarrier){ 
-                    (tu, vw) =>
-                      val t = productCarrier.π0(tu)
-                      val u = productCarrier.π1(tu)
-                      val v = productCarrier.π0(vw)
-                      val w = productCarrier.π1(vw)
-                      productCarrier.pair(
-                          op(t, v),
-                          thatOp(u, w)
-                      )
-                  }
+                } yield productCarrier.squared.biArrow(productCarrier) { (tu, vw) =>
+                  val t = productCarrier.π0(tu)
+                  val u = productCarrier.π1(tu)
+                  val v = productCarrier.π0(vw)
+                  val w = productCarrier.π1(vw)
+                  productCarrier.pair(
+                    op(t, v),
+                    thatOp(u, w)
+                  )
+                }
 
-              override def lookupRightScalarBinaryOp: Option[RightScalarBinaryOp[T x U, S]] = 
+              override def lookupRightScalarBinaryOp: Option[RightScalarBinaryOp[T x U, S]] =
                 for {
                   op <- assignment.lookupRightScalarBinaryOp
                   thatOp <- thatAssignment.lookupRightScalarBinaryOp
-                } yield
-                  (productCarrier x scalars).biArrow(productCarrier){ 
-                    (tu, s) =>
-                      val t = productCarrier.π0(tu)
-                      val u = productCarrier.π1(tu)
-                      productCarrier.pair(
-                          op(t, s),
-                          thatOp(u, s)
-                      )
-                  }
-                
-              override def lookupScalarConstant: Option[NullaryOp[S]] = 
-                  throw new IllegalArgumentException(
-                    "algebra multiplication should not override scalar constant operator " + operator
+                } yield (productCarrier x scalars).biArrow(productCarrier) { (tu, s) =>
+                  val t = productCarrier.π0(tu)
+                  val u = productCarrier.π1(tu)
+                  productCarrier.pair(
+                    op(t, s),
+                    thatOp(u, s)
                   )
-                
-              override def lookupScalarBinaryOp: Option[BinaryOp[S]] = 
+                }
+
+              override def lookupScalarConstant: Option[NullaryOp[S]] =
+                throw new IllegalArgumentException(
+                  "algebra multiplication should not override scalar constant operator " + operator
+                )
+
+              override def lookupScalarBinaryOp: Option[BinaryOp[S]] =
                 for {
                   op <- assignment.lookupScalarBinaryOp
                   thatOp <- thatAssignment.lookupScalarBinaryOp
@@ -409,44 +402,44 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   }
 
   class AbstractBinaryOp(
-    name: String
+      name: String
   ) extends Operator(name, 2) {
     def :=[S <: ~, T <: ~](
-      binaryOp: BinaryOp[T]
+        binaryOp: BinaryOp[T]
     ) =
-      new OperatorAssignment[T, S](this){
+      new OperatorAssignment[T, S](this) {
         override def lookupBinaryOp =
           Some(binaryOp)
       }
   }
 
   class AbstractRightScalarBinaryOp(
-    name: String
+      name: String
   ) extends Operator(name, 2) {
     def :=[T <: ~, S <: ~](
-      binaryOp: RightScalarBinaryOp[T, S]
+        binaryOp: RightScalarBinaryOp[T, S]
     ) =
-      new OperatorAssignment[T, S](this){
+      new OperatorAssignment[T, S](this) {
         override def lookupRightScalarBinaryOp =
           Some(binaryOp)
       }
   }
 
   class AbstractScalarBinaryOp(
-    name: String
+      name: String
   ) extends Operator(name, 2) {
     def :=[S <: ~, T <: ~](binaryOp: BinaryOp[S]) =
-      new OperatorAssignment[T, S](this){
+      new OperatorAssignment[T, S](this) {
         override def lookupScalarBinaryOp =
           Some(binaryOp)
       }
   }
 
   class AbstractUnaryOp(
-    name: String
+      name: String
   ) extends Operator(name, 1) {
     def :=[S <: ~, T <: ~](unaryOp: UnaryOp[T]) =
-      new OperatorAssignment[T, S](this){
+      new OperatorAssignment[T, S](this) {
         override def lookupUnaryOp =
           Some(unaryOp)
       }
@@ -495,34 +488,34 @@ trait AlgebraicMachinery { topos: BaseTopos =>
   }
 
   class AlgebraicTheory[
-    S <: ~
+      S <: ~
   ](
       scalars: DOT[S]
-   )(
+  )(
       preassignments: OperatorAssignment[_ <: ~, S]*
-   )(
+  )(
       operators: Operator*
-   )(
+  )(
       laws: Law*
-   ){
+  ) {
     def extend(moreOperators: Operator*)(moreLaws: Law*) =
       new AlgebraicTheory[S](
         scalars
       )(
-        preassignments :_*
+        preassignments: _*
       )(
-        operators ++ moreOperators :_*
+        operators ++ moreOperators: _*
       )(
-        laws ++ moreLaws :_*
+        laws ++ moreLaws: _*
       )
 
     def isMorphism[A <: ~, B <: ~](
-      sourceAlgebra: Algebra[A],
-      targetAlgebra: Algebra[B],
-      arrow: A > B
+        sourceAlgebra: Algebra[A],
+        targetAlgebra: Algebra[B],
+        arrow: A > B
     ): Boolean =
       if (sourceAlgebra.carrier != arrow.source ||
-          targetAlgebra.carrier != arrow.target)
+        targetAlgebra.carrier != arrow.target)
         bail("Source/target of arrow do not match algebra carriers")
       else
         operators forall {
@@ -532,12 +525,9 @@ trait AlgebraicMachinery { topos: BaseTopos =>
           case op: PrincipalConstant =>
             (
               for {
-                srcConstant <-
-                  sourceAlgebra.operatorAssignments.lookup(op)
-                tgtConstant <-
-                  targetAlgebra.operatorAssignments.lookup(op)
-              } yield
-                (arrow o srcConstant) == tgtConstant
+                srcConstant <- sourceAlgebra.operatorAssignments.lookup(op)
+                tgtConstant <- targetAlgebra.operatorAssignments.lookup(op)
+              } yield (arrow o srcConstant) == tgtConstant
             ) getOrElse bail(
               "Not found in source algebra: " + op.name
             )
@@ -545,12 +535,9 @@ trait AlgebraicMachinery { topos: BaseTopos =>
           case op: AbstractUnaryOp =>
             (
               for {
-                srcOp <-
-                  sourceAlgebra.operatorAssignments.lookup(op)
-                tgtOp <-
-                  targetAlgebra.operatorAssignments.lookup(op)
-              } yield
-                (arrow o srcOp) == (tgtOp o arrow)
+                srcOp <- sourceAlgebra.operatorAssignments.lookup(op)
+                tgtOp <- targetAlgebra.operatorAssignments.lookup(op)
+              } yield (arrow o srcOp) == (tgtOp o arrow)
             ) getOrElse bail(
               "Not found in source algebra: " + op.name
             )
@@ -559,36 +546,29 @@ trait AlgebraicMachinery { topos: BaseTopos =>
             val square = sourceAlgebra.carrier.squared
             (
               for {
-                srcOp <-
-                  sourceAlgebra.operatorAssignments.lookup(op)
-                tgtOp <-
-                  targetAlgebra.operatorAssignments.lookup(op)
-              } yield
-                (arrow o srcOp.arrow) ==
-                  tgtOp(
-                    arrow o square.π0,
-                    arrow o square.π1
-                  )
+                srcOp <- sourceAlgebra.operatorAssignments.lookup(op)
+                tgtOp <- targetAlgebra.operatorAssignments.lookup(op)
+              } yield (arrow o srcOp.arrow) ==
+                tgtOp(
+                  arrow o square.π0,
+                  arrow o square.π1
+                )
             ) getOrElse bail(
-                "Not found in source algebra: " + op.name
-              )
+              "Not found in source algebra: " + op.name
+            )
 
           case op: AbstractRightScalarBinaryOp =>
             val carrierScalars = sourceAlgebra.carrier x scalars
             (for {
-              srcOp <-
-                sourceAlgebra.operatorAssignments.lookup(op)
-              tgtOp <-
-                targetAlgebra.operatorAssignments.lookup(op)
-            } yield
-              (arrow o srcOp.arrow) ==
-                tgtOp(
-                  arrow o carrierScalars.π0,
-                  carrierScalars.π1
-                )
-            ) getOrElse bail(
-                "Not found in source algebra: " + op.name
-              )
+              srcOp <- sourceAlgebra.operatorAssignments.lookup(op)
+              tgtOp <- targetAlgebra.operatorAssignments.lookup(op)
+            } yield (arrow o srcOp.arrow) ==
+              tgtOp(
+                arrow o carrierScalars.π0,
+                carrierScalars.π1
+              )) getOrElse bail(
+              "Not found in source algebra: " + op.name
+            )
 
           case op: AbstractScalarBinaryOp =>
             true // free pass, no need to verify these on carrier
@@ -600,9 +580,9 @@ trait AlgebraicMachinery { topos: BaseTopos =>
         }
 
     class Algebra[T <: ~](
-      val carrier: DOT[T]
+        val carrier: DOT[T]
     )(
-      private val assignments: OperatorAssignment[T, S]*
+        private val assignments: OperatorAssignment[T, S]*
     ) { algebra =>
       val operatorAssignments =
         OperatorAssignments(
@@ -612,7 +592,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
         )
 
       def x[U <: ~](
-        that: Algebra[U]
+          that: Algebra[U]
       ): Algebra[T x U] = {
         val productCarrier = carrier x that.carrier
         new Algebra(
@@ -624,23 +604,23 @@ trait AlgebraicMachinery { topos: BaseTopos =>
             OperatorAssignments(that.assignments),
             productCarrier,
             scalars
-          ) :_*
-        ) 
+          ): _*
+        )
       }
-        
+
       object EvaluationContext {
         def apply[T <: ~](
-          variables: Seq[VariableTerm[_ <: AlgebraicSort]]
+            variables: Seq[VariableTerm[_ <: AlgebraicSort]]
         ) =
           variables.foldRight(
-            new SimpleEvaluationContext : EvaluationContext
+            new SimpleEvaluationContext: EvaluationContext
           )(
             addVariableToContext
           )
 
         private def addVariableToContext(
-          variable: VariableTerm[_ <: AlgebraicSort],
-          context: EvaluationContext
+            variable: VariableTerm[_ <: AlgebraicSort],
+            context: EvaluationContext
         ) =
           new CompoundEvaluationContext(
             variable.symbol,
@@ -649,7 +629,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
           )
 
         private def carrierFor(
-          variable: VariableTerm[_ <: AlgebraicSort]
+            variable: VariableTerm[_ <: AlgebraicSort]
         ) =
           if (variable.isScalar)
             scalars
@@ -661,14 +641,14 @@ trait AlgebraicMachinery { topos: BaseTopos =>
         type ROOT <: ~
         def root: DOT[ROOT]
         def evaluate(
-          term: Term[Principal]
+            term: Term[Principal]
         ): ROOT > T
         def evaluateScalar(
-          term: Term[Scalar]
+            term: Term[Scalar]
         ): ROOT > S
 
         protected def evaluateScalarConstant(
-          term: ScalarConstant
+            term: ScalarConstant
         ): ROOT > S =
           operatorAssignments.lookup(term) map { constant =>
             constant o root.toI
@@ -677,7 +657,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
           )
 
         protected def evaluatePrincipalConstant(
-          term: PrincipalConstant
+            term: PrincipalConstant
         ): ROOT > T =
           operatorAssignments.lookup(term) map { constant =>
             constant o root.toI
@@ -686,7 +666,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
           )
 
         protected def evaluateBinaryScalarOpTerm(
-          term: BinaryScalarOpTerm
+            term: BinaryScalarOpTerm
         ): ROOT > S =
           operatorAssignments.lookup(term.op) map { op =>
             root(scalars) { r =>
@@ -700,7 +680,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
           )
 
         protected def evaluateBinaryOpTerm(
-          term: BinaryOpTerm[Principal]
+            term: BinaryOpTerm[Principal]
         ): ROOT > T =
           operatorAssignments.lookup(term.op) map { op =>
             root(carrier) { r =>
@@ -714,7 +694,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
           )
 
         protected def evaluateBinaryRightScalarOpTerm(
-          term: BinaryRightScalarOpTerm
+            term: BinaryRightScalarOpTerm
         ): ROOT > T =
           operatorAssignments.lookup(term.op) map { op =>
             root(carrier) { r =>
@@ -728,12 +708,10 @@ trait AlgebraicMachinery { topos: BaseTopos =>
           )
 
         protected def evaluateUnaryOpTerm(
-          term: UnaryOpTerm[Principal]
+            term: UnaryOpTerm[Principal]
         ): ROOT > T =
           operatorAssignments.lookup(term.op) map { op =>
-            root(carrier) { r =>
-              op(evaluate(term.innerTerm)(r))
-            }
+            root(carrier) { r => op(evaluate(term.innerTerm)(r)) }
           } getOrElse bail(
             "Unknown operator in expression: " + term.op
           )
@@ -744,7 +722,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
         override def root = I
 
         override def evaluate(
-          term: Term[Principal]
+            term: Term[Principal]
         ): UNIT > T =
           term match {
             case term: PrincipalConstant =>
@@ -757,13 +735,13 @@ trait AlgebraicMachinery { topos: BaseTopos =>
           }
 
         override def evaluateScalar(
-          term: Term[Scalar]
+            term: Term[Scalar]
         ): UNIT > S =
           term match {
             case term: ScalarConstant =>
               evaluateScalarConstant(term)
 
-            case term : BinaryScalarOpTerm =>
+            case term: BinaryScalarOpTerm =>
               evaluateBinaryScalarOpTerm(term)
 
             case _ =>
@@ -774,17 +752,17 @@ trait AlgebraicMachinery { topos: BaseTopos =>
       }
 
       class CompoundEvaluationContext[HEAD <: ~](
-        name: String,
-        head: DOT[HEAD],
-        val tail: EvaluationContext
+          name: String,
+          head: DOT[HEAD],
+          val tail: EvaluationContext
       ) extends EvaluationContext {
         private type TAIL = tail.ROOT
         override type ROOT = HEAD x TAIL
-        override def root : BIPRODUCT[HEAD, TAIL] =
+        override def root: BIPRODUCT[HEAD, TAIL] =
           head x tail.root
 
         override def evaluate(
-          term: Term[Principal]
+            term: Term[Principal]
         ): HEAD x TAIL > T =
           term match {
             case VariableTerm(symbol, _) if symbol == name =>
@@ -796,7 +774,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
             case term: BinaryRightScalarOpTerm =>
               evaluateBinaryRightScalarOpTerm(term)
 
-            case term : UnaryOpTerm[Principal] =>
+            case term: UnaryOpTerm[Principal] =>
               evaluateUnaryOpTerm(term)
 
             case _ =>
@@ -804,13 +782,13 @@ trait AlgebraicMachinery { topos: BaseTopos =>
           }
 
         override def evaluateScalar(
-          term: Term[Scalar]
+            term: Term[Scalar]
         ): HEAD x TAIL > S =
           term match {
             case VariableTerm(symbol, _) if symbol == name =>
               root.π0.asInstanceOf[HEAD x TAIL > S]
 
-            case term : BinaryScalarOpTerm =>
+            case term: BinaryScalarOpTerm =>
               evaluateBinaryScalarOpTerm(term)
 
             case _ =>
@@ -824,7 +802,7 @@ trait AlgebraicMachinery { topos: BaseTopos =>
             law.freeVariables
           )
 
-      def sanityTest : Unit = {
+      def sanityTest: Unit = {
         if (!operatorAssignments.hasPrecisely(operators))
           bail("Assignments do not match signature of theory")
 
@@ -842,22 +820,22 @@ trait AlgebraicMachinery { topos: BaseTopos =>
 
   object AlgebraicTheory {
     def apply(operators: Operator*)(laws: Law*) =
-      new AlgebraicTheory[UNIT](I)()(operators:_*)(laws:_*)
+      new AlgebraicTheory[UNIT](I)()(operators: _*)(laws: _*)
   }
 
   object AlgebraicTheoryWithScalars {
     def apply[
-      S <: ~
+        S <: ~
     ](
-      scalars: DOT[S]
+        scalars: DOT[S]
     )(
-      preassignments: OperatorAssignment[_ <: ~, S]*
+        preassignments: OperatorAssignment[_ <: ~, S]*
     )(
-      operators: Operator*
+        operators: Operator*
     )(
-      laws: Law*
+        laws: Law*
     ) =
-      new AlgebraicTheory[S](scalars)(preassignments :_*)(operators :_*)(laws:_*)
+      new AlgebraicTheory[S](scalars)(preassignments: _*)(operators: _*)(laws: _*)
   }
 
   type Algebra = AlgebraicTheory[_ <: ~]#Algebra[_ <: ~]

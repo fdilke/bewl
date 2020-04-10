@@ -6,9 +6,7 @@ import com.fdilke.bewl.topos.algebra.{AlgebraicMachinery, AlgebraicStructures}
 
 import scala.language.{postfixOps, reflectiveCalls}
 
-trait ConstructToposOfAutomorphisms extends
-  BaseTopos with
-  ToposEnrichments {
+trait ConstructToposOfAutomorphisms extends BaseTopos with ToposEnrichments {
 
   Ɛ: ToposPrerequisites =>
 
@@ -17,26 +15,28 @@ trait ConstructToposOfAutomorphisms extends
     case class AutomorphismPreArrow[
       S <: ~,
       T <: ~
-    ] (
+    ](
       source: S > S,
       target: T > T,
-      arrow:  S > T
+      arrow: S > T
     )
 
-    lazy val build: Topos[~] with Wrappings[
-      ~,
-      ~,
-      ({type λ[X <: ~] = X > X}) # λ,
-      ({type λ[X <: ~, Y <: ~] = AutomorphismPreArrow[X, Y]}) # λ,
-      ({type λ[T <: ~] = T}) # λ
-    ] =
-      new Topos[~] with Wrappings[
+    lazy val build: Topos[~]
+      with Wrappings[
         ~,
         ~,
-        ({type λ[X <: ~] = X > X}) # λ,
-        ({type λ[X <: ~, Y <: ~] = AutomorphismPreArrow[X, Y]}) # λ,
-        ({type λ[T <: ~] = T}) # λ
-      ] {
+        ({ type λ[X <: ~] = X > X })#λ,
+        ({ type λ[X <: ~, Y <: ~] = AutomorphismPreArrow[X, Y] })#λ,
+        ({ type λ[T <: ~] = T })#λ
+      ] =
+      new Topos[~]
+        with Wrappings[
+          ~,
+          ~,
+          ({ type λ[X <: ~] = X > X })#λ,
+          ({ type λ[X <: ~, Y <: ~] = AutomorphismPreArrow[X, Y] })#λ,
+          ({ type λ[T <: ~] = T })#λ
+        ] {
         override val name = "Aut_" + Ɛ.name
 
         override type UNIT = Ɛ.UNIT
@@ -44,7 +44,7 @@ trait ConstructToposOfAutomorphisms extends
         override type >[S <: ~, T <: ~] = AutomorphismArrow[S, T]
         override type TRUTH = Ɛ.TRUTH
         override type →[T <: ~, U <: ~] = Ɛ.→[T, U]
-        
+
         override val I = trivialAutomorphism(Ɛ.I)
         override val omega = trivialAutomorphism(Ɛ.omega)
         override val truth = AutomorphismArrow(I, omega, Ɛ.truth)
@@ -64,7 +64,7 @@ trait ConstructToposOfAutomorphisms extends
           override def size(): Int =
             carrier.size
 
-          override def sanityTest : Unit = {
+          override def sanityTest: Unit = {
             arrow.sanityTest
             inverse.sanityTest
             if (carrier != arrow.target)
@@ -87,36 +87,36 @@ trait ConstructToposOfAutomorphisms extends
             ) with BiproductDot[X, Y] {
               override val left: DOT[X] = automorphism
               override val right: DOT[Y] = that
-              override def pair(l: X, r: Y): x[X, Y] = 
+              override def pair(l: X, r: Y): x[X, Y] =
                 productCarrier.pair(l, r)
             }
           }
           override def `>Uncached`[Y <: ~](that: DOT[Y]) = {
             val exponentialCarrier = carrier > that.carrier
             new Automorphism[X → Y](
-              exponentialCarrier.transpose(exponentialCarrier) {
-                (e, x) => that.arrow(
+              exponentialCarrier.transpose(exponentialCarrier) { (e, x) =>
+                that.arrow(
                   exponentialCarrier.evaluate(e, inverse(x))
                 )
               },
-              exponentialCarrier.transpose(exponentialCarrier) {
-                (e, x) => that.inverse(
-                   exponentialCarrier.evaluate(e, arrow(x))
+              exponentialCarrier.transpose(exponentialCarrier) { (e, x) =>
+                that.inverse(
+                  exponentialCarrier.evaluate(e, arrow(x))
                 )
               }
             ) with ExponentialDot[X, Y] { exponentialAutomorphism =>
               override val source = automorphism
               override val target = that
-              
+
               override def evaluate(
-                function: X → Y, 
+                function: X → Y,
                 arg: X
-              ): Y = 
+              ): Y =
                 exponentialCarrier.evaluate(
-                  function, 
+                  function,
                   arg
                 )
-              
+
               override def transpose[R <: ~](biArrow: BiArrow[R, X, Y]): R > (X → Y) =
                 AutomorphismArrow(
                   biArrow.product.left,
@@ -124,7 +124,7 @@ trait ConstructToposOfAutomorphisms extends
                   exponentialCarrier.transpose(
                     (biArrow.product.left.carrier x biArrow.product.right.carrier).biArrow(
                       biArrow.arrow.arrow.target
-                    ){
+                    ) {
                       biArrow(_, _)
                     }
                   )
@@ -134,9 +134,7 @@ trait ConstructToposOfAutomorphisms extends
           override lazy val globals =
             carrier.globals.filter { global =>
               (arrow o global) == global
-            } map { global =>
-              AutomorphismArrow(I, automorphism, global)
-            }
+            } map { global => AutomorphismArrow(I, automorphism, global) }
         }
 
         case class AutomorphismArrow[S <: ~, T <: ~](
@@ -147,7 +145,7 @@ trait ConstructToposOfAutomorphisms extends
           override def \[U <: ~](monic: U > T): S > U =
             AutomorphismArrow(source, monic.source, arrow \ monic.arrow)
 
-          override def sanityTest : Unit = {
+          override def sanityTest: Unit = {
             source.sanityTest
             target.sanityTest
             arrow.sanityTest
@@ -163,7 +161,11 @@ trait ConstructToposOfAutomorphisms extends
             ) with EqualizingDot[S] { equalizer =>
               override val equalizerTarget = source
               override def restrict[R <: ~](anArrow: R > S) =
-                AutomorphismArrow(anArrow.source, equalizer, equalizerCarrier.restrict(anArrow.arrow))
+                AutomorphismArrow(
+                  anArrow.source,
+                  equalizer,
+                  equalizerCarrier.restrict(anArrow.arrow)
+                )
             }
           }
           override def apply(s: S) = arrow(s)
@@ -233,30 +235,28 @@ trait ConstructToposOfAutomorphisms extends
         override def functionAsArrow[ // TODO: looks redundant, take out of API?
           S <: ~,
           T <: ~
-        ] (
-            source: Automorphism[S],
-            target: Automorphism[T],
-            f: S => T
-            ): AutomorphismArrow[S, T] =
+        ](
+          source: Automorphism[S],
+          target: Automorphism[T],
+          f: S => T
+        ): AutomorphismArrow[S, T] =
           ???
 
         override def makeArrow[
           S <: ~,
           T <: ~
-        ] (
-            prearrow: AutomorphismPreArrow[S, T]
-            ) = ???
+        ](
+          prearrow: AutomorphismPreArrow[S, T]
+        ) = ???
 
         private val memoizedDotWrapper =
-          Memoize.generic withLowerBound[
-            ({
-              type λ[T <: ~] = Ɛ.>[T, T]
-            })#λ,
-            ({
-              type λ[T <: ~] = Automorphism[T]
-            })#λ,
-            ~
-          ] { predot =>
+          Memoize.generic withLowerBound [({
+            type λ[T <: ~] = Ɛ.>[T, T]
+          })#λ,
+          ({
+            type λ[T <: ~] = Automorphism[T]
+          })#λ,
+          ~] { predot =>
             if (predot.isIso)
               Automorphism(predot, predot.inverse)
             else
@@ -265,14 +265,14 @@ trait ConstructToposOfAutomorphisms extends
 
         override def makeDot[
           T <: ~
-        ] (
+        ](
           predot: Ɛ.>[T, T]
         ) =
           memoizedDotWrapper(predot)
 
         override def unwrap[
           T <: ~
-        ] (
+        ](
           auto: Automorphism[T]
         ): Ɛ.>[T, T] =
           auto.arrow
@@ -281,7 +281,7 @@ trait ConstructToposOfAutomorphisms extends
           L <: ~,
           R <: ~,
           T <: ~
-        ] (
+        ](
           left: Automorphism[L],
           right: Automorphism[R],
           target: Automorphism[T]

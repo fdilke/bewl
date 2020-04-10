@@ -26,10 +26,10 @@ class FindGeneratorsTest extends AnyFreeSpec {
     )
 
   private val actionTopos =
-    ToposOfMonoidActions of(
+    ToposOfMonoidActions of (
       monoidOf3,
       FiniteSets.DefaultMonoidAssistant
-    )
+  )
 
   "The generator finder" - {
     "can build up a set of maximal cyclic subalgebras for a monoid action" - {
@@ -86,9 +86,11 @@ class FindGeneratorsTest extends AnyFreeSpec {
       "as expected for a non-cyclic action" in {
         val regularSquared =
           actionTopos.unwrap(
-            actionTopos.makeDot(
-              regularAction
-            ).squared
+            actionTopos
+              .makeDot(
+                regularAction
+              )
+              .squared
           )
         apply(
           regularSquared

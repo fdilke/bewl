@@ -11,7 +11,6 @@ import scala.language.postfixOps
 
 object ComparePitchClassEncodings extends App {
 
-
 // TODO fix: too slow!
 //  val affineGroup =
 //    groupOfUnits(
@@ -22,9 +21,12 @@ object ComparePitchClassEncodings extends App {
 
   val informalGroup: EQUALIZER[FiniteSets.x[Int, Int]] =
     affineMapsDot(FiniteSets.omega) { m =>
-      elementsOf(octaveDot).map {
-        affineMapApply(_, m)
-      }.toSet.size == octaveLength
+      elementsOf(octaveDot)
+        .map {
+          affineMapApply(_, m)
+        }
+        .toSet
+        .size == octaveLength
     } whereTrue
 
   println("PCE 2")
@@ -35,21 +37,24 @@ object ComparePitchClassEncodings extends App {
   val semitoneEncoding = Seq(0, 4, 7)
 
   val isomorphicTriads =
-    elementsOf(informalGroup).map { g =>
-      circle5Encoding.map {
-        affineMapApply(_, g)
-      }.sorted
-    }.toSeq.distinct filter {
+    elementsOf(informalGroup)
+      .map { g =>
+        circle5Encoding.map {
+          affineMapApply(_, g)
+        }.sorted
+      }
+      .toSeq
+      .distinct filter {
       _.head == 0
     }
 
-  isomorphicTriads foreach { triad =>
-    println(triad mkString ",")
-  }
+  isomorphicTriads foreach { triad => println(triad mkString ",") }
 
-  assert(isomorphicTriads.contains(
-    semitoneEncoding
-  ))
+  assert(
+    isomorphicTriads.contains(
+      semitoneEncoding
+    )
+  )
 }
 
 object StabilizerSanity extends App {
@@ -71,7 +76,7 @@ object StabilizerSanity extends App {
         affineMapApply(a, p) == affineMapApply(a, q)
     } toSet
 
-  val (c,e,g) = (0,4,1)
+  val (c, e, g) = (0, 4, 1)
   println("stab(c) size =" + stab(c).size)
   println("stab(e) size =" + stab(e).size)
   println("stab(g) size =" + stab(g).size)
@@ -92,7 +97,7 @@ object TriadicGenerators extends App {
         Set(triadicMonoid.unit(()), i, j)
       ) { set =>
         set.union(
-          for { i <- set ; j <- set } yield {
+          for { i <- set; j <- set } yield {
             triadicMonoid.multiply(i, j)
           }
         )

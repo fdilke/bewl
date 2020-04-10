@@ -1,7 +1,14 @@
 package com.fdilke.bewl.fsets.monoid_actions
 
 import com.fdilke.bewl.fsets.FiniteSets
-import com.fdilke.bewl.fsets.FiniteSets.{>, FindGeneratorAnalysis, FindGenerators, FindPresentation, Monoid, ToposOfMonoidActions}
+import com.fdilke.bewl.fsets.FiniteSets.{
+  >,
+  FindGeneratorAnalysis,
+  FindGenerators,
+  FindPresentation,
+  Monoid,
+  ToposOfMonoidActions
+}
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.dot
 import com.fdilke.bewl.helper.StandardSymbols
 import com.fdilke.bewl.helper.StandardSymbols.{i, iso}
@@ -12,19 +19,21 @@ import scala.language.{postfixOps, reflectiveCalls}
 object CheckExtractPresentation {
   def apply[M, A](
     monoid: Monoid[M]
-  ) (
+  )(
     action: monoid.Action[A]
-  ) : Unit = {
+  ): Unit = {
     val generatorsWithRelators: Seq[GeneratorWithRelators[M, A]] =
       FindPresentation.forMonoid(
         monoid
       )(
         action,
-        FindGenerators.forMonoid(
-          monoid
-        )(
-          action
-        ).generators
+        FindGenerators
+          .forMonoid(
+            monoid
+          )(
+            action
+          )
+          .generators
       )
 
     for {

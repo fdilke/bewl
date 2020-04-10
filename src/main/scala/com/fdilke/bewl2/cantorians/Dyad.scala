@@ -19,13 +19,13 @@ object Dyad {
       isPowerOf2(n / 2)
 
   @inline def canonical[T](
-      dyad: T*
+    dyad: T*
   ): (Seq[T], Int) =
     canonicalSub(dyad, dyad.length)
 
   @tailrec private def canonicalSub[T](
-      dyad: Seq[T],
-      len: Int
+    dyad: Seq[T],
+    len: Int
   ): (Seq[T], Int) =
     if (len == 1)
       (dyad, 1)
@@ -55,9 +55,9 @@ object Dyad {
     Dyad(t)
 
   def μ[T](
-      dd: Dyad[
-        Dyad[T]
-      ]
+    dd: Dyad[
+      Dyad[T]
+    ]
   ): Dyad[T] =
     Dyad(
       0 until Math.max(
@@ -70,8 +70,8 @@ object Dyad {
 }
 
 class Dyad[T] private (
-    val cycle: Seq[T],
-    val length: Int
+  val cycle: Seq[T],
+  val length: Int
 ) {
 
   override def hashCode(): Int =
@@ -92,7 +92,7 @@ class Dyad[T] private (
     )
 
   def flatMap[U](
-      f: T => Dyad[U]
+    f: T => Dyad[U]
   ): Dyad[U] =
     μ[U](map(f))
 

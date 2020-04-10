@@ -18,16 +18,20 @@ object NollCalculations extends App {
   ): FiniteSets.ActionSplitting[
     FiniteSets.x[Int, Int],
     A,
-    ({ type λ[T] =
-      triadicMonoid.Action[T] })#λ
+    ({
+      type λ[T] =
+        triadicMonoid.Action[T]
+    })#λ
   ] =
-    ActionSplitter.forMonoid(
-      triadicMonoid
-    ).splitAction(
-      triadicTopos.unwrap(
-        dot
+    ActionSplitter
+      .forMonoid(
+        triadicMonoid
       )
-    )
+      .splitAction(
+        triadicTopos.unwrap(
+          dot
+        )
+      )
 
   if (false) {
     val subobjs: Iterable[triadicTopos.>[Int, triadicTopos.TRUTH]] =
@@ -47,8 +51,7 @@ object NollCalculations extends App {
     val sortedSizes: Seq[Int] =
       sizeGroups.keySet.toSeq.sorted
 
-    for { size <- sortedSizes }
-     println("size " + size + " : " + sizeGroups(size).size)
+    for { size <- sortedSizes } println("size " + size + " : " + sizeGroups(size).size)
 
     for {
       size <- sortedSizes
@@ -79,9 +82,7 @@ object NollCalculations extends App {
       n <- elementsOf(octaveDot)
     } {
       val generated =
-        elementsOf(triadicMonoid.carrier).map {
-          a => affineMapApply(n, a)
-        }.toSeq.distinct.sorted
+        elementsOf(triadicMonoid.carrier).map { a => affineMapApply(n, a) }.toSeq.distinct.sorted
 
       println(n + " -> " + generated.mkString(","))
     }
@@ -93,27 +94,29 @@ object NollCalculations extends App {
       n <- elementsOf(chordDot)
     } {
       val generated =
-        elementsOf(triadicMonoid.carrier).map {
-          a => affineMapApply(n, a)
-        }.toSeq.distinct.sorted
+        elementsOf(triadicMonoid.carrier).map { a => affineMapApply(n, a) }.toSeq.distinct.sorted
 
       println(n + " -> " + generated.mkString(","))
     }
-    println("#chord subobjects = " +
-      (chord >> triadicTopos.omega).size)
+    println(
+      "#chord subobjects = " +
+        (chord >> triadicTopos.omega).size
+    )
 
     for {
       chi <- chord >> triadicTopos.omega
     } {
       val sub = chi.whereTrue
-      println("sub> " + elementsOf(
-        triadicTopos.unwrap(sub).actionCarrier
-      ).toSeq.sorted.mkString(","))
+      println(
+        "sub> " + elementsOf(
+          triadicTopos.unwrap(sub).actionCarrier
+        ).toSeq.sorted.mkString(",")
+      )
     }
     System.exit(0)
   }
 
-  if(false)  {
+  if (false) {
     val cc = cyclic x cyclic
     val ccAnalysis =
       triadicSplit(cc)
@@ -125,8 +128,9 @@ object NollCalculations extends App {
     val nub = Timed("calculating the nub") {
       cyclic > triadicTopos.omega
     }
-    println("nub size: " +
-      triadicTopos.unwrap(nub).actionCarrier.size
+    println(
+      "nub size: " +
+        triadicTopos.unwrap(nub).actionCarrier.size
     )
 
     val nubAnalysis =
@@ -140,7 +144,7 @@ object NollCalculations extends App {
     )
   }
 
-  if(false)  {
+  if (false) {
     val cc = cyclic x chord
     val ccAnalysis =
       triadicSplit(cc)
@@ -152,8 +156,9 @@ object NollCalculations extends App {
     val pc = Timed("calculating power chord") {
       chord.power
     }
-    println("power chord size: " +
-      triadicTopos.unwrap(pc).actionCarrier.size
+    println(
+      "power chord size: " +
+        triadicTopos.unwrap(pc).actionCarrier.size
     )
 
     val pcAnalysis =
@@ -171,11 +176,13 @@ object NollCalculations extends App {
     println("Chord square:")
     val c2 = chord x chord
     val csAnalysis =
-      ActionSplitter.forMonoid(
-        triadicMonoid
-      ).splitAction(
-        chordAction x chordAction
-      )
+      ActionSplitter
+        .forMonoid(
+          triadicMonoid
+        )
+        .splitAction(
+          chordAction x chordAction
+        )
     println(
       "\tnumber of components: " + (
         csAnalysis.components.size
@@ -238,14 +245,16 @@ object NollCalculations extends App {
   def measure[T](
     tune: triadicTopos.DOT[T]
   ) =
-    triadicTopos.unwrap(
-      tune
-    ).actionCarrier size
+    triadicTopos
+      .unwrap(
+        tune
+      )
+      .actionCarrier size
 
   def showProperties[T](
     name: String,
     tune: triadicTopos.DOT[T]
-  ) : Unit = {
+  ): Unit = {
     val tuneMinimal =
       Timed(s"calc $name minimal") {
         tune.isMinimal
@@ -264,9 +273,7 @@ object NollCalculations extends App {
       println("size of omega = " + triadicTopos.omega.size)
       println("size of power = " + measure(power))
       if (false) {
-        (power >> triadicTopos.I) foreach { to1 =>
-          println("calculated power -> 1")
-        }
+        (power >> triadicTopos.I) foreach { to1 => println("calculated power -> 1") }
         println("calculated power -> 1... done")
         val isInjective =
           Timed("calculating injectivity of " + name) {
@@ -298,9 +305,13 @@ object NollCalculations extends App {
 object LogicalOperationsSlow extends App {
   if (false) {
     val omegaElements: Iterable[triadicTopos.TRUTH] =
-      elementsOf(triadicTopos.unwrap(
-        triadicTopos.omega
-      ).actionCarrier)
+      elementsOf(
+        triadicTopos
+          .unwrap(
+            triadicTopos.omega
+          )
+          .actionCarrier
+      )
 
     import triadicTopos.OmegaEnrichments
 
@@ -330,20 +341,24 @@ object LogicalOperationsSlow extends App {
 
   if (false) {
     def triadicSplit[A](
-                         dot: triadicTopos.DOT[A]
-                       ): FiniteSets.ActionSplitting[
+      dot: triadicTopos.DOT[A]
+    ): FiniteSets.ActionSplitting[
       FiniteSets.x[Int, Int],
       A,
-      ({type λ[T] =
-        triadicMonoid.Action[T]})#λ
-      ] =
-      ActionSplitter.forMonoid(
-        triadicMonoid
-      ).splitAction(
-        triadicTopos.unwrap(
-          dot
+      ({
+        type λ[T] =
+          triadicMonoid.Action[T]
+      })#λ
+    ] =
+      ActionSplitter
+        .forMonoid(
+          triadicMonoid
         )
-      )
+        .splitAction(
+          triadicTopos.unwrap(
+            dot
+          )
+        )
 
     val omegaSplit =
       triadicSplit(
@@ -366,4 +381,3 @@ object ChordRelationsSlow extends App {
       diag o diag
     }
 }
-

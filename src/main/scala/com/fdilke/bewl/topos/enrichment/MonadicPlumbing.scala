@@ -27,7 +27,7 @@ trait MonadicPlumbing {
     val ab_c = (a x b) x c
     ((a *- b) o ab_c.π0) x (
       ((a -* b) o ab_c.π0) x
-      ab_c.π1
+        ab_c.π1
     )
   }
 
@@ -42,8 +42,7 @@ trait MonadicPlumbing {
   ): (A x (B x C)) > ((A x B) x C) = {
     val a_bc = a x (b x c)
     (a_bc.π0 x
-      ((b *- c) o a_bc.π1)
-    ) x
+      ((b *- c) o a_bc.π1)) x
       ((b -* c) o a_bc.π1)
   }
 }

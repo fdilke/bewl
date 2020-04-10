@@ -22,29 +22,27 @@ import scala.language.postfixOps
 object BellNumbers extends App {
 
   def slowBell(n: Int): Int = {
-    val set: DOT[Int] = dot(0 until n :_*)
+    val set: DOT[Int] = dot(0 until n: _*)
     implicit val set2 = set.squared
     implicit val anonImplicit = set2.power
 
-    val eqRelns = set2.power.whereAll(set) {
-      (ssp, s) =>
-        ssp(s ⊕⊕ s)
-    }.whereAll(set, set) {
-      (ssp, x, y) =>
+    val eqRelns = set2.power
+      .whereAll(set) { (ssp, s) => ssp(s ⊕⊕ s) }
+      .whereAll(set, set) { (ssp, x, y) =>
         ssp(x ⊕⊕ y) →
-        ssp(y ⊕⊕ x)
-    }.whereAll(set, set, set) {
-      (ssp, x, y, z) =>
+          ssp(y ⊕⊕ x)
+      }
+      .whereAll(set, set, set) { (ssp, x, y, z) =>
         ssp(x ⊕⊕ y) ∧
-        ssp(y ⊕⊕ z) →
-        ssp(x ⊕⊕ z)
-    }
+          ssp(y ⊕⊕ z) →
+          ssp(x ⊕⊕ z)
+      }
     eqRelns size
   }
 
   def bell(n: Int): Int =
     dot(
-      0 until n :_*
+      0 until n: _*
     ).congruences size
 
   for {

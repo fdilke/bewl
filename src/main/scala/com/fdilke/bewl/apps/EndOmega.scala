@@ -9,7 +9,7 @@ object EndOmega extends App {
   val topos =
     FiniteSets.ToposOfMonoidActions.of(monoidOf3)
 
-  import topos.{ unwrap, omega, > }
+  import topos.{unwrap, omega, >}
 
   doIt(
     elementsOf(
@@ -26,7 +26,7 @@ object EndOmega extends App {
     ideals: Iterable[IDEAL],
     mappings: Iterable[IDEAL > IDEAL]
   ): Unit = {
-    assert( ideals.size == 3 )
+    assert(ideals.size == 3)
     val Seq(_m, _i, _o) = ideals
 
     val idealToName: Map[IDEAL, String] =
@@ -36,18 +36,15 @@ object EndOmega extends App {
         _o -> "O"
       )
 
-    ideals foreach { ii =>
-      println(idealToName(ii) + " = " + ii)
-    }
+    ideals foreach { ii => println(idealToName(ii) + " = " + ii) }
     println
 
     for {
       f <- mappings
-    }
-      println(
-        ideals map { ii =>
-          idealToName(ii) + " => " + idealToName(f(ii))
-        } mkString ", "
-      )
+    } println(
+      ideals map { ii =>
+        idealToName(ii) + " => " + idealToName(f(ii))
+      } mkString ", "
+    )
   }
 }

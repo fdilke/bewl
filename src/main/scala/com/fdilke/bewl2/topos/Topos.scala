@@ -17,7 +17,7 @@ import scala.language.postfixOps
 
 object Topos {
   def apply[DOT[_]](
-      implicit topos: Topos[DOT]
+    implicit topos: Topos[DOT]
   ): Topos[DOT] = topos
 }
 
@@ -38,7 +38,7 @@ trait Topos[DOT[_]] { topos =>
   implicit val omega: DOT[Ω]
   val truth: Unit => Ω
   def chi[S: DOT, T: DOT](
-      monic: S => T
+    monic: S => T
   ): CharacteristicArrow[DOT, S, T, Ω]
 
   def sanityTest[S: DOT]: Unit
@@ -53,18 +53,18 @@ trait Topos[DOT[_]] { topos =>
   def exponentialUncached[A: DOT, B: DOT]: DOT[A > B]
 
   def transpose[A: DOT, B: DOT, C: DOT](
-      arrow: (A, B) => C
+    arrow: (A, B) => C
   ): A => (B > C)
 
   def equalize[S: DOT, T: DOT, X](
-      func1: S => T,
-      func2: S => T
+    func1: S => T,
+    func2: S => T
   ): EqualizerReceiver[DOT, S, X] => X
 
   // TODO: put this helper code in a separate class
 
   @inline implicit class RichFunction[S: DOT, T: DOT](
-      function: S => T
+    function: S => T
   ) {
     @inline final def =?=(function2: S => T): Boolean =
       compareFunctions(function, function2)
@@ -102,7 +102,7 @@ trait Topos[DOT[_]] { topos =>
   }
 
   @inline implicit class RichBiFunction[S: DOT, T: DOT, U: DOT](
-      function: (S, T) => U
+    function: (S, T) => U
   ) {
     @inline final def =?=(function2: (S, T) => U): Boolean =
 //      tupled(function) =?= tupled(function2)
@@ -124,7 +124,7 @@ trait Topos[DOT[_]] { topos =>
   }
 
   @inline implicit class RichBewlean(
-      bewlean: Ω
+    bewlean: Ω
   ) {
     import LogicalOperations._
 
@@ -141,7 +141,7 @@ trait Topos[DOT[_]] { topos =>
   // anticipate these will not be used very much...
   // as it's all baked into the types and thoughtcrime is impossible. remove?
   @inline final def dot[S](
-      implicit dot: DOT[S]
+    implicit dot: DOT[S]
   ): DOT[S] = dot
 
   final def id[S: DOT]: S => S =
@@ -149,7 +149,7 @@ trait Topos[DOT[_]] { topos =>
 
   final private class DotExtras[A: DOT] {
     final private def makeProduct[B](
-        dot: DOT[B]
+      dot: DOT[B]
     ): DOT[(A, B)] = {
       implicit val theDot: DOT[B] = dot
       productUncached[A, B]
@@ -165,7 +165,7 @@ trait Topos[DOT[_]] { topos =>
       memoizedProduct(dot[B])
 
     final private def makeExponential[B](
-        dot: DOT[B]
+      dot: DOT[B]
     ): DOT[A > B] = {
       implicit val theDot: DOT[B] = dot
       exponentialUncached[A, B]
@@ -192,7 +192,7 @@ trait Topos[DOT[_]] { topos =>
   }
 
   final private def makeDotExtras[A](
-      dot: DOT[A]
+    dot: DOT[A]
   ): DotExtras[A] = {
     implicit val theDot: DOT[A] = dot
     new DotExtras[A]
@@ -217,7 +217,7 @@ trait Topos[DOT[_]] { topos =>
     extras[A].`_∀`(f)
 
   @inline final def ∀[A: DOT](
-      f: A => Ω
+    f: A => Ω
   ): (Unit => Ω) =
     u =>
       (∀[A])(
@@ -263,9 +263,9 @@ trait Topos[DOT[_]] { topos =>
       (and ?= { (a, _) => a })(
         new EqualizerReceiver[DOT, (Ω, Ω), (Ω, Ω) => Ω] {
           override def apply[R <: (Ω, Ω)](
-              equalizer: Equalizer[DOT, (Ω, Ω), R]
+            equalizer: Equalizer[DOT, (Ω, Ω), R]
           )(
-              implicit dot: DOT[R]
+            implicit dot: DOT[R]
           ): (Ω, Ω) => Ω =
             untupled(
               equalizer.include.chi.chi

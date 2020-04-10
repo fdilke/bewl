@@ -10,30 +10,29 @@ trait ElementEnrichments {
   implicit class RichExponential[
     S <: ~,
     T <: ~
-  ] (
+  ](
     exp: S → T
-  ) (
+  )(
     implicit expDot: EXPONENTIAL[S, T]
   ) {
     def o[
       R <: ~
-    ] (
+    ](
       preExp: R → S
-    ) (
+    )(
       implicit preExpDot: EXPONENTIAL[R, S]
-    ): R → T = (
+    ): R → T =
+      (
         preExpDot.source > expDot.target
-      ).transpose (
+      ).transpose(
         preExpDot
-      ) {
-        (sr, r) => exp(sr(r))
-      } (
+      ) { (sr, r) => exp(sr(r)) }(
         preExp
       )
 
     def o[
       R <: ~
-    ] (
+    ](
       preExp: R > S
     ): R → T =
       (expDot.target > preExp)(

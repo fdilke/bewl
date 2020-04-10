@@ -11,7 +11,7 @@ class MemoizeTest extends AnyFunSpec {
   private class Counterize[I, O](func: I => O) {
     private var count = 0
 
-    def check(verify: => Unit) : Unit = {
+    def check(verify: => Unit): Unit = {
       count shouldBe 0
       verify
       count shouldBe 1
@@ -28,7 +28,7 @@ class MemoizeTest extends AnyFunSpec {
   private class CounterizeGeneric[I[T], O[T]](func: I[_] => O[_]) {
     private var count = 0
 
-    def check(verify: => Unit) : Unit = {
+    def check(verify: => Unit): Unit = {
       count shouldBe 0
       verify
       count shouldBe 1
@@ -42,10 +42,12 @@ class MemoizeTest extends AnyFunSpec {
     }
   }
 
-  private class CounterizeGenericWithBase[BASE, I[T <: BASE], O[T <: BASE]](func: I[BASE] => O[BASE]) {
+  private class CounterizeGenericWithBase[BASE, I[T <: BASE], O[T <: BASE]](
+    func: I[BASE] => O[BASE]
+  ) {
     private var count = 0
 
-    def check(verify: => Unit) : Unit = {
+    def check(verify: => Unit): Unit = {
       count shouldBe 0
       verify
       count shouldBe 1
@@ -62,7 +64,7 @@ class MemoizeTest extends AnyFunSpec {
   describe("A memoized function") {
 
     it("caches results for a vanilla function") {
-      def testFunc(n: Int) : String =
+      def testFunc(n: Int): String =
         "Hello " + n
 
       val counter = new Counterize[Int, String](testFunc)
@@ -91,7 +93,7 @@ class MemoizeTest extends AnyFunSpec {
       counter.check {
         memoizedFunc(
           new Input[Int](Seq(2))
-        ).seq shouldBe Seq(2,2)
+        ).seq shouldBe Seq(2, 2)
       }
     }
 
@@ -136,5 +138,3 @@ class MemoizeTest extends AnyFunSpec {
     }
   }
 }
-
-

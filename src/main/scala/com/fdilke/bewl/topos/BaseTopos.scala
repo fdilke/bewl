@@ -18,7 +18,7 @@ trait BaseTopos {
   type x[T <: ~, U <: ~] = (T ⊕ U) with ~
 
   type UNIT <: ~
-  val I : DOT[UNIT]
+  val I: DOT[UNIT]
 
   type TRUTH <: ~
   val omega: DOT[TRUTH]
@@ -49,13 +49,13 @@ trait BaseTopos {
       )
 
     def evaluate(
-        function: S → T,
-        arg: S
+      function: S → T,
+      arg: S
     ): T
-    
+
     final def evaluation: BiArrow[S → T, S, T] =
       (this x source).biArrow(target) {
-        evaluate(_, _) 
+        evaluate(_, _)
       }
   }
 
@@ -66,8 +66,8 @@ trait BaseTopos {
     L,
     R
   ] with DOT[
-    L x R
-  ]
+      L x R
+    ]
 
   trait BiproductDot[
     L <: ~,
@@ -85,16 +85,16 @@ trait BaseTopos {
 
     final def biArrow[T <: ~](
       target: DOT[T]
-    ) (
+    )(
       bifunc: (L, R) => T
-    ) : BiArrow[L, R, T] =
+    ): BiArrow[L, R, T] =
       BiArrow(this, this(target) {
         case x ⊕ y => bifunc(x, y)
       })
 
     final def relation(
       bifunc: (L, R) => TRUTH
-    ) : Relation[L, R] =
+    ): Relation[L, R] =
       Relation(
         left,
         right,
@@ -103,7 +103,7 @@ trait BaseTopos {
 
     final def relation(
       criterion: L x R > TRUTH
-    ) : Relation[L, R] =
+    ): Relation[L, R] =
       Relation(
         left,
         right,
@@ -125,7 +125,7 @@ trait BaseTopos {
 
     final def existsMid[T <: ~](
       mid: DOT[T]
-    ) (
+    )(
       trifunc: (L, T, R) => TRUTH
     ): BiArrow[L, R, TRUTH] =
       BiArrow[L, R, TRUTH](
@@ -141,7 +141,7 @@ trait BaseTopos {
 
     final def existsMidWithImages[T <: ~](
       mid: DOT[T]
-    ) (
+    )(
       trifunc: (L, T, R) => TRUTH
     ): BiArrow[L, R, TRUTH] =
       BiArrow[L, R, TRUTH](
@@ -166,9 +166,7 @@ trait BaseTopos {
     ): R > S
 
     lazy val inclusion: S > S =
-      dot(equalizerTarget) { 
-        s => s 
-      }
+      dot(equalizerTarget) { s => s }
   }
 
   private object InitialDot {
@@ -197,27 +195,27 @@ trait BaseTopos {
     ): A x B =
       biproduct.pair(a, b)
   }
-  
+
   implicit class RichFunctionalElement[
     S <: ~,
     T <: ~
   ](
     f: S → T
-  ) (
-    implicit exp: EXPONENTIAL[S, T]   
+  )(
+    implicit exp: EXPONENTIAL[S, T]
   ) {
     def apply(
       s: S
     ): T =
       exp.evaluate(f, s)
   }
-  
+
   trait BaseDot[S <: ~] { self: DOT[S] =>
     val toI: S > UNIT
     val globals: Iterable[UNIT > S]
     def xUncached[T <: ~](that: DOT[T]): BIPRODUCT[S, T]
     def `>Uncached`[T <: ~](that: DOT[T]): EXPONENTIAL[S, T]
-    def apply[T <: ~](target: DOT[T])(f: S => T) : S > T
+    def apply[T <: ~](target: DOT[T])(f: S => T): S > T
     def sanityTest: Unit
   }
 
@@ -230,9 +228,9 @@ trait BaseTopos {
     final private val memoizedProduct =
       Memoize.generic.withLowerBound[
         DOT,
-        ({ type λ[U <: ~] = BIPRODUCT[S, U]}) # λ,
+        ({ type λ[U <: ~] = BIPRODUCT[S, U] })#λ,
         ~
-      ] (xUncached)
+      ](xUncached)
 
     final def x[U <: ~](
       that: DOT[U]
@@ -242,9 +240,9 @@ trait BaseTopos {
     final private val memoizedExponential =
       Memoize.generic.withLowerBound[
         DOT,
-        ({ type λ[T <: ~] = EXPONENTIAL[S, T]}) # λ,
+        ({ type λ[T <: ~] = EXPONENTIAL[S, T] })#λ,
         ~
-      ] (`>Uncached`)
+      ](`>Uncached`)
 
     final def >[T <: ~](
       that: DOT[T]
@@ -254,7 +252,7 @@ trait BaseTopos {
     final private val memoizedCoproduct =
       Memoize.generic.withLowerBound[
         DOT,
-        ({ type λ[T <: ~] = Coproduct[S, T]}) # λ,
+        ({ type λ[T <: ~] = Coproduct[S, T] })#λ,
         ~
       ](`+Uncached`)
 
@@ -290,56 +288,50 @@ trait BaseTopos {
 
     final def preForAll[R <: ~](
       source: DOT[R]
-    ) (
+    )(
       bifunc: (R, S) => TRUTH
     ): R > TRUTH =
       ∀ o power.transpose(source)(bifunc)
 
     final def forAll[T <: ~](
       target: DOT[T]
-    ) (
+    )(
       g: (S, T) => TRUTH
     ): S > TRUTH =
       target.preForAll(dot)(g)
 
     final def forAll[
-      T <: ~, 
+      T <: ~,
       U <: ~
-    ] (
-      target: DOT[T], 
+    ](
+      target: DOT[T],
       target2: DOT[U]
-    ) (
+    )(
       g: (S, T, U) => TRUTH
     ): S > TRUTH =
-      forAll(target) { (x, t) =>
-        target.forAll(target2) { (t, u) => 
-            g(x, t, u)
-          }(t)
-      }
+      forAll(target) { (x, t) => target.forAll(target2) { (t, u) => g(x, t, u) }(t) }
 
     // TODO refactor to be properly variadic
     final def forAll[
-      T <: ~, 
+      T <: ~,
       U <: ~,
       V <: ~
-    ] (
-      target: DOT[T], 
+    ](
+      target: DOT[T],
       target2: DOT[U],
       target3: DOT[V]
-    ) (
+    )(
       g: (S, T, U, V) => TRUTH
     ): S > TRUTH =
       forAll(target) { (x, t) =>
-        target.forAll(target2) { (t, u) => 
-          target2.forAll(target3) { (u, v) =>
-              g(x, t, u, v)
-            }(u)
-          }(t)
-        }
+        target.forAll(target2) { (t, u) => target2.forAll(target3) { (u, v) => g(x, t, u, v) }(u) }(
+          t
+        )
+      }
 
     final def whereAll[T <: ~](
       target: DOT[T]
-    ) (
+    )(
       g: (S, T) => TRUTH
     ): EQUALIZER[S] =
       forAll(target)(g).whereTrue
@@ -347,7 +339,7 @@ trait BaseTopos {
     final def whereAll[T <: ~, U <: ~](
       target: DOT[T],
       target2: DOT[U]
-    ) (
+    )(
       g: (S, T, U) => TRUTH
     ): EQUALIZER[S] =
       forAll(target, target2)(g).whereTrue
@@ -356,14 +348,14 @@ trait BaseTopos {
       target: DOT[T],
       target2: DOT[U],
       target3: DOT[V]
-    ) (
+    )(
       g: (S, T, U, V) => TRUTH
     ): EQUALIZER[S] =
       forAll(target, target2, target3)(g).whereTrue
 
     final private def preExists[R <: ~](
       source: DOT[R]
-    ) (
+    )(
       bifunc: (R, S) => TRUTH
     ): R > TRUTH =
       ∃ o power.transpose(source)(bifunc)
@@ -406,7 +398,7 @@ trait BaseTopos {
 
     final lazy val diagonal: S > (S x S) =
       this(squared) { x =>
-        implicit val anonImplicit : BIPRODUCT[S, S] = squared
+        implicit val anonImplicit: BIPRODUCT[S, S] = squared
         x ⊕⊕ x
       }
 
@@ -434,12 +426,12 @@ trait BaseTopos {
     final lazy val pac =
       new PartialArrowClassifier(dot)
 
-    final def *- [T <: ~](
+    final def *-[T <: ~](
       that: DOT[T]
     ) =
       (this x that).π0
 
-    final def -* [T <: ~](
+    final def -*[T <: ~](
       that: DOT[T]
     ) =
       (this x that).π1
@@ -449,12 +441,12 @@ trait BaseTopos {
     ) =
       new Coproduct(this, that)
 
-    final def +- [T <: ~](
+    final def +-[T <: ~](
       that: DOT[T]
     ) =
       (this ⊔ that).injectLeft
 
-    final def -+ [T <: ~](
+    final def -+[T <: ~](
       that: DOT[T]
     ) =
       (this ⊔ that).injectRight
@@ -466,7 +458,7 @@ trait BaseTopos {
 
     def arrowFromFunctionalRelation[B <: ~](
       target: DOT[B]
-    ) (
+    )(
       predicate: (S, B) => TRUTH
     ): S > B = {
       val product = dot x target
@@ -481,7 +473,7 @@ trait BaseTopos {
     final def >[
       T <: ~,
       U <: ~
-    ] (
+    ](
       arrow: T > U
     ): (U → S) > (T → S) =
       (arrow.source > dot).transpose(
@@ -494,10 +486,9 @@ trait BaseTopos {
     final def ⋀(
       family: (S → TRUTH) > TRUTH
     ): S > TRUTH =
-      forAll(family.whereTrue) {
-        (s, g) =>
-          implicit val anonImplicit = power
-          g(s)
+      forAll(family.whereTrue) { (s, g) =>
+        implicit val anonImplicit = power
+        g(s)
       }
 
     final def where(
@@ -562,7 +553,9 @@ trait BaseTopos {
       optionalGenerator map {
         _ >> dot size
       } getOrElse {
-        throw new IllegalArgumentException("Cannot size dots in this topos - no generator available")
+        throw new IllegalArgumentException(
+          "Cannot size dots in this topos - no generator available"
+        )
       }
   }
 
@@ -573,8 +566,8 @@ trait BaseTopos {
 
     def apply(s: S): T
     def ?=(that: S > T): EQUALIZER[S]
-    def o[R <: ~](that: R > S) : R > T
-    def \[U <: ~](monic: U > T) : S > U
+    def o[R <: ~](that: R > S): R > T
+    def \[U <: ~](monic: U > T): S > U
     def sanityTest: Unit
   }
 
@@ -582,9 +575,7 @@ trait BaseTopos {
     arrow: S > T =>
 
     final lazy val name: UNIT > (S → T) =
-      (source > target).transpose(I) {
-          (i, x) => arrow(x)
-      }
+      (source > target).transpose(I) { (i, x) => arrow(x) }
 
     final def x[U <: ~](
       that: S > U
@@ -592,9 +583,7 @@ trait BaseTopos {
       implicit val product: BIPRODUCT[T, U] =
         target x that.target
 
-      source(product) {
-        s => this(s) ⊕⊕ that(s)
-      }
+      source(product) { s => this(s) ⊕⊕ that(s) }
     }
 
     final def toBool(
@@ -609,40 +598,41 @@ trait BaseTopos {
         source.toTrue
 
     final lazy val isMonic: Boolean =
-      source.forAll(source) {
-        (s, t) => target.=?=(
-          this(s), this(t)
-        ) → source.=?=(
-          s, t
-        )
+      source
+        .forAll(source) { (s, t) =>
+          target.=?=(
+            this(s),
+            this(t)
+          ) → source.=?=(
+            s,
+            t
+          )
       } toBool
 
     final lazy val isEpic: Boolean =
-      target.exists(source) {
-        (t, s) => target.=?=(
-          t, arrow(s)
-        )
+      target
+        .exists(source) { (t, s) =>
+          target.=?=(
+            t,
+            arrow(s)
+          )
       } toBool
 
     final lazy val isIso: Boolean =
       isMonic && isEpic
 
     final lazy val isSection: Boolean =
-      (target >> source).exists { left: T > S =>
-        (left o arrow) == source.identity
-      }
+      (target >> source).exists { left: T > S => (left o arrow) == source.identity }
 
     final lazy val isRetraction: Boolean =
-      (target >> source).exists { right: T > S =>
-        (arrow o right) == target.identity
-      }
-      
-    final lazy val inverse: T > S =
-      source.power.transpose(target) {
-          (t, s) => target.=?=(t, arrow(s))
-        } \ source.singleton
+      (target >> source).exists { right: T > S => (arrow o right) == target.identity }
 
-    def /[R <: ~](iso: S > R) : R > T =
+    final lazy val inverse: T > S =
+      source.power.transpose(target) { (t, s) =>
+        target.=?=(t, arrow(s))
+      } \ source.singleton
+
+    def /[R <: ~](iso: S > R): R > T =
       arrow o iso.inverse
 
     def +[U <: ~](that: U > T) =
@@ -657,11 +647,12 @@ trait BaseTopos {
       )
 
     def factorizeEpiMono: (
-      S > T, T > T
+      S > T,
+      T > T
     ) = (
-        image.restrict(arrow),
-        image.inclusion
-      )
+      image.restrict(arrow),
+      image.inclusion
+    )
 
     final def =?( // slow ("pure") coequalizer
       that: S > T
@@ -670,47 +661,46 @@ trait BaseTopos {
       implicit val t2Power = t2.power
 
       val congruences: EQUALIZER[T x T → TRUTH] =
-        t2Power.whereAll(target) {
-          (ssp, t) =>
-            ssp(t ⊕⊕ t)
-        }.whereAll(target, target) {
-          (ssp, t, u) =>
-            ssp(t ⊕⊕  u) →
+        t2Power
+          .whereAll(target) { (ssp, t) => ssp(t ⊕⊕ t) }
+          .whereAll(target, target) { (ssp, t, u) =>
+            ssp(t ⊕⊕ u) →
               ssp(u ⊕⊕ t)
-        }.whereAll(target, target, target) {
-          (ssp, t, u, v) =>
+          }
+          .whereAll(target, target, target) { (ssp, t, u, v) =>
             ssp(t ⊕⊕ u) ∧
               ssp(u ⊕⊕ v) →
               ssp(t ⊕⊕ v)
-        }.whereAll(source) {
-          (ssp, s) =>
+          }
+          .whereAll(source) { (ssp, s) =>
             ssp(
               this(s) ⊕⊕ that(s)
             )
-        }
+          }
 
-      target / {
-          (t, u) =>
-            t2.⋀(
-              congruences.inclusion.chi
-            ) (
-              t ⊕⊕ u
-            )
-        }
+      target / { (t, u) =>
+        t2.⋀(
+          congruences.inclusion.chi
+        )(
+          t ⊕⊕ u
+        )
+      }
     }
 
-    final def =?!(  // fast ("hybrid") coequalizer
+    final def =?!( // fast ("hybrid") coequalizer
       that: S > T
     ): Quotient[T] =
       target /
-        target.squared.relation(
-          (arrow x that).image.inclusion chi
-        ).toEquivalence
+        target.squared
+          .relation(
+            (arrow x that).image.inclusion chi
+          )
+          .toEquivalence
 
     // Contravariant exponential functor
     final def >[
       U <: ~
-    ] (
+    ](
       exponent: DOT[U]
     ): (U → S) > (U → T) =
       (exponent > target).transpose(
@@ -725,12 +715,15 @@ trait BaseTopos {
     L <: ~,
     R <: ~,
     T <: ~
-  ] (
+  ](
     product: BIPRODUCT[L, R],
     arrow: L x R > T
   ) extends (
-    (L, R) => T
-  ) {
+        (
+          L,
+          R
+        ) => T
+      ) {
     def apply(
       l: L,
       r: R
@@ -754,26 +747,32 @@ trait BaseTopos {
 
   // Helper methods for triple products (this could obviously be extended).
   def leftProjection[X <: ~, Y <: ~, Z <: ~](
-    x: DOT[X], y: DOT[Y], z: DOT[Z]
-  ) : X x Y x Z > X =
+    x: DOT[X],
+    y: DOT[Y],
+    z: DOT[Z]
+  ): X x Y x Z > X =
     (x x y).π0 o (x x y x z).π0
 
   def midProjection[X <: ~, Y <: ~, Z <: ~](
-   x: DOT[X], y: DOT[Y], z: DOT[Z]
-  ) : X x Y x Z > Y =
+    x: DOT[X],
+    y: DOT[Y],
+    z: DOT[Z]
+  ): X x Y x Z > Y =
     (x x y).π1 o (x x y x z).π0
 
   def rightProjection[X <: ~, Y <: ~, Z <: ~](
-   x: DOT[X], y: DOT[Y], z: DOT[Z]
-  ) : X x Y x Z > Z =
+    x: DOT[X],
+    y: DOT[Y],
+    z: DOT[Z]
+  ): X x Y x Z > Z =
     (x x y x z).π1
 
   class PartialArrowClassifier[A <: ~](
     dot: DOT[A]
   ) {
     val classifier =
-      dot.power.forAll(dot, dot) {
-        (f, a, b) =>
+      dot.power
+        .forAll(dot, dot) { (f, a, b) =>
           implicit val anonImplicit = dot.power
           (f(a) ∧ f(b)) → dot.=?=(a, b)
       } whereTrue
@@ -781,9 +780,7 @@ trait BaseTopos {
     val include = classifier restrict dot.singleton
 
     val ⏊ = classifier restrict
-      dot.power.transpose(I) {
-        (i, x) => falsity(i)
-      }
+      dot.power.transpose(I) { (i, x) => falsity(i) }
 
     def extend[S <: ~, B <: ~](
       monic: S > B,
@@ -792,17 +789,18 @@ trait BaseTopos {
       classifier.restrict(
         dot.power.transpose(
           monic.target
-        ) {
-          (t, a) => monic.target.exists(
+        ) { (t, a) =>
+          monic.target.exists(
             monic.source
-          ) {
-            (t, s) =>
-              dot.=?=(
-                arrowOnSub(s), a
-              ) ∧
-                monic.target.=?=(
-                  monic(s), t
-                )
+          ) { (t, s) =>
+            dot.=?=(
+              arrowOnSub(s),
+              a
+            ) ∧
+              monic.target.=?=(
+                monic(s),
+                t
+              )
           }(t)
         }
       )
@@ -820,9 +818,7 @@ trait BaseTopos {
     private val injectRightFull =
       (left.pac.⏊ o right.toI) x right.pac.include
 
-    val coproduct = fullProduct where { x =>
-      injectLeftFull.chi(x) ∨ injectRightFull.chi(x)
-    }
+    val coproduct = fullProduct where { x => injectLeftFull.chi(x) ∨ injectRightFull.chi(x) }
     val injectLeft = coproduct restrict injectLeftFull
     val injectRight = coproduct restrict injectRightFull
 
@@ -831,27 +827,24 @@ trait BaseTopos {
       rightArrow: B > X
     ) = {
       val target = leftArrow.target
-      coproduct.arrowFromFunctionalRelation(target) {
-        (αβ, x) =>
-          coproduct.exists(left) {
-            (αβ, a) =>
-              coproduct.=?=(
-                αβ,
-                injectLeft(a)
-              ) ∧ target.=?=(
-                x,
-                leftArrow(a)
-              )
-          }(αβ) ∨
-          coproduct.exists(right) {
-            (αβ, b) =>
-              coproduct.=?=(
-                αβ,
-                injectRight(b)
-              ) ∧ target.=?=(
-                x,
-                rightArrow(b)
-              )
+      coproduct.arrowFromFunctionalRelation(target) { (αβ, x) =>
+        coproduct.exists(left) { (αβ, a) =>
+          coproduct.=?=(
+            αβ,
+            injectLeft(a)
+          ) ∧ target.=?=(
+            x,
+            leftArrow(a)
+          )
+        }(αβ) ∨
+          coproduct.exists(right) { (αβ, b) =>
+            coproduct.=?=(
+              αβ,
+              injectRight(b)
+            ) ∧ target.=?=(
+              x,
+              rightArrow(b)
+            )
           }(αβ)
       }
     }
@@ -862,36 +855,37 @@ trait BaseTopos {
     equiv: Relation[S, S]
   ) {
     val arrow: S > QUOTIENT[S] =
-      dot.power.transpose(
-        dot
-      )(
-        equiv.criterion
-      ).factorizeEpiMono._1
+      dot.power
+        .transpose(
+          dot
+        )(
+          equiv.criterion
+        )
+        .factorizeEpiMono
+        ._1
 
     def lift[
       T <: ~
-    ] (
+    ](
       compatibleArrow: S > T
     ): QUOTIENT[S] > T = {
       val target = compatibleArrow.target
 
       target.power.transpose(
-        (arrow.target x target).
-          existsMid(
-            compatibleArrow.source
-          ) {
-            (q, s, t) =>
-              implicit val anonImplicit = dot.power
-              q(s) ∧ target.=?=(
-                compatibleArrow(s), t
-              )
-          }
+        (arrow.target x target).existsMid(
+          compatibleArrow.source
+        ) { (q, s, t) =>
+          implicit val anonImplicit = dot.power
+          q(s) ∧ target.=?=(
+            compatibleArrow(s),
+            t
+          )
+        }
       ) \ target.singleton
     }
   }
 
   // TODO: shouldn't need this, hack to get round bug in Scala 2.12.0-M4
   def tempConst[A <: ~](dot: DOT[A])(a: A) =
-    I(dot) { _ => a}
+    I(dot) { _ => a }
 }
-

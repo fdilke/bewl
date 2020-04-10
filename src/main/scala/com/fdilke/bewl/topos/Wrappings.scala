@@ -13,14 +13,14 @@ trait Wrappings[
     T <: BASE
   ](
     predot: PREDOT[T]
-  ) : DOT[WRAPPER[T]]
+  ): DOT[WRAPPER[T]]
 
   def makeArrow[
     S <: BASE,
     T <: BASE
   ](
     prearrow: PREARROW[S, T]
-  ) : WRAPPER[S] > WRAPPER[T]
+  ): WRAPPER[S] > WRAPPER[T]
 
   def functionAsArrow[
     S <: BASE,
@@ -35,19 +35,19 @@ trait Wrappings[
     L <: BASE,
     R <: BASE,
     T <: BASE
-  ] (
+  ](
     left: DOT[WRAPPER[L]],
     right: DOT[WRAPPER[R]],
     target: DOT[WRAPPER[T]]
-  ) (
+  )(
     bifunc: (L, R) => T
   ): BiArrow[WRAPPER[L], WRAPPER[R], WRAPPER[T]]
 
   final def bifunctionAsBiArrow[
     X <: BASE
-  ] (
+  ](
     dot: DOT[WRAPPER[X]]
-  ) (
+  )(
     bifunc: (X, X) => X
   ): BiArrow[
     WRAPPER[X],
@@ -66,4 +66,3 @@ trait Wrappings[
 object Wrappings {
   type NO_WRAPPER[T] = T
 }
-

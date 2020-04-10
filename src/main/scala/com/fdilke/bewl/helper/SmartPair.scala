@@ -20,7 +20,7 @@ object ⊕ {
     a: A
   ) {
     def ⊕[B](
-       b: B
+      b: B
     ) =
       new ⊕(a, b)
   }

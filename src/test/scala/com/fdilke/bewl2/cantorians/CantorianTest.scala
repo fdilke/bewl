@@ -31,7 +31,11 @@ class CantorianTest extends AnyFunSpec {
         cycle(true, false, false)
 
       cantorianTFT.asIterable.take(5).toList shouldBe Seq(
-        true, false, false, true, false
+        true,
+        false,
+        false,
+        true,
+        false
       )
     }
   }
@@ -49,7 +53,11 @@ class CantorianTest extends AnyFunSpec {
           }
       }
       cantorianTF.asIterable.take(5).toList shouldBe Seq(
-        true, false, true, false, true
+        true,
+        false,
+        true,
+        false,
+        true
       )
     }
 

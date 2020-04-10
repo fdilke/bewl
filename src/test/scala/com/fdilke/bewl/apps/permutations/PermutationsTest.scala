@@ -13,7 +13,7 @@ class PermutationsTest extends AnyFunSpec {
 
   describe("Permutations") {
     it("can be defined, unwrapped, and examined as maps") {
-      val perm: Permutation[Int] = π(1,2)(3)π
+      val perm: Permutation[Int] = π(1, 2)(3) π
 
       perm.sanityTest
 
@@ -21,25 +21,29 @@ class PermutationsTest extends AnyFunSpec {
 
       perm.asArrow shouldBe expectedCarrier(expectedCarrier) {
         Map(
-          1 -> 2, 2 -> 1, 3 -> 3
+          1 -> 2,
+          2 -> 1,
+          3 -> 3
         )
       }
 
       perm.asMap shouldBe Map(
-        1 -> 2, 2 -> 1, 3 -> 3
+        1 -> 2,
+        2 -> 1,
+        3 -> 3
       )
     }
 
     it("can be tested on their parity") {
       (π π).parity shouldBe EVEN
-      (π(1,2)π).parity shouldBe ODD
-      (π(1,2,3)π).parity shouldBe EVEN
-      (π(1,2)(3,4)π).parity shouldBe EVEN
-      (π(1,2,3,4)π).parity shouldBe ODD
+      (π(1, 2) π).parity shouldBe ODD
+      (π(1, 2, 3) π).parity shouldBe EVEN
+      (π(1, 2)(3, 4) π).parity shouldBe EVEN
+      (π(1, 2, 3, 4) π).parity shouldBe ODD
     }
 
     it("come with extra syntactic sugar") {
-      val permutation = π(1, 2)π
+      val permutation = π(1, 2) π
 
       permutation.carrier shouldBe Set(1, 2)
 
@@ -53,19 +57,19 @@ class PermutationsTest extends AnyFunSpec {
 
     it("can be composed when they're compatible") {
       intercept[IllegalArgumentException] {
-        (π(1,2)π) * (π(2,3)π)
+        (π(1, 2) π) * (π(2, 3) π)
       }
-      (π(1,2)(3)π) * (π(1)(2,3)π) shouldBe (π(1,3,2)π)
+      (π(1, 2)(3) π) * (π(1)(2, 3) π) shouldBe (π(1, 3, 2) π)
     }
 
     it("can compute the automorphism group of 'flip'") {
-      import Permutations.topos.{ ~ => _, _ }
-      val flip = π(1,2)π
+      import Permutations.topos.{~ => _, _}
+      val flip = π(1, 2) π
       val group: Group[Int → Int] = groupOfUnits(
         endomorphismMonoid(flip).monoid
       )._1
       group.sanityTest
-      val groupCarrier : Permutation[Int → Int] = group.carrier
+      val groupCarrier: Permutation[Int → Int] = group.carrier
       groupCarrier.carrier should have size 2
       //TODO: FIX! A bug in Scala 2.12.0-M4 prevents this
 //      groupCarrier.carrier.foreach { x =>

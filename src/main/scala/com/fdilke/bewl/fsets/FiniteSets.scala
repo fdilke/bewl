@@ -1,51 +1,59 @@
 package com.fdilke.bewl.fsets
 
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.allMaps
-import com.fdilke.bewl.fsets.monoid_actions.{ActionSplitter, FindGenerators, FindPresentation, FiniteSetsMonoidAssistant}
+import com.fdilke.bewl.fsets.monoid_actions.{
+  ActionSplitter,
+  FindGenerators,
+  FindPresentation,
+  FiniteSetsMonoidAssistant
+}
 import com.fdilke.bewl.helper.{Memoize, ⊕}
 import com.fdilke.bewl.helper.⊕._
 import com.fdilke.bewl.topos.{Topos, Wrappings}
 
-object FiniteSets extends BaseFiniteSets
-  with FindGenerators
-  with FindPresentation
-  with ActionSplitter
-  with FiniteSetsMonoidAssistant
-  with FiniteSetsImageFinder
+object FiniteSets
+    extends BaseFiniteSets
+    with FindGenerators
+    with FindPresentation
+    with ActionSplitter
+    with FiniteSetsMonoidAssistant
+    with FiniteSetsImageFinder
 
-class BaseFiniteSets extends Topos[Any] with Wrappings[
-  Any, Any, Iterable, FiniteSetsPreArrow, Wrappings.NO_WRAPPER
-] {
+class BaseFiniteSets
+    extends Topos[Any]
+    with Wrappings[
+      Any,
+      Any,
+      Iterable,
+      FiniteSetsPreArrow,
+      Wrappings.NO_WRAPPER
+    ] {
   override val name = "FiniteSets"
   override type DOT[S] = FiniteSetsDot[S]
   override type >[S, T] = FiniteSetsArrow[S, T]
   override type UNIT = Unit
   override type TRUTH = Boolean
   override type →[T <: ~, U <: ~] = Map[T, U] with ~
-  
+
   override lazy val I = makeDot(Iterable(()))
   override lazy val omega = makeDot(Iterable(true, false))
   override lazy val truth = I(omega) { _ => true }
   override lazy val optionalGenerator = Some(I)
 
   class FiniteSetsDot[S](
-      protected[fsets] val elements: Iterable[S]
-  )
-    extends Dot[S] { outerDot =>
+    protected[fsets] val elements: Iterable[S]
+  ) extends Dot[S] { outerDot =>
     override lazy val toI = this(I) { _ => () }
 
     override lazy val globals: Iterable[UNIT > S] =
-      elements map { s =>
-        new FiniteSetsArrow(I, this, (_: UNIT) => s)
-      }
+      elements map { s => new FiniteSetsArrow(I, this, (_: UNIT) => s) }
 
     override def xUncached[T](that: DOT[T]) =
       new FiniteSetsDot[S x T](
         for {
           s <- this.elements
           t <- that.elements
-        }
-          yield s ⊕ t
+        } yield s ⊕ t
       ) with BiproductDot[S, T] {
         override val left: DOT[S] = outerDot
         override val right: DOT[T] = that
@@ -55,22 +63,19 @@ class BaseFiniteSets extends Topos[Any] with Wrappings[
 
     override def `>Uncached`[T](that: FiniteSetsDot[T]) = {
       new FiniteSetsDot[S → T](
-        allMaps(outerDot.elements, that.elements) 
+        allMaps(outerDot.elements, that.elements)
       ) with ExponentialDot[S, T] { exponentialDot =>
         override val source: DOT[S] = outerDot
         override val target: DOT[T] = that
 
         override def transpose[R](biArrow: BiArrow[R, S, T]) =
-          biArrow.product.left(exponentialDot) {
-            r =>
-              outerDot.elements.map {
-                s => s -> biArrow(r, s)
-              }.toMap
-        }
-            
+          biArrow.product.left(exponentialDot) { r =>
+            outerDot.elements.map { s => s -> biArrow(r, s) }.toMap
+          }
+
         override def evaluate(
-            function: S → T, 
-            arg: S
+          function: S → T,
+          arg: S
         ): T =
           function(arg)
       }
@@ -98,19 +103,21 @@ class BaseFiniteSets extends Topos[Any] with Wrappings[
           monic(u) == quarry
         } getOrElse {
           throw new IllegalArgumentException(s"Cannot backdivide $self by monic $monic")
-      }}
-    override def sanityTest : Unit = {
+        }
+      }
+    override def sanityTest: Unit = {
       source.sanityTest
       target.sanityTest
-      for {targetElement <- source.elements map function}
-        if (!target.elements.exists(_ == targetElement)) {
-          throw new IllegalArgumentException(
-            "Map value " + targetElement + " not in target " + target.elements
-          )
-        }
+      for { targetElement <- source.elements map function } if (!target.elements.exists(
+          _ == targetElement
+        )) {
+        throw new IllegalArgumentException(
+          "Map value " + targetElement + " not in target " + target.elements
+        )
+      }
     }
     override def ?=(that: S > T) =
-      new FiniteSetsDot[S] (
+      new FiniteSetsDot[S](
         source.elements.filter { s => function(s) == that.function(s) }
       ) with EqualizingDot[S] { equalizer =>
         override val equalizerTarget = source
@@ -128,23 +135,20 @@ class BaseFiniteSets extends Topos[Any] with Wrappings[
       target(omega) { t =>
         source.elements.exists {
           this(_) == t
-      }}
+        }
+      }
 
     override def equals(other: Any): Boolean = other match {
       case that: FiniteSetsArrow[S, T] =>
         (source eq that.source) &&
           (target eq that.target) &&
-          source.elements.forall { x => 
-            function(x) == that.function(x)
-          }
+          source.elements.forall { x => function(x) == that.function(x) }
       case _ => false
     }
     override def hashCode = 0
 
     override def toString =
-      s"FiniteSetsArrow[$source -> $target : ${
-        source.elements map { this(_) }
-      }]"
+      s"FiniteSetsArrow[$source -> $target : ${source.elements map { this(_) }}]"
   }
 
   private val memoizedDotWrapper = {
@@ -171,7 +175,7 @@ class BaseFiniteSets extends Topos[Any] with Wrappings[
     left: DOT[L],
     right: DOT[R],
     target: DOT[T]
-  ) (
+  )(
     bifunc: (L, R) => T
   ): BiArrow[L, R, T] =
     (left x right).biArrow(target) {
@@ -184,4 +188,3 @@ case class FiniteSetsPreArrow[S, T](
   target: Iterable[T],
   function: S => T
 )
-

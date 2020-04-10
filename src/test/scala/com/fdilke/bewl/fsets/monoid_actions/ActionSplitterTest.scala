@@ -8,7 +8,7 @@ import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3.Action
 import org.scalatest.matchers.should.Matchers._
 
 import org.scalatest.freespec.AnyFreeSpec
-import com.fdilke.bewl.helper.StandardSymbols.{i,x,y}
+import com.fdilke.bewl.helper.StandardSymbols.{i, x, y}
 import scala.language.{postfixOps, reflectiveCalls}
 
 class ActionSplitterTest extends AnyFreeSpec {
@@ -28,10 +28,10 @@ class ActionSplitterTest extends AnyFreeSpec {
     ActionComponent[
       Symbol,
       A,
-      ({type λ[T] = monoidOf3.Action[T]}) # λ
+      ({ type λ[T] = monoidOf3.Action[T] })#λ
     ]
   ] =
-    splitter splitAction(
+    splitter splitAction (
       action
     ) components
 
@@ -44,9 +44,9 @@ class ActionSplitterTest extends AnyFreeSpec {
 
   "The action splitter can extract a coproduct decomposition" - {
     "for the empty monoid action" in {
-        components(
-          monoidOf3.voidAction
-        ) shouldBe empty
+      components(
+        monoidOf3.voidAction
+      ) shouldBe empty
     }
 
     "for the regular monoid action" in {

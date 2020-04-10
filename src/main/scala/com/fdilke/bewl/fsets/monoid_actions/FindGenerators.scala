@@ -99,11 +99,12 @@ trait FindGenerators extends BaseFiniteSets {
             }
 
             override lazy val generators =
-              actionElements.foldLeft(
-                initialCyclics
-              ) {
-                _ << _
-              } transversal
+              actionElements
+                .foldLeft(
+                  initialCyclics
+                ) {
+                  _ << _
+                } transversal
 
             override lazy val initialCyclics =
               new MaximalCyclics

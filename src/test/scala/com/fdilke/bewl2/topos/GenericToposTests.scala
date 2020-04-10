@@ -9,20 +9,20 @@ import org.scalatest.matchers.should.Matchers._
 
 abstract class GenericToposTests[
   DOT[_]: Topos,
-  FOO : DOT,
-  BAR : DOT,
-  BAZ : DOT
+  FOO: DOT,
+  BAR: DOT,
+  BAZ: DOT
 ] extends AnyFunSpec {
 
-  val foo2bar : FOO => BAR
-  val foo2ImageOfBar : FOO => BAZ
+  val foo2bar: FOO => BAR
+  val foo2ImageOfBar: FOO => BAZ
   val foobar2baz: (FOO, BAR) => BAZ
   val monicBar2baz: BAR => BAZ
 
   private final lazy val foo2baz = foo2ImageOfBar // a convenient alias
 
   trait EqualizerSituationReceiver[X] {
-    def apply[S : DOT, M : DOT, T : DOT](
+    def apply[S: DOT, M: DOT, T: DOT](
       equalizerSituation: EqualizerSituation[S, M, T]
     ): X
   }
@@ -37,16 +37,16 @@ abstract class GenericToposTests[
   import topos._
 
   case class EqualizerSituation[
-    S : DOT,
-    M : DOT,
-    T : DOT
+    S: DOT,
+    M: DOT,
+    T: DOT
   ](
     r: S => M,
     s: M => T,
     t: M => T
   ) {
 
-    def sanityTest : Unit = {
+    def sanityTest: Unit = {
       topos.sanityTest[S]
       topos.sanityTest[M]
       topos.sanityTest[T]
@@ -66,13 +66,13 @@ abstract class GenericToposTests[
   describe(s"The fixtures for $name") {
     it("include distinct sane objects") {
       val objects: Set[DOT[_]] = Set(
-        foo, bar, baz
+        foo,
+        bar,
+        baz
       )
 
       objects should have size 3
-      objects foreach { dot: DOT[_] =>
-        sanityTest(dot)
-      }
+      objects foreach { dot: DOT[_] => sanityTest(dot) }
     }
 
     it("include sane arrows whose sources and targets match their names") {
@@ -115,23 +115,23 @@ abstract class GenericToposTests[
 
     it("has identity arrows which can be composed") {
       val identityFoo: FOO => FOO = identity
-      id[FOO]  shouldBeFn identityFoo
-      (foo2bar o id[FOO])  shouldBeFn foo2bar
+      id[FOO] shouldBeFn identityFoo
+      (foo2bar o id[FOO]) shouldBeFn foo2bar
       (id[BAR] o foo2bar) shouldBeFn foo2bar
     }
 
     it("has equalizers") {
       // 2 levels of fancy footwork required to extract the types
       provideEqualizerSituation(new EqualizerSituationReceiver[scalatest.Assertion] {
-        def apply[S : DOT, M : DOT, T : DOT](
+        def apply[S: DOT, M: DOT, T: DOT](
           equalizerSituation: EqualizerSituation[S, M, T]
         ): scalatest.Assertion = {
           import equalizerSituation._
-          (s ?= t) (
+          (s ?= t)(
             new EqualizerReceiver[DOT, M, Int] {
               private val numCalls: AtomicInteger =
                 new AtomicInteger(0)
-              override def apply[R:DOT](
+              override def apply[R: DOT](
                 equalizer: FunctionalPlumbing.Equalizer[DOT, M, R]
               ): Int = {
                 val inclusion: R => M = equalizer.include
@@ -221,8 +221,8 @@ abstract class GenericToposTests[
 //      rightProjection(bar, foo, baz) o productArrow shouldBe foo2baz
 //    }
 
-        it("can construct exponential diagrams") {
-          sanityTest[BAR > BAZ]
+    it("can construct exponential diagrams") {
+      sanityTest[BAR > BAZ]
 
 //          val evaluation = exponential.evaluation
 //          evaluation.product.sanityTest
@@ -231,53 +231,51 @@ abstract class GenericToposTests[
 //          evaluation.arrow.sanityTest
 //          evaluation.arrow.target shouldBe baz
 
-          val transposed: FOO => (BAR > BAZ) =
-            foobar2baz.transpose
+      val transposed: FOO => (BAR > BAZ) =
+        foobar2baz.transpose
 
-          transposed.sanityTest
-          transposed.source shouldBe foo
-          transposed.target shouldBe dot[BAR > BAZ]
+      transposed.sanityTest
+      transposed.source shouldBe foo
+      transposed.target shouldBe dot[BAR > BAZ]
 
-          val untransposed: (FOO, BAR) => BAZ = {
-            (f, b) => transposed(f)(b)
-          }
+      val untransposed: (FOO, BAR) => BAZ = { (f, b) => transposed(f)(b) }
 
-          untransposed shouldBeFn foobar2baz
-        }
+      untransposed shouldBeFn foobar2baz
+    }
 
-        it("has standardized exponentials") {
-          dot[FOO > BAR] shouldBe dot[FOO > BAR]
-        }
+    it("has standardized exponentials") {
+      dot[FOO > BAR] shouldBe dot[FOO > BAR]
+    }
 
-        it("has a truth object (subobject classifier)") {
-          sanityTest[Ω]
-          truth.sanityTest
-          truth.source shouldBe dot[Unit]
-          truth.target shouldBe dot[Ω]
+    it("has a truth object (subobject classifier)") {
+      sanityTest[Ω]
+      truth.sanityTest
+      truth.source shouldBe dot[Unit]
+      truth.target shouldBe dot[Ω]
 
 // TODO: sort this out
 //          falsity.sanityTest
 
-          val chi: CharacteristicArrow[DOT, BAR, BAZ, Ω] =
-            monicBar2baz.chi
-          chi.chi.sanityTest
-          chi.chi.source shouldBe baz
-          chi.chi.target shouldBe omega
+      val chi: CharacteristicArrow[DOT, BAR, BAZ, Ω] =
+        monicBar2baz.chi
+      chi.chi.sanityTest
+      chi.chi.source shouldBe baz
+      chi.chi.target shouldBe omega
 
-          (chi.chi o monicBar2baz) shouldBeFn toTrue[BAR]
+      (chi.chi o monicBar2baz) shouldBeFn toTrue[BAR]
 
-          val restriction: FOO => BAR =
-            chi.restrict(foo2ImageOfBar)
-          restriction.sanityTest
-          restriction.source shouldBe dot[FOO]
-          restriction.target shouldBe dot[BAR]
-          (monicBar2baz o restriction) shouldBeFn foo2ImageOfBar
+      val restriction: FOO => BAR =
+        chi.restrict(foo2ImageOfBar)
+      restriction.sanityTest
+      restriction.source shouldBe dot[FOO]
+      restriction.target shouldBe dot[BAR]
+      (monicBar2baz o restriction) shouldBeFn foo2ImageOfBar
 
-          // Note behaviour is not defined for these pathological cases:
-          // construct a non-monic arrow, have chi throw a NotMonicException
-          // try backdividing by a monic when we can't
-          // It's up to the caller to check. There could be a safe backdivide
-        }
+      // Note behaviour is not defined for these pathological cases:
+      // construct a non-monic arrow, have chi throw a NotMonicException
+      // try backdividing by a monic when we can't
+      // It's up to the caller to check. There could be a safe backdivide
+    }
 
     /*
         it("expresses the subobject classifier as the carrier of a Heyting algebra") {
@@ -444,6 +442,6 @@ abstract class GenericToposTests[
       maps.head shouldBeFn fooFromO
     }
 
-         */
+   */
   }
 }

@@ -4,17 +4,16 @@ import com.fdilke.bewl.helper.IterateToFixed
 import com.fdilke.bewl.topos.{BaseTopos, ToposEnrichments, ToposPrerequisites, ToposStructures}
 import scala.language.postfixOps
 
-trait RelationalAlgebra extends BaseTopos with
-  ToposEnrichments {
+trait RelationalAlgebra extends BaseTopos with ToposEnrichments {
 
   Ɛ: ToposPrerequisites =>
 
   import Relation._
 
   case class Relation[S <: ~, T <: ~](
-    source: DOT[S],
-    target: DOT[T],
-    criterion: BiArrow[S, T, TRUTH]
+      source: DOT[S],
+      target: DOT[T],
+      criterion: BiArrow[S, T, TRUTH]
   ) {
     lazy val subobject: EQUALIZER[S x T] =
       criterion.arrow.whereTrue
@@ -22,27 +21,23 @@ trait RelationalAlgebra extends BaseTopos with
     def apply(s: S, t: T) =
       criterion(s, t)
 
-    def <= (that: Relation[S, T]): Boolean =
+    def <=(that: Relation[S, T]): Boolean =
       that.criterion.arrow o
         subobject.inclusion toBool
 
     def inverse: Relation[T, S] =
-      (target x source) relation {
-        (t, s) =>
-          criterion(s, t)
-      }
+      (target x source) relation { (t, s) => criterion(s, t) }
 
     def ∨(
-      that: Relation[S, T]
+        that: Relation[S, T]
     ) =
-      criterion.product relation {
-        (s, t) =>
-          criterion(s, t) ∨
-            that.criterion(s, t)
+      criterion.product relation { (s, t) =>
+        criterion(s, t) ∨
+          that.criterion(s, t)
       }
 
     def o[U <: ~](
-      that: Relation[T, U]
+        that: Relation[T, U]
     ) =
       Relation[S, U](
         source,
@@ -57,7 +52,7 @@ trait RelationalAlgebra extends BaseTopos with
   }
 
   implicit class EndoRelation[S <: ~](
-    relation: Relation[S, S]
+      relation: Relation[S, S]
   ) {
     import relation._
 
@@ -66,14 +61,11 @@ trait RelationalAlgebra extends BaseTopos with
         relation ∨
           relation.inverse ∨
           diagonalRelation(source)
-      ) {
-        r => r o r
-      }
+      ) { r => r o r }
 
     def isReflexive: Boolean =
       (criterion.arrow o
-        source.diagonal
-      ) toBool
+        source.diagonal) toBool
 
     def isSymmetric: Boolean =
       inverse == relation
@@ -87,10 +79,10 @@ trait RelationalAlgebra extends BaseTopos with
     def isEquivalence: Boolean =
       isReflexive && isSymmetric && isIdempotent
   }
-  
+
   object Relation {
     def diagonalRelation[S <: ~](
-      carrier: DOT[S]
+        carrier: DOT[S]
     ): Relation[S, S] =
       Relation[S, S](
         carrier,

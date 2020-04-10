@@ -9,7 +9,7 @@ import scala.reflect.runtime.universe._
 
 trait Compact[T] {
   def find(
-      predicate: T => Boolean
+    predicate: T => Boolean
   ): Option[
     () => T
   ]
@@ -21,17 +21,17 @@ trait Compact[T] {
 object Compact {
 
   def apply[T](
-      implicit compact: Compact[T]
+    implicit compact: Compact[T]
   ): Compact[T] = compact
 
   implicit def CompactnessForEnum[
-      ENUM <: Enumeration: TypeTag
+    ENUM <: Enumeration: TypeTag
   ]: Compact[ENUM#Value] =
     (predicate: ENUM#Value => Boolean) =>
       FindSingleton[ENUM].values find predicate map { v => () => v }
 
   @inline def find[T: Compact](
-      predicate: T => Boolean
+    predicate: T => Boolean
   ): Option[
     () => T
   ] =
@@ -39,7 +39,7 @@ object Compact {
       predicate
 
   @inline def determine[T: Compact](
-      predicate: T => Boolean
+    predicate: T => Boolean
   ): Option[T] =
     find[T](
       predicate
@@ -51,14 +51,14 @@ object Compact {
     Compact[T] optional
 
   @inline def exists[T: Compact](
-      predicate: T => Boolean
+    predicate: T => Boolean
   ): Boolean =
     find[T](
       predicate
     ) isDefined
 
   @inline def forAll[T: Compact](
-      predicate: T => Boolean
+    predicate: T => Boolean
   ): Boolean =
     !exists[T] {
       !predicate(_)
@@ -68,8 +68,8 @@ object Compact {
     optional[T].isDefined
 
   implicit def compactExponential[
-      H: Hausdorff,
-      C: Compact
+    H: Hausdorff,
+    C: Compact
   ]: Compact[
     H => C
   ] =
@@ -81,8 +81,8 @@ object Compact {
 
 trait Hausdorff[T] {
   def equalH(
-      t1: T,
-      t2: T
+    t1: T,
+    t2: T
   ): Boolean
 
   def intKey(t: T): Int
@@ -91,7 +91,7 @@ trait Hausdorff[T] {
 object Hausdorff {
 
   def apply[T](
-      implicit hausdorff: Hausdorff[T]
+    implicit hausdorff: Hausdorff[T]
   ): Hausdorff[T] = hausdorff
 
   def standardHausdorff[T]: Hausdorff[T] =
@@ -104,19 +104,19 @@ object Hausdorff {
     }
 
   implicit def HausdorffnessForEnum[
-      ENUM <: Enumeration
+    ENUM <: Enumeration
   ]: Hausdorff[ENUM#Value] =
     standardHausdorff[ENUM#Value]
 
   implicit def HausdorffnessForInt[
-      Int
+    Int
   ]: Hausdorff[Int] =
     standardHausdorff[Int]
 
   class Key[H](
-      val h: H
+    val h: H
   )(
-      implicit hausdorff: Hausdorff[H]
+    implicit hausdorff: Hausdorff[H]
   ) {
     override def hashCode(): Int =
       hausdorff.intKey(h)
@@ -129,22 +129,22 @@ object Hausdorff {
   }
 
   @inline def equalH[T: Hausdorff](
-      t1: T,
-      t2: T
+    t1: T,
+    t2: T
   ): Boolean =
     Hausdorff[T] equalH (
       t1, t2
     )
 
   implicit def hausdorffExponential[
-      C: Compact,
-      H: Hausdorff
+    C: Compact,
+    H: Hausdorff
   ]: Hausdorff[
     C => H
   ] = new Hausdorff[C => H] {
     override def equalH(
-        f: C => H,
-        g: C => H
+      f: C => H,
+      g: C => H
     ): Boolean =
       forAll[C] { c =>
         Hausdorff[H].equalH(

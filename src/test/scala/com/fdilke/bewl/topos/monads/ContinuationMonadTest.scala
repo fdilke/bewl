@@ -5,7 +5,7 @@ import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import com.fdilke.bewl.helper.ContinuousIntegration.notOnCI
 import com.fdilke.bewl.helper.⊕._
 import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.should.Matchers.{ a => _, _ }
+import org.scalatest.matchers.should.Matchers.{a => _, _}
 import com.fdilke.bewl.helper.StandardSymbols._
 
 import scala.language.{implicitConversions, postfixOps, reflectiveCalls}
@@ -36,8 +36,7 @@ class ContinuationMonadTest extends AnyFreeSpec {
       for {
         f <- elementsOf(two > omega)
         symbol <- Seq(x, y)
-      }
-        eta(symbol)(f) shouldBe f(symbol)
+      } eta(symbol)(f) shouldBe f(symbol)
     }
 
     "functoriality (map) works" in {
@@ -59,8 +58,7 @@ class ContinuationMonadTest extends AnyFreeSpec {
       for {
         soo <- elementsOf(symbols > omega > omega)
         soo_ : RichExponential[Symbol → TRUTH, TRUTH] = soo
-      }
-        map(soo) shouldBe (soo_ o (omega > f))
+      } map(soo) shouldBe (soo_ o (omega > f))
     }
 
     "tensorial strength is calculated correctly" in notOnCI {
@@ -69,7 +67,7 @@ class ContinuationMonadTest extends AnyFreeSpec {
 
       val mSymbols = continuation(symbols).free
 
-      val strength : (
+      val strength: (
         (
           Int x (Symbol → TRUTH → TRUTH)
         ) > (
@@ -82,7 +80,7 @@ class ContinuationMonadTest extends AnyFreeSpec {
           symbols
         )
 
-      strength should have (
+      strength should have(
         source(ints x mSymbols),
         target(
           continuation(
@@ -97,14 +95,11 @@ class ContinuationMonadTest extends AnyFreeSpec {
         ist <- elementsOf(
           (ints x symbols) > omega
         )
-      }
-        strength(i ⊕ m)(ist) shouldBe m(
-          asElement(
-            symbols(omega) {
-              h => ist(i ⊕ h)
-            }
-          )
+      } strength(i ⊕ m)(ist) shouldBe m(
+        asElement(
+          symbols(omega) { h => ist(i ⊕ h) }
         )
+      )
 
       continuation.sanityTest3(ints)
       continuation.sanityTest4(ints, symbols)
@@ -119,12 +114,12 @@ class ContinuationMonadTest extends AnyFreeSpec {
       val mInts = continuation(ints).free
       val mSymbols = continuation(symbols).free
 
-      val strength : (
+      val strength: (
         (
           Int → Symbol
         ) > (
           (Int → TRUTH → TRUTH) →
-          (Symbol → TRUTH → TRUTH)
+            (Symbol → TRUTH → TRUTH)
         )
       ) =
         continuation.functorialStrength(
@@ -132,7 +127,7 @@ class ContinuationMonadTest extends AnyFreeSpec {
           symbols
         )
 
-      strength should have (
+      strength should have(
         source(ints > symbols),
         target(mInts > mSymbols)
       )
@@ -141,14 +136,11 @@ class ContinuationMonadTest extends AnyFreeSpec {
         i2s: (Int → Symbol) <- elementsOf(ints > symbols)
         mi: (Int → TRUTH → TRUTH) <- elementsOf(mInts)
         s2o: (Symbol → TRUTH) <- elementsOf(symbols > omega)
-      }
-        strength(i2s)(mi)(s2o) shouldBe mi(
-          asElement(
-            ints(omega) { i =>
-              s2o(i2s(i))
-            }
-          )
+      } strength(i2s)(mi)(s2o) shouldBe mi(
+        asElement(
+          ints(omega) { i => s2o(i2s(i)) }
         )
+      )
     }
 
     "multiplication (mu) works" in {
@@ -159,20 +151,17 @@ class ContinuationMonadTest extends AnyFreeSpec {
       ) = continuation(I).mu
 
       val io2iooo: (UNIT → TRUTH) > (UNIT → TRUTH → TRUTH → TRUTH) =
-        (I > omega > omega > omega).transpose(I > omega) {
-          (x, f) => f(x)
-        }
+        (I > omega > omega > omega).transpose(I > omega) { (x, f) => f(x) }
 
       implicit val forIoooo = I > omega > omega > omega > omega
 
       for {
         ioooo <- elementsOf(I > omega > omega > omega > omega)
         ioooo_ : RichExponential[UNIT → TRUTH → TRUTH → TRUTH, TRUTH] = ioooo
-      }
-        mu(ioooo) shouldBe (ioooo_ o io2iooo)
+      } mu(ioooo) shouldBe (ioooo_ o io2iooo)
 
       Monad.sanityTest[
-        ({type λ[X <: ~] = X → TRUTH → TRUTH}) # λ,
+        ({ type λ[X <: ~] = X → TRUTH → TRUTH })#λ,
         UNIT
       ](continuation, I)
       // Can't run sanityTest2, would take too long (2 ^ 2 ^ 2 ^ 2 ^ 2 ^ 2 ^ 1)
@@ -182,7 +171,7 @@ class ContinuationMonadTest extends AnyFreeSpec {
     }
 
     "defines a valid home algebra structure map" in {
-      continuation.home.structure should have (
+      continuation.home.structure should have(
         source(omega > omega > omega),
         target(omega)
       )
@@ -192,9 +181,7 @@ class ContinuationMonadTest extends AnyFreeSpec {
           omega.identity
         )
 
-      for (
-        oo <- elementsOf(omega > omega > omega)
-      )
+      for (oo <- elementsOf(omega > omega > omega))
         continuation.home.structure(
           oo
         ) shouldBe oo(id)

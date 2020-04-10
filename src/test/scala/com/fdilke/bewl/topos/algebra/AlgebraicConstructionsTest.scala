@@ -49,13 +49,12 @@ class AlgebraicConstructionsTest extends AnyFunSpec {
       for {
         symbol <- elementsOf(three)
         mapping <- elementsOf(endosOf3.monoid.carrier)
-      }
-        homeAction.actionMultiply(
-          symbol,
-          mapping
-        ) should equal(
-          mapping(symbol)
-        )
+      } homeAction.actionMultiply(
+        symbol,
+        mapping
+      ) should equal(
+        mapping(symbol)
+      )
     }
   }
 
@@ -75,8 +74,10 @@ class AlgebraicConstructionsTest extends AnyFunSpec {
 
     it("for a deliberately not very invertible monoid") {
       val monoid = monoidFromTable(
-        i, x,
-        x, x
+        i,
+        x,
+        x,
+        x
       )
       val (group, inject) = groupOfUnits(monoid)
       group.sanityTest
@@ -93,8 +94,10 @@ class AlgebraicConstructionsTest extends AnyFunSpec {
 
     it("for a monoid that is a group already") {
       val monoid: FiniteSets.Monoid[Symbol] = monoidFromTable(
-        i, x,
-        x, i
+        i,
+        x,
+        x,
+        i
       )
       val (group, inject) = groupOfUnits(monoid)
       group.sanityTest
@@ -111,7 +114,7 @@ class AlgebraicConstructionsTest extends AnyFunSpec {
     it("for a larger endomorphism monoid") {
       val group =
         groupOfUnits(
-          endomorphismMonoid(dot(1,2,3)).monoid
+          endomorphismMonoid(dot(1, 2, 3)).monoid
         )._1
       group.sanityTest
       group.carrier.size shouldBe 6

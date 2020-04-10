@@ -22,9 +22,12 @@ object TwitterHack {
     accessSecret
   ) = {
     val lines =
-      Source.fromFile(
-        TWITTER_CFG_PATH
-      ).getLines.toSeq
+      Source
+        .fromFile(
+          TWITTER_CFG_PATH
+        )
+        .getLines
+        .toSeq
 
     Seq(
       "consumer-key",
@@ -45,10 +48,12 @@ object TwitterHack {
     }
   }
 
-  println(s"found creds:" +
-    consumerKey + "," +
-    consumerSecret + "," +
-    accessToken + "," + accessSecret)
+  println(
+    s"found creds:" +
+      consumerKey + "," +
+      consumerSecret + "," +
+      accessToken + "," + accessSecret
+  )
 
   val client = new TwitterRestClient(
     ConsumerToken(consumerKey, consumerSecret),
@@ -56,12 +61,15 @@ object TwitterHack {
   )
 
   val felixId =
-    Await.result(
-      client.user("fdilke"),
-      5 seconds
-    ).data.id
+    Await
+      .result(
+        client.user("fdilke"),
+        5 seconds
+      )
+      .data
+      .id
 
-  def tweetMe(message: String) : Unit = {
+  def tweetMe(message: String): Unit = {
     //        println("user details: " + user)
     //        println("user name: " + user.data.name)
     client.createDirectMessageEvent(felixId, message).onComplete {

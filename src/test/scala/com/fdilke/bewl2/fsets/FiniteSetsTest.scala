@@ -31,15 +31,18 @@ class FiniteSetsTest extends GenericToposTests[Iterable, Boolean, String, Int] {
 
   override val foobar2baz = untupled(
     Map(
-      (true, "X") -> 2, (false, "X") -> 3,
-      (true, "Y") -> 1, (false, "Y") -> 2,
-      (true, "Z") -> 2, (false, "Z") -> 3
+      (true, "X") -> 2,
+      (false, "X") -> 3,
+      (true, "Y") -> 1,
+      (false, "Y") -> 2,
+      (true, "Z") -> 2,
+      (false, "Z") -> 3
     )
   )
 
   override def provideEqualizerSituation[X](
     receiver: EqualizerSituationReceiver[X]
- ): X =
+  ): X =
     receiver(
       new EqualizerSituation[Boolean, String, Int](
         foo2bar,

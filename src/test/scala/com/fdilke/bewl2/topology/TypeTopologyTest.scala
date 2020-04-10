@@ -48,7 +48,7 @@ class TypeTopologyTest extends AnyFunSpec {
         sd.toString.toCharArray.count(_.isUpper) == 1
       } shouldBe false
 
-      StrontiumDogEnumeration.values should contain ( optional[StrontiumDog].get )
+      StrontiumDogEnumeration.values should contain(optional[StrontiumDog].get)
       inhabited[StrontiumDog] shouldBe true
       optional[Impossibility] shouldBe None
       inhabited[Impossibility] shouldBe false
@@ -114,9 +114,7 @@ class TypeTopologyTest extends AnyFunSpec {
       ) shouldBe true
     }
     it("compact ^ Hausdorff is implicitly compact") {
-      find[StrontiumDog => Weekday] { specialDay =>
-        specialDay(Johnny) == Monday
-      } match {
+      find[StrontiumDog => Weekday] { specialDay => specialDay(Johnny) == Monday } match {
         case Some(prefunc) =>
           prefunc()(Johnny) shouldBe Monday
         case _ =>
@@ -141,17 +139,13 @@ class TypeTopologyTest extends AnyFunSpec {
       }
     }
     it("compact ^ Hausdorff is implicitly compact - with Int") {
-      find[Int => Weekday] { specialDay =>
-        specialDay(3) == Monday
-      } match {
+      find[Int => Weekday] { specialDay => specialDay(3) == Monday } match {
         case Some(prefunc) =>
           prefunc()(3) shouldBe Monday
         case _ =>
           fail("No solution found")
       }
-      find[Int => Weekday] { specialDay =>
-        specialDay(7).id - specialDay(22).id == 1
-      } match {
+      find[Int => Weekday] { specialDay => specialDay(7).id - specialDay(22).id == 1 } match {
         case Some(preSpecialDay) =>
           val specialDay: Int => Weekday =
             preSpecialDay()
@@ -159,9 +153,7 @@ class TypeTopologyTest extends AnyFunSpec {
         case _ =>
           fail("No solution found")
       }
-      find[Int => Weekday] { specialDay =>
-        specialDay(88).id - specialDay(-100).id == 72
-      } match {
+      find[Int => Weekday] { specialDay => specialDay(88).id - specialDay(-100).id == 72 } match {
         case Some(_) =>
           fail("Incorrect solution found")
         case _ =>
@@ -169,9 +161,7 @@ class TypeTopologyTest extends AnyFunSpec {
     }
     it("compactness of compact ^ Hausdorff returns real functions") {
       val dogSeq: Int => StrontiumDog =
-        (find[Int => StrontiumDog] { dogSeq =>
-          dogSeq(3) == TheGronk
-        } get)()
+        (find[Int => StrontiumDog] { dogSeq => dogSeq(3) == TheGronk } get)()
       dogSeq(3) shouldBe TheGronk
       StrontiumDogEnumeration.values should contain(dogSeq(77))
     }

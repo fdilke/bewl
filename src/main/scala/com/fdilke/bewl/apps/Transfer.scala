@@ -12,7 +12,7 @@ object Transfer {
   def apply[P](
     group: Group[P],
     subgroup: DOT[P]
-  ):P > P = {
+  ): P > P = {
     val elements = elementsOf(group.carrier)
     val subgroupElements = elementsOf(subgroup) toSeq
 
@@ -24,7 +24,8 @@ object Transfer {
             p,
             group.inverse(x)
           )
-        )}
+        )
+      }
 
     elements foreach { p =>
       if (findRepresentative(p).isEmpty)
@@ -44,7 +45,7 @@ object Transfer {
         }
       coefficients.fold(
         group.unit(())
-      ) (
+      )(
         group.multiply
       )
     }
@@ -53,7 +54,7 @@ object Transfer {
 
 object UseTransfer extends App {
   val n = 6
-  val symbols = dot(1 to n :_*)
+  val symbols = dot(1 to n: _*)
   type PERMUTATION = Int → Int
 
   val group: Group[PERMUTATION] =

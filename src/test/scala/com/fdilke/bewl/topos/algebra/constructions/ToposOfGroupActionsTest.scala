@@ -1,4 +1,3 @@
-
 package com.fdilke.bewl.topos.algebra.constructions
 
 import com.fdilke.bewl.fsets.{FiniteSets, FiniteSetsUtilities}
@@ -9,80 +8,93 @@ import org.scalatest.matchers.should.Matchers.{a => _, _}
 
 import scala.Function.untupled
 
-class ToposOfGroupActionsTest extends GenericToposTests[
-  Any,
-  Any,
-  ({type λ[X] = twoGroup.Action[X]}) # λ,
-  ({type λ[X, Y] = twoGroup.ActionPreArrow[X, Y]}) # λ,
-  ({type λ[T] = T}) # λ
-](
-  new ToposWithFixtures[
-    Any,
-    Any,
-    ({type λ[X] = twoGroup.Action[X]}) # λ,
-    ({type λ[X, Y] = twoGroup.ActionPreArrow[X, Y]}) # λ,
-    ({type λ[T] = T}) # λ
-  ] {
+class ToposOfGroupActionsTest
+    extends GenericToposTests[
+      Any,
+      Any,
+      ({ type λ[X] = twoGroup.Action[X] })#λ,
+      ({ type λ[X, Y] = twoGroup.ActionPreArrow[X, Y] })#λ,
+      ({ type λ[T] = T })#λ
+    ](
+      new ToposWithFixtures[
+        Any,
+        Any,
+        ({ type λ[X] = twoGroup.Action[X] })#λ,
+        ({ type λ[X, Y] = twoGroup.ActionPreArrow[X, Y] })#λ,
+        ({ type λ[T] = T })#λ
+      ] {
 
-    override val topos = FiniteSets.ToposOfGroupActions of twoGroup
+        override val topos = FiniteSets.ToposOfGroupActions of twoGroup
 
-    import topos.{~ => _, _}
+        import topos.{~ => _, _}
 
-    override type FOO = Symbol
-    override type BAR = String
-    override type BAZ = Int
+        override type FOO = Symbol
+        override type BAR = String
+        override type BAZ = Int
 
-    override val foo = makeDot(twoGroup.regularAction)
+        override val foo = makeDot(twoGroup.regularAction)
 
-    private val barDot: FiniteSets.DOT[String] = FiniteSetsUtilities.dot("x", "x'", "y")
+        private val barDot: FiniteSets.DOT[String] = FiniteSetsUtilities.dot("x", "x'", "y")
 
-    private val barFlip: String => String = Map("x" -> "x'", "x'" -> "x", "y" -> "y")
+        private val barFlip: String => String = Map("x" -> "x'", "x'" -> "x", "y" -> "y")
 
-    private val barMultiply: (String, Symbol) => String =
-      (s, m) => if (m == a) barFlip(s) else s
+        private val barMultiply: (String, Symbol) => String =
+          (s, m) => if (m == a) barFlip(s) else s
 
-    override val bar = makeDot(twoGroup.action(barDot)(barMultiply))
+        override val bar = makeDot(twoGroup.action(barDot)(barMultiply))
 
-    private val bazDot: FiniteSets.DOT[Int] = FiniteSetsUtilities.dot(1, 2, 3, 4, 5)
+        private val bazDot: FiniteSets.DOT[Int] = FiniteSetsUtilities.dot(1, 2, 3, 4, 5)
 
-    // TODO: pack away local private stuff into a scope
+        // TODO: pack away local private stuff into a scope
 
-    private val bazFlip: Int => Int = Map(1 -> 2, 2 -> 1, 3 -> 4, 4 -> 3, 5 -> 5)
+        private val bazFlip: Int => Int = Map(1 -> 2, 2 -> 1, 3 -> 4, 4 -> 3, 5 -> 5)
 
-    private val bazMultiply: (Int, Symbol) => Int =
-      (s, m) => if (m == a) bazFlip(s) else s
+        private val bazMultiply: (Int, Symbol) => Int =
+          (s, m) => if (m == a) bazFlip(s) else s
 
-    override val baz = makeDot(twoGroup.action(bazDot)(bazMultiply))
+        override val baz = makeDot(twoGroup.action(bazDot)(bazMultiply))
 
-    override val foo2bar = functionAsArrow(foo, bar, Map(i -> "x", a -> "x'"))
-    override val foo2ImageOfBar = functionAsArrow(foo, baz, Map(i -> 4, a -> 3))
-    override val foobar2baz = bifunctionAsBiArrow(foo, bar, baz)(untupled (Map(
-      (i, "x") -> 1, (i, "x'") -> 3, (i, "y") -> 2,
-      (a, "x") -> 4, (a, "x'") -> 2, (a, "y") -> 1
-    )))
-    override val monicBar2baz = functionAsArrow(bar, baz, Map("x" -> 3, "x'" -> 4, "y" -> 5))
+        override val foo2bar = functionAsArrow(foo, bar, Map(i -> "x", a -> "x'"))
+        override val foo2ImageOfBar = functionAsArrow(foo, baz, Map(i -> 4, a -> 3))
+        override val foobar2baz = bifunctionAsBiArrow(foo, bar, baz)(
+          untupled(
+            Map(
+              (i, "x") -> 1,
+              (i, "x'") -> 3,
+              (i, "y") -> 2,
+              (a, "x") -> 4,
+              (a, "x'") -> 2,
+              (a, "y") -> 1
+            )
+          )
+        )
+        override val monicBar2baz = functionAsArrow(bar, baz, Map("x" -> 3, "x'" -> 4, "y" -> 5))
 
-    override def makeSampleDot(): DOT[String] =
-      makeDot(twoGroup.action(barDot)(barMultiply))
+        override def makeSampleDot(): DOT[String] =
+          makeDot(twoGroup.action(barDot)(barMultiply))
 
-    override def makeSampleArrow(): Symbol > String =
-      functionAsArrow(foo, bar, Map(
-        i -> "x",
-        a -> "x'"
-      ))
+        override def makeSampleArrow(): Symbol > String =
+          functionAsArrow(
+            foo,
+            bar,
+            Map(
+              i -> "x",
+              a -> "x'"
+            )
+          )
 
-    override val equalizerSituation = {
-      val altMonicBar2baz = functionAsArrow(bar, baz, Map("x" -> 2, "x'" -> 1, "y" -> 5))
-      val pickOutY = tempConst(bar)("y")
+        override val equalizerSituation = {
+          val altMonicBar2baz = functionAsArrow(bar, baz, Map("x" -> 2, "x'" -> 1, "y" -> 5))
+          val pickOutY = tempConst(bar)("y")
 
-      new EqualizerSituation[UNIT, String, Int](
-        pickOutY,
-        monicBar2baz,
-        altMonicBar2baz
-      )
-    }
-  }
-) {
+          new EqualizerSituation[UNIT, String, Int](
+            pickOutY,
+            monicBar2baz,
+            altMonicBar2baz
+          )
+        }
+      }
+    ) {
   import fixtures._
   import topos.{~ => _, _}
 

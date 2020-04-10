@@ -4,8 +4,24 @@ import com.fdilke.bewl.fsets.FiniteSets._
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import Relation._
 import org.scalatest.funspec.AnyFunSpec
-import org.scalatest.matchers.should.Matchers.{ a => _, _ }
-import com.fdilke.bewl.helper.StandardSymbols.{i, x, y, a, b, c, d, e, f, f2, g, g2, r, s, commutative}
+import org.scalatest.matchers.should.Matchers.{a => _, _}
+import com.fdilke.bewl.helper.StandardSymbols.{
+  i,
+  x,
+  y,
+  a,
+  b,
+  c,
+  d,
+  e,
+  f,
+  f2,
+  g,
+  g2,
+  r,
+  s,
+  commutative
+}
 
 class RelationalAlgebraTest extends AnyFunSpec {
 
@@ -125,7 +141,7 @@ class RelationalAlgebraTest extends AnyFunSpec {
         1 -> 1,
         0 -> 1
       ).isReflexive shouldBe true
-      
+
       relationFrom(
         carrier,
         0 -> 0,
@@ -212,7 +228,7 @@ class RelationalAlgebraTest extends AnyFunSpec {
           carrier
         )
 
-        diag.toEquivalence shouldBe diag
+      diag.toEquivalence shouldBe diag
     }
 
     it("are as expected for sets") {
@@ -225,13 +241,24 @@ class RelationalAlgebraTest extends AnyFunSpec {
       ).toEquivalence shouldBe
         relationFrom(
           carrier,
-          0 -> 0, 1 -> 1, 2 -> 2, 3 -> 3, 4 -> 4, 5 -> 5,
-          1 -> 2, 2 -> 1,
-          2 -> 3, 3 -> 2,
-          3 -> 4, 4 -> 3,
-          1 -> 3, 3 -> 1,
-          1 -> 4, 4 -> 1,
-          2 -> 4, 4 -> 2
+          0 -> 0,
+          1 -> 1,
+          2 -> 2,
+          3 -> 3,
+          4 -> 4,
+          5 -> 5,
+          1 -> 2,
+          2 -> 1,
+          2 -> 3,
+          3 -> 2,
+          3 -> 4,
+          4 -> 3,
+          1 -> 3,
+          3 -> 1,
+          1 -> 4,
+          4 -> 1,
+          2 -> 4,
+          4 -> 2
         )
     }
   }
@@ -304,17 +331,13 @@ class RelationalAlgebraTest extends AnyFunSpec {
           c -> b
         )
 
-      notReflexive.
-        isEquivalence shouldBe false
+      notReflexive.isEquivalence shouldBe false
 
-      notSymmetric.
-        isEquivalence shouldBe false
+      notSymmetric.isEquivalence shouldBe false
 
-      notTransitive.
-        isEquivalence shouldBe false
+      notTransitive.isEquivalence shouldBe false
 
-      identifyBandC.
-        isEquivalence shouldBe true
+      identifyBandC.isEquivalence shouldBe true
     }
   }
 }

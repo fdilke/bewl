@@ -9,21 +9,21 @@ object Memoize {
     )
 
   class MemoizedFunction[INPUT, OUTPUT](
-      function: INPUT => OUTPUT
+    function: INPUT => OUTPUT
   ) extends (INPUT => OUTPUT) {
-    private val resultMap = 
+    private val resultMap =
       scala.collection.mutable.Map[INPUT, OUTPUT]()
 
     def apply(input: INPUT): OUTPUT =
       resultMap.getOrElseUpdate(
-        input, 
+        input,
         function(input)
       )
   }
 
   object generic {
     def apply[INPUT[T], OUTPUT[T]](
-        function: INPUT[Nothing] => OUTPUT[Nothing]
+      function: INPUT[Nothing] => OUTPUT[Nothing]
     ) =
       new MemoizedFunctionGeneric[INPUT, OUTPUT, Any](
         function.asInstanceOf[
@@ -32,23 +32,25 @@ object Memoize {
       )
 
     class MemoizedFunctionGeneric[
-      INPUT[T <: BASE], 
-      OUTPUT[T <: BASE], 
+      INPUT[T <: BASE],
+      OUTPUT[T <: BASE],
       BASE
     ](
-        function: INPUT[_ <: BASE] => OUTPUT[_ <: BASE]
+      function: INPUT[_ <: BASE] => OUTPUT[_ <: BASE]
     ) {
-      private val resultMap = 
+      private val resultMap =
         scala.collection.mutable.Map[
-          INPUT[_], 
+          INPUT[_],
           OUTPUT[_]
         ]()
 
       def apply[T <: BASE](input: INPUT[T]): OUTPUT[T] =
-        resultMap.getOrElseUpdate(
-            input, 
+        resultMap
+          .getOrElseUpdate(
+            input,
             function(input)
-        ).asInstanceOf[OUTPUT[T]]
+          )
+          .asInstanceOf[OUTPUT[T]]
     }
 
     def withLowerBound[
@@ -65,5 +67,3 @@ object Memoize {
       )
   }
 }
-
-

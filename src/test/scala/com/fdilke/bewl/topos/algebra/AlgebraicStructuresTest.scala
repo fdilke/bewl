@@ -2,8 +2,24 @@ package com.fdilke.bewl.topos.algebra
 
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import org.scalatest.funspec.AnyFunSpec
-import org.scalatest.matchers.should.Matchers.{ a => _, _ }
-import com.fdilke.bewl.helper.StandardSymbols.{i, x, y, a, b, c, d, e, f, f2, g, g2, r, s, commutative}
+import org.scalatest.matchers.should.Matchers.{a => _, _}
+import com.fdilke.bewl.helper.StandardSymbols.{
+  i,
+  x,
+  y,
+  a,
+  b,
+  c,
+  d,
+  e,
+  f,
+  f2,
+  g,
+  g2,
+  r,
+  s,
+  commutative
+}
 
 class AlgebraicStructuresTest extends AnyFunSpec {
 
@@ -13,10 +29,17 @@ class AlgebraicStructuresTest extends AnyFunSpec {
     it("can be constructed and verified") {
       val carrier = dot(i, x, y)
       val unit = makeNullaryOperator(carrier, i)
-      val product = makeBinaryOperator(carrier,
-        (i, i) -> i, (i, x) -> x, (i, y) -> y,
-        (x, i) -> x, (x, x) -> x, (x, y) -> x,
-        (y, i) -> y, (y, x) -> y, (y, y) -> y
+      val product = makeBinaryOperator(
+        carrier,
+        (i, i) -> i,
+        (i, x) -> x,
+        (i, y) -> y,
+        (x, i) -> x,
+        (x, x) -> x,
+        (x, y) -> x,
+        (y, i) -> y,
+        (y, x) -> y,
+        (y, y) -> y
       )
       new Monoid[Symbol](carrier, unit, product).sanityTest
     }
@@ -25,10 +48,17 @@ class AlgebraicStructuresTest extends AnyFunSpec {
       intercept[IllegalArgumentException] {
         val carrier = dot(i, x, y)
         val unit = makeNullaryOperator(carrier, i)
-        val product = makeBinaryOperator(carrier,
-          (i, i) -> i, (i, x) -> i, (i, y) -> i,
-          (x, i) -> x, (x, x) -> x, (x, y) -> x,
-          (y, i) -> y, (y, x) -> y, (y, y) -> y
+        val product = makeBinaryOperator(
+          carrier,
+          (i, i) -> i,
+          (i, x) -> i,
+          (i, y) -> i,
+          (x, i) -> x,
+          (x, x) -> x,
+          (x, y) -> x,
+          (y, i) -> y,
+          (y, x) -> y,
+          (y, y) -> y
         )
         new Monoid[Symbol](carrier, unit, product).sanityTest
       }.getMessage shouldBe "left unit law failed"
@@ -37,9 +67,15 @@ class AlgebraicStructuresTest extends AnyFunSpec {
     it("enforce the right unit law") {
       intercept[IllegalArgumentException] {
         monoidFromTable(
-          i, x, y,
-          i, x, y,
-          i, x, y
+          i,
+          x,
+          y,
+          i,
+          x,
+          y,
+          i,
+          x,
+          y
         ).sanityTest
       }.getMessage shouldBe "right unit law failed"
     }
@@ -47,45 +83,125 @@ class AlgebraicStructuresTest extends AnyFunSpec {
     it("enforce associative multiplication") {
       intercept[IllegalArgumentException] {
         monoidFromTable(
-          i, x, y,
-          x, y, y,
-          y, x, y
+          i,
+          x,
+          y,
+          x,
+          y,
+          y,
+          y,
+          x,
+          y
         ).sanityTest
       }.getMessage shouldBe "associative law failed"
     }
 
     it("can validate the triadic monoid") {
       monoidFromTable(
-        i, a, b, c, f,f2, g,g2,
-        a, a, a, a, a, a, a, a,
-        b, b, b, b, b, b, b, b,
-        c, c, c, c, c, c, c, c,
-        f, b, c, b, f2,f, b, b,
-        f2,c, b, c, f,f2, c, c,
-        g, c, a, a, a, a,g2, g,
-        g2,a, c, c, c, c, g,g2
+        i,
+        a,
+        b,
+        c,
+        f,
+        f2,
+        g,
+        g2,
+        a,
+        a,
+        a,
+        a,
+        a,
+        a,
+        a,
+        a,
+        b,
+        b,
+        b,
+        b,
+        b,
+        b,
+        b,
+        b,
+        c,
+        c,
+        c,
+        c,
+        c,
+        c,
+        c,
+        c,
+        f,
+        b,
+        c,
+        b,
+        f2,
+        f,
+        b,
+        b,
+        f2,
+        c,
+        b,
+        c,
+        f,
+        f2,
+        c,
+        c,
+        g,
+        c,
+        a,
+        a,
+        a,
+        a,
+        g2,
+        g,
+        g2,
+        a,
+        c,
+        c,
+        c,
+        c,
+        g,
+        g2
       ).sanityTest
     }
 
     it("can tell if a monoid is commutative") {
       monoidFromTable(
-        i, a, b,
-        a, a, b,
-        b, b, b
+        i,
+        a,
+        b,
+        a,
+        a,
+        b,
+        b,
+        b,
+        b
       ) should be(commutative)
       monoidFromTable(
-        i, a, b,
-        a, a, a,
-        b, b, b
-      ) should not be(commutative)
+        i,
+        a,
+        b,
+        a,
+        a,
+        a,
+        b,
+        b,
+        b
+      ) should not be (commutative)
     }
   }
 
   val monoid4 =
     monoidFromTable(
-      i, x, y,
-      x, x, x,
-      y, y, y
+      i,
+      x,
+      y,
+      x,
+      x,
+      x,
+      y,
+      y,
+      y
     )
 
   describe("Monoid actions") {
@@ -110,39 +226,57 @@ class AlgebraicStructuresTest extends AnyFunSpec {
     }
 
     it("can be constructed and validated") {
-      monoid4.action[Symbol](
-        dot(a, b)
-      ){ 
-        Function untupled Map(
-          (a, i) -> a, (a, x) -> a, (a, y) -> a,
-          (b, i) -> b, (b, x) -> b, (b, y) -> b
-        )
-      }.sanityTest
+      monoid4
+        .action[Symbol](
+          dot(a, b)
+        ) {
+          Function untupled Map(
+            (a, i) -> a,
+            (a, x) -> a,
+            (a, y) -> a,
+            (b, i) -> b,
+            (b, x) -> b,
+            (b, y) -> b
+          )
+        }
+        .sanityTest
     }
 
     it("enforce the right unit law") {
       intercept[IllegalArgumentException] {
-        monoid4.action[Symbol](
-          dot(a, b)
-        ){
-          Function untupled Map(
-            (a, i) -> b, (a, x) -> a, (a, y) -> a,
-            (b, i) -> a, (b, x) -> b, (b, y) -> b
-          )
-        }.sanityTest
+        monoid4
+          .action[Symbol](
+            dot(a, b)
+          ) {
+            Function untupled Map(
+              (a, i) -> b,
+              (a, x) -> a,
+              (a, y) -> a,
+              (b, i) -> a,
+              (b, x) -> b,
+              (b, y) -> b
+            )
+          }
+          .sanityTest
       }.getMessage shouldBe "right unit law failed"
     }
 
     it("enforce the associative law") {
       intercept[IllegalArgumentException] {
-        monoid4.action[Symbol](
-          dot(a, b)
-        ) {
-          Function untupled Map(
-            (a, i) -> a, (a, x) -> b, (a, y) -> a,
-            (b, i) -> b, (b, x) -> b, (b, y) -> a
-          )
-        }.sanityTest
+        monoid4
+          .action[Symbol](
+            dot(a, b)
+          ) {
+            Function untupled Map(
+              (a, i) -> a,
+              (a, x) -> b,
+              (a, y) -> a,
+              (b, i) -> b,
+              (b, x) -> b,
+              (b, y) -> a
+            )
+          }
+          .sanityTest
       }.getMessage shouldBe "mixed associative law failed"
     }
 
@@ -150,10 +284,8 @@ class AlgebraicStructuresTest extends AnyFunSpec {
       val monoid1x = {
         val carrier = dot(i, x)
         val unit = makeNullaryOperator(carrier, i)
-        val product = makeBinaryOperator(carrier,
-          (i, i) -> i, (i, x) -> x,
-          (x, i) -> x, (x, x) -> x
-        )
+        val product =
+          makeBinaryOperator(carrier, (i, i) -> i, (i, x) -> x, (x, i) -> x, (x, x) -> x)
         new Monoid[Symbol](carrier, unit, product)
       }
       monoid1x.sanityTest
@@ -164,9 +296,11 @@ class AlgebraicStructuresTest extends AnyFunSpec {
             actionCarrier,
             monoid1x.carrier,
             actionCarrier
-          ) (
-            (a, i) -> a, (a, x) -> a,
-            (b, i) -> b, (b, x) -> a
+          )(
+            (a, i) -> a,
+            (a, x) -> a,
+            (b, i) -> b,
+            (b, x) -> a
           )
         new monoid1x.Action[Symbol](
           actionCarrier,
@@ -182,9 +316,12 @@ class AlgebraicStructuresTest extends AnyFunSpec {
             monoid1x.carrier,
             actionCarrier
           )(
-            (c, i) -> c, (c, x) -> d,
-            (d, i) -> d, (d, x) -> d,
-            (e, i) -> e, (e, x) -> e
+            (c, i) -> c,
+            (c, x) -> d,
+            (d, i) -> d,
+            (d, x) -> d,
+            (e, i) -> e,
+            (e, x) -> e
           )
         new monoid1x.Action[Symbol](
           actionCarrier,
@@ -193,7 +330,8 @@ class AlgebraicStructuresTest extends AnyFunSpec {
       }
       rightAction2.sanityTest
       val actionMorphism = arrow(rightAction.carrier, rightAction2.carrier)(
-        a -> d, b -> c
+        a -> d,
+        b -> c
       )
       monoid1x.actions.isMorphism(rightAction, rightAction2, actionMorphism) shouldBe true
       val nonActionMorphism =
@@ -201,7 +339,8 @@ class AlgebraicStructuresTest extends AnyFunSpec {
           rightAction.carrier,
           rightAction2.carrier
         )(
-          a -> c, b -> c
+          a -> c,
+          b -> c
         )
       monoid1x.actions.isMorphism(
         rightAction,
@@ -215,13 +354,18 @@ class AlgebraicStructuresTest extends AnyFunSpec {
     it("can be defined with an appropriate unit, multiplication and inverse") {
       val carrier = dot(i, x, y)
       val unit = makeNullaryOperator(carrier, i)
-      val inverse = makeUnaryOperator(carrier,
-        i -> i, x -> y, y -> x
-      )
-      val product = makeBinaryOperator(carrier,
-        (i, i) -> i, (i, x) -> x, (i, y) -> y,
-        (x, i) -> x, (x, x) -> y, (x, y) -> i,
-        (y, i) -> y, (y, x) -> i, (y, y) -> x
+      val inverse = makeUnaryOperator(carrier, i -> i, x -> y, y -> x)
+      val product = makeBinaryOperator(
+        carrier,
+        (i, i) -> i,
+        (i, x) -> x,
+        (i, y) -> y,
+        (x, i) -> x,
+        (x, x) -> y,
+        (x, y) -> i,
+        (y, i) -> y,
+        (y, x) -> i,
+        (y, y) -> x
       )
       new Group[Symbol](
         carrier,
@@ -234,13 +378,18 @@ class AlgebraicStructuresTest extends AnyFunSpec {
     it("must have inverses for every element") {
       val carrier = dot(i, x, y)
       val unit = makeNullaryOperator(carrier, i)
-      val inverse = makeUnaryOperator(carrier,
-        i -> i, x -> y, y -> x
-      )
-      val product = makeBinaryOperator(carrier,
-        (i, i) -> i, (i, x) -> x, (i, y) -> y,
-        (x, i) -> x, (x, x) -> x, (x, y) -> x,
-        (y, i) -> y, (y, x) -> y, (y, y) -> y
+      val inverse = makeUnaryOperator(carrier, i -> i, x -> y, y -> x)
+      val product = makeBinaryOperator(
+        carrier,
+        (i, i) -> i,
+        (i, x) -> x,
+        (i, y) -> y,
+        (x, i) -> x,
+        (x, x) -> x,
+        (x, y) -> x,
+        (y, i) -> y,
+        (y, x) -> y,
+        (y, y) -> y
       )
       intercept[IllegalArgumentException] {
         new Group[Symbol](
@@ -255,13 +404,18 @@ class AlgebraicStructuresTest extends AnyFunSpec {
     it("can tell if a group is commutative") {
       val carrier = dot(i, x, y)
       val unit = makeNullaryOperator(carrier, i)
-      val inverse = makeUnaryOperator(carrier,
-        i -> i, x -> y, y -> x
-      )
-      val product = makeBinaryOperator(carrier,
-        (i, i) -> i, (i, x) -> x, (i, y) -> y,
-        (x, i) -> x, (x, x) -> y, (x, y) -> i,
-        (y, i) -> y, (y, x) -> i, (y, y) -> x
+      val inverse = makeUnaryOperator(carrier, i -> i, x -> y, y -> x)
+      val product = makeBinaryOperator(
+        carrier,
+        (i, i) -> i,
+        (i, x) -> x,
+        (i, y) -> y,
+        (x, i) -> x,
+        (x, x) -> y,
+        (x, y) -> i,
+        (y, i) -> y,
+        (y, x) -> i,
+        (y, y) -> x
       )
       new Group[Symbol](
         carrier,
@@ -272,14 +426,46 @@ class AlgebraicStructuresTest extends AnyFunSpec {
     }
 
     it("can tell if a group is not commutative") {
-      val group = groupOfUnits(monoidFromTable(
-        i, a, b, c, r, s,
-        a, i, s, r, c, b,
-        b, r, i, s, a, c,
-        c, s, r, i, b, a,
-        r, b, c, a, s, i,
-        s, c, a, b, i, r
-      ))._1
+      val group = groupOfUnits(
+        monoidFromTable(
+          i,
+          a,
+          b,
+          c,
+          r,
+          s,
+          a,
+          i,
+          s,
+          r,
+          c,
+          b,
+          b,
+          r,
+          i,
+          s,
+          a,
+          c,
+          c,
+          s,
+          r,
+          i,
+          b,
+          a,
+          r,
+          b,
+          c,
+          a,
+          s,
+          i,
+          s,
+          c,
+          a,
+          b,
+          i,
+          r
+        )
+      )._1
       group.sanityTest
       group.carrier.size shouldBe 6
       group should not be commutative
@@ -296,7 +482,7 @@ class AlgebraicStructuresTest extends AnyFunSpec {
 
   describe("Lattices") {
     it("can be defined and verified") {
-      val carrier = dot(0 to 7 :_*)
+      val carrier = dot(0 to 7: _*)
       val bottom = makeNullaryOperator(carrier, 0)
       val top = makeNullaryOperator(carrier, 7)
       val meet = bifunctionAsBiArrow(carrier) { _ & _ }

@@ -1,7 +1,13 @@
 package com.fdilke.bewl.apps.music
 
 import com.fdilke.bewl.fsets.FiniteSets
-import FiniteSets.{>, LocalMonoidAssistant, ToposOfMonoidActions, bifunctionAsBiArrow, functionAsArrow}
+import FiniteSets.{
+  >,
+  LocalMonoidAssistant,
+  ToposOfMonoidActions,
+  bifunctionAsBiArrow,
+  functionAsArrow
+}
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import com.fdilke.bewl.helper.⊕
 import TriadicFixtures._
@@ -18,7 +24,7 @@ class TriadicFixturesTest extends AnyFreeSpec {
   ): Unit =
     CheckLocalMorphismEnumerator(
       triadicMonoid
-    ) (
+    )(
       sourceAction,
       targetAction,
       thorough

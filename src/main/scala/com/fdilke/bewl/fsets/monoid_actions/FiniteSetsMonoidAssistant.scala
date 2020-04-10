@@ -8,11 +8,11 @@ import scala.language.{postfixOps, reflectiveCalls}
 
 trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
   Ɛ: FindGenerators with FindPresentation with ActionSplitter =>
-  
+
   object LocalMonoidAssistant extends MonoidAssistant {
     override def actionAnalyzer[
       M <: ~
-    ] (
+    ](
       monoid: Monoid[M]
     ): monoid.ActionAnalyzer =
       new monoid.ActionAnalyzer {
@@ -22,7 +22,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
           val actionSplitting: ActionSplitting[
             M,
             A,
-            ({type λ[X <: ~] = monoid.Action[X]}) # λ
+            ({ type λ[X <: ~] = monoid.Action[X] })#λ
           ]
         }
 
@@ -49,7 +49,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
 
         private val actionSplitter: ActionSplitter[
           M,
-          ({type λ[T] = monoid.Action[T]}) # λ
+          ({ type λ[T] = monoid.Action[T] })#λ
         ] =
           ActionSplitter.forMonoid(
             monoid
@@ -78,8 +78,8 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
               )
 
             private def mapsBetween[A, B](
-              src: ActionComponent[M, A, ({type λ[T] = monoid.Action[T]}) # λ],
-              tgt: ActionComponent[M, B, ({type λ[T] = monoid.Action[T]}) # λ],
+              src: ActionComponent[M, A, ({ type λ[T] = monoid.Action[T] })#λ],
+              tgt: ActionComponent[M, B, ({ type λ[T] = monoid.Action[T] })#λ]
             ): Iterable[Map[A, B]] = {
               val srcGenerators =
                 src.componentGenerators
@@ -102,38 +102,41 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
               ): Iterable[Map[A, B]] = {
                 val gr = srcPresentation(index)
                 val generator = gr.generator
-                targetElements.filter { targetElement =>
-                  gr.relators forall { relator =>
-                    val otherTarget: B =
-                      if (relator.otherIndex == index)
-                        targetElement
-                      else
-                        partialMap(
-                          srcGenerators(relator.otherIndex)
-                        )
-                    targetMultiply(
-                      targetElement,
-                      relator.selfScalar
-                    ) == targetMultiply(
-                      otherTarget,
-                      relator.otherScalar
-                    )
-                  }
-                }.map { targetElement =>
-                  {
-                    for {
-                      m <- monoidElements
-                    } yield {
-                      srcAction.actionMultiply(
-                        generator,
-                        m
-                      ) -> targetMultiply(
+                targetElements
+                  .filter { targetElement =>
+                    gr.relators forall { relator =>
+                      val otherTarget: B =
+                        if (relator.otherIndex == index)
+                          targetElement
+                        else
+                          partialMap(
+                            srcGenerators(relator.otherIndex)
+                          )
+                      targetMultiply(
                         targetElement,
-                        m
+                        relator.selfScalar
+                      ) == targetMultiply(
+                        otherTarget,
+                        relator.otherScalar
                       )
                     }
-                  } toMap
-                }.toSeq distinct
+                  }
+                  .map { targetElement =>
+                    {
+                      for {
+                        m <- monoidElements
+                      } yield {
+                        srcAction.actionMultiply(
+                          generator,
+                          m
+                        ) -> targetMultiply(
+                          targetElement,
+                          m
+                        )
+                      }
+                    } toMap
+                  }
+                  .toSeq distinct
               }
 
               srcPresentation.indices.foldLeft(
@@ -145,8 +148,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
                     partialMap,
                     index
                   )
-                } yield
-                  partialMap ++ extension
+                } yield partialMap ++ extension
               }
             }
 
@@ -158,23 +160,23 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
                 targetAction.actionCarrier
 
               mapsBetween(
-                ActionComponent[M, A, ({type λ[T] = monoid.Action[T]}) # λ](
+                ActionComponent[M, A, ({ type λ[T] = monoid.Action[T] })#λ](
                   allGenerators,
                   action,
                   generatorsWithRelators
                 ),
-                ActionComponent[M, B, ({type λ[T] = monoid.Action[T]}) # λ](
+                ActionComponent[M, B, ({ type λ[T] = monoid.Action[T] })#λ](
                   target.actionSplitting.allGenerators,
                   targetAction,
                   Seq.empty // don't use 'em
                 )
               ) map {
-                  functionAsArrow(
-                    action.actionCarrier,
-                    targetCarrier,
-                    _
-                  )
-                }
+                functionAsArrow(
+                  action.actionCarrier,
+                  targetCarrier,
+                  _
+                )
+              }
             }
 
             override def morphismsTo[B](
@@ -195,13 +197,12 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
                     Map[A, B]
                   ]
                 ] {
-                  tupled {
-                    (i, j) =>
-                      mapsBetween(
-                        srcComponents(i),
-                        tgtComponents(j)
-                      )
-                    }
+                  tupled { (i, j) =>
+                    mapsBetween(
+                      srcComponents(i),
+                      tgtComponents(j)
+                    )
+                  }
                 }
 
               def absorb(
@@ -215,8 +216,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
                     srcIndex,
                     tgtIndex
                   )
-                } yield
-                  partialMap ++ continuation
+                } yield partialMap ++ continuation
 
               srcComponents.indices.foldLeft(
                 Iterable(
@@ -233,13 +233,12 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
               }
             }
 
-            lazy val recursiveImago:
-              FiniteSetsActionAnalysis[
-                M x A
-              ] =
-                analyze(
-                  monoid.regularAction x action
-                )
+            lazy val recursiveImago: FiniteSetsActionAnalysis[
+              M x A
+            ] =
+              analyze(
+                monoid.regularAction x action
+              )
 
             override def rawExponential[B <: ~](
               target: FiniteSetsActionAnalysis[B]
@@ -251,14 +250,10 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
                 monoid.carrier x action.actionCarrier
 
               def arrowToMap(arrow: M x A > B): M x A → B =
-                mXa.elements map {
-                  m_a => m_a -> arrow(m_a)
-                } toMap
+                mXa.elements map { m_a => m_a -> arrow(m_a) } toMap
 
               def mapToArrow(arrow: M x A → B): M x A > B =
-                  mXa.biArrow(targetCarrier) {
-                    (m, a) => arrow(m ⊕⊕ a)
-                  }.arrow
+                mXa.biArrow(targetCarrier) { (m, a) => arrow(m ⊕⊕ a) }.arrow
 
               val morphisms: DOT[M x A → B] =
                 makeDot(
@@ -271,51 +266,44 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
                 override val exponentialAction =
                   monoid.action(
                     morphisms
-                  ) {
-                    (f, m) =>
-                      arrowToMap(
-                        mXa.biArrow(targetCarrier) {
-                          (n, a) =>
-                            f(monoid.multiply(m, n) ⊕⊕ a)
-                        }.arrow
-                      )
+                  ) { (f, m) =>
+                    arrowToMap(
+                      mXa.biArrow(targetCarrier) { (n, a) => f(monoid.multiply(m, n) ⊕⊕ a) }.arrow
+                    )
                   }
 
                 override val evaluation =
                   (morphisms x action.actionCarrier).biArrow(
                     targetCarrier
-                  ) {
-                    (f, s) =>
-                      f(
-                        monoid.unit(
-                          action.actionCarrier.toI(s)
-                        ) ⊕⊕ s
-                      )
+                  ) { (f, s) =>
+                    f(
+                      monoid.unit(
+                        action.actionCarrier.toI(s)
+                      ) ⊕⊕ s
+                    )
                   }
 
                 override def transpose[X <: ~](
                   otherAction: monoid.Action[X],
                   biArrow: BiArrow[X, A, B]
                 ) =
-                  otherAction.actionCarrier(morphisms) {
-                    x =>
-                      arrowToMap(
-                        mXa.biArrow(targetCarrier) {
-                          (m, a) =>
-                            biArrow(
-                              otherAction.actionMultiply(x, m),
-                              a
-                            )
-                        } arrow
-                      )
+                  otherAction.actionCarrier(morphisms) { x =>
+                    arrowToMap(
+                      mXa
+                        .biArrow(targetCarrier) { (m, a) =>
+                          biArrow(
+                            otherAction.actionMultiply(x, m),
+                          a
+                        )
+                      } arrow
+                    )
                   }
-                }
               }
-        }
-    }
+            }
+          }
+      }
   }
 
   override val monoidAssistant =
     LocalMonoidAssistant
 }
-

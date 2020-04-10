@@ -82,30 +82,26 @@ class VanillaPitcherPredicateSolverTest extends AnyFunSpec {
       val samplePredicates: Seq[
         VanillaPitcher[StrontiumDog] => Boolean
       ] = Seq(
-          f => f.tail.head.toString startsWith "Stix",
-          f => {
-            val h = (iterate(f) {
-              _ tail
-            })
-            val siz = (h map {
-              _ head
-            } take 10).size 
-            siz > NUM_STRONTIES
-          },
-          f => f.tail.head.id > NUM_STRONTIES
-        )
-      samplePredicates.foreach { pred =>
-        solveFunction(pred) shouldBe None
-      }
+        f => f.tail.head.toString startsWith "Stix",
+        f => {
+          val h = (iterate(f) {
+            _ tail
+          })
+          val siz = (h map {
+            _ head
+          } take 10).size
+          siz > NUM_STRONTIES
+        },
+        f => f.tail.head.id > NUM_STRONTIES
+      )
+      samplePredicates.foreach { pred => solveFunction(pred) shouldBe None }
     }
     it("returns a function that can be evaluated on all arguments") {
-      solveFunction[StrontiumDog] { dogOfTheDay =>
-        dogOfTheDay.tail.tail.head == Johnny
-      } match {
+      solveFunction[StrontiumDog] { dogOfTheDay => dogOfTheDay.tail.tail.head == Johnny } match {
         case None => fail("no solution found")
         case Some(dogOfTheDay) =>
-          StrontiumDogEnumeration.values should contain (dogOfTheDay.head)
-          StrontiumDogEnumeration.values should contain (dogOfTheDay.tail.tail.tail.head)
+          StrontiumDogEnumeration.values should contain(dogOfTheDay.head)
+          StrontiumDogEnumeration.values should contain(dogOfTheDay.tail.tail.tail.head)
       }
     }
   }

@@ -1,6 +1,5 @@
 package com.fdilke.bewl2.cantorians
 
-
 import com.fdilke.bewl2.cantorians.Cantorian.cycle
 import com.fdilke.bewl2.topology.StrontiumDogEnumeration.StrontiumDog
 import org.scalatest.funspec.AnyFunSpec
@@ -33,12 +32,13 @@ class CompactVanillaPitcherTest extends AnyFunSpec {
       val unsolvablePredicates: Seq[(VanillaPitcher[Int => StrontiumDog]) => Boolean] = Seq(
         _.head(0).id >= StrontiumDogEnumeration.values.size,
         p => p.head(0).toString == "Nelson Bunker Kreelman",
-        p => Set(
-          p.head(0),
-          p.tail.head(0),
-          p.tail.tail.head(1),
-          p.tail.tail.head(2)
-        ).size == 4
+        p =>
+          Set(
+            p.head(0),
+            p.tail.head(0),
+            p.tail.tail.head(1),
+            p.tail.tail.head(2)
+          ).size == 4
       )
 
       unsolvablePredicates.foreach { predicate =>

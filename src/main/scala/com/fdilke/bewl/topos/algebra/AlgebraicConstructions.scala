@@ -5,24 +5,22 @@ import com.fdilke.bewl.topos.BaseTopos
 import ⊕._
 
 trait AlgebraicConstructions {
-  Ɛ: BaseTopos with
-    AlgebraicMachinery with
-    AlgebraicStructures  =>
+  Ɛ: BaseTopos with AlgebraicMachinery with AlgebraicStructures =>
 
   def endomorphismMonoid[T <: ~](
-    dot: DOT[T]
+      dot: DOT[T]
   ) =
     new EndomorphismMonoid[T](dot)
 
   class EndomorphismMonoid[T <: ~](
-    dot: DOT[T]
+      dot: DOT[T]
   ) {
-    private implicit val endos = 
+    private implicit val endos =
       dot > dot
 
     val monoid =
       new Monoid[T → T](
-        endos, 
+        endos,
         dot.identity.name,
         BiArrow(endos x endos, endos.transpose(endos x endos) {
           case (f ⊕ g, x) => g(f(x))
@@ -32,14 +30,12 @@ trait AlgebraicConstructions {
     lazy val homeAction =
       monoid.action(
         dot
-      ) { (a, m) =>
-        m(a)
-      }
+      ) { (a, m) => m(a) }
   }
 
   def groupOfUnits[T <: ~](
-    monoid: Monoid[T]
-  ) : (Group[T], T > T) = {
+      monoid: Monoid[T]
+  ): (Group[T], T > T) = {
     val carrier = monoid.carrier
     val pairs = carrier.squared
     val unit = monoid.unit

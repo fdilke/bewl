@@ -9,12 +9,18 @@ import org.scalatest.matchers.should.Matchers._
 class FiniteSetsUtilitiesTest extends AnyFreeSpec {
   "allMaps()" - {
     "enumerates all maps between two sets" in {
-      allMaps(Seq(1, 2), Set("a", "b", "c")) map {
-        f => Map(1->f(1), 2->f(2))
+      allMaps(Seq(1, 2), Set("a", "b", "c")) map { f =>
+        Map(1 -> f(1), 2 -> f(2))
       } shouldBe Seq(
-        Map(1->"a", 2->"a"), Map(1->"b", 2->"a"), Map(1->"c", 2->"a"),
-        Map(1->"a", 2->"b"), Map(1->"b", 2->"b"), Map(1->"c", 2->"b"),
-        Map(1->"a", 2->"c"), Map(1->"b", 2->"c"), Map(1->"c", 2->"c")
+        Map(1 -> "a", 2 -> "a"),
+        Map(1 -> "b", 2 -> "a"),
+        Map(1 -> "c", 2 -> "a"),
+        Map(1 -> "a", 2 -> "b"),
+        Map(1 -> "b", 2 -> "b"),
+        Map(1 -> "c", 2 -> "b"),
+        Map(1 -> "a", 2 -> "c"),
+        Map(1 -> "b", 2 -> "c"),
+        Map(1 -> "c", 2 -> "c")
       )
     }
 
@@ -51,11 +57,10 @@ class FiniteSetsUtilitiesTest extends AnyFreeSpec {
       for {
         f <- elementsOf(numbers.power)
         x <- elementsOf(numbers)
-      }
-        doubleChar(f) shouldBe (
-          ( f(1) && f(2) && !f(3)) ||
-          ( !f(1) && !f(2) && f(3))
-        )
+      } doubleChar(f) shouldBe (
+        (f(1) && f(2) && !f(3)) ||
+          (!f(1) && !f(2) && f(3))
+      )
     }
   }
 }

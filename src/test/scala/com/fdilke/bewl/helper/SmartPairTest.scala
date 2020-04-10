@@ -6,7 +6,7 @@ import ⊕._
 
 class SmartPairTest extends AnyFreeSpec {
 
-  "Smart pairs"- {
+  "Smart pairs" - {
     "allow their components to be accessed" in {
       val x23: Int ⊕ String = 2 ⊕ "a"
       x23._1 shouldBe 2

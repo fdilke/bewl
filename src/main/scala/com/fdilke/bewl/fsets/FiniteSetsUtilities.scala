@@ -9,7 +9,7 @@ object FiniteSetsUtilities {
   def arrow[S, T](
     source: DOT[S],
     target: DOT[T]
-  ) (
+  )(
     map: (S, T)*
   ) =
     functionAsArrow(
@@ -19,19 +19,19 @@ object FiniteSetsUtilities {
     )
 
   def biArrow[L, R, T](
-   left: DOT[L],
-   right: DOT[R],
-   target: DOT[T]
+    left: DOT[L],
+    right: DOT[R],
+    target: DOT[T]
   )(
-   mappings: ((L, R), T)*
- ) =
+    mappings: ((L, R), T)*
+  ) =
     bifunctionAsBiArrow[L, R, T](
       left,
       right,
       target
     )(
       Function untupled Map(
-        mappings:_*
+        mappings: _*
       )
     )
 
@@ -66,7 +66,7 @@ object FiniteSetsUtilities {
     functionAsArrow(
       carrier,
       carrier,
-      Map(mappings:_*)
+      Map(mappings: _*)
     )
 
   def makeBinaryOperator[X](
@@ -75,9 +75,9 @@ object FiniteSetsUtilities {
   ) =
     bifunctionAsBiArrow[X](
       carrier
-    ) (
+    )(
       Function untupled Map(
-        mappings:_*
+        mappings: _*
       )
     )
 
@@ -88,7 +88,7 @@ object FiniteSetsUtilities {
   ): (T → TRUTH) > TRUTH = {
     val incl =
       bifunctionAsBiArrow(
-        dot(subsets :_*),
+        dot(subsets: _*),
         set,
         omega
       ) {
@@ -98,16 +98,14 @@ object FiniteSetsUtilities {
   }
 
   private def intSqrt(square: Int) =
-    (1 to square).find { n =>
-      n * n == square
-    }.getOrElse {
+    (1 to square).find { n => n * n == square }.getOrElse {
       throw new IllegalArgumentException("Not a valid monoid multiplication table: size " + square)
     }
 
   def monoidFromTable[M](table: M*): Monoid[M] = {
     val carrierSize = intSqrt(table.size)
     val carrierAsList = table.take(carrierSize)
-    val carrier = dot(carrierAsList :_*)
+    val carrier = dot(carrierAsList: _*)
     val mappings =
       for {
         i <- 0 until carrierSize
@@ -121,7 +119,7 @@ object FiniteSetsUtilities {
     val product =
       makeBinaryOperator(
         carrier,
-        mappings:_ *
+        mappings: _*
       )
     new Monoid[M](
       carrier,
@@ -136,26 +134,23 @@ object FiniteSetsUtilities {
   def allMaps[A, B](
     source: Iterable[A],
     target: Iterable[B]
-  ) : Iterable[Map[A, B]] =
-      if (source.isEmpty)
-        Iterable { Map.empty }
-      else
-        for {
-          f <- allMaps(source.tail, target)
-          choice <- target
-        } yield {
-          f + (source.head -> choice)
-        }
+  ): Iterable[Map[A, B]] =
+    if (source.isEmpty)
+      Iterable { Map.empty }
+    else
+      for {
+        f <- allMaps(source.tail, target)
+        choice <- target
+      } yield {
+        f + (source.head -> choice)
+      }
 
   def relationFrom[X, Y](
     source: DOT[X],
     target: DOT[Y],
     identifications: (X, Y)*
   ): FiniteSets.Relation[X, Y] =
-    (source x target) relation {
-      (p, q) =>
-        identifications contains p -> q
-    }
+    (source x target) relation { (p, q) => identifications contains p -> q }
 
   def relationFrom[X](
     carrier: DOT[X],
@@ -164,6 +159,6 @@ object FiniteSetsUtilities {
     relationFrom(
       carrier,
       carrier,
-      identifications :_*
+      identifications: _*
     )
 }

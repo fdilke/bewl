@@ -24,8 +24,8 @@ class VerifyLengthTest extends AnyFreeSpec {
         )
 
       VerifyLength(N, 3) shouldBe false
-      VerifyLength(Seq(1,2,3), 3) shouldBe true
-      VerifyLength(Seq(1,2,3, 4), 3) shouldBe false
+      VerifyLength(Seq(1, 2, 3), 3) shouldBe true
+      VerifyLength(Seq(1, 2, 3, 4), 3) shouldBe false
     }
   }
 }

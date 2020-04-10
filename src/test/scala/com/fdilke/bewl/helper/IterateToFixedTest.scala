@@ -7,7 +7,7 @@ import scala.collection.mutable.ListBuffer
 
 class IterateToFixedTest extends AnyFreeSpec {
 
-  "Iterating to a fixed point"- {
+  "Iterating to a fixed point" - {
     "works" in {
       val argumentsSeen = new ListBuffer[Int]
       def collatz(n: Int) = {
@@ -15,9 +15,9 @@ class IterateToFixedTest extends AnyFreeSpec {
         if (n == 1)
           1
         else if (n % 2 == 0)
-          n/2
+          n / 2
         else
-          3*n + 1
+          3 * n + 1
       }
       IterateToFixed(6)(collatz) shouldBe 1
       argumentsSeen.toList shouldBe Seq(

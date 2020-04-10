@@ -3,11 +3,11 @@ package com.fdilke.bewl2.util
 import com.fdilke.bewl2.topos.Topos
 
 class FunctionWithEquality[
-    DOT[_]: Topos,
-    S: DOT,
-    T: DOT
+  DOT[_]: Topos,
+  S: DOT,
+  T: DOT
 ](
-    val innerFunction: S => T
+  val innerFunction: S => T
 ) extends Function[S, T] {
 
   override def apply(s: S): T =

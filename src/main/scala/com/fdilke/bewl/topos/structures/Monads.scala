@@ -14,14 +14,14 @@ trait Monads {
   ] {
     def apply[
       X <: ~
-    ] (
+    ](
       dot: DOT[X]
     ): Monad.At[M, X]
 
     def map[
       X <: ~,
       Y <: ~
-    ] (
+    ](
       arrow: X > Y
     ): M[X] > M[Y]
 
@@ -33,12 +33,12 @@ trait Monads {
       lazy val carrier = structure target
       lazy val local = apply(carrier)
 
-      def sanityTest : Unit = {
-        (structure o local.eta).shouldBe( carrier.identity )
+      def sanityTest: Unit = {
+        (structure o local.eta).shouldBe(carrier.identity)
       }
 
       def sanityTest2: Unit = {
-        (structure o map(structure)).shouldBe (structure o local.mu)
+        (structure o map(structure)).shouldBe(structure o local.mu)
       }
     }
   }
@@ -82,5 +82,3 @@ trait Monads {
     }
   }
 }
-
-

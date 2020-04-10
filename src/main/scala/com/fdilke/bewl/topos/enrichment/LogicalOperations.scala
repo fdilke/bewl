@@ -6,9 +6,7 @@ import com.fdilke.bewl.topos.{BaseTopos, ToposAlgebra, ToposStructures}
 
 trait LogicalOperations {
 
-  Ɛ: BaseTopos with
-    ToposStructures with
-    ToposAlgebra =>
+  Ɛ: BaseTopos with ToposStructures with ToposAlgebra =>
 
   trait LogicalOperations {
     val and: BiArrow[TRUTH, TRUTH, TRUTH]
@@ -43,9 +41,7 @@ trait LogicalOperations {
       )
 
     override lazy val falsity: UNIT > TRUTH =
-      I.forAll(omega) {
-        (_, ω) => ω
-      }
+      I.forAll(omega) { (_, ω) => ω }
   }
 
   val logicalOperations: LogicalOperations =
