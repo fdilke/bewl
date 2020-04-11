@@ -1,20 +1,17 @@
 package com.fdilke.bewl2.topology
 
 import com.fdilke.bewl2.cantorians.VanillaPitcher
-import com.fdilke.bewl2.topology
 import com.fdilke.bewl2.topology.Compact._
 import com.fdilke.bewl2.topology.EmptyEnumeration._
-import com.fdilke.bewl2.topology.Hausdorff._
-import com.fdilke.bewl2.topology.VanillaPitcherPredicateSolver.{solveSeq, solvePitcher}
 import com.fdilke.bewl2.topology.StrontiumDogEnumeration._
-import com.fdilke.bewl2.topology.WeekdayEnumeration._
+import com.fdilke.bewl2.topology.PitcherPredicateSolver.{solvePitcher, solveSeq}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
 
 import scala.collection.Iterator.iterate
 import scala.language.postfixOps
 
-class VanillaPitcherPredicateSolverTest extends AnyFunSpec {
+class PitcherPredicateSolverTest extends AnyFunSpec {
   describe("The predicate solver can act on maps") {
     it("detects immediate success for the rubberstamp predicate on an empty map") {
       def rubberstampPredicate(calendar: VanillaPitcher[StrontiumDog]): Boolean =
@@ -94,7 +91,9 @@ class VanillaPitcherPredicateSolverTest extends AnyFunSpec {
       samplePredicates.foreach { pred => solvePitcher(pred) shouldBe None }
     }
     it("returns a function that can be evaluated on all arguments") {
-      solvePitcher[StrontiumDog] { dogOfTheDay => dogOfTheDay.tail.tail.head == Johnny } match {
+      solvePitcher[StrontiumDog, VanillaPitcher] { dogOfTheDay =>
+        dogOfTheDay.tail.tail.head == Johnny
+      } match {
         case None => fail("no solution found")
         case Some(dogOfTheDay) =>
           StrontiumDogEnumeration.values should contain(dogOfTheDay.head)
@@ -104,8 +103,8 @@ class VanillaPitcherPredicateSolverTest extends AnyFunSpec {
     it("can generate a seq, but not a pitcher for uninhabited types") {
       def rubberstampPredicate(calendar: VanillaPitcher[Impossibility]): Boolean =
         true
-      solveSeq[Impossibility](rubberstampPredicate) shouldBe Some(Seq.empty)
-      solvePitcher[Impossibility](rubberstampPredicate) shouldBe None
+      solveSeq[Impossibility, VanillaPitcher](rubberstampPredicate) shouldBe Some(Seq.empty)
+      solvePitcher[Impossibility, VanillaPitcher](rubberstampPredicate) shouldBe None
     }
   }
 }

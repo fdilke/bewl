@@ -8,10 +8,10 @@ import com.fdilke.bewl2.topology.StrontiumDogEnumeration._
 import com.fdilke.bewl2.topology.Compact._
 import com.fdilke.bewl2.topology.StrontiumDogEnumeration
 
-class CompactVanillaPitcherTest extends AnyFunSpec {
+class CompactVanillaPitcherOldTest extends AnyFunSpec {
   ignore("Vanilla pitchers of compact things... (working towards Cantorians)") {
     it("are implicitly compact: can find solution pitchers where they exist") {
-      val solvablePredicates: Seq[(VanillaPitcher[Int => StrontiumDog]) => Boolean] = Seq(
+      val solvablePredicates: Seq[(VanillaPitcherOld[Int => StrontiumDog]) => Boolean] = Seq(
         _.head(0) == Johnny,
         p => p.head(0) != p.tail.head(1),
         p => p.tail.tail.head(0) == Wulf
@@ -19,7 +19,7 @@ class CompactVanillaPitcherTest extends AnyFunSpec {
 
       solvablePredicates.foreach { predicate =>
         determine[
-          VanillaPitcher[Int => StrontiumDog]
+          VanillaPitcherOld[Int => StrontiumDog]
         ](predicate) match {
           case None => fail("No solution found")
           case Some(dogPitcher) =>
@@ -29,7 +29,7 @@ class CompactVanillaPitcherTest extends AnyFunSpec {
     }
 
     it("are implicitly compact: can identify unsolvable pitchers") {
-      val unsolvablePredicates: Seq[(VanillaPitcher[Int => StrontiumDog]) => Boolean] = Seq(
+      val unsolvablePredicates: Seq[(VanillaPitcherOld[Int => StrontiumDog]) => Boolean] = Seq(
         _.head(0).id >= StrontiumDogEnumeration.values.size,
         p => p.head(0).toString == "Nelson Bunker Kreelman",
         p =>
@@ -43,7 +43,7 @@ class CompactVanillaPitcherTest extends AnyFunSpec {
 
       unsolvablePredicates.foreach { predicate =>
         determine[
-          VanillaPitcher[Int => StrontiumDog]
+          VanillaPitcherOld[Int => StrontiumDog]
         ](predicate) shouldBe None
       }
     }

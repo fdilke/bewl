@@ -740,4 +740,8 @@ Very rough roadmap:
 - be able to play a Dyad[LogicalNote] at a given speed/pitch
 - use 'search[]' to be like "find" but more proactive: executes the thing too?
     or use another name, "determine" ? - part done, sort this out
-    
+- make GroundedTree[T] ordered when T is. Also internal sort => Euclidean rhythm?    
+- add a JonssonTaski typeclass for Cantorians and trees
+- awkward using Pitcher[_, SELF] so rename as PitcherOld, have a Pitcher typeclass,
+    phase out PitcherOld which should really not be needed once Cantorian: Pitcher.
+ 
