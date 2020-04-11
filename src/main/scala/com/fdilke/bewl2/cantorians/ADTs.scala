@@ -40,4 +40,19 @@ object VanillaPitcher {
     C: Compact
   ]: Compact[VanillaPitcher[C]] =
     predicate => ???
+
+  def apply[T](
+    t: T,
+    pitcher: => VanillaPitcher[T]
+  ): VanillaPitcher[T] =
+    new VanillaPitcher[T] {
+      override val head: T = t
+      override def tail: VanillaPitcher[T] = pitcher
+    }
+
+  def constantly[T](t: T): VanillaPitcher[T] =
+    new VanillaPitcher[T] { pitcher =>
+      override val head: T = t
+      override def tail: VanillaPitcher[T] = pitcher
+    }
 }

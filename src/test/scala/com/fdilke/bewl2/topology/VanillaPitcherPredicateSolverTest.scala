@@ -5,7 +5,7 @@ import com.fdilke.bewl2.topology
 import com.fdilke.bewl2.topology.Compact._
 import com.fdilke.bewl2.topology.EmptyEnumeration._
 import com.fdilke.bewl2.topology.Hausdorff._
-import com.fdilke.bewl2.topology.VanillaPitcherPredicateSolver.{solveFunction, solveMap}
+import com.fdilke.bewl2.topology.VanillaPitcherPredicateSolver.{solveSeq, solvePitcher}
 import com.fdilke.bewl2.topology.StrontiumDogEnumeration._
 import com.fdilke.bewl2.topology.WeekdayEnumeration._
 import org.scalatest.funspec.AnyFunSpec
@@ -15,37 +15,35 @@ import scala.collection.Iterator.iterate
 import scala.language.postfixOps
 
 class VanillaPitcherPredicateSolverTest extends AnyFunSpec {
-  ignore("The predicate solver can act on maps") {
+  describe("The predicate solver can act on maps") {
     it("detects immediate success for the rubberstamp predicate on an empty map") {
       def rubberstampPredicate(calendar: VanillaPitcher[StrontiumDog]): Boolean =
         true
 
-      solveMap(
+      solveSeq(
         rubberstampPredicate
       ) shouldBe
-        Some(Map.empty)
+        Some(Seq.empty)
     }
 
-    it("detects immediate failure for the Dr No predicate on an empty map") {
+    it("detects immediate failure for the Dr No predicate") {
       def drNoPredicate(calendar: VanillaPitcher[StrontiumDog]): Boolean =
         false
 
-      solveMap(
+      solveSeq(
         drNoPredicate
       ) shouldBe
         None
     }
 
-    it("solves in one go for the Johnny-on-Wednesday predicate on an empty map") {
+    it("solves in one go for the Johnny-as-head predicate") {
       def johnnyOnWed(calendar: VanillaPitcher[StrontiumDog]): Boolean =
-        calendar.tail.tail.head == Johnny
+        calendar.tail.tail.head == Wulf
 
-      solveMap(
+      solveSeq(
         johnnyOnWed
       ) shouldBe Some(
-        Map(
-          new Key(Wednesday) -> Johnny
-        )
+        Seq(Johnny, Johnny, Wulf)
       )
     }
 
@@ -53,7 +51,7 @@ class VanillaPitcherPredicateSolverTest extends AnyFunSpec {
       def tueSameWed(calendar: VanillaPitcher[StrontiumDog]): Boolean =
         calendar.head == calendar.tail.head
 
-      solveFunction(
+      solvePitcher(
         tueSameWed
       ) match {
         case Some(function) =>
@@ -70,39 +68,44 @@ class VanillaPitcherPredicateSolverTest extends AnyFunSpec {
           f => Set(f.head, f.tail.head, f.tail.tail.head).size == 2
         )
       samplePredicates.foreach { pred =>
-        solveFunction(pred) match {
-          case Some(fn) =>
-            pred(fn) shouldBe true
+        solvePitcher(pred) match {
+          case Some(pitcher) =>
+            pred(pitcher) shouldBe true
           case None =>
             fail("Solver failed")
         }
       }
     }
     it("can diagnose when there is no solution for a predicate") {
+      def first10stronts(pitcher: VanillaPitcher[StrontiumDog]): Set[StrontiumDog] =
+        (iterate(pitcher) {
+          _ tail
+        } map {
+          _ head
+        } take 10).toSet
+
       val samplePredicates: Seq[
         VanillaPitcher[StrontiumDog] => Boolean
       ] = Seq(
         f => f.tail.head.toString startsWith "Stix",
-        f => {
-          val h = (iterate(f) {
-            _ tail
-          })
-          val siz = (h map {
-            _ head
-          } take 10).size
-          siz > NUM_STRONTIES
-        },
+        f => first10stronts(f).size > NUM_STRONTIES,
         f => f.tail.head.id > NUM_STRONTIES
       )
-      samplePredicates.foreach { pred => solveFunction(pred) shouldBe None }
+      samplePredicates.foreach { pred => solvePitcher(pred) shouldBe None }
     }
     it("returns a function that can be evaluated on all arguments") {
-      solveFunction[StrontiumDog] { dogOfTheDay => dogOfTheDay.tail.tail.head == Johnny } match {
+      solvePitcher[StrontiumDog] { dogOfTheDay => dogOfTheDay.tail.tail.head == Johnny } match {
         case None => fail("no solution found")
         case Some(dogOfTheDay) =>
           StrontiumDogEnumeration.values should contain(dogOfTheDay.head)
           StrontiumDogEnumeration.values should contain(dogOfTheDay.tail.tail.tail.head)
       }
+    }
+    it("can generate a seq, but not a pitcher for uninhabited types") {
+      def rubberstampPredicate(calendar: VanillaPitcher[Impossibility]): Boolean =
+        true
+      solveSeq[Impossibility](rubberstampPredicate) shouldBe Some(Seq.empty)
+      solvePitcher[Impossibility](rubberstampPredicate) shouldBe None
     }
   }
 }

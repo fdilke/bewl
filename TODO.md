@@ -717,6 +717,10 @@ Very rough roadmap:
 - have some impossible predicates to make sure we diagnose them as such
 - have cases where H isn't compact
 - express the compactness of H => C using the solver
+- use some simplifying techniques here e.g. lose "implicitly":
+    https://scalac.io/typeclasses-in-scala/
+- airtight way to make sure dyads are canonical
+- check monadicity of the dyad
 
 # Updated roadmap
 
@@ -733,10 +737,7 @@ Very rough roadmap:
 - implement density / sorting (generalization of Euclidean rhythms)
 - knowledge of genetic codes?
 - machinery of abstract recursion schemes? use/learn from shapeless?
-- airtight way to make sure dyads are canonical
-- check monadicity of the dyad
 - be able to play a Dyad[LogicalNote] at a given speed/pitch
-- use some simplifying techniques here e.g. lose "implicitly":
-    https://scalac.io/typeclasses-in-scala/
 - use 'search[]' to be like "find" but more proactive: executes the thing too?
-    or use another name, "determine" ?
+    or use another name, "determine" ? - part done, sort this out
+    

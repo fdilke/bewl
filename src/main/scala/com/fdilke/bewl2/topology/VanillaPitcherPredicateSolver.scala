@@ -2,38 +2,32 @@ package com.fdilke.bewl2.topology
 
 import com.fdilke.bewl2.cantorians.VanillaPitcher
 import com.fdilke.bewl2.topology.Compact._
-import com.fdilke.bewl2.topology.Hausdorff.Key
 
 import scala.annotation.tailrec
 import scala.language.postfixOps
 
 object VanillaPitcherPredicateSolver {
-  def solveMap[
+  def solveSeq[
     C: Compact
   ](
     predicate: VanillaPitcher[C] => Boolean
-  ): Option[DraftPitcher[C]] =
+  ): Option[Seq[C]] =
     new VanillaPitcherPredicateSolver(
       predicate
     ) tryMap {
       DraftPitcher.empty
+    } map {
+      _.seq
     }
 
-  def solveFunction[
+  def solvePitcher[
     C: Compact
   ](
     predicate: VanillaPitcher[C] => Boolean
   ): Option[VanillaPitcher[C]] =
-    solveMap(predicate) map {
-      functionFromMap(_)
+    Compact[C].optional flatMap { c =>
+      solveSeq(predicate) map { seq => GoPlatinumPitcher(seq, c) }
     }
-
-  @inline def functionFromMap[
-    C: Compact
-  ](
-    draft: DraftPitcher[C]
-  ): VanillaPitcher[C] =
-    draft.asPitcher
 }
 
 class VanillaPitcherPredicateSolver[
@@ -54,18 +48,18 @@ class VanillaPitcherPredicateSolver[
           None
       )
     } catch {
-      case StumpedAtException(n) =>
-        Right(n)
+      case StumpedException =>
+        Right(())
     }) match {
       case Left(result) => result
-      case Right(n) =>
+      case Right(_) =>
         determine[C] { c =>
           tryMapNonTailRec(
-            draft.wIth(n, c)
+            draft.plus(c)
           ) isDefined
         } match { // exercise for the student, why can't this be a flatmap?
           case Some(c) => // TODO: enhance find so we don't do this calculation twice
-            tryMap(draft.wIth(n, c))
+            tryMap(draft.plus(c))
           case None => None
         }
     }
@@ -74,21 +68,43 @@ class VanillaPitcherPredicateSolver[
     draft: DraftPitcher[C]
   ): Option[DraftPitcher[C]] =
     tryMap(draft)
-
-  case class StumpedAtException(
-    n: Int
-  ) extends Exception
 }
+
+case object StumpedException extends Exception
 
 object DraftPitcher {
   def empty[C: Compact]: DraftPitcher[C] =
-    ???
+    new DraftPitcher[C](Seq.empty)
 }
 
-class DraftPitcher[C: Compact] {
+class DraftPitcher[C](
+  val seq: Seq[C]
+) extends AnyVal {
   def asPitcher: VanillaPitcher[C] =
-    ???
+    new VanillaPitcher[C] {
+      override lazy val head: C =
+        if (seq.isEmpty)
+          throw StumpedException
+        else
+          seq.head
 
-  def wIth(n: Int, c: C): DraftPitcher[C] =
-    ???
+      override def tail: VanillaPitcher[C] =
+        if (seq.isEmpty)
+          throw StumpedException
+        else
+          new DraftPitcher[C](seq.tail).asPitcher
+    }
+
+  def plus(c: C): DraftPitcher[C] =
+    new DraftPitcher[C](seq :+ c)
+}
+
+object GoPlatinumPitcher {
+  def apply[C](
+    seq: Seq[C],
+    backstop: C
+  ): VanillaPitcher[C] =
+    seq.foldRight[VanillaPitcher[C]](
+      VanillaPitcher.constantly(backstop)
+    ) { (c: C, pitcher: VanillaPitcher[C]) => VanillaPitcher[C](c, pitcher) }
 }
