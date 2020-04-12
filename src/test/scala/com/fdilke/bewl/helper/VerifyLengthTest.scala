@@ -19,9 +19,8 @@ class VerifyLengthTest extends AnyFreeSpec {
     }
     "takes no more than it needs" in {
       lazy val N: LazyList[Int] =
-        0 #:: (
-          N.map { _ + 1 }
-        )
+        0 #::
+          N.map(_ + 1)
 
       VerifyLength(N, 3) shouldBe false
       VerifyLength(Seq(1, 2, 3), 3) shouldBe true

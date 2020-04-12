@@ -78,8 +78,7 @@ class HausdorffToCompactPredicateSolverTest extends AnyFunSpec {
         Seq(
           f => f(Wednesday).toString.startsWith("Stix"),
           f => WeekdayEnumeration.values.map(f).size > StrontiumDogEnumeration.values.size,
-          f =>
-            forAll[Weekday](wd1 => forAll[Weekday](wd2 => (f(wd1) != f(wd2)) || (wd1 == wd2)))
+          f => forAll[Weekday](wd1 => forAll[Weekday](wd2 => (f(wd1) != f(wd2)) || (wd1 == wd2)))
         )
       samplePredicates.foreach(pred => solveFunction(pred) shouldBe None)
     }

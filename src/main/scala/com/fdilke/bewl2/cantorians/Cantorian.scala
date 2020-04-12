@@ -106,6 +106,6 @@ object Cantorian {
     }
 
   // can we make 'compactness' implicit instead and not need this?
-//  implicit val cantorianCompactness: Compact[Cantorian] =
-//    Pitcher.compactness[Cantorian, Boolean]
+  implicit val cantorianCompactness: Compact[Cantorian] =
+    Pitcher.compactness[Cantorian, Boolean]
 }

@@ -74,11 +74,10 @@ trait FindGenerators extends BaseFiniteSets {
                 newCyclic: Cyclic
               ) =
                 new MaximalCyclics(
-                  newCyclic +: (
+                  newCyclic +:
                     cyclics.filterNot {
                       _.subsetOf(newCyclic)
                     }
-                  )
                 )
 
               override def +(

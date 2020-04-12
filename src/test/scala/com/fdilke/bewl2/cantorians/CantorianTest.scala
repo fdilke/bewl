@@ -103,20 +103,20 @@ class CantorianTest extends AnyFunSpec {
       cantorianAsFn(2009) shouldBe false
     }
 
-//    it("are compact - can solve predicates when a solution exists") {
-//      val samplePredicates: Seq[Cantorian => Boolean] = Seq(
-//        _ => true,
-//        _.head,
-//        c => c.head && c.tail.head
-//      )
-//      samplePredicates.foreach {
-//        determine[Cantorian](_) match {
-//          case None => fail("no solution found")
-//          case Some(cantorian) =>
-//            predicate(cantorian) shouldBe true
-//        }
-//      }
-//    }
+    it("are compact - can solve predicates when a solution exists") {
+      val samplePredicates: Seq[Cantorian => Boolean] = Seq(
+        _ => true,
+        _.head,
+        c => c.head && c.tail.head
+      )
+      samplePredicates.foreach { predicate =>
+        determine[Cantorian](predicate) match {
+          case None => fail("no solution found")
+          case Some(cantorian) =>
+            predicate(cantorian) shouldBe true
+        }
+      }
+    }
   }
 
 ////  describe("Analyzing co-cantorians") {
