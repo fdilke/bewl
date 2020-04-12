@@ -1,6 +1,7 @@
 package com.fdilke.bewl2.topology
 
-import com.fdilke.bewl2.cantorians.VanillaPitcher
+import com.fdilke.bewl2.cantorians.{Pitcher, VanillaPitcher}
+import com.fdilke.bewl2.cantorians.VanillaPitcher._
 import com.fdilke.bewl2.topology.Compact._
 import com.fdilke.bewl2.topology.EmptyEnumeration._
 import com.fdilke.bewl2.topology.StrontiumDogEnumeration._
@@ -17,7 +18,7 @@ class PitcherPredicateSolverTest extends AnyFunSpec {
       def rubberstampPredicate(calendar: VanillaPitcher[StrontiumDog]): Boolean =
         true
 
-      solveSeq(
+      solveSeq[VanillaPitcher[StrontiumDog], StrontiumDog](
         rubberstampPredicate
       ) shouldBe
         Some(Seq.empty)
@@ -27,7 +28,7 @@ class PitcherPredicateSolverTest extends AnyFunSpec {
       def drNoPredicate(calendar: VanillaPitcher[StrontiumDog]): Boolean =
         false
 
-      solveSeq(
+      solveSeq[VanillaPitcher[StrontiumDog], StrontiumDog](
         drNoPredicate
       ) shouldBe
         None
@@ -37,7 +38,7 @@ class PitcherPredicateSolverTest extends AnyFunSpec {
       def johnnyOnWed(calendar: VanillaPitcher[StrontiumDog]): Boolean =
         calendar.tail.tail.head == Wulf
 
-      solveSeq(
+      solveSeq[VanillaPitcher[StrontiumDog], StrontiumDog](
         johnnyOnWed
       ) shouldBe Some(
         Seq(Johnny, Johnny, Wulf)
@@ -48,7 +49,7 @@ class PitcherPredicateSolverTest extends AnyFunSpec {
       def tueSameWed(calendar: VanillaPitcher[StrontiumDog]): Boolean =
         calendar.head == calendar.tail.head
 
-      solvePitcher(
+      solvePitcher[VanillaPitcher[StrontiumDog], StrontiumDog](
         tueSameWed
       ) match {
         case Some(function) =>
@@ -64,10 +65,10 @@ class PitcherPredicateSolverTest extends AnyFunSpec {
           f => f.head != f.tail.tail.head,
           f => Set(f.head, f.tail.head, f.tail.tail.head).size == 2
         )
-      samplePredicates.foreach { pred =>
-        solvePitcher(pred) match {
+      samplePredicates.foreach { predicate =>
+        solvePitcher[VanillaPitcher[StrontiumDog], StrontiumDog](predicate) match {
           case Some(pitcher) =>
-            pred(pitcher) shouldBe true
+            predicate(pitcher) shouldBe true
           case None =>
             fail("Solver failed")
         }
@@ -88,10 +89,12 @@ class PitcherPredicateSolverTest extends AnyFunSpec {
         f => first10stronts(f).size > NUM_STRONTIES,
         f => f.tail.head.id > NUM_STRONTIES
       )
-      samplePredicates.foreach { pred => solvePitcher(pred) shouldBe None }
+      samplePredicates.foreach { predicate =>
+        solvePitcher[VanillaPitcher[StrontiumDog], StrontiumDog](predicate) shouldBe None
+      }
     }
     it("returns a function that can be evaluated on all arguments") {
-      solvePitcher[StrontiumDog, VanillaPitcher] { dogOfTheDay =>
+      solvePitcher[VanillaPitcher[StrontiumDog], StrontiumDog] { dogOfTheDay =>
         dogOfTheDay.tail.tail.head == Johnny
       } match {
         case None => fail("no solution found")
@@ -103,8 +106,10 @@ class PitcherPredicateSolverTest extends AnyFunSpec {
     it("can generate a seq, but not a pitcher for uninhabited types") {
       def rubberstampPredicate(calendar: VanillaPitcher[Impossibility]): Boolean =
         true
-      solveSeq[Impossibility, VanillaPitcher](rubberstampPredicate) shouldBe Some(Seq.empty)
-      solvePitcher[Impossibility, VanillaPitcher](rubberstampPredicate) shouldBe None
+      solveSeq[VanillaPitcher[Impossibility], Impossibility](rubberstampPredicate) shouldBe Some(
+        Seq.empty
+      )
+      solvePitcher[VanillaPitcher[Impossibility], Impossibility](rubberstampPredicate) shouldBe None
     }
   }
 }

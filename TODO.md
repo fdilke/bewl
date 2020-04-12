@@ -708,6 +708,34 @@ Very rough roadmap:
 
     sbt "testOnly *HausdorffToCompactPredicateSolverTest"
 
+# an abandoned idea:
+
+      implicit def pitcherForVanillaPitcherExtension[
+        P[X] <: VanillaPitcher[X]
+    //    P[_] <: ({ type λ[X] <: VanillaPitcher[X] }) # λ
+      ](
+        headFn: Pitcher.HeadFn,
+        tailFn: Pitcher: TailFn
+        constructFn: Pitcher.Constructor[P]
+      ): Pitcher[P] =
+        new Pitcher[P] {
+          override def head[T](
+            pitcher: P[T]
+          ): T =
+            pitcher.head
+    
+          override def tail[T](
+            pitcher: P[T]
+          ): VanillaPitcher[T] =
+            pitcher.tail
+    
+          override def construct[T](
+            head: => T,
+            tail: => VanillaPitcher[T]
+          ): VanillaPitcher[T] =
+            VanillaPitcher(head, tail)
+        }
+
 # Done
     
 - move Pitcher, Catcher to their own module

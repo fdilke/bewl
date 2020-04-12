@@ -57,47 +57,55 @@ object VanillaPitcherOld {
     }
 }
 
-trait Pitcher[P[_]] {
-  def head[T](
-    pitcher: P[T]
+trait Pitcher[P, T] {
+  def head(
+    pitcher: P
   ): T
-  def tail[T](
-    pitcher: P[T]
-  ): P[T]
-  def construct[T](
+  def tail(
+    pitcher: P
+  ): P
+  def construct(
     head: => T,
-    tail: => P[T]
-  ): P[T]
+    tail: => P
+  ): P
 }
 
 object Pitcher {
-  def apply[P[_]: Pitcher](
-    implicit pitcher: Pitcher[P]
-  ): Pitcher[P] = pitcher
+  def apply[P, T](
+    implicit pitcher: Pitcher[P, T]
+  ): Pitcher[P, T] = pitcher
 
   @inline
-  def head[T, P[_]: Pitcher](
-    pitcher: P[T]
+  def head[P, T](
+    p: P
+  )(
+    implicit pitcher: Pitcher[P, T]
   ): T =
-    Pitcher[P].head(pitcher)
+    pitcher.head(p)
 
   @inline
-  def tail[T, P[_]: Pitcher](
-    pitcher: P[T]
-  ): P[T] =
-    Pitcher[P].tail(pitcher)
+  def tail[P, T](
+    p: P
+  )(
+    implicit pitcher: Pitcher[P, T]
+  ): P =
+    pitcher.tail(p)
 
   @inline
-  def construct[T, P[_]: Pitcher](
+  def construct[P, T](
     head: => T,
-    tail: => P[T]
-  ): P[T] =
-    Pitcher[P].construct(head, tail)
+    tail: => P
+  )(
+    implicit pitcher: Pitcher[P, T]
+  ): P =
+    pitcher.construct(head, tail)
 
-  def constantly[T, P[_]: Pitcher](
+  def constantly[P, T](
     t: T
-  ): P[T] = {
-    lazy val constantPitcher: P[T] =
+  )(
+    implicit pitcher: Pitcher[P, T]
+  ): P = {
+    lazy val constantPitcher: P =
       construct(
         t,
         constantPitcher
@@ -121,19 +129,19 @@ object VanillaPitcher {
       override def tail: VanillaPitcher[T] = pitcher
     }
 
-  implicit val pitcherForVanillaPitcher: Pitcher[VanillaPitcher] =
-    new Pitcher[VanillaPitcher] {
-      override def head[T](
+  implicit def pitcherForVanillaPitcher[T]: Pitcher[VanillaPitcher[T], T] =
+    new Pitcher[VanillaPitcher[T], T] {
+      override def head(
         pitcher: VanillaPitcher[T]
       ): T =
         pitcher.head
 
-      override def tail[T](
+      override def tail(
         pitcher: VanillaPitcher[T]
       ): VanillaPitcher[T] =
         pitcher.tail
 
-      override def construct[T](
+      override def construct(
         head: => T,
         tail: => VanillaPitcher[T]
       ): VanillaPitcher[T] =

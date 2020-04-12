@@ -1,46 +1,57 @@
 package com.fdilke.bewl2.topology
 
-import com.fdilke.bewl2.cantorians.{Pitcher}
+import com.fdilke.bewl2.cantorians.Pitcher
+import com.fdilke.bewl2.cantorians.Pitcher._
 import com.fdilke.bewl2.topology.Compact._
-import Pitcher._
+
 import scala.annotation.tailrec
 import scala.language.postfixOps
 
 object PitcherPredicateSolver {
   def solveSeq[
-    C: Compact,
-    P[_]: Pitcher
+    P,
+    C: Compact
   ](
-    predicate: P[C] => Boolean
+    predicate: P => Boolean
+  )(
+    implicit pitcher: Pitcher[P, C]
   ): Option[Seq[C]] =
     new PitcherPredicateSolver(
       predicate
-    ) trySeq {
+    )(Compact[C], pitcher) trySeq { // <== should not be needed
       DraftPitcher.empty
     } map {
       _.seq
     }
 
   def solvePitcher[
-    C: Compact,
-    P[_]: Pitcher
+    P,
+    C: Compact
   ](
-    predicate: P[C] => Boolean
-  ): Option[P[C]] =
+    predicate: P => Boolean
+  )(
+    implicit pitcher: Pitcher[P, C]
+  ): Option[P] =
     Compact[C].optional flatMap { c =>
-      solveSeq(predicate) map { seq => GoPlatinumPitcher(seq, c) }
+      solveSeq(
+        predicate
+      )(Compact[C], pitcher) map { seq => // <== should not be needed
+        GoPlatinumPitcher(seq, c)
+      }
     }
 }
 
 class PitcherPredicateSolver[
-  C: Compact,
-  P[_]: Pitcher
+  P,
+  C: Compact
 ](
-  predicate: P[C] => Boolean
+  predicate: P => Boolean
+)(
+  implicit pitcher: Pitcher[P, C]
 ) {
   @tailrec private final def trySeq(
-    draft: DraftPitcher[C, P]
-  ): Option[DraftPitcher[C, P]] =
+    draft: DraftPitcher[P, C]
+  ): Option[DraftPitcher[P, C]] =
     (try {
       Left(
         if (predicate(
@@ -67,24 +78,24 @@ class PitcherPredicateSolver[
     }
 
   private def trySeqNonTailRec(
-    draft: DraftPitcher[C, P]
-  ): Option[DraftPitcher[C, P]] =
+    draft: DraftPitcher[P, C]
+  ): Option[DraftPitcher[P, C]] =
     trySeq(draft)
 }
 
 case object StumpedException extends Exception
 
 object DraftPitcher {
-  def empty[C: Compact, P[_]]: DraftPitcher[C, P] =
-    new DraftPitcher[C, P](Seq.empty)
+  def empty[C: Compact, P]: DraftPitcher[P, C] =
+    new DraftPitcher[P, C](Seq.empty)
 }
 
-class DraftPitcher[C, P[_]](
+class DraftPitcher[P, C](
   val seq: Seq[C]
 ) extends AnyVal {
   def asPitcher(
-    implicit pitcher: Pitcher[P]
-  ): P[C] = {
+    implicit pitcher: Pitcher[P, C]
+  ): P = {
     @inline def conditionally[X](
       block: => X
     ): X =
@@ -93,28 +104,30 @@ class DraftPitcher[C, P[_]](
       else
         block
 
-    Pitcher[P].construct(
+    construct(
       conditionally {
         seq head
       },
       conditionally {
-        new DraftPitcher(
+        new DraftPitcher[P, C](
           seq tail
         ) asPitcher
       }
     )
   }
 
-  def plus(c: C): DraftPitcher[C, P] =
-    new DraftPitcher[C, P](seq :+ c)
+  def plus(c: C): DraftPitcher[P, C] =
+    new DraftPitcher[P, C](seq :+ c)
 }
 
 object GoPlatinumPitcher {
-  def apply[C, P[_]: Pitcher](
+  def apply[P, C](
     seq: Seq[C],
     backstop: C
-  ): P[C] =
-    seq.foldRight[P[C]](
+  )(
+    implicit pitcher: Pitcher[P, C]
+  ): P =
+    seq.foldRight[P](
       constantly(backstop)
-    ) { (c: C, pitcher: P[C]) => construct[C, P](c, pitcher) }
+    ) { (c: C, p: P) => construct[P, C](c, p) }
 }
