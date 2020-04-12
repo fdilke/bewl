@@ -45,14 +45,14 @@ object Compact {
   ): Option[(T, U)] = {
     val holder: AtomicReference[(T, U)] =
       new AtomicReference[(T, U)]()
-    if (exists[T]{ t =>
-      val u: U = f(t)
-      val satisfied: Boolean =
-        predicate(u)
-      if (satisfied)
-        holder.set(t -> u)
-      satisfied
-    })
+    if (exists[T] { t =>
+          val u: U = f(t)
+          val satisfied: Boolean =
+            predicate(u)
+          if (satisfied)
+            holder.set(t -> u)
+          satisfied
+        })
       Some(holder.get())
     else
       None

@@ -51,7 +51,7 @@ class PitcherPredicateSolver[
 )(
   implicit pitcher: Pitcher[P, C]
 ) {
-  @tailrec final private def trySeq(
+  final private def trySeq(
     draft: DraftPitcher[P, C]
   ): Option[DraftPitcher[P, C]] =
     (try {
@@ -68,21 +68,13 @@ class PitcherPredicateSolver[
     }) match {
       case Left(result) => result
       case Right(_) =>
-        determine[C] { c =>
-          trySeqNonTailRec(
-            draft.plus(c)
-          ) isDefined
-        } match { // exercise for the student, why can't this be a flatmap?
-          case Some(c) => // TODO: enhance find so we don't do this calculation twice
-            trySeq(draft.plus(c))
-          case None => None
+        determine[C, Option[DraftPitcher[P, C]]](
+          c => trySeq(draft.plus(c)),
+          od => od.isDefined
+        ) flatMap {
+          _._2
         }
     }
-
-  private def trySeqNonTailRec(
-    draft: DraftPitcher[P, C]
-  ): Option[DraftPitcher[P, C]] =
-    trySeq(draft)
 }
 
 case object StumpedException extends Exception
