@@ -1,7 +1,7 @@
 package com.fdilke.bewl.topos.monads
 
-import com.fdilke.bewl.topos.{ToposStructures, BaseTopos}
-import com.fdilke.bewl.helper.{Memoize, ⊕}
+import com.fdilke.bewl.topos.{BaseTopos, ToposStructures}
+import com.fdilke.bewl.helper.{⊕, Memoize}
 
 trait ContinuationMonad {
   Ɛ: BaseTopos with ToposStructures =>
@@ -21,8 +21,8 @@ trait ContinuationMonad {
   ](
     dot: DOT[S]
   ) extends StrongMonad[
-        ({ type λ[X <: ~] = X → S → S })#λ
-      ] {
+      ({ type λ[X <: ~] = X → S → S })#λ
+    ] {
     override def apply[X <: ~](
       dash: DOT[X]
     ) =
@@ -51,7 +51,7 @@ trait ContinuationMonad {
             ffff(
               (dash > dot > dot > dot).transpose(
                 dash > dot
-              ) { (x, f) => f(x) }(
+              )((x, f) => f(x))(
                 f
               )
             )
@@ -64,18 +64,18 @@ trait ContinuationMonad {
           daa: DOT[Y]
         ) =
           (
-            (dash x daa) > dot > dot
+            (dash.x(daa)) > dot > dot
           ).transpose {
-            dash x (daa > dot > dot)
+            dash.x(daa > dot > dot)
           } {
             case (
                 x ⊕ yss,
                 xys
                 ) =>
-              implicit val dashDaa = dash x daa
+              implicit val dashDaa = dash.x(daa)
               implicit val anonImplicit = daa > dot > dot
               yss(
-                (dot > daa(dashDaa) { y => x ⊕⊕ y })(
+                (dot > daa(dashDaa)(y => x ⊕⊕ y))(
                   xys
                 )
               )

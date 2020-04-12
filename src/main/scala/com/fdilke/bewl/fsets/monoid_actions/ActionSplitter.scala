@@ -52,16 +52,16 @@ trait ActionSplitter extends BaseFiniteSets {
           monoid.carrier.elements
 
         private val findGenerators =
-          FindGenerators forMonoid monoid
+          FindGenerators.forMonoid(monoid)
 
         private val findPresentation =
-          FindPresentation forMonoid monoid
+          FindPresentation.forMonoid(monoid)
 
         override def splitAction[A](
           action: monoid.Action[A]
         ) = {
           val allGenerators: Seq[A] =
-            findGenerators apply action generators
+            findGenerators.apply(action) generators
           val indexedGenerators: Seq[(A, Int)] =
             allGenerators.zipWithIndex
           val actionMultiply: BiArrow[A, M, A] =
@@ -94,7 +94,7 @@ trait ActionSplitter extends BaseFiniteSets {
             ({ type λ[T] = monoid.Action[T] })#λ
           ] = { block =>
             val componentGenerators: Seq[A] =
-              block map allGenerators
+              block.map(allGenerators)
             val componentAction: monoid.Action[A] =
               monoid.action(
                 makeDot(
@@ -128,7 +128,7 @@ trait ActionSplitter extends BaseFiniteSets {
             ({ type λ[T] = monoid.Action[T] })#λ
           ](
             allGenerators,
-            blocks map handleBlock
+            blocks.map(handleBlock)
           )
         }
       }

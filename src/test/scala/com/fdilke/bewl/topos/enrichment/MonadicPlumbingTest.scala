@@ -18,19 +18,18 @@ class MonadicPlumbingTest extends AnyFreeSpec {
         numbers
       ) should have(
         source(
-          symbols x numbers
+          symbols.x(numbers)
         ),
         target(
-          numbers x symbols
+          numbers.x(symbols)
         ),
         iso(
           true
         )
       )
 
-      twist(symbols, numbers) o
-        twist(numbers, symbols) shouldBe
-        (numbers x symbols).identity
+      twist(symbols, numbers).o(twist(numbers, symbols)) shouldBe
+        numbers.x(symbols).identity
     }
   }
 
@@ -46,10 +45,10 @@ class MonadicPlumbingTest extends AnyFreeSpec {
         strings
       ) should have(
         source(
-          (symbols x numbers) x strings
+          (symbols.x(numbers)).x(strings)
         ),
         target(
-          symbols x (numbers x strings)
+          symbols.x(numbers.x(strings))
         ),
         iso(
           true
@@ -70,10 +69,10 @@ class MonadicPlumbingTest extends AnyFreeSpec {
         strings
       ) should have(
         source(
-          symbols x (numbers x strings)
+          symbols.x(numbers.x(strings))
         ),
         target(
-          (symbols x numbers) x strings
+          (symbols.x(numbers)).x(strings)
         ),
         iso(
           true

@@ -27,7 +27,7 @@ object BellNumbers extends App {
     implicit val anonImplicit = set2.power
 
     val eqRelns = set2.power
-      .whereAll(set) { (ssp, s) => ssp(s ⊕⊕ s) }
+      .whereAll(set)((ssp, s) => ssp(s ⊕⊕ s))
       .whereAll(set, set) { (ssp, x, y) =>
         ssp(x ⊕⊕ y) →
           ssp(y ⊕⊕ x)

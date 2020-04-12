@@ -6,8 +6,8 @@ case class ↔[A, B](
 ) {
   def o[C](Δ: B ↔ C) =
     new ↔[A, C](
-      / andThen Δ./,
-      Δ.\ andThen \
+      /.andThen(Δ./),
+      Δ.\.andThen(\)
     )
 
   def unary_~ =

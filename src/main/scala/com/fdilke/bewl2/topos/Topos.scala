@@ -2,11 +2,11 @@ package com.fdilke.bewl2.topos
 
 import com.fdilke.bewl.helper.Memoize
 import com.fdilke.bewl2.topos.FunctionalPlumbing.{
+  collapse,
+  withUnit,
   CharacteristicArrow,
   Equalizer,
-  EqualizerReceiver,
-  collapse,
-  withUnit
+  EqualizerReceiver
 }
 import org.scalatest.exceptions.TestFailedException
 import org.scalatest.matchers.must.Matchers
@@ -45,7 +45,7 @@ trait Topos[DOT[_]] { topos =>
   def sanityTest[S: DOT, T: DOT](arrow: S => T): Unit
 
   def toTrue[S: DOT]: S => Ω =
-    truth o to1[S]
+    truth.o(to1[S])
 
   def compareFunctions[S: DOT, T: DOT](func: S => T, func2: S => T): Boolean
   def functionAsString[S: DOT, T: DOT](arrow: S => T): String
@@ -82,7 +82,7 @@ trait Topos[DOT[_]] { topos =>
       equalize(function, function2)
 
     @inline final def o[R: DOT](function2: R => S): R => T =
-      function compose function2
+      function.compose(function2)
 
     @inline final def x[U: DOT](function2: S => U): S => (T, U) =
       s => (function(s), function2(s))
@@ -186,8 +186,8 @@ trait Topos[DOT[_]] { topos =>
     lazy val `_∃` : (A > Ω) => Ω =
       collapse { f =>
         val tt: Ω => Ω =
-          collapse { (w: Ω) => ∀ { (x: A) => f(x) → w } }
-        ∀ { (w: Ω) => tt(w) → w }
+          collapse((w: Ω) => ∀((x: A) => f(x) → w))
+        ∀((w: Ω) => tt(w) → w)
       }
   }
 
@@ -229,9 +229,9 @@ trait Topos[DOT[_]] { topos =>
 
   // Projection operators
   def π0[A: DOT, B: DOT]: ((A, B)) => A =
-    tupled { (a, b) => a }
+    tupled((a, b) => a)
   def π1[A: DOT, B: DOT]: ((A, B)) => B =
-    tupled { (a, b) => b }
+    tupled((a, b) => b)
 
   // TODO: this works but is monstrous. Remedy is to abolish
   //  materialized products in favour of multiary plumbing?
@@ -256,7 +256,7 @@ trait Topos[DOT[_]] { topos =>
   object LogicalOperations {
     lazy val and: (Ω, Ω) => Ω =
       untupled {
-        (truth x truth).chi.chi
+        truth.x(truth).chi.chi
       }
 
     lazy val implies: (Ω, Ω) => Ω =
@@ -274,9 +274,9 @@ trait Topos[DOT[_]] { topos =>
       )
 
     lazy val falsity: Unit => Ω =
-      ∀ { (ω: Ω) => ω }
+      ∀((ω: Ω) => ω)
 
     lazy val or: (Ω, Ω) => Ω =
-      collapse { (a: Ω, b: Ω) => ∀ { (ω: Ω) => (a → ω) ∧ (b → ω) → ω } }
+      collapse((a: Ω, b: Ω) => ∀((ω: Ω) => (a → ω) ∧ (b → ω) → ω))
   }
 }

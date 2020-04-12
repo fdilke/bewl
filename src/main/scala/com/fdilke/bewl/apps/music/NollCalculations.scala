@@ -7,7 +7,7 @@ import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSets.ActionSplitter
 import triadicTopos.EndoRelation
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.elementsOf
-import com.fdilke.bewl.helper.{IterateToFixed, Timed, ⊕}
+import com.fdilke.bewl.helper.{⊕, IterateToFixed, Timed}
 
 import scala.language.postfixOps
 
@@ -46,7 +46,7 @@ object NollCalculations extends App {
     println("Number of each size:")
 
     val sizeGroups: Map[Int, Iterable[triadicTopos.EQUALIZER[Int]]] =
-      subobjs map { _.whereTrue } groupBy subSize
+      subobjs.map(_.whereTrue).groupBy(subSize)
 
     val sortedSizes: Seq[Int] =
       sizeGroups.keySet.toSeq.sorted
@@ -82,11 +82,11 @@ object NollCalculations extends App {
       n <- elementsOf(octaveDot)
     } {
       val generated =
-        elementsOf(triadicMonoid.carrier).map { a => affineMapApply(n, a) }.toSeq.distinct.sorted
+        elementsOf(triadicMonoid.carrier).map(a => affineMapApply(n, a)).toSeq.distinct.sorted
 
       println(n + " -> " + generated.mkString(","))
     }
-    System exit 0
+    System.exit(0)
   }
 
   if (false) {
@@ -94,7 +94,7 @@ object NollCalculations extends App {
       n <- elementsOf(chordDot)
     } {
       val generated =
-        elementsOf(triadicMonoid.carrier).map { a => affineMapApply(n, a) }.toSeq.distinct.sorted
+        elementsOf(triadicMonoid.carrier).map(a => affineMapApply(n, a)).toSeq.distinct.sorted
 
       println(n + " -> " + generated.mkString(","))
     }
@@ -117,7 +117,7 @@ object NollCalculations extends App {
   }
 
   if (false) {
-    val cc = cyclic x cyclic
+    val cc = cyclic.x(cyclic)
     val ccAnalysis =
       triadicSplit(cc)
     println(
@@ -145,7 +145,7 @@ object NollCalculations extends App {
   }
 
   if (false) {
-    val cc = cyclic x chord
+    val cc = cyclic.x(chord)
     val ccAnalysis =
       triadicSplit(cc)
     println(
@@ -174,14 +174,14 @@ object NollCalculations extends App {
 
   if (true) { // fast enough now
     println("Chord square:")
-    val c2 = chord x chord
+    val c2 = chord.x(chord)
     val csAnalysis =
       ActionSplitter
         .forMonoid(
           triadicMonoid
         )
         .splitAction(
-          chordAction x chordAction
+          chordAction.x(chordAction)
         )
     println(
       "\tnumber of components: " + (
@@ -239,7 +239,7 @@ object NollCalculations extends App {
       }
     }
     println(" (" + (c2_omega.size) + ")")
-    System exit 0
+    System.exit(0)
   }
 
   def measure[T](
@@ -273,14 +273,14 @@ object NollCalculations extends App {
       println("size of omega = " + triadicTopos.omega.size)
       println("size of power = " + measure(power))
       if (false) {
-        (power >> triadicTopos.I) foreach { to1 => println("calculated power -> 1") }
+        (power >> triadicTopos.I).foreach(to1 => println("calculated power -> 1"))
         println("calculated power -> 1... done")
         val isInjective =
           Timed("calculating injectivity of " + name) {
-            (power >> tune) exists { projection =>
+            (power >> tune).exists { projection =>
               print("*")
               val retracts =
-                (projection o tune.singleton) == tune.identity
+                (projection.o(tune.singleton)) == tune.identity
               if (retracts)
                 println("!")
               retracts
@@ -378,6 +378,6 @@ object ChordRelationsSlow extends App {
 
   val ans =
     Timed("Composing the diagonal") {
-      diag o diag
+      diag.o(diag)
     }
 }

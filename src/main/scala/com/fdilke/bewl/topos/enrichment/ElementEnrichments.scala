@@ -26,7 +26,7 @@ trait ElementEnrichments {
         preExpDot.source > expDot.target
       ).transpose(
         preExpDot
-      ) { (sr, r) => exp(sr(r)) }(
+      )((sr, r) => exp(sr(r)))(
         preExp
       )
 

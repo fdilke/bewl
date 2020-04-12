@@ -11,6 +11,6 @@ object ContinuousIntegration {
   def notOnCI(
     function: => Unit
   ) =
-    if (!(ciSpecificSettings exists { setting => Option(System.getenv(setting)).isEmpty }))
+    if (!ciSpecificSettings.exists(setting => Option(System.getenv(setting)).isEmpty))
       function
 }

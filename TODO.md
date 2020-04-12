@@ -752,6 +752,8 @@ Very rough roadmap:
 
 # Updated roadmap
 
+- express the compactness of the Cantorian
+- and the compactness of the pitcher
 - have cases where C isn't Hausdorff
 - should 'find' include some way to capture intermediate results, e.g.
     find[C] { c => f(c).isOk } but now we want to have saved f(c),
@@ -759,9 +761,7 @@ Very rough roadmap:
     actually return value is Option[() => (C, R)]
     Already have the technology to do this assuming it's not abused in 
         too many places :() i.e. the exception hack
-- express the compactness of the Cantorian
 - Hausdorffness of the catcher
-- Compactness of the pitcher
 - implement density / sorting (generalization of Euclidean rhythms)
 - knowledge of genetic codes?
 - machinery of abstract recursion schemes? use/learn from shapeless?

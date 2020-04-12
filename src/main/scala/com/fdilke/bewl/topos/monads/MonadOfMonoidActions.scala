@@ -21,8 +21,8 @@ trait MonadOfMonoidActions {
   ](
     monoid: Monoid[M]
   ) extends StrongMonad[
-        ({ type λ[X <: ~] = X x M })#λ
-      ] {
+      ({ type λ[X <: ~] = X x M })#λ
+    ] {
     override def apply[X <: ~](
       dot: DOT[X]
     ) =

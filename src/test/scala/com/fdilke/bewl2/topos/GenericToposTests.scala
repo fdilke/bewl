@@ -19,7 +19,7 @@ abstract class GenericToposTests[
   val foobar2baz: (FOO, BAR) => BAZ
   val monicBar2baz: BAR => BAZ
 
-  private final lazy val foo2baz = foo2ImageOfBar // a convenient alias
+  final private lazy val foo2baz = foo2ImageOfBar // a convenient alias
 
   trait EqualizerSituationReceiver[X] {
     def apply[S: DOT, M: DOT, T: DOT](
@@ -55,7 +55,7 @@ abstract class GenericToposTests[
         throw new IllegalArgumentException("equalizing two arrows that are already equal!")
       }
 
-      (s o r) shouldBeFn (t o r)
+      (s.o(r)) shouldBeFn (t.o(r))
     }
   }
 
@@ -72,7 +72,7 @@ abstract class GenericToposTests[
       )
 
       objects should have size 3
-      objects foreach { dot: DOT[_] => sanityTest(dot) }
+      objects.foreach { dot: DOT[_] => sanityTest(dot) }
     }
 
     it("include sane arrows whose sources and targets match their names") {
@@ -116,8 +116,8 @@ abstract class GenericToposTests[
     it("has identity arrows which can be composed") {
       val identityFoo: FOO => FOO = identity
       id[FOO] shouldBeFn identityFoo
-      (foo2bar o id[FOO]) shouldBeFn foo2bar
-      (id[BAR] o foo2bar) shouldBeFn foo2bar
+      (foo2bar.o(id[FOO])) shouldBeFn foo2bar
+      (id[BAR].o(foo2bar)) shouldBeFn foo2bar
     }
 
     it("has equalizers") {
@@ -135,8 +135,8 @@ abstract class GenericToposTests[
                 equalizer: FunctionalPlumbing.Equalizer[DOT, M, R]
               ): Int = {
                 val inclusion: R => M = equalizer.include
-                (s o inclusion) shouldBeFn (t o inclusion)
-                (inclusion o equalizer.restrict(r)) shouldBeFn r
+                (s.o(inclusion)) shouldBeFn (t.o(inclusion))
+                (inclusion.o(equalizer.restrict(r))) shouldBeFn r
                 numCalls.incrementAndGet()
               }
             }
@@ -153,7 +153,7 @@ abstract class GenericToposTests[
 //        right (baz)
 //      )
       val productArrow: FOO => (BAR, BAZ) =
-        foo2bar x foo2baz
+        foo2bar.x(foo2baz)
 
       productArrow.sanityTest
 //      productArrow should have (
@@ -167,14 +167,14 @@ abstract class GenericToposTests[
       foo2baz shouldBeFn { (x: FOO) => productArrow(x)._2 }
 
       val swapFooBar: ((FOO, BAR)) => (BAR, FOO) =
-        Function.tupled { (x, y) => (y, x) }
+        Function.tupled((x, y) => (y, x))
 
       val swapBarFoo: ((BAR, FOO)) => (FOO, BAR) =
-        Function.tupled { (y, x) => (x, y) }
+        Function.tupled((y, x) => (x, y))
 
-      id[(BAR, FOO)] shouldBeFn (swapFooBar o swapBarFoo)
-      id[(FOO, BAR)] shouldBeFn (swapBarFoo o swapFooBar)
-      id[(FOO, BAR)] shouldBeFn (π0[FOO, BAR] x π1[FOO, BAR])
+      id[(BAR, FOO)] shouldBeFn (swapFooBar.o(swapBarFoo))
+      id[(FOO, BAR)] shouldBeFn (swapBarFoo.o(swapFooBar))
+      id[(FOO, BAR)] shouldBeFn (π0[FOO, BAR].x(π1[FOO, BAR]))
     }
 
     it("has a terminator") {
@@ -184,7 +184,7 @@ abstract class GenericToposTests[
       fooToI.source shouldBe foo
       fooToI.target shouldBe dot[Unit]
 
-      (to1[BAR] o foo2bar) shouldBeFn fooToI
+      (to1[BAR].o(foo2bar)) shouldBeFn fooToI
     }
 
     it("has a (derived) initial object") {
@@ -194,7 +194,7 @@ abstract class GenericToposTests[
       fooFromO.source shouldBe dot[Void]
       fooFromO.target shouldBe foo
 
-      (foo2bar o fooFromO) shouldBeFn from0[BAR]
+      (foo2bar.o(fooFromO)) shouldBeFn from0[BAR]
     }
 
     it("consistently calculates arrows from the initial to the terminal") {
@@ -262,14 +262,14 @@ abstract class GenericToposTests[
       chi.chi.source shouldBe baz
       chi.chi.target shouldBe omega
 
-      (chi.chi o monicBar2baz) shouldBeFn toTrue[BAR]
+      (chi.chi.o(monicBar2baz)) shouldBeFn toTrue[BAR]
 
       val restriction: FOO => BAR =
         chi.restrict(foo2ImageOfBar)
       restriction.sanityTest
       restriction.source shouldBe dot[FOO]
       restriction.target shouldBe dot[BAR]
-      (monicBar2baz o restriction) shouldBeFn foo2ImageOfBar
+      (monicBar2baz.o(restriction)) shouldBeFn foo2ImageOfBar
 
       // Note behaviour is not defined for these pathological cases:
       // construct a non-monic arrow, have chi throw a NotMonicException

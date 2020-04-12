@@ -30,15 +30,17 @@ object FiniteSetsUtilities {
       right,
       target
     )(
-      Function untupled Map(
-        mappings: _*
+      Function.untupled(
+        Map(
+          mappings: _*
+        )
       )
     )
 
   def elementsOf[X](
     dot: DOT[X]
   ): Iterable[X] =
-    dot.globals map {
+    dot.globals.map {
       _(())
     }
 
@@ -76,8 +78,10 @@ object FiniteSetsUtilities {
     bifunctionAsBiArrow[X](
       carrier
     )(
-      Function untupled Map(
-        mappings: _*
+      Function.untupled(
+        Map(
+          mappings: _*
+        )
       )
     )
 
@@ -94,11 +98,11 @@ object FiniteSetsUtilities {
       ) {
         _ contains _
       }
-    (set.power transpose incl).chi
+    set.power.transpose(incl).chi
   }
 
   private def intSqrt(square: Int) =
-    (1 to square).find { n => n * n == square }.getOrElse {
+    (1 to square).find(n => n * n == square).getOrElse {
       throw new IllegalArgumentException("Not a valid monoid multiplication table: size " + square)
     }
 
@@ -136,7 +140,7 @@ object FiniteSetsUtilities {
     target: Iterable[B]
   ): Iterable[Map[A, B]] =
     if (source.isEmpty)
-      Iterable { Map.empty }
+      Iterable(Map.empty)
     else
       for {
         f <- allMaps(source.tail, target)
@@ -150,7 +154,7 @@ object FiniteSetsUtilities {
     target: DOT[Y],
     identifications: (X, Y)*
   ): FiniteSets.Relation[X, Y] =
-    (source x target) relation { (p, q) => identifications contains p -> q }
+    (source.x(target)).relation((p, q) => identifications contains p -> q)
 
   def relationFrom[X](
     carrier: DOT[X],

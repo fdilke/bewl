@@ -4,6 +4,8 @@ import com.fdilke.bewl2.cantorians.Cantorian.cycle
 import com.fdilke.bewl2.topology.StrontiumDogEnumeration.StrontiumDog
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
+import com.fdilke.bewl2.topology.Compact._
+import Pitcher._
 
 class CantorianTest extends AnyFunSpec {
 
@@ -100,13 +102,20 @@ class CantorianTest extends AnyFunSpec {
       cantorianAsFn(78) shouldBe true
       cantorianAsFn(2009) shouldBe false
     }
+
 //    it("are compact - can solve predicates when a solution exists") {
 //      val samplePredicates: Seq[Cantorian => Boolean] = Seq(
 //        _ => true,
 //        _.head,
 //        c => c.head && c.tail.head
 //      )
-//
+//      samplePredicates.foreach {
+//        determine[Cantorian](_) match {
+//          case None => fail("no solution found")
+//          case Some(cantorian) =>
+//            predicate(cantorian) shouldBe true
+//        }
+//      }
 //    }
   }
 

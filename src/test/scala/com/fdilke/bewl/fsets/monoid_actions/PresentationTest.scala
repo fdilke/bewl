@@ -5,7 +5,7 @@ import com.fdilke.bewl.fsets.FiniteSets.{>, ToposOfMonoidActions, VOID}
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
 import org.scalatest.freespec.AnyFreeSpec
-import com.fdilke.bewl.helper.StandardSymbols.{i, x, y, a, b, c, r, s, source, target, iso}
+import com.fdilke.bewl.helper.StandardSymbols.{a, b, c, i, iso, r, s, source, target, x, y}
 import org.scalatest.matchers.should.Matchers._
 
 import scala.language.{existentials, reflectiveCalls}
@@ -13,7 +13,7 @@ import scala.language.{existentials, reflectiveCalls}
 class PresentationTest extends AnyFreeSpec {
 
   private val actionTopos =
-    ToposOfMonoidActions of monoidOf3
+    ToposOfMonoidActions.of(monoidOf3)
 
   "Building actions from presentations" - {
     "works for an empty generating set" in {
@@ -161,7 +161,7 @@ class PresentationTest extends AnyFreeSpec {
           I -> { _ => 1 }
         )
       val twoAction =
-        end2.action(twoCarrier) { (s, m) => twoActionMap(m)(s) }
+        end2.action(twoCarrier)((s, m) => twoActionMap(m)(s))
 
       val twoProjection: Int > Int =
         presentation.project(

@@ -2,13 +2,13 @@ package com.fdilke.bewl.fsets.monoid_actions
 
 import com.fdilke.bewl.fsets.FiniteSets
 import FiniteSets.{
-  Monoid,
   >,
+  bifunctionAsBiArrow,
+  functionAsArrow,
   DefaultMonoidAssistant,
   LocalMonoidAssistant,
-  ToposOfMonoidActions,
-  bifunctionAsBiArrow,
-  functionAsArrow
+  Monoid,
+  ToposOfMonoidActions
 }
 import org.scalatest.matchers.should.Matchers._
 import com.fdilke.bewl.testutil.CustomMatchers._

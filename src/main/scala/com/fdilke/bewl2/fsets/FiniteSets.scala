@@ -13,24 +13,23 @@ object FiniteSets {
     override def sanityTest[S: Iterable]: Unit =
       println(s"Sanity testing ${dot[S]}")
 
-    override def sanityTest[S: Iterable, T: Iterable](arrow: S => T): Unit = {
-      for { s <- dot[S]; t = arrow(s) } if (!dot[T].exists { _ == t })
+    override def sanityTest[S: Iterable, T: Iterable](arrow: S => T): Unit =
+      for { s <- dot[S]; t = arrow(s) } if (!dot[T].exists(_ == t))
         throw new IllegalArgumentException(
           "Broken arrow: " + functionAsString(arrow) +
             s" maps value $s outside domain ${dot[S]}"
         )
-    }
 
     override def functionAsString[S: Iterable, T: Iterable](
       arrow: S => T
     ): String =
-      (dot[S].map { s => s -> arrow(s) } toMap) toString
+      (dot[S].map(s => s -> arrow(s)) toMap) toString
 
     override def compareFunctions[S: Iterable, T: Iterable](
       func: S => T,
       func2: S => T
     ): Boolean =
-      dot[S] forall { s => func(s) == func2(s) }
+      dot[S].forall(s => func(s) == func2(s))
 
     override def equalize[
       S: Iterable,
@@ -41,7 +40,7 @@ object FiniteSets {
       func2: S => T
     ): EqualizerReceiver[Iterable, S, X] => X = {
       @inline type R = S
-      val subset: Iterable[R] = dot[S] filter { s => func1(s) == func2(s) }
+      val subset: Iterable[R] = dot[S].filter(s => func1(s) == func2(s))
       _(new Equalizer[Iterable, S, R] {
         override val include: R => S =
           identity
@@ -63,13 +62,13 @@ object FiniteSets {
         a -> b
       }
 
-    override implicit val terminator: Iterable[Unit] =
-      Iterable({})
+    implicit override val terminator: Iterable[Unit] =
+      Iterable {}
 
     override def to1[S: Iterable]: S => Unit =
       _ => {}
 
-    override implicit val initial: Iterable[Void] =
+    implicit override val initial: Iterable[Void] =
       Iterable[Void]()
 
     override def from0[S: Iterable]: Void => S =
@@ -81,7 +80,7 @@ object FiniteSets {
       A: Iterable,
       B: Iterable
     ]: Iterable[A > B] =
-      allMaps(dot[A], dot[B]) map { f => new FunctionWithEquality[Iterable, A, B](f) }
+      allMaps(dot[A], dot[B]).map(f => new FunctionWithEquality[Iterable, A, B](f))
 
     override def transpose[
       A: Iterable,
@@ -96,7 +95,7 @@ object FiniteSets {
         )
 
     override type Ω = Boolean
-    override implicit val omega: Iterable[Boolean] =
+    implicit override val omega: Iterable[Boolean] =
       Iterable(true, false)
     override val truth: Unit => Boolean =
       _ => true

@@ -1,6 +1,6 @@
 package com.fdilke.bewl.topos
 
-import com.fdilke.bewl.helper.{Memoize, VerifyLength, ⊕}
+import com.fdilke.bewl.helper.{⊕, Memoize, VerifyLength}
 
 import scala.language.postfixOps
 
@@ -45,7 +45,7 @@ trait BaseTopos {
       bifunc: (R, S) => T
     ): R > (S → T) =
       transpose(
-        (index x source).biArrow(target)(bifunc)
+        index.x(source).biArrow(target)(bifunc)
       )
 
     def evaluate(
@@ -54,7 +54,7 @@ trait BaseTopos {
     ): T
 
     final def evaluation: BiArrow[S → T, S, T] =
-      (this x source).biArrow(target) {
+      this.x(source).biArrow(target) {
         evaluate(_, _)
       }
   }
@@ -78,10 +78,10 @@ trait BaseTopos {
     def pair(l: L, r: R): L x R
 
     final lazy val π0 =
-      product(left) { _._1 }
+      product(left)(_._1)
 
     final lazy val π1 =
-      product(right) { _._2 }
+      product(right)(_._2)
 
     final def biArrow[T <: ~](
       target: DOT[T]
@@ -166,15 +166,15 @@ trait BaseTopos {
     ): R > S
 
     lazy val inclusion: S > S =
-      dot(equalizerTarget) { s => s }
+      dot(equalizerTarget)(s => s)
   }
 
   private object InitialDot {
     lazy val O = falsity whereTrue
     def fromO[X <: ~](dot: DOT[X]) = {
-      val xO = dot.toTrue ?= (falsity o dot.toI)
-      val xOtoO = O restrict xO.toI
-      xO.inclusion o xOtoO.inverse
+      val xO = dot.toTrue ?= (falsity.o(dot.toI))
+      val xOtoO = O.restrict(xO.toI)
+      xO.inclusion.o(xOtoO.inverse)
     }
   }
   type VOID = UNIT // TODO: fix with strict equalizers
@@ -223,7 +223,7 @@ trait BaseTopos {
     dot: DOT[S] =>
 
     final lazy val identity: S > S =
-      dot(dot) { s => s }
+      dot(dot)(s => s)
 
     final private val memoizedProduct =
       Memoize.generic.withLowerBound[
@@ -261,29 +261,31 @@ trait BaseTopos {
     ): Coproduct[S, T] =
       memoizedCoproduct(that)
 
-    final lazy val toTrue = truth o toI
+    final lazy val toTrue = truth.o(toI)
     final lazy val power = this > omega
     final lazy val ∀ = toTrue.name.chi
-    final lazy val squared = dot x dot
+    final lazy val squared = dot.x(dot)
 
     final def map(f: S => S) =
-      dot(dot) { f }
+      dot(dot)(f)
 
     final def flatMap(
       bifunc: S => S > S
     ) =
-      (this x this).biArrow(this) {
+      this.x(this).biArrow(this) {
         bifunc(_)(_)
       }
 
     final lazy val ∃ : S → TRUTH > TRUTH =
       power.forAll(omega) { (f, w) =>
         implicit val anonImplicit: EXPONENTIAL[S, TRUTH] = power
-        (power x omega).universally(dot) {
-          case (f ⊕ w, x) => {
-            f(x) → w
-          }
-        }(f, w) → w
+        power
+          .x(omega)
+          .universally(dot) {
+            case (f ⊕ w, x) => {
+              f(x) → w
+            }
+          }(f, w) → w
       }
 
     final def preForAll[R <: ~](
@@ -291,7 +293,7 @@ trait BaseTopos {
     )(
       bifunc: (R, S) => TRUTH
     ): R > TRUTH =
-      ∀ o power.transpose(source)(bifunc)
+      ∀.o(power.transpose(source)(bifunc))
 
     final def forAll[T <: ~](
       target: DOT[T]
@@ -309,7 +311,7 @@ trait BaseTopos {
     )(
       g: (S, T, U) => TRUTH
     ): S > TRUTH =
-      forAll(target) { (x, t) => target.forAll(target2) { (t, u) => g(x, t, u) }(t) }
+      forAll(target)((x, t) => target.forAll(target2)((t, u) => g(x, t, u))(t))
 
     // TODO refactor to be properly variadic
     final def forAll[
@@ -324,7 +326,7 @@ trait BaseTopos {
       g: (S, T, U, V) => TRUTH
     ): S > TRUTH =
       forAll(target) { (x, t) =>
-        target.forAll(target2) { (t, u) => target2.forAll(target3) { (u, v) => g(x, t, u, v) }(u) }(
+        target.forAll(target2)((t, u) => target2.forAll(target3)((u, v) => g(x, t, u, v))(u))(
           t
         )
       }
@@ -358,7 +360,7 @@ trait BaseTopos {
     )(
       bifunc: (R, S) => TRUTH
     ): R > TRUTH =
-      ∃ o power.transpose(source)(bifunc)
+      ∃.o(power.transpose(source)(bifunc))
 
     final def existsViaE[T <: ~](
       target: DOT[T]
@@ -380,7 +382,7 @@ trait BaseTopos {
       g: (S, T) => TRUTH
     ): S > TRUTH = {
       val dotTarget =
-        dot x target
+        dot.x(target)
 
       val criterion: S x T > TRUTH =
         dotTarget.biArrow(omega) {
@@ -391,7 +393,7 @@ trait BaseTopos {
         criterion.whereTrue
 
       val kk: EQUALIZER[S] =
-        (dotTarget.π0 o hh.inclusion).image
+        dotTarget.π0.o(hh.inclusion).image
 
       kk.inclusion.chi
     }
@@ -406,22 +408,22 @@ trait BaseTopos {
       BiArrow(squared, diagonal.chi)
 
     final lazy val singleton: S > (S → TRUTH) =
-      power transpose =?=
+      power.transpose(=?=)
 
     def >>[T <: ~](
       target: DOT[T]
     ): Iterable[
       S > T
     ] =
-      (dot > target).globals map { global =>
+      (dot > target).globals.map { global =>
         dot(target) { s =>
           implicit val anonImplicit = dot > target
-          global(dot toI s)(s)
+          global(dot.toI(s))(s)
         }
       }
 
     final lazy val fromO: VOID > S =
-      InitialDot fromO dot
+      InitialDot.fromO(dot)
 
     final lazy val pac =
       new PartialArrowClassifier(dot)
@@ -429,12 +431,12 @@ trait BaseTopos {
     final def *-[T <: ~](
       that: DOT[T]
     ) =
-      (this x that).π0
+      this.x(that).π0
 
     final def -*[T <: ~](
       that: DOT[T]
     ) =
-      (this x that).π1
+      this.x(that).π1
 
     final def `+Uncached`[T <: ~](
       that: DOT[T]
@@ -461,12 +463,12 @@ trait BaseTopos {
     )(
       predicate: (S, B) => TRUTH
     ): S > B = {
-      val product = dot x target
-      val graph = product where {
-        ⊕ tupled predicate
+      val product = dot.x(target)
+      val graph = product.where {
+        ⊕.tupled(predicate)
       } inclusion
 
-      (product.π1 o graph) / (product.π0 o graph)
+      (product.π1.o(graph)) / (product.π0.o(graph))
     }
 
     // Contravariant exponential functor
@@ -533,30 +535,34 @@ trait BaseTopos {
       VerifyLength(>>(omega).toSeq, 2)
 
     final def congruences: Iterable[Relation[S, S]] =
-      squared >> omega map { arrow =>
-        Relation(
-          dot,
-          dot,
-          BiArrow(
-            squared,
-            arrow
+      (squared >> omega)
+        .map { arrow =>
+          Relation(
+            dot,
+            dot,
+            BiArrow(
+              squared,
+              arrow
+            )
           )
-        )
-      } filter {
-        _.isEquivalence
-      }
+        }
+        .filter {
+          _.isEquivalence
+        }
 
     final lazy val isSimple: Boolean =
       VerifyLength(congruences toSeq, 2)
 
     def size(): Int =
-      optionalGenerator map {
-        _ >> dot size
-      } getOrElse {
-        throw new IllegalArgumentException(
-          "Cannot size dots in this topos - no generator available"
-        )
-      }
+      optionalGenerator
+        .map {
+          _ >> dot size
+        }
+        .getOrElse {
+          throw new IllegalArgumentException(
+            "Cannot size dots in this topos - no generator available"
+          )
+        }
   }
 
   trait BaseArrow[S <: ~, T <: ~] {
@@ -575,15 +581,15 @@ trait BaseTopos {
     arrow: S > T =>
 
     final lazy val name: UNIT > (S → T) =
-      (source > target).transpose(I) { (i, x) => arrow(x) }
+      (source > target).transpose(I)((i, x) => arrow(x))
 
     final def x[U <: ~](
       that: S > U
     ): S > (T x U) = {
       implicit val product: BIPRODUCT[T, U] =
-        target x that.target
+        target.x(that.target)
 
-      source(product) { s => this(s) ⊕⊕ that(s) }
+      source(product)(s => this(s) ⊕⊕ that(s))
     }
 
     final def toBool(
@@ -622,10 +628,10 @@ trait BaseTopos {
       isMonic && isEpic
 
     final lazy val isSection: Boolean =
-      (target >> source).exists { left: T > S => (left o arrow) == source.identity }
+      (target >> source).exists { left: T > S => (left.o(arrow)) == source.identity }
 
     final lazy val isRetraction: Boolean =
-      (target >> source).exists { right: T > S => (arrow o right) == target.identity }
+      (target >> source).exists { right: T > S => (arrow.o(right)) == target.identity }
 
     final lazy val inverse: T > S =
       source.power.transpose(target) { (t, s) =>
@@ -633,7 +639,7 @@ trait BaseTopos {
       } \ source.singleton
 
     def /[R <: ~](iso: S > R): R > T =
-      arrow o iso.inverse
+      arrow.o(iso.inverse)
 
     def +[U <: ~](that: U > T) =
       (source ⊔ that.source).sum(
@@ -662,7 +668,7 @@ trait BaseTopos {
 
       val congruences: EQUALIZER[T x T → TRUTH] =
         t2Power
-          .whereAll(target) { (ssp, t) => ssp(t ⊕⊕ t) }
+          .whereAll(target)((ssp, t) => ssp(t ⊕⊕ t))
           .whereAll(target, target) { (ssp, t, u) =>
             ssp(t ⊕⊕ u) →
               ssp(u ⊕⊕ t)
@@ -693,7 +699,7 @@ trait BaseTopos {
       target /
         target.squared
           .relation(
-            (arrow x that).image.inclusion chi
+            arrow.x(that).image.inclusion chi
           )
           .toEquivalence
 
@@ -719,11 +725,11 @@ trait BaseTopos {
     product: BIPRODUCT[L, R],
     arrow: L x R > T
   ) extends (
-        (
-          L,
-          R
-        ) => T
-      ) {
+      (
+        L,
+        R
+      ) => T
+    ) {
     def apply(
       l: L,
       r: R
@@ -739,7 +745,7 @@ trait BaseTopos {
       l: S > L,
       r: S > R
     ): S > T =
-      arrow o (l x r)
+      arrow.o(l.x(r))
 
     def sanityTest =
       arrow.sanityTest
@@ -751,21 +757,21 @@ trait BaseTopos {
     y: DOT[Y],
     z: DOT[Z]
   ): X x Y x Z > X =
-    (x x y).π0 o (x x y x z).π0
+    x.x(y).π0.o(x.x(y).x(z).π0)
 
   def midProjection[X <: ~, Y <: ~, Z <: ~](
     x: DOT[X],
     y: DOT[Y],
     z: DOT[Z]
   ): X x Y x Z > Y =
-    (x x y).π1 o (x x y x z).π0
+    x.x(y).π1.o(x.x(y).x(z).π0)
 
   def rightProjection[X <: ~, Y <: ~, Z <: ~](
     x: DOT[X],
     y: DOT[Y],
     z: DOT[Z]
   ): X x Y x Z > Z =
-    (x x y x z).π1
+    x.x(y).x(z).π1
 
   class PartialArrowClassifier[A <: ~](
     dot: DOT[A]
@@ -777,10 +783,9 @@ trait BaseTopos {
           (f(a) ∧ f(b)) → dot.=?=(a, b)
       } whereTrue
 
-    val include = classifier restrict dot.singleton
+    val include = classifier.restrict(dot.singleton)
 
-    val ⏊ = classifier restrict
-      dot.power.transpose(I) { (i, x) => falsity(i) }
+    val ⏊ = classifier.restrict(dot.power.transpose(I)((i, x) => falsity(i)))
 
     def extend[S <: ~, B <: ~](
       monic: S > B,
@@ -811,16 +816,16 @@ trait BaseTopos {
     right: DOT[B]
   ) {
     private val fullProduct =
-      left.pac.classifier x right.pac.classifier
+      left.pac.classifier.x(right.pac.classifier)
 
     private val injectLeftFull =
-      left.pac.include x (right.pac.⏊ o left.toI)
+      left.pac.include.x(right.pac.⏊.o(left.toI))
     private val injectRightFull =
-      (left.pac.⏊ o right.toI) x right.pac.include
+      (left.pac.⏊.o(right.toI)).x(right.pac.include)
 
-    val coproduct = fullProduct where { x => injectLeftFull.chi(x) ∨ injectRightFull.chi(x) }
-    val injectLeft = coproduct restrict injectLeftFull
-    val injectRight = coproduct restrict injectRightFull
+    val coproduct = fullProduct.where(x => injectLeftFull.chi(x) ∨ injectRightFull.chi(x))
+    val injectLeft = coproduct.restrict(injectLeftFull)
+    val injectRight = coproduct.restrict(injectRightFull)
 
     def sum[X <: ~](
       leftArrow: A > X,
@@ -872,20 +877,22 @@ trait BaseTopos {
       val target = compatibleArrow.target
 
       target.power.transpose(
-        (arrow.target x target).existsMid(
-          compatibleArrow.source
-        ) { (q, s, t) =>
-          implicit val anonImplicit = dot.power
-          q(s) ∧ target.=?=(
-            compatibleArrow(s),
-            t
-          )
-        }
+        arrow.target
+          .x(target)
+          .existsMid(
+            compatibleArrow.source
+          ) { (q, s, t) =>
+            implicit val anonImplicit = dot.power
+            q(s) ∧ target.=?=(
+              compatibleArrow(s),
+              t
+            )
+          }
       ) \ target.singleton
     }
   }
 
   // TODO: shouldn't need this, hack to get round bug in Scala 2.12.0-M4
   def tempConst[A <: ~](dot: DOT[A])(a: A) =
-    I(dot) { _ => a }
+    I(dot)(_ => a)
 }

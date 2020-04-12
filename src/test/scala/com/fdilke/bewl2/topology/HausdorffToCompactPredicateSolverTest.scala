@@ -7,7 +7,7 @@ import Hausdorff._
 import StrontiumDogEnumeration._
 import WeekdayEnumeration._
 import EmptyEnumeration._
-import com.fdilke.bewl2.topology.HausdorffToCompactPredicateSolver.{solveMap, solveFunction}
+import com.fdilke.bewl2.topology.HausdorffToCompactPredicateSolver.{solveFunction, solveMap}
 
 class HausdorffToCompactPredicateSolverTest extends AnyFunSpec {
   describe("The predicate solver can act on maps") {
@@ -60,7 +60,7 @@ class HausdorffToCompactPredicateSolverTest extends AnyFunSpec {
     it("finds effective solutions for various predicates") {
       val samplePredicates: Seq[(Weekday => StrontiumDog) => Boolean] =
         Seq(
-          f => f(Friday) == f(Monday) && (f(Wednesday).toString startsWith "The"),
+          f => f(Friday) == f(Monday) && (f(Wednesday).toString.startsWith("The")),
           f => f(Friday) != f(Monday),
           f => Set(f(Monday), f(Tuesday), f(Wednesday)).size == 2
         )
@@ -76,15 +76,15 @@ class HausdorffToCompactPredicateSolverTest extends AnyFunSpec {
     it("can diagnose when there is no solution for a predicate") {
       val samplePredicates: Seq[(Weekday => StrontiumDog) => Boolean] =
         Seq(
-          f => f(Wednesday).toString startsWith "Stix",
+          f => f(Wednesday).toString.startsWith("Stix"),
           f => WeekdayEnumeration.values.map(f).size > StrontiumDogEnumeration.values.size,
           f =>
-            forAll[Weekday] { wd1 => forAll[Weekday] { wd2 => (f(wd1) != f(wd2)) || (wd1 == wd2) } }
+            forAll[Weekday](wd1 => forAll[Weekday](wd2 => (f(wd1) != f(wd2)) || (wd1 == wd2)))
         )
-      samplePredicates.foreach { pred => solveFunction(pred) shouldBe None }
+      samplePredicates.foreach(pred => solveFunction(pred) shouldBe None)
     }
     it("returns a function that can be evaluated on all arguments") {
-      solveFunction[Int, StrontiumDog] { dogOfTheDay => dogOfTheDay(2) == Johnny } match {
+      solveFunction[Int, StrontiumDog](dogOfTheDay => dogOfTheDay(2) == Johnny) match {
         case None => fail("no solution found")
         case Some(dogOfTheDay) =>
           StrontiumDogEnumeration.values should contain(dogOfTheDay(22))

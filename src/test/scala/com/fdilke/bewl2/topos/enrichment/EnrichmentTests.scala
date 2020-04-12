@@ -21,9 +21,9 @@ class EnrichmentTests extends AnyFunSpec {
       theId shouldBeFn id[Boolean]
       theId shouldNotBeFn constT
 
-      intercept[IllegalArgumentException] { theId shouldNotBeFn theId }
-      intercept[IllegalArgumentException] { theId shouldNotBeFn id[Boolean] }
-      intercept[IllegalArgumentException] { theId shouldBeFn constT }
+      intercept[IllegalArgumentException](theId shouldNotBeFn theId)
+      intercept[IllegalArgumentException](theId shouldNotBeFn id[Boolean])
+      intercept[IllegalArgumentException](theId shouldBeFn constT)
     }
 
     it("work for binary functions") {
@@ -44,11 +44,11 @@ class EnrichmentTests extends AnyFunSpec {
       and shouldNotBeFn xor
       and shouldBeFn otherAnd
 
-      intercept[IllegalArgumentException] { pi0 shouldNotBeFn pi0 }
-      intercept[IllegalArgumentException] { pi0 shouldNotBeFn untupled(π0[Boolean, Boolean]) }
-      intercept[IllegalArgumentException] { pi0 shouldBeFn xor }
-      intercept[IllegalArgumentException] { and shouldBeFn xor }
-      intercept[IllegalArgumentException] { and shouldNotBeFn otherAnd }
+      intercept[IllegalArgumentException](pi0 shouldNotBeFn pi0)
+      intercept[IllegalArgumentException](pi0 shouldNotBeFn untupled(π0[Boolean, Boolean]))
+      intercept[IllegalArgumentException](pi0 shouldBeFn xor)
+      intercept[IllegalArgumentException](and shouldBeFn xor)
+      intercept[IllegalArgumentException](and shouldNotBeFn otherAnd)
     }
   }
 
@@ -62,8 +62,8 @@ class EnrichmentTests extends AnyFunSpec {
       forall.source shouldBe dot[Int > Ω]
       forall.target shouldBe dot[Ω]
 
-      (forall o embed.chi.chi.name) shouldNotBeFn truth
-      (forall o id[Int].chi.chi.name) shouldBeFn truth
+      (forall.o(embed.chi.chi.name)) shouldNotBeFn truth
+      (forall.o(id[Int].chi.chi.name)) shouldBeFn truth
     }
   }
 
@@ -96,9 +96,9 @@ class EnrichmentTests extends AnyFunSpec {
       exists.source shouldBe dot[Int > Boolean]
       exists.target shouldBe dot[Boolean]
 
-      (exists o embed.chi.chi.name) shouldBeFn truth
-      (exists o embedEmpty.chi.chi.name) shouldNotBeFn truth
-      (exists o id[Int].chi.chi.name) shouldBeFn truth
+      (exists.o(embed.chi.chi.name)) shouldBeFn truth
+      (exists.o(embedEmpty.chi.chi.name)) shouldNotBeFn truth
+      (exists.o(id[Int].chi.chi.name)) shouldBeFn truth
     }
   }
   /*

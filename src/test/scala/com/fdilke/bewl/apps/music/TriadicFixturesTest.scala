@@ -3,10 +3,10 @@ package com.fdilke.bewl.apps.music
 import com.fdilke.bewl.fsets.FiniteSets
 import FiniteSets.{
   >,
-  LocalMonoidAssistant,
-  ToposOfMonoidActions,
   bifunctionAsBiArrow,
-  functionAsArrow
+  functionAsArrow,
+  LocalMonoidAssistant,
+  ToposOfMonoidActions
 }
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import com.fdilke.bewl.helper.⊕

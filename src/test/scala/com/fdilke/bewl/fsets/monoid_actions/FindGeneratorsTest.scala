@@ -26,10 +26,7 @@ class FindGeneratorsTest extends AnyFreeSpec {
     )
 
   private val actionTopos =
-    ToposOfMonoidActions of (
-      monoidOf3,
-      FiniteSets.DefaultMonoidAssistant
-  )
+    ToposOfMonoidActions.of(monoidOf3, FiniteSets.DefaultMonoidAssistant)
 
   "The generator finder" - {
     "can build up a set of maximal cyclic subalgebras for a monoid action" - {

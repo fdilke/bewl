@@ -27,7 +27,7 @@ object Transfer {
         )
       }
 
-    elements foreach { p =>
+    elements.foreach { p =>
       if (findRepresentative(p).isEmpty)
         representatives += p
     }
@@ -66,16 +66,16 @@ object UseTransfer extends App {
     (p != the1) && (group.multiply(p, p) == the1)
 
   def prettyPrint(map: Map[Int, Int]): String =
-    (1 to n).filter { i =>
-      map(i) != i
-    } map { i =>
-      i -> map(i)
-    } map {
-      _.toString
-    } mkString ""
+    (1 to n)
+      .filter(i => map(i) != i)
+      .map(i => i -> map(i))
+      .map {
+        _.toString
+      }
+      .mkString("")
 
   for {
-    i <- elementsOf(group.carrier) filter isInvolution
+    i <- elementsOf(group.carrier).filter(isInvolution)
   } {
     print("> " + prettyPrint(i))
     val subgroup = dot(the1, i)

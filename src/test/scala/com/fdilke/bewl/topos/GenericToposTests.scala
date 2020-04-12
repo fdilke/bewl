@@ -3,15 +3,15 @@ package com.fdilke.bewl.topos
 import com.fdilke.bewl.helper.⊕
 import com.fdilke.bewl.topos.constructions.ConstructToposOfMonoidActions
 import com.fdilke.bewl.helper.StandardSymbols.{
-  iso,
-  injective,
   epic,
-  monic,
-  source,
-  target,
+  injective,
+  iso,
   left,
+  monic,
   right,
-  sanityTest
+  sanityTest,
+  source,
+  target
 }
 import org.scalatest.matchers.should.Matchers._
 
@@ -37,7 +37,7 @@ abstract class ToposFixtureSanityTests[
 
       objects should have size 3
 
-      objects foreach { _.sanityTest }
+      objects.foreach(_.sanityTest)
     }
 
     it("include sane arrows whose sources and targets match their names") {
@@ -50,10 +50,10 @@ abstract class ToposFixtureSanityTests[
       foo2baz.target shouldBe baz
 
       foobar2baz.arrow.sanityTest
-      foobar2baz.product shouldBe (foo x bar)
+      foobar2baz.product shouldBe (foo.x(bar))
       foobar2baz.product.left shouldBe foo
       foobar2baz.product.right shouldBe bar
-      foobar2baz.arrow.source shouldBe (foo x bar)
+      foobar2baz.arrow.source shouldBe (foo.x(bar))
       foobar2baz.arrow.target shouldBe baz
 
       monicBar2baz.sanityTest
@@ -115,7 +115,7 @@ abstract class ToposWithFixtures[
       throw new IllegalArgumentException("equalizing two arrows that are already equal!")
     }
 
-    (s o r) shouldBe (t o r)
+    (s.o(r)) shouldBe (t.o(r))
   }
 
   final lazy val foo2baz = foo2ImageOfBar // a convenient alias
@@ -151,27 +151,27 @@ abstract class GenericToposTests[
 
     it("has identity arrows which can be composed") {
       foo(foo)(identity) shouldBe foo.identity
-      foo2bar o foo.identity shouldBe foo2bar
-      bar.identity o foo2bar shouldBe foo2bar
+      foo2bar.o(foo.identity) shouldBe foo2bar
+      bar.identity.o(foo2bar) shouldBe foo2bar
     }
 
     it("can construct biproduct diagrams") {
-      (bar x baz).sanityTest
-      (bar x baz) should have(
+      bar.x(baz).sanityTest
+      (bar.x(baz)) should have(
         left(bar),
         right(baz)
       )
-      val productArrow = foo2bar x foo2baz
+      val productArrow = foo2bar.x(foo2baz)
 
       productArrow.sanityTest
       productArrow should have(
         source(foo),
-        target(bar x baz),
+        target(bar.x(baz)),
         sanityTest(null)
       )
 
-      (bar x baz).π0.sanityTest
-      (bar x baz).π1.sanityTest
+      bar.x(baz).π0.sanityTest
+      bar.x(baz).π1.sanityTest
 
       foo(bar) { x =>
         productArrow(x)._1
@@ -182,9 +182,9 @@ abstract class GenericToposTests[
       } shouldBe foo2baz
 
       val fooXbar: BIPRODUCT[FOO, BAR] =
-        foo x bar
+        foo.x(bar)
       fooXbar(fooXbar) {
-        ⊕ tupled fooXbar.pair
+        ⊕.tupled(fooXbar.pair)
       } shouldBe fooXbar.identity
     }
 
@@ -195,7 +195,7 @@ abstract class GenericToposTests[
       fooToI.source shouldBe foo
       fooToI.target shouldBe topos.I
 
-      bar.toI o foo2bar shouldBe fooToI
+      bar.toI.o(foo2bar) shouldBe fooToI
     }
 
     it("has a (derived) initial object") {
@@ -205,7 +205,7 @@ abstract class GenericToposTests[
       fooFromO.source shouldBe O
       fooFromO.target shouldBe foo
 
-      foo2bar o fooFromO shouldBe bar.fromO
+      foo2bar.o(fooFromO) shouldBe bar.fromO
       O >> foo shouldBe Seq(fooFromO)
     }
 
@@ -214,19 +214,19 @@ abstract class GenericToposTests[
     }
 
     it("has standardized products") {
-      (foo x bar) shouldBe (foo x bar)
+      (foo.x(bar)) shouldBe (foo.x(bar))
     }
 
     it("can chain products") {
-      val barXfooXbaz = bar x foo x baz
-      val productArrow = foo2bar x foo.identity x foo2baz
+      val barXfooXbaz = bar.x(foo).x(baz)
+      val productArrow = foo2bar.x(foo.identity).x(foo2baz)
       productArrow.sanityTest
       productArrow.source shouldBe foo
       productArrow.target shouldBe barXfooXbaz
 
-      leftProjection(bar, foo, baz) o productArrow shouldBe foo2bar
-      midProjection(bar, foo, baz) o productArrow shouldBe foo.identity
-      rightProjection(bar, foo, baz) o productArrow shouldBe foo2baz
+      leftProjection(bar, foo, baz).o(productArrow) shouldBe foo2bar
+      midProjection(bar, foo, baz).o(productArrow) shouldBe foo.identity
+      rightProjection(bar, foo, baz).o(productArrow) shouldBe foo2baz
     }
 
     it("can construct exponential diagrams") {
@@ -241,7 +241,7 @@ abstract class GenericToposTests[
       evaluation.arrow.target shouldBe baz
 
       val foo2bar2baz: FOO > (BAR → BAZ) =
-        (bar > baz) transpose foobar2baz
+        (bar > baz).transpose(foobar2baz)
       foo2bar2baz.sanityTest
       foo2bar2baz should have(
         source(foo),
@@ -249,7 +249,7 @@ abstract class GenericToposTests[
       )
 
       implicit val anonImplicit = bar > baz
-      (foo x bar)(baz) {
+      foo.x(bar)(baz) {
         case f ⊕ b =>
           foo2bar2baz(f)(b)
       } shouldBe foobar2baz.arrow
@@ -268,8 +268,8 @@ abstract class GenericToposTests[
         val equalizer = s ?= t
         val e = equalizer.inclusion
 
-        (s o e) shouldBe (t o e)
-        (e o equalizer.restrict(r)) shouldBe r
+        (s.o(e)) shouldBe (t.o(e))
+        (e.o(equalizer.restrict(r))) shouldBe r
       }
       runTest(equalizerSituation)
     }
@@ -287,13 +287,13 @@ abstract class GenericToposTests[
       char.source shouldBe baz
       char.target shouldBe omega
 
-      char o monicBar2baz shouldBe bar.toTrue
+      char.o(monicBar2baz) shouldBe bar.toTrue
 
       val restriction = foo2ImageOfBar \ monicBar2baz
       restriction.sanityTest
       restriction.source shouldBe foo
       restriction.target shouldBe bar
-      monicBar2baz o restriction shouldBe foo2ImageOfBar
+      monicBar2baz.o(restriction) shouldBe foo2ImageOfBar
 
       // Note behaviour is not defined for these pathological cases:
       // construct a non-monic arrow, have chi throw a NotMonicException
@@ -312,14 +312,14 @@ abstract class GenericToposTests[
 
     it("has enumeration of globals and arrows") {
       I.globals shouldBe Seq(I.identity)
-      (foo x baz).globals.size shouldBe foo.globals.size * baz.globals.size
+      foo.x(baz).globals.size shouldBe foo.globals.size * baz.globals.size
       foo >> I shouldBe Seq(foo.toI)
       foo >> bar should contain(foo2bar)
       foo >> baz should contain(foo2ImageOfBar)
       bar >> baz should contain(monicBar2baz)
     }
 
-    optionalGenerator map { generator =>
+    optionalGenerator.map { generator =>
       it("has a generator") {
         def distinguishesMapsBetween[
           A <: ~,
@@ -332,8 +332,8 @@ abstract class GenericToposTests[
             anArrow <- source >> target
             anotherArrow <- source >> target if anotherArrow != anArrow
           } {
-            generator >> source exists { g =>
-              (anArrow o g) != (anotherArrow o g)
+            (generator >> source).exists { g =>
+              (anArrow.o(g)) != (anotherArrow.o(g))
             } shouldBe true
           }
 
@@ -347,7 +347,7 @@ abstract class GenericToposTests[
       O should have size 0
       I should have size 1
       foo.size should be > 1
-      (foo x bar) should have size (foo.size * bar.size)
+      (foo.x(bar)) should have size (foo.size * bar.size)
       (foo + bar) should have size (foo.size + bar.size)
     }
 
@@ -356,7 +356,7 @@ abstract class GenericToposTests[
       if (!inActionTopos) { // reluctantly skip, too slow with current technology
         monicBar2baz shouldBe monic
 
-        (foo x foo).π0 should not be monic
+        foo.x(foo).π0 should not be monic
         foo.=?=.arrow should not be monic
 
         foo.diagonal shouldBe monic
@@ -381,7 +381,7 @@ abstract class GenericToposTests[
 
       if (!inActionTopos) { // reluctantly skip, too slow with current technology
         foo.identity shouldBe epic
-        (foo x foo).π0 shouldBe epic
+        foo.x(foo).π0 shouldBe epic
         foo.diagonal should not be epic
         omega.diagonal should not be epic
 
@@ -415,7 +415,7 @@ abstract class GenericToposTests[
 
       epic shouldBe epic
       monic shouldBe monic
-      (monic o epic) shouldBe foo2bar
+      (monic.o(epic)) shouldBe foo2bar
     }
 
     if (!inActionTopos) { // reluctantly skip, too slow with current technology

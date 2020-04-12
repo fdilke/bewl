@@ -33,13 +33,11 @@ trait Monads {
       lazy val carrier = structure target
       lazy val local = apply(carrier)
 
-      def sanityTest: Unit = {
-        (structure o local.eta).shouldBe(carrier.identity)
-      }
+      def sanityTest: Unit =
+        structure.o(local.eta).shouldBe(carrier.identity)
 
-      def sanityTest2: Unit = {
-        (structure o map(structure)).shouldBe(structure o local.mu)
-      }
+      def sanityTest2: Unit =
+        structure.o(map(structure)).shouldBe(structure.o(local.mu))
     }
   }
 
@@ -63,8 +61,8 @@ trait Monads {
       val at = monad(dot)
       import at._
 
-      mu o monad.map(eta) shouldBe free.identity
-      mu o monad(free).eta shouldBe free.identity
+      mu.o(monad.map(eta)) shouldBe free.identity
+      mu.o(monad(free).eta) shouldBe free.identity
     }
 
     def sanityTest2[
@@ -78,7 +76,7 @@ trait Monads {
       val at = monad(dot)
       import at._
 
-      mu o monad.map(mu) shouldBe (mu o monad(free).mu)
+      mu.o(monad.map(mu)) shouldBe (mu.o(monad(free).mu))
     }
   }
 }

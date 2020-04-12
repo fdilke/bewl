@@ -17,11 +17,11 @@ object FiniteSetsPresentedAction {
     val lookupMonoid: Map[M, Int] =
       monoidElements.zipWithIndex.toMap
     val generators: List[A] =
-      generatorsWithRelators map { _.generator } toList
+      generatorsWithRelators.map(_.generator) toList
     val lookupGenerator: Map[A, Int] =
       generators.zipWithIndex.toMap
 
-    val words = makeDot(generators) x monoid.carrier
+    val words = makeDot(generators).x(monoid.carrier)
 
     def indexOfWord(g: A, m: M): Int =
       lookupGenerator(g) * monoidElements.size + lookupMonoid(m)

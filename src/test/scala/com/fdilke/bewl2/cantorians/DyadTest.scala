@@ -1,6 +1,6 @@
 package com.fdilke.bewl2.cantorians
 
-import com.fdilke.bewl2.cantorians.Dyad.{canonical, isPowerOf2, η, μ}
+import com.fdilke.bewl2.cantorians.Dyad.{η, μ, canonical, isPowerOf2}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
 
@@ -11,7 +11,7 @@ class DyadTest extends AnyFunSpec {
     it("can tell if a number is a power of 2") {
       Seq(
         0, 1, 2, 3, 4, 5, 8, 17, 32
-      ) map isPowerOf2 shouldBe Seq(
+      ).map(isPowerOf2) shouldBe Seq(
         false, true, true, false, true, false, true, false, true
       )
     }
@@ -58,8 +58,8 @@ class DyadTest extends AnyFunSpec {
       Dyad("A", "B", "A", "B", "A", "B", "A", "B") shouldBe Dyad("A", "B")
     }
     it("support map which coalesces the result into canonical form") {
-      Dyad("foo", "barbaz") map { _.length } shouldBe Dyad(3, 6)
-      Dyad(1, 2, 3, 4) map { _ % 2 } shouldBe Dyad(1, 0)
+      Dyad("foo", "barbaz").map(_.length) shouldBe Dyad(3, 6)
+      Dyad(1, 2, 3, 4).map(_ % 2) shouldBe Dyad(1, 0)
     }
     it("have a length") {
       Dyad(1).length shouldBe 1
@@ -86,7 +86,7 @@ class DyadTest extends AnyFunSpec {
         η[Dyad[Int]](dyad)
       ) shouldBe dyad
       μ[Int](
-        dyad map { η[Int] }
+        dyad.map(η[Int])
       ) shouldBe dyad
     }
     it("also μ obeys the monad associativity law") {
@@ -102,7 +102,7 @@ class DyadTest extends AnyFunSpec {
         )
 
       μ[Int](
-        dyad map { μ[Int] }
+        dyad.map(μ[Int])
       ) shouldBe
         μ[Int](
           μ[Dyad[Int]](dyad)

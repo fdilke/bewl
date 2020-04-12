@@ -7,7 +7,7 @@ object FiniteSetsUtilities {
     target: Iterable[B]
   ): Iterable[Map[A, B]] =
     if (source.isEmpty)
-      Iterable { Map.empty }
+      Iterable(Map.empty)
     else
       for {
         partialMap <- allMaps(source.tail, target)

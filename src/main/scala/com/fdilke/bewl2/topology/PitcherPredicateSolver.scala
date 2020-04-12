@@ -18,11 +18,13 @@ object PitcherPredicateSolver {
   ): Option[Seq[C]] =
     new PitcherPredicateSolver(
       predicate
-    )(Compact[C], pitcher) trySeq { // <== should not be needed
-      DraftPitcher.empty
-    } map {
-      _.seq
-    }
+    )(Compact[C], pitcher)
+      .trySeq { // <== should not be needed
+        DraftPitcher.empty
+      }
+      .map {
+        _.seq
+      }
 
   def solvePitcher[
     P,
@@ -32,10 +34,10 @@ object PitcherPredicateSolver {
   )(
     implicit pitcher: Pitcher[P, C]
   ): Option[P] =
-    Compact[C].optional flatMap { c =>
+    Compact[C].optional.flatMap { c =>
       solveSeq(
         predicate
-      )(Compact[C], pitcher) map { seq => // <== should not be needed
+      )(Compact[C], pitcher).map { seq => // <== should not be needed
         GoPlatinumPitcher(seq, c)
       }
     }
@@ -49,14 +51,14 @@ class PitcherPredicateSolver[
 )(
   implicit pitcher: Pitcher[P, C]
 ) {
-  @tailrec private final def trySeq(
+  @tailrec final private def trySeq(
     draft: DraftPitcher[P, C]
   ): Option[DraftPitcher[P, C]] =
     (try {
       Left(
         if (predicate(
-            draft.asPitcher
-          ))
+              draft.asPitcher
+            ))
           Some(draft)
         else
           None
@@ -129,5 +131,5 @@ object GoPlatinumPitcher {
   ): P =
     seq.foldRight[P](
       constantly(backstop)
-    ) { (c: C, p: P) => construct[P, C](c, p) }
+    )((c: C, p: P) => construct[P, C](c, p))
 }

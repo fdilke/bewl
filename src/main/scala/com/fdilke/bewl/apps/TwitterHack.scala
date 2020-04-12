@@ -34,7 +34,7 @@ object TwitterHack {
       "consumer-secret",
       "access-token",
       "access-secret"
-    ) map { key =>
+    ).map { key =>
       lines.find {
         _.startsWith(key + "=")
       } match {
@@ -69,7 +69,7 @@ object TwitterHack {
       .data
       .id
 
-  def tweetMe(message: String): Unit = {
+  def tweetMe(message: String): Unit =
     //        println("user details: " + user)
     //        println("user name: " + user.data.name)
     client.createDirectMessageEvent(felixId, message).onComplete {
@@ -79,7 +79,6 @@ object TwitterHack {
       case Failure(_) =>
         println("DM send failed")
     }
-  }
 
 //  tweetMe("And another!")
 }

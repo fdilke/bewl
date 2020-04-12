@@ -31,14 +31,14 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
       val totalSet = dot(1, 2, 3, 4)
       val subset = dot(1, 3)
 
-      val embed = subset(totalSet) { x => x }
+      val embed = subset(totalSet)(x => x)
       val ∀ = totalSet.∀
       ∀ should have(
         source(totalSet > omega),
         target(omega)
       )
-      ∀ o embed.chi.name should not be truth
-      ∀ o totalSet.identity.chi.name shouldBe truth
+      ∀.o(embed.chi.name) should not be truth
+      ∀.o(totalSet.identity.chi.name) shouldBe truth
     }
   }
 
@@ -48,16 +48,16 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
       val subset = dot(1, 3)
       val emptySet = dot[Int]()
 
-      val embed = subset(totalSet) { x => x }
-      val embedEmpty = emptySet(totalSet) { x => x }
+      val embed = subset(totalSet)(x => x)
+      val embedEmpty = emptySet(totalSet)(x => x)
       val exists = totalSet.∃
       exists should have(
         source(totalSet > omega),
         target(omega)
       )
-      exists o embed.chi.name shouldBe truth
-      exists o embedEmpty.chi.name should not be truth
-      exists o totalSet.identity.chi.name shouldBe truth
+      exists.o(embed.chi.name) shouldBe truth
+      exists.o(embedEmpty.chi.name) should not be truth
+      exists.o(totalSet.identity.chi.name) shouldBe truth
     }
 
     it("can be used over a dot to make an arrow into omega") {
@@ -78,12 +78,12 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
       val mid = dot("Johnny", "Wulf", "Gronk")
       val right = dot(1, 2, 3, 4)
 
-      val product = left x right
+      val product = left.x(right)
 
       product.existsMid(mid) { (l, m, r) =>
         l && (m == "Wulf") && (r > 2)
       } shouldBe {
-        product.biArrow(omega) { (l, r) => l && (r > 2) }
+        product.biArrow(omega)((l, r) => l && (r > 2))
       }
     }
   }
@@ -102,7 +102,7 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
       )
 
       unaryMinus shouldBe {
-        set map { -_ }
+        set.map(-_)
       }
     }
 
@@ -136,10 +136,10 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
       } yield binop(i, j)
 
     it("has the correct binary operations for binary operations") {
-      Ω.meet shouldBe theBinOp { _ & _ }
-      Ω.join shouldBe theBinOp { _ | _ }
-      Ω.implies shouldBe theBinOp { !_ | _ }
-      falsity shouldBe I(omega) { _ => false }
+      Ω.meet shouldBe theBinOp(_ & _)
+      Ω.join shouldBe theBinOp(_ | _)
+      Ω.implies shouldBe theBinOp(!_ | _)
+      falsity shouldBe I(omega)(_ => false)
     }
   }
 
@@ -203,7 +203,7 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
         target(pac.classifier)
       )
       pac.⏊ shouldBe pac.extend(O.toI, set.fromO)
-      Seq(0, 1) map pac.⏊(()) shouldBe Seq(false, false)
+      Seq(0, 1).map(pac.⏊(())) shouldBe Seq(false, false)
 
       val foo = dot(a, b)
       val subFoo = dot(true)
@@ -252,8 +252,8 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
         source(coproduct),
         target(tgt)
       )
-      foo2target shouldBe (sum o (foo +- bar))
-      bar2target shouldBe (sum o (foo -+ bar))
+      foo2target shouldBe (sum.o(foo +- bar))
+      bar2target shouldBe (sum.o(foo -+ bar))
     }
   }
 
@@ -264,7 +264,7 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
       symbols.universally { _ =>
         true
       } shouldBe true
-      symbols.universally { _ == a } shouldBe false
+      symbols.universally(_ == a) shouldBe false
     }
   }
 
@@ -288,7 +288,7 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
       theMonic.sanityTest
       theEpic shouldBe epic
       theMonic shouldBe monic
-      (theMonic o theEpic) shouldBe anArrow
+      (theMonic.o(theEpic)) shouldBe anArrow
     }
   }
 
@@ -333,7 +333,7 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
         quotient.lift(arrowToLift)
       lifted.source shouldBe quotientObject
       lifted.target shouldBe numbers
-      lifted o quotientArrow shouldBe arrowToLift
+      lifted.o(quotientArrow) shouldBe arrowToLift
     }
   }
 
@@ -355,8 +355,8 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
       val coequalizerArrow: Int > COEQUALIZER[Int] =
         coequalizer.arrow
       coequalizerArrow.source shouldBe numbers
-      coequalizerArrow o f1 shouldBe (
-        coequalizerArrow o f2
+      coequalizerArrow.o(f1) shouldBe (
+        coequalizerArrow.o(f2)
       )
 
       val booleans = dot(true, false)
@@ -367,12 +367,12 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
           3 -> false,
           4 -> false
         )
-      otherEqualizer o f1 shouldBe (
-        otherEqualizer o f2
+      otherEqualizer.o(f1) shouldBe (
+        otherEqualizer.o(f2)
       )
       val factor: COEQUALIZER[Int] > Boolean =
         coequalizer.lift(otherEqualizer)
-      factor o coequalizerArrow shouldBe otherEqualizer
+      factor.o(coequalizerArrow) shouldBe otherEqualizer
     }
 
     it("should give the expected construction for sets (fast version)") {
@@ -392,8 +392,8 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
       val coequalizerArrow: Int > COEQUALIZER[Int] =
         coequalizer.arrow
       coequalizerArrow.source shouldBe numbers
-      coequalizerArrow o f1 shouldBe (
-        coequalizerArrow o f2
+      coequalizerArrow.o(f1) shouldBe (
+        coequalizerArrow.o(f2)
       )
 
       val booleans = dot(true, false)
@@ -404,12 +404,12 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
           3 -> false,
           4 -> false
         )
-      otherEqualizer o f1 shouldBe (
-        otherEqualizer o f2
+      otherEqualizer.o(f1) shouldBe (
+        otherEqualizer.o(f2)
       )
       val factor: COEQUALIZER[Int] > Boolean =
         coequalizer.lift(otherEqualizer)
-      factor o coequalizerArrow shouldBe otherEqualizer
+      factor.o(coequalizerArrow) shouldBe otherEqualizer
     }
   }
 
@@ -419,12 +419,12 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
       val numbers = dot(1, 2, 3)
 
       symbols *- numbers shouldBe
-        (symbols x numbers)(symbols) {
+        symbols.x(numbers)(symbols) {
           case s ⊕ _ => s
         }
 
       symbols -* numbers shouldBe
-        (symbols x numbers)(numbers) {
+        symbols.x(numbers)(numbers) {
           case _ ⊕ n => n
         }
     }
@@ -484,7 +484,7 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
 
     it("you can use where") {
       val just2 =
-        dot(1, 2, 3) where {
+        dot(1, 2, 3).where {
           _ == 2
         }
 
@@ -521,7 +521,7 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
           a -> 2,
           b -> 1
         )
-      theSection should be a section
+      (theSection should be).a(section)
       val nonsection: Symbol > Int =
         arrow(symbols, numbers)(
           a -> 2,
@@ -541,7 +541,7 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
           b -> 1,
           c -> 1
         )
-      section should be a retraction
+      (section should be).a(retraction)
       val nonsection: Symbol > Int =
         arrow(symbols, numbers)(
           a -> 2,
@@ -561,13 +561,13 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
 
   describe("Minimality") {
     it("is detected properly for sets") {
-      0 to 3 filter { n =>
+      (0 to 3).filter { n =>
         makeDot(0 until n).isMinimal
       } shouldBe Seq(1)
     }
     it("is detected properly for group actions") {
       val topos =
-        ToposOfGroupActions of twoGroup
+        ToposOfGroupActions.of(twoGroup)
 
       topos.makeDot(
         twoGroup.regularAction
@@ -577,14 +577,14 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
 
   describe("Simplicity") {
     it("is detected properly for sets") {
-      0 to 3 filter { n =>
+      (0 to 3).filter { n =>
         makeDot(0 until n).isSimple
       } shouldBe Seq(2)
     }
 
     it("is detected properly for group actions") {
       val topos =
-        ToposOfGroupActions of twoGroup
+        ToposOfGroupActions.of(twoGroup)
 
       topos.makeDot(
         twoGroup.regularAction

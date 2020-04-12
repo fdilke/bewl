@@ -104,7 +104,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
                 val generator = gr.generator
                 targetElements
                   .filter { targetElement =>
-                    gr.relators forall { relator =>
+                    gr.relators.forall { relator =>
                       val otherTarget: B =
                         if (relator.otherIndex == index)
                           targetElement
@@ -170,7 +170,7 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
                   targetAction,
                   Seq.empty // don't use 'em
                 )
-              ) map {
+              ).map {
                 functionAsArrow(
                   action.actionCarrier,
                   targetCarrier,
@@ -218,26 +218,28 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
                   )
                 } yield partialMap ++ continuation
 
-              srcComponents.indices.foldLeft(
-                Iterable(
-                  Map.empty[A, B]
-                )
-              ) {
-                absorb
-              } map {
-                functionAsArrow(
-                  action.actionCarrier,
-                  targetCarrier,
-                  _
-                )
-              }
+              srcComponents.indices
+                .foldLeft(
+                  Iterable(
+                    Map.empty[A, B]
+                  )
+                ) {
+                  absorb
+                }
+                .map {
+                  functionAsArrow(
+                    action.actionCarrier,
+                    targetCarrier,
+                    _
+                  )
+                }
             }
 
             lazy val recursiveImago: FiniteSetsActionAnalysis[
               M x A
             ] =
               analyze(
-                monoid.regularAction x action
+                monoid.regularAction.x(action)
               )
 
             override def rawExponential[B <: ~](
@@ -247,19 +249,21 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
                 target.action.actionCarrier
 
               implicit val mXa: BIPRODUCT[M, A] =
-                monoid.carrier x action.actionCarrier
+                monoid.carrier.x(action.actionCarrier)
 
               def arrowToMap(arrow: M x A > B): M x A → B =
-                mXa.elements map { m_a => m_a -> arrow(m_a) } toMap
+                mXa.elements.map(m_a => m_a -> arrow(m_a)) toMap
 
               def mapToArrow(arrow: M x A → B): M x A > B =
-                mXa.biArrow(targetCarrier) { (m, a) => arrow(m ⊕⊕ a) }.arrow
+                mXa.biArrow(targetCarrier)((m, a) => arrow(m ⊕⊕ a)).arrow
 
               val morphisms: DOT[M x A → B] =
                 makeDot(
-                  recursiveImago.morphismsTo(
-                    target
-                  ) map arrowToMap
+                  recursiveImago
+                    .morphismsTo(
+                      target
+                    )
+                    .map(arrowToMap)
                 )
 
               new monoid.RawExponential[A, B] {
@@ -268,20 +272,22 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
                     morphisms
                   ) { (f, m) =>
                     arrowToMap(
-                      mXa.biArrow(targetCarrier) { (n, a) => f(monoid.multiply(m, n) ⊕⊕ a) }.arrow
+                      mXa.biArrow(targetCarrier)((n, a) => f(monoid.multiply(m, n) ⊕⊕ a)).arrow
                     )
                   }
 
                 override val evaluation =
-                  (morphisms x action.actionCarrier).biArrow(
-                    targetCarrier
-                  ) { (f, s) =>
-                    f(
-                      monoid.unit(
-                        action.actionCarrier.toI(s)
-                      ) ⊕⊕ s
-                    )
-                  }
+                  morphisms
+                    .x(action.actionCarrier)
+                    .biArrow(
+                      targetCarrier
+                    ) { (f, s) =>
+                      f(
+                        monoid.unit(
+                          action.actionCarrier.toI(s)
+                        ) ⊕⊕ s
+                      )
+                    }
 
                 override def transpose[X <: ~](
                   otherAction: monoid.Action[X],

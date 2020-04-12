@@ -1,10 +1,10 @@
 package com.fdilke.bewl.apps.music
 
 import com.fdilke.bewl.fsets.FiniteSets
-import com.fdilke.bewl.fsets.FiniteSets.{EQUALIZER, Monoid, bifunctionAsBiArrow, x}
+import com.fdilke.bewl.fsets.FiniteSets.{bifunctionAsBiArrow, x, EQUALIZER, Monoid}
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.{elementsOf, makeNullaryOperator}
 import TriadicFixtures._
-import com.fdilke.bewl.helper.{IterateToFixed, ⊕}
+import com.fdilke.bewl.helper.{⊕, IterateToFixed}
 import ⊕._
 
 import scala.language.postfixOps
@@ -44,11 +44,12 @@ object ComparePitchClassEncodings extends App {
         }.sorted
       }
       .toSeq
-      .distinct filter {
-      _.head == 0
-    }
+      .distinct
+      .filter {
+        _.head == 0
+      }
 
-  isomorphicTriads foreach { triad => println(triad mkString ",") }
+  isomorphicTriads.foreach(triad => println(triad.mkString(",")))
 
   assert(
     isomorphicTriads.contains(
@@ -71,7 +72,7 @@ object StabilizerSanity extends App {
 //  println("StabilizerSanity 3")
 
   def stab(a: Int) =
-    elementsOf(affineMapsDot.squared) filter {
+    elementsOf(affineMapsDot.squared).filter {
       case p ⊕ q =>
         affineMapApply(a, p) == affineMapApply(a, q)
     } toSet

@@ -54,7 +54,7 @@ object CheckExtractPresentation {
     val theProjection: Int > A =
       presentedAction.project(
         action,
-        generatorsWithRelators map {
+        generatorsWithRelators.map {
           _.generator
         }
       )

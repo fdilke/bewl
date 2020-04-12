@@ -54,7 +54,7 @@ trait Wrappings[
     WRAPPER[X],
     WRAPPER[X]
   ] =
-    bifunctionAsBiArrow[X, X, X](dot, dot, dot) { bifunc }
+    bifunctionAsBiArrow[X, X, X](dot, dot, dot)(bifunc)
 
   // An implementation may have the ability to "unwrap" dots
   def unwrap[T <: BASE](

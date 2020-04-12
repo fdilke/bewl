@@ -2,13 +2,13 @@ package com.fdilke.bewl.apps.music
 
 import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSets.{
+  bifunctionAsBiArrow,
+  makeDot,
+  x,
   EQUALIZER,
   FiniteSetsDot,
   Monoid,
-  ToposOfMonoidActions,
-  bifunctionAsBiArrow,
-  makeDot,
-  x
+  ToposOfMonoidActions
 }
 import com.fdilke.bewl.fsets.FiniteSetsUtilities.makeNullaryOperator
 import com.fdilke.bewl.helper.⊕
@@ -124,7 +124,7 @@ object TriadicFixtures {
       ({ type λ[X, Y] = triadicMonoid.ActionPreArrow[X, Y] })#λ,
       ({ type λ[T] = T })#λ
     ] =
-    ToposOfMonoidActions of triadicMonoid
+    ToposOfMonoidActions.of(triadicMonoid)
 
   val octave: triadicTopos.DOT[Int] =
     triadicTopos.makeDot(

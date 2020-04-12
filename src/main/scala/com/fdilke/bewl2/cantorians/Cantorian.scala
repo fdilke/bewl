@@ -2,6 +2,8 @@ package com.fdilke.bewl2.cantorians
 
 import java.util.function.Supplier
 
+import com.fdilke.bewl2.topology.Compact
+
 import scala.annotation.tailrec
 import scala.language.postfixOps
 
@@ -43,19 +45,19 @@ object GroundedTree {
     BranchNode(left, right)
 }
 
-trait Cantorian
-  extends PitcherOld[Cantorian, Boolean]
-    with Function[Int, Boolean] { cantorian =>
+trait Cantorian extends PitcherOld[Cantorian, Boolean] with Function[Int, Boolean] { cantorian =>
   def asIterable: Iterable[Boolean] =
     new Iterable[Boolean] {
       override def iterator: Iterator[Boolean] =
-        Iterator.iterate(
-          cantorian
-        ) {
-          _.tail
-        } map {
-          _.head
-        }
+        Iterator
+          .iterate(
+            cantorian
+          ) {
+            _.tail
+          }
+          .map {
+            _.head
+          }
     }
   @tailrec
   final def apply(index: Int): Boolean =
@@ -67,11 +69,11 @@ trait Cantorian
 
 object Cantorian {
   def apply(
-    h: Boolean,
+    h: => Boolean,
     t: => Cantorian
   ): Cantorian =
     new Cantorian {
-      override val head: Boolean = h
+      override def head: Boolean = h
       override def tail: Cantorian = t
     }
 
@@ -81,6 +83,29 @@ object Cantorian {
         values
           .foldRight[Supplier[Cantorian]](
             supplier
-          ) { (b: Boolean, c: Supplier[Cantorian]) => () => Cantorian(b, c.get) } get
+          )((b: Boolean, c: Supplier[Cantorian]) => () => Cantorian(b, c.get)) get
     } get
+
+  implicit val cantorianPitcher: Pitcher[Cantorian, Boolean] =
+    new Pitcher[Cantorian, Boolean] {
+      override def head(
+        cantorian: Cantorian
+      ): Boolean =
+        cantorian.head
+
+      override def tail(
+        cantorian: Cantorian
+      ): Cantorian =
+        cantorian.tail
+
+      override def construct(
+        head: => Boolean,
+        tail: => Cantorian
+      ): Cantorian =
+        Cantorian(head, tail)
+    }
+
+  // can we make 'compactness' implicit instead and not need this?
+//  implicit val cantorianCompactness: Compact[Cantorian] =
+//    Pitcher.compactness[Cantorian, Boolean]
 }

@@ -23,10 +23,9 @@ object BuildEquivalence {
     def equate(
       i: Int,
       j: Int
-    ): Unit = {
+    ): Unit =
       if (i != j)
         array(i) = j
-    }
 
     for {
       (j, k) <- relators

@@ -9,7 +9,7 @@ import org.scalatest.matchers.should.Matchers._
 class FiniteSetsUtilitiesTest extends AnyFreeSpec {
   "allMaps()" - {
     "enumerates all maps between two sets" in {
-      allMaps(Seq(1, 2), Set("a", "b", "c")) map { f =>
+      allMaps(Seq(1, 2), Set("a", "b", "c")).map { f =>
         Map(1 -> f(1), 2 -> f(2))
       } shouldBe Seq(
         Map(1 -> "a", 2 -> "a"),

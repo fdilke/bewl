@@ -10,9 +10,9 @@ trait FiniteSetsImageFinder extends BaseFiniteSets {
         T <: ~
       ](
         arrow: S > T
-      ): EQUALIZER[T] = {
+      ): EQUALIZER[T] =
         new FiniteSetsDot[T](
-          (arrow.source.elements map arrow.function).toSeq.distinct
+          arrow.source.elements.map(arrow.function).toSeq.distinct
         ) with EqualizingDot[T] { equalizer =>
 
           override val equalizerTarget: DOT[T] =
@@ -25,6 +25,5 @@ trait FiniteSetsImageFinder extends BaseFiniteSets {
               subdot(_)
             }
         }
-      }
     }
 }

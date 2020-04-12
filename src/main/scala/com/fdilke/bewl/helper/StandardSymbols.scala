@@ -35,7 +35,7 @@ object StandardSymbols {
     "r",
     "s",
     "q"
-  ) map {
+  ).map {
     Symbol(_)
   }
 
@@ -71,7 +71,7 @@ object StandardSymbols {
     "left",
     "right",
     "sanityTest"
-  ) map {
+  ).map {
     Symbol(_)
   }
 }

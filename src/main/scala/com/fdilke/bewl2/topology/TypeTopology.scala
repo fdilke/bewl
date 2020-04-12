@@ -1,7 +1,7 @@
 package com.fdilke.bewl2.topology
 
 import com.fdilke.bewl2.topology.Compact._
-import com.fdilke.bewl2.topology.HausdorffToCompactPredicateSolver.{solveMap, functionFromMap}
+import com.fdilke.bewl2.topology.HausdorffToCompactPredicateSolver.{functionFromMap, solveMap}
 import com.fdilke.bewl2.util.FindSingleton
 
 import scala.language.{implicitConversions, postfixOps}
@@ -15,7 +15,7 @@ trait Compact[T] {
   ]
 
   lazy val optional: Option[T] =
-    determine[T] { _ => true }(this)
+    determine[T](_ => true)(this)
 }
 
 object Compact {
@@ -28,22 +28,21 @@ object Compact {
     ENUM <: Enumeration: TypeTag
   ]: Compact[ENUM#Value] =
     (predicate: ENUM#Value => Boolean) =>
-      FindSingleton[ENUM].values find predicate map { v => () => v }
+      FindSingleton[ENUM].values.find(predicate).map(v => () => v)
 
   @inline def find[T: Compact](
     predicate: T => Boolean
   ): Option[
     () => T
   ] =
-    Compact[T] find
-      predicate
+    Compact[T].find(predicate)
 
   @inline def determine[T: Compact](
     predicate: T => Boolean
   ): Option[T] =
     find[T](
       predicate
-    ) map {
+    ).map {
       _()
     }
 
@@ -67,6 +66,15 @@ object Compact {
   @inline def inhabited[T: Compact]: Boolean =
     optional[T].isDefined
 
+  implicit val compactBoolean: Compact[Boolean] =
+    predicate =>
+      if (predicate(true))
+        Some(() => true)
+      else if (predicate(false))
+        Some(() => false)
+      else
+        None
+
   implicit def compactExponential[
     H: Hausdorff,
     C: Compact
@@ -76,7 +84,7 @@ object Compact {
     predicate =>
       solveMap(
         predicate
-      ) map { map => () => functionFromMap(map) }
+      ).map(map => () => functionFromMap(map))
 }
 
 trait Hausdorff[T] {
@@ -132,9 +140,7 @@ object Hausdorff {
     t1: T,
     t2: T
   ): Boolean =
-    Hausdorff[T] equalH (
-      t1, t2
-    )
+    Hausdorff[T].equalH(t1, t2)
 
   implicit def hausdorffExponential[
     C: Compact,

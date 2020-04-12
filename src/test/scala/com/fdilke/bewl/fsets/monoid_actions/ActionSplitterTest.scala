@@ -31,9 +31,10 @@ class ActionSplitterTest extends AnyFreeSpec {
       ({ type λ[T] = monoidOf3.Action[T] })#λ
     ]
   ] =
-    splitter splitAction (
-      action
-    ) components
+    splitter
+      .splitAction(
+        action
+      ) components
 
   private val scalarMultiply: (String, Symbol) => String =
     (s, m) => monoidOf3.multiply(Symbol(s), m).name
@@ -64,7 +65,7 @@ class ActionSplitterTest extends AnyFreeSpec {
     "for regularAction x bar" in {
       val regbarSplitting =
         components(
-          regularAction x bar
+          regularAction.x(bar)
         )
 
       regbarSplitting should have size 1

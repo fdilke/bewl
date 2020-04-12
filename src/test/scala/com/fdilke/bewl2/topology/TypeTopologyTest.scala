@@ -1,13 +1,12 @@
 package com.fdilke.bewl2.topology
 
+import com.fdilke.bewl2.topology.Compact._
+import com.fdilke.bewl2.topology.EmptyEnumeration.Impossibility
+import com.fdilke.bewl2.topology.Hausdorff._
+import com.fdilke.bewl2.topology.StrontiumDogEnumeration._
+import com.fdilke.bewl2.topology.WeekdayEnumeration._
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
-import com.fdilke.bewl2.topology.Compact
-import Compact._
-import Hausdorff._
-import StrontiumDogEnumeration._
-import WeekdayEnumeration._
-import com.fdilke.bewl2.topology.EmptyEnumeration.Impossibility
 
 import scala.language.postfixOps
 
@@ -33,7 +32,7 @@ class TypeTopologyTest extends AnyFunSpec {
 
     it("allow use of quantifiers once implicitly compact") {
       exists[StrontiumDog] { sd =>
-        preferredWeapon(sd) startsWith "No.4"
+        preferredWeapon(sd).startsWith("No.4")
       } shouldBe true
 
       exists[StrontiumDog] { sd =>
@@ -114,7 +113,7 @@ class TypeTopologyTest extends AnyFunSpec {
       ) shouldBe true
     }
     it("compact ^ Hausdorff is implicitly compact") {
-      find[StrontiumDog => Weekday] { specialDay => specialDay(Johnny) == Monday } match {
+      find[StrontiumDog => Weekday](specialDay => specialDay(Johnny) == Monday) match {
         case Some(prefunc) =>
           prefunc()(Johnny) shouldBe Monday
         case _ =>
@@ -139,13 +138,13 @@ class TypeTopologyTest extends AnyFunSpec {
       }
     }
     it("compact ^ Hausdorff is implicitly compact - with Int") {
-      find[Int => Weekday] { specialDay => specialDay(3) == Monday } match {
+      find[Int => Weekday](specialDay => specialDay(3) == Monday) match {
         case Some(prefunc) =>
           prefunc()(3) shouldBe Monday
         case _ =>
           fail("No solution found")
       }
-      find[Int => Weekday] { specialDay => specialDay(7).id - specialDay(22).id == 1 } match {
+      find[Int => Weekday](specialDay => specialDay(7).id - specialDay(22).id == 1) match {
         case Some(preSpecialDay) =>
           val specialDay: Int => Weekday =
             preSpecialDay()
@@ -153,7 +152,7 @@ class TypeTopologyTest extends AnyFunSpec {
         case _ =>
           fail("No solution found")
       }
-      find[Int => Weekday] { specialDay => specialDay(88).id - specialDay(-100).id == 72 } match {
+      find[Int => Weekday](specialDay => specialDay(88).id - specialDay(-100).id == 72) match {
         case Some(_) =>
           fail("Incorrect solution found")
         case _ =>
@@ -161,9 +160,18 @@ class TypeTopologyTest extends AnyFunSpec {
     }
     it("compactness of compact ^ Hausdorff returns real functions") {
       val dogSeq: Int => StrontiumDog =
-        (find[Int => StrontiumDog] { dogSeq => dogSeq(3) == TheGronk } get)()
+        (find[Int => StrontiumDog](dogSeq => dogSeq(3) == TheGronk) get)()
       dogSeq(3) shouldBe TheGronk
       StrontiumDogEnumeration.values should contain(dogSeq(77))
+    }
+    it("compactness of Boolean") {
+      determine[Boolean] { b =>
+        b
+      } shouldBe Some(true)
+      determine[Boolean](!_) shouldBe Some(false)
+      determine[Boolean] { _ =>
+        false
+      } shouldBe None
     }
   }
 }

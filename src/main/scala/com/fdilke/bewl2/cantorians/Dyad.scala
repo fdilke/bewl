@@ -60,12 +60,12 @@ object Dyad {
     ]
   ): Dyad[T] =
     Dyad(
-      0 until Math.max(
+      (0 until Math.max(
         dd.length,
-        dd.cycle map {
+        dd.cycle.map {
           _.length
         } max
-      ) map { index => dd(index)(index) }: _*
+      )).map(index => dd(index)(index)): _*
     )
 }
 
@@ -81,7 +81,7 @@ class Dyad[T] private (
     obj.asInstanceOf[Dyad[T]].cycle == cycle
 
   def map[U](f: T => U): Dyad[U] =
-    Dyad(cycle map f: _*)
+    Dyad(cycle.map(f): _*)
 
   def apply(index: Int): T =
     cycle(

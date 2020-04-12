@@ -37,7 +37,7 @@ class SmartPairTest extends AnyFreeSpec {
       def bifunc(n: Int, text: String) =
         text(n)
 
-      val tupledBifunc = ⊕ tupled bifunc
+      val tupledBifunc = ⊕.tupled(bifunc)
 
       tupledBifunc(2 ⊕ "felix") shouldBe 'l'
     }

@@ -15,7 +15,7 @@ object HausdorffToCompactPredicateSolver {
   ): Option[Map[Key[H], C]] =
     new HausdorffToCompactPredicateSolver(
       predicate
-    ) tryMap {
+    ).tryMap {
       Map.empty
     }
 
@@ -25,7 +25,7 @@ object HausdorffToCompactPredicateSolver {
   ](
     predicate: (H => C) => Boolean
   ): Option[H => C] =
-    solveMap(predicate) map {
+    solveMap(predicate).map {
       functionFromMap(_)
     }
 
@@ -48,17 +48,17 @@ class HausdorffToCompactPredicateSolver[
 ](
   predicate: (H => C) => Boolean
 ) {
-  @tailrec private final def tryMap(
+  @tailrec final private def tryMap(
     map: Map[Key[H], C]
   ): Option[Map[Key[H], C]] =
     (try {
       Left(
         if (predicate(h =>
-            map.getOrElse(
-              new Key(h),
-              throw StumpedAtException(h)
-            )
-          ))
+              map.getOrElse(
+                new Key(h),
+                throw StumpedAtException(h)
+              )
+            ))
           Some(map)
         else
           None

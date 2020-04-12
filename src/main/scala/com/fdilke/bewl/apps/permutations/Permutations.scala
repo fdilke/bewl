@@ -72,16 +72,16 @@ object Permutations {
     permutation: Permutation[T]
   ) {
     lazy val asArrow =
-      Permutations.topos unwrap permutation
+      Permutations.topos.unwrap(permutation)
 
     lazy val carrier: Set[T] =
       elementsOf(asArrow.source) toSet
 
     lazy val asMap: Map[T, T] =
-      carrier map { e => e -> asArrow(e) } toMap
+      carrier.map(e => e -> asArrow(e)) toMap
 
     lazy val parity: Int =
-      Parity of asMap
+      Parity.of(asMap)
 
     def send(key: T): T =
       asMap(key)
@@ -89,7 +89,7 @@ object Permutations {
     def *(that: RichPermutation[T]): Permutation[T] =
       if (carrier == that.carrier)
         dot(
-          (asMap.view mapValues that.asMap).toMap
+          asMap.view.mapValues(that.asMap).toMap
         )
       else
         throw new IllegalArgumentException
@@ -99,8 +99,8 @@ object Permutations {
     val permutations =
       new Iterable[FiniteSets.→[Int, Int]] {
         override def iterator =
-          (1 to n).permutations map {
-            _.zipWithIndex map {
+          (1 to n).permutations.map {
+            _.zipWithIndex.map {
               case (x, i) => x -> (i + 1)
             } toMap
           }
@@ -108,12 +108,12 @@ object Permutations {
     val permutationCarrier =
       FiniteSets.makeDot(permutations)
     val the1: FiniteSets.→[Int, Int] =
-      (1 to n) map { i => i -> i } toMap
+      (1 to n).map(i => i -> i) toMap
     val mul = FiniteSets.bifunctionAsBiArrow(
       permutationCarrier
-    ) { (p, q) => (1 to n) map { i => i -> p(q(i)) } toMap }
+    )((p, q) => (1 to n).map(i => i -> p(q(i))) toMap)
     val inv =
-      permutationCarrier(permutationCarrier) { p => (1 to n) map { i => p(i) -> i } toMap }
+      permutationCarrier(permutationCarrier)(p => (1 to n).map(i => p(i) -> i) toMap)
     new FiniteSets.Group[FiniteSets.→[Int, Int]](
       permutationCarrier,
       FiniteSetsUtilities.makeNullaryOperator(permutationCarrier, the1),

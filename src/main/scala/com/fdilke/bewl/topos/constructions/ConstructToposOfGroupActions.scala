@@ -1,6 +1,6 @@
 package com.fdilke.bewl.topos.constructions
 
-import com.fdilke.bewl.helper.{Memoize, ⊕}
+import com.fdilke.bewl.helper.{⊕, Memoize}
 import com.fdilke.bewl.topos.algebra.{AlgebraicMachinery, AlgebraicStructures}
 import com.fdilke.bewl.topos._
 
@@ -34,12 +34,12 @@ trait ConstructToposOfGroupActions extends BaseTopos with ToposEnrichments {
         override type →[T <: ~, U <: ~] = Ɛ.→[T, U]
 
         override val I: DOT[UNIT] =
-          ActionDot(Ɛ.I) { (i, g) => i }
+          ActionDot(Ɛ.I)((i, g) => i)
         override lazy val optionalGenerator =
           Some(new ActionDot(group.regularAction))
 
         override lazy val omega: DOT[TRUTH] =
-          ActionDot(Ɛ.omega) { (ω, g) => ω }
+          ActionDot(Ɛ.omega)((ω, g) => ω)
 
         override lazy val truth: >[UNIT, TRUTH] =
           ActionArrow(I, omega, Ɛ.truth)
@@ -65,7 +65,7 @@ trait ConstructToposOfGroupActions extends BaseTopos with ToposEnrichments {
               }
 
             fixedPoints.globals.map { global =>
-              ActionArrow(I, dot, fixedPoints.inclusion o global)
+              ActionArrow(I, dot, fixedPoints.inclusion.o(global))
             }
           }
 
@@ -75,10 +75,10 @@ trait ConstructToposOfGroupActions extends BaseTopos with ToposEnrichments {
             that: DOT[T]
           ): BIPRODUCT[S, T] = {
             val productDot: Ɛ.BIPRODUCT[S, T] =
-              this.action.actionCarrier x that.action.actionCarrier
+              this.action.actionCarrier.x(that.action.actionCarrier)
 
             new ActionDot[S x T](
-              this.action x that.action
+              this.action.x(that.action)
             ) with BiproductDot[S, T] {
               override val left = dot
               override val right = that
@@ -89,7 +89,7 @@ trait ConstructToposOfGroupActions extends BaseTopos with ToposEnrichments {
 
           override def `>Uncached`[T <: ~](that: DOT[T]): EXPONENTIAL[S, T] = {
             val exponentialDot = this.action.actionCarrier > that.action.actionCarrier
-            val exp_x_G = exponentialDot x group.carrier
+            val exp_x_G = exponentialDot.x(group.carrier)
             new ActionDot[S → T](
               group.action(exponentialDot) {
                 case (f, g) =>
@@ -147,7 +147,7 @@ trait ConstructToposOfGroupActions extends BaseTopos with ToposEnrichments {
               target,
               action.actionCarrier(
                 target.action.actionCarrier
-              ) { f }
+              )(f)
             )
 
           override def sanityTest: Unit = {
@@ -206,7 +206,7 @@ trait ConstructToposOfGroupActions extends BaseTopos with ToposEnrichments {
             ActionArrow(
               that.source,
               target,
-              arrow o that.arrow
+              arrow.o(that.arrow)
             )
 
           override def \[U <: ~](monic: U > T): S > U =
@@ -270,7 +270,7 @@ trait ConstructToposOfGroupActions extends BaseTopos with ToposEnrichments {
           target: ActionDot[T],
           f: S => T
         ): S > T =
-          source(target) { f }
+          source(target)(f)
 
         override def makeArrow[
           S <: ~,
@@ -278,7 +278,7 @@ trait ConstructToposOfGroupActions extends BaseTopos with ToposEnrichments {
         ](
           prearrow: group.ActionPreArrow[S, T]
         ): ActionArrow[S, T] = {
-          import prearrow.{source, target, function}
+          import prearrow.{function, source, target}
           new ActionArrow(
             makeDot(source),
             makeDot(target),
@@ -289,11 +289,7 @@ trait ConstructToposOfGroupActions extends BaseTopos with ToposEnrichments {
         }
 
         private val memoizedDotWrapper =
-          Memoize.generic withLowerBound [({
-            type λ[T <: ~] = group.Action[T]
-          })#λ,
-          ActionDot,
-          ~] {
+          Memoize.generic.withLowerBound[({ type λ[T <: ~] = group.Action[T] })#λ, ActionDot, ~] {
             new ActionDot(_)
           }
 
@@ -315,11 +311,13 @@ trait ConstructToposOfGroupActions extends BaseTopos with ToposEnrichments {
         )(
           bifunc: (L, R) => T
         ): BiArrow[L, R, T] =
-          (left x right).biArrow(
-            target
-          ) {
-            bifunc
-          }
+          left
+            .x(right)
+            .biArrow(
+              target
+            ) {
+              bifunc
+            }
       }
     }
   }

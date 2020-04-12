@@ -40,9 +40,7 @@ trait StrongMonads {
       x: DOT[X],
       y: DOT[Y]
     ): M[X] x Y > M[X x Y] =
-      map(twist(y, x)) o
-        tensorialStrength(y, x) o
-        twist(T(x), y)
+      map(twist(y, x)).o(tensorialStrength(y, x)).o(twist(T(x), y))
 
     def functorialStrength[
       X <: ~,
@@ -58,7 +56,7 @@ trait StrongMonads {
       ).transpose(
         x > y
       ) { (x2y, mx) =>
-        implicit val anonImplicit: BIPRODUCT[X → Y, M[X]] = (x > y) x T(x)
+        implicit val anonImplicit: BIPRODUCT[X → Y, M[X]] = (x > y).x(T(x))
         map(
           (x > y).evaluation.arrow
         )(
@@ -103,9 +101,11 @@ trait StrongMonads {
       (
         map(
           I -* a
-        ) o tensorialStrength(
-          I,
-          a
+        ).o(
+          tensorialStrength(
+            I,
+            a
+          )
         )
       ) shouldBe (
         I -* T(a)
@@ -119,13 +119,13 @@ trait StrongMonads {
       b: DOT[B]
     ): Unit =
       (
-        tensorialStrength(a, b) o (
-          (a *- b) x (
-            η(b) o (a -* b)
+        tensorialStrength(a, b).o(
+          (a *- b).x(
+            η(b).o(a -* b)
           )
         )
       ) shouldBe (
-        η(a x b)
+        η(a.x(b))
       )
 
     def sanityTest5[
@@ -137,16 +137,15 @@ trait StrongMonads {
       b: DOT[B],
       c: DOT[C]
     ): Unit = {
-      val a_btc = a x (b x T(c))
+      val a_btc = a.x(b.x(T(c)))
       val stBC = tensorialStrength(b, c)
 
-      (tensorialStrength(a, b x c) o
-        (a_btc.π0 x (stBC o a_btc.π1)) o
-        associator(a, b, T(c))) shouldBe (
+      (tensorialStrength(a, b.x(c))
+        .o(a_btc.π0.x(stBC.o(a_btc.π1)))
+        .o(associator(a, b, T(c)))) shouldBe (
         map(
           associator(a, b, c)
-        ) o
-          tensorialStrength(a x b, c)
+        ).o(tensorialStrength(a.x(b), c))
       )
     }
 
@@ -159,10 +158,10 @@ trait StrongMonads {
     ): Unit = {
       val stAB = tensorialStrength(a, b)
       val stATB = tensorialStrength(a, T(b))
-      val axttb = a x T(T(b))
+      val axttb = a.x(T(T(b)))
 
-      stAB o (axttb.π0 x (μ(b) o axttb.π1)) shouldBe (
-        μ(a x b) o map(stAB) o stATB
+      stAB.o(axttb.π0.x(μ(b).o(axttb.π1))) shouldBe (
+        μ(a.x(b)).o(map(stAB)).o(stATB)
       )
     }
   }

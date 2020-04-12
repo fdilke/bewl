@@ -61,7 +61,7 @@ class PitcherPredicateSolverTest extends AnyFunSpec {
     it("finds effective solutions for various predicates") {
       val samplePredicates: Seq[VanillaPitcher[StrontiumDog] => Boolean] =
         Seq(
-          f => f.head == f.tail.head && (f.tail.tail.head.toString startsWith "The"),
+          f => f.head == f.tail.head && (f.tail.tail.head.toString.startsWith("The")),
           f => f.head != f.tail.tail.head,
           f => Set(f.head, f.tail.head, f.tail.tail.head).size == 2
         )
@@ -76,16 +76,18 @@ class PitcherPredicateSolverTest extends AnyFunSpec {
     }
     it("can diagnose when there is no solution for a predicate") {
       def first10stronts(pitcher: VanillaPitcher[StrontiumDog]): Set[StrontiumDog] =
-        (iterate(pitcher) {
+        iterate(pitcher) {
           _ tail
-        } map {
-          _ head
-        } take 10).toSet
+        }.map {
+            _ head
+          }
+          .take(10)
+          .toSet
 
       val samplePredicates: Seq[
         VanillaPitcher[StrontiumDog] => Boolean
       ] = Seq(
-        f => f.tail.head.toString startsWith "Stix",
+        f => f.tail.head.toString.startsWith("Stix"),
         f => first10stronts(f).size > NUM_STRONTIES,
         f => f.tail.head.id > NUM_STRONTIES
       )

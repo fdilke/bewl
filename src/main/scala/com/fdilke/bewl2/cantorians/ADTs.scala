@@ -1,12 +1,13 @@
 package com.fdilke.bewl2.cantorians
 
-import com.fdilke.bewl2.topology.Compact
+import com.fdilke.bewl2.topology.PitcherPredicateSolver.solvePitcher
+import com.fdilke.bewl2.topology.{Compact, PitcherPredicateSolver}
 
 trait PitcherOld[
   PITCHER <: PitcherOld[PITCHER, T],
   T
 ] {
-  val head: T
+  def head: T
   def tail: PITCHER
 }
 
@@ -112,6 +113,13 @@ object Pitcher {
       )
     constantPitcher
   }
+  def compactness[
+    P,
+    C: Compact
+  ](
+    implicit pitcherTude: Pitcher[P, C]
+  ): Compact[P] =
+    (predicate: P => Boolean) => solvePitcher[P, C](predicate).map(p => () => p)
 }
 
 trait VanillaPitcher[T] {

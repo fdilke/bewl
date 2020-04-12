@@ -60,7 +60,7 @@ class VanillaPitcherOldPredicateSolverTest extends AnyFunSpec {
     it("finds effective solutions for various predicates") {
       val samplePredicates: Seq[VanillaPitcherOld[StrontiumDog] => Boolean] =
         Seq(
-          f => f.head == f.tail.head && (f.tail.tail.head.toString startsWith "The"),
+          f => f.head == f.tail.head && (f.tail.tail.head.toString.startsWith("The")),
           f => f.head != f.tail.tail.head,
           f => Set(f.head, f.tail.head, f.tail.tail.head).size == 2
         )
@@ -75,23 +75,25 @@ class VanillaPitcherOldPredicateSolverTest extends AnyFunSpec {
     }
     it("can diagnose when there is no solution for a predicate") {
       def first10stronts(pitcher: VanillaPitcherOld[StrontiumDog]): Set[StrontiumDog] =
-        (iterate(pitcher) {
+        iterate(pitcher) {
           _ tail
-        } map {
-          _ head
-        } take 10).toSet
+        }.map {
+            _ head
+          }
+          .take(10)
+          .toSet
 
       val samplePredicates: Seq[
         VanillaPitcherOld[StrontiumDog] => Boolean
       ] = Seq(
-        f => f.tail.head.toString startsWith "Stix",
+        f => f.tail.head.toString.startsWith("Stix"),
         f => first10stronts(f).size > NUM_STRONTIES,
         f => f.tail.head.id > NUM_STRONTIES
       )
-      samplePredicates.foreach { pred => solvePitcher(pred) shouldBe None }
+      samplePredicates.foreach(pred => solvePitcher(pred) shouldBe None)
     }
     it("returns a function that can be evaluated on all arguments") {
-      solvePitcher[StrontiumDog] { dogOfTheDay => dogOfTheDay.tail.tail.head == Johnny } match {
+      solvePitcher[StrontiumDog](dogOfTheDay => dogOfTheDay.tail.tail.head == Johnny) match {
         case None => fail("no solution found")
         case Some(dogOfTheDay) =>
           StrontiumDogEnumeration.values should contain(dogOfTheDay.head)

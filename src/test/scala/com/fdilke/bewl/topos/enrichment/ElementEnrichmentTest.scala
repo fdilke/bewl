@@ -30,7 +30,7 @@ class ElementEnrichmentTest extends AnyFreeSpec {
         val gg = g: RichExponential[Int, Boolean]
 
         val gof: Symbol → Boolean =
-          gg o f
+          gg.o(f)
 
         for {
           s <- elementsOf(symbols)
@@ -55,7 +55,7 @@ class ElementEnrichmentTest extends AnyFreeSpec {
         val gg = g: RichExponential[Int, Boolean]
 
         val gof: Symbol → Boolean =
-          gg o f
+          gg.o(f)
 
         for {
           s <- elementsOf(symbols)

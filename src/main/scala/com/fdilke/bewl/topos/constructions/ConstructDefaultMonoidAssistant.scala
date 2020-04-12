@@ -45,8 +45,8 @@ trait ConstructDefaultMonoidAssistant extends BaseTopos with ToposEnrichments {
               val targetMultiply =
                 targetAction.actionMultiply
 
-              val product = action.actionCarrier x monoid.carrier
-              action.actionCarrier >> targetCarrier filter { arrow =>
+              val product = action.actionCarrier.x(monoid.carrier)
+              (action.actionCarrier >> targetCarrier).filter { arrow =>
                 (
                   product
                     .biArrow(omega) { (a, m) =>
@@ -68,7 +68,7 @@ trait ConstructDefaultMonoidAssistant extends BaseTopos with ToposEnrichments {
               val targetMultiply =
                 targetAction.actionMultiply
 
-              val mXs = monoid.carrier x action.actionCarrier
+              val mXs = monoid.carrier.x(action.actionCarrier)
               val possibleMorphisms =
                 mXs > targetCarrier
               import possibleMorphisms.{evaluate => $}
@@ -100,7 +100,7 @@ trait ConstructDefaultMonoidAssistant extends BaseTopos with ToposEnrichments {
               val morphismMultiply =
                 morphisms.restrict(
                   possibleMorphisms.transpose(
-                    morphisms x monoid.carrier
+                    morphisms.x(monoid.carrier)
                   ) {
                     case (f ⊕ m, n ⊕ s) =>
                       $(
@@ -118,24 +118,26 @@ trait ConstructDefaultMonoidAssistant extends BaseTopos with ToposEnrichments {
                   monoid.Action[M x A → B](
                     morphisms,
                     BiArrow[M x A → B, M, M x A → B](
-                      morphisms x monoid.carrier,
+                      morphisms.x(monoid.carrier),
                       morphismMultiply
                     )
                   )
                 override val evaluation =
-                  (morphisms x action.actionCarrier).biArrow(
-                    targetCarrier
-                  ) { (f, s) =>
-                    $(
-                      f,
-                      mXs.pair(
-                        monoid.unit(
-                          action.actionCarrier.toI(s)
-                        ),
-                        s
+                  morphisms
+                    .x(action.actionCarrier)
+                    .biArrow(
+                      targetCarrier
+                    ) { (f, s) =>
+                      $(
+                        f,
+                        mXs.pair(
+                          monoid.unit(
+                            action.actionCarrier.toI(s)
+                          ),
+                          s
+                        )
                       )
-                    )
-                  }
+                    }
 
                 override def transpose[X <: ~](
                   otherAction: monoid.Action[X],

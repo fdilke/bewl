@@ -14,19 +14,20 @@ object VanillaPitcherOldPredicateSolver {
   ): Option[Seq[C]] =
     new VanillaPitcherOldPredicateSolver(
       predicate
-    ) tryMap {
-      DraftPitcherOld.empty
-    } map {
-      _.seq
-    }
+    ).tryMap {
+        DraftPitcherOld.empty
+      }
+      .map {
+        _.seq
+      }
 
   def solvePitcher[
     C: Compact
   ](
     predicate: VanillaPitcherOld[C] => Boolean
   ): Option[VanillaPitcherOld[C]] =
-    Compact[C].optional flatMap { c =>
-      solveSeq(predicate) map { seq => GoPlatinumPitcherOld(seq, c) }
+    Compact[C].optional.flatMap { c =>
+      solveSeq(predicate).map(seq => GoPlatinumPitcherOld(seq, c))
     }
 }
 
@@ -35,14 +36,14 @@ class VanillaPitcherOldPredicateSolver[
 ](
   predicate: VanillaPitcherOld[C] => Boolean
 ) {
-  @tailrec private final def tryMap(
+  @tailrec final private def tryMap(
     draft: DraftPitcherOld[C]
   ): Option[DraftPitcherOld[C]] =
     (try {
       Left(
         if (predicate(
-            draft.asPitcher
-          ))
+              draft.asPitcher
+            ))
           Some(draft)
         else
           None
@@ -106,5 +107,5 @@ object GoPlatinumPitcherOld {
   ): VanillaPitcherOld[C] =
     seq.foldRight[VanillaPitcherOld[C]](
       VanillaPitcherOld.constantly(backstop)
-    ) { (c: C, pitcher: VanillaPitcherOld[C]) => VanillaPitcherOld[C](c, pitcher) }
+    )((c: C, pitcher: VanillaPitcherOld[C]) => VanillaPitcherOld[C](c, pitcher))
 }

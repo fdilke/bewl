@@ -50,7 +50,7 @@ class ContinuationMonadTest extends AnyFreeSpec {
         Symbol → TRUTH → TRUTH
       ) > (
         Int → TRUTH → TRUTH
-      ) = continuation map f
+      ) = continuation.map(f)
 
       implicit val forSoo: EXPONENTIAL[Symbol → TRUTH, TRUTH] =
         symbols > omega > omega
@@ -58,7 +58,7 @@ class ContinuationMonadTest extends AnyFreeSpec {
       for {
         soo <- elementsOf(symbols > omega > omega)
         soo_ : RichExponential[Symbol → TRUTH, TRUTH] = soo
-      } map(soo) shouldBe (soo_ o (omega > f))
+      } map(soo) shouldBe (soo_.o(omega > f))
     }
 
     "tensorial strength is calculated correctly" in notOnCI {
@@ -76,15 +76,15 @@ class ContinuationMonadTest extends AnyFreeSpec {
       ) =
         continuation(
           ints
-        ) tensorialStrength (
+        ).tensorialStrength(
           symbols
         )
 
       strength should have(
-        source(ints x mSymbols),
+        source(ints.x(mSymbols)),
         target(
           continuation(
-            ints x symbols
+            ints.x(symbols)
           ).free
         )
       )
@@ -93,11 +93,11 @@ class ContinuationMonadTest extends AnyFreeSpec {
         i <- elementsOf(ints)
         m <- elementsOf(mSymbols)
         ist <- elementsOf(
-          (ints x symbols) > omega
+          (ints.x(symbols)) > omega
         )
       } strength(i ⊕ m)(ist) shouldBe m(
         asElement(
-          symbols(omega) { h => ist(i ⊕ h) }
+          symbols(omega)(h => ist(i ⊕ h))
         )
       )
 
@@ -138,7 +138,7 @@ class ContinuationMonadTest extends AnyFreeSpec {
         s2o: (Symbol → TRUTH) <- elementsOf(symbols > omega)
       } strength(i2s)(mi)(s2o) shouldBe mi(
         asElement(
-          ints(omega) { i => s2o(i2s(i)) }
+          ints(omega)(i => s2o(i2s(i)))
         )
       )
     }
@@ -151,14 +151,14 @@ class ContinuationMonadTest extends AnyFreeSpec {
       ) = continuation(I).mu
 
       val io2iooo: (UNIT → TRUTH) > (UNIT → TRUTH → TRUTH → TRUTH) =
-        (I > omega > omega > omega).transpose(I > omega) { (x, f) => f(x) }
+        (I > omega > omega > omega).transpose(I > omega)((x, f) => f(x))
 
       implicit val forIoooo = I > omega > omega > omega > omega
 
       for {
         ioooo <- elementsOf(I > omega > omega > omega > omega)
         ioooo_ : RichExponential[UNIT → TRUTH → TRUTH → TRUTH, TRUTH] = ioooo
-      } mu(ioooo) shouldBe (ioooo_ o io2iooo)
+      } mu(ioooo) shouldBe (ioooo_.o(io2iooo))
 
       Monad.sanityTest[
         ({ type λ[X <: ~] = X → TRUTH → TRUTH })#λ,

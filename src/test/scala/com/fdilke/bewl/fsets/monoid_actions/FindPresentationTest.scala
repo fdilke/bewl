@@ -17,7 +17,7 @@ import scala.language.{postfixOps, reflectiveCalls}
 
 class FindPresentationTest extends AnyFreeSpec {
 
-  import monoidOf3.{Action, regularAction}
+  import monoidOf3.{regularAction, Action}
 
   private val findGenerators: {
     def apply[A](
@@ -44,10 +44,7 @@ class FindPresentationTest extends AnyFreeSpec {
     )
 
   private val actionTopos =
-    ToposOfMonoidActions of (
-      monoidOf3,
-      FiniteSets.DefaultMonoidAssistant
-  )
+    ToposOfMonoidActions.of(monoidOf3, FiniteSets.DefaultMonoidAssistant)
 
   private val scalarMultiply: (String, Symbol) => String =
     (s, m) => monoidOf3.multiply(Symbol(s), m).name
@@ -72,7 +69,7 @@ class FindPresentationTest extends AnyFreeSpec {
     }
     "for a right ideal squared action" in {
       canExtractPresentation(
-        bar x bar
+        bar.x(bar)
       )
     }
     "for the truth object monoid action" in {
@@ -85,10 +82,11 @@ class FindPresentationTest extends AnyFreeSpec {
     "for a more fancy monoid action" in {
       canExtractPresentation(
         actionTopos.unwrap(
-          actionTopos.omega x
+          actionTopos.omega.x(
             actionTopos.makeDot(
               monoidOf3.regularAction
             )
+          )
         )
       )
     }

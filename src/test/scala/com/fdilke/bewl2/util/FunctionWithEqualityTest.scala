@@ -5,8 +5,8 @@ import org.scalatest.matchers.should.Matchers._
 import com.fdilke.bewl2.fsets.FiniteSets._
 
 class FunctionWithEqualityTest extends AnyFreeSpec {
-  private implicit val domain: Iterable[Int] = 0 to 10
-  private implicit val range: Iterable[Boolean] = Iterable(true, false)
+  implicit private val domain: Iterable[Int] = 0 to 10
+  implicit private val range: Iterable[Boolean] = Iterable(true, false)
 
   "a function with equality" - {
     "has the same effect on values" in {

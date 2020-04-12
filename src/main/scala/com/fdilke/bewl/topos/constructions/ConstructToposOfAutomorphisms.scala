@@ -70,9 +70,9 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with ToposEnrichments {
             if (carrier != arrow.target)
               throw new IllegalArgumentException("Source and target must match")
             if (carrier != inverse.source ||
-              carrier != inverse.target ||
-              (inverse o arrow) != carrier.identity ||
-              (arrow o inverse) != carrier.identity)
+                carrier != inverse.target ||
+                (inverse.o(arrow)) != carrier.identity ||
+                (arrow.o(inverse)) != carrier.identity)
               throw new IllegalArgumentException("Incorrect inverse")
           }
 
@@ -80,10 +80,10 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with ToposEnrichments {
             AutomorphismArrow(automorphism, target, carrier(target.carrier)(f))
 
           override def xUncached[Y <: ~](that: DOT[Y]) = {
-            val productCarrier = carrier x that.carrier
+            val productCarrier = carrier.x(that.carrier)
             new Automorphism(
-              (arrow o productCarrier.π0) x (that.arrow o productCarrier.π1),
-              (inverse o productCarrier.π0) x (that.inverse o productCarrier.π1)
+              (arrow.o(productCarrier.π0)).x(that.arrow.o(productCarrier.π1)),
+              (inverse.o(productCarrier.π0)).x(that.inverse.o(productCarrier.π1))
             ) with BiproductDot[X, Y] {
               override val left: DOT[X] = automorphism
               override val right: DOT[Y] = that
@@ -122,19 +122,21 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with ToposEnrichments {
                   biArrow.product.left,
                   exponentialAutomorphism,
                   exponentialCarrier.transpose(
-                    (biArrow.product.left.carrier x biArrow.product.right.carrier).biArrow(
-                      biArrow.arrow.arrow.target
-                    ) {
-                      biArrow(_, _)
-                    }
+                    biArrow.product.left.carrier
+                      .x(biArrow.product.right.carrier)
+                      .biArrow(
+                        biArrow.arrow.arrow.target
+                      ) {
+                        biArrow(_, _)
+                      }
                   )
                 )
             }
           }
           override lazy val globals =
-            carrier.globals.filter { global =>
-              (arrow o global) == global
-            } map { global => AutomorphismArrow(I, automorphism, global) }
+            carrier.globals.filter(global => (arrow.o(global)) == global).map { global =>
+              AutomorphismArrow(I, automorphism, global)
+            }
         }
 
         case class AutomorphismArrow[S <: ~, T <: ~](
@@ -149,15 +151,15 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with ToposEnrichments {
             source.sanityTest
             target.sanityTest
             arrow.sanityTest
-            if ((arrow o source.arrow) != (target.arrow o arrow))
+            if ((arrow.o(source.arrow)) != (target.arrow.o(arrow)))
               throw new IllegalArgumentException("Arrow does not respect automorphisms")
           }
 
           override def ?=(that: S > T) = {
             val equalizerCarrier = this.arrow ?= that.arrow
             new Automorphism[S](
-              (source.arrow o equalizerCarrier.inclusion) \ equalizerCarrier.inclusion,
-              (source.inverse o equalizerCarrier.inclusion) \ equalizerCarrier.inclusion
+              (source.arrow.o(equalizerCarrier.inclusion)) \ equalizerCarrier.inclusion,
+              (source.inverse.o(equalizerCarrier.inclusion)) \ equalizerCarrier.inclusion
             ) with EqualizingDot[S] { equalizer =>
               override val equalizerTarget = source
               override def restrict[R <: ~](anArrow: R > S) =
@@ -173,7 +175,7 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with ToposEnrichments {
             AutomorphismArrow(
               that.source,
               target,
-              arrow o that.arrow
+              arrow.o(that.arrow)
             )
           override lazy val chi =
             AutomorphismArrow(
@@ -206,10 +208,10 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with ToposEnrichments {
 
               new Automorphism(
                 delegatedImage.restrict(
-                  anArrow.target.arrow o delegatedImage.inclusion
+                  anArrow.target.arrow.o(delegatedImage.inclusion)
                 ),
                 delegatedImage.restrict(
-                  anArrow.target.inverse o delegatedImage.inclusion
+                  anArrow.target.inverse.o(delegatedImage.inclusion)
                 )
               ) with EqualizingDot[T] { equalizingDot =>
 
@@ -250,13 +252,11 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with ToposEnrichments {
         ) = ???
 
         private val memoizedDotWrapper =
-          Memoize.generic withLowerBound [({
-            type λ[T <: ~] = Ɛ.>[T, T]
-          })#λ,
-          ({
-            type λ[T <: ~] = Automorphism[T]
-          })#λ,
-          ~] { predot =>
+          Memoize.generic.withLowerBound[
+            ({ type λ[T <: ~] = Ɛ.>[T, T] })#λ,
+            ({ type λ[T <: ~] = Automorphism[T] })#λ,
+            ~
+          ] { predot =>
             if (predot.isIso)
               Automorphism(predot, predot.inverse)
             else
@@ -288,7 +288,7 @@ trait ConstructToposOfAutomorphisms extends BaseTopos with ToposEnrichments {
         )(
           bifunc: (L, R) => T
         ) =
-          (left x right).biArrow(target) { bifunc }
+          left.x(right).biArrow(target)(bifunc)
       }
   }
 }

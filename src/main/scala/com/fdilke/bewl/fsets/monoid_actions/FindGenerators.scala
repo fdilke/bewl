@@ -45,7 +45,7 @@ trait FindGenerators extends BaseFiniteSets {
               override val generator: A
             ) extends AbstractCyclic[A] {
               val elements: Set[A] =
-                monoidElements map { (m: M) =>
+                monoidElements.map { (m: M) =>
                   action.actionMultiply(
                     generator,
                     m
@@ -58,7 +58,7 @@ trait FindGenerators extends BaseFiniteSets {
               def subsetOf(
                 other: Cyclic
               ): Boolean =
-                elements subsetOf other.elements
+                elements.subsetOf(other.elements)
             }
 
             class MaximalCyclics(
@@ -75,8 +75,8 @@ trait FindGenerators extends BaseFiniteSets {
               ) =
                 new MaximalCyclics(
                   newCyclic +: (
-                    cyclics filterNot {
-                      _ subsetOf newCyclic
+                    cyclics.filterNot {
+                      _.subsetOf(newCyclic)
                     }
                   )
                 )
@@ -87,7 +87,7 @@ trait FindGenerators extends BaseFiniteSets {
                 self + Cyclic(a)
 
               override lazy val transversal =
-                cyclics map {
+                cyclics.map {
                   _.generator
                 }
 

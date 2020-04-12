@@ -3,17 +3,17 @@ package com.fdilke.bewl.fsets.monoid_actions
 import com.fdilke.bewl.fsets.FiniteSets
 import com.fdilke.bewl.fsets.FiniteSets.{
   >,
-  LocalMonoidAssistant,
-  ToposOfMonoidActions,
   bifunctionAsBiArrow,
-  functionAsArrow
+  functionAsArrow,
+  LocalMonoidAssistant,
+  ToposOfMonoidActions
 }
 import com.fdilke.bewl.fsets.FiniteSetsUtilities._
 import com.fdilke.bewl.helper.⊕
 import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers._
-import com.fdilke.bewl.helper.StandardSymbols.{i, x, y, source, target}
+import com.fdilke.bewl.helper.StandardSymbols.{i, source, target, x, y}
 
 import scala.Function.untupled
 import scala.language.{existentials, postfixOps, reflectiveCalls}
@@ -30,10 +30,7 @@ class FiniteSetsLocalMonoidAssistantTest extends AnyFreeSpec {
   import analyzer.analyze
 
   private val actionTopos =
-    ToposOfMonoidActions of (
-      monoidOf3,
-      FiniteSets.DefaultMonoidAssistant
-  )
+    ToposOfMonoidActions.of(monoidOf3, FiniteSets.DefaultMonoidAssistant)
 
   private val scalarMultiply: (String, Symbol) => String =
     (s, m) => monoidOf3.multiply(Symbol(s), m).name
@@ -65,7 +62,7 @@ class FiniteSetsLocalMonoidAssistantTest extends AnyFreeSpec {
 
       "for regularAction x bar to bar" in {
         enumeratesMorphisms(
-          regularAction x bar,
+          regularAction.x(bar),
           regularAction,
           thorough = true
         )
@@ -73,7 +70,7 @@ class FiniteSetsLocalMonoidAssistantTest extends AnyFreeSpec {
 
       "for bar x bar to bar" in {
         enumeratesMorphisms(
-          bar x bar,
+          bar.x(bar),
           bar,
           thorough = true
         )
@@ -81,7 +78,7 @@ class FiniteSetsLocalMonoidAssistantTest extends AnyFreeSpec {
 
       "and for bar x bar to regularAction" in {
         enumeratesMorphisms(
-          bar x bar,
+          bar.x(bar),
           regularAction,
           thorough = true
         )
@@ -140,11 +137,11 @@ class FiniteSetsLocalMonoidAssistantTest extends AnyFreeSpec {
         )
       rawExponential.exponentialAction.sanityTest
       rawExponential.evaluation.arrow should have(
-        source(rawExponential.exponentialAction.actionCarrier x barDot),
+        source(rawExponential.exponentialAction.actionCarrier.x(barDot)),
         target(bazDot)
       )
       monoidOf3.actions.isMorphism(
-        rawExponential.exponentialAction x bar,
+        rawExponential.exponentialAction.x(bar),
         baz,
         rawExponential.evaluation.arrow
       ) shouldBe true
@@ -176,7 +173,7 @@ class FiniteSetsLocalMonoidAssistantTest extends AnyFreeSpec {
         source(foo.actionCarrier),
         target(exponentialDot)
       )
-      (foo.actionCarrier x barDot)(bazDot) {
+      foo.actionCarrier.x(barDot)(bazDot) {
         case f ⊕ b =>
           rawExponential.evaluation(
             foo2bar2baz(f),
