@@ -34,30 +34,6 @@ trait Catcher[
     }
 }
 
-trait VanillaPitcherOld[T] extends PitcherOld[VanillaPitcherOld[T], T]
-
-object VanillaPitcherOld {
-  implicit def compactVanillaPitcher[
-    C: Compact
-  ]: Compact[VanillaPitcherOld[C]] =
-    predicate => ???
-
-  def apply[T](
-    t: T,
-    pitcher: => VanillaPitcherOld[T]
-  ): VanillaPitcherOld[T] =
-    new VanillaPitcherOld[T] {
-      override val head: T = t
-      override def tail: VanillaPitcherOld[T] = pitcher
-    }
-
-  def constantly[T](t: T): VanillaPitcherOld[T] =
-    new VanillaPitcherOld[T] { pitcher =>
-      override val head: T = t
-      override def tail: VanillaPitcherOld[T] = pitcher
-    }
-}
-
 trait Pitcher[P, T] {
   def head(
     pitcher: P
