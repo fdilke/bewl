@@ -13,9 +13,6 @@ trait Compact[T] {
   ): Option[
     () => T
   ]
-
-  lazy val optional: Option[T] =
-    determine[T](_ => true)(this)
 }
 
 object Compact {
@@ -47,7 +44,7 @@ object Compact {
     }
 
   @inline def optional[T: Compact]: Option[T] =
-    Compact[T] optional
+    determine[T](_ => true)
 
   @inline def exists[T: Compact](
     predicate: T => Boolean
@@ -160,7 +157,7 @@ object Hausdorff {
       }
 
     override def intKey(f: C => H): Int =
-      Compact[C].optional match {
+      optional[C] match {
         case None => 0
         case Some(c) =>
           Hausdorff[H].intKey(

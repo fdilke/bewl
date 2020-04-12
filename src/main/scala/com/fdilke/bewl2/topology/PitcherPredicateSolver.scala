@@ -34,7 +34,7 @@ object PitcherPredicateSolver {
   )(
     implicit pitcher: Pitcher[P, C]
   ): Option[P] =
-    Compact[C].optional.flatMap { c =>
+    optional[C].flatMap { c =>
       solveSeq(
         predicate
       )(Compact[C], pitcher).map { seq => // <== should not be needed
