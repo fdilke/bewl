@@ -53,6 +53,19 @@ class TypeTopologyTest extends AnyFunSpec {
       inhabited[Impossibility] shouldBe false
     }
 
+    it("allow 'findLazy' for testing intermediate results'") {
+      findLazy[StrontiumDog, Int](
+        sd => sd.id,
+        _ > 1
+      ) shouldBe Some(
+        (TheGronk, 2)
+      )
+      findLazy[StrontiumDog, String](
+        sd => sd.toString,
+        _.length < 4
+      ) shouldBe None
+    }
+
     it("can be made implicitly Hausdorff") {
       equalH(Johnny, Wulf) shouldBe false
       equalH(TheGronk, TheGronk) shouldBe true
