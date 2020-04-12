@@ -3,8 +3,8 @@ package com.fdilke.bewl2.cantorians
 import com.fdilke.bewl2.topology.PitcherPredicateSolver.solvePitcher
 import com.fdilke.bewl2.topology.{Compact, PitcherPredicateSolver}
 
-trait PitcherOld[
-  PITCHER <: PitcherOld[PITCHER, T],
+trait PitcherFType[
+  PITCHER <: PitcherFType[PITCHER, T],
   T
 ] {
   def head: T
@@ -23,7 +23,7 @@ trait Catcher[
   ]
 
   final def apply[
-    PITCHER <: PitcherOld[PITCHER, T]
+    PITCHER <: PitcherFType[PITCHER, T]
   ](
     pitcher: PITCHER
   ): U =

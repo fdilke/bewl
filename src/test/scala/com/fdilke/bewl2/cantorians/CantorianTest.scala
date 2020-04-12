@@ -44,16 +44,15 @@ class CantorianTest extends AnyFunSpec {
 
   describe("Cantorians") {
     it("can be converted to iterators") {
-      object cantorianTF extends Cantorian {
-        override val head: Boolean = true
+      lazy val cantorianTF: Cantorian =
+        Cantorian(
+          true,
+          Cantorian(
+            false,
+            cantorianTF
+          )
+        )
 
-        override def tail: Cantorian =
-          new Cantorian {
-            override val head: Boolean = false
-
-            override def tail: Cantorian = cantorianTF
-          }
-      }
       cantorianTF.asIterable.take(5).toList shouldBe Seq(
         true,
         false,

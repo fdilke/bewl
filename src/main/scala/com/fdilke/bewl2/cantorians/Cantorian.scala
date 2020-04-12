@@ -45,7 +45,7 @@ object GroundedTree {
     BranchNode(left, right)
 }
 
-trait Cantorian extends PitcherOld[Cantorian, Boolean] with Function[Int, Boolean] { cantorian =>
+trait Cantorian extends PitcherFType[Cantorian, Boolean] with Function[Int, Boolean] { cantorian =>
   def asIterable: Iterable[Boolean] =
     new Iterable[Boolean] {
       override def iterator: Iterator[Boolean] =
