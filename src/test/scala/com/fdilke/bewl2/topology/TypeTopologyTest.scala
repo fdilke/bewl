@@ -15,8 +15,8 @@ class TypeTopologyTest extends AnyFunSpec {
 
   private def preferredWeapon(sd: StrontiumDog): String =
     sd match {
-      case Johnny => "No.4 Cartridge"
-      case Wulf => "Der Happy Stick"
+      case Johnny   => "No.4 Cartridge"
+      case Wulf     => "Der Happy Stick"
       case TheGronk => "Oh my poor heartses"
     }
 

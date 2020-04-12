@@ -34,6 +34,10 @@ did better with minimal .scalaafmt.conf from the scalafmt project itself
 
 note very complete config options available from Cmd-comma preferences / scalafmt tab
 
+to search GitHub:
+
+    https://github.com/search?utf8=%E2%9C%93&q=filename%3A.scalafmt.conf&type=Code
+    
 # Comagmas - this needs writing up
 
 These are the opposite of magmas, which are just sets with a binary operation which 

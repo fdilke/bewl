@@ -87,6 +87,27 @@ class CantorianTest extends AnyFunSpec {
       complexTree(allFalse) shouldBe "z"
       complexTree(falseTrueAlternate) shouldBe "z"
     }
+
+    it("can be treated as Int => Bool") {
+      val cantorianTFT: Cantorian =
+        cycle(true, false, false)
+      val cantorianAsFn: Int => Boolean =
+        cantorianTFT
+
+      cantorianAsFn(0) shouldBe true
+      cantorianAsFn(2) shouldBe false
+      cantorianAsFn(77) shouldBe false
+      cantorianAsFn(78) shouldBe true
+      cantorianAsFn(2009) shouldBe false
+    }
+//    it("are compact - can solve predicates when a solution exists") {
+//      val samplePredicates: Seq[Cantorian => Boolean] = Seq(
+//        _ => true,
+//        _.head,
+//        c => c.head && c.tail.head
+//      )
+//
+//    }
   }
 
 ////  describe("Analyzing co-cantorians") {

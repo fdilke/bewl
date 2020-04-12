@@ -2,6 +2,7 @@ package com.fdilke.bewl2.cantorians
 
 import java.util.function.Supplier
 
+import scala.annotation.tailrec
 import scala.language.postfixOps
 
 class GroundedCatcher[T, U](
@@ -13,9 +14,9 @@ sealed trait GroundedTree[T] extends GroundedCatcher[Boolean, T] with Function[C
 case class LeafNode[T](
   leaf: T
 ) extends GroundedCatcher[Boolean, T](
-      Left(leaf)
-    )
-    with GroundedTree[T] {
+    Left(leaf)
+  )
+  with GroundedTree[T] {
   def apply(cantorian: Cantorian): T =
     leaf
 }
@@ -24,9 +25,9 @@ case class BranchNode[T](
   left: GroundedTree[T],
   right: GroundedTree[T]
 ) extends GroundedCatcher[Boolean, T](
-      Right(boolean => if (boolean) left else right)
-    )
-    with GroundedTree[T] {
+    Right(boolean => if (boolean) left else right)
+  )
+  with GroundedTree[T] {
   def apply(cantorian: Cantorian): T =
     this.apply[Cantorian](cantorian)
 }
@@ -42,7 +43,9 @@ object GroundedTree {
     BranchNode(left, right)
 }
 
-trait Cantorian extends PitcherOld[Cantorian, Boolean] { cantorian =>
+trait Cantorian
+  extends PitcherOld[Cantorian, Boolean]
+    with Function[Int, Boolean] { cantorian =>
   def asIterable: Iterable[Boolean] =
     new Iterable[Boolean] {
       override def iterator: Iterator[Boolean] =
@@ -54,6 +57,12 @@ trait Cantorian extends PitcherOld[Cantorian, Boolean] { cantorian =>
           _.head
         }
     }
+  @tailrec
+  final def apply(index: Int): Boolean =
+    if (index == 0)
+      head
+    else
+      tail(index - 1)
 }
 
 object Cantorian {
