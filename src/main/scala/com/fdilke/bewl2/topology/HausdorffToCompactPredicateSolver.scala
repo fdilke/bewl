@@ -48,7 +48,7 @@ class HausdorffToCompactPredicateSolver[
 ](
   predicate: (H => C) => Boolean
 ) {
-  @tailrec final private def tryMap(
+  def tryMap(
     map: Map[Key[H], C]
   ): Option[Map[Key[H], C]] =
     (try {
@@ -69,21 +69,16 @@ class HausdorffToCompactPredicateSolver[
     }) match {
       case Left(result) => result
       case Right(h) =>
-        determine[C] { c =>
-          tryMapNonTailRec(
-            map + (new Key(h) -> c)
-          ) isDefined
-        } match { // exercise for the student, why can't this be a flatmap?
-          case Some(c) => // TODO: enhance find so we don't do this calculation twice
-            tryMap(map + (new Key(h) -> c))
-          case None => None
+        determine[C, Option[Map[Key[H], C]]](
+          c =>
+            tryMap(
+              map + (new Key(h) -> c)
+            ),
+          om => om.isDefined
+        ).flatMap {
+          _._2
         }
     }
-
-  private def tryMapNonTailRec(
-    map: Map[Key[H], C]
-  ): Option[Map[Key[H], C]] =
-    tryMap(map)
 
   case class StumpedAtException(
     h: H
