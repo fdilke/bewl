@@ -749,27 +749,26 @@ Very rough roadmap:
     https://scalac.io/typeclasses-in-scala/
 - airtight way to make sure dyads are canonical
 - check monadicity of the dyad
-
-# Updated roadmap
-
-- express the compactness of the Cantorian
-- and the compactness of the pitcher
-- have cases where C isn't Hausdorff
+- express the compactness of the Cantorian (and of the pitcher, sort of)
 - should 'find' include some way to capture intermediate results, e.g.
     find[C] { c => f(c).isOk } but now we want to have saved f(c),
     so it's a 'predicate that also remembers a R, for some R'
     actually return value is Option[() => (C, R)]
     Already have the technology to do this assuming it's not abused in 
         too many places :() i.e. the exception hack
+- use 'search[]' to be like "find" but more proactive: executes the thing too?
+    or use another name, "determine" ? - part done, sort this out
+
+# Updated roadmap
+
+- have cases where C isn't Hausdorff
 - Hausdorffness of the catcher
 - implement density / sorting (generalization of Euclidean rhythms)
 - knowledge of genetic codes?
 - machinery of abstract recursion schemes? use/learn from shapeless?
 - be able to play a Dyad[LogicalNote] at a given speed/pitch
-- use 'search[]' to be like "find" but more proactive: executes the thing too?
-    or use another name, "determine" ? - part done, sort this out
-- make GroundedTree[T] ordered when T is. Also internal sort => Euclidean rhythm?    
-- add a JonssonTaski typeclass for Cantorians and trees
+- make GroundedTree[T] ordered when T is; also internal sort => Euclidean rhythm?    
+- add a JonssonTarski typeclass for Cantorians and trees
 - awkward using Pitcher[_, SELF] so rename as PitcherOld, have a Pitcher typeclass,
     phase out PitcherOld which should really not be needed once Cantorian: Pitcher.
  

@@ -51,7 +51,7 @@ class PitcherPredicateSolver[
 )(
   implicit pitcher: Pitcher[P, C]
 ) {
-  final private def trySeq(
+  def trySeq(
     draft: DraftPitcher[P, C]
   ): Option[DraftPitcher[P, C]] =
     (try {
@@ -71,7 +71,7 @@ class PitcherPredicateSolver[
         determine[C, Option[DraftPitcher[P, C]]](
           c => trySeq(draft.plus(c)),
           od => od.isDefined
-        ) flatMap {
+        ).flatMap {
           _._2
         }
     }
