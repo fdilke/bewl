@@ -36,7 +36,7 @@ object Compact {
   ] =
     Compact[T].find(predicate)
 
-  def findLazy[
+  def determine[
     T: Compact,
     U
   ](
@@ -45,15 +45,14 @@ object Compact {
   ): Option[(T, U)] = {
     val holder: AtomicReference[(T, U)] =
       new AtomicReference[(T, U)]()
-    def wrappedPredicate(t: T): Boolean = {
+    if (exists[T]{ t =>
       val u: U = f(t)
       val satisfied: Boolean =
         predicate(u)
       if (satisfied)
         holder.set(t -> u)
       satisfied
-    }
-    if (exists[T](wrappedPredicate))
+    })
       Some(holder.get())
     else
       None

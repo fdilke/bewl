@@ -53,14 +53,14 @@ class TypeTopologyTest extends AnyFunSpec {
       inhabited[Impossibility] shouldBe false
     }
 
-    it("allow 'findLazy' for testing intermediate results'") {
-      findLazy[StrontiumDog, Int](
+    it("allow special helper method for testing intermediate results'") {
+      determine[StrontiumDog, Int](
         sd => sd.id,
         _ > 1
       ) shouldBe Some(
         (TheGronk, 2)
       )
-      findLazy[StrontiumDog, String](
+      determine[StrontiumDog, String](
         sd => sd.toString,
         _.length < 4
       ) shouldBe None
