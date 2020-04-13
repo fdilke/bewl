@@ -70,38 +70,38 @@ object Dyad {
 
   implicit def jonssonTarski[T]: JonssonTarski[Dyad[T]] =
     new JonssonTarski[Dyad[T]] {
-      override def join(l: Dyad[T], r: Dyad[T]): Dyad[T] = {
-        val length = Math.max(l.length, r.length)
-
+      override def join(
+        l: Dyad[T],
+        r: Dyad[T]
+      ): Dyad[T] =
         Dyad(
-          0 until (length * 2) map { index =>
-            (if (index % 2 == 0) l else r) (
-              index / 2
-            )
+          Seq.concat(
+            (0 until Math.max(l.length, r.length)).map { index =>
+              Seq(
+                l(index),
+                r(index)
+              )
+            }: _*
+          ): _*
+        )
+
+      override def left(
+        dyad: Dyad[T]
+      ): Dyad[T] =
+        Dyad(
+          Range(0, dyad.length, 2).map {
+            dyad(_)
           }: _*
         )
-      }
 
-      override def left(dyad: Dyad[T]): Dyad[T] = {
-        val length = dyad.length
+      override def right(
+        dyad: Dyad[T]
+      ): Dyad[T] =
         Dyad(
-          Range(0, length, 2) map {
+          Range(1, dyad.length + 1, 2).map {
             dyad(_)
-          } :_*
+          }: _*
         )
-      }
-
-      override def right(dyad: Dyad[T]): Dyad[T] = {
-        val length = dyad.length
-        if (length == 1)
-          dyad
-        else
-          Dyad(
-            Range(1, length, 2) map {
-              dyad(_)
-            } :_*
-          )
-      }
     }
 }
 
