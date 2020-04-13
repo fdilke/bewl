@@ -5,6 +5,7 @@ import java.util.function.Supplier
 import com.fdilke.bewl2.topology.Compact
 
 import scala.annotation.tailrec
+import scala.collection.Iterator.iterate
 import scala.language.postfixOps
 
 class GroundedCatcher[T, U](
@@ -49,8 +50,7 @@ trait Cantorian extends PitcherFType[Cantorian, Boolean] with Function[Int, Bool
   def asIterable: Iterable[Boolean] =
     new Iterable[Boolean] {
       override def iterator: Iterator[Boolean] =
-        Iterator
-          .iterate(
+        iterate(
             cantorian
           ) {
             _.tail
@@ -65,6 +65,22 @@ trait Cantorian extends PitcherFType[Cantorian, Boolean] with Function[Int, Bool
       head
     else
       tail(index - 1)
+
+  def take(n: Int): Seq[Boolean] =
+    if (n == 0)
+      Seq.empty
+    else
+      head +: tail.take(n - 1)
+
+  def drop(n: Int): Cantorian =
+    iterate(
+      cantorian
+    ) {
+      _.tail
+    } drop(n) next
+
+  def slice(from: Int, until: Int): Seq[Boolean] =
+    drop(from).take(until - from)
 }
 
 object Cantorian {

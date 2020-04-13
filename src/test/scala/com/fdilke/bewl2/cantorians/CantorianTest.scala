@@ -44,6 +44,17 @@ class CantorianTest extends AnyFunSpec {
   }
 
   describe("Cantorians") {
+    it("can be sampled with take, drop, and slice") {
+      trueFalseAlternate.take(7) shouldBe Seq(
+        true, false, true, false, true, false, true
+      )
+      cycle(true, false, false).drop(5).take(3) shouldBe Seq(
+        false, true, false
+      )
+      falseTrueAlternate.slice(3, 8) shouldBe Seq(
+        true, false, true, false, true
+      )
+    }
     it("can be converted to iterators") {
       lazy val cantorianTF: Cantorian =
         Cantorian(
@@ -130,6 +141,11 @@ class CantorianTest extends AnyFunSpec {
         }
       }
     }
+
+//    it("have a Jonsson-Tarski structure that obeys the axioms") {
+//      val trueReally: Cantorian =
+//        left(trueFalseAlternate)
+//    }
   }
 
 ////  describe("Analyzing co-cantorians") {
