@@ -1,6 +1,7 @@
 package com.fdilke.bewl2.cantorians
 
 import com.fdilke.bewl2.cantorians.Dyad.{η, μ, canonical, isPowerOf2}
+import com.fdilke.bewl2.cantorians.JonssonTarski.{join, left, right}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
 
@@ -128,6 +129,28 @@ class DyadTest extends AnyFunSpec {
           "post O",
           "captain Brian"
         )
+    }
+    it("have a Jonsson-Tarski structure that obeys the axioms") {
+      left(Dyad(1)) shouldBe Dyad(1)
+      right(Dyad(1)) shouldBe Dyad(1)
+
+      val dyad: Dyad[Int] =
+        Dyad(1, 2, 3, 4)
+      val dyad2 = dyad.map {
+        _ + 10
+      }
+
+      left(dyad) shouldBe Dyad(1, 3)
+      right(dyad) shouldBe Dyad(2, 4)
+
+      join(dyad, dyad2) shouldBe Dyad(
+        1, 11, 2, 12, 3, 13, 4, 14
+      )
+
+      join(left(dyad), right(dyad)) shouldBe dyad
+
+      left(join(dyad, dyad2)) shouldBe dyad
+      right(join(dyad2, dyad)) shouldBe dyad
     }
   }
 }

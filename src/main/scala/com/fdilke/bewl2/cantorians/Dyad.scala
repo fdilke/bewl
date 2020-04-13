@@ -67,6 +67,42 @@ object Dyad {
         } max
       )).map(index => dd(index)(index)): _*
     )
+
+  implicit def jonssonTarski[T]: JonssonTarski[Dyad[T]] =
+    new JonssonTarski[Dyad[T]] {
+      override def join(l: Dyad[T], r: Dyad[T]): Dyad[T] = {
+        val length = Math.max(l.length, r.length)
+
+        Dyad(
+          0 until (length * 2) map { index =>
+            (if (index % 2 == 0) l else r) (
+              index / 2
+            )
+          }: _*
+        )
+      }
+
+      override def left(dyad: Dyad[T]): Dyad[T] = {
+        val length = dyad.length
+        Dyad(
+          Range(0, length, 2) map {
+            dyad(_)
+          } :_*
+        )
+      }
+
+      override def right(dyad: Dyad[T]): Dyad[T] = {
+        val length = dyad.length
+        if (length == 1)
+          dyad
+        else
+          Dyad(
+            Range(1, length, 2) map {
+              dyad(_)
+            } :_*
+          )
+      }
+    }
 }
 
 class Dyad[T] private (
