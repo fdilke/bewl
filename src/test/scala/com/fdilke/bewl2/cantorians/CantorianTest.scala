@@ -6,6 +6,7 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
 import com.fdilke.bewl2.topology.Compact._
 import Pitcher._
+import com.fdilke.bewl2.topology.Hausdorff.Key
 
 class CantorianTest extends AnyFunSpec {
 
@@ -103,16 +104,29 @@ class CantorianTest extends AnyFunSpec {
     }
 
     it("are compact - can solve predicates when a solution exists") {
-      val samplePredicates: Seq[Cantorian => Boolean] = Seq(
+      val solvablePredicates: Seq[Cantorian => Boolean] = Seq(
         _ => true,
         _.head,
         c => c.head && c.tail.head
       )
-      samplePredicates.foreach { predicate =>
+      solvablePredicates.foreach { predicate =>
         determine[Cantorian](predicate) match {
           case None => fail("no solution found")
           case Some(cantorian) =>
             predicate(cantorian) shouldBe true
+        }
+      }
+    }
+
+    it("are compact - can detect when a predicate is unsolvable") {
+      val unsolvablePredicates: Seq[Cantorian => Boolean] = Seq(
+        _ => false,
+        x => Set(0, 1, 2).map(x(_)).size == 3
+      )
+      unsolvablePredicates.foreach {
+        determine[Cantorian](_) match {
+          case Some(_) => fail("no solution found")
+          case None    =>
         }
       }
     }

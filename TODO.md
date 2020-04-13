@@ -761,6 +761,7 @@ Very rough roadmap:
 
 # Updated roadmap
 
+- JonssonTarskitude of the cantorian
 - have cases where C isn't Hausdorff
 - Hausdorffness of the catcher
 - implement density / sorting (generalization of Euclidean rhythms)
