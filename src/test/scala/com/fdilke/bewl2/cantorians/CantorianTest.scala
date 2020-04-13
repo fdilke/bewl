@@ -7,6 +7,7 @@ import org.scalatest.matchers.should.Matchers._
 import com.fdilke.bewl2.topology.Compact._
 import Pitcher._
 import com.fdilke.bewl2.topology.Hausdorff.Key
+import JonssonTarski._
 
 class CantorianTest extends AnyFunSpec {
 
@@ -49,10 +50,16 @@ class CantorianTest extends AnyFunSpec {
         true, false, true, false, true, false, true
       )
       cycle(true, false, false).drop(5).take(3) shouldBe Seq(
-        false, true, false
+        false,
+        true,
+        false
       )
       falseTrueAlternate.slice(3, 8) shouldBe Seq(
-        true, false, true, false, true
+        true,
+        false,
+        true,
+        false,
+        true
       )
     }
     it("can be converted to iterators") {
@@ -142,10 +149,30 @@ class CantorianTest extends AnyFunSpec {
       }
     }
 
-//    it("have a Jonsson-Tarski structure that obeys the axioms") {
-//      val trueReally: Cantorian =
-//        left(trueFalseAlternate)
-//    }
+    it("have a Jonsson-Tarski structure that obeys the axioms") {
+      val trueReally: Cantorian =
+        left(trueFalseAlternate)
+      trueReally.take(7) shouldBe Seq.fill(7)(true)
+
+      val falseReally: Cantorian =
+        right(trueFalseAlternate)
+      falseReally.take(7) shouldBe Seq.fill(7)(false)
+
+      join(trueFalseAlternate, falseTrueAlternate).take(8) shouldBe Seq(
+        true, false, false, true, true, false, false, true
+      )
+
+      val cantorianTFT: Cantorian =
+        cycle(true, false, true)
+
+      join(left(cantorianTFT), right(cantorianTFT)).take(10) shouldBe
+        cantorianTFT.take(10)
+
+      left(join(cantorianTFT, trueFalseAlternate)).take(10) shouldBe
+        cantorianTFT.take(10)
+      right(join(falseTrueAlternate, cantorianTFT)).take(10) shouldBe
+        cantorianTFT.take(10)
+    }
   }
 
 ////  describe("Analyzing co-cantorians") {

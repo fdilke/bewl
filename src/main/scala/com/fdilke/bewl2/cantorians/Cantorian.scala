@@ -51,13 +51,12 @@ trait Cantorian extends PitcherFType[Cantorian, Boolean] with Function[Int, Bool
     new Iterable[Boolean] {
       override def iterator: Iterator[Boolean] =
         iterate(
-            cantorian
-          ) {
-            _.tail
-          }
-          .map {
-            _.head
-          }
+          cantorian
+        ) {
+          _.tail
+        }.map {
+          _.head
+        }
     }
   @tailrec
   final def apply(index: Int): Boolean =
@@ -77,7 +76,7 @@ trait Cantorian extends PitcherFType[Cantorian, Boolean] with Function[Int, Bool
       cantorian
     ) {
       _.tail
-    } drop(n) next
+    }.drop(n) next
 
   def slice(from: Int, until: Int): Seq[Boolean] =
     drop(from).take(until - from)
@@ -124,4 +123,35 @@ object Cantorian {
   // can we make 'compactness' implicit instead and not need this?
   implicit val cantorianCompactness: Compact[Cantorian] =
     Pitcher.compactness[Cantorian, Boolean]
+
+  implicit val cantorianJonssonTarski: JonssonTarski[Cantorian] =
+    new JonssonTarski[Cantorian] {
+      override def join(l: Cantorian, r: Cantorian): Cantorian =
+        Cantorian(
+          l.head,
+          Cantorian(
+            r.head,
+            join(
+              l.tail,
+              r.tail
+            )
+          )
+        )
+
+      override def left(join: Cantorian): Cantorian =
+        Cantorian(
+          join.head,
+          left(
+            join.tail.tail
+          )
+        )
+
+      override def right(join: Cantorian): Cantorian =
+        Cantorian(
+          join.tail.head,
+          right(
+            join.tail.tail
+          )
+        )
+    }
 }
