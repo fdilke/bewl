@@ -1,7 +1,10 @@
 package com.fdilke.bewl2.cantorians
 
+import com.fdilke.bewl2.cantorians.Pitcher.{head, tail}
 import com.fdilke.bewl2.topology.PitcherPredicateSolver.solvePitcher
 import com.fdilke.bewl2.topology.{Compact, PitcherPredicateSolver}
+
+import scala.annotation.tailrec
 
 trait PitcherFType[
   PITCHER <: PitcherFType[PITCHER, T],
@@ -11,8 +14,8 @@ trait PitcherFType[
   def tail: PITCHER
 }
 
-trait Catcher[
-  SELF <: Catcher[SELF, T, U],
+trait CatcherFType[
+  SELF <: CatcherFType[SELF, T, U],
   T,
   U
 ] { self: SELF =>
@@ -21,16 +24,65 @@ trait Catcher[
     U,
     T => SELF
   ]
+}
 
-  final def apply[
-    PITCHER <: PitcherFType[PITCHER, T]
+object CatcherFType {
+  def standardCatcher[
+    C <: CatcherFType[C, T, U],
+    T,
+    U
   ](
-    pitcher: PITCHER
+    constructFn: Either[U, T => C] => C
+  ): Catcher[C, T, U] =
+    new Catcher[C, T, U] {
+      override def either(c: C): Either[U, T => C] =
+        c.either
+
+      override def construct(e: => Either[U, T => C]): C =
+        constructFn(e)
+    }
+}
+
+trait Catcher[C, T, U] {
+  def either(c: C): Either[U, T => C]
+  def construct(e: => Either[U, T => C]): C
+}
+
+object Catcher {
+  @inline
+  def either[C, T, U](
+    c: C
+  )(
+    implicit tude: Catcher[C, T, U]
+  ): Either[U, T => C] =
+    tude.either(c)
+
+  @inline
+  def construct[C, T, U](
+    e: => Either[U, T => C]
+  )(
+    implicit tude: Catcher[C, T, U]
+  ): C =
+    tude.construct(e)
+
+  @tailrec
+  def applyCatcher[C, P, T, U](
+    c: C
+  )(
+    p: P
+  )(
+    implicit
+    pitcherTude: Pitcher[P, T],
+    catcherTude: Catcher[C, T, U]
   ): U =
-    either match {
+    either(c) match {
       case Left(u) => u
-      case Right(t2self) =>
-        t2self(pitcher.head)(pitcher.tail)
+      case Right(t2c) =>
+        applyCatcher(
+          t2c(head(p))
+        )(
+          tail(p)
+        )
     }
 }
 

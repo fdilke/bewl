@@ -2,6 +2,7 @@ package com.fdilke.bewl2.cantorians
 
 import java.util.function.Supplier
 
+import com.fdilke.bewl2.cantorians.Catcher.applyCatcher
 import com.fdilke.bewl2.topology.Compact
 
 import scala.annotation.tailrec
@@ -10,9 +11,16 @@ import scala.language.postfixOps
 
 class GroundedCatcher[T, U](
   val either: Either[U, T => GroundedCatcher[T, U]]
-) extends Catcher[GroundedCatcher[T, U], T, U]
+) extends CatcherFType[GroundedCatcher[T, U], T, U]
 
-sealed trait GroundedTree[T] extends GroundedCatcher[Boolean, T] with Function[Cantorian, T]
+object GroundedCatcher {
+  implicit def catcherTude[T, U]: Catcher[GroundedCatcher[T, U], T, U] =
+    CatcherFType.standardCatcher[GroundedCatcher[T, U], T, U](e => new GroundedCatcher(e))
+}
+
+sealed trait GroundedTree[T] //
+  extends GroundedCatcher[Boolean, T] //
+  with Function[Cantorian, T]
 
 case class LeafNode[T](
   leaf: T
@@ -32,7 +40,7 @@ case class BranchNode[T](
   )
   with GroundedTree[T] {
   def apply(cantorian: Cantorian): T =
-    this.apply[Cantorian](cantorian)
+    applyCatcher(this: GroundedCatcher[Boolean, T])(cantorian)
 }
 
 object GroundedTree {
