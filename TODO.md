@@ -756,20 +756,26 @@ Very rough roadmap:
     actually return value is Option[() => (C, R)]
     Already have the technology to do this assuming it's not abused in 
         too many places :() i.e. the exception hack
+- awkward using Pitcher[_, SELF] so rename as PitcherOld, have a Pitcher typeclass,
+    phase out PitcherOld which should really not be needed once Cantorian: Pitcher.
 - use 'search[]' to be like "find" but more proactive: executes the thing too?
     or use another name, "determine" ? - part done, sort this out
+- JonssonTarskitude of the cantorian
+- JonssonTarskitude of the dyad
 
 # Updated roadmap
 
-- JonssonTarskitude of the cantorian
+- make Catcher into a typeclass, following same pattern as for Pitcher
+- tell if a function Pitcher[C] => H is constant
+- derive a Catcher[C, H] from a function Pitcher[C] => H
+- map co-cantorians to GroundedTrees and then on to Dyads
 - have cases where C isn't Hausdorff
 - Hausdorffness of the catcher
 - implement density / sorting (generalization of Euclidean rhythms)
 - knowledge of genetic codes?
 - machinery of abstract recursion schemes? use/learn from shapeless?
 - be able to play a Dyad[LogicalNote] at a given speed/pitch
-- make GroundedTree[T] ordered when T is; also internal sort => Euclidean rhythm?    
-- add a JonssonTarski typeclass for Cantorians and trees
-- awkward using Pitcher[_, SELF] so rename as PitcherOld, have a Pitcher typeclass,
-    phase out PitcherOld which should really not be needed once Cantorian: Pitcher.
+- make GroundedTree[T] ordered when T is; also internal sort => Euclidean rhythm?
+- derive GroundedTree from a co-cantorian    
+- JonssonTarskitude of trees
  
