@@ -2,8 +2,10 @@ package com.fdilke.bewl2.cantorians
 
 import com.fdilke.bewl2.cantorians.Dyad.{η, μ, canonical, isPowerOf2}
 import com.fdilke.bewl2.cantorians.JonssonTarski.{join, left, right}
+import com.fdilke.bewl2.topology.Hausdorff
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
+import com.fdilke.bewl2.topology.Hausdorff._
 
 import scala.language.postfixOps
 
@@ -26,6 +28,10 @@ class DyadTest extends AnyFunSpec {
       canonical(4.0, 4.0, 4.0, 4.0) shouldBe (Seq(4.0), 1)
       canonical(10, 15, 10, 15, 10, 15, 10, 15) shouldBe (Seq(10, 15), 2)
       canonical(6, 5, 0, 2, 6, 5, 0, 2) shouldBe (Seq(6, 5, 0, 2), 4)
+      canonical[Boolean => Int](
+        if (_) 4 else 4,
+        b => (if (b) 8 else 9) / 2
+      )._2 shouldBe 1
     }
   }
   describe("Dyads") {
@@ -61,6 +67,13 @@ class DyadTest extends AnyFunSpec {
     it("support map which coalesces the result into canonical form") {
       Dyad("foo", "barbaz").map(_.length) shouldBe Dyad(3, 6)
       Dyad(1, 2, 3, 4).map(_ % 2) shouldBe Dyad(1, 0)
+      Dyad[Boolean => Int](
+        if (_) 4 else 4,
+        b => (if (b) 8 else 9) / 2
+      ) shouldBe Dyad[Boolean => Int](
+        if (_) 4 else 4,
+        b => (if (b) 8 else 9) / 2
+      )
     }
     it("have a length") {
       Dyad(1).length shouldBe 1
@@ -151,6 +164,25 @@ class DyadTest extends AnyFunSpec {
 
       left(join(dyad, dyad2)) shouldBe dyad
       right(join(dyad2, dyad)) shouldBe dyad
+    }
+    it("inherit Hausdorffness from their type parameter") {
+      equalH(
+        Dyad[Boolean => Int](
+          _ => 4,
+          if (_) 20 else 18
+        ),
+        Dyad[Boolean => Int](
+          if (_) 1 else 3,
+          _ => 2
+        )
+      ) shouldBe false
+      equalH(
+        Dyad[Boolean => Int](_ => 4),
+        Dyad[Boolean => Int](
+          if (_) 4 else 4,
+          b => (if (b) 8 else 9) / 2
+        )
+      ) shouldBe true
     }
   }
 }

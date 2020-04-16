@@ -762,10 +762,12 @@ Very rough roadmap:
     or use another name, "determine" ? - part done, sort this out
 - JonssonTarskitude of the cantorian
 - JonssonTarskitude of the dyad
+- make Catcher into a typeclass, following same pattern as for Pitcher
+- Hausdorffitude of the dyad
 
 # Updated roadmap
 
-- make Catcher into a typeclass, following same pattern as for Pitcher
+- Hausdorffitude of the catcher
 - tell if a function Pitcher[C] => H is constant
 - derive a Catcher[C, H] from a function Pitcher[C] => H
 - map co-cantorians to GroundedTrees and then on to Dyads

@@ -118,6 +118,24 @@ trait Hausdorff[T] {
 }
 
 object Hausdorff {
+  def via[
+    H,
+    K: Hausdorff
+  ](
+    fn: H => K
+  ): Hausdorff[H] =
+    new Hausdorff[H] {
+      override def equalH(h1: H, h2: H): Boolean =
+        Hausdorff.equalH(
+          fn(h1),
+          fn(h2)
+        )
+
+      override def intKey(h: H): Int =
+        Hausdorff[K].intKey(
+          fn(h)
+        )
+    }
 
   def apply[T](
     implicit hausdorff: Hausdorff[T]
@@ -132,15 +150,40 @@ object Hausdorff {
         t.hashCode
     }
 
-  implicit def HausdorffnessForEnum[
+  implicit def hausdorffnessForEnum[
     ENUM <: Enumeration
   ]: Hausdorff[ENUM#Value] =
     standardHausdorff[ENUM#Value]
 
-  implicit def HausdorffnessForInt[
-    Int
-  ]: Hausdorff[Int] =
+  implicit def hausdorffnessForSeq[
+    H: Hausdorff
+  ]: Hausdorff[Seq[H]] =
+    new Hausdorff[Seq[H]] {
+      override def equalH(
+        seq1: Seq[H],
+        seq2: Seq[H]
+    ): Boolean =
+        seq1.length == seq2.length &&
+          seq1.zip(seq2).forall {
+            case (s, t) =>
+              Hausdorff.equalH(s, t)
+          }
+
+      override def intKey(seq: Seq[H]): Int =
+        seq map Hausdorff[H].intKey sum
+    }
+
+  implicit val hausdorffnessForInt: Hausdorff[Int] =
     standardHausdorff[Int]
+
+  implicit val hausdorffnessForString: Hausdorff[String] =
+    standardHausdorff[String]
+
+  implicit val hausdorffnessForBoolean: Hausdorff[Boolean] =
+    standardHausdorff[Boolean]
+
+  implicit val hausdorffnessForDouble: Hausdorff[Double] =
+    standardHausdorff[Double]
 
   class Key[H](
     val h: H
@@ -162,6 +205,11 @@ object Hausdorff {
     t2: T
   ): Boolean =
     Hausdorff[T].equalH(t1, t2)
+
+  @inline def intKey[T: Hausdorff](
+    t: T
+  ): Int =
+    Hausdorff[T].intKey(t)
 
   implicit def hausdorffExponential[
     C: Compact,

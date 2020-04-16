@@ -1,7 +1,9 @@
 package com.fdilke.bewl2.cantorians
 
 import com.fdilke.bewl2.cantorians.Dyad.μ
+import com.fdilke.bewl2.topology.Hausdorff
 
+import scala.Function.tupled
 import scala.annotation.tailrec
 import scala.language.postfixOps
 
@@ -18,32 +20,42 @@ object Dyad {
     else
       isPowerOf2(n / 2)
 
-  @inline def canonical[T](
-    dyad: T*
-  ): (Seq[T], Int) =
+  @inline def canonical[
+    H: Hausdorff
+  ](
+    dyad: H*
+  ): (Seq[H], Int) =
     canonicalSub(dyad, dyad.length)
 
-  @tailrec private def canonicalSub[T](
-    dyad: Seq[T],
+  @tailrec private def canonicalSub[
+    H: Hausdorff
+  ](
+    dyad: Seq[H],
     len: Int
-  ): (Seq[T], Int) =
+  ): (Seq[H], Int) =
     if (len == 1)
       (dyad, 1)
     else {
       val len_2 = len / 2
       val front = dyad.take(len_2)
       val rear = dyad.slice(len_2, len)
-      if (front == rear)
+      if (front.zip(rear) forall {
+        tupled (Hausdorff[H].equalH)
+      })
         canonicalSub(front, len_2)
       else
         (dyad, len)
     }
 
-  def apply[T](cycle: T*) =
+  def apply[
+    H: Hausdorff
+  ](
+    cycle: H*
+  ): Dyad[H] =
     if (!isPowerOf2(cycle.length))
       throw new IllegalArgumentException(s"Cycle length ${cycle.length} is not a power of 2")
     else {
-      val (canonicalCycle, length): (Seq[T], Int) =
+      val (canonicalCycle, length): (Seq[H], Int) =
         canonical(cycle: _*)
       new Dyad(
         canonicalCycle,
@@ -51,14 +63,14 @@ object Dyad {
       )
     }
 
-  def η[T](t: T): Dyad[T] =
+  def η[H: Hausdorff](t: H): Dyad[H] =
     Dyad(t)
 
-  def μ[T](
+  def μ[H: Hausdorff](
     dd: Dyad[
-      Dyad[T]
+      Dyad[H]
     ]
-  ): Dyad[T] =
+  ): Dyad[H] =
     Dyad(
       (0 until Math.max(
         dd.length,
@@ -68,12 +80,14 @@ object Dyad {
       )).map(index => dd(index)(index)): _*
     )
 
-  implicit def jonssonTarski[T]: JonssonTarski[Dyad[T]] =
-    new JonssonTarski[Dyad[T]] {
+  implicit def jonssonTarski[
+    H: Hausdorff
+  ]: JonssonTarski[Dyad[H]] =
+    new JonssonTarski[Dyad[H]] {
       override def join(
-        l: Dyad[T],
-        r: Dyad[T]
-      ): Dyad[T] =
+        l: Dyad[H],
+        r: Dyad[H]
+      ): Dyad[H] =
         Dyad(
           Seq.concat(
             (0 until Math.max(l.length, r.length)).map { index =>
@@ -86,8 +100,8 @@ object Dyad {
         )
 
       override def left(
-        dyad: Dyad[T]
-      ): Dyad[T] =
+        dyad: Dyad[H]
+      ): Dyad[H] =
         Dyad(
           Range(0, dyad.length, 2).map {
             dyad(_)
@@ -95,31 +109,46 @@ object Dyad {
         )
 
       override def right(
-        dyad: Dyad[T]
-      ): Dyad[T] =
+        dyad: Dyad[H]
+      ): Dyad[H] =
         Dyad(
           Range(1, dyad.length + 1, 2).map {
             dyad(_)
           }: _*
         )
     }
+
+  implicit def hausdorffDyad[
+    H: Hausdorff
+  ]: Hausdorff[Dyad[H]] =
+    Hausdorff.via[Dyad[H], Seq[H]] {
+      _.cycle
+    }
 }
 
-class Dyad[T] private (
-  val cycle: Seq[T],
+class Dyad[H: Hausdorff] private (
+  val cycle: Seq[H],
   val length: Int
 ) {
-
   override def hashCode(): Int =
-    cycle.hashCode()
+    Hausdorff.intKey(this)
 
   override def equals(obj: Any): Boolean =
-    obj.asInstanceOf[Dyad[T]].cycle == cycle
+    Hausdorff.equalH(
+      obj.asInstanceOf[Dyad[H]],
+      this
+    )
 
-  def map[U](f: T => U): Dyad[U] =
-    Dyad(cycle.map(f): _*)
+  def map[
+    K: Hausdorff
+  ](
+    f: H => K
+  ): Dyad[K] =
+    Dyad(
+      cycle.map(f): _*
+    )
 
-  def apply(index: Int): T =
+  def apply(index: Int): H =
     cycle(
       if (index >= 0)
         index % length
@@ -127,10 +156,12 @@ class Dyad[T] private (
         length + (index % length)
     )
 
-  def flatMap[U](
-    f: T => Dyad[U]
-  ): Dyad[U] =
-    μ[U](map(f))
+  def flatMap[
+    K: Hausdorff
+  ](
+    f: H => Dyad[K]
+  ): Dyad[K] =
+    μ[K](map(f))
 
   override def toString: String =
     "Dyad(" + cycle.mkString(",") + ")"

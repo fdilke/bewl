@@ -72,6 +72,20 @@ class TypeTopologyTest extends AnyFunSpec {
     }
   }
 
+  describe("Inheritance of Hausdorff separation") {
+    it("works from H to Seq[H]") {
+      equalH[Seq[StrontiumDog]](
+        Seq(Johnny, Wulf),
+        Seq(Johnny, Wulf)
+      ) shouldBe true
+
+      equalH[Seq[StrontiumDog]](
+        Seq(Johnny, Wulf),
+        Seq(TheGronk)
+      ) shouldBe false
+    }
+  }
+
   describe("Derived topologies") {
     it("Hausdorff ^ compact is implicitly Hausdorff") {
       equalH[StrontiumDog => Weekday](
