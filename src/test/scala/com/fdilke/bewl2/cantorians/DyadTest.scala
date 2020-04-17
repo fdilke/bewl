@@ -2,10 +2,9 @@ package com.fdilke.bewl2.cantorians
 
 import com.fdilke.bewl2.cantorians.Dyad.{η, μ, canonical, isPowerOf2}
 import com.fdilke.bewl2.cantorians.JonssonTarski.{join, left, right}
-import com.fdilke.bewl2.topology.Hausdorff
+import com.fdilke.bewl2.topology.Hausdorff._
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
-import com.fdilke.bewl2.topology.Hausdorff._
 
 import scala.language.postfixOps
 
@@ -184,5 +183,8 @@ class DyadTest extends AnyFunSpec {
         )
       ) shouldBe true
     }
+//    it("can be recast as Catchers of defined type") {
+//      // Catcher[C, T, U]
+//    }
   }
 }

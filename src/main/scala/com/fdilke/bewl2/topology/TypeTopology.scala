@@ -162,7 +162,7 @@ object Hausdorff {
       override def equalH(
         seq1: Seq[H],
         seq2: Seq[H]
-    ): Boolean =
+      ): Boolean =
         seq1.length == seq2.length &&
           seq1.zip(seq2).forall {
             case (s, t) =>
@@ -170,7 +170,7 @@ object Hausdorff {
           }
 
       override def intKey(seq: Seq[H]): Int =
-        seq map Hausdorff[H].intKey sum
+        seq.map(Hausdorff[H].intKey) sum
     }
 
   implicit val hausdorffnessForInt: Hausdorff[Int] =

@@ -49,6 +49,11 @@ trait Catcher[C, T, U] {
 }
 
 object Catcher {
+  @inline def apply[C, T, U](
+    implicit catcherTude: Catcher[C, T, U]
+  ): Catcher[C, T, U] =
+    catcherTude
+
   @inline
   def either[C, T, U](
     c: C

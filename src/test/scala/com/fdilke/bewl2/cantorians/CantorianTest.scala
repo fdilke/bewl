@@ -1,13 +1,10 @@
 package com.fdilke.bewl2.cantorians
 
 import com.fdilke.bewl2.cantorians.Cantorian.cycle
-import com.fdilke.bewl2.topology.StrontiumDogEnumeration.StrontiumDog
+import com.fdilke.bewl2.cantorians.JonssonTarski._
+import com.fdilke.bewl2.topology.Compact._
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
-import com.fdilke.bewl2.topology.Compact._
-import Pitcher._
-import com.fdilke.bewl2.topology.Hausdorff.Key
-import JonssonTarski._
 
 class CantorianTest extends AnyFunSpec {
 

@@ -18,42 +18,6 @@ object GroundedCatcher {
     CatcherFType.standardCatcher[GroundedCatcher[T, U], T, U](e => new GroundedCatcher(e))
 }
 
-sealed trait GroundedTree[T] //
-  extends GroundedCatcher[Boolean, T] //
-  with Function[Cantorian, T]
-
-case class LeafNode[T](
-  leaf: T
-) extends GroundedCatcher[Boolean, T](
-    Left(leaf)
-  )
-  with GroundedTree[T] {
-  def apply(cantorian: Cantorian): T =
-    leaf
-}
-
-case class BranchNode[T](
-  left: GroundedTree[T],
-  right: GroundedTree[T]
-) extends GroundedCatcher[Boolean, T](
-    Right(boolean => if (boolean) left else right)
-  )
-  with GroundedTree[T] {
-  def apply(cantorian: Cantorian): T =
-    applyCatcher(this: GroundedCatcher[Boolean, T])(cantorian)
-}
-
-object GroundedTree {
-  def apply[T](leaf: T): GroundedTree[T] =
-    LeafNode(leaf)
-
-  def apply[T](
-    left: GroundedTree[T],
-    right: GroundedTree[T]
-  ): GroundedTree[T] =
-    BranchNode(left, right)
-}
-
 trait Cantorian extends PitcherFType[Cantorian, Boolean] with Function[Int, Boolean] { cantorian =>
   def asIterable: Iterable[Boolean] =
     new Iterable[Boolean] {
