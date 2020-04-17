@@ -85,24 +85,9 @@ class CantorianTest extends AnyFunSpec {
     }
 
     it("can be operated on by trees - simple branch node case") {
-      tree35(allTrue) shouldBe 3
-      tree35(trueFalseAlternate) shouldBe 3
-      tree35(falseTrueAlternate) shouldBe 5
-    }
-
-    it("can be operated on by trees - complex branch node case") {
-      val complexTree =
-        BranchNode(
-          BranchNode(
-            LeafNode("x"),
-            LeafNode("y")
-          ),
-          LeafNode("z")
-        )
-      complexTree(allTrue) shouldBe "x"
-      complexTree(trueFalseAlternate) shouldBe "y"
-      complexTree(allFalse) shouldBe "z"
-      complexTree(falseTrueAlternate) shouldBe "z"
+      tree35(allTrue) shouldBe 5
+      tree35(trueFalseAlternate) shouldBe 5
+      tree35(falseTrueAlternate) shouldBe 3
     }
 
     it("can be treated as Int => Bool") {

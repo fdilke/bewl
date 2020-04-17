@@ -39,9 +39,9 @@ object Dyad {
       val len_2 = len / 2
       val front = dyad.take(len_2)
       val rear = dyad.slice(len_2, len)
-      if (front.zip(rear) forall {
-        tupled (Hausdorff[H].equalH)
-      })
+      if (front.zip(rear).forall {
+            tupled(Hausdorff[H].equalH)
+          })
         canonicalSub(front, len_2)
       else
         (dyad, len)

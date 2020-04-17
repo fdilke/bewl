@@ -5,7 +5,7 @@ import org.scalatest.matchers.should.Matchers._
 import Catcher._
 import com.fdilke.bewl2.cantorians.Cantorian.cycle
 
-class GroundedTreeTest extends AnyFunSpec{
+class GroundedTreeTest extends AnyFunSpec {
   describe("Grounded trees") {
     it("have an implicit Catcher") {
       val catcherTude = Catcher[
@@ -29,14 +29,28 @@ class GroundedTreeTest extends AnyFunSpec{
             )
         }
       ) shouldBe GroundedTree(
-          GroundedTree(
-            GroundedTree(7),
-            GroundedTree(8)
-          ),
-          GroundedTree(3)
-        )
+        GroundedTree(
+          GroundedTree(7),
+          GroundedTree(8)
+        ),
+        GroundedTree(3)
+      )
     }
-    it("operate correctly on Cantorians") {
+    it("operate correctly on Cantorians - leaf case") {
+      GroundedTree(7)(cycle(true)) shouldBe 7
+    }
+    it("operate correctly on Cantorians - simple branch node case") {
+      val tree: GroundedTree[Int] =
+        GroundedTree(
+          GroundedTree(7),
+          GroundedTree(1)
+        )
+
+      tree(cycle(true)) shouldBe 1
+      tree(cycle(false)) shouldBe 7
+      tree(cycle(false, true)) shouldBe 7
+    }
+    it("operate correctly on Cantorians - complex branch node case") {
       val tree: GroundedTree[Int] =
         GroundedTree(
           GroundedTree(
