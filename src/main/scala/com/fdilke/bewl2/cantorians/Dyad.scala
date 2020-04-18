@@ -104,9 +104,7 @@ object Dyad {
   implicit def hausdorffDyad[
     H: Hausdorff
   ]: Hausdorff[Dyad[H]] =
-    Hausdorff.via[Dyad[H], Seq[H]] {
-      _.cycle
-    }
+    Catcher.hausdorff[Dyad[H], Boolean, H]
 
   implicit def catcherDyad[
     H: Hausdorff
