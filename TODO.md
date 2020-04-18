@@ -767,10 +767,10 @@ Very rough roadmap:
 - Hausdorffitude of the catcher by adding tests for GroundedTree
 - make the dyad a catcher? this could override existing def of equality
 - have dyads act on Cantorians and other pitchers via catcher nature
+- decided: not a JonssonTarskitude of trees and yet Dyads do have one
 
-# Updated roadmap
+# Still to do: (roadmap)
 
-- JonssonTarskitude of trees
 - check equality of functions Pitcher[C] => H mirrors that for catchers
 - derive GroundedTree from a co-cantorian    
 - derive a Catcher[C, H] from a function Pitcher[C] => H
