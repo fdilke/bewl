@@ -1,8 +1,10 @@
 package com.fdilke.bewl2.cantorians
 
+import com.fdilke.bewl2.cantorians.Catcher.applyCatcher
 import com.fdilke.bewl2.cantorians.Pitcher.{head, tail}
+import com.fdilke.bewl2.topology.Compact.forAll
 import com.fdilke.bewl2.topology.PitcherPredicateSolver.solvePitcher
-import com.fdilke.bewl2.topology.{Compact, PitcherPredicateSolver}
+import com.fdilke.bewl2.topology.{Compact, Hausdorff}
 
 import scala.annotation.tailrec
 
@@ -49,6 +51,7 @@ trait Catcher[C, T, U] {
 }
 
 object Catcher {
+
   @inline def apply[C, T, U](
     implicit catcherTude: Catcher[C, T, U]
   ): Catcher[C, T, U] =
@@ -88,6 +91,32 @@ object Catcher {
         )(
           tail(p)
         )
+    }
+
+  def hausdorff[CATCHER, C: Compact, H: Hausdorff](
+    implicit catcherTude: Catcher[CATCHER, C, H]
+  ): Hausdorff[CATCHER] =
+    new Hausdorff[CATCHER] {
+      override def equalH(
+        catcher1: CATCHER,
+        catcher2: CATCHER
+      ): Boolean =
+        forAll[VanillaPitcher[C]] { pitcher =>
+          Hausdorff.equalH(
+            applyCatcher(catcher1)(pitcher),
+            applyCatcher(catcher2)(pitcher)
+          )
+        }(Pitcher.compactness[VanillaPitcher[C], C])
+      override def intKey(catcher: CATCHER): Int =
+        Compact.optional[C] match {
+          case None => 0
+          case Some(c) =>
+            Hausdorff.intKey(
+              applyCatcher(catcher)(
+                Pitcher.constantly[VanillaPitcher[C], C](c)
+              )
+            )
+        }
     }
 }
 

@@ -18,7 +18,6 @@ trait Compact[T] {
 }
 
 object Compact {
-
   def apply[T](
     implicit compact: Compact[T]
   ): Compact[T] = compact

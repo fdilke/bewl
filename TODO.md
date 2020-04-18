@@ -768,10 +768,10 @@ Very rough roadmap:
 # Updated roadmap
 
 - Hausdorffitude of the catcher by adding tests for GroundedTree
+- make the dyad a catcher? this could override existing def of equality
 - check equality of functions Pitcher[C] => H mirrors that for catchers
 - derive a Catcher[C, H] from a function Pitcher[C] => H
 - verify equivalence of catchers and corresponding functions
-- make the dyad a catcher? this could override existing def of equality
 - show equivalence of dyads to all other catchers
 - all legs of triangle, dyad <=> catcher <=> function of pitcher
 - tell if a function Pitcher[C] => H is constant

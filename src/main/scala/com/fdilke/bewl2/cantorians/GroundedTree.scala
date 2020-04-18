@@ -1,6 +1,7 @@
 package com.fdilke.bewl2.cantorians
 
 import com.fdilke.bewl2.cantorians.Catcher.applyCatcher
+import com.fdilke.bewl2.topology.Hausdorff
 
 sealed trait GroundedTree[T] //
   extends CatcherFType[GroundedTree[T], Boolean, T] //
@@ -34,7 +35,9 @@ case class BranchNode[T](
 }
 
 object GroundedTree {
-  def apply[T](leaf: T): GroundedTree[T] =
+  def apply[T](
+    leaf: T
+  ): GroundedTree[T] =
     LeafNode(leaf)
 
   def apply[T](
@@ -52,4 +55,9 @@ object GroundedTree {
           bool2tree(true)
         )
     }
+
+  implicit def hausdorff[
+    H: Hausdorff
+  ]: Hausdorff[GroundedTree[H]] =
+    Catcher.hausdorff[GroundedTree[H], Boolean, H]
 }

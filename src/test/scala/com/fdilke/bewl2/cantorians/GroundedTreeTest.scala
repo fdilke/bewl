@@ -1,12 +1,79 @@
 package com.fdilke.bewl2.cantorians
 
+import com.fdilke.bewl2.cantorians.Cantorian.cycle
+import com.fdilke.bewl2.topology.Hausdorff
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
-import Catcher._
-import com.fdilke.bewl2.cantorians.Cantorian.cycle
 
 class GroundedTreeTest extends AnyFunSpec {
   describe("Grounded trees") {
+    it("have an implicit Hausdorff") {
+      val hausdorffTude = Hausdorff[
+        GroundedTree[Int]
+      ]
+      hausdorffTude.equalH(
+        GroundedTree(7),
+        GroundedTree(7)
+      ) shouldBe true
+      hausdorffTude.equalH(
+        GroundedTree(1),
+        GroundedTree(7)
+      ) shouldBe false
+      hausdorffTude.equalH(
+        GroundedTree(
+          GroundedTree(
+            GroundedTree(7),
+            GroundedTree(8)
+          ),
+          GroundedTree(3)
+        ),
+        GroundedTree(
+          GroundedTree(
+            GroundedTree(7),
+            GroundedTree(8)
+          ),
+          GroundedTree(3)
+        )
+      ) shouldBe true
+      hausdorffTude.equalH(
+        GroundedTree(
+          GroundedTree(
+            GroundedTree(7),
+            GroundedTree(
+              GroundedTree(8),
+              GroundedTree(8)
+            )
+          ),
+          GroundedTree(3)
+        ),
+        GroundedTree(
+          GroundedTree(
+            GroundedTree(7),
+            GroundedTree(8)
+          ),
+          GroundedTree(3)
+        )
+      ) shouldBe true
+      hausdorffTude.equalH(
+        GroundedTree(
+          GroundedTree(
+            GroundedTree(7),
+            GroundedTree(
+              GroundedTree(8),
+              GroundedTree(9)
+            )
+          ),
+          GroundedTree(3)
+        ),
+        GroundedTree(
+          GroundedTree(
+            GroundedTree(7),
+            GroundedTree(8)
+          ),
+          GroundedTree(3)
+        )
+      ) shouldBe false
+    }
     it("have an implicit Catcher") {
       val catcherTude = Catcher[
         GroundedTree[Int],
