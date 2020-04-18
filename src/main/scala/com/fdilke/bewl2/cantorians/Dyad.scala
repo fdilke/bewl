@@ -88,34 +88,17 @@ object Dyad {
         l: Dyad[H],
         r: Dyad[H]
       ): Dyad[H] =
-        Dyad(
-          Seq.concat(
-            (0 until Math.max(l.length, r.length)).map { index =>
-              Seq(
-                l(index),
-                r(index)
-              )
-            }: _*
-          ): _*
-        )
+        Dyad.join(l, r)
 
       override def left(
         dyad: Dyad[H]
       ): Dyad[H] =
-        Dyad(
-          Range(0, dyad.length, 2).map {
-            dyad(_)
-          }: _*
-        )
+        dyad.left
 
       override def right(
         dyad: Dyad[H]
       ): Dyad[H] =
-        Dyad(
-          Range(1, dyad.length + 1, 2).map {
-            dyad(_)
-          }: _*
-        )
+        dyad.right
     }
 
   implicit def hausdorffDyad[
@@ -124,6 +107,53 @@ object Dyad {
     Hausdorff.via[Dyad[H], Seq[H]] {
       _.cycle
     }
+
+  implicit def catcherDyad[
+    H: Hausdorff
+  ]: Catcher[Dyad[H], Boolean, H] =
+    new Catcher[Dyad[H], Boolean, H] {
+      override def either(
+        dyad: Dyad[H]
+      ): Either[H, Boolean => Dyad[H]] =
+        if (dyad.length == 1)
+          Left(dyad(0))
+        else
+          Right {
+            if (_)
+              dyad.right
+            else
+              dyad.left
+          }
+
+      override def construct(
+        e: => Either[
+          H,
+          Boolean => Dyad[H]
+        ]
+      ): Dyad[H] = e match {
+        case Left(h) => Dyad(h)
+        case Right(bool2dyad) =>
+          Dyad.join(
+            bool2dyad(false),
+            bool2dyad(true)
+          )
+      }
+    }
+
+  def join[H: Hausdorff](
+    l: Dyad[H],
+    r: Dyad[H]
+  ): Dyad[H] =
+    Dyad(
+      Seq.concat(
+        (0 until Math.max(l.length, r.length)).map { index =>
+          Seq(
+            l(index),
+            r(index)
+          )
+        }: _*
+      ): _*
+    )
 }
 
 class Dyad[H: Hausdorff] private (
@@ -165,4 +195,18 @@ class Dyad[H: Hausdorff] private (
 
   override def toString: String =
     "Dyad(" + cycle.mkString(",") + ")"
+
+  def left: Dyad[H] =
+    Dyad(
+      Range(0, cycle.length, 2).map {
+        apply(_)
+      }: _*
+    )
+
+  def right: Dyad[H] =
+    Dyad(
+      Range(1, cycle.length + 1, 2).map {
+        apply(_)
+      }: _*
+    )
 }

@@ -764,10 +764,10 @@ Very rough roadmap:
 - JonssonTarskitude of the dyad
 - make Catcher into a typeclass, following same pattern as for Pitcher
 - Hausdorffitude of the dyad
+- Hausdorffitude of the catcher by adding tests for GroundedTree
 
 # Updated roadmap
 
-- Hausdorffitude of the catcher by adding tests for GroundedTree
 - make the dyad a catcher? this could override existing def of equality
 - check equality of functions Pitcher[C] => H mirrors that for catchers
 - derive a Catcher[C, H] from a function Pitcher[C] => H

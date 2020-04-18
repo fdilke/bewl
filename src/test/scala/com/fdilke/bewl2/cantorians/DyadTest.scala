@@ -183,6 +183,31 @@ class DyadTest extends AnyFunSpec {
         )
       ) shouldBe true
     }
+    it("have Catcher nature") {
+      val dyadIntCatcher =
+        Catcher[Dyad[Int], Boolean, Int]
+
+      dyadIntCatcher.either(
+        Dyad(2)
+      ) shouldBe Left(2)
+
+      dyadIntCatcher.either(
+        Dyad(2, 3)
+      ) match {
+        case Left(_) => fail("Unexpected singleton dyad")
+        case Right(fn) =>
+          dyadIntCatcher.either(fn(false)) shouldBe Left(2)
+          dyadIntCatcher.either(fn(true)) shouldBe Left(3)
+      }
+
+      dyadIntCatcher.construct(Left(2)) shouldBe Dyad(2)
+      dyadIntCatcher.construct(Right(boolean => if (boolean) Dyad(3) else Dyad(4, 5))) shouldBe Dyad(
+        4,
+        3,
+        5,
+        3
+      )
+    }
 //    it("can be recast as Catchers of defined type") {
 //      // Catcher[C, T, U]
 //    }
