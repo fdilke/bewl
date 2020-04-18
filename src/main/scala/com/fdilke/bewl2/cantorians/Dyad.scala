@@ -1,5 +1,6 @@
 package com.fdilke.bewl2.cantorians
 
+import com.fdilke.bewl2.cantorians.Catcher.applyCatcher
 import com.fdilke.bewl2.cantorians.Dyad.μ
 import com.fdilke.bewl2.topology.Hausdorff
 
@@ -184,6 +185,11 @@ class Dyad[H: Hausdorff] private (
         length + (index % length)
     )
 
+  def apply[P](p: P)(
+    implicit pitcherTude: Pitcher[P, Boolean]
+  ): H =
+    applyCatcher(this)(p)
+
   def flatMap[
     K: Hausdorff
   ](
@@ -197,14 +203,14 @@ class Dyad[H: Hausdorff] private (
   def left: Dyad[H] =
     Dyad(
       Range(0, cycle.length, 2).map {
-        apply(_)
+        apply
       }: _*
     )
 
   def right: Dyad[H] =
     Dyad(
       Range(1, cycle.length + 1, 2).map {
-        apply(_)
+        apply
       }: _*
     )
 }

@@ -208,6 +208,18 @@ class DyadTest extends AnyFunSpec {
         3
       )
     }
+    it("act on Cantorians and other pitchers") {
+      val dyad: Dyad[Int] =
+        Dyad(2, 4, 7, 1, 9, 0, 3, 5)
+
+      dyad(Cantorian.cycle(true)) shouldBe 5
+      dyad(Cantorian.cycle(false)) shouldBe 2
+      dyad(Cantorian.cycle(true, false)) shouldBe 0
+      dyad(Cantorian.cycle(false, true)) shouldBe 7
+
+      dyad(Pitcher.constantly[VanillaPitcher[Boolean], Boolean](true)) shouldBe 5
+      dyad(Pitcher.constantly[VanillaPitcher[Boolean], Boolean](false)) shouldBe 2
+    }
 //    it("can be recast as Catchers of defined type") {
 //      // Catcher[C, T, U]
 //    }

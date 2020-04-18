@@ -765,11 +765,14 @@ Very rough roadmap:
 - make Catcher into a typeclass, following same pattern as for Pitcher
 - Hausdorffitude of the dyad
 - Hausdorffitude of the catcher by adding tests for GroundedTree
+- make the dyad a catcher? this could override existing def of equality
+- have dyads act on Cantorians and other pitchers via catcher nature
 
 # Updated roadmap
 
-- make the dyad a catcher? this could override existing def of equality
+- JonssonTarskitude of trees
 - check equality of functions Pitcher[C] => H mirrors that for catchers
+- derive GroundedTree from a co-cantorian    
 - derive a Catcher[C, H] from a function Pitcher[C] => H
 - verify equivalence of catchers and corresponding functions
 - show equivalence of dyads to all other catchers
@@ -777,12 +780,9 @@ Very rough roadmap:
 - tell if a function Pitcher[C] => H is constant
 - map co-cantorians to GroundedTrees and then on to Dyads
 - have cases where C isn't Hausdorff
-- Hausdorffness of the catcher
 - implement density / sorting (generalization of Euclidean rhythms)
 - knowledge of genetic codes?
 - machinery of abstract recursion schemes? use/learn from shapeless?
 - be able to play a Dyad[LogicalNote] at a given speed/pitch
 - make GroundedTree[T] ordered when T is; also internal sort => Euclidean rhythm?
-- derive GroundedTree from a co-cantorian    
-- JonssonTarskitude of trees
  

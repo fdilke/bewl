@@ -1,6 +1,5 @@
 package com.fdilke.bewl2.cantorians
 
-import com.fdilke.bewl2.cantorians.Catcher.applyCatcher
 import com.fdilke.bewl2.cantorians.Pitcher.{head, tail}
 import com.fdilke.bewl2.topology.Compact.forAll
 import com.fdilke.bewl2.topology.PitcherPredicateSolver.solvePitcher
