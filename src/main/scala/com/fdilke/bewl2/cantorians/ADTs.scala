@@ -117,6 +117,20 @@ object Catcher {
             )
         }
     }
+
+  def recast[C1, C2, S, T](
+    c1: C1
+  )(
+    implicit catcherTude1: Catcher[C1, S, T],
+    catcherTude2: Catcher[C2, S, T]
+  ): C2 = {
+    def recastSub(c: C1): C2 =
+      catcherTude1.either(c) match {
+        case Left(t)    => catcherTude2.construct(Left(t))
+        case Right(s2c) => catcherTude2.construct(Right(s => recastSub(s2c(s))))
+      }
+    recastSub(c1)
+  }
 }
 
 trait Pitcher[P, T] {

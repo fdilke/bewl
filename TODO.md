@@ -771,6 +771,7 @@ Very rough roadmap:
 
 # Still to do: (roadmap)
 
+- recast any catcher as a catcher of any other type catching/delivering the same thing
 - check equality of functions Pitcher[C] => H mirrors that for catchers
 - derive GroundedTree from a co-cantorian    
 - derive a Catcher[C, H] from a function Pitcher[C] => H
