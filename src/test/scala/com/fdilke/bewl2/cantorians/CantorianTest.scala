@@ -79,9 +79,9 @@ class CantorianTest extends AnyFunSpec {
     }
 
     it("can be operated on by trees -leaf node case") {
-      GroundedTree[Int](2)(allTrue) shouldBe 2
-      GroundedTree[Int](2)(allFalse) shouldBe 2
-      GroundedTree[Int](2)(falseTrueAlternate) shouldBe 2
+      GroundedTree[Int](2).apply(allTrue) shouldBe 2
+      GroundedTree[Int](2).apply(allFalse) shouldBe 2
+      GroundedTree[Int](2).apply(falseTrueAlternate) shouldBe 2
     }
 
     it("can be operated on by trees - simple branch node case") {

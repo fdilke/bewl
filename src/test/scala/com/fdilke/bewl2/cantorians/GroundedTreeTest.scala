@@ -2,6 +2,7 @@ package com.fdilke.bewl2.cantorians
 
 import com.fdilke.bewl2.cantorians.Cantorian.cycle
 import com.fdilke.bewl2.topology.Hausdorff
+import com.fdilke.bewl2.topology.Hausdorff.equalH
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
 
@@ -104,7 +105,7 @@ class GroundedTreeTest extends AnyFunSpec {
       )
     }
     it("operate correctly on Cantorians - leaf case") {
-      GroundedTree(7)(cycle(true)) shouldBe 7
+      GroundedTree(7).apply(cycle(true)) shouldBe 7
     }
     it("operate correctly on Cantorians - simple branch node case") {
       val tree: GroundedTree[Int] =
@@ -130,6 +131,17 @@ class GroundedTreeTest extends AnyFunSpec {
       tree(cycle(true, false)) shouldBe 3
       tree(cycle(false)) shouldBe 7
       tree(cycle(false, true)) shouldBe 8
+    }
+    it("have consistent equality") {
+      (GroundedTree(2) == GroundedTree(3)) shouldBe false
+      equalH(GroundedTree(2), GroundedTree(3)) shouldBe false
+
+      val tree: GroundedTree[Int] =
+        GroundedTree(1)
+      val tree2: GroundedTree[Int] =
+        GroundedTree(tree, tree)
+      (tree == tree2) shouldBe true
+      equalH(tree, tree2) shouldBe true
     }
   }
 }
