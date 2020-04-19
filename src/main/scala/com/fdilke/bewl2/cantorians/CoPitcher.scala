@@ -21,16 +21,14 @@ object CoPitcher {
         val candidate: H = coP(
           Pitcher.constantly[P, C](sampleC)
         )
-        if (
-          forAll[P] { p =>
-            Hausdorff.equalH(
-              coP(p),
-              candidate
-            )
-          }(
-            Pitcher.compactness[P, C]
-          )
-        )
+        if (forAll[P] { p =>
+              Hausdorff.equalH(
+                coP(p),
+                candidate
+              )
+            }(
+              Pitcher.compactness[P, C]
+            ))
           Some(candidate)
         else
           None
@@ -47,9 +45,15 @@ object CoPitcher {
       override def either(
         coP: P => H
       ): Either[H, C => P => H] =
-        ???
-//        if (isConstant(coP))
-//          Left()
+        detectConstant(coP) match {
+          case Some(h) => Left(h)
+          case None =>
+            Right { c => p =>
+              coP(
+                pitcherTude.construct(c, p)
+              )
+            }
+        }
 
       override def construct(e: => Either[H, C => P => H]): P => H =
         ???

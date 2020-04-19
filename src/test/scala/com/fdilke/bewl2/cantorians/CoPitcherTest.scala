@@ -29,7 +29,7 @@ class CoPitcherTest extends AnyFunSpec {
       detectConstant[Cantorian, Boolean, Int](all0CoP) shouldBe Some(0)
       detectConstant[Cantorian, Boolean, Int](all1CoP) shouldBe Some(1)
     }
-    ignore("preserves their action as functions") {
+    it("preserves their action as functions") {
       implicit val catcherTude: Catcher[Cantorian => Int, Boolean, Int] =
         CoPitcher.functionAsCatcher[Cantorian, Boolean, Int]
 
@@ -39,8 +39,7 @@ class CoPitcherTest extends AnyFunSpec {
       for {
         coP <- Seq(all0CoP, all1CoP, headCoP, notHeadCoP)
         cantorian <- Seq(tCantorian, fCantorian, tfCantorian, ftCantorian)
-      }
-        applyFn(coP)(cantorian) shouldBe (1 + coP(cantorian))
+      } applyFn(coP)(cantorian) shouldBe coP(cantorian)
     }
   }
 }
