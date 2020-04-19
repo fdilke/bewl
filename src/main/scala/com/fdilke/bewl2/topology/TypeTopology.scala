@@ -20,31 +20,6 @@ trait Compact[T] {
 }
 
 object Compact {
-  def isConstant[
-    P,
-    C: Compact,
-    H: Hausdorff
-  ](
-    fn: P => H
-  )(
-    implicit pitcherTude: Pitcher[P, C]
-  ): Boolean =
-    optional[C] match {
-      case None =>
-        throw new IllegalArgumentException("Domain is empty")
-      case Some(sampleC) =>
-        val candidate: H = fn(
-          Pitcher.constantly[P, C](sampleC)
-        )
-        forAll[P] { p =>
-          Hausdorff.equalH(
-            fn(p),
-            candidate
-          )
-        }(
-          Pitcher.compactness[P, C]
-        )
-    }
 
   def apply[T](
     implicit compact: Compact[T]
