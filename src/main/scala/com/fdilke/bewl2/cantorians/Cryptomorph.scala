@@ -9,11 +9,6 @@ sealed class Cryptomorph[H: Hausdorff](
   implicit val fnCatcherTude: Catcher[Cantorian => H, Boolean, H] =
     functionAsCatcher[Cantorian, Boolean, H]
 
-  lazy val dyad: Dyad[H] =
-    Catcher.recast[Cantorian => H, Dyad[H], Boolean, H](
-      coCantorian
-    )
-
   def as[CT[_]](
     implicit ctCatcherTude: Catcher[CT[H], Boolean, H]
   ): CT[H] =
