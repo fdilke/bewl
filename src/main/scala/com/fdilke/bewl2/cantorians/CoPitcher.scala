@@ -5,30 +5,53 @@ import com.fdilke.bewl2.topology.{Compact, Hausdorff}
 
 object CoPitcher {
 
-  def isConstant[
+  def detectConstant[
     P,
     C: Compact,
     H: Hausdorff
   ](
-    fn: P => H
+    coP: P => H
   )(
     implicit pitcherTude: Pitcher[P, C]
-  ): Boolean =
+  ): Option[H] =
     optional[C] match {
       case None =>
         throw new IllegalArgumentException("Domain is empty")
       case Some(sampleC) =>
-        val candidate: H = fn(
+        val candidate: H = coP(
           Pitcher.constantly[P, C](sampleC)
         )
-        forAll[P] { p =>
-          Hausdorff.equalH(
-            fn(p),
-            candidate
+        if (
+          forAll[P] { p =>
+            Hausdorff.equalH(
+              coP(p),
+              candidate
+            )
+          }(
+            Pitcher.compactness[P, C]
           )
-        }(
-          Pitcher.compactness[P, C]
         )
+          Some(candidate)
+        else
+          None
     }
 
+  def functionAsCatcher[
+    P,
+    C: Compact,
+    H: Hausdorff
+  ](
+    implicit pitcherTude: Pitcher[P, C]
+  ): Catcher[P => H, C, H] =
+    new Catcher[P => H, C, H] {
+      override def either(
+        coP: P => H
+      ): Either[H, C => P => H] =
+        ???
+//        if (isConstant(coP))
+//          Left()
+
+      override def construct(e: => Either[H, C => P => H]): P => H =
+        ???
+    }
 }
