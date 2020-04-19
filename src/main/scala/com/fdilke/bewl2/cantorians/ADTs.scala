@@ -125,10 +125,12 @@ object Catcher {
     catcherTude2: Catcher[C2, S, T]
   ): C2 = {
     def recastSub(c: C1): C2 =
-      catcherTude1.either(c) match {
-        case Left(t)    => catcherTude2.construct(Left(t))
-        case Right(s2c) => catcherTude2.construct(Right(s => recastSub(s2c(s))))
-      }
+      catcherTude2.construct(
+        catcherTude1.either(c) match {
+          case Left(t)    => Left(t)
+          case Right(s2c) => Right(s => recastSub(s2c(s)))
+        }
+      )
     recastSub(c1)
   }
 }
