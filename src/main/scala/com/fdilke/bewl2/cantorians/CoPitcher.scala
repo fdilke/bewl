@@ -1,5 +1,6 @@
 package com.fdilke.bewl2.cantorians
 
+import com.fdilke.bewl2.cantorians.Pitcher.{head, tail}
 import com.fdilke.bewl2.topology.Compact.{forAll, optional}
 import com.fdilke.bewl2.topology.{Compact, Hausdorff}
 
@@ -55,7 +56,12 @@ object CoPitcher {
             }
         }
 
-      override def construct(e: => Either[H, C => P => H]): P => H =
-        ???
+      override def construct(
+        e: => Either[H, C => P => H]
+      ): P => H =
+        e match {
+          case Left(h)      => _ => h
+          case Right(c2p2h) => p => c2p2h(head(p))(tail(p))
+        }
     }
 }

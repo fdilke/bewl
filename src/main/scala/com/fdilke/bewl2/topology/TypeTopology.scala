@@ -202,16 +202,16 @@ object Hausdorff {
       h.toString
   }
 
-  @inline def equalH[T: Hausdorff](
-    t1: T,
-    t2: T
+  @inline def equalH[H: Hausdorff](
+    t1: H,
+    t2: H
   ): Boolean =
-    Hausdorff[T].equalH(t1, t2)
+    Hausdorff[H].equalH(t1, t2)
 
-  @inline def intKey[T: Hausdorff](
-    t: T
+  @inline def intKey[H: Hausdorff](
+    t: H
   ): Int =
-    Hausdorff[T].intKey(t)
+    Hausdorff[H].intKey(t)
 
   implicit def hausdorffExponential[
     C: Compact,

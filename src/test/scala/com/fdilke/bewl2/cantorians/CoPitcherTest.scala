@@ -1,6 +1,9 @@
 package com.fdilke.bewl2.cantorians
 
 import com.fdilke.bewl2.cantorians.CoPitcher.detectConstant
+import com.fdilke.bewl2.topology.{Compact, Hausdorff}
+import com.fdilke.bewl2.topology.Compact.forAll
+import com.fdilke.bewl2.topology.Hausdorff.equalH
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
 
@@ -40,6 +43,42 @@ class CoPitcherTest extends AnyFunSpec {
         coP <- Seq(all0CoP, all1CoP, headCoP, notHeadCoP)
         cantorian <- Seq(tCantorian, fCantorian, tfCantorian, ftCantorian)
       } applyFn(coP)(cantorian) shouldBe coP(cantorian)
+
+      for {
+        coP <- Seq(all0CoP, all1CoP, headCoP, notHeadCoP)
+      } {
+        equalH[Cantorian => Int](
+          coP,
+          cantorian => applyFn(coP)(cantorian)
+        ) shouldBe true
+
+        forAll[Cantorian] { cantorian =>
+          applyFn(coP)(cantorian) == coP(cantorian)
+        } shouldBe true
+      }
+    }
+    it("can construct and deconstruct functions as catchers") {
+      def coP(cantorian: Cantorian): Boolean =
+        cantorian(2) ^ cantorian(5)
+      def coP2(cantorian: Cantorian): Boolean =
+        cantorian(3) ^ cantorian(6)
+
+      implicit val catcherTude: Catcher[Cantorian => Boolean, Boolean, Boolean] =
+        CoPitcher.functionAsCatcher[Cantorian, Boolean, Boolean]
+
+      equalH[Cantorian => Boolean](
+        Catcher.construct[Cantorian => Boolean, Boolean, Boolean](
+          Left(false)
+        ),
+        _ => false
+      ) shouldBe true
+
+      equalH[Cantorian => Boolean](
+        Catcher.construct[Cantorian => Boolean, Boolean, Boolean](
+          Right(_ => coP)
+        ),
+        coP2
+      ) shouldBe true
     }
   }
 }
