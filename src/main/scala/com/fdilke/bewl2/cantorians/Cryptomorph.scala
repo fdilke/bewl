@@ -4,13 +4,19 @@ import com.fdilke.bewl2.topology.Hausdorff
 
 sealed abstract class Cryptomorph[H: Hausdorff] {
 
-  implicit val coCantorianCatcherTude: Catcher[Cantorian => H, Boolean, H] =
+  private implicit val coCantorianCatcherTude: Catcher[
+    Cantorian => H,
+    Boolean,
+    H
+  ] =
     CoPitcher.functionAsCatcher[Cantorian, Boolean, H]
 
   def coCantorian: Cantorian => H =
-    ???
+    Catcher.recast[Dyad[H], Cantorian => H, Boolean, H](
+      dyad
+    )
 
-  def asDyad: Dyad[H] =
+  def dyad: Dyad[H] =
     Catcher.recast[Cantorian => H, Dyad[H], Boolean, H](
       coCantorian
     )
@@ -25,5 +31,15 @@ object Cryptomorph {
     new Cryptomorph {
       override def coCantorian: Cantorian => H =
         coC
+    }
+
+  def apply[
+    H: Hausdorff
+  ](
+     dyad0: Dyad[H]
+   ): Cryptomorph[H] =
+    new Cryptomorph {
+      override def dyad: Dyad[H] =
+        dyad0
     }
 }
