@@ -2,12 +2,14 @@ package com.fdilke.bewl2.topology
 
 import java.util.concurrent.atomic.AtomicReference
 
+import com.fdilke.bewl2.cantorians.{Cantorian, Pitcher, VanillaPitcher}
 import com.fdilke.bewl2.topology.Compact._
 import com.fdilke.bewl2.topology.HausdorffToCompactPredicateSolver.{functionFromMap, solveMap}
 import com.fdilke.bewl2.util.FindSingleton
 
 import scala.language.{implicitConversions, postfixOps}
 import scala.reflect.runtime.universe._
+import Pitcher._
 
 trait Compact[T] {
   def find(
@@ -18,6 +20,32 @@ trait Compact[T] {
 }
 
 object Compact {
+  def isConstant[
+    P,
+    C: Compact,
+    H: Hausdorff
+  ](
+    fn: P => H
+  )(
+    implicit pitcherTude: Pitcher[P, C]
+  ): Boolean =
+    optional[C] match {
+      case None =>
+        throw new IllegalArgumentException("Domain is empty")
+      case Some(sampleC) =>
+        val candidate: H = fn(
+          Pitcher.constantly[P, C](sampleC)
+        )
+        forAll[P] { p =>
+          Hausdorff.equalH(
+            fn(p),
+            candidate
+          )
+        }(
+          Pitcher.compactness[P, C]
+        )
+    }
+
   def apply[T](
     implicit compact: Compact[T]
   ): Compact[T] = compact
