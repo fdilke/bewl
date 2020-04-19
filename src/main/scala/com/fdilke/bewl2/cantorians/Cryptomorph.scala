@@ -3,8 +3,8 @@ package com.fdilke.bewl2.cantorians
 import com.fdilke.bewl2.cantorians.CoPitcher.functionAsCatcher
 import com.fdilke.bewl2.topology.Hausdorff
 
-sealed class Cryptomorph[H: Hausdorff](
-  val coCantorian: Cantorian => H
+case class Cryptomorph[H: Hausdorff](
+  coCantorian: Cantorian => H
 ) {
   implicit val fnCatcherTude: Catcher[Cantorian => H, Boolean, H] =
     functionAsCatcher[Cantorian, Boolean, H]
@@ -18,15 +18,6 @@ sealed class Cryptomorph[H: Hausdorff](
 }
 
 object Cryptomorph {
-  def apply[
-    H: Hausdorff
-  ](
-    coC: Cantorian => H
-  ): Cryptomorph[H] =
-    new Cryptomorph(
-      coC
-    )
-
   def apply[
     C,
     H: Hausdorff
