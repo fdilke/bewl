@@ -36,5 +36,30 @@ class CryptomorphTest extends AnyFunSpec {
 
       cryp.dyad shouldBe dyad
     }
+    it("can be constructed from another catcher-of-boolean type and regarded as a dyad") {
+      val tree: GroundedTree[Int] =
+        GroundedTree(
+          GroundedTree(1),
+          GroundedTree(
+            GroundedTree(2),
+            GroundedTree(3)
+          )
+        )
+
+      val cryp: Cryptomorph[Int] =
+        Cryptomorph(tree)
+
+      equalH[Cantorian => Int](
+        cryp.coCantorian,
+        c => if (c.head) (if (c.tail.head) 3 else 2) else 1
+      ) shouldBe true
+
+      cryp.dyad shouldBe Dyad(
+        1,
+        2,
+        1,
+        3
+      )
+    }
   }
 }

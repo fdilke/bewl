@@ -1,22 +1,19 @@
 package com.fdilke.bewl2.cantorians
 
+import com.fdilke.bewl2.cantorians.CoPitcher.functionAsCatcher
 import com.fdilke.bewl2.topology.Hausdorff
 
-sealed abstract class Cryptomorph[H: Hausdorff] {
-
-  private implicit val coCantorianCatcherTude: Catcher[
+sealed class Cryptomorph[H](
+  val coCantorian: Cantorian => H
+)(
+  implicit catcherTude: Catcher[
     Cantorian => H,
     Boolean,
     H
-  ] =
-    CoPitcher.functionAsCatcher[Cantorian, Boolean, H]
-
-  def coCantorian: Cantorian => H =
-    Catcher.recast[Dyad[H], Cantorian => H, Boolean, H](
-      dyad
-    )
-
-  def dyad: Dyad[H] =
+  ],
+  hausdorffTude: Hausdorff[H]
+) {
+  lazy val dyad: Dyad[H] =
     Catcher.recast[Cantorian => H, Dyad[H], Boolean, H](
       coCantorian
     )
@@ -27,19 +24,28 @@ object Cryptomorph {
     H: Hausdorff
   ](
     coC: Cantorian => H
-  ): Cryptomorph[H] =
-    new Cryptomorph {
-      override def coCantorian: Cantorian => H =
-        coC
-    }
+  ): Cryptomorph[H] = {
+    implicit val fnCatcherTude: Catcher[Cantorian => H, Boolean, H] =
+      functionAsCatcher[Cantorian, Boolean, H]
+    new Cryptomorph(
+      coC
+    )
+  }
 
   def apply[
+    C,
     H: Hausdorff
   ](
-     dyad0: Dyad[H]
-   ): Cryptomorph[H] =
-    new Cryptomorph {
-      override def dyad: Dyad[H] =
-        dyad0
-    }
+    catcher: C
+  )(
+    implicit catcherTude: Catcher[C, Boolean, H]
+  ): Cryptomorph[H] = {
+    implicit val fnCatcherTude: Catcher[Cantorian => H, Boolean, H] =
+      functionAsCatcher[Cantorian, Boolean, H]
+    new Cryptomorph(
+      Catcher.recast[C, Cantorian => H, Boolean, H](
+        catcher
+      )
+    )
+  }
 }
