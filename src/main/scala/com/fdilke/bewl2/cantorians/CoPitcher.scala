@@ -47,11 +47,12 @@ object CoPitcher {
         coP: P => H
       ): Either[H, C => P => H] =
         detectConstant(coP) match {
-          case Some(h) => Left(h)
+          case Some(h) =>
+            Left(h)
           case None =>
             Right { c => p =>
               coP(
-                pitcherTude.construct(c, p)
+                Pitcher.construct(c, p)
               )
             }
         }
@@ -60,8 +61,10 @@ object CoPitcher {
         e: => Either[H, C => P => H]
       ): P => H =
         e match {
-          case Left(h)      => _ => h
-          case Right(c2p2h) => p => c2p2h(head(p))(tail(p))
+          case Left(h) =>
+            _ => h
+          case Right(c2p2h) =>
+            p => c2p2h(head(p))(tail(p))
         }
     }
 }

@@ -768,17 +768,17 @@ Very rough roadmap:
 - make the dyad a catcher? this could override existing def of equality
 - have dyads act on Cantorians and other pitchers via catcher nature
 - decided: not a JonssonTarskitude of trees and yet Dyads do have one
+- recast any catcher as a catcher of any other type catching/delivering the same thing
+- tell if a function Pitcher[C] => H is constant
+- derive a Catcher[C, H] from a function Pitcher[C] => H
+- show equivalence of dyads to all other catchers
 
 # Still to do: (roadmap)
 
-- recast any catcher as a catcher of any other type catching/delivering the same thing
+- verify equivalence of catchers and corresponding functions
 - check equality of functions Pitcher[C] => H mirrors that for catchers
 - derive GroundedTree from a co-cantorian    
-- derive a Catcher[C, H] from a function Pitcher[C] => H
-- verify equivalence of catchers and corresponding functions
-- show equivalence of dyads to all other catchers
 - all legs of triangle, dyad <=> catcher <=> function of pitcher
-- tell if a function Pitcher[C] => H is constant
 - map co-cantorians to GroundedTrees and then on to Dyads
 - have cases where C isn't Hausdorff
 - implement density / sorting (generalization of Euclidean rhythms)
