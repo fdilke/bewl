@@ -61,5 +61,22 @@ class CryptomorphTest extends AnyFunSpec {
         3
       )
     }
+    it("can be recast as any other catcher-of-boolean type") {
+      Cryptomorph
+        .apply[Dyad[Int], Int](
+          Dyad(6, 5, 0, 2)
+        )
+        .as[GroundedTree] shouldBe
+        GroundedTree[Int](
+          GroundedTree(
+            GroundedTree(6),
+            GroundedTree(0)
+          ),
+          GroundedTree(
+            GroundedTree(5),
+            GroundedTree(2)
+          )
+        )
+    }
   }
 }

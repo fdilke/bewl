@@ -30,6 +30,9 @@ class LeafNode[H: Hausdorff](
 ) extends GroundedTree[H] {
   override def either: Either[H, Boolean => GroundedTree[H]] =
     Left(leaf)
+
+  override def toString: String =
+    leaf.toString
 }
 
 class BranchNode[H: Hausdorff](
@@ -45,6 +48,9 @@ class BranchNode[H: Hausdorff](
       right
     else
       left
+
+  override def toString: String =
+    "<" + left.toString + ", " + right.toString + ">"
 }
 
 object GroundedTree {

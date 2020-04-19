@@ -17,6 +17,13 @@ sealed class Cryptomorph[H](
     Catcher.recast[Cantorian => H, Dyad[H], Boolean, H](
       coCantorian
     )
+
+  def as[CT[_]](
+    implicit ctCatcherTude: Catcher[CT[H], Boolean, H]
+  ): CT[H] =
+    Catcher.recast[Cantorian => H, CT[H], Boolean, H](
+      coCantorian
+    )
 }
 
 object Cryptomorph {

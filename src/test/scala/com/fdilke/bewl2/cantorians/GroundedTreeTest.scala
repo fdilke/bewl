@@ -143,5 +143,15 @@ class GroundedTreeTest extends AnyFunSpec {
       (tree == tree2) shouldBe true
       equalH(tree, tree2) shouldBe true
     }
+    it("can be represented sanely as strings") {
+      GroundedTree(
+        GroundedTree(
+          GroundedTree(7),
+          GroundedTree(8)
+        ),
+        GroundedTree(3)
+      ).toString shouldBe
+        "<<7, 8>, 3>"
+    }
   }
 }

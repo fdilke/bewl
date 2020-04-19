@@ -772,18 +772,18 @@ Very rough roadmap:
 - tell if a function Pitcher[C] => H is constant
 - derive a Catcher[C, H] from a function Pitcher[C] => H
 - show equivalence of dyads to all other catchers
-
-# Still to do: (roadmap)
-
 - verify equivalence of catchers and corresponding functions
 - check equality of functions Pitcher[C] => H mirrors that for catchers
 - derive GroundedTree from a co-cantorian    
-- all legs of triangle, dyad <=> catcher <=> function of pitcher
 - map co-cantorians to GroundedTrees and then on to Dyads
+
+# Still to do: (roadmap)
+
+- all legs of triangle, dyad <=> catcher <=> function of pitcher
 - have cases where C isn't Hausdorff
 - implement density / sorting (generalization of Euclidean rhythms)
 - knowledge of genetic codes?
 - machinery of abstract recursion schemes? use/learn from shapeless?
 - be able to play a Dyad[LogicalNote] at a given speed/pitch
 - make GroundedTree[T] ordered when T is; also internal sort => Euclidean rhythm?
- 
+ - other structures on Cryps: monads x 2? orderings? algebraic structure?
