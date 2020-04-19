@@ -779,6 +779,8 @@ Very rough roadmap:
 
 # Still to do: (roadmap)
 
+- equality and Hausdorffness for cryptomorphs
+- can they be interpreted as catchers? is this useful?
 - all legs of triangle, dyad <=> catcher <=> function of pitcher
 - have cases where C isn't Hausdorff
 - implement density / sorting (generalization of Euclidean rhythms)
