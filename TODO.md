@@ -779,7 +779,11 @@ Very rough roadmap:
 
 # Still to do: (roadmap)
 
-- equality and Hausdorffness for cryptomorphs
+- have proper CoPitcher class, have Cryp inherit from it
+- coalesce functionAsCatcher - make it all inherent
+- abolish recast() and recastAs() ; Cryptomorph is itself a Catcher
+- proper equality/H-itude for Cryps/CoPitchers
+- make CoCatcher a Pitcher, add as[_[_]], do same trick
 - can they be interpreted as catchers? is this useful?
 - all legs of triangle, dyad <=> catcher <=> function of pitcher
 - have cases where C isn't Hausdorff

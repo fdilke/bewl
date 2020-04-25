@@ -33,6 +33,7 @@ class DotAndArrowEnrichmentTest extends AnyFunSpec {
 
       val embed = subset(totalSet)(x => x)
       val ∀ = totalSet.∀
+
       ∀ should have(
         source(totalSet > omega),
         target(omega)

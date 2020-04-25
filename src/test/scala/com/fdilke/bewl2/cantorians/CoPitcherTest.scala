@@ -6,6 +6,7 @@ import com.fdilke.bewl2.topology.Compact.forAll
 import com.fdilke.bewl2.topology.Hausdorff.equalH
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
+import Cantorian._
 
 class CoPitcherTest extends AnyFunSpec {
   private val all0CoP: Cantorian => Int =
@@ -79,6 +80,65 @@ class CoPitcherTest extends AnyFunSpec {
         ),
         coP2
       ) shouldBe true
+    }
+  }
+  describe("Co-pitchers") {
+    it("can be constructed from a function and recast as other catchers") {
+      val coC: Cantorian => Int =
+        c => Set(0, 1, 2).map(c).size
+
+      val coPitcher: CoPitcher[Cantorian, Boolean, Int] =
+        new CoPitcher(coC)
+
+      coPitcher.recastAs[Dyad[Int]] shouldBe
+        Dyad(1, 2, 2, 2, 2, 2, 2, 1)
+
+      equalH(
+        coPitcher.function,
+        coC
+      ) shouldBe true
+    }
+    it("can be constructed from another catcher type and regarded as a dyad") {
+      val tree: GroundedTree[Int] =
+        GroundedTree(
+          GroundedTree(1),
+          GroundedTree(
+            GroundedTree(2),
+            GroundedTree(3)
+          )
+        )
+
+      val coPitcher: CoPitcher[Cantorian, Boolean, Int] =
+        new CoPitcher(tree)
+
+      equalH[Cantorian => Int](
+        coPitcher.function,
+        c => if (c.head) (if (c.tail.head) 3 else 2) else 1
+      ) shouldBe true
+
+      coPitcher.recastAs[Dyad[Int]] shouldBe Dyad(
+        1,
+        2,
+        1,
+        3
+      )
+    }
+    it("can be recast as any other catcher-of-boolean type") {
+      val dyad: Dyad[Int] =
+        Dyad(6, 5, 0, 2)
+      new CoPitcher[Cantorian, Boolean, Int](
+        dyad(_)
+      ).recastAs[GroundedTree[Int]] shouldBe
+        GroundedTree[Int](
+          GroundedTree(
+            GroundedTree(6),
+            GroundedTree(0)
+          ),
+          GroundedTree(
+            GroundedTree(5),
+            GroundedTree(2)
+          )
+        )
     }
   }
 }

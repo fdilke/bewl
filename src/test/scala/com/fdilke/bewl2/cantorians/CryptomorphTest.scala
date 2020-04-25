@@ -13,7 +13,7 @@ class CryptomorphTest extends AnyFunSpec {
       val cryp: Cryptomorph[Int] =
         Cryptomorph(coC)
 
-      cryp.as[Dyad] shouldBe
+      cryp.recastAs[Dyad] shouldBe
         Dyad(1, 2, 2, 2, 2, 2, 2, 1)
 
       equalH(
@@ -33,7 +33,7 @@ class CryptomorphTest extends AnyFunSpec {
         c => if (c.head) 2 else 3
       ) shouldBe true
 
-      cryp.as[Dyad] shouldBe dyad
+      cryp.recastAs[Dyad] shouldBe dyad
     }
     it("can be constructed from another catcher-of-boolean type and regarded as a dyad") {
       val tree: GroundedTree[Int] =
@@ -53,7 +53,7 @@ class CryptomorphTest extends AnyFunSpec {
         c => if (c.head) (if (c.tail.head) 3 else 2) else 1
       ) shouldBe true
 
-      cryp.as[Dyad] shouldBe Dyad(
+      cryp.recastAs[Dyad] shouldBe Dyad(
         1,
         2,
         1,
@@ -65,7 +65,7 @@ class CryptomorphTest extends AnyFunSpec {
         .apply[Dyad[Int], Int](
           Dyad(6, 5, 0, 2)
         )
-        .as[GroundedTree] shouldBe
+        .recastAs[GroundedTree] shouldBe
         GroundedTree[Int](
           GroundedTree(
             GroundedTree(6),

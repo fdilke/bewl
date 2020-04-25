@@ -9,7 +9,7 @@ case class Cryptomorph[H: Hausdorff](
   implicit val fnCatcherTude: Catcher[Cantorian => H, Boolean, H] =
     functionAsCatcher[Cantorian, Boolean, H]
 
-  def as[CT[_]](
+  def recastAs[CT[_]](
     implicit ctCatcherTude: Catcher[CT[H], Boolean, H]
   ): CT[H] =
     Catcher.recast[Cantorian => H, CT[H], Boolean, H](
