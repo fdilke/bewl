@@ -3,7 +3,6 @@ package com.fdilke.bewl2.cantorians
 import com.fdilke.bewl2.cantorians.Pitcher.{head, tail}
 import com.fdilke.bewl2.topology.Compact.{forAll, optional}
 import com.fdilke.bewl2.topology.{Compact, Hausdorff}
-//import CoPitcher._
 
 object CoPitcher {
 
@@ -36,39 +35,6 @@ object CoPitcher {
           None
     }
 
-  def functionAsCatcher[
-    P,
-    C: Compact,
-    H: Hausdorff
-  ](
-    implicit pitcherTude: Pitcher[P, C]
-  ): Catcher[P => H, C, H] =
-    new Catcher[P => H, C, H] {
-      override def either(
-        coP: P => H
-      ): Either[H, C => P => H] =
-        detectConstant(coP) match {
-          case Some(h) =>
-            Left(h)
-          case None =>
-            Right { c => p =>
-              coP(
-                Pitcher.construct(c, p)
-              )
-            }
-        }
-
-      override def construct(
-        e: => Either[H, C => P => H]
-      ): P => H =
-        e match {
-          case Left(h) =>
-            _ => h
-          case Right(c2p2h) =>
-            p => c2p2h(head(p))(tail(p))
-        }
-    }
-
   implicit def catcherTude[P, C: Compact, H: Hausdorff](
     implicit pitcherTude: Pitcher[P, C]
   ): Catcher[CoPitcher[P, C, H], C, H] =
@@ -81,7 +47,7 @@ object CoPitcher {
             Left(h)
           case None =>
             Right { c =>
-              new CoPitcher[P, C, H](p =>
+              CoPitcher[P, C, H](p =>
                 coP.function(
                   Pitcher.construct(c, p)
                 )
@@ -92,7 +58,7 @@ object CoPitcher {
       override def construct(
         e: => Either[H, C => CoPitcher[P, C, H]]
       ): CoPitcher[P, C, H] =
-        new CoPitcher[P, C, H](
+        CoPitcher[P, C, H](
           e match {
             case Left(h) =>
               _ => h
@@ -101,6 +67,30 @@ object CoPitcher {
           }
         )
     }
+
+  implicit def hausdorffCoPitcher[
+    P,
+    C: Compact,
+    H: Hausdorff
+  ](
+    implicit pitcherTude: Pitcher[P, C]
+  ): Hausdorff[
+    CoPitcher[P, C, H]
+  ] =
+    Catcher.hausdorff[CoPitcher[P, C, H], C, H]
+
+  @inline def apply[
+    P,
+    C: Compact,
+    H: Hausdorff
+  ](
+    function: P => H
+  )(
+    implicit pitcherTude: Pitcher[P, C]
+  ): CoPitcher[P, C, H] =
+    new CoPitcher[P, C, H](
+      function
+    )
 }
 
 class CoPitcher[P, C: Compact, H: Hausdorff](

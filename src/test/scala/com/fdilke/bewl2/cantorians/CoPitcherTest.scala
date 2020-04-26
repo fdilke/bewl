@@ -1,12 +1,11 @@
 package com.fdilke.bewl2.cantorians
 
+import com.fdilke.bewl2.cantorians.Cantorian._
 import com.fdilke.bewl2.cantorians.CoPitcher.detectConstant
-import com.fdilke.bewl2.topology.{Compact, Hausdorff}
 import com.fdilke.bewl2.topology.Compact.forAll
 import com.fdilke.bewl2.topology.Hausdorff.equalH
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
-import Cantorian._
 
 class CoPitcherTest extends AnyFunSpec {
   private val all0CoP: Cantorian => Int =
@@ -34,11 +33,12 @@ class CoPitcherTest extends AnyFunSpec {
       detectConstant[Cantorian, Boolean, Int](all1CoP) shouldBe Some(1)
     }
     it("preserves their action as functions") {
-      implicit val catcherTude: Catcher[Cantorian => Int, Boolean, Int] =
-        CoPitcher.functionAsCatcher[Cantorian, Boolean, Int]
-
       def applyFn(coc: Cantorian => Int)(cantorian: Cantorian): Int =
-        Catcher.applyCatcher[Cantorian => Int, Cantorian, Boolean, Int](coc)(cantorian)
+        Catcher.applyCatcher[CoPitcher[Cantorian, Boolean, Int], Cantorian, Boolean, Int](
+          CoPitcher[Cantorian, Boolean, Int](coc)
+        )(
+          cantorian
+        )
 
       for {
         coP <- Seq(all0CoP, all1CoP, headCoP, notHeadCoP)
@@ -64,21 +64,18 @@ class CoPitcherTest extends AnyFunSpec {
       def coP2(cantorian: Cantorian): Boolean =
         cantorian(3) ^ cantorian(6)
 
-      implicit val catcherTude: Catcher[Cantorian => Boolean, Boolean, Boolean] =
-        CoPitcher.functionAsCatcher[Cantorian, Boolean, Boolean]
-
-      equalH[Cantorian => Boolean](
-        Catcher.construct[Cantorian => Boolean, Boolean, Boolean](
+      equalH[CoPitcher[Cantorian, Boolean, Boolean]](
+        Catcher.construct[CoPitcher[Cantorian, Boolean, Boolean], Boolean, Boolean](
           Left(false)
         ),
-        _ => false
+        CoPitcher[Cantorian, Boolean, Boolean](_ => false)
       ) shouldBe true
 
-      equalH[Cantorian => Boolean](
-        Catcher.construct[Cantorian => Boolean, Boolean, Boolean](
-          Right(_ => coP)
+      equalH[CoPitcher[Cantorian, Boolean, Boolean]](
+        Catcher.construct[CoPitcher[Cantorian, Boolean, Boolean], Boolean, Boolean](
+          Right(_ => CoPitcher(coP))
         ),
-        coP2
+        CoPitcher(coP2)
       ) shouldBe true
     }
   }
@@ -88,7 +85,7 @@ class CoPitcherTest extends AnyFunSpec {
         c => Set(0, 1, 2).map(c).size
 
       val coPitcher: CoPitcher[Cantorian, Boolean, Int] =
-        new CoPitcher(coC)
+        CoPitcher(coC)
 
       coPitcher.recastAs[Dyad[Int]] shouldBe
         Dyad(1, 2, 2, 2, 2, 2, 2, 1)
@@ -109,7 +106,7 @@ class CoPitcherTest extends AnyFunSpec {
         )
 
       val coPitcher: CoPitcher[Cantorian, Boolean, Int] =
-        new CoPitcher(tree)
+        CoPitcher(tree)
 
       equalH[Cantorian => Int](
         coPitcher.function,
@@ -126,7 +123,7 @@ class CoPitcherTest extends AnyFunSpec {
     it("can be recast as any other catcher-of-boolean type") {
       val dyad: Dyad[Int] =
         Dyad(6, 5, 0, 2)
-      new CoPitcher[Cantorian, Boolean, Int](
+      CoPitcher[Cantorian, Boolean, Int](
         dyad(_)
       ).recastAs[GroundedTree[Int]] shouldBe
         GroundedTree[Int](

@@ -1,9 +1,9 @@
 package com.fdilke.bewl2.cantorians
 
+import com.fdilke.bewl2.cantorians.Cryptomorph.Cryptomorph
 import com.fdilke.bewl2.topology.Hausdorff.equalH
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
-import Cryptomorph.Cryptomorph
 
 class CryptomorphTest extends AnyFunSpec {
   describe("The co-cantorian cryptomorph") {
@@ -77,6 +77,24 @@ class CryptomorphTest extends AnyFunSpec {
             GroundedTree(2)
           )
         )
+    }
+    it("are implicitly Hausdorff") {
+      equalH[Cryptomorph[Int]](
+        Cryptomorph[Dyad[Int], Int](
+          Dyad(6, 5, 0, 2)
+        ),
+        Cryptomorph[Dyad[Int], Int](
+          Dyad(6, 5, 0, 2)
+        )
+      ) shouldBe true
+      equalH[Cryptomorph[Int]](
+        Cryptomorph[Dyad[Int], Int](
+          Dyad(6, 5, 0, 2)
+        ),
+        Cryptomorph[Dyad[Int], Int](
+          Dyad(1, 7)
+        )
+      ) shouldBe false
     }
   }
 }
