@@ -776,10 +776,11 @@ Very rough roadmap:
 - check equality of functions Pitcher[C] => H mirrors that for catchers
 - derive GroundedTree from a co-cantorian    
 - map co-cantorians to GroundedTrees and then on to Dyads
+- have proper CoPitcher class, have Cryp inherit from it... 
+    worked ok as concrete abstract type 
 
 # Still to do: (roadmap)
 
-- have proper CoPitcher class, have Cryp inherit from it
 - coalesce functionAsCatcher - make it all inherent
 - abolish recast() and recastAs() ; Cryptomorph is itself a Catcher
 - proper equality/H-itude for Cryps/CoPitchers
