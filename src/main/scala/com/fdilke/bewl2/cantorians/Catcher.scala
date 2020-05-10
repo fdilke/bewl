@@ -109,19 +109,22 @@ object Catcher {
         }
     }
 
-  def recast[C1, C2, S, T](
-    c1: C1
+  implicit class RichCatcher[C, S, T](
+    c: C
   )(
-    implicit catcherTude1: Catcher[C1, S, T],
-    catcherTude2: Catcher[C2, S, T]
-  ): C2 = {
-    def recastSub(c: C1): C2 =
-      catcherTude2.construct(
-        catcherTude1.either(c) match {
-          case Left(t)    => Left(t)
-          case Right(s2c) => Right(s => recastSub(s2c(s)))
-        }
-      )
-    recastSub(c1)
+    implicit catcherTude: Catcher[C, S, T]
+  ) {
+    def as[C2](
+      implicit catcherTude2: Catcher[C2, S, T]
+    ): C2 = {
+      def asSub(c1: C): C2 =
+        catcherTude2.construct(
+          catcherTude.either(c1) match {
+            case Left(t)    => Left(t)
+            case Right(s2c) => Right(s => asSub(s2c(s)))
+          }
+        )
+      asSub(c)
+    }
   }
 }

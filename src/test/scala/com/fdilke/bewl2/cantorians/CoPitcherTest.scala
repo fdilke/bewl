@@ -6,6 +6,7 @@ import com.fdilke.bewl2.topology.Compact.forAll
 import com.fdilke.bewl2.topology.Hausdorff.equalH
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
+import Catcher._
 
 class CoPitcherTest extends AnyFunSpec {
   private val all0CoP: Cantorian => Int =
@@ -87,7 +88,7 @@ class CoPitcherTest extends AnyFunSpec {
       val coPitcher: CoPitcher[Cantorian, Boolean, Int] =
         CoPitcher(coC)
 
-      coPitcher.recastAs[Dyad[Int]] shouldBe
+      coPitcher.as[Dyad[Int]] shouldBe
         Dyad(1, 2, 2, 2, 2, 2, 2, 1)
 
       equalH(
@@ -113,7 +114,7 @@ class CoPitcherTest extends AnyFunSpec {
         c => if (c.head) (if (c.tail.head) 3 else 2) else 1
       ) shouldBe true
 
-      coPitcher.recastAs[Dyad[Int]] shouldBe Dyad(
+      coPitcher.as[Dyad[Int]] shouldBe Dyad(
         1,
         2,
         1,
@@ -125,7 +126,7 @@ class CoPitcherTest extends AnyFunSpec {
         Dyad(6, 5, 0, 2)
       CoPitcher[Cantorian, Boolean, Int](
         dyad(_)
-      ).recastAs[GroundedTree[Int]] shouldBe
+      ).as[GroundedTree[Int]] shouldBe
         GroundedTree[Int](
           GroundedTree(
             GroundedTree(6),

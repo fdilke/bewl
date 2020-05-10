@@ -4,6 +4,7 @@ import com.fdilke.bewl2.cantorians.Cryptomorph.Cryptomorph
 import com.fdilke.bewl2.topology.Hausdorff.equalH
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
+import Catcher._
 
 class CryptomorphTest extends AnyFunSpec {
   describe("The co-cantorian cryptomorph") {
@@ -14,7 +15,7 @@ class CryptomorphTest extends AnyFunSpec {
       val cryp: Cryptomorph[Int] =
         Cryptomorph(coC)
 
-      cryp.recastAs[Dyad[Int]] shouldBe
+      cryp.as[Dyad[Int]] shouldBe
         Dyad(1, 2, 2, 2, 2, 2, 2, 1)
 
       equalH(
@@ -34,7 +35,7 @@ class CryptomorphTest extends AnyFunSpec {
         c => if (c.head) 2 else 3
       ) shouldBe true
 
-      cryp.recastAs[Dyad[Int]] shouldBe dyad
+      cryp.as[Dyad[Int]] shouldBe dyad
     }
     it("can be constructed from another catcher-of-boolean type and regarded as a dyad") {
       val tree: GroundedTree[Int] =
@@ -54,7 +55,7 @@ class CryptomorphTest extends AnyFunSpec {
         c => if (c.head) (if (c.tail.head) 3 else 2) else 1
       ) shouldBe true
 
-      cryp.recastAs[Dyad[Int]] shouldBe Dyad(
+      cryp.as[Dyad[Int]] shouldBe Dyad(
         1,
         2,
         1,
@@ -66,7 +67,7 @@ class CryptomorphTest extends AnyFunSpec {
         .apply[Dyad[Int], Int](
           Dyad(6, 5, 0, 2)
         )
-        .recastAs[GroundedTree[Int]] shouldBe
+        .as[GroundedTree[Int]] shouldBe
         GroundedTree[Int](
           GroundedTree(
             GroundedTree(6),

@@ -97,11 +97,4 @@ class CoPitcher[P, C: Compact, H: Hausdorff](
   val function: P => H
 )(
   implicit pitcherTude: Pitcher[P, C]
-) { coPitcher =>
-  def recastAs[CT](
-    implicit ctCatcherTude: Catcher[CT, C, H]
-  ): CT =
-    Catcher.recast[CoPitcher[P, C, H], CT, C, H](
-      coPitcher
-    )
-}
+)

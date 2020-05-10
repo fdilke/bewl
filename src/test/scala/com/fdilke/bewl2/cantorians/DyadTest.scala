@@ -220,8 +220,5 @@ class DyadTest extends AnyFunSpec {
       dyad(Pitcher.constantly[VanillaPitcher[Boolean], Boolean](true)) shouldBe 5
       dyad(Pitcher.constantly[VanillaPitcher[Boolean], Boolean](false)) shouldBe 2
     }
-//    it("can be recast as Catchers of defined type") {
-//      // Catcher[C, T, U]
-//    }
   }
 }

@@ -4,6 +4,7 @@ import com.fdilke.bewl2.cantorians.Dyad._
 import com.fdilke.bewl2.topology.Hausdorff.equalH
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers._
+import Catcher._
 
 class CatcherTest extends AnyFunSpec {
   describe("Catchers") {
@@ -86,8 +87,8 @@ class CatcherTest extends AnyFunSpec {
   }
 
   private def dyad2tree(dyad: Dyad[Int]): GroundedTree[Int] =
-    Catcher.recast[Dyad[Int], GroundedTree[Int], Boolean, Int](dyad)
+    dyad.as[GroundedTree[Int]]
 
   private def tree2dyad(tree: GroundedTree[Int]): Dyad[Int] =
-    Catcher.recast[GroundedTree[Int], Dyad[Int], Boolean, Int](tree)
+    tree.as[Dyad[Int]]
 }
