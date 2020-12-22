@@ -65,6 +65,7 @@ object Pitcher {
       )
     constantPitcher
   }
+
   def compactness[
     P,
     C: Compact

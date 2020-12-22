@@ -785,6 +785,10 @@ Very rough roadmap:
 # Still to do: (roadmap)
 
 - proper equality/H-itude for Cryps/CoPitchers
+- Cryp should be a proper class, not a type
+- add a hashCode to Cryp/CoPitcher; can use Hausdorff.intKey()?
+- add a constructor for Cryp so we can pass it the Dyad arguments  
+- bake in Pitcher.compactness(...) so it's implicit, we never need to call it explicitly
 - make CoCatcher a Pitcher, add as[_[_]], do same trick
 - all legs of triangle, dyad <=> catcher <=> function of pitcher
 - have cases where C isn't Hausdorff
@@ -793,4 +797,4 @@ Very rough roadmap:
 - machinery of abstract recursion schemes? use/learn from shapeless?
 - be able to play a Dyad[LogicalNote] at a given speed/pitch
 - make GroundedTree[T] ordered when T is; also internal sort => Euclidean rhythm?
- - other structures on Cryps: monads x 2? orderings? algebraic structure?
+- other structures on Cryps: monads x 2? orderings? algebraic structure?

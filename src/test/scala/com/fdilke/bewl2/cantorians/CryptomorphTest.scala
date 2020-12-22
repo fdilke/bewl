@@ -62,6 +62,7 @@ class CryptomorphTest extends AnyFunSpec {
         3
       )
     }
+
     it("can be recast as any other catcher-of-boolean type") {
       Cryptomorph
         .apply[Dyad[Int], Int](
@@ -79,7 +80,8 @@ class CryptomorphTest extends AnyFunSpec {
           )
         )
     }
-    it("are implicitly Hausdorff") {
+
+    it("is implicitly Hausdorff") {
       equalH[Cryptomorph[Int]](
         Cryptomorph[Dyad[Int], Int](
           Dyad(6, 5, 0, 2)
@@ -96,6 +98,24 @@ class CryptomorphTest extends AnyFunSpec {
           Dyad(1, 7)
         )
       ) shouldBe false
+    }
+
+    it("has sane semantics of equality") {
+      val cryp: Cryptomorph[Int] =
+        Cryptomorph[Dyad[Int], Int](
+          Dyad(6, 5, 0, 2)
+        )
+      val cryp2: Cryptomorph[Int] =
+        Cryptomorph[Dyad[Int], Int](
+          Dyad(6, 5, 0, 2)
+        )
+      val cryp3: Cryptomorph[Int] =
+        Cryptomorph[Dyad[Int], Int](
+          Dyad(8, 8, 0, 8, 9, 9, 0, 9)
+        )
+      cryp shouldBe cryp
+      cryp shouldBe cryp2
+      cryp shouldNot be(cryp3)
     }
   }
 }

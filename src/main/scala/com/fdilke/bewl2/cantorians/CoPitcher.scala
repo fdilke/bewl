@@ -97,4 +97,17 @@ class CoPitcher[P, C: Compact, H: Hausdorff](
   val function: P => H
 )(
   implicit pitcherTude: Pitcher[P, C]
-)
+) {
+  override def equals(
+    other: Any
+  ): Boolean =
+    other match {
+      case other: CoPitcher[P, C, H] =>
+        forAll[P] { p =>
+          function(p) == other.function(p)
+        }(
+          Pitcher.compactness[P, C]
+        )
+      case _ => false
+    }
+}

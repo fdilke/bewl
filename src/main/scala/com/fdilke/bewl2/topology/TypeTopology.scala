@@ -1,15 +1,12 @@
 package com.fdilke.bewl2.topology
 
-import java.util.concurrent.atomic.AtomicReference
-
-import com.fdilke.bewl2.cantorians.{Cantorian, Pitcher, VanillaPitcher}
 import com.fdilke.bewl2.topology.Compact._
 import com.fdilke.bewl2.topology.HausdorffToCompactPredicateSolver.{functionFromMap, solveMap}
 import com.fdilke.bewl2.util.FindSingleton
 
+import java.util.concurrent.atomic.AtomicReference
 import scala.language.{implicitConversions, postfixOps}
 import scala.reflect.runtime.universe._
-import Pitcher._
 
 trait Compact[T] {
   def find(
