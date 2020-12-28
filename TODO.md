@@ -736,6 +736,12 @@ Very rough roadmap:
             VanillaPitcher(head, tail)
         }
 
+# Design decision
+
+Cryptomorph[H] = CoPitcher[Cantorian, Boolean, H]
+to have decent semantics of equality, requires H to be Hausdorff... and then it's H itself.
+- NOT DO: Cryp should be a proper class, not a type
+
 # Done
     
 - move Pitcher, Catcher to their own module
@@ -781,12 +787,13 @@ Very rough roadmap:
 - abolish recast() and recastAs() ; Cryptomorph is itself a Catcher
 - can they be interpreted as catchers? is this useful? Yes
 - coalesce functionAsCatcher - make it all inherent
+- proper equality/H-itude for Cryps/CoPitchers
+- require H to be Hausdorff in Cryp[H], then make Cryp[H] Hausdorff
 
 # Still to do: (roadmap)
 
-- proper equality/H-itude for Cryps/CoPitchers
-- Cryp should be a proper class, not a type
-- add a hashCode to Cryp/CoPitcher; can use Hausdorff.intKey()?
+- maybe do this by making it extend a trait EqualityForHausdorffs, which could be used elsewhere?  
+- then add a hashCode to Cryp/CoPitcher; can use Hausdorff.intKey()?
 - add a constructor for Cryp so we can pass it the Dyad arguments  
 - bake in Pitcher.compactness(...) so it's implicit, we never need to call it explicitly
 - make CoCatcher a Pitcher, add as[_[_]], do same trick

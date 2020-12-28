@@ -110,4 +110,7 @@ class CoPitcher[P, C: Compact, H: Hausdorff](
         )
       case _ => false
     }
+
+  override def hashCode(): Int =
+    Hausdorff.intKey(this)
 }
