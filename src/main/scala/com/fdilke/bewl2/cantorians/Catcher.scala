@@ -126,5 +126,12 @@ object Catcher {
         )
       asSub(c)
     }
+
+    def apply[P](
+      pitcher: P
+    )(
+      implicit pitcherTude: Pitcher[P, S]
+    ): T =
+      Catcher.applyCatcher(c)(pitcher)
   }
 }

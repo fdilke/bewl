@@ -100,6 +100,13 @@ class CryptomorphTest extends AnyFunSpec {
       ) shouldBe false
     }
 
+    it("can be applied to Cantorians") {
+      val cryp = Cryptomorph(6, 5, 0, 2)
+      val cantorianTFT = Cantorian.cycle(true, false, true)
+      cryp.function(cantorianTFT) shouldBe 5
+      cryp(cantorianTFT) shouldBe 5
+    }
+
     it("has sane semantics of equality") {
       val cryp: Cryptomorph[Int] =
         Cryptomorph[Dyad[Int], Int](

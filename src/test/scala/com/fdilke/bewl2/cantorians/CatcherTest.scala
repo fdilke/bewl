@@ -36,6 +36,7 @@ class CatcherTest extends AnyFunSpec {
         tree2
       ) shouldBe true
     }
+
     it("can be recast, preserving equality semantics") {
       val sampleTrees: Seq[GroundedTree[Int]] = Seq(
         GroundedTree(
@@ -83,6 +84,13 @@ class CatcherTest extends AnyFunSpec {
         tree2dyad(dyad2tree(dyad)),
         dyad
       ) shouldBe true
+    }
+
+    it("can be applied to pitchers") {
+      val catcher = RichCatcher(Dyad(1, 2, 1, 3))
+      catcher.apply(
+        Cantorian.cycle(true, false, true)
+      ) shouldBe 2
     }
   }
 

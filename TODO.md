@@ -754,6 +754,13 @@ can't do this because traits can't have type parameters with context bounds:
             }
     }
 
+so it would have to be a base class for all Hausdorffs... are we ready for that?
+
+# Questions
+
+is a Cryptomorph => Boolean necessarily a Cantorian?
+shouldn't now need an explicit apply(Cantorian) in Dyad, but it seems I do... why?
+
 # Design decision
 
 Cryptomorph[H] = CoPitcher[Cantorian, Boolean, H]
@@ -809,11 +816,15 @@ to have decent semantics of equality, requires H to be Hausdorff... and then it'
 - proper equality/H-itude for Cryps/CoPitchers
 - require H to be Hausdorff in Cryp[H], then make Cryp[H] Hausdorff
 - then add a hashCode to Cryp/CoPitcher; can use Hausdorff.intKey()
+- add a constructor for Cryp so we can pass it the Dyad arguments  
+- build Catcher.applyCatcher into RichCatcher, so we can apply Cryps to Cantorians
 
 # Still to do: (roadmap)
 
 - test the hashcodes properly: have a factory that churns out objects of required type
-- add a constructor for Cryp so we can pass it the Dyad arguments  
+- do monadic computations with Cryps as with Dyads: there should be η, μ, map, flatMap
+- there should be shift and index, so we can treat Cryps as arrays  
+- have a Seq[H] => H give rise to a Seq[Cryptomorph[H]] => Cryptomorph[H]  
 - bake in Pitcher.compactness(...) so it's implicit, we never need to call it explicitly
 - make CoCatcher a Pitcher, add as[_[_]], do same trick
 - all legs of triangle, dyad <=> catcher <=> function of pitcher
