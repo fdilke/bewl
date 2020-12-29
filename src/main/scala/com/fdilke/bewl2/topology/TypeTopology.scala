@@ -1,5 +1,6 @@
 package com.fdilke.bewl2.topology
 
+import com.fdilke.bewl2.cantorians.{CoPitcher, Pitcher}
 import com.fdilke.bewl2.topology.Compact._
 import com.fdilke.bewl2.topology.HausdorffToCompactPredicateSolver.{functionFromMap, solveMap}
 import com.fdilke.bewl2.util.FindSingleton

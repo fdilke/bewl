@@ -26,4 +26,13 @@ object Cryptomorph {
     new Cryptomorph(
       Catcher.applyCatcher(catcher)(_)
     )
+
+  def apply[
+    H: Hausdorff
+  ](
+     seq: H*
+   ): Cryptomorph[H] =
+    Cryptomorph[Dyad[H], H](
+      Dyad(seq :_*)
+    )
 }

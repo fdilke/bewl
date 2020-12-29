@@ -117,5 +117,13 @@ class CryptomorphTest extends AnyFunSpec {
       cryp shouldBe cryp2
       cryp shouldNot be(cryp3)
     }
+    it("can be instantiated from an argument list like the equivalent Dyad") {
+      Cryptomorph[Int](
+        6, 5, 0, 2
+      ) shouldBe
+      Cryptomorph[Dyad[Int], Int](
+        Dyad(6, 5, 0, 2)
+      )
+    }
   }
 }

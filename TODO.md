@@ -736,11 +736,30 @@ Very rough roadmap:
             VanillaPitcher(head, tail)
         }
 
+# Nice idea, not quite ready
+
+can't do this because traits can't have type parameters with context bounds:
+
+    trait EqualityForHausdorffs[H: Hausdorff] { hausdorff: H =>
+        override def hashCode(): Int =
+            Hausdorff.intKey(hausdorff)
+    
+        override def equals(
+            other: Any
+        ): Boolean =
+            other match {
+                case other: H =>
+                Hausdorff.equalH(other, hausdorff)
+                case _ => false
+            }
+    }
+
 # Design decision
 
 Cryptomorph[H] = CoPitcher[Cantorian, Boolean, H]
 to have decent semantics of equality, requires H to be Hausdorff... and then it's H itself.
 - NOT DO: Cryp should be a proper class, not a type
+- WE CAN'T: extend a trait EqualityForHausdorffs, which could be used elsewhere?  
 
 # Done
     
@@ -789,11 +808,11 @@ to have decent semantics of equality, requires H to be Hausdorff... and then it'
 - coalesce functionAsCatcher - make it all inherent
 - proper equality/H-itude for Cryps/CoPitchers
 - require H to be Hausdorff in Cryp[H], then make Cryp[H] Hausdorff
+- then add a hashCode to Cryp/CoPitcher; can use Hausdorff.intKey()
 
 # Still to do: (roadmap)
 
-- maybe do this by making it extend a trait EqualityForHausdorffs, which could be used elsewhere?  
-- then add a hashCode to Cryp/CoPitcher; can use Hausdorff.intKey()?
+- test the hashcodes properly: have a factory that churns out objects of required type
 - add a constructor for Cryp so we can pass it the Dyad arguments  
 - bake in Pitcher.compactness(...) so it's implicit, we never need to call it explicitly
 - make CoCatcher a Pitcher, add as[_[_]], do same trick
