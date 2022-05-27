@@ -2,8 +2,6 @@ package com.fdilke.bewl2
 
 trait Topos[SET[_]]:
 
-  implicit val implicitTopos: Topos[SET] = this
-
   type F[_]
 
 // initial abortive experiments with type lambdas

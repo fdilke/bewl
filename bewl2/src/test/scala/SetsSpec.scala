@@ -1,6 +1,6 @@
 import com.fdilke.bewl2.Topos
 import munit.FunSuite
-import com.fdilke.bewl2.sets.Sets.implicitTopos
+import com.fdilke.bewl2.sets.Sets
 
 class SetsSpec extends GenericToposTests[Set]
 
