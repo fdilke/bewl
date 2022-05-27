@@ -1,6 +1,6 @@
 import munit.FunSuite
 
-class FiniteSetsSpec extends FunSuite:
+class OtherThingSpec extends FunSuite:
   test("example test that succeeds") {
     val obtained = 42
     val expected = 42
