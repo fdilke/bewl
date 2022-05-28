@@ -1,5 +1,7 @@
-import munit.FunSuite
+package com.fdilke.bewl
+
 import munit.Clue.generate
+import munit.FunSuite
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

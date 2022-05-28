@@ -1,3 +1,5 @@
+package com.fdilke.bewl
+
 import munit.FunSuite
 
 class OtherThingSpec extends FunSuite:
