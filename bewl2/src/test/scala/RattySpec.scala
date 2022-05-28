@@ -3,16 +3,26 @@ import munit.Clue.generate
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+// import scala.runtime.stdLibPatches.language.experimental.fewerBraces
 
 class RattySpec extends FunSuite:
-  test("example test that succeeds") {
+  test("kicking the tyres") {
     val obtained = 42
     val expected = 42
     val x: Future[Int] = Future {
       2
     }
-// TODO: get -Yindent-colons to work    
+//    val y: Future[Int] = Future:
+//      2
+    val z: Seq[Int] = rattenberg {
+      x => x + 1
+    }
+// TODO: get -Yindent-colons to work
 //    val y: Future[Int] = Future:
 //      2
     assertEquals(obtained, expected)
+    assertEquals(z, Seq(2,3,4))
   }
+
+  def rattenberg(f: Int => Int): Seq[Int] =
+    Seq(1,2,3) map f

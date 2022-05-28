@@ -3,4 +3,4 @@ using munit, for laughs
 or a test framework that is more Scala 3 friendly?
 work out exact rules with indentations, lambdas
 compiler option -Yindent-colons is your friend...?
-
+this does in fact work, you just have to put up with red marks
