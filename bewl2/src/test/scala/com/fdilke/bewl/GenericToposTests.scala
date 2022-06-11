@@ -1,6 +1,6 @@
 package com.fdilke.bewl
 
-import com.fdilke.bewl2.Topos
+import com.fdilke.bewl2.{Monad, Topos}
 import munit.FunSuite
 
 
@@ -10,11 +10,13 @@ import munit.FunSuite
 //  val initial: T
 
 abstract class GenericToposTests[
-  SET[_]: Topos
-] extends FunSuite:
+  SET[_],
+  CTXT[_]
+](implicit
+ val topos: Topos[SET, CTXT]
+) extends FunSuite:
 
-  val theTopos: Topos[SET] = Topos[SET]
-  import theTopos._
+  import topos._
 
   type FOO
   implicit val dotFoo: SET[FOO]
@@ -27,7 +29,7 @@ abstract class GenericToposTests[
 
   test("identity arrows have sane equality semantics") {
     assert(
-      arrow[FOO, FOO] { x => x } =!= id[FOO]
+      arrow[FOO, FOO] { x => monad.eta(x) } =!= id[FOO]
     )
     assert(
       id[FOO] =!= id[FOO]

@@ -1,9 +1,9 @@
 package com.fdilke.bewl2.sets
 
 import com.fdilke.bewl2.Topos
+import com.fdilke.bewl2.Monad
 
-implicit object Sets extends Topos[Set]:
-  override type F = [X] =>> X
+implicit object Sets extends Topos[Set, Monad.IDENTITY]:
 
   override def equalArrows[X: Set, Y: Set](
    f1: X => Y,

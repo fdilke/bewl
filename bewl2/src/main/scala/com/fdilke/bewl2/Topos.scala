@@ -2,26 +2,39 @@ package com.fdilke.bewl2
 
 import scala.annotation.targetName
 
-trait BaseTopos[SET[_]]:
+trait BaseTopos[
+  SET[_],
+  CTXT[_]: Monad
+]:
 
-  type F[_]
   @targetName("topos arrow")
-  type ~>[X, Y] = F[X] => F[Y]
+  type ~>[X, Y] = X => CTXT[Y]
 
   def equalArrows[X: SET, Y: SET](
     f1: X ~> Y,
     f2: X ~> Y
   ): Boolean
 
-trait Topos[SET[_]] extends BaseTopos[SET]:
+trait Topos[
+  SET[_],
+  CTXT[_]: Monad
+] extends BaseTopos[SET, CTXT]:
+
+  final val monad: Monad[CTXT] =
+    implicitly[Monad[CTXT]]
 
   final inline def arrow[X: SET, Y: SET]( // necessary?
-    f: F[X] => F[Y]
+    f: X => CTXT[Y]
   ): X ~> Y =
     f
 
   final def id[X: SET]: X ~> X =
-    identity
+    monad.eta(_)
+//    monad.eta
+//    val f: X => CTXT[X] =
+//      x => monad.eta(x)
+//    val g: X ~> X = f
+//    g
 
 // initial abortive experiments with type lambdas
 //  type M = [X, Y] =>> Map[Y, X]
@@ -38,11 +51,16 @@ trait Topos[SET[_]] extends BaseTopos[SET]:
     ): Boolean =
       equalArrows(f, f2)
 
-    def o[V: SET](
+    final def o[V: SET](
       f2: V ~> X
     ): V ~> Y =
-      f compose f2
+      monad.mu[Y] compose monad.map(f) compose f2
 
 object Topos:
-  def apply[SET[_]: Topos]: Topos[SET] =
-    implicitly[Topos[SET]]
+  def apply[
+    SET[_],
+    CTXT[_]
+  ](
+   implicit topos: Topos[SET, CTXT]
+  ): Topos[SET, CTXT] =
+    topos
