@@ -3,12 +3,6 @@ package com.fdilke.bewl
 import com.fdilke.bewl2.{Monad, Topos}
 import munit.FunSuite
 
-
-//class Abstract:
-//  type T
-//  def transform(t: T): T
-//  val initial: T
-
 abstract class GenericToposTests[
   SET[_],
   CTXT[_]
@@ -44,5 +38,37 @@ abstract class GenericToposTests[
     sanityTest[FOO]
     sanityTest(foo2bar)
   }
-  
 
+  test("biproduct diagrams work") {
+//    bar.x(baz).sanityTest
+//    (bar.x(baz)) should have(
+//      left(bar),
+//      right(baz)
+//    )
+//    val productArrow = foo2bar.x(foo2baz)
+//
+//    productArrow.sanityTest
+//    productArrow should have(
+//      source(foo),
+//      target(bar.x(baz)),
+//      sanityTest(null)
+//    )
+//
+//    bar.x(baz).π0.sanityTest
+//    bar.x(baz).π1.sanityTest
+//
+//    foo(bar) { x =>
+//      productArrow(x)._1
+//    } shouldBe foo2bar
+//
+//    foo(baz) { x =>
+//      productArrow(x)._2
+//    } shouldBe foo2baz
+//
+//    val fooXbar: BIPRODUCT[FOO, BAR] =
+//      foo.x(bar)
+//    fooXbar(fooXbar) {
+//      ⊕.tupled(fooXbar.pair)
+//    } shouldBe fooXbar.identity
+  }
+// TODO: fix
