@@ -24,7 +24,6 @@ abstract class GenericToposTests[
   implicit val dotBar: SET[BAR]
   val foo2bar: FOO ~> BAR
 
-
 //  import ToposHelpers._
 
   test("identity arrows have sane equality semantics") {
@@ -40,4 +39,10 @@ abstract class GenericToposTests[
     assert( (foo2bar o id[FOO]) =!= foo2bar)
     assert( (id[BAR] o foo2bar) =!= foo2bar)
   }
+
+  test("sane fixtures") {
+    sanityTest[FOO]
+    sanityTest(foo2bar)
+  }
+  
 

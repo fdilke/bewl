@@ -12,4 +12,10 @@ implicit object Sets extends Topos[Set, Monad.IDENTITY]:
     implicitly[Set[X]].forall { x =>
       f1(x) == f2(x)
     }
+    
+  override def sanityTest[X: Set]: Unit = ()
+  
+  override def sanityTest[X: Set, Y: Set](f: X ~> Y): Unit = ()
+  
 
+  

@@ -14,6 +14,9 @@ trait BaseTopos[
     f1: X ~> Y,
     f2: X ~> Y
   ): Boolean
+  
+  def sanityTest[X: SET]: Unit
+  def sanityTest[X: SET, Y: SET](f: X ~> Y): Unit
 
 trait Topos[
   SET[_],
