@@ -22,7 +22,7 @@ abstract class GenericToposTests[
 
   test("identity arrows have sane equality semantics") {
     assert(
-      arrow[FOO, FOO] { x => monad.eta(x) } =!= id[FOO]
+      arrow[FOO, FOO] { x => x } =!= id[FOO]
     )
     assert(
       id[FOO] =!= id[FOO]

@@ -1,14 +1,16 @@
 package com.fdilke.bewl2
 
 import scala.annotation.targetName
+import com.fdilke.bewl2.Mappable
 
 trait BaseTopos[
   SET[_],
-  CTXT[_]: Monad
+  CTXT[_] : Mappable
 ]:
 
+//  type piggle = [Y] =>> CTXT[Y]
   @targetName("topos arrow")
-  type ~>[X, Y] = X => CTXT[Y]
+  type ~>[X, Y] = (CTXT[X] => CTXT[Y])
 
   def equalArrows[X: SET, Y: SET](
     f1: X ~> Y,
@@ -20,19 +22,16 @@ trait BaseTopos[
 
 trait Topos[
   SET[_],
-  CTXT[_]: Monad
+  CTXT[_]: Mappable
 ] extends BaseTopos[SET, CTXT]:
 
-  final val monad: Monad[CTXT] =
-    implicitly[Monad[CTXT]]
-
   final inline def arrow[X: SET, Y: SET]( // necessary?
-    f: X => CTXT[Y]
+    f: CTXT[X] => CTXT[Y]
   ): X ~> Y =
     f
 
   final def id[X: SET]: X ~> X =
-    monad.eta(_)
+    identity
 //    monad.eta
 //    val f: X => CTXT[X] =
 //      x => monad.eta(x)
@@ -57,12 +56,12 @@ trait Topos[
     final def o[V: SET](
       f2: V ~> X
     ): V ~> Y =
-      monad.mu[Y] compose monad.map(f) compose f2
+      f compose f2
 
 object Topos:
   def apply[
     SET[_],
-    CTXT[_]
+    CTXT[A]: Mappable
   ](
    implicit topos: Topos[SET, CTXT]
   ): Topos[SET, CTXT] =
