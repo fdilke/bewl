@@ -11,7 +11,7 @@ lazy val root = project
 //        "-language:experimental.fewerBraces"
     ),
     libraryDependencies ++= Seq(
-        "org.scalameta" %% "munit" % "0.7.29" % Test,
+        "org.scalameta" %% "munit" % "1.0.0-M3" % Test,
         "org.typelevel" % "cats-core_3" % "2.7.0"
     )
   )
