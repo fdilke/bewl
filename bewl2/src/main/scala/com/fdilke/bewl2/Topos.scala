@@ -8,15 +8,27 @@ trait BaseTopos[
   CTXT[_] : Mappable
 ]:
 
-//  type piggle = [Y] =>> CTXT[Y]
+  val mappable: Mappable[CTXT] =
+    Mappable[CTXT]
+
   @targetName("topos arrow")
-  type ~>[X, Y] = (CTXT[X] => CTXT[Y])
+  type ~>[X, Y] = CTXT[X] => CTXT[Y]
 
   def equalArrows[X: SET, Y: SET](
     f1: X ~> Y,
     f2: X ~> Y
   ): Boolean
-  
+
+  implicit def productObject[
+    X: SET,
+    Y: SET
+  ]: SET[(X, Y)]
+
+  def productMagic[A: SET, B: SET](
+    ca: CTXT[A],
+    cb: CTXT[B]
+  ): CTXT[(A, B)]
+
   def sanityTest[X: SET]: Unit
   def sanityTest[X: SET, Y: SET](f: X ~> Y): Unit
 
@@ -30,33 +42,43 @@ trait Topos[
   ): X ~> Y =
     f
 
-  final def id[X: SET]: X ~> X =
-    identity
-//    monad.eta
-//    val f: X => CTXT[X] =
-//      x => monad.eta(x)
-//    val g: X ~> X = f
-//    g
+  final def dot[X: SET]: SET[X] =
+    implicitly[SET[X]]
 
-// initial abortive experiments with type lambdas
-//  type M = [X, Y] =>> Map[Y, X]
-//  ({ type λ[T] = triadicMonoid.Action[T] })#λ
-//  type FTYPE = [H, X] =>> ( type { H[Y <: H[Y]] })#Y
-//  H[X <: H[X]]
+  final def id[X: SET]: X ~> X =
+    identity[CTXT[X]]
+
+  final def π0[X, Y]: (X, Y) ~> X =
+    c => mappable.map(c, _._1)
+
+  final def π1[X, Y]: (X, Y) ~> Y =
+    c => mappable.map(c, _._2)
 
   implicit final class ArrowHelpers[X: SET, Y: SET](
     f: X ~> Y
   ):
-    @targetName("functional equality")
+    @targetName("arrow equality")
     def =!=(
       f2: X ~> Y
     ): Boolean =
       equalArrows(f, f2)
 
+    @targetName("arrow composition")
     final def o[V: SET](
       f2: V ~> X
     ): V ~> Y =
       f compose f2
+
+    @targetName("arrow multiplication")
+    final def x[Z: SET](
+     f2: X ~> Z
+    ): X ~> (Y, Z) =
+      cx => productMagic[Y, Z](
+        f(cx), f2(cx)
+      )
+
+    final def sanityTest: Unit =
+      Topos.this.sanityTest[X, Y](f)
 
 object Topos:
   def apply[

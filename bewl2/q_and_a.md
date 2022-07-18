@@ -26,3 +26,6 @@ SetOps[A, Set, Set[A]] shows the way... persevere with this;
     def map[B](f: A => B): CTXT[B]
   }
 but it's no good. Need a typeclass.
+
+# Dot classes
+A monad in the case of Set. Also MonoidAction[M, _] ? Not really.

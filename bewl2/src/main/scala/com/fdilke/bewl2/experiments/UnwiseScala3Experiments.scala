@@ -11,5 +11,16 @@ object UnwiseScala3Experiments {
   ]: Int =
     2
 
+  //    monad.eta
+  //    val f: X => CTXT[X] =
+  //      x => monad.eta(x)
+  //    val g: X ~> X = f
+  //    g
+
+  // initial abortive experiments with type lambdas
+  //  type M = [X, Y] =>> Map[Y, X]
+  //  ({ type λ[T] = triadicMonoid.Action[T] })#λ
+  //  type FTYPE = [H, X] =>> ( type { H[Y <: H[Y]] })#Y
+  //  H[X <: H[X]]
 
 }

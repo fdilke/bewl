@@ -17,5 +17,8 @@ object Mappable {
     ):B =
       f(a)
   }
+  
+  def apply[C[_]: Mappable]: Mappable[C] =
+    implicitly
 }
 

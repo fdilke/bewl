@@ -1,6 +1,6 @@
 package com.fdilke.bewl
 
-import com.fdilke.bewl2.{Monad, Topos}
+import com.fdilke.bewl2.Topos
 import munit.FunSuite
 
 abstract class GenericToposTests[
@@ -16,7 +16,10 @@ abstract class GenericToposTests[
   implicit val dotFoo: SET[FOO]
   type BAR
   implicit val dotBar: SET[BAR]
+  type BAZ
+  implicit val dotBaz: SET[BAZ]
   val foo2bar: FOO ~> BAR
+  val foo2baz: FOO ~> BAZ
 
 //  import ToposHelpers._
 
@@ -40,35 +43,22 @@ abstract class GenericToposTests[
   }
 
   test("biproduct diagrams work") {
-//    bar.x(baz).sanityTest
-//    (bar.x(baz)) should have(
-//      left(bar),
-//      right(baz)
-//    )
-//    val productArrow = foo2bar.x(foo2baz)
-//
-//    productArrow.sanityTest
-//    productArrow should have(
-//      source(foo),
-//      target(bar.x(baz)),
-//      sanityTest(null)
-//    )
-//
-//    bar.x(baz).π0.sanityTest
-//    bar.x(baz).π1.sanityTest
-//
-//    foo(bar) { x =>
-//      productArrow(x)._1
-//    } shouldBe foo2bar
-//
-//    foo(baz) { x =>
-//      productArrow(x)._2
-//    } shouldBe foo2baz
-//
-//    val fooXbar: BIPRODUCT[FOO, BAR] =
-//      foo.x(bar)
-//    fooXbar(fooXbar) {
-//      ⊕.tupled(fooXbar.pair)
-//    } shouldBe fooXbar.identity
+    sanityTest[(BAR, BAZ)]
+    val productArrow: FOO ~> (BAR, BAZ) = foo2bar x foo2baz
+    productArrow.sanityTest
+
+    val pig: FOO ~> BAR = π0[BAR, BAZ] o productArrow
+    val hog: FOO ~> BAZ = π1[BAR, BAZ] o productArrow
+
+    assert(
+      (π0[BAR, BAZ] o productArrow)  =!= foo2bar
+    )
+    assert(
+      (π1[BAR, BAZ] o productArrow) =!= foo2baz
+    )
+    val recombine: (BAR, BAZ) ~> (BAR, BAZ) =
+      π0[BAR, BAZ] x π1[BAR, BAZ]
+    assert(
+      recombine =!= id[(BAR, BAZ)]
+    )
   }
-// TODO: fix

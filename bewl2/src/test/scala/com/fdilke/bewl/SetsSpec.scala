@@ -16,9 +16,18 @@ class SetsSpec extends GenericToposTests()(Sets):
   override implicit val dotBar: Set[Boolean] =
     Set(true, false)
 
+  override type BAZ = Int
+  override implicit val dotBaz: Set[Int] =
+    Set(0, 1, 2, 3, 4, 5)
+
   override val foo2bar: String ~> Boolean =
     arrow[String, Boolean] { (x: String) =>
       true
+    }
+
+  override val foo2baz: String ~> Int =
+    arrow[String, Int] { (x: String) =>
+      x.length
     }
 
 
