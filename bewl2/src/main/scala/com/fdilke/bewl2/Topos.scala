@@ -19,7 +19,7 @@ trait BaseTopos[
     f2: X ~> Y
   ): Boolean
 
-  implicit def productObject[
+  def uncachedProductObject[
     X: SET,
     Y: SET
   ]: SET[(X, Y)]
@@ -53,6 +53,14 @@ trait Topos[
 
   final def π1[X, Y]: (X, Y) ~> Y =
     c => mappable.map(c, _._2)
+
+  implicit def productObject[
+      X: SET,
+      Y: SET
+  ]: SET[(X, Y)] = {
+    uncachedProductObject[X, Y]
+//    ??? // add caching!
+  }
 
   implicit final class ArrowHelpers[X: SET, Y: SET](
     f: X ~> Y

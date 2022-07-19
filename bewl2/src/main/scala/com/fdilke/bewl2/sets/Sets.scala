@@ -13,7 +13,7 @@ implicit object Sets extends Topos[Set, [A] =>> A]:
       f1(x) == f2(x)
     }
 
-  override implicit def productObject[
+  override def uncachedProductObject[
     X: Set,
     Y: Set
   ]: Set[(X, Y)] =
