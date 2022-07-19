@@ -15,3 +15,5 @@ lazy val root = project
         "org.typelevel" % "cats-core_3" % "2.7.0"
     )
   )
+
+testFrameworks += new TestFramework("munit.Framework")

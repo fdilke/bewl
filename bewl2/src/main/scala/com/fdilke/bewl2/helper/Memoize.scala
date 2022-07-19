@@ -19,10 +19,23 @@ object Memoize {
     OUT[_, _]
   ](
     fn: [X, Y] => IN[X, Y] => OUT[X, Y]
-  ): [X, Y] => IN[X, Y] => OUT[X, Y] =
+  ): [X, Y] => IN[X, Y] => OUT[X, Y] = {
+    def erasedFn(
+      in: IN[Nothing, Nothing]
+    ): OUT[Nothing, Nothing] =
+      fn[Nothing, Nothing](
+        in
+      )
+    val memoizedErased =
+      vanilla[
+        IN[Nothing, Nothing],
+        OUT[Nothing, Nothing]
+      ](erasedFn)
+
     [X, Y] =>
       (input: IN[X, Y]) =>
-        fn[X, Y](
-          input
-        )
+        memoizedErased(
+          input.asInstanceOf[IN[Nothing, Nothing]]
+        ).asInstanceOf[OUT[X, Y]]
+  }
 }

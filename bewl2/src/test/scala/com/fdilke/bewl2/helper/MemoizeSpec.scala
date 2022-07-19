@@ -3,44 +3,57 @@ package com.fdilke.bewl2.helper
 import munit.FunSuite
 import munit.Clue.generate
 
+import java.nio.file.{Files, Path}
 import java.util.concurrent.atomic.AtomicInteger
 
 class MemoizeSpec extends FunSuite:
 
-  private val callCount: AtomicInteger =
-    AtomicInteger(0)
+  class LocalScope {
+    val callCount: AtomicInteger =
+      AtomicInteger(0)
 
-  private def vanillaFn(text: String): Int =
-    callCount.incrementAndGet()
-    text.length
+    def vanillaFn(text: String): Int =
+      callCount.incrementAndGet()
+      text.length
 
-  private val memoizedVanilla: String => Int =
-    Memoize.vanilla(vanillaFn)
+    val memoizedVanilla: String => Int =
+      Memoize.vanilla(vanillaFn)
 
-  private def composite[X, Y](
-    setXsetY: (Set[X], Set[Y])
-  ): Set[X | Y] = {
-    val (setX, setY) = setXsetY
+    def composite[X, Y](
+      setXsetY: (Set[X], Set[Y])
+    ): Set[X | Y] =
+      callCount.incrementAndGet()
+      val (setX, setY) = setXsetY
 
-    setX map { x =>
-      x : (X | Y)
-    } union (
-      setY map { y =>
-        y : (X | Y)
-      }
-    )
-  }
+      setX map { x =>
+        x : (X | Y)
+      } union (
+        setY map { y =>
+          y : (X | Y)
+        }
+      )
 
-  private val memoizedComposite:
-    [X, Y] => ((Set[X], Set[Y])) => Set[X | Y]
+    val memoizedComposite:
+      [X, Y] => ((Set[X], Set[Y])) => Set[X | Y]
     = Memoize[
       [X, Y] =>> (Set[X], Set[Y]),
       [X, Y] =>> Set[X | Y]
     ](
       [X, Y] => (sets: (Set[X], Set[Y])) => composite[X, Y](sets)
     )
+  }
 
-  test("memoized vanilla function acts as pass through,is cached") {
+  private val fixture: FunFixture[LocalScope] =
+    FunFixture[LocalScope](
+      setup = { test =>
+        new LocalScope
+      },
+      teardown = { scope => () }
+    )
+
+  fixture.test("memoized vanilla function acts as pass through,is cached") { scope =>
+    import scope._
+
     assertEquals(
       callCount.get(),
       0
@@ -63,7 +76,9 @@ class MemoizeSpec extends FunSuite:
     )
   }
 
-  test("memoized function with 2 type args acts as pass through") {
+  fixture.test("memoized function with 2 type args acts as pass through") { scope =>
+    import scope._
+
     val input =
       Set(1,2,3) -> Set("hello", "goodbye")
     val output =
@@ -71,16 +86,28 @@ class MemoizeSpec extends FunSuite:
         1, 2, 3, "hello", "goodbye"
       )
     assertEquals(
+      callCount.get(),
+      0
+    )
+    assertEquals(
       memoizedComposite[Int, String](
         input
       ),
-      composite[Int, String](
+      output
+    )
+    assertEquals(
+      callCount.get(),
+      1
+    )
+    assertEquals(
+      memoizedComposite[Int, String](
         input
-      )
+      ),
+      output
+    )
+    assertEquals(
+      callCount.get(),
+      1
     )
   }
 
-//  test("can conveniently cache some composite operation") {
-//    assert(
-//
-//    }
