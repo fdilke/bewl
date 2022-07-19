@@ -39,6 +39,17 @@ also anon context parameters:
 # upgrade implicits
   as described here: https://dotty.epfl.ch/docs/reference/contextual/relationship-implicits.html
   
+# eq
+  to apply this to types DOT[...], I had to cast them to Object ; and then presumably
+  Scala tests whether they have the same address
+
 # Polymorphic function types e.g.
   [A] => List[A] => List[A]
   https://dotty.epfl.ch/docs/reference/new-types/polymorphic-function-types.html
+  
+Seems helpful, and maybe an optimization, to add "UNIT" to the laundry list of
+type arguments to a topos. Could argue for → (the exponent type) similarly.
+What about VOID, and the zero stuff generally, which we can infer?
+Maybe better to do this as an exercise and make sure it's isomorphic to the built-in?
+also add it as a fallback and calculate the from-scratch version anyway, AND have a 
+mechanism where these can be separated.
