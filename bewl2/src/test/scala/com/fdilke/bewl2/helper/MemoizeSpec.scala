@@ -5,7 +5,7 @@ import munit.Clue.generate
 
 class MemoizeSpec extends FunSuite:
 
-  private def composite[X, Y](
+  def composite[X, Y](
     setXsetY: (Set[X], Set[Y])
   ): Set[X | Y] = {
     val (setX, setY) = setXsetY
@@ -20,20 +20,12 @@ class MemoizeSpec extends FunSuite:
   }
 
   private val memoizedFunction:
-    Memoizable2[
+    [X, Y] => ((Set[X], Set[Y])) => Set[X | Y]
+    = Memoize[
       [X, Y] =>> (Set[X], Set[Y]),
       [X, Y] =>> Set[X | Y]
-    ] =
-    Memoize(
-      new Memoizable2[
-        [X, Y] =>> (Set[X], Set[Y]),
-        [X, Y] =>> Set[X | Y]
-      ] {
-        def apply[X, Y](
-          input: (Set[X], Set[Y])
-        ): Set[X | Y] =
-          composite[X, Y](input)
-      }
+    ](
+      [X, Y] => (sets: (Set[X], Set[Y])) => composite[X, Y](sets)
     )
 
   test("memoized function acts as pass through") {

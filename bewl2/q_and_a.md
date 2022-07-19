@@ -35,4 +35,10 @@ A monad in the case of Set. Also MonoidAction[M, _] ? Not really.
 also anon context parameters:
   def maximum[T](xs: List[T])(using Ord[T]): T =
     xs.reduceLeft(max)
+
+# upgrade implicits
+  as described here: https://dotty.epfl.ch/docs/reference/contextual/relationship-implicits.html
   
+# Polymorphic function types e.g.
+  [A] => List[A] => List[A]
+  https://dotty.epfl.ch/docs/reference/new-types/polymorphic-function-types.html
