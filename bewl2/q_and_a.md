@@ -29,3 +29,10 @@ but it's no good. Need a typeclass.
 
 # Dot classes
 A monad in the case of Set. Also MonoidAction[M, _] ? Not really.
+
+# should try this:
+  extension (x: C) def pair(y: C) = (x, y)
+also anon context parameters:
+  def maximum[T](xs: List[T])(using Ord[T]): T =
+    xs.reduceLeft(max)
+  

@@ -10,23 +10,50 @@ class MemoizeSpec extends FunSuite:
   ): Set[X | Y] = {
     val (setX, setY) = setXsetY
 
-    (setX map { x => x : (X | Y) } ) union (
-      setY map { y => y : (X | Y) }
+    setX map { x =>
+      x : (X | Y)
+    } union (
+      setY map { y =>
+        y : (X | Y)
+      }
     )
   }
 
-//  private val memoizedFunction =
-//    Memoized
+  private val memoizedFunction:
+    Memoizable2[
+      [X, Y] =>> (Set[X], Set[Y]),
+      [X, Y] =>> Set[X | Y]
+    ] =
+    Memoize(
+      new Memoizable2[
+        [X, Y] =>> (Set[X], Set[Y]),
+        [X, Y] =>> Set[X | Y]
+      ] {
+        def apply[X, Y](
+          input: (Set[X], Set[Y])
+        ): Set[X | Y] =
+          composite[X, Y](input)
+      }
+    )
 
-  test("sanity of the test") {
-    assertEquals(
-      composite[Int, String](
-        Set(1,2,3),
-        Set("hello", "goodbye")
-      ),
+  test("memoized function acts as pass through") {
+    val input =
+      Set(1,2,3) -> Set("hello", "goodbye")
+    val output =
       Set[Int | String](
         1, 2, 3, "hello", "goodbye"
       )
+    assertEquals(
+      composite[Int, String](
+        input
+      ),
+      output
+    )
+    assertEquals(
+      memoizedFunction[Int, String](
+        input
+      ),
+      output
     )
   }
 
