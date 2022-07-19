@@ -2,6 +2,7 @@ package com.fdilke.bewl2
 
 import scala.annotation.targetName
 import com.fdilke.bewl2.Mappable
+import com.fdilke.bewl2.helper.Memoize
 
 trait BaseTopos[
   SET[_],
@@ -42,10 +43,10 @@ trait Topos[
   ): X ~> Y =
     f
 
-  final def dot[X: SET]: SET[X] =
+  final inline def dot[X: SET]: SET[X] =
     implicitly[SET[X]]
 
-  final def id[X: SET]: X ~> X =
+  final inline def id[X: SET]: X ~> X =
     identity[CTXT[X]]
 
   final def π0[X, Y]: (X, Y) ~> X =
@@ -53,6 +54,9 @@ trait Topos[
 
   final def π1[X, Y]: (X, Y) ~> Y =
     c => mappable.map(c, _._2)
+
+//  private val memoizedProduct =
+//    Memoize.generic[X, Y](uncachedProductObject)
 
   implicit def productObject[
       X: SET,
