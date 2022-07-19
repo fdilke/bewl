@@ -12,6 +12,12 @@ class MemoizeSpec extends FunSuite:
     val callCount: AtomicInteger =
       AtomicInteger(0)
 
+    def callCountIs(expected: Int): Unit =
+      assertEquals(
+        callCount.get(),
+        expected
+      )
+
     def vanillaFn(text: String): Int =
       callCount.incrementAndGet()
       text.length
@@ -28,18 +34,18 @@ class MemoizeSpec extends FunSuite:
       setX map { x =>
         x : (X | Y)
       } union (
-        setY map { y =>
+      setY map { y =>
           y : (X | Y)
         }
-      )
+    )
 
     val memoizedComposite:
-      [X, Y] => ((Set[X], Set[Y])) => Set[X | Y]
-    = Memoize[
-      [X, Y] =>> (Set[X], Set[Y]),
-      [X, Y] =>> Set[X | Y]
+        [X, Y] => ((Set[X], Set[Y])) => Set[X | Y]
+      = Memoize[
+        [X, Y] =>> (Set[X], Set[Y]),
+        [X, Y] =>> Set[X | Y]
     ](
-      [X, Y] => (sets: (Set[X], Set[Y])) => composite[X, Y](sets)
+        [X, Y] => (sets: (Set[X], Set[Y])) => composite[X, Y](sets)
     )
   }
 
@@ -54,26 +60,17 @@ class MemoizeSpec extends FunSuite:
   fixture.test("memoized vanilla function acts as pass through,is cached") { scope =>
     import scope._
 
-    assertEquals(
-      callCount.get(),
-      0
-    )
-    assertEquals(
-      memoizedVanilla("hello"),
-      5
-    )
-    assertEquals(
-      callCount.get(),
-      1
-    )
-    assertEquals(
-      memoizedVanilla("hello"),
-      5
-    )
-    assertEquals(
-      callCount.get(),
-      1
-    )
+    def confirmVanilla =
+      assertEquals(
+        memoizedVanilla("hello"),
+        5
+      )
+
+    callCountIs(0)
+    confirmVanilla
+    callCountIs(1)
+    confirmVanilla
+    callCountIs(1)
   }
 
   fixture.test("memoized function with 2 type args acts as pass through") { scope =>
@@ -85,29 +82,19 @@ class MemoizeSpec extends FunSuite:
       Set[Int | String](
         1, 2, 3, "hello", "goodbye"
       )
-    assertEquals(
-      callCount.get(),
-      0
-    )
-    assertEquals(
-      memoizedComposite[Int, String](
-        input
-      ),
-      output
-    )
-    assertEquals(
-      callCount.get(),
-      1
-    )
-    assertEquals(
-      memoizedComposite[Int, String](
-        input
-      ),
-      output
-    )
-    assertEquals(
-      callCount.get(),
-      1
-    )
+
+    def confirmComposite =
+      assertEquals(
+        memoizedComposite[Int, String](
+          input
+        ),
+        output
+      )
+
+    callCountIs(0)
+    confirmComposite
+    callCountIs(1)
+    confirmComposite
+    callCountIs(1)
   }
 
