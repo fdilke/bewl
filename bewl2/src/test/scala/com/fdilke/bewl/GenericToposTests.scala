@@ -3,6 +3,8 @@ package com.fdilke.bewl
 import com.fdilke.bewl2.Topos
 import munit.FunSuite
 
+import java.io.File
+
 abstract class GenericToposTests[
   DOT[_],
   CTXT[_],
@@ -73,3 +75,27 @@ abstract class GenericToposTests[
       (toUnit[BAR] o foo2bar) =!= fooTo1
     )
   }
+
+  test("caches products") {
+    val fooXbar1: DOT[(FOO, BAR)] = dot[(FOO, BAR)]
+    val fooXbar2: DOT[(FOO, BAR)] = dot[(FOO, BAR)]
+    assert(
+      (fooXbar1.asInstanceOf[Object]) eq (fooXbar2.asInstanceOf[Object])
+    )
+  }
+
+//  test("has a (derived) initial object") {
+//    O.sanityTest
+//    val fooFromO = foo.fromO
+//    fooFromO.sanityTest
+//    fooFromO.source shouldBe O
+//    fooFromO.target shouldBe foo
+//
+//    foo2bar.o(fooFromO) shouldBe bar.fromO
+//    O >> foo shouldBe Seq(fooFromO)
+//  }
+//
+//  test("consistently calculates arrows from the initial to the terminal") {
+//    O.toI shouldBe I.fromO
+//  }
+
