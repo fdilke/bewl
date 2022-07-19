@@ -2,6 +2,18 @@ package com.fdilke.bewl2.helper
 
 object Memoize {
 
+  def vanilla[A, B](
+    fn: A => B
+  ): A => B = {
+    val resultMap =
+      scala.collection.mutable.Map[A, B]()
+
+    a => resultMap.getOrElseUpdate(
+          a,
+          fn(a)
+        )
+  }
+
   def apply[
     IN[_, _],
     OUT[_, _]
