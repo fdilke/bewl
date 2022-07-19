@@ -4,20 +4,21 @@ import com.fdilke.bewl2.Topos
 import munit.FunSuite
 
 abstract class GenericToposTests[
-  SET[_],
-  CTXT[_]
+  DOT[_],
+  CTXT[_],
+  UNIT
 ](implicit
- val topos: Topos[SET, CTXT]
+ val topos: Topos[DOT, CTXT, UNIT]
 ) extends FunSuite:
 
   import topos._
 
   type FOO
-  implicit val dotFoo: SET[FOO]
+  implicit val dotFoo: DOT[FOO]
   type BAR
-  implicit val dotBar: SET[BAR]
+  implicit val dotBar: DOT[BAR]
   type BAZ
-  implicit val dotBaz: SET[BAZ]
+  implicit val dotBaz: DOT[BAZ]
   val foo2bar: FOO ~> BAR
   val foo2baz: FOO ~> BAZ
 
@@ -47,8 +48,8 @@ abstract class GenericToposTests[
     val productArrow: FOO ~> (BAR, BAZ) = foo2bar x foo2baz
     productArrow.sanityTest
 
-    val pig: FOO ~> BAR = π0[BAR, BAZ] o productArrow
-    val hog: FOO ~> BAZ = π1[BAR, BAZ] o productArrow
+    π0[BAR, BAZ].sanityTest
+    π1[BAR, BAZ].sanityTest
 
     assert(
       (π0[BAR, BAZ] o productArrow)  =!= foo2bar
@@ -60,5 +61,15 @@ abstract class GenericToposTests[
       π0[BAR, BAZ] x π1[BAR, BAZ]
     assert(
       recombine =!= id[(BAR, BAZ)]
+    )
+  }
+
+  test("the unit object behaves") {
+    sanityTest[UNIT]
+    val fooTo1: FOO ~> UNIT = toUnit[FOO]
+    fooTo1.sanityTest
+
+    assert(
+      (toUnit[BAR] o foo2bar) =!= fooTo1
     )
   }

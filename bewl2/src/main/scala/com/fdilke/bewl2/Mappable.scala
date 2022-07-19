@@ -18,7 +18,7 @@ object Mappable {
       f(a)
   }
   
-  def apply[C[_]: Mappable]: Mappable[C] =
+  inline def apply[C[_]: Mappable]: Mappable[C] =
     implicitly
 }
 

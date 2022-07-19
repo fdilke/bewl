@@ -5,48 +5,52 @@ import com.fdilke.bewl2.Mappable
 import com.fdilke.bewl2.helper.Memoize
 
 trait BaseTopos[
-  SET[_],
-  CTXT[_] : Mappable
+  DOT[_],
+  CTXT[_] : Mappable,
+  UNIT
 ]:
-
   val mappable: Mappable[CTXT] =
     Mappable[CTXT]
 
   @targetName("topos arrow")
   type ~>[X, Y] = CTXT[X] => CTXT[Y]
 
-  def equalArrows[X: SET, Y: SET](
+  def equalArrows[X: DOT, Y: DOT](
     f1: X ~> Y,
     f2: X ~> Y
   ): Boolean
 
   def uncachedProductObject[
-    X: SET,
-    Y: SET
-  ]: SET[(X, Y)]
+    X: DOT,
+    Y: DOT
+  ]: DOT[(X, Y)]
 
-  def productMagic[A: SET, B: SET](
+  def productMagic[A: DOT, B: DOT](
     ca: CTXT[A],
     cb: CTXT[B]
   ): CTXT[(A, B)]
 
-  def sanityTest[X: SET]: Unit
-  def sanityTest[X: SET, Y: SET](f: X ~> Y): Unit
+  def sanityTest[X: DOT]: Unit
+  def sanityTest[X: DOT, Y: DOT](f: X ~> Y): Unit
+
+  implicit val unitDot: DOT[UNIT]
+  def toUnit[X: DOT]: X ~> UNIT
 
 trait Topos[
-  SET[_],
-  CTXT[_]: Mappable
-] extends BaseTopos[SET, CTXT]:
+  DOT[_],
+  CTXT[_]: Mappable,
+  UNIT
+] extends BaseTopos[DOT, CTXT, UNIT]:
 
-  final inline def arrow[X: SET, Y: SET]( // necessary?
+  final inline def arrow[X: DOT, Y: DOT]( // necessary?
     f: CTXT[X] => CTXT[Y]
   ): X ~> Y =
     f
 
-  final inline def dot[X: SET]: SET[X] =
-    implicitly[SET[X]]
+  final inline def dot[X: DOT]: DOT[X] =
+    implicitly[DOT[X]]
 
-  final inline def id[X: SET]: X ~> X =
+  final inline def id[X: DOT]: X ~> X =
     identity[CTXT[X]]
 
   final def π0[X, Y]: (X, Y) ~> X =
@@ -55,18 +59,29 @@ trait Topos[
   final def π1[X, Y]: (X, Y) ~> Y =
     c => mappable.map(c, _._2)
 
-//  private val memoizedProduct =
-//    Memoize.generic[X, Y](uncachedProductObject)
+  private val memoizedProduct:
+    [X, Y] => ((DOT[X], DOT[Y])) => DOT[(X, Y)]
+  = Memoize[
+      [X, Y] =>> (DOT[X], DOT[Y]),
+      [X, Y] =>> DOT[(X, Y)]
+    ](
+      [X, Y] => (DOTs: (DOT[X], DOT[Y])) => {
+        implicit val DOTX: DOT[X] = DOTs._1
+        implicit val DOTY: DOT[Y] = DOTs._2
+        uncachedProductObject[X, Y]
+      }
+    )
 
   implicit def productObject[
-      X: SET,
-      Y: SET
-  ]: SET[(X, Y)] = {
-    uncachedProductObject[X, Y]
-//    ??? // add caching!
-  }
+      X: DOT,
+      Y: DOT
+  ]: DOT[(X, Y)] =
+    memoizedProduct[X, Y](
+      dot[X],
+      dot[Y]
+    )
 
-  implicit final class ArrowHelpers[X: SET, Y: SET](
+  implicit final class ArrowHelpers[X: DOT, Y: DOT](
     f: X ~> Y
   ):
     @targetName("arrow equality")
@@ -76,13 +91,13 @@ trait Topos[
       equalArrows(f, f2)
 
     @targetName("arrow composition")
-    final def o[V: SET](
+    final def o[V: DOT](
       f2: V ~> X
     ): V ~> Y =
       f compose f2
 
     @targetName("arrow multiplication")
-    final def x[Z: SET](
+    final def x[Z: DOT](
      f2: X ~> Z
     ): X ~> (Y, Z) =
       cx => productMagic[Y, Z](
@@ -94,9 +109,10 @@ trait Topos[
 
 object Topos:
   def apply[
-    SET[_],
-    CTXT[A]: Mappable
+    DOT[_],
+    CTXT[A]: Mappable,
+    UNIT : DOT
   ](
-   implicit topos: Topos[SET, CTXT]
-  ): Topos[SET, CTXT] =
+   implicit topos: Topos[DOT, CTXT, UNIT]
+  ): Topos[DOT, CTXT, UNIT] =
     topos

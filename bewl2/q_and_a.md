@@ -14,21 +14,21 @@ initially thought this would have to be a monad, or support map,
 but all we need is:
 
 - support for arrows C[X] -> C[Y]
-- support for biproducts, so given X and Y for which there's SET[_],
-  we can generate a 'product kit' consisting of SET[(X, Y)],
+- support for biproducts, so given X and Y for which there's DOT[_],
+  we can generate a 'product kit' consisting of DOT[(X, Y)],
   C[(X, Y)] -> C[X] and C[Y], plus the ability to multiply arrows
 - maybe require C[_] to have Map... so there's IdentityWithMap?
 
 # type convolutions:
 how do we constrain a type CTXT so that a CTXT[A] always has def map[B](f: A => B): CTXT[B] ?
-SetOps[A, Set, Set[A]] shows the way... persevere with this;
+DOTOps[A, DOT, DOT[A]] shows the way... persevere with this;
   trait Mappable[A, CTXT[_] /* <: Mappable[A, CTXT]] */ ] { self: CTXT[A] =>
     def map[B](f: A => B): CTXT[B]
   }
 but it's no good. Need a typeclass.
 
 # Dot classes
-A monad in the case of Set. Also MonoidAction[M, _] ? Not really.
+A monad in the case of DOT. Also MonoidAction[M, _] ? Not really.
 
 # should try this:
   extension (x: C) def pair(y: C) = (x, y)

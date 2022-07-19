@@ -2,8 +2,15 @@ package com.fdilke.bewl2.sets
 
 import com.fdilke.bewl2.Topos
 import com.fdilke.bewl2.Mappable
+//import UnitSet._
+//
+//object UnitSet {
+//  implicit val unitSet: Set[Unit] = Set(())
+//}
 
-implicit object Sets extends Topos[Set, [A] =>> A]:
+implicit object Sets extends Topos[
+  Set, [A] =>> A, Unit
+]:
 
   override def equalArrows[X: Set, Y: Set](
    f1: X => Y,
@@ -39,6 +46,9 @@ implicit object Sets extends Topos[Set, [A] =>> A]:
         throw new IllegalArgumentException("target outside range")
     }
 
+  override implicit val unitDot: Set[Unit] = Set(())
+
+  def toUnit[X: Set]: X ~> Unit = { _ => () }
 
   
 
