@@ -7,6 +7,7 @@ import com.fdilke.bewl2.helper.Memoize
 trait BaseTopos[
   DOT[_],
   CTXT[_] : Mappable,
+  VOID,
   UNIT
 ]:
   val mappable: Mappable[CTXT] =
@@ -34,13 +35,16 @@ trait BaseTopos[
   def sanityTest[X: DOT, Y: DOT](f: X ~> Y): Unit
 
   implicit val unitDot: DOT[UNIT]
+  implicit val zeroDot: DOT[VOID]
   def toUnit[X: DOT]: X ~> UNIT
+  def fromZero[X: DOT]: VOID ~> X
 
 trait Topos[
   DOT[_],
   CTXT[_]: Mappable,
+  VOID,
   UNIT
-] extends BaseTopos[DOT, CTXT, UNIT]:
+] extends BaseTopos[DOT, CTXT, VOID, UNIT]:
 
   final inline def arrow[X: DOT, Y: DOT]( // necessary?
     f: CTXT[X] => CTXT[Y]
@@ -108,11 +112,12 @@ trait Topos[
       Topos.this.sanityTest[X, Y](f)
 
 object Topos:
-  def apply[
+  inline def apply[
     DOT[_],
     CTXT[A]: Mappable,
-    UNIT : DOT
+    VOID,
+    UNIT
   ](
-   implicit topos: Topos[DOT, CTXT, UNIT]
-  ): Topos[DOT, CTXT, UNIT] =
+   implicit topos: Topos[DOT, CTXT, VOID, UNIT]
+  ): Topos[DOT, CTXT, VOID, UNIT] =
     topos

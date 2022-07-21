@@ -8,9 +8,10 @@ import java.io.File
 abstract class GenericToposTests[
   DOT[_],
   CTXT[_],
+  VOID,
   UNIT
 ](implicit
- val topos: Topos[DOT, CTXT, UNIT]
+ val topos: Topos[DOT, CTXT, VOID, UNIT]
 ) extends FunSuite:
 
   import topos._
@@ -66,6 +67,14 @@ abstract class GenericToposTests[
     )
   }
 
+  test("caches products") {
+    val fooXbar1: DOT[(FOO, BAR)] = dot[(FOO, BAR)]
+    val fooXbar2: DOT[(FOO, BAR)] = dot[(FOO, BAR)]
+    assert(
+      (fooXbar1.asInstanceOf[Object]) eq (fooXbar2.asInstanceOf[Object])
+    )
+  }
+
   test("the unit object behaves") {
     sanityTest[UNIT]
     val fooTo1: FOO ~> UNIT = toUnit[FOO]
@@ -76,11 +85,13 @@ abstract class GenericToposTests[
     )
   }
 
-  test("caches products") {
-    val fooXbar1: DOT[(FOO, BAR)] = dot[(FOO, BAR)]
-    val fooXbar2: DOT[(FOO, BAR)] = dot[(FOO, BAR)]
+  test("the zero object behaves") {
+    sanityTest[VOID]
+    val barFrom0: VOID ~> BAR = fromZero[BAR]
+    barFrom0.sanityTest
+
     assert(
-      (fooXbar1.asInstanceOf[Object]) eq (fooXbar2.asInstanceOf[Object])
+      (foo2bar o fromZero[FOO]) =!= barFrom0
     )
   }
 

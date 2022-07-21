@@ -2,14 +2,9 @@ package com.fdilke.bewl2.sets
 
 import com.fdilke.bewl2.Topos
 import com.fdilke.bewl2.Mappable
-//import UnitSet._
-//
-//object UnitSet {
-//  implicit val unitSet: Set[Unit] = Set(())
-//}
 
 implicit object Sets extends Topos[
-  Set, [A] =>> A, Unit
+  Set, [A] =>> A, Void, Unit
 ]:
 
   override def equalArrows[X: Set, Y: Set](
@@ -47,7 +42,9 @@ implicit object Sets extends Topos[
     }
 
   override implicit val unitDot: Set[Unit] = Set(())
+  override implicit val zeroDot: Set[Void] = Set.empty
 
+  def fromZero[X: Set]: Void ~> X = { _ => throw new IllegalArgumentException("Encountered a VOID") }
   def toUnit[X: Set]: X ~> Unit = { _ => () }
 
   
