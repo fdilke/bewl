@@ -8,7 +8,8 @@ trait BaseTopos[
   DOT[_],
   CTXT[_] : Mappable,
   VOID,
-  UNIT
+  UNIT,
+  →[_, _]
 ]:
   val mappable: Mappable[CTXT] =
     Mappable[CTXT]
@@ -26,6 +27,11 @@ trait BaseTopos[
     Y: DOT
   ]: DOT[(X, Y)]
 
+  def uncachedExponentialObject[
+    X: DOT,
+    Y: DOT
+  ]: DOT[X → Y]
+
   def productMagic[A: DOT, B: DOT](
     ca: CTXT[A],
     cb: CTXT[B]
@@ -39,12 +45,18 @@ trait BaseTopos[
   def toUnit[X: DOT]: X ~> UNIT
   def fromZero[X: DOT]: VOID ~> X
 
+  def evaluation[X: DOT, Y: DOT]: (X → Y, X) ~> Y
+  def transpose[X: DOT, Y: DOT, Z: DOT](
+    xy2z: (X, Y) ~> Z
+  ): X ~> (Y → Z)
+
 trait Topos[
   DOT[_],
   CTXT[_]: Mappable,
   VOID,
-  UNIT
-] extends BaseTopos[DOT, CTXT, VOID, UNIT]:
+  UNIT,
+  →[_, _]
+] extends BaseTopos[DOT, CTXT, VOID, UNIT, →]:
 
   final inline def arrow[X: DOT, Y: DOT]( // necessary?
     f: CTXT[X] => CTXT[Y]
@@ -69,9 +81,9 @@ trait Topos[
       [X, Y] =>> (DOT[X], DOT[Y]),
       [X, Y] =>> DOT[(X, Y)]
     ](
-      [X, Y] => (DOTs: (DOT[X], DOT[Y])) => {
-        implicit val DOTX: DOT[X] = DOTs._1
-        implicit val DOTY: DOT[Y] = DOTs._2
+      [X, Y] => (dots: (DOT[X], DOT[Y])) => {
+        implicit val dotX: DOT[X] = dots._1
+        implicit val dotY: DOT[Y] = dots._2
         uncachedProductObject[X, Y]
       }
     )
@@ -81,6 +93,28 @@ trait Topos[
       Y: DOT
   ]: DOT[(X, Y)] =
     memoizedProduct[X, Y](
+      dot[X],
+      dot[Y]
+    )
+
+  private val memoizedExponential:
+    [X, Y] => ((DOT[X], DOT[Y])) => DOT[X → Y]
+  = Memoize[
+      [X, Y] =>> (DOT[X], DOT[Y]),
+      [X, Y] =>> DOT[X → Y]
+    ](
+      [X, Y] => (dots: (DOT[X], DOT[Y])) => {
+        implicit val dotX: DOT[X] = dots._1
+        implicit val dotY: DOT[Y] = dots._2
+        uncachedExponentialObject[X, Y]
+      }
+    )
+
+  implicit def exponentialObject[
+      X: DOT,
+      Y: DOT
+  ]: DOT[X → Y] =
+    memoizedExponential[X, Y](
       dot[X],
       dot[Y]
     )
@@ -116,8 +150,9 @@ object Topos:
     DOT[_],
     CTXT[A]: Mappable,
     VOID,
-    UNIT
+    UNIT,
+    →[_, _]
   ](
-   implicit topos: Topos[DOT, CTXT, VOID, UNIT]
-  ): Topos[DOT, CTXT, VOID, UNIT] =
+   implicit topos: Topos[DOT, CTXT, VOID, UNIT, →]
+  ): Topos[DOT, CTXT, VOID, UNIT, →] =
     topos

@@ -1,4 +1,4 @@
-package com.fdilke.bewl
+package com.fdilke.bewl2.topos
 
 import com.fdilke.bewl2.Topos
 import munit.FunSuite
@@ -9,12 +9,13 @@ abstract class GenericToposTests[
   DOT[_],
   CTXT[_],
   VOID,
-  UNIT
+  UNIT,
+  →[_, _]
 ](implicit
- val topos: Topos[DOT, CTXT, VOID, UNIT]
+ val topos: Topos[DOT, CTXT, VOID, UNIT, →]
 ) extends FunSuite:
 
-  import topos._
+  import topos.*
 
   type FOO
   implicit val dotFoo: DOT[FOO]
@@ -24,6 +25,7 @@ abstract class GenericToposTests[
   implicit val dotBaz: DOT[BAZ]
   val foo2bar: FOO ~> BAR
   val foo2baz: FOO ~> BAZ
+  val foobar2baz: (FOO, BAR) ~> BAZ
 
 //  import ToposHelpers._
 
@@ -46,6 +48,7 @@ abstract class GenericToposTests[
     sanityTest[BAR]
     sanityTest[BAZ]
     sanityTest(foo2bar)
+    sanityTest(foobar2baz)
   }
 
   test("biproduct diagrams work") {
@@ -107,30 +110,26 @@ abstract class GenericToposTests[
     assert( toUnit[VOID] =!= fromZero[UNIT] )
   }
 
-//  test("can construct exponential diagrams") {
-//    // Check evaluation maps baz^bar x bar -> baz
-//    val exponential = bar > baz
-//    exponential.sanityTest
-//    val evaluation = exponential.evaluation
-//    evaluation.product.sanityTest
-//    evaluation.product.left shouldBe (bar > baz)
-//    evaluation.product.right shouldBe bar
-//    evaluation.arrow.sanityTest
-//    evaluation.arrow.target shouldBe baz
-//
-//    val foo2bar2baz: FOO > (BAR → BAZ) =
-//      (bar > baz).transpose(foobar2baz)
-//    foo2bar2baz.sanityTest
-//    foo2bar2baz should have(
-//      source(foo),
-//      target(bar > baz)
-//    )
-//
-//    implicit val anonImplicit = bar > baz
-//    foo.x(bar)(baz) {
-//      case f ⊕ b =>
-//        foo2bar2baz(f)(b)
-//    } shouldBe foobar2baz.arrow
-//  }
+  test("can construct exponential diagrams") {
+    sanityTest[BAR → BAZ]
+    val eval: (BAR → BAZ, BAR) ~> BAZ  =
+      evaluation[BAR, BAZ]
+    sanityTest(eval)
+    val foo2bar2baz: FOO ~> (BAR → BAZ) =
+      transpose(foobar2baz)
+    sanityTest(foo2bar2baz)
+
+    // reconstruct the arrow from its transpose:
+    // f(foo, bar) === eval(f*(foo), bar)
+    assert( foobar2baz =!=
+      arrow[(FOO, BAR), BAZ] { (cFooBar: CTXT[(FOO, BAR)]) =>
+        val cFoo: CTXT[FOO] = π0[FOO, BAR](cFooBar)
+        val cBar: CTXT[BAR] = π1[FOO, BAR](cFooBar)
+        val fnBarBaz: CTXT[BAR → BAZ] = foo2bar2baz(cFoo)
+        val cTuple = productMagic[BAR → BAZ, BAR](fnBarBaz, cBar)
+        eval(cTuple)
+      }
+    )
+  }
 
 
