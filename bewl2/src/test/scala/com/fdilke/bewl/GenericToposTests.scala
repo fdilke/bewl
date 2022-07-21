@@ -43,6 +43,8 @@ abstract class GenericToposTests[
 
   test("sane fixtures") {
     sanityTest[FOO]
+    sanityTest[BAR]
+    sanityTest[BAZ]
     sanityTest(foo2bar)
   }
 
@@ -65,6 +67,12 @@ abstract class GenericToposTests[
     assert(
       recombine =!= id[(BAR, BAZ)]
     )
+  }
+
+  test("distinguishes projection arrows") {
+    assert(!(
+      π0[FOO, FOO] =!= π1[FOO, FOO]
+    ))
   }
 
   test("caches products") {
@@ -95,6 +103,10 @@ abstract class GenericToposTests[
     )
   }
 
+  test("consistently calculates arrows from the initial to the terminal") {
+    assert( toUnit[VOID] =!= fromZero[UNIT] )
+  }
+
 //  test("can construct exponential diagrams") {
 //    // Check evaluation maps baz^bar x bar -> baz
 //    val exponential = bar > baz
@@ -121,18 +133,4 @@ abstract class GenericToposTests[
 //    } shouldBe foobar2baz.arrow
 //  }
 
-//  test("has a (derived) initial object") {
-//    O.sanityTest
-//    val fooFromO = foo.fromO
-//    fooFromO.sanityTest
-//    fooFromO.source shouldBe O
-//    fooFromO.target shouldBe foo
-//
-//    foo2bar.o(fooFromO) shouldBe bar.fromO
-//    O >> foo shouldBe Seq(fooFromO)
-//  }
-//
-//  test("consistently calculates arrows from the initial to the terminal") {
-//    O.toI shouldBe I.fromO
-//  }
 
