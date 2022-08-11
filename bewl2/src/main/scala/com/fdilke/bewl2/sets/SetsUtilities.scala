@@ -1,6 +1,6 @@
 package com.fdilke.bewl2.sets
 
-object SetsUtilities {
+object SetsUtilities:
   def allMaps[A, B](
      source: Set[A],
      target: Set[B]
@@ -14,4 +14,15 @@ object SetsUtilities {
       } yield {
         partialMap + (source.head -> choice)
       }
-}
+
+  trait VarArgFunc[-A, +B]:
+    def apply(is: A*): B
+
+  def allNaryOps(
+    arity: Int,
+    order: Int
+  ): Iterable[VarArgFunc[Int, Int]] =
+    Iterable(
+      // new VarArgFunc[Int, Int]
+      h => 0
+    )
