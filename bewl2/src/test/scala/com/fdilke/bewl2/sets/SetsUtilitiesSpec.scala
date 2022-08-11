@@ -38,9 +38,30 @@ class SetsUtilitiesSpec extends FunSuite:
 
   test("enumerates n-ary operations: degenerate case of binaries on 1") {
     assertEquals(
-      allNaryOps(2, 1) map { f =>
+      allNaryOps(arity = 2, order = 1) map { f =>
         f(0, 0)
       },
       Iterable(0)
+    )
+  }
+
+  test("enumerates n-ary operations: degenerate case of unaries on 2") {
+    assertEquals(
+      allNaryOps(arity = 1, order = 2) map { f =>
+        f(0) -> f(1)
+      },
+      Iterable(
+        0 -> 0,
+        1 -> 0,
+        0 -> 1,
+        1 -> 1
+      )
+    )
+  }
+
+  test("enumerates n-ary operations: even more degenerate case of nullaries on 0") {
+    assertEquals(
+      allNaryOps(arity = 0, order = 0),
+      Iterable.empty
     )
   }
