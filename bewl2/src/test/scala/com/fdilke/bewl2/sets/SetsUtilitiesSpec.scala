@@ -10,7 +10,7 @@ class SetsUtilitiesSpec extends FunSuite:
           allMaps(Set(1, 2), Set("a", "b", "c")).map { f =>
               Seq(f(1), f(2))
           },
-          Set(
+          Iterable(
              Seq("a", "a"),
              Seq("b", "a"),
              Seq("c", "a"),

@@ -4,9 +4,9 @@ object SetsUtilities {
   def allMaps[A, B](
      source: Set[A],
      target: Set[B]
-  ): Set[Map[A, B]] =
+  ): Iterable[Map[A, B]] =
     if (source.isEmpty)
-      Set(Map.empty)
+      Iterable(Map.empty)
     else
       for {
         partialMap <- allMaps(source.tail, target)

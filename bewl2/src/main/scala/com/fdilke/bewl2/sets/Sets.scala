@@ -35,7 +35,7 @@ implicit object Sets extends Topos[
     X: Set,
     Y: Set
   ]: Set[X Map Y] =
-    allMaps(dot[X], dot[Y])
+    allMaps(dot[X], dot[Y]).toSet
 
   override def sanityTest[X: Set]: Unit = ()
   
