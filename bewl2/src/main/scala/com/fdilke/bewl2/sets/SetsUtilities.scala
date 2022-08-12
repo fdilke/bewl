@@ -1,5 +1,7 @@
 package com.fdilke.bewl2.sets
 
+import scala.language.postfixOps
+
 object SetsUtilities:
   def allMaps[A, B](
      source: Iterable[A],
