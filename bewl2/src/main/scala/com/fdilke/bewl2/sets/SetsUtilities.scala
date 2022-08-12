@@ -24,13 +24,17 @@ object SetsUtilities:
   ): Iterable[VarArgFunc[Int, Int]] = {
     val toOrder: Seq[Int] = (0 until order)
     val toArity: Seq[Int] = (0 until arity)
-    val source: Iterable[Map[Int, Int]] =
-      allMaps(toArity, toOrder)
-    allMaps(source, toOrder) map { (m: Map[Int, Int] => Int) =>
+    allMaps(
+      allMaps(toArity, toOrder),
+      toOrder
+    ) map { (m: Map[Int, Int] => Int) =>
       (a: Seq[Int]) =>
-        val x: Map[Int, Int] = Map(
-          toArity map { i => i -> a(i) } :_*
+        m(
+          Map(
+            toArity map { i =>
+              i -> a(i)
+            } :_*
+          )
         )
-        m(x)
     }
   }

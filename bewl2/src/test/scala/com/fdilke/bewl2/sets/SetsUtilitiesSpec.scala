@@ -1,8 +1,10 @@
 package com.fdilke.bewl2.sets;
 
 import junit.framework.TestCase
-import munit.FunSuite;
-import SetsUtilities._
+import munit.FunSuite
+import SetsUtilities.*
+
+import scala.language.postfixOps
 
 class SetsUtilitiesSpec extends FunSuite:
   test("enumerates all maps between two sets") {
@@ -63,5 +65,17 @@ class SetsUtilitiesSpec extends FunSuite:
     assertEquals(
       allNaryOps(arity = 0, order = 0),
       Iterable.empty
+    )
+  }
+
+  test("enumerates n-ary operations: case of binaries on 2") {
+    assertEquals(
+      allNaryOps(arity = 2, order = 2) map { f =>
+        s"${f(0,0)}${f(0,1)}${f(1,0)}${f(1,1)}"
+      } toSet,
+      Set(
+        "0000", "0001", "0010", "0011", "0100", "0101", "0110", "0111",
+        "1000", "1001", "1010", "1011", "1100", "1101", "1110", "1111"
+      )
     )
   }
