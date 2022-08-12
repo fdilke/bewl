@@ -18,23 +18,27 @@ object SetsUtilities:
   trait VarArgFunc[-A, +B]:
     def apply(is: A*): B
 
+  private def seqToMap[T](
+    a: Seq[T]
+  ): Map[Int, T] =
+    Map(
+      a.indices map { i =>
+        i -> a(i)
+      } :_*
+    )
+
   def allNaryOps(
     arity: Int,
     order: Int
   ): Iterable[VarArgFunc[Int, Int]] = {
     val toOrder: Seq[Int] = (0 until order)
     val toArity: Seq[Int] = (0 until arity)
+
     allMaps(
       allMaps(toArity, toOrder),
       toOrder
     ) map { (m: Map[Int, Int] => Int) =>
       (a: Seq[Int]) =>
-        m(
-          Map(
-            toArity map { i =>
-              i -> a(i)
-            } :_*
-          )
-        )
+        m(seqToMap(a))
     }
   }
