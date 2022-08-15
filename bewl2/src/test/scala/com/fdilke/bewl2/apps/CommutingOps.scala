@@ -1,6 +1,8 @@
 package com.fdilke.bewl2.apps
 
-import com.fdilke.bewl2.sets.SetsUtilities._
+import com.fdilke.bewl2.sets.SetsUtilities.*
+
+import scala.collection.View
 
 object CommutingOps extends App:
   private val order = 4
@@ -27,3 +29,4 @@ object CommutingOps extends App:
     + Math.round(100.0 * count / ops.size) + "%)"
   )
 
+//  val x: Iterable[Int] = Iterable(1,2,3).view

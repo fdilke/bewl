@@ -10,12 +10,12 @@ object SetsUtilities:
     if (source.isEmpty)
       Iterable(Map.empty)
     else
-      for {
+      (for {
         partialMap <- allMaps(source.tail, target)
         choice <- target
       } yield {
         partialMap + (source.head -> choice)
-      }
+      }).view
 
   trait VarArgFunc[-A, +B]:
     def apply(is: A*): B
