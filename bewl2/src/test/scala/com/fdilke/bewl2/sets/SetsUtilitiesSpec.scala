@@ -11,8 +11,8 @@ class SetsUtilitiesSpec extends FunSuite:
     assertEquals(
         allMaps(Set(1, 2), Set("a", "b", "c")).map { f =>
             Seq(f(1), f(2))
-        },
-        Iterable(
+        }.toSeq,
+        Seq(
            Seq("a", "a"),
            Seq("b", "a"),
            Seq("c", "a"),
@@ -42,8 +42,8 @@ class SetsUtilitiesSpec extends FunSuite:
     assertEquals(
       allNaryOps(arity = 2, order = 1) map { f =>
         f(0, 0)
-      },
-      Iterable(0)
+      } toSeq,
+      Seq(0)
     )
   }
 
@@ -51,8 +51,8 @@ class SetsUtilitiesSpec extends FunSuite:
     assertEquals(
       allNaryOps(arity = 1, order = 2) map { f =>
         f(0) -> f(1)
-      },
-      Iterable(
+      } toSeq,
+      Seq(
         0 -> 0,
         1 -> 0,
         0 -> 1,
@@ -63,8 +63,8 @@ class SetsUtilitiesSpec extends FunSuite:
 
   test("enumerates n-ary operations: even more degenerate case of nullaries on 0") {
     assertEquals(
-      allNaryOps(arity = 0, order = 0),
-      Iterable.empty
+      allNaryOps(arity = 0, order = 0).toSeq,
+      Seq.empty
     )
   }
 
