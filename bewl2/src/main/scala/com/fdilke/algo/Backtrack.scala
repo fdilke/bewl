@@ -24,15 +24,15 @@ object Backtrack {
     def recurse(
       partialMap: Map[KEY, VALUE],
       step: NextStep[KEY, VALUE]
-    ): Iterable[Map[KEY, VALUE]] =
+    ): Iterator[Map[KEY, VALUE]] =
       step match {
         case MapInvalid =>
-          Iterable.empty
+          Iterator.empty
         case MapComplete /* .asInstanceOf[NextStep[KEY, VALUE]] */ =>
-          Iterable(partialMap)
+          Iterator(partialMap)
         case MapContinue(key, node) =>
           for {
-            value <- values
+            value <- values.iterator
             newMap = partialMap + (key -> value)
             solution <- recurse(newMap, node(newMap))
           } yield
@@ -40,6 +40,9 @@ object Backtrack {
       }
 
     val initialMap: Map[KEY, VALUE] = new HashMap[KEY, VALUE]()
-    recurse(initialMap, initialNode(initialMap))
+    new Iterable[Map[KEY, VALUE]] {
+      override def iterator: Iterator[Map[KEY, VALUE]] =
+        recurse(initialMap, initialNode(initialMap))
+    }
   }
 }

@@ -12,8 +12,8 @@ class BacktrackSpec extends FunSuite:
       Backtrack.solve[Int, Boolean](
         Iterable(true, false),
         nodeVoid
-      ),
-      Iterable.empty
+      ).toSet,
+      Set.empty
     )
   }
 
