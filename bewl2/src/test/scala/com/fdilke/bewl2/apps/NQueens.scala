@@ -55,7 +55,6 @@ object NQueens extends App {
       }
       println()
     }
-    println("-----------------")
   }
 
   Backtrack.solve[Int, (Int, Int)](
