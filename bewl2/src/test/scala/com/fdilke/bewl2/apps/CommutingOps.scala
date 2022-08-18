@@ -6,6 +6,7 @@ import com.fdilke.bewl2.apps.NQueens.{coordinates, lastOneAttacks, queensNode}
 import com.fdilke.bewl2.sets.SetsUtilities.*
 
 import java.util.concurrent.atomic.AtomicInteger
+import scala.annotation.tailrec
 import scala.collection.View
 
 object CommutingOpsBruteForce extends App:
@@ -28,7 +29,6 @@ object CommutingOpsBruteForce extends App:
     allNaryOps(arity = 2, order = order)
   val count = ops.count(selfCommutes)
 
-//  println("count = " + count)
   println("count = " + count + " of " + ops.size + " ("
     + Math.round(100.0 * count / ops.size) + "%)"
   )
@@ -49,7 +49,7 @@ object CommutingOpsSubtle extends App:
      map: Map[(Int, Int), Int]
   ): Unit =
     counter.incrementAndGet()
-    println("-----------------")
+    println("--+" + List.fill(order*2)('-').mkString)
     print("  |")
     for { i <- elements } {
       print(s"$i ")
@@ -77,11 +77,11 @@ object CommutingOpsSubtle extends App:
     else
       None
 
-  def theNext(
+  /*@tailrec*/ def theNext(
     m0: Map[(Int, Int), Int],
     quad: ((Int, Int), (Int, Int))
   ): NextStep[(Int, Int), Int] =
-    println(s"quad: $quad")
+//    println(s"quad: $quad")
     val ((a, b), (c, d)) = quad
     assuming(m0, (a, b)) { (ab, m1) =>
       assuming(m1, (c, d)) { (cd, m2) =>
