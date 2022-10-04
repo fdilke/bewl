@@ -1,40 +1,12 @@
 package com.fdilke.bewl2.apps
 
 import com.fdilke.algo.Backtrack
-import com.fdilke.algo.Backtrack.*
-import com.fdilke.bewl2.apps.NQueens.{coordinates, lastOneAttacks, queensNode}
-import com.fdilke.bewl2.sets.SetsUtilities.*
+import com.fdilke.algo.Backtrack.{DecisionNode, MapComplete, MapInvalid, NextStep, assuming}
 
 import java.util.concurrent.atomic.AtomicInteger
-import scala.annotation.tailrec
-import scala.collection.View
-
-object CommutingOpsBruteForce extends App:
-  private val order = 4
-  private val quads: Seq[(Int, Int, Int, Int)] =
-    allMaps(
-      source = 0 until 4,
-      target = 0 until order
-    ).toSeq.map { (m: Map[Int, Int]) =>
-      (m(0), m(1), m(2), m(3))
-    }
-
-  def selfCommutes(op: VarArgFunc[Int, Int]): Boolean =
-    quads.forall { case (a, b, c, d) =>
-      op(op(a, b), op(c, d)) ==
-        op(op(a, c), op(b, d))
-    }
-
-  val ops: Iterable[VarArgFunc[Int, Int]] =
-    allNaryOps(arity = 2, order = order)
-  val count = ops.count(selfCommutes)
-
-  println("count = " + count + " of " + ops.size + " ("
-    + Math.round(100.0 * count / ops.size) + "%)"
-  )
 
 object CommutingOpsSubtle extends App:
-  private val order = 2
+  private val order = 3
 
   private val elements: Set[Int] = (0 until order).toSet
   private val pairs: Set[(Int, Int)] =
@@ -44,10 +16,10 @@ object CommutingOpsSubtle extends App:
     } yield { (i, j) }
 
   def showTable(
-     counter: AtomicInteger
-  )(
-     map: Map[(Int, Int), Int]
-  ): Unit =
+                 counter: AtomicInteger
+               )(
+                 map: Map[(Int, Int), Int]
+               ): Unit =
     counter.incrementAndGet()
     println("--+" + List.fill(order*2)('-').mkString)
     print("  |")
@@ -77,11 +49,11 @@ object CommutingOpsSubtle extends App:
     else
       None
 
-  /*@tailrec*/ def theNext(
+  /*@tailrec*/
+  def theNext(
     m0: Map[(Int, Int), Int],
     quad: ((Int, Int), (Int, Int))
   ): NextStep[(Int, Int), Int] =
-//    println(s"quad: $quad")
     val ((a, b), (c, d)) = quad
     assuming(m0, (a, b)) { (ab, m1) =>
       assuming(m1, (c, d)) { (cd, m2) =>
@@ -114,3 +86,4 @@ object CommutingOpsSubtle extends App:
     commutesNode
   ) foreach showTable(counter)
   println("total: " + counter.get)
+
