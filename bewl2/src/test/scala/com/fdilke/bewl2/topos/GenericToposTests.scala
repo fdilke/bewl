@@ -193,10 +193,9 @@ abstract class GenericToposTests[
     )(using
       x: DOT[S], y: DOT[M], z: DOT[T]
     ): Unit =
-      val capture: [A] => Equalizer[A, M] => DOT[A] ?=> Unit =
+      s.?=[Unit](t) {
         [A] => (equalizer: Equalizer[A, M]) => (xx: DOT[A]) ?=> {
           val e = equalizer.inclusion
-
           assert {
             (s o e) =!= (t o e)
           }
@@ -204,8 +203,56 @@ abstract class GenericToposTests[
             (e o equalizer.restrict(r)) =!= r
           }
         }
-      s.?=[Unit](t)(capture)
+      }
 
+    def crapply[RESULT](
+     capture: [S, M, T] => (
+       r: S ~> M,
+       s: M ~> T,
+       t: M ~> T
+     ) => (
+       DOT[S], DOT[M], DOT[T]
+     ) ?=>
+       RESULT
+    ): RESULT =
+      ???
+
+    def happly[RESULT](
+     capture: [S, M, T] => (
+       r: S ~> M,
+       s: M ~> T,
+       t: M ~> T
+     ) => (
+       DOT[S]
+     ) ?=>
+       RESULT
+    ): RESULT =
+      ???
+
+//    equalizerSituation[Unit](
+    if (false)
+      happly[Unit](
+        [S, M, T] => (
+          r: S ~> M,
+          s: M ~> T,
+          t: M ~> T
+        ) => (
+          ss: DOT[S]
+        ) ?=>
+          ???
+      )
+
+    if (false)
+      crapply[Unit](
+        [S, M, T] => (
+          r: S ~> M,
+          s: M ~> T,
+          t: M ~> T
+        ) => (
+          ss: DOT[S], mm: DOT[M], tt: DOT[T]
+        ) ?=>
+          ??? // runTest[S, M, T](r, s, t)
+      )
 //    def piffle[A](x: A):A = x
 //    equalizerSituation.piff[Unit](piffle)
 //    equalizerSituation[Unit](runTest)
