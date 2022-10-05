@@ -28,3 +28,82 @@ case class Captured[S](s: S):
     piffle: [T] => (S, T) => RESULT
   ): RESULT =
     piffle[S](s, s)
+
+//    def runTest[S, M, T](
+//      r: S ~> M,
+//      s: M ~> T,
+//      t: M ~> T
+//    )(using
+//      x: DOT[S], y: DOT[M], z: DOT[T]
+//    ): Unit =
+//      s.?=[Unit](t) {
+//        [A] => (equalizer: Equalizer[A, M]) => (xx: DOT[A]) ?=> {
+//          val e = equalizer.inclusion
+//          assert {
+//            (s o e) =!= (t o e)
+//          }
+//          assert {
+//            (e o equalizer.restrict(r)) =!= r
+//          }
+//        }
+//      }
+//
+//    def crapply[RESULT](
+//     capture: [S, M, T] => (
+//       r: S ~> M,
+//       s: M ~> T,
+//       t: M ~> T
+//     ) => (
+//       DOT[S], DOT[M], DOT[T]
+//     ) ?=>
+//       RESULT
+//    ): RESULT =
+//      ???
+//
+//    def happly[RESULT](
+//     capture: [S, M, T] => (
+//       r: S ~> M,
+//       s: M ~> T,
+//       t: M ~> T
+//     ) => (
+//       DOT[S]
+//     ) ?=>
+//       RESULT
+//    ): RESULT =
+//      ???
+//
+////    equalizerSituation[Unit](
+//    if (false)
+//      happly[Unit](
+//        [S, M, T] => (
+//          r: S ~> M,
+//          s: M ~> T,
+//          t: M ~> T
+//        ) => (
+//          ss: DOT[S]
+//        ) ?=>
+//          ???
+//      )
+//
+//    if (false)
+//      crapply[Unit](
+//        [S, M, T] => (
+//          r: S ~> M,
+//          s: M ~> T,
+//          t: M ~> T
+//        ) => (
+//          ss: DOT[S], mm: DOT[M], tt: DOT[T]
+//        ) ?=>
+//          runTest[S, M, T](r, s, t)
+//      )
+//
+//    equalizerSituation[Unit](
+//      [S, M, T] => (
+//        r: S ~> M,
+//        s: M ~> T,
+//        t: M ~> T
+//      ) => (
+//        ss: DOT[S], mm: DOT[M], tt: DOT[T]
+//      ) ?=>
+//        runTest[S, M, T](r, s, t)
+//    )
