@@ -49,6 +49,19 @@ trait BaseTopos[
   def transpose[X: DOT, Y: DOT, Z: DOT](
     xy2z: (X, Y) ~> Z
   ): X ~> (Y → Z)
+  def doEqualizer[X: DOT, Y: DOT, RESULT](
+    f: X ~> Y,
+    f2: X ~> Y
+  )(
+    capture: [A] => Equalizer[A, X] => DOT[A] ?=> RESULT
+  ): RESULT
+
+  trait Equalizer[A : DOT, X : DOT]:
+    val inclusion: A ~> X
+    def restrict[R : DOT](
+      arrow: R ~> X
+    ): R ~> A
+
 
 trait Topos[
   DOT[_],
@@ -123,26 +136,34 @@ trait Topos[
     f: X ~> Y
   ):
     @targetName("arrow equality")
-    def =!=(
+    inline final def =!=(
       f2: X ~> Y
     ): Boolean =
       equalArrows(f, f2)
 
     @targetName("arrow composition")
-    final def o[V: DOT](
+    inline final def o[V: DOT](
       f2: V ~> X
     ): V ~> Y =
       f compose f2
 
     @targetName("arrow multiplication")
-    final def x[Z: DOT](
+    inline final def x[Z: DOT](
      f2: X ~> Z
     ): X ~> (Y, Z) =
       cx => productMagic[Y, Z](
         f(cx), f2(cx)
       )
 
-    final def sanityTest: Unit =
+    @targetName("arrow equalizers")
+    inline final def ?=[RESULT](
+     f2: X ~> Y
+    )(
+      capture: [A] => Equalizer[A, X] => (zzz: DOT[A]) ?=> RESULT
+    ): RESULT =
+      doEqualizer(f, f2)(capture)
+
+    inline final def sanityTest: Unit =
       Topos.this.sanityTest[X, Y](f)
 
 object Topos:

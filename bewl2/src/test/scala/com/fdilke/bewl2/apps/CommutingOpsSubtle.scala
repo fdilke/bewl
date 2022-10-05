@@ -6,7 +6,7 @@ import com.fdilke.algo.Backtrack.{DecisionNode, MapComplete, MapInvalid, NextSte
 import java.util.concurrent.atomic.AtomicInteger
 
 object CommutingOpsSubtle extends App:
-  private val order = 3
+  private val order = 5
 
   private val elements: Set[Int] = (0 until order).toSet
   private val pairs: Set[(Int, Int)] =
@@ -16,10 +16,10 @@ object CommutingOpsSubtle extends App:
     } yield { (i, j) }
 
   def showTable(
-                 counter: AtomicInteger
-               )(
-                 map: Map[(Int, Int), Int]
-               ): Unit =
+    counter: AtomicInteger
+  )(
+    map: Map[(Int, Int), Int]
+  ): Unit =
     counter.incrementAndGet()
     println("--+" + List.fill(order*2)('-').mkString)
     print("  |")

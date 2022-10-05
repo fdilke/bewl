@@ -26,8 +26,43 @@ abstract class GenericToposTests[
   val foo2bar: FOO ~> BAR
   val foo2baz: FOO ~> BAZ
   val foobar2baz: (FOO, BAR) ~> BAZ
+  val equalizerSituation: EqualizerSituation[_, _, _]
 
-//  import ToposHelpers._
+  case class EqualizerSituation[
+    S : DOT,
+    M : DOT,
+    T : DOT
+  ](
+    r: S ~> M,
+    s: M ~> T,
+    t: M ~> T
+  ):
+    def sanityTest: Unit =
+      topos.sanityTest(r)
+      topos.sanityTest(s)
+      topos.sanityTest(t)
+
+    if (s =!= t) {
+      throw new IllegalArgumentException("equalizing two arrows that are already equal!")
+    }
+
+    assert(
+      (s o r) =!= (t o r)
+    )
+
+    def apply[RESULT](
+      capture: [S, M, T] => (
+        r: S ~> M,
+        s: M ~> T,
+        t: M ~> T
+      ) => (
+        DOT[S], DOT[M], DOT[T]
+      ) ?=>
+        RESULT
+    ): RESULT =
+      capture(r, s, t) // (summon[DOT[S]], summon[DOT[M]], summon[DOT[T]])
+
+                         //  import ToposHelpers._
 
   test("identity arrows have sane equality semantics") {
     assert(
@@ -132,4 +167,50 @@ abstract class GenericToposTests[
     )
   }
 
+  test("caches exponentials") {
+    val fooToBar1: DOT[FOO → BAR] = dot[FOO → BAR]
+    val fooToBar2: DOT[FOO → BAR] = dot[FOO → BAR]
+    assert(
+      (fooToBar1.asInstanceOf[Object]) eq (fooToBar2.asInstanceOf[Object])
+    )
+  }
+
+  // need to understand context parameters/functions better:
+  // why don't these compile?
+//  def hax[T](x: T): T = ???
+//  val h: [T] =>> (x: T) => T = hax
+//  def pax[T](x: T, y: T): T = ???
+//  val p: [T] => (x: T, y: T) => T = pax
+
+//  def max[T](x: T, y: T)(using ord: DOT[T]): T = ???
+//  val p: [T] => (x: T, y: T) => (ord: DOT[T]) ?=> T = max
+
+  test("calculates equalizers") {
+    def runTest[S, M, T](
+      r: S ~> M,
+      s: M ~> T,
+      t: M ~> T
+    )(using
+      x: DOT[S], y: DOT[M], z: DOT[T]
+    ): Unit =
+      val capture: [A] => Equalizer[A, M] => DOT[A] ?=> Unit =
+        [A] => (equalizer: Equalizer[A, M]) => (xx: DOT[A]) ?=> {
+          val e = equalizer.inclusion
+
+          assert {
+            (s o e) =!= (t o e)
+          }
+          assert {
+            (e o equalizer.restrict(r)) =!= r
+          }
+        }
+      s.?=[Unit](t)(capture)
+
+//    def piffle[A](x: A):A = x
+//    equalizerSituation.piff[Unit](piffle)
+//    equalizerSituation[Unit](runTest)
+  }
+
+/*
+*/
 

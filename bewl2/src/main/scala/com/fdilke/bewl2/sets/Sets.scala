@@ -70,6 +70,15 @@ implicit object Sets extends Topos[
       }
     )
 
+  override def doEqualizer[X: Set, Y: Set, RESULT](
+    f: X => Y,
+    f2: X => Y
+  )(
+    capture: [A] => Equalizer[A, X] => Set[A] ?=> RESULT
+  ): RESULT =
+    ???
+
+
   
 
   
