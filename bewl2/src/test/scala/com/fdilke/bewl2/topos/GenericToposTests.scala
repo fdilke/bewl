@@ -175,17 +175,7 @@ abstract class GenericToposTests[
     )
   }
 
-  // need to understand context parameters/functions better:
-  // why don't these compile?
-//  def hax[T](x: T): T = ???
-//  val h: [T] =>> (x: T) => T = hax
-//  def pax[T](x: T, y: T): T = ???
-//  val p: [T] => (x: T, y: T) => T = pax
-
-//  def max[T](x: T, y: T)(using ord: DOT[T]): T = ???
-//  val p: [T] => (x: T, y: T) => (ord: DOT[T]) ?=> T = max
-
-  test("calculates equalizers".ignore) {
+  test("calculates equalizers") {
     equalizerSituation[Unit](
       [S, M, T] => (
         r: S ~> M,

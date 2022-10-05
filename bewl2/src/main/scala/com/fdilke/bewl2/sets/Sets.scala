@@ -76,7 +76,35 @@ implicit object Sets extends Topos[
   )(
     capture: [A] => Equalizer[A, X] => Set[A] ?=> RESULT
   ): RESULT =
-    ???
+    inline def maskType[A](
+      dotA: Set[A],
+      theInclusion: A => X,
+      theRestriction: [R] => (R ~> X) => Set[R] ?=> (R ~> A)
+    ): RESULT =
+      given Set[A] = dotA
+      capture[A](
+        new Equalizer[A, X] {
+          override val inclusion: A ~> X =
+            theInclusion
+          override def restrict[R: Set](
+            arrow: R ~> X
+          ): R ~> A =
+            theRestriction(arrow)
+        }
+      )
+    type X_ = X
+    val whereEqual: Set[X_] =
+      summon[Set[X]] filter { x =>
+        f(x) == f2(x)
+      }
+    maskType[X_](
+      dotA =whereEqual,
+      theInclusion = identity,
+      theRestriction = [R] => (arrow: R ~> X) => (rr: Set[R]) ?=> {
+        (r: R) => arrow(r)
+      }
+    )
+
 
 
   

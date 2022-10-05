@@ -107,3 +107,13 @@ case class Captured[S](s: S):
 //      ) ?=>
 //        runTest[S, M, T](r, s, t)
 //    )
+
+// need to understand context parameters/functions better:
+// these should sort of compile, but don't: you have to spell out [T] => xxx on the RHS
+//  def hax[T](x: T): T = ???
+//  val h: [T] =>> (x: T) => T = hax
+//  def pax[T](x: T, y: T): T = ???
+//  val p: [T] => (x: T, y: T) => T = pax
+
+//  def max[T](x: T, y: T)(using ord: DOT[T]): T = ???
+//  val p: [T] => (x: T, y: T) => (ord: DOT[T]) ?=> T = max
