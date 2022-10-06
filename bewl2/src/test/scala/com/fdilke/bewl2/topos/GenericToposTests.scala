@@ -10,9 +10,10 @@ abstract class GenericToposTests[
   CTXT[_],
   VOID,
   UNIT,
+  BEWL,
   →[_, _]
 ](implicit
- val topos: Topos[DOT, CTXT, VOID, UNIT, →]
+ val topos: Topos[DOT, CTXT, VOID, UNIT, BEWL, →]
 ) extends FunSuite:
 
   import topos.*
@@ -198,4 +199,34 @@ abstract class GenericToposTests[
     )
   }
 
+  test("has a subobject classifier") {
+    sanityTest[BEWL]
+    sanityTest(truth)
+    // sanityTest(falsity)
+    /*
+    val char = monicBar2baz.chi
+    char.sanityTest
+    char.source shouldBe baz
+    char.target shouldBe omega
+  
+    char.o(monicBar2baz) shouldBe bar.toTrue
+  
+    val restriction = foo2ImageOfBar \ monicBar2baz
+    restriction.sanityTest
+    restriction.source shouldBe foo
+    restriction.target shouldBe bar
+    monicBar2baz.o(restriction) shouldBe foo2ImageOfBar
+    */
+  }
+
+/*
+it("has a truth object (subobject classifier)") {
+  omega.sanityTest
+
+  // Note behaviour is not defined for these pathological cases:
+  // construct a non-monic arrow, have chi throw a NotMonicException
+  // try backdividing by a monic when we can't
+  // It's up to the caller to check. There could be a safe backdivide
+}
+*/
 

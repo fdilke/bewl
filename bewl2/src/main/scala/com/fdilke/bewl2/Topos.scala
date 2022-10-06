@@ -9,6 +9,7 @@ trait BaseTopos[
   CTXT[_] : Mappable,
   VOID,
   UNIT,
+  BEWL,
   →[_, _]
 ]:
   val mappable: Mappable[CTXT] =
@@ -42,8 +43,10 @@ trait BaseTopos[
 
   implicit val unitDot: DOT[UNIT]
   implicit val zeroDot: DOT[VOID]
+  implicit val omegaDot: DOT[BEWL]
   def toUnit[X: DOT]: X ~> UNIT
   def fromZero[X: DOT]: VOID ~> X
+  val truth: UNIT ~> BEWL
 
   def evaluation[X: DOT, Y: DOT]: (X → Y, X) ~> Y
   def transpose[X: DOT, Y: DOT, Z: DOT](
@@ -68,8 +71,9 @@ trait Topos[
   CTXT[_]: Mappable,
   VOID,
   UNIT,
+  BEWL,
   →[_, _]
-] extends BaseTopos[DOT, CTXT, VOID, UNIT, →]:
+] extends BaseTopos[DOT, CTXT, VOID, UNIT, BEWL, →]:
 
   final inline def arrow[X: DOT, Y: DOT]( // necessary?
     f: CTXT[X] => CTXT[Y]
@@ -172,8 +176,9 @@ object Topos:
     CTXT[A]: Mappable,
     VOID,
     UNIT,
+    BEWL,
     →[_, _]
   ](
-   implicit topos: Topos[DOT, CTXT, VOID, UNIT, →]
-  ): Topos[DOT, CTXT, VOID, UNIT, →] =
+   implicit topos: Topos[DOT, CTXT, VOID, UNIT, BEWL, →]
+  ): Topos[DOT, CTXT, VOID, UNIT, BEWL, →] =
     topos

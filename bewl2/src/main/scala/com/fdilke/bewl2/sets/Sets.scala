@@ -5,7 +5,7 @@ import com.fdilke.bewl2.Mappable
 import com.fdilke.bewl2.sets.SetsUtilities.allMaps
 
 implicit object Sets extends Topos[
-  Set, [A] =>> A, Void, Unit, Map
+  Set, [A] =>> A, Void, Unit, Boolean, Map
 ]:
   override def equalArrows[X: Set, Y: Set](
    f1: X => Y,
@@ -49,6 +49,8 @@ implicit object Sets extends Topos[
 
   override implicit val unitDot: Set[Unit] = Set(())
   override implicit val zeroDot: Set[Void] = Set.empty
+  override implicit val omegaDot: Set[Boolean] = Set(true, false)
+  override val truth: Unit => Boolean = _ => true
 
   override def fromZero[X: Set]: Void => X = { _ =>
     throw new IllegalArgumentException("Encountered a VOID")

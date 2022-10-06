@@ -9,9 +9,13 @@ class SetsSpec extends GenericToposTests()(Sets):
 
   import topos.*
 
-  override type FOO = Boolean
-  override implicit val dotFoo: Set[Boolean] =
-    Set(true, false)
+  sealed trait Direction
+  case object Up extends Direction
+  case object Down extends Direction
+
+  override type FOO = Direction
+  override implicit val dotFoo: Set[Direction] =
+    Set(Up, Down)
 
   override type BAR = String
   override implicit val dotBar: Set[String] =
@@ -22,25 +26,25 @@ class SetsSpec extends GenericToposTests()(Sets):
     Set(1, 2, 3, 4)
 
   override val foo2bar: FOO ~> BAR =
-    arrow(Map[Boolean, String](elems =
-        true -> "one",
-        false -> "two"
+    arrow(Map[Direction, String](elems =
+        Up -> "one",
+        Down -> "two"
       ))
 
-  override val foo2baz: Boolean ~> Int =
-    arrow(Map[Boolean, Int](elems =
-        true -> 3,
-        false -> 2
+  override val foo2baz: Direction ~> Int =
+    arrow(Map[Direction, Int](elems =
+        Up -> 3,
+        Down -> 2
       ))
 
-  override val foobar2baz: (Boolean, String) ~> Int =
-    arrow(Map[(Boolean, String), Int](elems =
-        (true, "one") -> 2,
-        (false, "one") -> 3,
-        (true, "two") -> 1,
-        (false, "two") -> 2,
-        (true, "three") -> 2,
-        (false, "three") -> 3
+  override val foobar2baz: (Direction, String) ~> Int =
+    arrow(Map[(Direction, String), Int](elems =
+        (Up, "one") -> 2,
+        (Down, "one") -> 3,
+        (Up, "two") -> 1,
+        (Down, "two") -> 2,
+        (Up, "three") -> 2,
+        (Down, "three") -> 3
       ))
 
   override val equalizerSituation: EqualizerSituation[_, _, _] =
