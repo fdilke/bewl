@@ -25,7 +25,7 @@ class SetsSpec extends GenericToposTests()(Sets):
   override implicit val dotBaz: Set[Int] =
     Set(1, 2, 3, 4)
 
-  override val foo2bar: FOO ~> BAR =
+  override val foo2bar: Direction ~> String =
     arrow(Map[Direction, String](elems =
         Up -> "one",
         Down -> "two"
@@ -36,6 +36,13 @@ class SetsSpec extends GenericToposTests()(Sets):
         Up -> 3,
         Down -> 2
       ))
+
+  override val monicBar2baz: String ~> Int =
+    arrow(Map[String, Int](elems =
+      "one" -> 2,
+      "two" -> 3,
+      "three" -> 1
+    ))
 
   override val foobar2baz: (Direction, String) ~> Int =
     arrow(Map[(Direction, String), Int](elems =

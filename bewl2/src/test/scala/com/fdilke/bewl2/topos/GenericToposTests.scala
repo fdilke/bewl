@@ -27,6 +27,7 @@ abstract class GenericToposTests[
   val foo2bar: FOO ~> BAR
   val foo2baz: FOO ~> BAZ
   val foobar2baz: (FOO, BAR) ~> BAZ
+  val monicBar2baz: BAR ~> BAZ
   val equalizerSituation: EqualizerSituation[_, _, _]
 
   case class EqualizerSituation[
