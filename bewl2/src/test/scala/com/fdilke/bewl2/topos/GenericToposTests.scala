@@ -28,6 +28,7 @@ abstract class GenericToposTests[
   val foo2baz: FOO ~> BAZ
   val foobar2baz: (FOO, BAR) ~> BAZ
   val monicBar2baz: BAR ~> BAZ
+  val foo2ImageOfBar: FOO ~> BAZ
   val equalizerSituation: EqualizerSituation[_, _, _]
 
   case class EqualizerSituation[
@@ -68,7 +69,7 @@ abstract class GenericToposTests[
 
   test("identity arrows have sane equality semantics") {
     assert(
-      arrow[FOO, FOO] { x => x } =!= id[FOO]
+      identity[CTXT[FOO]] =!= id[FOO]
     )
     assert(
       id[FOO] =!= id[FOO]
@@ -204,30 +205,15 @@ abstract class GenericToposTests[
     sanityTest[BEWL]
     sanityTest(truth)
     // sanityTest(falsity)
-    /*
-    val char = monicBar2baz.chi
-    char.sanityTest
-    char.source shouldBe baz
-    char.target shouldBe omega
-  
-    char.o(monicBar2baz) shouldBe bar.toTrue
-  
+    val char: BAZ ~> BEWL = monicBar2baz.chi
+    sanityTest(char)
+    assert {
+      (char o monicBar2baz) =!= toTrue[BAR]
+    }
     val restriction = foo2ImageOfBar \ monicBar2baz
     restriction.sanityTest
-    restriction.source shouldBe foo
-    restriction.target shouldBe bar
-    monicBar2baz.o(restriction) shouldBe foo2ImageOfBar
-    */
+    assert {
+      (monicBar2baz o restriction) =!= foo2ImageOfBar
+    }
   }
-
-/*
-it("has a truth object (subobject classifier)") {
-  omega.sanityTest
-
-  // Note behaviour is not defined for these pathological cases:
-  // construct a non-monic arrow, have chi throw a NotMonicException
-  // try backdividing by a monic when we can't
-  // It's up to the caller to check. There could be a safe backdivide
-}
-*/
 

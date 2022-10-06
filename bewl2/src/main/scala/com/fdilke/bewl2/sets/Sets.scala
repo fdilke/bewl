@@ -4,6 +4,8 @@ import com.fdilke.bewl2.Topos
 import com.fdilke.bewl2.Mappable
 import com.fdilke.bewl2.sets.SetsUtilities.allMaps
 
+import scala.language.postfixOps
+
 implicit object Sets extends Topos[
   Set, [A] =>> A, Void, Unit, Boolean, Map
 ]:
@@ -106,6 +108,25 @@ implicit object Sets extends Topos[
         (r: R) => arrow(r)
       }
     )
+
+  override def chiForMonic[X: Set, Y: Set](
+    monic: X => Y
+  ): Y => Boolean =
+    y => summon[Set[X]] exists { x =>
+      monic(x) == y
+    }
+
+  override def backDivideMonic[X: Set, Y: Set, A: Set](
+     arrow: X => Y,
+     monic: A => Y
+  ): X => A =
+    x => {
+      val target: Y = arrow(x)
+      summon[Set[A]] find { a =>
+        monic(a) == target
+      } get
+    }
+
 
 
 

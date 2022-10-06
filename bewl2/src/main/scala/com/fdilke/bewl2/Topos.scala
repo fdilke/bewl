@@ -58,6 +58,13 @@ trait BaseTopos[
   )(
     capture: [A] => Equalizer[A, X] => DOT[A] ?=> RESULT
   ): RESULT
+  def chiForMonic[X: DOT, Y: DOT](
+    monic: X ~> Y
+  ): Y ~> BEWL
+  def backDivideMonic[X: DOT, Y: DOT, A: DOT](
+    arrow: X ~> Y,
+    monic: A ~> Y
+  ): X ~> A
 
   trait Equalizer[A : DOT, X : DOT]:
     val inclusion: A ~> X
@@ -75,7 +82,7 @@ trait Topos[
   →[_, _]
 ] extends BaseTopos[DOT, CTXT, VOID, UNIT, BEWL, →]:
 
-  final inline def arrow[X: DOT, Y: DOT]( // necessary?
+  final inline def arrow[X: DOT, Y: DOT]( // occasionally useful
     f: CTXT[X] => CTXT[Y]
   ): X ~> Y =
     f
@@ -91,6 +98,9 @@ trait Topos[
 
   final def π1[X, Y]: (X, Y) ~> Y =
     c => mappable.map(c, _._2)
+
+  final def toTrue[X: DOT]: X ~> BEWL =
+    truth o toUnit[X]
 
   private val memoizedProduct:
     [X, Y] => ((DOT[X], DOT[Y])) => DOT[(X, Y)]
@@ -136,7 +146,7 @@ trait Topos[
       dot[Y]
     )
 
-  implicit final class ArrowHelpers[X: DOT, Y: DOT](
+  implicit final class RichArrow[X: DOT, Y: DOT](
     f: X ~> Y
   ):
     @targetName("arrow equality")
@@ -166,6 +176,16 @@ trait Topos[
       capture: [A] => Equalizer[A, X] => (zzz: DOT[A]) ?=> RESULT
     ): RESULT =
       doEqualizer(f, f2)(capture)
+
+    @targetName("characteristic of a monic")
+    inline final def chi: Y ~> BEWL =
+      chiForMonic(f)
+      
+    @targetName("backdivision by a monic")
+    inline final def \[A: DOT](
+      monic: A ~> Y
+    ): X ~> A =
+      backDivideMonic(f, monic)
 
     inline final def sanityTest: Unit =
       Topos.this.sanityTest[X, Y](f)

@@ -26,38 +26,44 @@ class SetsSpec extends GenericToposTests()(Sets):
     Set(1, 2, 3, 4)
 
   override val foo2bar: Direction ~> String =
-    arrow(Map[Direction, String](elems =
+    Map[Direction, String](elems =
         Up -> "one",
         Down -> "two"
-      ))
+    )
 
   override val foo2baz: Direction ~> Int =
-    arrow(Map[Direction, Int](elems =
+    Map[Direction, Int](elems =
         Up -> 3,
         Down -> 2
-      ))
+    )
 
   override val monicBar2baz: String ~> Int =
-    arrow(Map[String, Int](elems =
+    Map[String, Int](elems =
       "one" -> 2,
       "two" -> 3,
       "three" -> 1
-    ))
+    )
 
   override val foobar2baz: (Direction, String) ~> Int =
-    arrow(Map[(Direction, String), Int](elems =
-        (Up, "one") -> 2,
-        (Down, "one") -> 3,
-        (Up, "two") -> 1,
-        (Down, "two") -> 2,
-        (Up, "three") -> 2,
-        (Down, "three") -> 3
-      ))
+    Map[(Direction, String), Int](elems =
+      (Up, "one") -> 2,
+      (Down, "one") -> 3,
+      (Up, "two") -> 1,
+      (Down, "two") -> 2,
+      (Up, "three") -> 2,
+      (Down, "three") -> 3
+    )
+
+  override val foo2ImageOfBar: Direction ~> Int =
+    Map[Direction, Int](elems =
+      Up -> 3,
+      Down -> 2
+    )
 
   override val equalizerSituation: EqualizerSituation[_, _, _] =
     new EqualizerSituation[FOO, BAR, BAZ](
       foo2bar,
-      arrow(Map[String, Int]("one" -> 1, "two" -> 2, "three" -> 3)),
-      arrow(Map[String, Int]("one" -> 1, "two" -> 2, "three" -> 1))
+      Map[String, Int]("one" -> 1, "two" -> 2, "three" -> 3),
+      Map[String, Int]("one" -> 1, "two" -> 2, "three" -> 1)
     )
 
