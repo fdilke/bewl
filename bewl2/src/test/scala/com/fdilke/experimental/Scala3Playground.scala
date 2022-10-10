@@ -5,7 +5,7 @@ import munit.FunSuite
 import scala.concurrent.Future
 
 class Scala3Playground extends FunSuite:
-  test("kicking the tyres") {
+  test("type lambdas") {
     def whiffle[T](t: T): Boolean = false
     val theSniff: [T] => T => Boolean =
       [T] => (t: T) => t.hashCode() > 0
@@ -21,6 +21,10 @@ class Scala3Playground extends FunSuite:
       ),
       expected = true
     )
+  }
+
+  test("swapping ? for > ... ?") {
+    val x: List[_] = List[Int](1,2,3)
   }
 
 case class Captured[S](s: S):

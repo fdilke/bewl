@@ -1,6 +1,7 @@
 package com.fdilke.bewl2.sets
 
 import scala.language.postfixOps
+import com.fdilke.utility.Shortcuts._
 
 object SetsUtilities:
   def allMaps[A, B](
@@ -32,7 +33,7 @@ object SetsUtilities:
   def allNaryOps(
     arity: Int,
     order: Int
-  ): Iterable[VarArgFunc[Int, Int]] = {
+  ): Iterable[VarArgFunc[Int, Int]] =
     val toOrder: Seq[Int] = (0 until order)
     val toArity: Seq[Int] = (0 until arity)
 
@@ -43,4 +44,16 @@ object SetsUtilities:
       (a: Seq[Int]) =>
         m(seqToMap(a))
     }
-  }
+
+  def makeNullaryOperator[X: Set](
+    value: X
+  ): Unit => X =
+    _ => value
+
+  def makeNullaryOperator[X: Set](
+    values: (X, X)*
+  ): X => X =
+    val map: Map[X, X] = Map[X, X](values: _*)
+    if summon[Set[X]] != map.keySet then
+      bail("incomplete or excessive unary operator definition")
+    map

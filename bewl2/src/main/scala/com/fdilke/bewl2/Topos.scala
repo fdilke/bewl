@@ -2,6 +2,7 @@ package com.fdilke.bewl2
 
 import scala.annotation.targetName
 import com.fdilke.bewl2.Mappable
+import com.fdilke.bewl2.algebra.AlgebraicMachinery
 import com.fdilke.bewl2.helper.Memoize
 
 trait BaseTopos[
@@ -80,7 +81,8 @@ trait Topos[
   UNIT,
   BEWL,
   →[_, _]
-] extends BaseTopos[DOT, CTXT, VOID, UNIT, BEWL, →]:
+] extends BaseTopos[DOT, CTXT, VOID, UNIT, BEWL, →]
+  with AlgebraicMachinery[DOT, CTXT, VOID, UNIT, BEWL, →]:
 
   final inline def arrow[X: DOT, Y: DOT]( // occasionally useful
     f: CTXT[X] => CTXT[Y]
@@ -146,6 +148,8 @@ trait Topos[
       dot[Y]
     )
 
+  type BiArrow[X, Y, Z] = (X, Y) ~> Z
+  
   implicit final class RichArrow[X: DOT, Y: DOT](
     f: X ~> Y
   ):
@@ -180,15 +184,20 @@ trait Topos[
     @targetName("characteristic of a monic")
     inline final def chi: Y ~> BEWL =
       chiForMonic(f)
-      
+
     @targetName("backdivision by a monic")
     inline final def \[A: DOT](
       monic: A ~> Y
     ): X ~> A =
       backDivideMonic(f, monic)
+      
+    @targetName("test for iso") // TODO: fix!!
+    final def isIsoPlaceholderTrue: Boolean =
+      true
 
     inline final def sanityTest: Unit =
       Topos.this.sanityTest[X, Y](f)
+
 
 object Topos:
   inline def apply[

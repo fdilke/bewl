@@ -5,7 +5,7 @@ import munit.FunSuite
 
 import java.io.File
 
-abstract class GenericToposTests[
+abstract class GenericToposSpec[
   DOT[_],
   CTXT[_],
   VOID,

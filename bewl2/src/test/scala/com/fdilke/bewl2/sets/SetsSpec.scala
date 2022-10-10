@@ -2,10 +2,10 @@ package com.fdilke.bewl2.sets
 
 import com.fdilke.bewl2.Topos
 import com.fdilke.bewl2.sets.Sets
-import com.fdilke.bewl2.topos.GenericToposTests
+import com.fdilke.bewl2.topos.GenericToposSpec
 import munit.FunSuite
 
-class SetsSpec extends GenericToposTests()(Sets):
+class SetsSpec extends GenericToposSpec()(Sets):
 
   import topos.*
 
