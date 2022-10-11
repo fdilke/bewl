@@ -2,21 +2,11 @@ package com.fdilke.bewl2.topos
 
 import com.fdilke.bewl2.sets.Sets
 import munit.FunSuite
-import com.fdilke.bewl2.sets.SetsUtilities._
+import com.fdilke.bewl2.sets.SetsUtilities.*
+
+import scala.language.postfixOps
 
 class AlgebraicMachinerySpec extends FunSuite:
-//  test("placeholder") {
-//
-//  }
-
-//  private val topos: Sets.type = com.fdilke.bewl2.sets.Sets
-//  import com.fdilke.bewl2.sets.Sets
-//  import Sets.StandardTermsAndOperators._
-//  import Sets.NamedLaws._
-
-//  test("Simple/compound terms can describe their free variables") {
-//
-//  }
 
   implicit class ShouldBeToAssert[A](a: A):
     inline def shouldBe(b: A): Unit =
@@ -26,7 +16,6 @@ class AlgebraicMachinerySpec extends FunSuite:
   import topos.StandardTermsAndOperators._
   import topos.NamedLaws._
   import topos._
-  // AlgebraicTheory
 
   test("Simple and compound terms can describe their own free variables") {
     α.freeVariables shouldBe Seq(α)
@@ -36,7 +25,6 @@ class AlgebraicMachinerySpec extends FunSuite:
   private val unstructuredSets = AlgebraicTheory()()
 
   test("An evaluation context for no terms can evaluate constants, not variables") {
-//      implicit val carrier: Set[Boolean] = Set[Boolean](elems = true, false)
     val theO = makeNullaryOperator[Boolean](false)
     val pointedSets = AlgebraicTheory(o)()
     val algebra = new pointedSets.Algebra[Boolean](o := theO)
@@ -50,23 +38,22 @@ class AlgebraicMachinerySpec extends FunSuite:
     assert { context.evaluate(o).asInstanceOf[Unit => Boolean] =!= theO }
   }
 
-/*
   test("An evaluation context for one term over an empty theory is just a uniproduct") {
-//      val carrier = dot[Boolean](true, false)
     val algebra = new unstructuredSets.Algebra[Boolean]()
     val context = algebra.EvaluationContext[Boolean](Seq(α))
     assert { context.evaluate(α).isIsoPlaceholderTrue }
   }
 
   test("An evaluation context for two terms over an empty theory is just a biproduct") {
-//      val carrier = dot[Boolean](true, false)
     val algebra = new unstructuredSets.Algebra[Boolean]()
     val context = algebra.EvaluationContext[Boolean](Seq(α, β))
-    val to_a: (Boolean, Boolean) => Boolean = context.evaluate(α)
-    val to_b: (Boolean, Boolean) => Boolean = context.evaluate(β)
-    assert { (to_a x to_b).isIsoPlaceHolder, true }
+    val to_a: ((Boolean, Boolean)) => Boolean = context.evaluate(α).asInstanceOf[ ((Boolean, Boolean)) => Boolean ]
+    val to_b: ((Boolean, Boolean)) => Boolean = context.evaluate(β).asInstanceOf[ ((Boolean, Boolean)) => Boolean ]
+
+    (to_a x to_b).isIsoPlaceholderTrue shouldBe true
   }
 
+/*
   test("An evaluation context for one term can evaluate constants") {
 //      val carrier = dot[Boolean](true, false)
     val theO = makeNullaryOperator[Boolean](false)

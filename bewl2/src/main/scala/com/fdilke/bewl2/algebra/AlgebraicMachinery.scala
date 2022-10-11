@@ -517,7 +517,7 @@ trait AlgebraicMachinery[
 
   class AlgebraicTheory[
     S : DOT
-  ]( // ( scalars: DOT[S] )
+  ](
      preassignments: OperatorAssignment[_, S]*
    )(
      operators: Operator*
