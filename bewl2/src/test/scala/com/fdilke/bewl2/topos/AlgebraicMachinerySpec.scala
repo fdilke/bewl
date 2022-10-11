@@ -23,9 +23,9 @@ class AlgebraicMachinerySpec extends FunSuite:
   }
 
   private val unstructuredSets = AlgebraicTheory()()
+  private val theO: Unit => Boolean = makeNullaryOperator[Boolean](false)
 
   test("An evaluation context for no terms can evaluate constants, not variables") {
-    val theO = makeNullaryOperator[Boolean](false)
     val pointedSets = AlgebraicTheory(o)()
     val algebra = new pointedSets.Algebra[Boolean](o := theO)
     val context = algebra.EvaluationContext[Boolean](Seq())
@@ -53,19 +53,25 @@ class AlgebraicMachinerySpec extends FunSuite:
     (to_a x to_b).isIsoPlaceholderTrue shouldBe true
   }
 
-/*
   test("An evaluation context for one term can evaluate constants") {
-//      val carrier = dot[Boolean](true, false)
-    val theO = makeNullaryOperator[Boolean](false)
 
     val pointedSets = AlgebraicTheory(o)()
     val algebra = new pointedSets.Algebra[Boolean](o := theO)
     val context = algebra.EvaluationContext[Boolean](Seq(α))
+
+    val ppp: ((Boolean, Unit)) => Boolean = context.evaluate(o).asInstanceOf[((Boolean, Unit)) => Boolean]
+    ppp((true, ()))
+    val ppt: Boolean => Boolean = b => ppp(b, ())
+
     assert {
-      context.evaluate(o) =!= theO o toUnit[Boolean]
+      ppt =!= ( theO o toUnit[Boolean] )
     }
+
+    // TODO: clean this up! get rid of the casts.
+    //  Requires proper type safety on EvaluationContext[ROOT: DOT]
   }
 
+/*
   test("An evaluation context can evaluate compound terms with unary operators") {
       implicit val carrier: Set[Int] = Set[Int](0, 1, 2)
       val theO = makeNullaryOperator(0)
