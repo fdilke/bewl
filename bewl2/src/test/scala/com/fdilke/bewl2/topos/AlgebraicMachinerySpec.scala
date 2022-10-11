@@ -40,8 +40,12 @@ class AlgebraicMachinerySpec extends FunSuite:
 
   test("An evaluation context for one term over an empty theory is just a uniproduct") {
     val algebra = new unstructuredSets.Algebra[Boolean]()
-    val context = algebra.EvaluationContext[Boolean](Seq(α))
-    assert { context.evaluate(α).isIsoPlaceholderTrue }
+    val context: algebra.EvaluationContext[(Unit, Boolean)] =
+      algebra.EvaluationContext[Boolean](Seq(α)).asInstanceOf[
+        algebra.EvaluationContext[(Unit, Boolean)]
+      ]
+    val evalA: ((Unit, Boolean)) => Boolean = context.evaluate(α)
+    assert { evalA.isIsoPlaceholderTrue }
   }
 
   test("An evaluation context for two terms over an empty theory is just a biproduct") {

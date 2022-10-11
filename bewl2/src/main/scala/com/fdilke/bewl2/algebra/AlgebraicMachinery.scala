@@ -647,40 +647,24 @@ trait AlgebraicMachinery[
       object EvaluationContext {
         def apply[T : DOT](
           variables: Seq[VariableTerm[_ <: AlgebraicSort]]
-        ) =
-          variables.foldRight(
-            new SimpleEvaluationContext: EvaluationContext
+        ): EvaluationContext[_] =
+          variables.foldRight[EvaluationContext[_]](
+            SimpleEvaluationContext
           )(
             addVariableToContext
           )
 
         private def addVariableToContext(
           variable: VariableTerm[_ <: AlgebraicSort],
-          context: EvaluationContext
-        ): EvaluationContext =
-          if (variable.isScalar) then
-            new CompoundEvaluationContext[S](
-              variable.symbol,
-              context
-            )
+          context: EvaluationContext[_]
+        ): EvaluationContext[_] =
+          if (variable.isScalar) then // TODO: fold into variable
+            context.spawnCompound[S](variable.symbol)
           else
-            new CompoundEvaluationContext[T](
-              variable.symbol,
-              context
-            )
-
-//        private def carrierFor(
-//          variable: VariableTerm[_ <: AlgebraicSort]
-//        ) =
-//          if (variable.isScalar)
-//            scalars
-//          else
-//            carrier
+            context.spawnCompound[T](variable.symbol)
       }
 
-      trait EvaluationContext { // refactor as [ROOT: DOT]
-        type ROOT
-        implicit val dotRoot: DOT[ROOT]
+      trait EvaluationContext[ROOT: DOT] {
 
         def evaluate(
           term: Term[Principal]
@@ -774,11 +758,17 @@ trait AlgebraicMachinery[
         ): Boolean =
             evaluate(law.left) =!=
               evaluate(law.right)
+
+        def spawnCompound[U: DOT](
+          symbol: String
+        ): EvaluationContext[(U, ROOT)] =
+          new CompoundEvaluationContext[U, ROOT](
+            symbol,
+            this
+          )
       }
 
-      class SimpleEvaluationContext extends EvaluationContext {
-        override type ROOT = UNIT
-        override implicit val dotRoot = summon[DOT[UNIT]]
+      object SimpleEvaluationContext extends EvaluationContext[UNIT] {
 
         override def evaluate(
           term: Term[Principal]
@@ -810,15 +800,13 @@ trait AlgebraicMachinery[
           }
       }
 
-      class CompoundEvaluationContext[HEAD : DOT](
+      class CompoundEvaluationContext[HEAD : DOT, TAIL:DOT](
         name: String,
 //        head: DOT[HEAD],
-        val tail: EvaluationContext
-      ) extends EvaluationContext {
-        private type TAIL = tail.ROOT
-        override type ROOT = (HEAD, TAIL)
-        private implicit val dotTail: DOT[TAIL] = tail.dotRoot
-        override implicit val dotRoot = summon[DOT[(HEAD, TAIL)]]
+        val tail: EvaluationContext[TAIL]
+      ) extends EvaluationContext[(HEAD, TAIL)] {
+//        private implicit val dotTail: DOT[TAIL] = tail.dotRoot
+//        override implicit val dotRoot = summon[DOT[(HEAD, TAIL)]]
 
         //        override def root: BIPRODUCT[HEAD, TAIL] =
 //          head x tail.root
