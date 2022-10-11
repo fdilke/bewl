@@ -561,7 +561,6 @@ trait AlgebraicMachinery[
         )
 
         case op: AbstractBinaryOp =>
-//          val square = sourceAlgebra.carrier.squared
           (
             for {
               srcOp <- sourceAlgebra.operatorAssignments.lookup(op)
@@ -575,17 +574,12 @@ trait AlgebraicMachinery[
                   )
                 )
               }
-//                tgtOp(
-//                  arrow o square.π0,
-//                  arrow o square.π1
-//                )
             }
           ) getOrElse bail(
             "Not found in source algebra: " + op.name
           )
 
         case op: AbstractRightScalarBinaryOp =>
-//          val carrierScalars = sourceAlgebra.carrier x scalars
           (
             for {
               srcOp <- sourceAlgebra.operatorAssignments.lookup(op)
@@ -599,12 +593,6 @@ trait AlgebraicMachinery[
                   )
                 )
               }
-
-//              (arrow o srcOp.arrow) ==
-//                tgtOp(
-//                  arrow o carrierScalars.π0,
-//                  carrierScalars.π1
-//                )
             }
           ) getOrElse bail(
             "Not found in source algebra: " + op.name

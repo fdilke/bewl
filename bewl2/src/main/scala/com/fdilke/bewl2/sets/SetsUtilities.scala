@@ -50,7 +50,7 @@ object SetsUtilities:
   ): Unit => X =
     _ => value
 
-  def makeNullaryOperator[X: Set](
+  def makeUnaryOperator[X: Set](
     values: (X, X)*
   ): X => X =
     val map: Map[X, X] = Map[X, X](values: _*)
