@@ -5,11 +5,10 @@ import munit.FunSuite
 import com.fdilke.bewl2.sets.SetsUtilities._
 
 class AlgebraicMachinerySpec extends FunSuite:
-  test("placeholder") {
+//  test("placeholder") {
+//
+//  }
 
-  }
-
-/*
 //  private val topos: Sets.type = com.fdilke.bewl2.sets.Sets
 //  import com.fdilke.bewl2.sets.Sets
 //  import Sets.StandardTermsAndOperators._
@@ -48,9 +47,10 @@ class AlgebraicMachinerySpec extends FunSuite:
     intercept[IllegalArgumentException] {
       context.evaluateScalar(II)
     }
-    assert { context.evaluate(o) =!= theO }
+    assert { context.evaluate(o).asInstanceOf[Unit => Boolean] =!= theO }
   }
 
+/*
   test("An evaluation context for one term over an empty theory is just a uniproduct") {
 //      val carrier = dot[Boolean](true, false)
     val algebra = new unstructuredSets.Algebra[Boolean]()
