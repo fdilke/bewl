@@ -54,10 +54,17 @@ class AlgebraicMachinerySpec extends FunSuite:
 
   test("An evaluation context for two terms over an empty theory is just a biproduct") {
     val algebra = new unstructuredSets.Algebra[Boolean]()
-    val context = algebra.EvaluationContext[Boolean](Seq(α, β))
-    val to_a: ((Boolean, Boolean)) => Boolean = context.evaluate(α).asInstanceOf[ ((Boolean, Boolean)) => Boolean ]
-    val to_b: ((Boolean, Boolean)) => Boolean = context.evaluate(β).asInstanceOf[ ((Boolean, Boolean)) => Boolean ]
+    val context: algebra.EvaluationContext[(Boolean, (Boolean, Unit))] =
+      algebra.EvaluationContext[Boolean](Seq(α, β)).asInstanceOf[
+        algebra.EvaluationContext[(Boolean, (Boolean, Unit))]
+      ]
 
+    val to_a: ((Boolean, (Boolean, Unit))) => Boolean = context.evaluate(α)
+    val to_b: ((Boolean, (Boolean, Unit))) => Boolean = context.evaluate(β)
+
+    assert {
+      !( to_a =!= to_b )
+    }
     (to_a x to_b).isIsoPlaceholderTrue shouldBe true
   }
 
@@ -93,12 +100,12 @@ class AlgebraicMachinerySpec extends FunSuite:
           o := theO,
           StandardTermsAndOperators.~ := twiddle
         )
-      val context: algebra.EvaluationContext[(Unit, Int)] =
+      val context: algebra.EvaluationContext[(Int, Unit)] = // or Unit, Int ??
         algebra.EvaluationContext(Seq(α)).asInstanceOf[
-          algebra.EvaluationContext[(Unit, Int)]
+          algebra.EvaluationContext[(Int, Unit)]
         ]
-      val interpretO: ((Unit, Int)) => Int = theO o toUnit[(Unit, Int)]
-      val interpretα: ((Unit, Int)) => Int = context.evaluate(α)
+      val interpretO: ((Int, Unit)) => Int = theO o toUnit[(Int, Unit)]
+      val interpretα: ((Int, Unit)) => Int = context.evaluate(α)
       assert {
         ! ( interpretα =!= interpretO )
       }
@@ -112,10 +119,9 @@ class AlgebraicMachinerySpec extends FunSuite:
       assert {
         context.evaluate(α) =!= interpretα
       }
-//      assert {
-//        context.evaluate(~(~α)) =!= interpretα
-//      }
-// TODO: fix it! this should work
+      assert {
+        context.evaluate(~(~α)) =!= interpretα
+      }
     }
 
 /*
