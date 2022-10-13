@@ -849,17 +849,12 @@ trait AlgebraicMachinery[
     }
   }
 
-  object AlgebraicTheory {
+  object AlgebraicTheory:
     def apply(operators: Operator*)(laws: Law*) =
       new AlgebraicTheory[UNIT]()(operators: _*)(laws: _*)
-  }
 
-  object AlgebraicTheoryWithScalars {
-    def apply[
-      S : DOT
-    ](
-       scalars: DOT[S]
-     )(
+  object AlgebraicTheoryWithScalars:
+    def apply[S : DOT](
        preassignments: OperatorAssignment[_, S]*
      )(
        operators: Operator*
@@ -867,7 +862,6 @@ trait AlgebraicMachinery[
        laws: Law*
      ) =
       new AlgebraicTheory[S](preassignments: _*)(operators: _*)(laws: _*)
-  }
 
   type Algebra = AlgebraicTheory[_]#Algebra[_]
 }
