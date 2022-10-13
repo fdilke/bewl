@@ -633,7 +633,7 @@ trait AlgebraicMachinery[
       }
 
       object EvaluationContext {
-        def apply[T : DOT](
+        def apply(
           variables: Seq[VariableTerm[_ <: AlgebraicSort]]
         ): EvaluationContext[_] =
           variables.foldRight[EvaluationContext[_]](

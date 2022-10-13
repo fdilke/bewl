@@ -35,7 +35,7 @@ class AlgebraicMachinerySpec extends FunSuite:
   test("An evaluation context for no terms can evaluate constants, not variables") {
     val pointedSets = AlgebraicTheory(o)()
     val algebra = new pointedSets.Algebra[Boolean](o := theO)
-    val context = algebra.EvaluationContext[Boolean](Seq())
+    val context = algebra.EvaluationContext(Seq())
     intercept[IllegalArgumentException] {
       context.evaluate(α)
     }
@@ -48,7 +48,7 @@ class AlgebraicMachinerySpec extends FunSuite:
   test("An evaluation context for one term over an empty theory is just a uniproduct") {
     val algebra = new unstructuredSets.Algebra[Boolean]()
     val context: algebra.EvaluationContext[(Unit, Boolean)] =
-      algebra.EvaluationContext[Boolean](Seq(α)).asInstanceOf[
+      algebra.EvaluationContext(Seq(α)).asInstanceOf[
         algebra.EvaluationContext[(Unit, Boolean)]
       ]
     val evalA: ((Unit, Boolean)) => Boolean = context.evaluate(α)
@@ -58,7 +58,7 @@ class AlgebraicMachinerySpec extends FunSuite:
   test("An evaluation context for two terms over an empty theory is just a biproduct") {
     val algebra = new unstructuredSets.Algebra[Boolean]()
     val context: algebra.EvaluationContext[(Boolean, (Boolean, Unit))] =
-      algebra.EvaluationContext[Boolean](Seq(α, β)).asInstanceOf[
+      algebra.EvaluationContext(Seq(α, β)).asInstanceOf[
         algebra.EvaluationContext[(Boolean, (Boolean, Unit))]
       ]
 
@@ -76,7 +76,7 @@ class AlgebraicMachinerySpec extends FunSuite:
     val pointedSets = AlgebraicTheory(o)()
     val algebra = new pointedSets.Algebra[Boolean](o := theO)
     val context: algebra.EvaluationContext[(Boolean, Unit)] =
-      algebra.EvaluationContext[Boolean](Seq(α)).asInstanceOf[
+      algebra.EvaluationContext(Seq(α)).asInstanceOf[
         algebra.EvaluationContext[(Boolean, Unit)]
       ]
 
@@ -165,7 +165,7 @@ class AlgebraicMachinerySpec extends FunSuite:
       ** := rightMultiply
     )
     val context: minimalAlgebra.EvaluationContext[(String, Unit)] =
-      minimalAlgebra.EvaluationContext[String](Seq(α)).asInstanceOf[
+      minimalAlgebra.EvaluationContext(Seq(α)).asInstanceOf[
         minimalAlgebra.EvaluationContext[(String, Unit)]
       ]
     val interpretO: ((String, Unit)) => String = theO o toUnit[(String, Unit)]
@@ -176,40 +176,55 @@ class AlgebraicMachinerySpec extends FunSuite:
     context.evaluate((α ** II) ** II) isArrow context.evaluate(α)
   }
 
-/*
   test("An evaluation context can do operations on scalars") {
-      val scalars = dot(0, 1, 2)
-      val scalar1 = makeNullaryOperator(scalars, 1)
-      val scalar2 = makeNullaryOperator(scalars, 2)
-      val weakActsReferencingAMonoid = AlgebraicTheoryWithScalars(scalars)(II := scalar1)(**, ***)()
-      val act = dot(x)
-      val algebra = new weakActsReferencingAMonoid.Algebra[Symbol](act)(
-        ** := (act x scalars).biArrow(act) { (_, _) => x },
-        *** := bifunctionAsBiArrow(scalars) {
-          (x, y) => (x + y) % 3
+    implicit val scalars: Set[Int] = Set(0, 1, 2)
+    val scalar1: Unit => Int = makeNullaryOperator[Int](1)
+    val scalar2: Unit => Int = makeNullaryOperator[Int](2)
+    implicit val act: Set[Symbol] = Set(Symbol("x"))
+    val idScalarUnit: OperatorAssignment[Symbol, Int] = II := scalar1
+    val weakActsReferencingAMonoid: AlgebraicTheory[Int] =
+      AlgebraicTheoryWithScalars[Int](idScalarUnit)(**, ***)()
+    val algebra: weakActsReferencingAMonoid.Algebra[Symbol] =
+      new weakActsReferencingAMonoid.Algebra[Symbol](
+        ** := { (as: (Symbol, Int)) => Symbol("x") },
+        *** := { (xy: (Int, Int)) =>
+          val (x, y) = xy
+          (x + y) % 3
         }
       )
 
-      algebra.EvaluationContext(Seq()).evaluateScalar(
-        II *** II
-      ) shouldBe scalar2
+    algebra.EvaluationContext(Seq()).asInstanceOf[
+      algebra.EvaluationContext[Unit]
+    ].evaluateScalar(
+      II *** II
+    ) isArrow scalar2
 
-      algebra.EvaluationContext(Seq(α)).evaluate(
-        α
-      ) shouldBe (act *- I)
+    algebra.EvaluationContext(Seq(α)).asInstanceOf[
+      algebra.EvaluationContext[(Symbol, Unit)]
+    ].evaluate(
+      α
+    ) isArrow π0[Symbol, Unit] // (act *- I)
 
-      algebra.EvaluationContext(Seq(α)).evaluate(
-        α ** II
-      ) shouldBe (act *- I)
 
-      algebra.EvaluationContext(Seq(Ψ)).evaluateScalar(
-        Ψ
-      ) shouldBe (scalars *- I)
+    algebra.EvaluationContext(Seq(α)).asInstanceOf[
+      algebra.EvaluationContext[(Symbol, Unit)]
+    ].evaluate(
+      α ** II
+    ) isArrow π0[Symbol, Unit]
 
-      algebra.EvaluationContext(Seq(Ψ)).evaluateScalar(
-        ((Ψ *** II) *** II) *** II
-      ) shouldBe (scalars *- I)
-    }
+    algebra.EvaluationContext(Seq(Ψ)).asInstanceOf[
+      algebra.EvaluationContext[(Int, Unit)]
+    ].evaluateScalar(
+      Ψ
+    ) isArrow π0[Int, Unit]
+
+    algebra.EvaluationContext(Seq(Ψ)).asInstanceOf[
+      algebra.EvaluationContext[(Int, Unit)]
+    ].evaluateScalar(
+      ((Ψ *** II) *** II) *** II
+    ) isArrow π0[Int, Unit]
+  }
+/*
 
   test("Algebraic theories can encapsulate commutative magmas") {
       val commutativeMagmas = AlgebraicTheory(*)(α * β := β * α)
