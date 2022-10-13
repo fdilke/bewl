@@ -57,3 +57,9 @@ object SetsUtilities:
     if summon[Set[X]] != map.keySet then
       bail("incomplete or excessive unary operator definition")
     map
+    
+  def makeBinaryOperator[X: Set](
+    values: ((X, X), X)*
+  ): ((X, X)) => X =
+    val map: Map[(X, X), X] = Map[(X, X), X](values: _*)
+    map

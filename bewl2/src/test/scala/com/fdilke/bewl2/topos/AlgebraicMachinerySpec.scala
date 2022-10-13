@@ -9,11 +9,8 @@ import scala.language.postfixOps
 
 class AlgebraicMachinerySpec extends FunSuite:
 
-//  implicit class ShouldBeToAssert[A](a: A):
-//    inline def shouldBe(b: A): Unit =
-//      assertEquals(a, b)
   extension[A](a: A)
-    inline def shouldBe(b: A): Unit =
+    inline def is(b: A): Unit =
       assertEquals(a, b)
 
   private val topos = com.fdilke.bewl2.sets.Sets
@@ -21,9 +18,15 @@ class AlgebraicMachinerySpec extends FunSuite:
   import topos.NamedLaws._
   import topos._
 
+  extension[A: Set, B: Set](arrow: A => B)
+    inline def isArrow(arrow2: A => B): Unit =
+      assert(arrow =!= arrow2)
+    inline def isNotArrow(arrow2: A => B): Unit =
+      assert( !( arrow =!= arrow2) )
+
   test("Simple and compound terms can describe their own free variables") {
-    α.freeVariables shouldBe Seq(α)
-    (α * β).freeVariables shouldBe Seq(α, β)
+    α.freeVariables is Seq(α)
+    (α * β).freeVariables is Seq(α, β)
   }
 
   private val unstructuredSets = AlgebraicTheory()()
@@ -39,7 +42,7 @@ class AlgebraicMachinerySpec extends FunSuite:
     intercept[IllegalArgumentException] {
       context.evaluateScalar(II)
     }
-    assert { context.evaluate(o).asInstanceOf[Unit => Boolean] =!= theO }
+    context.evaluate(o).asInstanceOf[Unit => Boolean] isArrow theO
   }
 
   test("An evaluation context for one term over an empty theory is just a uniproduct") {
@@ -65,24 +68,21 @@ class AlgebraicMachinerySpec extends FunSuite:
     assert {
       !( to_a =!= to_b )
     }
-    (to_a x to_b).isIsoPlaceholderTrue shouldBe true
+    (to_a x to_b).isIsoPlaceholderTrue is true
   }
 
   test("An evaluation context for one term can evaluate constants") {
 
     val pointedSets = AlgebraicTheory(o)()
     val algebra = new pointedSets.Algebra[Boolean](o := theO)
-    val context = algebra.EvaluationContext[Boolean](Seq(α))
+    val context: algebra.EvaluationContext[(Boolean, Unit)] =
+      algebra.EvaluationContext[Boolean](Seq(α)).asInstanceOf[
+        algebra.EvaluationContext[(Boolean, Unit)]
+      ]
 
-    val ppp: ((Boolean, Unit)) => Boolean = context.evaluate(o).asInstanceOf[((Boolean, Unit)) => Boolean]
-    ppp((true, ()))
-    val ppt: Boolean => Boolean = b => ppp(b, ())
-
-    assert {
-      ppt =!= ( theO o toUnit[Boolean] )
+    theO o toUnit[Boolean] isArrow {
+      context.evaluate(o)(_, ())
     }
-
-    // TODO: clean this up! get rid of the casts.
   }
 
   test("An evaluation context can evaluate compound terms with unary operators") {
@@ -106,49 +106,42 @@ class AlgebraicMachinerySpec extends FunSuite:
         ]
       val interpretO: ((Int, Unit)) => Int = theO o toUnit[(Int, Unit)]
       val interpretα: ((Int, Unit)) => Int = context.evaluate(α)
-      assert {
-        ! ( interpretα =!= interpretO )
-      }
-      assert {
-        context.evaluate(o) =!= interpretO
-      }
+      interpretα isNotArrow interpretO
+      context.evaluate(o) isArrow interpretO
       val minusO: Term[Principal] = ~o
-      assert {
-        context.evaluate(~o) =!= interpretO
-      }
-      assert {
-        context.evaluate(α) =!= interpretα
-      }
-      assert {
-        context.evaluate(~(~α)) =!= interpretα
-      }
+      context.evaluate(~o) isArrow interpretO
+      context.evaluate(α) isArrow interpretα
+      context.evaluate(~(~α)) isArrow interpretα
     }
+
+  test("An evaluation context can evaluate compound terms with binary operators") {
+    implicit val carrier: Set[String] = Set[String]("unit", "x")
+    val theO: Unit => String = makeNullaryOperator[String]("unit")
+    val plus = makeBinaryOperator[String](
+      ("unit", "unit") -> "unit",
+      ("x", "unit") -> "x",
+      ("unit", "x") -> "x",
+      ("x", "x") -> "x"
+    )
+
+    val pointedMagmas = AlgebraicTheory(o, +)()
+    val algebra = new pointedMagmas.Algebra[String](o := theO, StandardTermsAndOperators.+ := plus)
+    val context: algebra.EvaluationContext[(String, Unit)] =
+      algebra.EvaluationContext(Seq(α)).asInstanceOf[
+        algebra.EvaluationContext[(String, Unit)]
+      ]
+    val interpretO: ((String, Unit)) => String = theO o toUnit[(String, Unit)]
+    val interpretα: ((String, Unit)) => String = context.evaluate(α)
+
+    interpretα isNotArrow interpretO
+    context.evaluate(o) isArrow interpretO
+    context.evaluate(o + o) isArrow interpretO
+    context.evaluate(o + α) isArrow interpretα
+    context.evaluate(α + o) isArrow interpretα
+    context.evaluate(α + o) isArrow interpretα
+  }
 
 /*
-  test("An evaluation context can evaluate compound terms with binary operators") {
-      val carrier = dot[String]("unit", "x")
-      val theO = makeNullaryOperator(carrier, "unit")
-      val plus = makeBinaryOperator(carrier,
-        ("unit", "unit") -> "unit",
-        ("x", "unit") -> "x",
-        ("unit", "x") -> "x",
-        ("x", "x") -> "x"
-      )
-
-      val pointedMagmas = AlgebraicTheory(o, $plus)()
-      val algebra = new pointedMagmas.Algebra[String](carrier)(o := theO, $plus := plus)
-      val context = algebra.EvaluationContext(Seq(α))
-      val interpretO = theO o context.root.toI
-      val interpretα = context.evaluate(α)
-
-      interpretα should not be interpretO
-      context.evaluate(o) shouldBe interpretO
-      context.evaluate(o + o) shouldBe interpretO
-      context.evaluate(o + α) shouldBe interpretα
-      context.evaluate(α + o) shouldBe interpretα
-      context.evaluate(α + o) shouldBe interpretα
-    }
-
   test("An evaluation context can evaluate compound terms with mixed binary operators") {
       val scalars = dot[Int](0, 1, 2)
 
