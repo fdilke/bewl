@@ -790,14 +790,8 @@ trait AlgebraicMachinery[
 
       class CompoundEvaluationContext[HEAD : DOT, TAIL:DOT](
         name: String,
-//        head: DOT[HEAD],
         val tail: EvaluationContext[TAIL]
       ) extends EvaluationContext[(HEAD, TAIL)] {
-//        private implicit val dotTail: DOT[TAIL] = tail.dotRoot
-//        override implicit val dotRoot = summon[DOT[(HEAD, TAIL)]]
-
-        //        override def root: BIPRODUCT[HEAD, TAIL] =
-//          head x tail.root
 
         override def evaluate(
           term: Term[Principal]

@@ -57,9 +57,19 @@ object SetsUtilities:
     if summon[Set[X]] != map.keySet then
       bail("incomplete or excessive unary operator definition")
     map
-    
+
   def makeBinaryOperator[X: Set](
     values: ((X, X), X)*
   ): ((X, X)) => X =
     val map: Map[(X, X), X] = Map[(X, X), X](values: _*)
     map
+
+  // TODO: the same as Function.tupled?
+//  def bifunctionAsBiArrow[L: Set, R: Set, T: Set](
+//    bifunc: (L, R) => T
+//  ): Sets.BiArrow[L, R, T] =
+//    Function.tupled(bifunc)
+    
+//  {
+//    case (l, r): bifunc(l, r)
+//  }

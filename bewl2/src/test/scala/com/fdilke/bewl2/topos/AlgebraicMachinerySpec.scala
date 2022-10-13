@@ -141,37 +141,35 @@ class AlgebraicMachinerySpec extends FunSuite:
     context.evaluate(α + o) isArrow interpretα
   }
 
+//  test("An evaluation context can evaluate compound terms with mixed binary operators") {
+//      implicit val scalars: Set[Int] = Set[Int](0, 1, 2)
+//      implicit val carrier: Set[String] = Set[String]("o", "i")
+//
+//      val theO: Unit => String = makeNullaryOperator[String]("o")
+//      val scalar1: Unit => Int = makeNullaryOperator[Int](2)
+//      val rightMultiply: BiArrow[String, Int, String] = Map(
+//        ("o", 0) -> "o",
+//        ("i", 0) -> "o",
+//        ("o", 1) -> "i",
+//        ("i", 1) -> "i",
+//        ("o", 2) -> "i",
+//        ("i", 2) -> "o"
+//      )
+//
+//      val pointedWeakActs = AlgebraicTheoryWithScalars(II := scalar1)(o, II, **)()
+//      val minimalAlgebra = new pointedWeakActs.Algebra[String](carrier)(
+//        o := theO, ** := rightMultiply
+//      )
+//      val context = minimalAlgebra.EvaluationContext(Seq(α))
+//      val interpretO = theO o context.root.toI
+//      val interpretI = makeNullaryOperator(carrier, "i") o context.root.toI
+//
+//      context.evaluate(o) shouldBe interpretO
+//      context.evaluate(o ** II) shouldBe interpretI
+//      context.evaluate((α ** II) ** II) shouldBe context.evaluate(α)
+//    }
+
 /*
-  test("An evaluation context can evaluate compound terms with mixed binary operators") {
-      val scalars = dot[Int](0, 1, 2)
-
-      val carrier = dot[String]("o", "i")
-      val theO = makeNullaryOperator(carrier, "o")
-      val scalar1 = makeNullaryOperator(scalars, 2)
-      val rightMultiply = bifunctionAsBiArrow(carrier, scalars, carrier)(
-        Function untupled Map(
-          ("o", 0) -> "o",
-          ("i", 0) -> "o",
-          ("o", 1) -> "i",
-          ("i", 1) -> "i",
-          ("o", 2) -> "i",
-          ("i", 2) -> "o"
-        )
-      )
-
-      val pointedWeakActs = AlgebraicTheoryWithScalars(scalars)(II := scalar1)(o, II, **)()
-      val minimalAlgebra = new pointedWeakActs.Algebra[String](carrier)(
-        o := theO, ** := rightMultiply
-      )
-      val context = minimalAlgebra.EvaluationContext(Seq(α))
-      val interpretO = theO o context.root.toI
-      val interpretI = makeNullaryOperator(carrier, "i") o context.root.toI
-
-      context.evaluate(o) shouldBe interpretO
-      context.evaluate(o ** II) shouldBe interpretI
-      context.evaluate((α ** II) ** II) shouldBe context.evaluate(α)
-    }
-
   test("An evaluation context can do operations on scalars") {
       val scalars = dot(0, 1, 2)
       val scalar1 = makeNullaryOperator(scalars, 1)
