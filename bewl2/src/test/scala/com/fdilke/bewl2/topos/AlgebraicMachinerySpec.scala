@@ -5,7 +5,7 @@ import com.fdilke.bewl2.sets.Sets
 import munit.FunSuite
 import com.fdilke.bewl2.sets.SetsUtilities.*
 import com.fdilke.bewl2.utility.Direction
-import Direction._
+import Direction.*
 
 import scala.language.postfixOps
 
@@ -288,7 +288,7 @@ class AlgebraicMachinerySpec extends FunSuite:
 
     val idScalarUnit: OperatorAssignment[String, Int] = II := badPointScalar
     val weakSetsOverAPointedSet =
-      AlgebraicTheoryWithScalars(idScalarUnit)(II)()
+      AlgebraicTheoryWithScalars[Int](idScalarUnit)(II)()
     intercept[IllegalArgumentException] {
       new weakSetsOverAPointedSet.Algebra[String]().sanityTest
     }
@@ -302,76 +302,65 @@ class AlgebraicMachinerySpec extends FunSuite:
         (Up, 0) -> Down
       )
 
-    val idScalarRightMult: OperatorAssignment[Direction, Int] =
-      ** := badScalarRightMultiplication
-
     val weakActsOverASet =
       AlgebraicTheoryWithScalars[Int]()(**)()
 
     intercept[IllegalArgumentException] {
       new weakActsOverASet.Algebra[Direction](
-        idScalarRightMult
+        ** := badScalarRightMultiplication
       ).sanityTest
     }
   }
 
-/*
   test("Algebraic theories can sanity-check their algebras for scalar multiplications; sad case") {
-      val scalars = dot(0)
-      val badScalarMultiplication =
-        bifunctionAsBiArrow(scalars) {
-          Function untupled Map(
+    implicit val scalars: Set[Int] = Set(0)
+      val badScalarMultiplication: ((Int, Int)) => Int =
+        Map(
             (0, 0) -> 1
           )
-        }
+      implicit val carrier: Set[String] = Set("x")
+
       val weakActsOverASet =
-        AlgebraicTheoryWithScalars(scalars)()(***)()
+        AlgebraicTheoryWithScalars[Int]()(***)()
       intercept[IllegalArgumentException] {
-        new weakActsOverASet.Algebra[Boolean](
-          dot(true)
-        )(
+        new weakActsOverASet.Algebra[String](
           *** := badScalarMultiplication
         ).sanityTest
       }
     }
 
   test("Algebraic theories can validate morphisms preserving unary operations") {
-    val carrierStrings = dot[String]("+", "-")
-    val minusStrings = makeUnaryOperator(carrierStrings,
-      "+" -> "-",
-      "-" -> "+"
-    )
-    val carrierInts = dot[Int](1, -1)
-    val minusInts = makeUnaryOperator(carrierInts,
-      1 -> -1,
-      -1 -> 1
-    )
-    val wrongSource = dot[String]("*")
-    val wrongTarget = dot[Int](0)
+    implicit val carrierString: Set[String] = Set("+", "-")
+    val minusStrings: String => String =
+      makeUnaryOperator[String](values =
+        "+" -> "-",
+        "-" -> "+"
+      )
+    implicit val carrierInts: Set[Int] = Set(1, -1)
+    val minusInts: Int => Int =
+      makeUnaryOperator[Int](values =
+        1 -> -1,
+        -1 -> 1
+      )
 
     val setsWithInvolution = AlgebraicTheory(~)(~(~α) := α)
-    val algebraStrings = new setsWithInvolution.Algebra[String](carrierStrings)($tilde := minusStrings)
-    val algebraInts = new setsWithInvolution.Algebra[Int](carrierInts)($tilde := minusInts)
+    val algebraStrings = new setsWithInvolution.Algebra[String](
+      StandardTermsAndOperators.~ := minusStrings
+    )
+    val algebraInts = new setsWithInvolution.Algebra[Int](
+      StandardTermsAndOperators.~ := minusInts
+    )
     algebraStrings.sanityTest
     algebraInts.sanityTest
 
-    val morphism = arrow(carrierStrings, carrierInts)("+" -> 1, "-" -> -1)
-    val morphismWithWrongSource = arrow(wrongSource, carrierInts)("*" -> 1)
-    morphismWithWrongSource.sanityTest
-    val morphismWithWrongTarget = arrow(carrierStrings, wrongTarget)("+" -> 0, "-" -> 0)
-    morphismWithWrongTarget.sanityTest
-    setsWithInvolution.isMorphism(algebraStrings, algebraInts, morphism) shouldBe true
-    intercept[IllegalArgumentException] {
-      setsWithInvolution.isMorphism(algebraStrings, algebraInts, morphismWithWrongSource) shouldBe true
-    }
-    intercept[IllegalArgumentException] {
-      setsWithInvolution.isMorphism(algebraStrings, algebraInts, morphismWithWrongTarget) shouldBe true
-    }
+    val morphism: String => Int = Map("+" -> 1, "-" -> -1)
+    setsWithInvolution.isMorphism(algebraStrings, algebraInts, morphism) is true
 
-    val notAMorphism = arrow(carrierStrings, carrierInts)("+" -> 1, "-" -> 1)
-    setsWithInvolution.isMorphism(algebraStrings, algebraInts, notAMorphism) shouldBe false
+    val notAMorphism: String => Int = Map("+" -> 1, "-" -> 1)
+    setsWithInvolution.isMorphism(algebraStrings, algebraInts, notAMorphism) is false
   }
 
+/*
   test("Algebraic theories can validate morphisms preserving constants") {
     val carrierInts = dot[Int](0, 1, 2)
     val pointInts = makeNullaryOperator(carrierInts, 0)

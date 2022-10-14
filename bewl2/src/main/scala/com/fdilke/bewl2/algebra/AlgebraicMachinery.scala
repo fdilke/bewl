@@ -620,14 +620,11 @@ trait AlgebraicMachinery[
       def x[U : DOT](
        that: Algebra[U]
       ): Algebra[(T, U)] = {
-//        val productCarrier = carrier x that.carrier
         new Algebra[(T, U)](
           OperatorAssignments(
             assignments
           ).crossedWith(
             OperatorAssignments(that.assignments)
-//            productCarrier,
-//            scalars
           ): _*
         )
       }
