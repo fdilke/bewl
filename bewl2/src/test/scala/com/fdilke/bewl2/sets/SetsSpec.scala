@@ -3,15 +3,13 @@ package com.fdilke.bewl2.sets
 import com.fdilke.bewl2.Topos
 import com.fdilke.bewl2.sets.Sets
 import com.fdilke.bewl2.topos.GenericToposSpec
+import com.fdilke.bewl2.utility.Direction
 import munit.FunSuite
+import Direction._
 
 class SetsSpec extends GenericToposSpec()(Sets):
 
   import topos.*
-
-  sealed trait Direction
-  case object Up extends Direction
-  case object Down extends Direction
 
   override type FOO = Direction
   override implicit val dotFoo: Set[Direction] =

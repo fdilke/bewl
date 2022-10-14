@@ -4,6 +4,8 @@ import com.fdilke.bewl2.algebra.Principal
 import com.fdilke.bewl2.sets.Sets
 import munit.FunSuite
 import com.fdilke.bewl2.sets.SetsUtilities.*
+import com.fdilke.bewl2.utility.Direction
+import Direction._
 
 import scala.language.postfixOps
 
@@ -205,7 +207,6 @@ class AlgebraicMachinerySpec extends FunSuite:
       α
     ) isArrow π0[Symbol, Unit] // (act *- I)
 
-
     algebra.EvaluationContext(Seq(α)).asInstanceOf[
       algebra.EvaluationContext[(Symbol, Unit)]
     ].evaluate(
@@ -224,111 +225,97 @@ class AlgebraicMachinerySpec extends FunSuite:
       ((Ψ *** II) *** II) *** II
     ) isArrow π0[Int, Unit]
   }
-/*
 
   test("Algebraic theories can encapsulate commutative magmas") {
-      val commutativeMagmas = AlgebraicTheory(*)(α * β := β * α)
-      case class CommutativeMagma[T](
-        override val carrier: DOT[T],
-        op: BinaryOp[T]
-      ) extends commutativeMagmas.Algebra[T](carrier)(* := op)
+    val commutativeMagmas = AlgebraicTheory(*)(α * β := β * α)
+    case class CommutativeMagma[T: Set](
+      op: BinaryOp[T]
+    ) extends commutativeMagmas.Algebra[T](* := op)
 
-      val carrier = dot(true, false)
-      val commutativeOp = bifunctionAsBiArrow(carrier) { _ & _}
-      val nonCommutativeOp = bifunctionAsBiArrow(carrier) { _ & !_ }
+    val commutativeOp: ((Boolean, Boolean)) => Boolean = Function.tupled { _ & _}
+    val nonCommutativeOp: ((Boolean, Boolean)) => Boolean = Function.tupled { _ & !_ }
 
      intercept[IllegalArgumentException] {
-        new commutativeMagmas.Algebra[Boolean](carrier)().sanityTest
+        new commutativeMagmas.Algebra[Boolean]().sanityTest
      }
      intercept[IllegalArgumentException] {
-        new commutativeMagmas.Algebra[Boolean](carrier)($plus := commutativeOp).sanityTest
+        new commutativeMagmas.Algebra[Boolean](StandardTermsAndOperators.+ := commutativeOp).sanityTest
      }
 
-      CommutativeMagma(carrier, commutativeOp).sanityTest
-      intercept[IllegalArgumentException] {
-        CommutativeMagma(carrier, nonCommutativeOp).sanityTest
-      }
+    CommutativeMagma[Boolean](commutativeOp).sanityTest
+    intercept[IllegalArgumentException] {
+      CommutativeMagma[Boolean](nonCommutativeOp).sanityTest
     }
+  }
 
   test("Algebraic theories can sanity-check their algebras for valid nullary operators") {
-      val carrier = dot(0)
-      val pointedSets = AlgebraicTheory(o)()
-      val badZero =
-        makeNullaryOperator(carrier, 1)
+    implicit val carrier: Set[Int] = Set(0)
+    val pointedSets = AlgebraicTheory(o)()
+    val badZero: Unit => Int = makeNullaryOperator[Int](1)
 
-      intercept[IllegalArgumentException] {
-        new pointedSets.Algebra[Int](
-          carrier
-        )(o := badZero).sanityTest
-      }
+    intercept[IllegalArgumentException] {
+      new pointedSets.Algebra[Int](o := badZero).sanityTest
     }
+  }
 
   test("Algebraic theories can sanity-check their algebras for valid unary operators") {
-        val setsWithInvolution = AlgebraicTheory(~)(~(~α) := α)
-        val carrier = dot(0)
-        val invertBadRange =
-          makeUnaryOperator(
-            carrier,
-            0 -> 1,
-          )
-        intercept[IllegalArgumentException] {
-          new setsWithInvolution.Algebra[Int](
-            carrier
-          )(
-            $tilde := invertBadRange
-          ).sanityTest
-        }
-      }
+    val setsWithInvolution = AlgebraicTheory(~)(~(~α) := α)
+    implicit val carrier: Set[Int] = Set(0)
+    val invertBadRange: Int => Int = makeUnaryOperator[Int](0 -> 1)
+    intercept[IllegalArgumentException] {
+      new setsWithInvolution.Algebra[Int](
+        StandardTermsAndOperators.~ := invertBadRange
+      ).sanityTest
+    }
+  }
 
   test("Algebraic theories can sanity-check their algebras for valid binary operators") {
-      val magmas = AlgebraicTheory(*)()
-      val carrier = dot(1)
-      val combineBadRange =
-        bifunctionAsBiArrow(
-          carrier
-        ) { _ + _ }
-      intercept[IllegalArgumentException] {
-        new magmas.Algebra[Int](
-          carrier
-        )(
-          * := combineBadRange
-        ).sanityTest
-      }
+    val magmas = AlgebraicTheory(*)()
+    implicit val carrier: Set[Int] = Set(1)
+    val combineBadRange: ((Int, Int)) => Int = Function.tupled { _ + _ }
+
+    intercept[IllegalArgumentException] {
+      new magmas.Algebra[Int](
+        * := combineBadRange
+      ).sanityTest
     }
+  }
 
   test("Algebraic theories can sanity-check their algebras for scalar constants") {
-      val scalars = dot(0)
-      val badPointScalar =
-        makeNullaryOperator(scalars, 1)
-      val weakSetsOverAPointedSet =
-        AlgebraicTheoryWithScalars(scalars)(II := badPointScalar)(II)()
-      intercept[IllegalArgumentException] {
-        new weakSetsOverAPointedSet.Algebra[String](
-          dot("")
-        )().sanityTest
-      }
+    implicit val scalars: Set[Int] = Set(0)
+    implicit val carrier: Set[String] = Set("x")
+    val badPointScalar: Unit => Int = makeNullaryOperator[Int](1)
+
+    val idScalarUnit: OperatorAssignment[String, Int] = II := badPointScalar
+    val weakSetsOverAPointedSet =
+      AlgebraicTheoryWithScalars(idScalarUnit)(II)()
+    intercept[IllegalArgumentException] {
+      new weakSetsOverAPointedSet.Algebra[String]().sanityTest
     }
+  }
 
   test("Algebraic theories can sanity-check their algebras for right scalar multiplications") {
-      val scalars = dot(0)
-      val carrier = dot(true)
-      val badScalarRightMultiplication =
-        bifunctionAsBiArrow(carrier, scalars, carrier) {
-          Function untupled Map(
-            (true, 0) -> false
-          )
-        }
-      val weakActsOverASet =
-        AlgebraicTheoryWithScalars(scalars)()(**)()
-      intercept[IllegalArgumentException] {
-        new weakActsOverASet.Algebra[Boolean](
-          carrier
-        )(
-          ** := badScalarRightMultiplication
-        ).sanityTest
-      }
-    }
+    implicit val scalars: Set[Int] = Set(0)
+    implicit val carrier: Set[Direction] = Set(Up)
+    val badScalarRightMultiplication : ((Direction, Int)) => Direction =
+      Map(
+        (Up, 0) -> Down
+      )
 
+    val idScalarRightMult: OperatorAssignment[Direction, Int] =
+      ** := badScalarRightMultiplication
+
+    val weakActsOverASet =
+      AlgebraicTheoryWithScalars[Int]()(**)()
+
+    intercept[IllegalArgumentException] {
+      new weakActsOverASet.Algebra[Direction](
+        idScalarRightMult
+      ).sanityTest
+    }
+  }
+
+/*
   test("Algebraic theories can sanity-check their algebras for scalar multiplications; sad case") {
       val scalars = dot(0)
       val badScalarMultiplication =

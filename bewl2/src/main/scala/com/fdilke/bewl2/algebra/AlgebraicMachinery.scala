@@ -621,7 +621,7 @@ trait AlgebraicMachinery[
        that: Algebra[U]
       ): Algebra[(T, U)] = {
 //        val productCarrier = carrier x that.carrier
-        new Algebra(
+        new Algebra[(T, U)](
           OperatorAssignments(
             assignments
           ).crossedWith(
