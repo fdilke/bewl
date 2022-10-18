@@ -360,70 +360,67 @@ class AlgebraicMachinerySpec extends FunSuite:
     setsWithInvolution.isMorphism(algebraStrings, algebraInts, notAMorphism) is false
   }
 
-/*
   test("Algebraic theories can validate morphisms preserving constants") {
-    val carrierInts = dot[Int](0, 1, 2)
-    val pointInts = makeNullaryOperator(carrierInts, 0)
-    val carrierStrings = dot[String]("samson", "delilah")
-    val pointStrings = makeNullaryOperator(carrierStrings, "delilah")
+    implicit val carrierInts: Set[Int] = Set[Int](0, 1, 2)
+    val pointInts: Unit => Int = makeNullaryOperator(0)
+    implicit val carrierStrings: Set[String] = Set[String]("samson", "delilah")
+    val pointStrings: Unit => String = makeNullaryOperator("delilah")
 
     val pointedSets = AlgebraicTheory(o)()
-    val algebraStrings = new pointedSets.Algebra[String](carrierStrings)(o := pointStrings)
-    val algebraInts = new pointedSets.Algebra[Int](carrierInts)(o := pointInts)
+    val algebraStrings = new pointedSets.Algebra[String](o := pointStrings)
+    val algebraInts = new pointedSets.Algebra[Int](o := pointInts)
 
-    val morphism = arrow(carrierStrings, carrierInts)("samson" -> 1, "delilah" -> 0)
-    val notAMorphism = arrow(carrierStrings, carrierInts)("samson" -> 1, "delilah" -> 1)
+    val morphism: String => Int = Map("samson" -> 1, "delilah" -> 0)
+    val notAMorphism: String => Int = Map("samson" -> 1, "delilah" -> 1)
 
-    pointedSets.isMorphism(algebraStrings, algebraInts, morphism) shouldBe true
-    pointedSets.isMorphism(algebraStrings, algebraInts, notAMorphism) shouldBe false
+    pointedSets.isMorphism(algebraStrings, algebraInts, morphism) is true
+    pointedSets.isMorphism(algebraStrings, algebraInts, notAMorphism) is false
   }
 
   test("Algebraic theories can validate morphisms preserving binary operations") {
-    val carrier = dot[Int](0, 1, 2, 3)
-    val multiplication = bifunctionAsBiArrow(carrier) {
+    implicit val carrierInts: Set[Int] = Set[Int](0, 1, 2, 3)
+    val multiplication: ((Int, Int)) => Int = Function.tupled {
       (x, y) => (x + y) % 4
     }
 
     val magmas = AlgebraicTheory(*)()
-    val algebra = new magmas.Algebra[Int](carrier)(* := multiplication)
+    val algebra = new magmas.Algebra[Int](* := multiplication)
 
-    val morphism = arrow(carrier, carrier)(0 -> 0, 1 -> 2, 2 -> 0, 3 -> 2)
-    val notAMorphism = arrow(carrier, carrier)(0 -> 1, 1 -> 2, 2 -> 3, 3 -> 0)
+    val morphism: Int => Int = Map(0 -> 0, 1 -> 2, 2 -> 0, 3 -> 2)
+    val notAMorphism: Int => Int = Map(0 -> 1, 1 -> 2, 2 -> 3, 3 -> 0)
 
-    magmas.isMorphism(algebra, algebra, morphism) shouldBe true
-    magmas.isMorphism(algebra, algebra, notAMorphism) shouldBe false
+    magmas.isMorphism(algebra, algebra, morphism) is true
+    magmas.isMorphism(algebra, algebra, notAMorphism) is false
   }
 
   test("Algebraic theories can validate morphisms preserving mixed operations with scalars") {
-    val scalars = dot[Symbol](q)
-    val pointScalar = makeNullaryOperator(scalars, q)
-    val carrier = dot[Boolean](true, false)
-    val multiplication = bifunctionAsBiArrow(carrier, scalars, carrier) {
-      Function untupled Map(
+    val q = Symbol("q")
+    implicit val scalars: Set[Symbol] = Set(q)
+    val pointScalar: Unit => Symbol = makeNullaryOperator[Symbol](q)
+    val multiplication: ((Boolean, Symbol)) => Boolean = Map(
         (true, q) -> false,
         (false, q) -> true
       )
-    }
 
-    val weakActsOverAPointedMagma = AlgebraicTheoryWithScalars(scalars)(II := pointScalar)(II, **)()
-    val algebra = new weakActsOverAPointedMagma.Algebra[Boolean](carrier)(** := multiplication)
+    val weakActsOverAPointedMagma = AlgebraicTheoryWithScalars[Symbol](II := pointScalar)(II, **)()
+    val algebra = new weakActsOverAPointedMagma.Algebra[Boolean](** := multiplication)
     algebra.sanityTest
 
-    val morphism = arrow(carrier, carrier)(true -> false, false -> true)
-    val notAMorphism = arrow(carrier, carrier)(true -> true, false -> true)
+    val morphism: Boolean => Boolean = Map(true -> false, false -> true)
+    val notAMorphism: Boolean => Boolean = Map(true -> true, false -> true)
 
-    weakActsOverAPointedMagma.isMorphism(algebra, algebra, morphism) shouldBe true
-    weakActsOverAPointedMagma.isMorphism(algebra, algebra, notAMorphism) shouldBe false
+    weakActsOverAPointedMagma.isMorphism(algebra, algebra, morphism) is true
+    weakActsOverAPointedMagma.isMorphism(algebra, algebra, notAMorphism) is false
   }
 
   test("Algebraic theories support named laws with error reporting when they fail") {
     import NamedLaws._
-    val carrier = dot[Int](1, -1)
-    val minusGood = makeUnaryOperator(carrier,
+    implicit val carrier: Set[Int] = Set(1, -1)
+    val minusGood: Int => Int = Map(
       1 -> -1,
       -1 -> 1
     )
-    val minusBad = makeUnaryOperator(carrier,
+    val minusBad: Int => Int = Map(
       1 -> 1,
       -1 -> 1
     )
@@ -431,16 +428,16 @@ class AlgebraicMachinerySpec extends FunSuite:
     val setsWithInvolution = AlgebraicTheory(~)(
       "involutive" law (~(~α) := α)
     )
-    new setsWithInvolution.Algebra[Int](carrier)($tilde := minusGood).sanityTest
+    new setsWithInvolution.Algebra[Int](StandardTermsAndOperators.~ := minusGood).sanityTest
     intercept[IllegalArgumentException] {
-      new setsWithInvolution.Algebra[Int](carrier)($tilde := minusBad).sanityTest
-    }.getMessage should include("involutive")
+      new setsWithInvolution.Algebra[Int](StandardTermsAndOperators.~ := minusBad).sanityTest
+    }.getMessage.contains("involutive") is true
   }
 
   test("Algebraic theories can verify additional laws once an algebra is constructed") {
     import NamedLaws._
-    val carrier = dot[Int](1, -1)
-    val minus = makeUnaryOperator(carrier,
+    implicit val carrier: Set[Int] = Set[Int](1, -1)
+    val minus: Int => Int = Map(
       1 -> -1,
       -1 -> 1
     )
@@ -448,106 +445,119 @@ class AlgebraicMachinerySpec extends FunSuite:
     val setsWithInvolution = AlgebraicTheory(~)(
       "involutive" law (~(~α) := α)
     )
-    val algebra = new setsWithInvolution.Algebra[Int](carrier)($tilde := minus)
+    val algebra = new setsWithInvolution.Algebra[Int](StandardTermsAndOperators.~ := minus)
     algebra.sanityTest
 
     algebra.satisfies(
       ~α := α
-    ) shouldBe false
+    ) is false
     algebra.satisfies(
       ~α := ~(~(~α))
-    ) shouldBe true
+    ) is true
   }
 
   test("Algebraic theories can be extended by adding new constants/operations, and laws ") {
-      val magmas = AlgebraicTheory(*)()
-      val commutativeMagmasWith1 =
-        magmas.extend(ι)(
-          "commutative" law( α * β := β * α ),
-          "unit" law( α * ι := α )
-        )
-      case class CommutativeMagmaWith1[T](
-        override val carrier: DOT[T],
-        unit: NullaryOp[T],
-        op: BinaryOp[T]
-      ) extends commutativeMagmasWith1.Algebra[T](carrier)(
-        ι := unit,
-        * := op
+    val magmas = AlgebraicTheory(*)()
+    val commutativeMagmasWith1 =
+      magmas.extend(ι)(
+        "commutative" law( α * β := β * α ),
+        "unit" law( α * ι := α )
       )
+    case class CommutativeMagmaWith1[T: Set](
+      unit: NullaryOp[T],
+      op: BinaryOp[T]
+    ) extends commutativeMagmasWith1.Algebra[T](
+      ι := unit,
+      * := op
+    )
 
-      val carrier = dot(true, false)
-      val commutativeOp = bifunctionAsBiArrow(carrier) { _ & _}
-      val nonCommutativeOp = bifunctionAsBiArrow(carrier) { _ & !_ }
-      val okUnit = makeNullaryOperator(carrier, true)
-      val notOkUnit = makeNullaryOperator(carrier, false)
+    val commutativeOp: ((Boolean, Boolean)) => Boolean = Function.tupled { _ & _}
+    val nonCommutativeOp: ((Boolean, Boolean)) => Boolean = Function.tupled{ _ & !_ }
+    val okUnit: Unit => Boolean = makeNullaryOperator(true)
+    val notOkUnit: Unit => Boolean = makeNullaryOperator(false)
 
+    new CommutativeMagmaWith1[Boolean](
+      okUnit,
+      commutativeOp
+    ).sanityTest
+
+    intercept[IllegalArgumentException] {
       new CommutativeMagmaWith1[Boolean](
-        carrier,
         okUnit,
+        nonCommutativeOp
+      ).sanityTest
+    }.getMessage is "commutative law failed"
+
+    intercept[IllegalArgumentException] {
+      new CommutativeMagmaWith1[Boolean](
+        notOkUnit,
         commutativeOp
       ).sanityTest
-
-      intercept[IllegalArgumentException] {
-        new CommutativeMagmaWith1[Boolean](
-          carrier,
-          okUnit,
-          nonCommutativeOp
-        ).sanityTest
-      }.getMessage shouldBe "commutative law failed"
-
-      intercept[IllegalArgumentException] {
-        new CommutativeMagmaWith1[Boolean](
-          carrier,
-          notOkUnit,
-          commutativeOp
-        ).sanityTest
-      }.getMessage shouldBe "unit law failed"
+    }.getMessage is "unit law failed"
   }
 
-  test("Algebraic theories upport binary multiplication of their algebras") {
-    def integersMod(n: Int) = {
-      val carrier = makeDot(0 until n)
-      new Group[Int](
-        carrier,
-        makeNullaryOperator(carrier, 0),
-        bifunctionAsBiArrow(carrier) {
-          (x: Int, y:Int) => (x + y) % n
-        },
-        functionAsArrow(
-          carrier,
-          carrier,
-          i => (n - i) % n
-        )
-      )
+
+  def withIntsMod[R](
+    modulus: Int
+  )(
+    block: [I] => Set[I] ?=> R
+  ): R =
+    maskSetDot[Int, R](
+      dot = 0 until modulus toSet
+    )(block)
+
+//    [Int4] => Set[Int4]
+
+  test("Algebraic theories support binary multiplication of their algebras") {
+//    def withIntegersMod(n: Int)(block: Set[Int] ?=> ) = {
+//      val carrier = makeDot(0 until n)
+//      new Group[Int](
+//        carrier,
+//        makeNullaryOperator(carrier, 0),
+//        bifunctionAsBiArrow(carrier) {
+//          (x: Int, y:Int) => (x + y) % n
+//        },
+//        functionAsArrow(
+//          carrier,
+//          carrier,
+//          i => (n - i) % n
+//        )
+//      )
+//    }
+  withIntsMod(2) (
+    [Int2] => (qq: Set[Int2]) ?=> {
+      println("seems to work")
     }
-    val c2 = integersMod(2)
-    val c3 = integersMod(3)
-    val c6 = integersMod(6)
-    c2.sanityTest
-    c3.sanityTest
-    c6.sanityTest
-    val c2xc3: Group[Int x Int] =
-      c2 x c3
-    c2xc3.sanityTest
-    val product =
-      c2.carrier x c3.carrier
-    c2xc3.carrier shouldBe ( product )
-    c6.carrier(c2xc3.carrier) {
-      a => product.pair(a % 2, a % 3)
-    } shouldBe iso
-
-    groups.isMorphism(
-      c2xc3,
-      c2,
-      product.π0
-    ) shouldBe true
-    groups.isMorphism(
-      c2xc3,
-      c3,
-      product.π1
-    ) shouldBe true
+  )
+//    val c2 = integersMod(2)
+//    val c3 = integersMod(3)
+//    val c6 = integersMod(6)
+//    c2.sanityTest
+//    c3.sanityTest
+//    c6.sanityTest
+//    val c2xc3: Group[Int x Int] =
+//      c2 x c3
+//    c2xc3.sanityTest
+//    val product =
+//      c2.carrier x c3.carrier
+//    c2xc3.carrier shouldBe ( product )
+//    c6.carrier(c2xc3.carrier) {
+//      a => product.pair(a % 2, a % 3)
+//    } shouldBe iso
+//
+//    groups.isMorphism(
+//      c2xc3,
+//      c2,
+//      product.π0
+//    ) shouldBe true
+//    groups.isMorphism(
+//      c2xc3,
+//      c3,
+//      product.π1
+//    ) shouldBe true
   }
 
+  /*
   test("Algebraic theories support binary multiplication of their algebras, even with scalar extensions") {
     import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
     import monoidOf3.regularAction
@@ -583,5 +593,4 @@ class AlgebraicMachinerySpec extends FunSuite:
     operatorsUsed.distinct.size shouldBe operatorsUsed.size
   }
 
-
-*/
+  */

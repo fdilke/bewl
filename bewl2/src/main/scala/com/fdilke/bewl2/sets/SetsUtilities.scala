@@ -64,12 +64,11 @@ object SetsUtilities:
     val map: Map[(X, X), X] = Map[(X, X), X](values: _*)
     map
 
-  // TODO: the same as Function.tupled?
-//  def bifunctionAsBiArrow[L: Set, R: Set, T: Set](
-//    bifunc: (L, R) => T
-//  ): Sets.BiArrow[L, R, T] =
-//    Function.tupled(bifunc)
-    
-//  {
-//    case (l, r): bifunc(l, r)
-//  }
+  def maskSetDot[X, R](
+    dot: Set[X]
+  )(
+    block: [X_] => Set[X_] ?=> R
+  ): R = {
+    implicit val _: Set[X] = dot
+    block[X]
+  }
