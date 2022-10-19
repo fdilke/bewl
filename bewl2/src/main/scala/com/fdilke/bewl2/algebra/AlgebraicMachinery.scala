@@ -45,14 +45,9 @@ trait AlgebraicMachinery[
       Law(left, right, Some(name))
   }
 
-  object NamedLaws {
-    implicit class NamedLaw(
-         name: String
-     ) {
-      def law(unnamedLaw: Law) =
-        unnamedLaw.named(name)
-    }
-  }
+  extension(name: String)
+    def law(unnamedLaw: Law) =
+      unnamedLaw.named(name)
 
   sealed trait Term[
     X <: AlgebraicSort
@@ -79,10 +74,8 @@ trait AlgebraicMachinery[
     def →(other: Term[X]) =
       applyDynamic("→")(other)
 
-    def **(
-      other: Term[Scalar]
-    )(
-      implicit eq: =:=[X, Principal]
+    def **(other: Term[Scalar])(
+      implicit eq: X =:= Principal
     ) =
       BinaryRightScalarOpTerm(
         this.asInstanceOf[Term[Principal]], // cast justified by =:=
@@ -90,10 +83,8 @@ trait AlgebraicMachinery[
         other
       )
 
-    def ***(
-      other: Term[Scalar]
-    )(
-      implicit eq: =:=[X, Scalar]
+    def ***(other: Term[Scalar])(
+      implicit eq: X =:= Scalar
     ) =
       BinaryScalarOpTerm(
         this.asInstanceOf[Term[Scalar]], // cast justified by =:=
@@ -104,10 +95,8 @@ trait AlgebraicMachinery[
     def unary_~ : Term[X] =
       UnaryOpTerm(StandardTermsAndOperators.~, this)
 
-    def :=(
-      that: Term[Principal]
-    )(
-      implicit eq: =:=[X, Principal]
+    def :=(that: Term[Principal])(
+      implicit eq: X =:= Principal
     ) =
       Law(
         this.asInstanceOf[Term[Principal]], // cast justified by =:=
@@ -646,7 +635,7 @@ trait AlgebraicMachinery[
 
       trait EvaluationContext[ROOT: DOT] {
 
-        def evaluate(
+        def evaluatePrincipal(
           term: Term[Principal]
         ): ROOT ~> T
 
@@ -695,8 +684,8 @@ trait AlgebraicMachinery[
             { (r: CTXT[ROOT]) =>
               op(
                 productMagic[T, T](
-                  evaluate(term.left)(r),
-                  evaluate(term.right)(r)
+                  evaluatePrincipal(term.left)(r),
+                  evaluatePrincipal(term.right)(r)
                 )
               )
             }
@@ -711,7 +700,7 @@ trait AlgebraicMachinery[
             { (r: CTXT[ROOT]) =>
               op(
                 productMagic[T, S](
-                  evaluate(term.left)(r),
+                  evaluatePrincipal(term.left)(r),
                   evaluateScalar(term.right)(r)
                 )
               )
@@ -723,12 +712,9 @@ trait AlgebraicMachinery[
         protected def evaluateUnaryOpTerm(
           term: UnaryOpTerm[Principal]
         ): ROOT ~> T =
-          operatorAssignments.lookup(term.op) map { op => // root(carrier)
-            { (r: CTXT[ROOT]) =>
-              op(
-                evaluate(term.innerTerm)(r)
-              )
-            }
+          operatorAssignments.lookup(term.op) map { op =>
+            (r: CTXT[ROOT]) =>
+              op(evaluatePrincipal(term.innerTerm)(r))
           } getOrElse bail(
             "Unknown operator in expression: " + term.op
           )
@@ -736,8 +722,8 @@ trait AlgebraicMachinery[
         def doesSatisfy(
           law: Law
         ): Boolean =
-            evaluate(law.left) =!=
-              evaluate(law.right)
+            evaluatePrincipal(law.left) =!=
+              evaluatePrincipal(law.right)
 
         def spawnCompound[U: DOT](
           symbol: String
@@ -750,7 +736,7 @@ trait AlgebraicMachinery[
 
       object SimpleEvaluationContext extends EvaluationContext[UNIT] {
 
-        override def evaluate(
+        override def evaluatePrincipal(
           term: Term[Principal]
         ): UNIT ~> T =
           term match {
@@ -785,7 +771,7 @@ trait AlgebraicMachinery[
         val tail: EvaluationContext[TAIL]
       ) extends EvaluationContext[(HEAD, TAIL)] {
 
-        override def evaluate(
+        override def evaluatePrincipal(
           term: Term[Principal]
         ): (HEAD, TAIL) ~> T =
           term match {
@@ -802,7 +788,7 @@ trait AlgebraicMachinery[
               evaluateUnaryOpTerm(term)
 
             case _ =>
-              tail.evaluate(term) o π1[HEAD, TAIL]
+              tail.evaluatePrincipal(term) o π1[HEAD, TAIL]
           }
 
         override def evaluateScalar(

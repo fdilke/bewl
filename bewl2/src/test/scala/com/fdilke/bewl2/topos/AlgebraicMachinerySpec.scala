@@ -17,7 +17,6 @@ class AlgebraicMachinerySpec extends FunSuite:
 
   private val topos = com.fdilke.bewl2.sets.Sets
   import topos.StandardTermsAndOperators._
-  import topos.NamedLaws._
   import topos._
 
   extension[A: Set, B: Set](arrow: A => B)
@@ -42,12 +41,12 @@ class AlgebraicMachinerySpec extends FunSuite:
         algebra.EvaluationContext[Unit]
       ]
     intercept[IllegalArgumentException] {
-      context.evaluate(α)
+      context.evaluatePrincipal(α)
     }
     intercept[IllegalArgumentException] {
       context.evaluateScalar(II)
     }
-    context.evaluate(o) isArrow theO
+    context.evaluatePrincipal(o) isArrow theO
   }
 
   test("An evaluation context for one term over an empty theory is just a uniproduct") {
@@ -56,8 +55,8 @@ class AlgebraicMachinerySpec extends FunSuite:
       algebra.EvaluationContext(Seq(α)).asInstanceOf[
         algebra.EvaluationContext[(Unit, Boolean)]
       ]
-    val evalA: ((Unit, Boolean)) => Boolean = context.evaluate(α)
-    assert { evalA.isIsoPlaceholderTrue }
+    val evalA: ((Unit, Boolean)) => Boolean = context.evaluatePrincipal(α)
+    evalA.isIsoPlaceholderTrue is true
   }
 
   test("An evaluation context for two terms over an empty theory is just a biproduct") {
@@ -67,12 +66,10 @@ class AlgebraicMachinerySpec extends FunSuite:
         algebra.EvaluationContext[(Boolean, (Boolean, Unit))]
       ]
 
-    val to_a: ((Boolean, (Boolean, Unit))) => Boolean = context.evaluate(α)
-    val to_b: ((Boolean, (Boolean, Unit))) => Boolean = context.evaluate(β)
+    val to_a: ((Boolean, (Boolean, Unit))) => Boolean = context.evaluatePrincipal(α)
+    val to_b: ((Boolean, (Boolean, Unit))) => Boolean = context.evaluatePrincipal(β)
 
-    assert {
-      !( to_a =!= to_b )
-    }
+    to_a isNotArrow to_b
     (to_a x to_b).isIsoPlaceholderTrue is true
   }
 
@@ -86,7 +83,7 @@ class AlgebraicMachinerySpec extends FunSuite:
       ]
 
     theO o toUnit[Boolean] isArrow {
-      context.evaluate(o)(_, ())
+      context.evaluatePrincipal(o)(_, ())
     }
   }
 
@@ -110,13 +107,13 @@ class AlgebraicMachinerySpec extends FunSuite:
           algebra.EvaluationContext[(Int, Unit)]
         ]
       val interpretO: ((Int, Unit)) => Int = theO o toUnit[(Int, Unit)]
-      val interpretα: ((Int, Unit)) => Int = context.evaluate(α)
+      val interpretα: ((Int, Unit)) => Int = context.evaluatePrincipal(α)
       interpretα isNotArrow interpretO
-      context.evaluate(o) isArrow interpretO
+      context.evaluatePrincipal(o) isArrow interpretO
       val minusO: Term[Principal] = ~o
-      context.evaluate(~o) isArrow interpretO
-      context.evaluate(α) isArrow interpretα
-      context.evaluate(~(~α)) isArrow interpretα
+      context.evaluatePrincipal(~o) isArrow interpretO
+      context.evaluatePrincipal(α) isArrow interpretα
+      context.evaluatePrincipal(~(~α)) isArrow interpretα
     }
 
   test("An evaluation context can evaluate compound terms with binary operators") {
@@ -136,14 +133,14 @@ class AlgebraicMachinerySpec extends FunSuite:
         algebra.EvaluationContext[(String, Unit)]
       ]
     val interpretO: ((String, Unit)) => String = theO o toUnit[(String, Unit)]
-    val interpretα: ((String, Unit)) => String = context.evaluate(α)
+    val interpretα: ((String, Unit)) => String = context.evaluatePrincipal(α)
 
     interpretα isNotArrow interpretO
-    context.evaluate(o) isArrow interpretO
-    context.evaluate(o + o) isArrow interpretO
-    context.evaluate(o + α) isArrow interpretα
-    context.evaluate(α + o) isArrow interpretα
-    context.evaluate(α + o) isArrow interpretα
+    context.evaluatePrincipal(o) isArrow interpretO
+    context.evaluatePrincipal(o + o) isArrow interpretO
+    context.evaluatePrincipal(o + α) isArrow interpretα
+    context.evaluatePrincipal(α + o) isArrow interpretα
+    context.evaluatePrincipal(α + o) isArrow interpretα
   }
 
   test("An evaluation context can evaluate compound terms with mixed binary operators") {
@@ -175,9 +172,9 @@ class AlgebraicMachinerySpec extends FunSuite:
     val interpretO: ((String, Unit)) => String = theO o toUnit[(String, Unit)]
     val interpretI: ((String, Unit)) => String = makeNullaryOperator[String]("i") o toUnit[(String, Unit)]
 
-    context.evaluate(o) isArrow interpretO
-    context.evaluate(o ** II) isArrow interpretI
-    context.evaluate((α ** II) ** II) isArrow context.evaluate(α)
+    context.evaluatePrincipal(o) isArrow interpretO
+    context.evaluatePrincipal(o ** II) isArrow interpretI
+    context.evaluatePrincipal((α ** II) ** II) isArrow context.evaluatePrincipal(α)
   }
 
   test("An evaluation context can do operations on scalars") {
@@ -206,13 +203,13 @@ class AlgebraicMachinerySpec extends FunSuite:
 
     algebra.EvaluationContext(Seq(α)).asInstanceOf[
       algebra.EvaluationContext[(Symbol, Unit)]
-    ].evaluate(
+    ].evaluatePrincipal(
       α
     ) isArrow π0[Symbol, Unit] // (act *- I)
 
     algebra.EvaluationContext(Seq(α)).asInstanceOf[
       algebra.EvaluationContext[(Symbol, Unit)]
-    ].evaluate(
+    ].evaluatePrincipal(
       α ** II
     ) isArrow π0[Symbol, Unit]
 
@@ -414,7 +411,6 @@ class AlgebraicMachinerySpec extends FunSuite:
   }
 
   test("Algebraic theories support named laws with error reporting when they fail") {
-    import NamedLaws._
     implicit val carrier: Set[Int] = Set(1, -1)
     val minusGood: Int => Int = Map(
       1 -> -1,
@@ -435,7 +431,6 @@ class AlgebraicMachinerySpec extends FunSuite:
   }
 
   test("Algebraic theories can verify additional laws once an algebra is constructed") {
-    import NamedLaws._
     implicit val carrier: Set[Int] = Set[Int](1, -1)
     val minus: Int => Int = Map(
       1 -> -1,
