@@ -159,6 +159,9 @@ class AlgebraicMachinerySpec extends FunSuite:
     )
 
     val idScalarUnit: OperatorAssignment[String, Int] = II := scalar1
+//    val hehee = AlgebraicTheoryWithScalars[Int](
+//      II := scalar1 // : OperatorAssignment[String, Int]
+//    )(o, II, **)()
     val pointedWeakActs: AlgebraicTheory[Int] =
       AlgebraicTheoryWithScalars[Int](idScalarUnit)(o, II, **)()
 
@@ -504,7 +507,22 @@ class AlgebraicMachinerySpec extends FunSuite:
   ): R =
     maskSetDot[Int, R](
       dot = 0 until modulus toSet
-    )(block)
+    ) {
+//      new Group[Int](
+//        carrier,
+//        makeNullaryOperator(carrier, 0),
+//        bifunctionAsBiArrow(carrier) {
+//          (x: Int, y:Int) => (x + y) % n
+//        },
+//        functionAsArrow(
+//          carrier,
+//          carrier,
+//          i => (n - i) % n
+//        )
+//      )
+
+      block
+    }
 
 //    [Int4] => Set[Int4]
 

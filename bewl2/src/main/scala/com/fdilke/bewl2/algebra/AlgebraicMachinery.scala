@@ -105,10 +105,10 @@ trait AlgebraicMachinery[
     val freeVariables: Seq[VariableTerm[_ <: AlgebraicSort]]
 
     def :=(
-            that: Term[Principal]
-          )(
-            implicit eq: =:=[X, Principal]
-          ) =
+      that: Term[Principal]
+    )(
+      implicit eq: =:=[X, Principal]
+    ) =
       Law(
         this.asInstanceOf[Term[Principal]], // cast justified by =:=
         that
@@ -123,8 +123,8 @@ trait AlgebraicMachinery[
   case class VariableTerm[
     S <: AlgebraicSort
   ](
-     symbol: String,
-     isScalar: Boolean
+   symbol: String,
+   isScalar: Boolean
   ) extends Term[S] {
     term =>
     override val freeVariables = Seq(term)
@@ -188,7 +188,7 @@ trait AlgebraicMachinery[
   class ConstantOperator[
     X <: AlgebraicSort
   ](
-     name: String
+    name: String
   ) extends Operator(name, arity = 0)
     with Term[X] {
     override val freeVariables =
