@@ -37,14 +37,17 @@ class AlgebraicMachinerySpec extends FunSuite:
   test("An evaluation context for no terms can evaluate constants, not variables") {
     val pointedSets = AlgebraicTheory(o)()
     val algebra = new pointedSets.Algebra[Boolean](o := theO)
-    val context = algebra.EvaluationContext(Seq())
+    val context: algebra.EvaluationContext[Unit] =
+      algebra.EvaluationContext(Seq()).asInstanceOf[
+        algebra.EvaluationContext[Unit]
+      ]
     intercept[IllegalArgumentException] {
       context.evaluate(α)
     }
     intercept[IllegalArgumentException] {
       context.evaluateScalar(II)
     }
-    context.evaluate(o).asInstanceOf[Unit => Boolean] isArrow theO
+    context.evaluate(o) isArrow theO
   }
 
   test("An evaluation context for one term over an empty theory is just a uniproduct") {
