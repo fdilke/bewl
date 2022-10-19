@@ -450,8 +450,8 @@ trait AlgebraicMachinery[
     name: String
   ) extends Operator(name, 2) {
     @targetName("definitionally")
-    def :=[S : DOT, T : DOT](binaryOp: BinaryOp[S]) =
-      new OperatorAssignment[T, S](this) {
+    def :=[S : DOT](binaryOp: BinaryOp[S]) =
+      new OperatorPreassignment[S](this) {
         override def lookupScalarBinaryOp =
           Some(binaryOp)
       }

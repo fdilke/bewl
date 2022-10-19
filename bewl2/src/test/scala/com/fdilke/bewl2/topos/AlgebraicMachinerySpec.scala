@@ -186,14 +186,16 @@ class AlgebraicMachinerySpec extends FunSuite:
     val scalar2: Unit => Int = makeNullaryOperator[Int](2)
     implicit val act: Set[Symbol] = Set(Symbol("x"))
     val weakActsReferencingAMonoid: AlgebraicTheory[Int] =
-      AlgebraicTheoryWithScalars[Int](II := scalar1)(**, ***)()
-    val algebra: weakActsReferencingAMonoid.Algebra[Symbol] =
-      new weakActsReferencingAMonoid.Algebra[Symbol](
-        ** := { (as: (Symbol, Int)) => Symbol("x") },
+      AlgebraicTheoryWithScalars[Int](
+        II := scalar1,
         *** := { (xy: (Int, Int)) =>
           val (x, y) = xy
           (x + y) % 3
         }
+      )(**, ***)()
+    val algebra: weakActsReferencingAMonoid.Algebra[Symbol] =
+      new weakActsReferencingAMonoid.Algebra[Symbol](
+        ** := { (as: (Symbol, Int)) => Symbol("x") }
       )
 
     algebra.EvaluationContext(Seq()).asInstanceOf[
@@ -321,11 +323,9 @@ class AlgebraicMachinerySpec extends FunSuite:
       implicit val carrier: Set[String] = Set("x")
 
       val weakActsOverASet =
-        AlgebraicTheoryWithScalars[Int]()(***)()
+        AlgebraicTheoryWithScalars[Int](*** := badScalarMultiplication)(***)()
       intercept[IllegalArgumentException] {
-        new weakActsOverASet.Algebra[String](
-          *** := badScalarMultiplication
-        ).sanityTest
+        new weakActsOverASet.Algebra[String]().sanityTest
       }
     }
 
