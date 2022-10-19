@@ -64,4 +64,28 @@ object UnwiseScala3Experiments {
       = [A, B] => (xsys: (List[A], List[B])) => foo[A, B](xsys)
 
   }
+
+  trait HasConstructionArgs(n: Int) {}
+  object FancyWidget extends HasConstructionArgs(3)
+
+  sealed trait Node[X]
+  class LeafNode[X](leaf: X) extends Node[X]
+  class BranchNode[X](left: => Node[X], right: => Node[X]) extends Node[X]
+
+  object SelfRefNode extends BranchNode[Unit](left = SelfRefNode, right = SelfRefNode)
+
+  def variableThing(name: String): Node[String] =
+    lazy val theVar: Node[String] = BranchNode[String](theVar, theVar)
+    theVar
+
+  abstract class Widget(n: Int) {
+    val parent: Widget
+  }
+
+  val selfParentWidget = new Widget(3) {
+    val parent: Widget = this
+  }
+
+//  def variableThing2(name: String): Node[String] =
+//    new BranchNode[String](BranchNode.this, BranchNode.this)
 }

@@ -56,7 +56,9 @@ trait AlgebraicMachinery[
 
   sealed trait Term[
     X <: AlgebraicSort
-  ] extends Dynamic {
+  ](
+    val freeVariables: Seq[VariableTerm[_ <: AlgebraicSort]]
+  ) extends Dynamic {
     def applyDynamic(
       name: String
     )(
@@ -78,10 +80,10 @@ trait AlgebraicMachinery[
       applyDynamic("→")(other)
 
     def **(
-            other: Term[Scalar]
-          )(
-            implicit eq: =:=[X, Principal]
-          ) =
+      other: Term[Scalar]
+    )(
+      implicit eq: =:=[X, Principal]
+    ) =
       BinaryRightScalarOpTerm(
         this.asInstanceOf[Term[Principal]], // cast justified by =:=
         StandardTermsAndOperators.**,
@@ -89,10 +91,10 @@ trait AlgebraicMachinery[
       )
 
     def ***(
-             other: Term[Scalar]
-           )(
-             implicit eq: =:=[X, Scalar]
-           ) =
+      other: Term[Scalar]
+    )(
+      implicit eq: =:=[X, Scalar]
+    ) =
       BinaryScalarOpTerm(
         this.asInstanceOf[Term[Scalar]], // cast justified by =:=
         StandardTermsAndOperators.***,
@@ -101,8 +103,6 @@ trait AlgebraicMachinery[
 
     def unary_~ : Term[X] =
       UnaryOpTerm(StandardTermsAndOperators.~, this)
-
-    val freeVariables: Seq[VariableTerm[_ <: AlgebraicSort]]
 
     def :=(
       that: Term[Principal]
@@ -125,9 +125,8 @@ trait AlgebraicMachinery[
   ](
    symbol: String,
    isScalar: Boolean
-  ) extends Term[S] {
-    term =>
-    override val freeVariables = Seq(term)
+  ) extends Term[S](Nil) {
+    override val freeVariables: Seq[VariableTerm[_ <: AlgebraicSort]] = Seq(this)
   }
 
   object PrincipalTerm {
@@ -154,46 +153,39 @@ trait AlgebraicMachinery[
     left: Term[S],
     op: AbstractBinaryOp,
     right: Term[S]
-  ) extends Term[S] {
-    override val freeVariables =
-      (left.freeVariables ++ right.freeVariables).distinct
-  }
+  ) extends Term[S](
+    (left.freeVariables ++ right.freeVariables).distinct
+  )
 
   case class BinaryRightScalarOpTerm(
     left: Term[Principal],
     op: AbstractRightScalarBinaryOp,
     right: Term[Scalar]
-  ) extends Term[Principal] {
-    override val freeVariables =
-      (left.freeVariables ++ right.freeVariables).distinct
-  }
+  ) extends Term[Principal](
+    (left.freeVariables ++ right.freeVariables).distinct
+  )
 
   case class BinaryScalarOpTerm(
     left: Term[Scalar],
     op: AbstractScalarBinaryOp,
     right: Term[Scalar]
-  ) extends Term[Scalar] {
-    override val freeVariables =
-      (left.freeVariables ++ right.freeVariables).distinct
-  }
+  ) extends Term[Scalar](
+    (left.freeVariables ++ right.freeVariables).distinct
+  )
 
   case class UnaryOpTerm[S <: AlgebraicSort](
     op: AbstractUnaryOp,
     innerTerm: Term[S]
-  ) extends Term[S] {
-    override val freeVariables =
-      innerTerm.freeVariables
-  }
+  ) extends Term[S](
+    innerTerm.freeVariables
+  )
 
   class ConstantOperator[
     X <: AlgebraicSort
   ](
     name: String
   ) extends Operator(name, arity = 0)
-    with Term[X] {
-    override val freeVariables =
-      Nil
-  }
+    with Term[X](Nil)
 
   class PrincipalConstant(
     name: String
@@ -204,7 +196,7 @@ trait AlgebraicMachinery[
       S : DOT,
       T : DOT
     ](
-       nullaryOp: NullaryOp[T]
+      nullaryOp: NullaryOp[T]
     ) =
       new OperatorAssignment[T, S](operator = this) {
         override def lookupPrincipalConstant: Option[NullaryOp[T]] =
