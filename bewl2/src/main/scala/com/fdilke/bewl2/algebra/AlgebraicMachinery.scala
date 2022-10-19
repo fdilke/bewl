@@ -213,16 +213,16 @@ trait AlgebraicMachinery[
       T : DOT
     ](
        nullaryOp: NullaryOp[T]
-    ): OperatorAssignment[UNIT, T] with OperatorPreassignment[T] =
-      new OperatorAssignment[UNIT, T](this) with OperatorPreassignment[T] {
+    ): OperatorPreassignment[T] =
+      new OperatorPreassignment[T](op = ScalarConstant.this) {
         override def lookupScalarConstant: Option[NullaryOp[T]] =
           Some(nullaryOp)
       }
   }
 
-  trait OperatorPreassignment[S: DOT] {
-    innerAssignment: OperatorAssignment[_, S] =>
-  }
+  class OperatorPreassignment[S: DOT](
+    op: Operator
+  ) extends OperatorAssignment[UNIT, S](op)
 
   abstract case class OperatorAssignment[
     T : DOT,
