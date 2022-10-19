@@ -158,12 +158,8 @@ class AlgebraicMachinerySpec extends FunSuite:
       ("i", 2) -> "o"
     )
 
-    val idScalarUnit: OperatorAssignment[String, Int] = II := scalar1
-//    val hehee = AlgebraicTheoryWithScalars[Int](
-//      II := scalar1 // : OperatorAssignment[String, Int]
-//    )(o, II, **)()
     val pointedWeakActs: AlgebraicTheory[Int] =
-      AlgebraicTheoryWithScalars[Int](idScalarUnit)(o, II, **)()
+      AlgebraicTheoryWithScalars[Int](II := scalar1)(o, II, **)()
 
     val minimalAlgebra = new pointedWeakActs.Algebra[String](
       o := theO,
@@ -186,9 +182,8 @@ class AlgebraicMachinerySpec extends FunSuite:
     val scalar1: Unit => Int = makeNullaryOperator[Int](1)
     val scalar2: Unit => Int = makeNullaryOperator[Int](2)
     implicit val act: Set[Symbol] = Set(Symbol("x"))
-    val idScalarUnit: OperatorAssignment[Symbol, Int] = II := scalar1
     val weakActsReferencingAMonoid: AlgebraicTheory[Int] =
-      AlgebraicTheoryWithScalars[Int](idScalarUnit)(**, ***)()
+      AlgebraicTheoryWithScalars[Int](II := scalar1)(**, ***)()
     val algebra: weakActsReferencingAMonoid.Algebra[Symbol] =
       new weakActsReferencingAMonoid.Algebra[Symbol](
         ** := { (as: (Symbol, Int)) => Symbol("x") },
@@ -289,9 +284,8 @@ class AlgebraicMachinerySpec extends FunSuite:
     implicit val carrier: Set[String] = Set("x")
     val badPointScalar: Unit => Int = makeNullaryOperator[Int](1)
 
-    val idScalarUnit: OperatorAssignment[String, Int] = II := badPointScalar
     val weakSetsOverAPointedSet =
-      AlgebraicTheoryWithScalars[Int](idScalarUnit)(II)()
+      AlgebraicTheoryWithScalars[Int](II := badPointScalar)(II)()
     intercept[IllegalArgumentException] {
       new weakSetsOverAPointedSet.Algebra[String]().sanityTest
     }

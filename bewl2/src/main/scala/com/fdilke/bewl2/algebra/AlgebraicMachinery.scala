@@ -210,15 +210,18 @@ trait AlgebraicMachinery[
     name
   ) {
     def :=[
-      S : DOT,
       T : DOT
     ](
        nullaryOp: NullaryOp[T]
-    ): OperatorAssignment[S, T] =
-      new OperatorAssignment[S, T](this) {
+    ): OperatorAssignment[UNIT, T] with OperatorPreassignment[T] =
+      new OperatorAssignment[UNIT, T](this) with OperatorPreassignment[T] {
         override def lookupScalarConstant: Option[NullaryOp[T]] =
           Some(nullaryOp)
       }
+  }
+
+  trait OperatorPreassignment[S: DOT] {
+    innerAssignment: OperatorAssignment[_, S] =>
   }
 
   abstract case class OperatorAssignment[
@@ -510,7 +513,7 @@ trait AlgebraicMachinery[
   class AlgebraicTheory[
     S : DOT
   ](
-     preassignments: OperatorAssignment[_, S]*
+     preassignments: OperatorPreassignment[S]*
    )(
      operators: Operator*
    )(
@@ -844,7 +847,7 @@ trait AlgebraicMachinery[
 
   object AlgebraicTheoryWithScalars:
     def apply[S : DOT](
-       preassignments: OperatorAssignment[_, S]*
+       preassignments: OperatorPreassignment[S]*
      )(
        operators: Operator*
      )(
