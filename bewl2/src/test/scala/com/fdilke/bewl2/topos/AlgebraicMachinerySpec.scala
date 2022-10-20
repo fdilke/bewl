@@ -8,6 +8,7 @@ import com.fdilke.bewl2.sets.SetsUtilities.*
 import com.fdilke.bewl2.utility.Direction
 import Direction.*
 
+import scala.Function.tupled
 import scala.language.postfixOps
 
 class AlgebraicMachinerySpec extends FunSuite:
@@ -233,8 +234,8 @@ class AlgebraicMachinerySpec extends FunSuite:
       op: BinaryOp[T]
     ) extends commutativeMagmas.Algebra[T](* := op)
 
-    val commutativeOp: ((Boolean, Boolean)) => Boolean = Function.tupled { _ & _}
-    val nonCommutativeOp: ((Boolean, Boolean)) => Boolean = Function.tupled { _ & !_ }
+    val commutativeOp: ((Boolean, Boolean)) => Boolean = tupled { _ & _}
+    val nonCommutativeOp: ((Boolean, Boolean)) => Boolean = tupled { _ & !_ }
 
      intercept[IllegalArgumentException] {
         new commutativeMagmas.Algebra[Boolean]().sanityTest
@@ -273,7 +274,7 @@ class AlgebraicMachinerySpec extends FunSuite:
   test("Algebraic theories can sanity-check their algebras for valid binary operators") {
     val magmas = AlgebraicTheory(*)()
     implicit val carrier: Set[Int] = Set(1)
-    val combineBadRange: ((Int, Int)) => Int = Function.tupled { _ + _ }
+    val combineBadRange: ((Int, Int)) => Int = tupled { _ + _ }
 
     intercept[IllegalArgumentException] {
       new magmas.Algebra[Int](
@@ -377,7 +378,7 @@ class AlgebraicMachinerySpec extends FunSuite:
 
   test("Algebraic theories can validate morphisms preserving binary operations") {
     implicit val carrierInts: Set[Int] = Set[Int](0, 1, 2, 3)
-    val multiplication: ((Int, Int)) => Int = Function.tupled {
+    val multiplication: ((Int, Int)) => Int = tupled {
       (x, y) => (x + y) % 4
     }
 
@@ -467,8 +468,8 @@ class AlgebraicMachinerySpec extends FunSuite:
       * := op
     )
 
-    val commutativeOp: ((Boolean, Boolean)) => Boolean = Function.tupled { _ & _}
-    val nonCommutativeOp: ((Boolean, Boolean)) => Boolean = Function.tupled{ _ & !_ }
+    val commutativeOp: ((Boolean, Boolean)) => Boolean = tupled { _ & _}
+    val nonCommutativeOp: ((Boolean, Boolean)) => Boolean = tupled{ _ & !_ }
     val okUnit: Unit => Boolean = makeNullaryOperator(true)
     val notOkUnit: Unit => Boolean = makeNullaryOperator(false)
 
@@ -521,41 +522,31 @@ class AlgebraicMachinerySpec extends FunSuite:
     }
   }
 
-//    [Int4] => Set[Int4]
-  private def withIntsMod[R](
-    modulus: Int
+  private def withCyclicGroup[R](
+    order: Int
   )(
     block: [I] => Set[I] ?=> I =:= Int ?=> Int =:= I ?=> LocalGroup[I] => R
   ): R =
     maskSetDot[Int, R](
-      dot = 0 until modulus toSet
+      dot = 0 until order toSet
     ) ( [I] => (_: Set[I]) ?=> (I_is_Int: I =:= Int) ?=>
       implicit val Int_is_I: Int =:= I = I_is_Int.flip
-      val group =
+      block[I](
         new LocalGroup[I](
           makeNullaryOperator[I](0),
-          Function.tupled[I, I, I] {
-            (x, y) => (x + y) % modulus
-          },
-          { (i: I) => (modulus - i) % modulus }
+          tupled { (x, y) => (x + y) % order },
+          { (i: I) => (order - i) % order }
         )
-
-      block[I](group)
+      )
     )
 
   test("Algebraic theories support binary multiplication of their algebras") {
-    withIntsMod[Unit](6) {
-      [Int6] => (_: Set[Int6]) ?=> (_: (Int6 =:= Int)) ?=> (_: (Int =:= Int6)) ?=> (group6: LocalGroup[Int6]) => {
-        ()
-      }
-    }
-
-    withIntsMod[Unit](2) {
+    withCyclicGroup(order = 2) {
     [Int2] => (_: Set[Int2]) ?=> (_: Int2 =:= Int) ?=> (_: Int =:= Int2) ?=> (group2: LocalGroup[Int2]) =>
-      withIntsMod[Unit](3) {
+      withCyclicGroup(order = 3) {
         [Int3] => (_: Set[Int3]) ?=> (_: Int3 =:= Int) ?=> (_: Int =:= Int3) ?=> (group3: LocalGroup[Int3]) =>
-          withIntsMod[Unit](6) {
-            [Int6] => (_: Set[Int6]) ?=> (_: Int6 =:= Int) ?=> (_: Int =:= Int6) ?=> (group6: LocalGroup[Int6]) => {
+          withCyclicGroup(order = 6) {
+            [Int6] => (_: Set[Int6]) ?=> (_: Int6 =:= Int) ?=> (_: Int =:= Int6) ?=> (group6: LocalGroup[Int6]) =>
               group2.sanityTest
               group3.sanityTest
               group6.sanityTest
@@ -606,10 +597,7 @@ class AlgebraicMachinerySpec extends FunSuite:
                 group2x3,
                 notChineseRemainder
               ) is false
-
-              ()
             }
-          }
       }
     }
   }
