@@ -491,32 +491,55 @@ class AlgebraicMachinerySpec extends FunSuite:
     }.getMessage is "unit law failed"
   }
 
+  private val localGroups = AlgebraicTheory(ι, StandardTermsAndOperators.~, *)(
+    "left unit" law { ι * α := α },
+    "right unit" law { α * ι := α },
+    "left inverse" law { (~α) * α := ι },
+    "associative" law { (α * β) * γ := α * (β * γ) }
+  )
 
-  def withIntsMod[R](
+  private class LocalGroup[G : Set](
+   unit: NullaryOp[G],
+   multiply: BinaryOp[G],
+   inverse: UnaryOp[G]
+  ) extends localGroups.Algebra[G](
+    ι := unit,
+    * := multiply,
+    StandardTermsAndOperators.~ := inverse
+  ) {
+    // Formalism to handle direct products more elegantly with added sugar
+    def x[H : Set](
+      that: LocalGroup[H]
+    ): LocalGroup[(G, H)] = {
+      val product = (this: localGroups.Algebra[G]) x (that)
+      new LocalGroup[(G, H)](
+        product.operatorAssignments.lookup(ι).get,
+        product.operatorAssignments.lookup(*).get,
+        product.operatorAssignments.lookup(StandardTermsAndOperators.~).get
+      )
+    }
+  }
+
+//    [Int4] => Set[Int4]
+  private def withIntsMod[R](
     modulus: Int
   )(
-    block: [I] => Set[I] ?=> R
+    block: [I] => Set[I] ?=> LocalGroup[I] => R
   ): R =
     maskSetDot[Int, R](
       dot = 0 until modulus toSet
-    ) {
-//      new Group[Int](
-//        carrier,
-//        makeNullaryOperator(carrier, 0),
-//        bifunctionAsBiArrow(carrier) {
-//          (x: Int, y:Int) => (x + y) % n
-//        },
-//        functionAsArrow(
-//          carrier,
-//          carrier,
-//          i => (n - i) % n
-//        )
-//      )
+    ) ( [I] => (_: Set[I]) ?=> (_: I =:= Int) ?=>
+      val group =
+        new LocalGroup[I](
+          makeNullaryOperator[I](0.asInstanceOf[I]),
+          Function.tupled[I, I, I] {
+            (x, y) => ((x + y) % modulus).asInstanceOf[I]
+          },
+          { (i: I) => ((modulus - i) % modulus).asInstanceOf[I] }
+        )
 
-      block
-    }
-
-//    [Int4] => Set[Int4]
+      block[I](group)
+    )
 
   test("Algebraic theories support binary multiplication of their algebras") {
 //    def withIntegersMod(n: Int)(block: Set[Int] ?=> ) = {
@@ -535,7 +558,7 @@ class AlgebraicMachinerySpec extends FunSuite:
 //      )
 //    }
   withIntsMod(2) (
-    [Int2] => (qq: Set[Int2]) ?=> {
+    [Int2] => (_: Set[Int2]) ?=> (group2: LocalGroup[Int2]) => {
       println("seems to work")
     }
   )
