@@ -528,14 +528,15 @@ class AlgebraicMachinerySpec extends FunSuite:
   ): R =
     maskSetDot[Int, R](
       dot = 0 until modulus toSet
-    ) ( [I] => (_: Set[I]) ?=> (_: I =:= Int) ?=>
+    ) ( [I] => (_: Set[I]) ?=> (I_is_Int: I =:= Int) ?=>
+      implicit val Int_is_I: Int =:= I = I_is_Int.flip
       val group =
         new LocalGroup[I](
-          makeNullaryOperator[I](0.asInstanceOf[I]),
+          makeNullaryOperator[I](0),
           Function.tupled[I, I, I] {
-            (x, y) => ((x + y) % modulus).asInstanceOf[I]
+            (x, y) => (x + y) % modulus
           },
-          { (i: I) => ((modulus - i) % modulus).asInstanceOf[I] }
+          { (i: I) => (modulus - i) % modulus }
         )
 
       block[I](group)
@@ -559,7 +560,13 @@ class AlgebraicMachinerySpec extends FunSuite:
 //    }
   withIntsMod(2) (
     [Int2] => (_: Set[Int2]) ?=> (group2: LocalGroup[Int2]) => {
-      println("seems to work")
+    withIntsMod(3) (
+      [Int3] => (_: Set[Int3]) ?=> (group3: LocalGroup[Int3]) => {
+      withIntsMod(6) (
+        [Int6] => (_: Set[Int6]) ?=> (group3: LocalGroup[Int6]) => {
+          println("seems to work")
+        }
+      }
     }
   )
 //    val c2 = integersMod(2)
