@@ -3,6 +3,7 @@ package com.fdilke.bewl2.topos
 import com.fdilke.bewl2.algebra.Principal
 import com.fdilke.bewl2.sets.Sets
 import munit.FunSuite
+import munit.Clue.generate
 import com.fdilke.bewl2.sets.SetsUtilities.*
 import com.fdilke.bewl2.utility.Direction
 import Direction.*
@@ -524,7 +525,7 @@ class AlgebraicMachinerySpec extends FunSuite:
   private def withIntsMod[R](
     modulus: Int
   )(
-    block: [I] => Set[I] ?=> LocalGroup[I] => R
+    block: [I] => Set[I] ?=> I =:= Int ?=> Int =:= I ?=> LocalGroup[I] => R
   ): R =
     maskSetDot[Int, R](
       dot = 0 until modulus toSet
@@ -543,58 +544,74 @@ class AlgebraicMachinerySpec extends FunSuite:
     )
 
   test("Algebraic theories support binary multiplication of their algebras") {
-//    def withIntegersMod(n: Int)(block: Set[Int] ?=> ) = {
-//      val carrier = makeDot(0 until n)
-//      new Group[Int](
-//        carrier,
-//        makeNullaryOperator(carrier, 0),
-//        bifunctionAsBiArrow(carrier) {
-//          (x: Int, y:Int) => (x + y) % n
-//        },
-//        functionAsArrow(
-//          carrier,
-//          carrier,
-//          i => (n - i) % n
-//        )
-//      )
-//    }
-  withIntsMod(2) (
-    [Int2] => (_: Set[Int2]) ?=> (group2: LocalGroup[Int2]) => {
-    withIntsMod(3) (
-      [Int3] => (_: Set[Int3]) ?=> (group3: LocalGroup[Int3]) => {
-      withIntsMod(6) (
-        [Int6] => (_: Set[Int6]) ?=> (group3: LocalGroup[Int6]) => {
-          println("seems to work")
-        }
+    withIntsMod[Unit](6) {
+      [Int6] => (_: Set[Int6]) ?=> (_: (Int6 =:= Int)) ?=> (_: (Int =:= Int6)) ?=> (group6: LocalGroup[Int6]) => {
+        ()
       }
     }
-  )
-//    val c2 = integersMod(2)
-//    val c3 = integersMod(3)
-//    val c6 = integersMod(6)
-//    c2.sanityTest
-//    c3.sanityTest
-//    c6.sanityTest
-//    val c2xc3: Group[Int x Int] =
-//      c2 x c3
-//    c2xc3.sanityTest
-//    val product =
-//      c2.carrier x c3.carrier
-//    c2xc3.carrier shouldBe ( product )
-//    c6.carrier(c2xc3.carrier) {
-//      a => product.pair(a % 2, a % 3)
-//    } shouldBe iso
-//
-//    groups.isMorphism(
-//      c2xc3,
-//      c2,
-//      product.π0
-//    ) shouldBe true
-//    groups.isMorphism(
-//      c2xc3,
-//      c3,
-//      product.π1
-//    ) shouldBe true
+
+    withIntsMod[Unit](2) {
+    [Int2] => (_: Set[Int2]) ?=> (_: Int2 =:= Int) ?=> (_: Int =:= Int2) ?=> (group2: LocalGroup[Int2]) =>
+      withIntsMod[Unit](3) {
+        [Int3] => (_: Set[Int3]) ?=> (_: Int3 =:= Int) ?=> (_: Int =:= Int3) ?=> (group3: LocalGroup[Int3]) =>
+          withIntsMod[Unit](6) {
+            [Int6] => (_: Set[Int6]) ?=> (_: Int6 =:= Int) ?=> (_: Int =:= Int6) ?=> (group6: LocalGroup[Int6]) => {
+              group2.sanityTest
+              group3.sanityTest
+              group6.sanityTest
+
+              val group2x3: LocalGroup[(Int2, Int3)] = group2 x group3
+              group2x3.sanityTest
+
+              localGroups.isMorphism(
+                group2x3,
+                group2,
+                { _ => 0 }
+              ) is true
+
+              localGroups.isMorphism(
+                group2x3,
+                group2,
+                { _ => 1 }
+              ) is false
+
+              localGroups.isMorphism(
+                group2x3,
+                group2,
+                π0[Int2, Int3]
+              ) is true
+
+              localGroups.isMorphism(
+                group2x3,
+                group3,
+                π1[Int2, Int3]
+              ) is true
+
+              val chineseRemainder: Int6 => (Int2, Int3) =
+                { i => (i % 2, i % 3) }
+              chineseRemainder.isIsoPlaceholderTrue is true
+
+              localGroups.isMorphism(
+                group6,
+                group2x3,
+                chineseRemainder
+              ) is true
+
+              val notChineseRemainder: Int6 => (Int2, Int3) =
+                { i => ((i + 1) % 2, (i + 2) % 3) }
+              notChineseRemainder.isIsoPlaceholderTrue is true
+
+              localGroups.isMorphism(
+                group6,
+                group2x3,
+                notChineseRemainder
+              ) is false
+
+              ()
+            }
+          }
+      }
+    }
   }
 
   /*
