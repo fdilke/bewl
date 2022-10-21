@@ -164,6 +164,16 @@ trait AlgebraicTheories[
      isScalar: Boolean
    ) extends Term[S](Nil) {
     override val freeVariables: Seq[VariableTerm[_ <: AlgebraicSort]] = Seq(this)
+
+    def addToContext[S : DOT, T : DOT](
+      algebra: AlgebraicTheory[S]#Algebra[T]
+    )(
+      context: algebra.EvaluationContext[_]
+    ): algebra.EvaluationContext[_] =
+      if (isScalar) then
+        context.spawnCompound[S](symbol)
+      else
+        context.spawnCompound[T](symbol)
   }
 
   object PrincipalTerm:
@@ -608,18 +618,9 @@ trait AlgebraicTheories[
         ): EvaluationContext[_] =
           variables.foldRight[EvaluationContext[_]](
             SimpleEvaluationContext
-          )(
-            addVariableToContext
-          )
-
-        private def addVariableToContext(
-          variable: VariableTerm[_ <: AlgebraicSort],
-          context: EvaluationContext[_]
-        ): EvaluationContext[_] =
-          if (variable.isScalar) then // TODO: fold into variable
-            context.spawnCompound[S](variable.symbol)
-          else
-            context.spawnCompound[T](variable.symbol)
+          ) {
+            _.addToContext(algebra = Algebra.this)(_)
+          }
       }
 
       trait EvaluationContext[ROOT: DOT] {
