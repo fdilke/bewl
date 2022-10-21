@@ -653,15 +653,13 @@ trait AlgebraicTheories[
         protected def evaluateBinaryScalarOpTerm(
           term: BinaryScalarOpTerm
         ): ROOT ~> S =
-          operatorAssignments.lookup(term.op) map { op => // root(scalars)
-          { (r: CTXT[ROOT]) =>
+          operatorAssignments.lookup(term.op) map { op => (r: CTXT[ROOT]) =>
             op(
               productMagic[S, S](
                 evaluateScalar(term.left)(r),
                 evaluateScalar(term.right)(r)
               )
             )
-          }
           } getOrElse bail(
             "Unknown operator in expression: " + term.op
           )
@@ -669,15 +667,13 @@ trait AlgebraicTheories[
         protected def evaluateBinaryOpTerm(
           term: BinaryOpTerm[Principal]
         ): ROOT ~> T =
-          operatorAssignments.lookup(term.op) map { op => // root(carrier)
-          { (r: CTXT[ROOT]) =>
+          operatorAssignments.lookup(term.op) map { op => (r: CTXT[ROOT]) =>
             op(
               productMagic[T, T](
                 evaluatePrincipal(term.left)(r),
                 evaluatePrincipal(term.right)(r)
               )
             )
-          }
           } getOrElse bail(
             "Unknown operator in expression: " + term.op
           )
@@ -685,15 +681,13 @@ trait AlgebraicTheories[
         protected def evaluateBinaryRightScalarOpTerm(
           term: BinaryRightScalarOpTerm
         ): ROOT ~> T =
-          operatorAssignments.lookup(term.op) map { op => // root(carrier)
-          { (r: CTXT[ROOT]) =>
+          operatorAssignments.lookup(term.op) map { op => (r: CTXT[ROOT]) =>
             op(
               productMagic[T, S](
                 evaluatePrincipal(term.left)(r),
                 evaluateScalar(term.right)(r)
               )
             )
-          }
           } getOrElse bail(
             "Unknown operator in expression: " + term.op
           )
@@ -701,8 +695,7 @@ trait AlgebraicTheories[
         protected def evaluateUnaryOpTerm(
           term: UnaryOpTerm[Principal]
         ): ROOT ~> T =
-          operatorAssignments.lookup(term.op) map { op =>
-            (r: CTXT[ROOT]) =>
+          operatorAssignments.lookup(term.op) map { op => (r: CTXT[ROOT]) =>
               op(evaluatePrincipal(term.innerTerm)(r))
           } getOrElse bail(
             "Unknown operator in expression: " + term.op
