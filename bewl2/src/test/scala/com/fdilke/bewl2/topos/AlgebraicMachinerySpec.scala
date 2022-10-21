@@ -19,6 +19,9 @@ class AlgebraicMachinerySpec extends FunSuite:
 
   private val topos = com.fdilke.bewl2.sets.Sets
   import topos.StandardTermsAndOperators._
+  import topos.StandardTermsAndOperators.~
+  import topos.StandardTermsAndOperators.**
+  import topos.StandardTermsAndOperators.***
   import topos._
 
   extension[A: Set, B: Set](arrow: A => B)
@@ -101,8 +104,8 @@ class AlgebraicMachinerySpec extends FunSuite:
       val pointedSetsWithOp: AlgebraicTheory[Unit] = AlgebraicTheory(o, ~)()
       val algebra: pointedSetsWithOp.Algebra[Int] =
         new pointedSetsWithOp.Algebra[Int](
-          o := theO,
-          StandardTermsAndOperators.~ := twiddle
+          (~) := twiddle,
+          o := theO
         )
       val context: algebra.EvaluationContext[(Int, Unit)] = // or Unit, Int ??
         algebra.EvaluationContext(Seq(α)).asInstanceOf[
@@ -129,7 +132,7 @@ class AlgebraicMachinerySpec extends FunSuite:
     )
 
     val pointedMagmas = AlgebraicTheory(o, +)()
-    val algebra = new pointedMagmas.Algebra[String](o := theO, StandardTermsAndOperators.+ := plus)
+    val algebra = new pointedMagmas.Algebra[String]((+) := plus, o := theO)
     val context: algebra.EvaluationContext[(String, Unit)] =
       algebra.EvaluationContext(Seq(α)).asInstanceOf[
         algebra.EvaluationContext[(String, Unit)]
@@ -241,7 +244,7 @@ class AlgebraicMachinerySpec extends FunSuite:
         new commutativeMagmas.Algebra[Boolean]().sanityTest
      }
      intercept[IllegalArgumentException] {
-        new commutativeMagmas.Algebra[Boolean](StandardTermsAndOperators.+ := commutativeOp).sanityTest
+        new commutativeMagmas.Algebra[Boolean]((+) := commutativeOp).sanityTest
      }
 
     CommutativeMagma[Boolean](commutativeOp).sanityTest
@@ -266,7 +269,7 @@ class AlgebraicMachinerySpec extends FunSuite:
     val invertBadRange: Int => Int = makeUnaryOperator[Int](0 -> 1)
     intercept[IllegalArgumentException] {
       new setsWithInvolution.Algebra[Int](
-        StandardTermsAndOperators.~ := invertBadRange
+        (~) := invertBadRange
       ).sanityTest
     }
   }
@@ -344,10 +347,10 @@ class AlgebraicMachinerySpec extends FunSuite:
 
     val setsWithInvolution = AlgebraicTheory(~)(~(~α) := α)
     val algebraStrings = new setsWithInvolution.Algebra[String](
-      StandardTermsAndOperators.~ := minusStrings
+      (~) := minusStrings
     )
     val algebraInts = new setsWithInvolution.Algebra[Int](
-      StandardTermsAndOperators.~ := minusInts
+      (~) := minusInts
     )
     algebraStrings.sanityTest
     algebraInts.sanityTest
@@ -426,9 +429,9 @@ class AlgebraicMachinerySpec extends FunSuite:
     val setsWithInvolution = AlgebraicTheory(~)(
       "involutive" law (~(~α) := α)
     )
-    new setsWithInvolution.Algebra[Int](StandardTermsAndOperators.~ := minusGood).sanityTest
+    new setsWithInvolution.Algebra[Int]((~) := minusGood).sanityTest
     intercept[IllegalArgumentException] {
-      new setsWithInvolution.Algebra[Int](StandardTermsAndOperators.~ := minusBad).sanityTest
+      new setsWithInvolution.Algebra[Int]((~) := minusBad).sanityTest
     }.getMessage.contains("involutive") is true
   }
 
@@ -442,7 +445,7 @@ class AlgebraicMachinerySpec extends FunSuite:
     val setsWithInvolution = AlgebraicTheory(~)(
       "involutive" law (~(~α) := α)
     )
-    val algebra = new setsWithInvolution.Algebra[Int](StandardTermsAndOperators.~ := minus)
+    val algebra = new setsWithInvolution.Algebra[Int]((~) := minus)
     algebra.sanityTest
 
     algebra.satisfies(
@@ -493,7 +496,7 @@ class AlgebraicMachinerySpec extends FunSuite:
     }.getMessage is "unit law failed"
   }
 
-  private val localGroups = AlgebraicTheory(ι, StandardTermsAndOperators.~, *)(
+  private val localGroups = AlgebraicTheory(ι, ~, *)(
     "left unit" law { ι * α := α },
     "right unit" law { α * ι := α },
     "left inverse" law { (~α) * α := ι },
@@ -507,7 +510,7 @@ class AlgebraicMachinerySpec extends FunSuite:
   ) extends localGroups.Algebra[G](
     ι := unit,
     * := multiply,
-    StandardTermsAndOperators.~ := inverse
+    (~) := inverse
   ) {
     // Formalism to handle direct products more elegantly with added sugar
     def x[H : Set](
@@ -517,7 +520,7 @@ class AlgebraicMachinerySpec extends FunSuite:
       new LocalGroup[(G, H)](
         product.operatorAssignments.lookup(ι).get,
         product.operatorAssignments.lookup(*).get,
-        product.operatorAssignments.lookup(StandardTermsAndOperators.~).get
+        product.operatorAssignments.lookup(~).get
       )
     }
   }
