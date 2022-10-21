@@ -27,6 +27,53 @@ trait AlgebraicMachinery[
   type BinaryOp[X] = BiArrow[X, X, X]
   type RightScalarBinaryOp[X, S] = BiArrow[X, S, X]
 
+  object StandardTermsAndOperators {
+    val o = new PrincipalConstant("o")
+    val ι = new PrincipalConstant("ι")
+    val ⊥ = new PrincipalConstant("⊥")
+    val ⊤ = new PrincipalConstant("⊤")
+    val II = new ScalarConstant("II")
+
+    val α = PrincipalTerm("α")
+    val β = PrincipalTerm("β")
+    val γ = PrincipalTerm("γ")
+    val Φ = ScalarTerm("Φ")
+    val Ψ = ScalarTerm("Ψ")
+
+    val ~ = new AbstractUnaryOp("~")
+    val ! = new AbstractUnaryOp("!")
+
+    val * = new AbstractBinaryOp("*")
+    val + = new AbstractBinaryOp("+")
+    val ∧ = new AbstractBinaryOp("∧")
+    val ∨ = new AbstractBinaryOp("∨")
+    val → = new AbstractBinaryOp("→")
+
+    val ** = new AbstractRightScalarBinaryOp("**")
+    val *** = new AbstractScalarBinaryOp("***")
+
+    private val binaryOperators =
+      Map[String, AbstractBinaryOp](
+        "*" -> *,
+        "+" -> +,
+        "∧" -> ∧,
+        "∨" -> ∨,
+        "→" -> →
+      )
+
+    def binaryOpFrom(name: String) =
+      binaryOperators.getOrElse(
+        name,
+        bail("Unknown binary operator: " + name)
+      )
+  }
+
+  import StandardTermsAndOperators._
+  import StandardTermsAndOperators.!
+  import StandardTermsAndOperators.~
+  import StandardTermsAndOperators.{ ** => `_**` }
+  import StandardTermsAndOperators.{ *** => `_***` }
+
   case class Law(
     left: Term[Principal],
     right: Term[Principal],
@@ -61,7 +108,7 @@ trait AlgebraicMachinery[
     ) =
       BinaryOpTerm(
         this,
-        StandardTermsAndOperators.binaryOpFrom(name),
+        binaryOpFrom(name),
         other
       )
 
@@ -79,7 +126,7 @@ trait AlgebraicMachinery[
     ) =
       BinaryRightScalarOpTerm(
         this.asInstanceOf[Term[Principal]], // cast justified by =:=
-        StandardTermsAndOperators.**,
+        `_**`,
         other
       )
 
@@ -88,12 +135,15 @@ trait AlgebraicMachinery[
     ) =
       BinaryScalarOpTerm(
         this.asInstanceOf[Term[Scalar]], // cast justified by =:=
-        StandardTermsAndOperators.***,
+        `_***`,
         other
       )
 
     def unary_~ : Term[X] =
-      UnaryOpTerm(StandardTermsAndOperators.~, this)
+      UnaryOpTerm(~, this)
+
+    def unary_! : Term[X] =
+      UnaryOpTerm(!, this)
 
     def :=(that: Term[Principal])(
       implicit eq: X =:= Principal
@@ -118,25 +168,19 @@ trait AlgebraicMachinery[
     override val freeVariables: Seq[VariableTerm[_ <: AlgebraicSort]] = Seq(this)
   }
 
-  object PrincipalTerm {
-    def apply(
-      symbol: String
-    ) =
+  object PrincipalTerm:
+    def apply(symbol: String) =
       VariableTerm[Principal](
         symbol,
         isScalar = false
       )
-  }
 
-  object ScalarTerm {
-    def apply(
-      symbol: String
-    ) =
+  object ScalarTerm:
+    def apply(symbol: String) =
       VariableTerm[Scalar](
         symbol,
         isScalar = true
       )
-  }
 
   case class BinaryOpTerm[S <: AlgebraicSort](
     left: Term[S],
@@ -455,48 +499,6 @@ trait AlgebraicMachinery[
         override def lookupUnaryOp =
           Some(unaryOp)
       }
-  }
-
-  object StandardTermsAndOperators {
-    val o = new PrincipalConstant("o")
-    val ι = new PrincipalConstant("ι")
-    val ⊥ = new PrincipalConstant("⊥")
-    val ⊤ = new PrincipalConstant("⊤")
-    val II = new ScalarConstant("II")
-
-    val α = PrincipalTerm("α")
-    val β = PrincipalTerm("β")
-    val γ = PrincipalTerm("γ")
-    val Φ = ScalarTerm("Φ")
-    val Ψ = ScalarTerm("Ψ")
-
-    val ~ = new AbstractUnaryOp("~")
-
-    val * = new AbstractBinaryOp("*")
-    val + = new AbstractBinaryOp("+")
-    val ∧ = new AbstractBinaryOp("∧")
-    val ∨ = new AbstractBinaryOp("∨")
-    val → = new AbstractBinaryOp("→")
-
-    val ** = new AbstractRightScalarBinaryOp("**")
-    val *** = new AbstractScalarBinaryOp("***")
-
-    private val binaryOperators =
-      Map[String, AbstractBinaryOp](
-        "*" -> *,
-        "+" -> +,
-        "∧" -> ∧,
-        "∨" -> ∨,
-        "→" -> →
-      )
-
-    def binaryOpFrom(name: String) =
-      binaryOperators.getOrElse(
-        name,
-        bail(
-          "Unknown binary operator: " + name
-        )
-      )
   }
 
   class AlgebraicTheory[
