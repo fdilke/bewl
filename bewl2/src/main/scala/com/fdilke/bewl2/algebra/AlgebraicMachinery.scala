@@ -19,6 +19,29 @@ trait AlgebraicMachinery[
   UNIT,
   BEWL,
   →[_, _]
+] extends AlgebraicTheories[DOT, CTXT, VOID, UNIT, BEWL, →]
+  with AlgebraicStructures[DOT, CTXT, VOID, UNIT, BEWL, →]:
+  topos: Topos[DOT, CTXT, VOID, UNIT, BEWL, →] =>
+
+
+trait AlgebraicStructures[
+  DOT[_],
+  CTXT[_]: Mappable,
+  VOID,
+  UNIT,
+  BEWL,
+  →[_, _]
+] {
+  topos: Topos[DOT, CTXT, VOID, UNIT, BEWL, →] =>
+}
+
+trait AlgebraicTheories[
+  DOT[_],
+  CTXT[_]: Mappable,
+  VOID,
+  UNIT,
+  BEWL,
+  →[_, _]
 ] {
   topos: Topos[DOT, CTXT, VOID, UNIT, BEWL, →] =>
 

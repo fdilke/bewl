@@ -11,7 +11,7 @@ import Direction.*
 import scala.Function.tupled
 import scala.language.postfixOps
 
-class AlgebraicMachinerySpec extends FunSuite:
+class AlgebraicTheoriesSpec extends FunSuite:
 
   extension[A](a: A)
     inline def is(b: A): Unit =
@@ -496,10 +496,10 @@ class AlgebraicMachinerySpec extends FunSuite:
     }.getMessage is "unit law failed"
   }
 
-  private val localGroups = AlgebraicTheory(ι, ~, *)(
+  private val localGroups = AlgebraicTheory(ι, !, *)(
     "left unit" law { ι * α := α },
     "right unit" law { α * ι := α },
-    "left inverse" law { (~α) * α := ι },
+    "left inverse" law { (!α) * α := ι },
     "associative" law { (α * β) * γ := α * (β * γ) }
   )
 
@@ -510,17 +510,17 @@ class AlgebraicMachinerySpec extends FunSuite:
   ) extends localGroups.Algebra[G](
     ι := unit,
     * := multiply,
-    (~) := inverse
+    (!) := inverse
   ) {
     // Formalism to handle direct products more elegantly with added sugar
     def x[H : Set](
       that: LocalGroup[H]
     ): LocalGroup[(G, H)] = {
-      val product = (this: localGroups.Algebra[G]) x (that)
+      val product = (this: localGroups.Algebra[G]) x that
       new LocalGroup[(G, H)](
         product.operatorAssignments.lookup(ι).get,
         product.operatorAssignments.lookup(*).get,
-        product.operatorAssignments.lookup(~).get
+        product.operatorAssignments.lookup(!).get
       )
     }
   }
