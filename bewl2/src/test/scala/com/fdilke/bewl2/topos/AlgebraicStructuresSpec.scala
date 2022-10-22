@@ -1,8 +1,144 @@
 package com.fdilke.bewl2.topos
 
+import com.fdilke.bewl2.algebra.Principal
+import com.fdilke.bewl2.sets.Sets
 import munit.FunSuite
+import munit.Clue.generate
+import com.fdilke.bewl2.sets.SetsUtilities.*
+import com.fdilke.bewl2.utility.Direction
+import Direction.*
 
-class AlgebraicStructuresSpec extends FunSuite:
+import scala.Function.tupled
+import scala.language.postfixOps
+import com.fdilke.bewl2.utility.RichFunSuite
+
+class AlgebraicStructuresSpec extends RichFunSuite:
+
+  private val topos = com.fdilke.bewl2.sets.Sets
+  import topos.StandardTermsAndOperators._
+  import topos.StandardTermsAndOperators.~
+  import topos.StandardTermsAndOperators.**
+  import topos.StandardTermsAndOperators.***
+  import topos._
+
+  private def withCyclicGroup[R](
+    order: Int
+  )(
+    block: [I] => Set[I] ?=> I =:= Int ?=> Int =:= I ?=> LocalGroup[I] => R
+  ): R =
+  maskSetDot[Int, R](
+    dot = 0 until order toSet
+  )([I] => (_: Set[I]) ?=> (I_is_Int: I =:= Int) ?=>
+    implicit val Int_is_I: Int =:= I = I_is_Int.flip
+      block[I] (
+      new LocalGroup[I](
+        makeNullaryOperator[I](0),
+        tupled { (x, y) => (x + y) % order },
+        { (i: I) => (order - i) % order }
+      )
+    )
+  )
+
+  test("Algebraic theories support binary multiplication of their algebras") {
+    withCyclicGroup(order = 2) {
+    [Int2] => (_: Set[Int2]) ?=> (_: Int2 =:= Int) ?=> (_: Int =:= Int2) ?=> (group2: LocalGroup[Int2]) =>
+      withCyclicGroup(order = 3) {
+        [Int3] => (_: Set[Int3]) ?=> (_: Int3 =:= Int) ?=> (_: Int =:= Int3) ?=> (group3: LocalGroup[Int3]) =>
+          withCyclicGroup(order = 6) {
+            [Int6] => (_: Set[Int6]) ?=> (_: Int6 =:= Int) ?=> (_: Int =:= Int6) ?=> (group6: LocalGroup[Int6]) =>
+              group2.sanityTest
+              group3.sanityTest
+              group6.sanityTest
+
+              val group2x3: LocalGroup[(Int2, Int3)] = group2 x group3
+              group2x3.sanityTest
+
+              localGroups.isMorphism(
+                group2x3,
+                group2,
+                { _ => 0 }
+              ) is true
+
+              localGroups.isMorphism(
+                group2x3,
+                group2,
+                { _ => 1 }
+              ) is false
+
+              localGroups.isMorphism(
+                group2x3,
+                group2,
+                π0[Int2, Int3]
+              ) is true
+
+              localGroups.isMorphism(
+                group2x3,
+                group3,
+                π1[Int2, Int3]
+              ) is true
+
+              val chineseRemainder: Int6 => (Int2, Int3) =
+                { i => (i % 2, i % 3) }
+              chineseRemainder.isIsoPlaceholderTrue is true
+
+              localGroups.isMorphism(
+                group6,
+                group2x3,
+                chineseRemainder
+              ) is true
+
+              val notChineseRemainder: Int6 => (Int2, Int3) =
+                { i => ((i + 1) % 2, (i + 2) % 3) }
+              notChineseRemainder.isIsoPlaceholderTrue is true
+
+              localGroups.isMorphism(
+                group6,
+                group2x3,
+                notChineseRemainder
+              ) is false
+            }
+      }
+    }
+  }
+
+  /*
+  test("Algebraic theories support binary multiplication of their algebras, even with scalar extensions") {
+    import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
+    import monoidOf3.regularAction
+
+    val barDot = dot("x", "y")
+    val scalarMultiply: (String, Symbol) => String =
+      (s, m) => monoidOf3.multiply(Symbol(s), m).name
+
+    val bar = monoidOf3.action(barDot)(scalarMultiply)
+
+    val product: monoidOf3.Action[String x Symbol] =
+      bar x regularAction
+    val underlyingProduct = barDot x regularAction.actionCarrier
+    product.sanityTest
+    product.carrier shouldBe underlyingProduct
+    product.operatorAssignments.lookup(II).get(()) shouldEqual i
+    monoidOf3.actions.isMorphism[String x Symbol, String](
+      product,
+      bar,
+      underlyingProduct.π0
+    )
+    monoidOf3.actions.isMorphism[String x Symbol, Symbol](
+      product,
+      regularAction,
+      underlyingProduct.π1
+    )
+
+    val operatorsUsed =
+      product.operatorAssignments.assignments map {
+        _.operator
+      }
+
+    operatorsUsed.distinct.size shouldBe operatorsUsed.size
+  }
+
+  */
+
   test("can construct/verify monoids") {
 //    val carrier = dot(i, x, y)
 //    val unit = makeNullaryOperator(carrier, i)

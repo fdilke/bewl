@@ -70,6 +70,6 @@ object SetsUtilities:
     block: [X_] => Set[X_] ?=> (X_ =:= X) ?=> R
   ): R = {
     implicit val _: Set[X] = dot
-//    implicit val _: I =:= Int = ...
+    // TODO: move the flip here, or actually, have the compiler infer it
     block[X]
   }

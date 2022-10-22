@@ -1,21 +1,14 @@
 package com.fdilke.bewl2.topos
 
-import com.fdilke.bewl2.algebra.Principal
-import com.fdilke.bewl2.sets.Sets
-import munit.FunSuite
-import munit.Clue.generate
-import com.fdilke.bewl2.sets.SetsUtilities.*
-import com.fdilke.bewl2.utility.Direction
-import Direction.*
+import com.fdilke.bewl2.sets.SetsUtilities._
+import com.fdilke.bewl2.utility.{Direction, RichFunSuite}
+import Direction._
 
 import scala.Function.tupled
 import scala.language.postfixOps
+//import munit.Clue.generate
 
-class AlgebraicTheoriesSpec extends FunSuite:
-
-  extension[A](a: A)
-    inline def is(b: A): Unit =
-      assertEquals(a, b)
+class AlgebraicTheoriesSpec extends RichFunSuite:
 
   private val topos = com.fdilke.bewl2.sets.Sets
   import topos.StandardTermsAndOperators._
@@ -24,11 +17,6 @@ class AlgebraicTheoriesSpec extends FunSuite:
   import topos.StandardTermsAndOperators.***
   import topos._
 
-  extension[A: Set, B: Set](arrow: A => B)
-    inline def isArrow(arrow2: A => B): Unit =
-      assert(arrow =!= arrow2)
-    inline def isNotArrow(arrow2: A => B): Unit =
-      assert( !( arrow =!= arrow2) )
 
   test("Simple and compound terms can describe their own free variables") {
     α.freeVariables is Seq(α)
@@ -115,7 +103,6 @@ class AlgebraicTheoriesSpec extends FunSuite:
       val interpretα: ((Int, Unit)) => Int = context.evaluatePrincipal(α)
       interpretα isNotArrow interpretO
       context.evaluatePrincipal(o) isArrow interpretO
-      val minusO: Term[Principal] = ~o
       context.evaluatePrincipal(~o) isArrow interpretO
       context.evaluatePrincipal(α) isArrow interpretα
       context.evaluatePrincipal(~(~α)) isArrow interpretα
@@ -496,149 +483,3 @@ class AlgebraicTheoriesSpec extends FunSuite:
     }.getMessage is "unit law failed"
   }
 
-  private val localGroups = AlgebraicTheory(ι, !, *)(
-    "left unit" law { ι * α := α },
-    "right unit" law { α * ι := α },
-    "left inverse" law { (!α) * α := ι },
-    "associative" law { (α * β) * γ := α * (β * γ) }
-  )
-
-  private class LocalGroup[G : Set](
-   unit: NullaryOp[G],
-   multiply: BinaryOp[G],
-   inverse: UnaryOp[G]
-  ) extends localGroups.Algebra[G](
-    ι := unit,
-    * := multiply,
-    (!) := inverse
-  ) {
-    // Formalism to handle direct products more elegantly with added sugar
-    def x[H : Set](
-      that: LocalGroup[H]
-    ): LocalGroup[(G, H)] = {
-      val product = (this: localGroups.Algebra[G]) x that
-      new LocalGroup[(G, H)](
-        product.operatorAssignments.lookup(ι).get,
-        product.operatorAssignments.lookup(*).get,
-        product.operatorAssignments.lookup(!).get
-      )
-    }
-  }
-
-  private def withCyclicGroup[R](
-    order: Int
-  )(
-    block: [I] => Set[I] ?=> I =:= Int ?=> Int =:= I ?=> LocalGroup[I] => R
-  ): R =
-    maskSetDot[Int, R](
-      dot = 0 until order toSet
-    ) ( [I] => (_: Set[I]) ?=> (I_is_Int: I =:= Int) ?=>
-      implicit val Int_is_I: Int =:= I = I_is_Int.flip
-      block[I](
-        new LocalGroup[I](
-          makeNullaryOperator[I](0),
-          tupled { (x, y) => (x + y) % order },
-          { (i: I) => (order - i) % order }
-        )
-      )
-    )
-
-  test("Algebraic theories support binary multiplication of their algebras") {
-    withCyclicGroup(order = 2) {
-    [Int2] => (_: Set[Int2]) ?=> (_: Int2 =:= Int) ?=> (_: Int =:= Int2) ?=> (group2: LocalGroup[Int2]) =>
-      withCyclicGroup(order = 3) {
-        [Int3] => (_: Set[Int3]) ?=> (_: Int3 =:= Int) ?=> (_: Int =:= Int3) ?=> (group3: LocalGroup[Int3]) =>
-          withCyclicGroup(order = 6) {
-            [Int6] => (_: Set[Int6]) ?=> (_: Int6 =:= Int) ?=> (_: Int =:= Int6) ?=> (group6: LocalGroup[Int6]) =>
-              group2.sanityTest
-              group3.sanityTest
-              group6.sanityTest
-
-              val group2x3: LocalGroup[(Int2, Int3)] = group2 x group3
-              group2x3.sanityTest
-
-              localGroups.isMorphism(
-                group2x3,
-                group2,
-                { _ => 0 }
-              ) is true
-
-              localGroups.isMorphism(
-                group2x3,
-                group2,
-                { _ => 1 }
-              ) is false
-
-              localGroups.isMorphism(
-                group2x3,
-                group2,
-                π0[Int2, Int3]
-              ) is true
-
-              localGroups.isMorphism(
-                group2x3,
-                group3,
-                π1[Int2, Int3]
-              ) is true
-
-              val chineseRemainder: Int6 => (Int2, Int3) =
-                { i => (i % 2, i % 3) }
-              chineseRemainder.isIsoPlaceholderTrue is true
-
-              localGroups.isMorphism(
-                group6,
-                group2x3,
-                chineseRemainder
-              ) is true
-
-              val notChineseRemainder: Int6 => (Int2, Int3) =
-                { i => ((i + 1) % 2, (i + 2) % 3) }
-              notChineseRemainder.isIsoPlaceholderTrue is true
-
-              localGroups.isMorphism(
-                group6,
-                group2x3,
-                notChineseRemainder
-              ) is false
-            }
-      }
-    }
-  }
-
-  /*
-  test("Algebraic theories support binary multiplication of their algebras, even with scalar extensions") {
-    import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
-    import monoidOf3.regularAction
-
-    val barDot = dot("x", "y")
-    val scalarMultiply: (String, Symbol) => String =
-      (s, m) => monoidOf3.multiply(Symbol(s), m).name
-
-    val bar = monoidOf3.action(barDot)(scalarMultiply)
-
-    val product: monoidOf3.Action[String x Symbol] =
-      bar x regularAction
-    val underlyingProduct = barDot x regularAction.actionCarrier
-    product.sanityTest
-    product.carrier shouldBe underlyingProduct
-    product.operatorAssignments.lookup(II).get(()) shouldEqual i
-    monoidOf3.actions.isMorphism[String x Symbol, String](
-      product,
-      bar,
-      underlyingProduct.π0
-    )
-    monoidOf3.actions.isMorphism[String x Symbol, Symbol](
-      product,
-      regularAction,
-      underlyingProduct.π1
-    )
-
-    val operatorsUsed =
-      product.operatorAssignments.assignments map {
-        _.operator
-      }
-
-    operatorsUsed.distinct.size shouldBe operatorsUsed.size
-  }
-
-  */
