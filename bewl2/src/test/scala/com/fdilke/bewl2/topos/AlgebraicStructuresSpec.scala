@@ -28,8 +28,7 @@ class AlgebraicStructuresSpec extends RichFunSuite:
   ): R =
   maskSetDot[Int, R](
     dot = 0 until order toSet
-  )([I] => (_: Set[I]) ?=> (I_is_Int: I =:= Int) ?=>
-    implicit val Int_is_I: Int =:= I = I_is_Int.flip
+  ) { [I] => (_: Set[I]) ?=> (_: I =:= Int) ?=> (_: Int =:= I) ?=>
       block[I] (
       new LocalGroup[I](
         makeNullaryOperator[I](0),
@@ -37,7 +36,7 @@ class AlgebraicStructuresSpec extends RichFunSuite:
         { (i: I) => (order - i) % order }
       )
     )
-  )
+  }
 
   test("Algebraic theories support binary multiplication of their algebras") {
     withCyclicGroup(order = 2) {

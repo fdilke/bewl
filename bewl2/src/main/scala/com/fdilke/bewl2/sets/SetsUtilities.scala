@@ -67,9 +67,7 @@ object SetsUtilities:
   def maskSetDot[X, R](
     dot: Set[X]
   )(
-    block: [X_] => Set[X_] ?=> (X_ =:= X) ?=> R
-  ): R = {
+    block: [X_] => Set[X_] ?=> (X_ =:= X) ?=> (X =:= X_) ?=> R
+  ): R =
     implicit val _: Set[X] = dot
-    // TODO: move the flip here, or actually, have the compiler infer it
     block[X]
-  }
