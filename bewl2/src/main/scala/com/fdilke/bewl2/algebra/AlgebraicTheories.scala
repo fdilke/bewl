@@ -774,8 +774,8 @@ trait AlgebraicTheories[
           }
 
         override def evaluateScalar(
-                                     term: Term[Scalar]
-                                   ): (HEAD, TAIL) ~> S =
+          term: Term[Scalar]
+        ): (HEAD, TAIL) ~> S =
           term match {
             case VariableTerm(symbol, _) if symbol == name =>
               π0[HEAD, TAIL].asInstanceOf[(HEAD, TAIL) ~> S]

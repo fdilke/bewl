@@ -7,6 +7,7 @@ import munit.Clue.generate
 import com.fdilke.bewl2.sets.SetsUtilities.*
 import com.fdilke.bewl2.utility.Direction
 import Direction.*
+import com.fdilke.bewl2.algebra.AlgebraicConstructions.*
 
 import scala.Function.tupled
 import scala.language.postfixOps
@@ -20,23 +21,6 @@ class AlgebraicStructuresSpec extends RichFunSuite:
   import topos.StandardTermsAndOperators.**
   import topos.StandardTermsAndOperators.***
   import topos._
-
-  private def withCyclicGroup[R](
-    order: Int
-  )(
-    block: [I] => Set[I] ?=> I =:= Int ?=> Int =:= I ?=> LocalGroup[I] => R
-  ): R =
-  maskSetDot[Int, R](
-    dot = 0 until order toSet
-  ) { [I] => (_: Set[I]) ?=> (_: I =:= Int) ?=> (_: Int =:= I) ?=>
-      block[I] (
-      new LocalGroup[I](
-        makeNullaryOperator[I](0),
-        tupled { (x, y) => (x + y) % order },
-        { (i: I) => (order - i) % order }
-      )
-    )
-  }
 
   test("Algebraic theories support binary multiplication of their algebras") {
     withCyclicGroup(order = 2) {
