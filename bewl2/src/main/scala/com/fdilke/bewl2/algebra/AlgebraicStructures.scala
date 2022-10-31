@@ -22,7 +22,7 @@ trait AlgebraicStructures[
   import StandardTermsAndOperators.!
   import StandardTermsAndOperators.*
 
-  val localGroups: AlgebraicTheory[UNIT] =
+  val groups: AlgebraicTheory[UNIT] =
     AlgebraicTheory(ι, !, *)(
       "left unit" law { ι * α := α },
       "right unit" law { α * ι := α },
@@ -30,26 +30,38 @@ trait AlgebraicStructures[
       "associative" law { (α * β) * γ := α * (β * γ) }
     )
 
-  class LocalGroup[G : DOT](
+  class Group[G : DOT](
    unit: NullaryOp[G],
    multiply: BinaryOp[G],
    inverse: UnaryOp[G]
-  ) extends localGroups.Algebra[G](
+  ) extends groups.Algebra[G](
     ι := unit,
     * := multiply,
     (!) := inverse
-  ) {
-    // Formalism to handle direct products more elegantly with added sugar
-    def x[H : DOT](
-      that: LocalGroup[H]
-    ): LocalGroup[(G, H)] = {
-      val product = (this: localGroups.Algebra[G]) x that
-      new LocalGroup[(G, H)](
+  ):
+    def x[H : DOT]( // product sugar
+      that: Group[H]
+    ): Group[(G, H)] = {
+      val product = (this: groups.Algebra[G]) x that
+      new Group[(G, H)](
         product.operatorAssignments.lookup(ι).get,
         product.operatorAssignments.lookup(*).get,
         product.operatorAssignments.lookup(!).get
       )
-//      ???
     }
-  }
+
+  val monoids: AlgebraicTheory[UNIT] =
+    AlgebraicTheory(ι, *)(
+      "left unit" law (ι * α := α),
+      "right unit" law (α * ι := α),
+      "associative" law ((α * β) * γ := α * (β * γ))
+    )
+
+  class Monoid[M: DOT](
+    val unit: NullaryOp[M],
+    val multiply: BinaryOp[M]
+  ) extends monoids.Algebra[M](
+    ι := unit,
+    * := multiply
+  ) // with Actions[M] with CommutativityCriterion
 }

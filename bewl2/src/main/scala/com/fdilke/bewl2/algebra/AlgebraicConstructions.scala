@@ -24,20 +24,20 @@ trait AlgebraicConstructions[
 
 }
 
-// Constructions specific to Sets (and maybe other topoi) live here
+// Constructions specific to Sets (and maybe other topoi`) live here
 object AlgebraicConstructions:
 
   def withCyclicGroup[R](
     order: Int
   )(
-    block: [I] => Set[I] ?=> I =:= Int ?=> Int =:= I ?=> Sets.LocalGroup[I] => R
+    block: [I] => Set[I] ?=> I =:= Int ?=> Int =:= I ?=> Sets.Group[I] => R
   ): R =
     maskSetDot[Int, R](
       dot = 0 until order toSet
     ) {
       [I] => (_: Set[I]) ?=> (_: I =:= Int) ?=> (_: Int =:= I) ?=>
         block[I](
-          new Sets.LocalGroup[I](
+          new Sets.Group[I](
             makeNullaryOperator[I](0),
             tupled { (x, y) => (x + y) % order },
             { (i: I) => (order - i) % order }

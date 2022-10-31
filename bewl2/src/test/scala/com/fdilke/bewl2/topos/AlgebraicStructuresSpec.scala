@@ -24,37 +24,37 @@ class AlgebraicStructuresSpec extends RichFunSuite:
 
   test("Algebraic theories support binary multiplication of their algebras") {
     withCyclicGroup(order = 2) {
-    [Int2] => (_: Set[Int2]) ?=> (_: Int2 =:= Int) ?=> (_: Int =:= Int2) ?=> (group2: LocalGroup[Int2]) =>
+    [Int2] => (_: Set[Int2]) ?=> (_: Int2 =:= Int) ?=> (_: Int =:= Int2) ?=> (group2: Group[Int2]) =>
       withCyclicGroup(order = 3) {
-        [Int3] => (_: Set[Int3]) ?=> (_: Int3 =:= Int) ?=> (_: Int =:= Int3) ?=> (group3: LocalGroup[Int3]) =>
+        [Int3] => (_: Set[Int3]) ?=> (_: Int3 =:= Int) ?=> (_: Int =:= Int3) ?=> (group3: Group[Int3]) =>
           withCyclicGroup(order = 6) {
-            [Int6] => (_: Set[Int6]) ?=> (_: Int6 =:= Int) ?=> (_: Int =:= Int6) ?=> (group6: LocalGroup[Int6]) =>
+            [Int6] => (_: Set[Int6]) ?=> (_: Int6 =:= Int) ?=> (_: Int =:= Int6) ?=> (group6: Group[Int6]) =>
               group2.sanityTest
               group3.sanityTest
               group6.sanityTest
 
-              val group2x3: LocalGroup[(Int2, Int3)] = group2 x group3
+              val group2x3: Group[(Int2, Int3)] = group2 x group3
               group2x3.sanityTest
 
-              localGroups.isMorphism(
+              groups.isMorphism(
                 group2x3,
                 group2,
                 { _ => 0 }
               ) is true
 
-              localGroups.isMorphism(
+              groups.isMorphism(
                 group2x3,
                 group2,
                 { _ => 1 }
               ) is false
 
-              localGroups.isMorphism(
+              groups.isMorphism(
                 group2x3,
                 group2,
                 π0[Int2, Int3]
               ) is true
 
-              localGroups.isMorphism(
+              groups.isMorphism(
                 group2x3,
                 group3,
                 π1[Int2, Int3]
@@ -64,7 +64,7 @@ class AlgebraicStructuresSpec extends RichFunSuite:
                 { i => (i % 2, i % 3) }
               chineseRemainder.isIsoPlaceholderTrue is true
 
-              localGroups.isMorphism(
+              groups.isMorphism(
                 group6,
                 group2x3,
                 chineseRemainder
@@ -74,7 +74,7 @@ class AlgebraicStructuresSpec extends RichFunSuite:
                 { i => ((i + 1) % 2, (i + 2) % 3) }
               notChineseRemainder.isIsoPlaceholderTrue is true
 
-              localGroups.isMorphism(
+              groups.isMorphism(
                 group6,
                 group2x3,
                 notChineseRemainder

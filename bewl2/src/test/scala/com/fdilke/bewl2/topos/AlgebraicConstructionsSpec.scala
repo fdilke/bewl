@@ -24,7 +24,7 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
 
   test("We can construct cyclic groups") {
     withCyclicGroup(order = 17) {
-      [Int17] => (_: Set[Int17]) ?=> (_: Int17 =:= Int) ?=> (_: Int =:= Int17) ?=> (group17: LocalGroup[Int17]) =>
+      [Int17] => (_: Set[Int17]) ?=> (_: Int17 =:= Int) ?=> (_: Int =:= Int17) ?=> (group17: Group[Int17]) =>
         summon[Set[Int17]].size is 17
         group17.sanityTest
     }
