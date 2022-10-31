@@ -21,13 +21,12 @@ trait AlgebraicConstructions[
   →[_, _]
 ] {
   topos: Topos[DOT, CTXT, VOID, UNIT, BEWL, →] =>
-
 }
 
-// Constructions specific to Sets (and maybe other topoi`) live here
+// Constructions specific to Sets (and maybe other topoi) live here
 object AlgebraicConstructions:
 
-  def withCyclicGroup[R](
+  def withCyclicGroup[R]( // TODO: make group argument implicit
     order: Int
   )(
     block: [I] => Set[I] ?=> I =:= Int ?=> Int =:= I ?=> Sets.Group[I] => R
@@ -50,30 +49,34 @@ object AlgebraicConstructions:
       throw new IllegalArgumentException("Not a valid monoid multiplication table: size " + square)
     }
 
-  def monoidFromTable[M: Set](table: M*): Sets.Monoid[M] = {
+  def monoidFromTable[M, RESULT](
+    table: M*
+  )(
+    block: Set[M] ?=> Sets.Monoid[M] ?=> RESULT
+  ): RESULT =
     val carrierSize = intSqrt(table.size)
-//    val carrierAsList = table.take(carrierSize)
-//    val carrier = dot(carrierAsList: _*)
-    val carrier = summon[Set[M]]
-//    val carrierSize = carrier.size
-    val carrierAsList = table.take(carrier.size)
-    
+    val carrierAsList = table.take(carrierSize)
+
     val mappings: Seq[((M, M), M)] =
       for {
-        i <- 0 until carrier.size
-        j <- 0 until carrier.size
+        i <- 0 until carrierSize
+        j <- 0 until carrierSize
       } yield (
         carrierAsList(i),
         carrierAsList(j)
       ) -> table(
-        i * carrier.size + j
+        i * carrierSize + j
       )
-    new Sets.Monoid[M](
-      makeNullaryOperator[M](
-        table.head
-      ),
-      makeBinaryOperator[M](
-        mappings: _*
+
+    implicit val _: Set[M] = Set(carrierAsList: _*)
+    implicit val _: Sets.Monoid[M] =
+      Sets.Monoid[M](
+        makeNullaryOperator[M](
+          table.head
+        ),
+        makeBinaryOperator[M](
+          mappings: _*
+        )
       )
-    )
-  }
+
+    block

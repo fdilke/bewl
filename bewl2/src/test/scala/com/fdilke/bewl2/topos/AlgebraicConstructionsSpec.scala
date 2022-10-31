@@ -35,12 +35,13 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
     import StockSymbols._
     val h: Symbol = e
     implicit val _: Set[Symbol] = Set(e, a)
-    val monoid: Monoid[Symbol] =
-      monoidFromTable(
-        e, a,
-        a, e
-      )
-    monoid.sanityTest
-    monoid.unit(()) is e
-    monoid.multiply(a, a) is e
+    monoidFromTable(
+      e, a,
+      a, e
+    ) {
+      (_: Set[Symbol]) ?=> (monoid: Monoid[Symbol]) ?=>   
+      monoid.sanityTest
+      monoid.unit(()) is e
+      monoid.multiply(a, a) is e
+    }
   }
