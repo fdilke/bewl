@@ -45,3 +45,35 @@ object AlgebraicConstructions:
         )
     }
 
+  private def intSqrt(square: Int) =
+    (1 to square).find(n => n * n == square).getOrElse {
+      throw new IllegalArgumentException("Not a valid monoid multiplication table: size " + square)
+    }
+
+  def monoidFromTable[M: Set](table: M*): Sets.Monoid[M] = {
+    val carrierSize = intSqrt(table.size)
+//    val carrierAsList = table.take(carrierSize)
+//    val carrier = dot(carrierAsList: _*)
+    val carrier = summon[Set[M]]
+//    val carrierSize = carrier.size
+    val carrierAsList = table.take(carrier.size)
+    
+    val mappings: Seq[((M, M), M)] =
+      for {
+        i <- 0 until carrier.size
+        j <- 0 until carrier.size
+      } yield (
+        carrierAsList(i),
+        carrierAsList(j)
+      ) -> table(
+        i * carrier.size + j
+      )
+    new Sets.Monoid[M](
+      makeNullaryOperator[M](
+        table.head
+      ),
+      makeBinaryOperator[M](
+        mappings: _*
+      )
+    )
+  }

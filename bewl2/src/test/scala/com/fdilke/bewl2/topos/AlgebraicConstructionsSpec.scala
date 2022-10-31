@@ -8,6 +8,7 @@ import com.fdilke.bewl2.sets.SetsUtilities.*
 import com.fdilke.bewl2.utility.Direction
 import Direction.*
 import com.fdilke.bewl2.algebra.AlgebraicConstructions.*
+import com.fdilke.bewl2.utility.StockSymbols
 
 import scala.Function.tupled
 import scala.language.postfixOps
@@ -30,3 +31,16 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
     }
   }
 
+  test("We can construct a monoid from a table") {
+    import StockSymbols._
+    val h: Symbol = e
+    implicit val _: Set[Symbol] = Set(e, a)
+    val monoid: Monoid[Symbol] =
+      monoidFromTable(
+        e, a,
+        a, e
+      )
+    monoid.sanityTest
+    monoid.unit(()) is e
+    monoid.multiply(a, a) is e
+  }
