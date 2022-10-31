@@ -26,22 +26,22 @@ trait AlgebraicConstructions[
 // Constructions specific to Sets (and maybe other topoi) live here
 object AlgebraicConstructions:
 
-  def withCyclicGroup[R]( // TODO: make group argument implicit
+  def withCyclicGroup[R](
     order: Int
   )(
-    block: [I] => Set[I] ?=> I =:= Int ?=> Int =:= I ?=> Sets.Group[I] => R
+    block: [I] => Set[I] ?=> I =:= Int ?=> Int =:= I ?=> Sets.Group[I] ?=> R
   ): R =
     maskSetDot[Int, R](
       dot = 0 until order toSet
     ) {
       [I] => (_: Set[I]) ?=> (_: I =:= Int) ?=> (_: Int =:= I) ?=>
-        block[I](
+        implicit val _: Sets.Group[I] =
           new Sets.Group[I](
             makeNullaryOperator[I](0),
             tupled { (x, y) => (x + y) % order },
             { (i: I) => (order - i) % order }
           )
-        )
+        block[I]
     }
 
   private def intSqrt(square: Int) =

@@ -25,11 +25,11 @@ class AlgebraicStructuresSpec extends RichFunSuite:
 
   test("Algebraic theories support binary multiplication of their algebras") {
     withCyclicGroup(order = 2) {
-    [Int2] => (_: Set[Int2]) ?=> (_: Int2 =:= Int) ?=> (_: Int =:= Int2) ?=> (group2: Group[Int2]) =>
+    [Int2] => (_: Set[Int2]) ?=> (_: Int2 =:= Int) ?=> (_: Int =:= Int2) ?=> (group2: Group[Int2]) ?=>
       withCyclicGroup(order = 3) {
-        [Int3] => (_: Set[Int3]) ?=> (_: Int3 =:= Int) ?=> (_: Int =:= Int3) ?=> (group3: Group[Int3]) =>
+        [Int3] => (_: Set[Int3]) ?=> (_: Int3 =:= Int) ?=> (_: Int =:= Int3) ?=> (group3: Group[Int3]) ?=>
           withCyclicGroup(order = 6) {
-            [Int6] => (_: Set[Int6]) ?=> (_: Int6 =:= Int) ?=> (_: Int =:= Int6) ?=> (group6: Group[Int6]) =>
+            [Int6] => (_: Set[Int6]) ?=> (_: Int6 =:= Int) ?=> (_: Int =:= Int6) ?=> (group6: Group[Int6]) ?=>
               group2.sanityTest
               group3.sanityTest
               group6.sanityTest
@@ -96,30 +96,30 @@ class AlgebraicStructuresSpec extends RichFunSuite:
           case (s, m) => monoidOf3.multiply(Symbol(s), m).name
 
         val anAction = monoidOf3.action[String](scalarMultiply) // was bar
-//        import monoidOf3.regularAction
-//
-//        val product: monoidOf3.Action[(String, Symbol)] =
-//          anAction x regularAction
-//
-//        product.sanityTest
-//        product.operatorAssignments.lookup(II).get(()) is e
-//        monoidOf3.actions.isMorphism[(String, Symbol), String](
-//          product,
-//          bar,
-//          π0[String, Symbol]
-//        ) is true
-//        monoidOf3.actions.isMorphism[(String, Symbol), Symbol](
-//          product,
-//          regularAction,
-//          π1[String, Symbol]
-//        ) is true
-//
-//        val operatorsUsed =
-//          product.operatorAssignments.assignments map {
-//            _.operator
-//          }
-//
-//        operatorsUsed.distinct.size is operatorsUsed.size
+        import monoidOf3.regularAction
+
+        val product: monoidOf3.Action[(String, Symbol)] =
+          anAction x regularAction
+
+        product.sanityTest
+        product.operatorAssignments.lookup(II).get(()) is e
+        monoidOf3.actions.isMorphism[(String, Symbol), String](
+          product,
+          anAction,
+          π0[String, Symbol]
+        ) is true
+        monoidOf3.actions.isMorphism[(String, Symbol), Symbol](
+          product,
+          regularAction,
+          π1[String, Symbol]
+        ) is true
+
+        val operatorsUsed =
+          product.operatorAssignments.assignments map {
+            _.operator
+          }
+
+        operatorsUsed.distinct.size is operatorsUsed.size
       }
     }
 
