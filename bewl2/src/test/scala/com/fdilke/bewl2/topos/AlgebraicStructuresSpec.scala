@@ -85,58 +85,61 @@ class AlgebraicStructuresSpec extends RichFunSuite:
     }
   }
 
-//  test("Algebraic theories support binary multiplication of their algebras, even with scalar extensions") {
-//    import StockSymbols._
-//    import StockStructures._
-//    import monoidOf3.regularAction
+  test("Algebraic theories support binary multiplication of their algebras, even with scalar extensions") {
+    import StockSymbols._
+    import StockStructures._
+
+    withMonoidOf3 {
+      (_: Set[Symbol]) ?=> (monoidOf3: Sets.Monoid[Symbol]) ?=>
+        implicit val _: Set[String] = Set("a", "b")
+        val scalarMultiply: ((String, Symbol)) => String =
+          case (s, m) => monoidOf3.multiply(Symbol(s), m).name
+
+        val anAction = monoidOf3.action[String](scalarMultiply) // was bar
+//        import monoidOf3.regularAction
 //
-//    implicit val _: Set[String] = Set("a", "b")
-//    val scalarMultiply: (String, Symbol) => String =
-//      (s, m) => monoidOf3.multiply(Symbol(s), m).name
+//        val product: monoidOf3.Action[(String, Symbol)] =
+//          anAction x regularAction
 //
-//    val anAction = monoidOf3.action(barDot)(scalarMultiply) // was bar
+//        product.sanityTest
+//        product.operatorAssignments.lookup(II).get(()) is e
+//        monoidOf3.actions.isMorphism[(String, Symbol), String](
+//          product,
+//          bar,
+//          π0[String, Symbol]
+//        ) is true
+//        monoidOf3.actions.isMorphism[(String, Symbol), Symbol](
+//          product,
+//          regularAction,
+//          π1[String, Symbol]
+//        ) is true
 //
-//    val product: monoidOf3.Action[(String, Symbol)] =
-//      anAction x regularAction
-////    val underlyingProduct = barDot x regularAction.actionCarrier
-//    product.sanityTest
-////    product.carrier shouldBe underlyingProduct
-//    product.operatorAssignments.lookup(II).get(()) is e
-//    monoidOf3.actions.isMorphism[(String, Symbol), String](
-//      product,
-//      bar,
-//      π0[String, Symbol]
-//    ) is true
-//    monoidOf3.actions.isMorphism[(String, Symbol), Symbol](
-//      product,
-//      regularAction,
-//      π1[String, Symbol]
-//    ) is true
+//        val operatorsUsed =
+//          product.operatorAssignments.assignments map {
+//            _.operator
+//          }
 //
-//    val operatorsUsed =
-//      product.operatorAssignments.assignments map {
-//        _.operator
-//      }
-//
-//    operatorsUsed.distinct.size is operatorsUsed.size
-//  }
-//
-//  test("can construct/verify monoids") {
-//    implicit val _: Set[Symbol] = Set(e, a, b)
-//    val unit = makeNullaryOperator(carrier, i)
-//    val product = makeBinaryOperator[Symbol](
-//      (i, i) -> i,
-//      (i, x) -> x,
-//      (i, y) -> y,
-//      (x, i) -> x,
-//      (x, x) -> x,
-//      (x, y) -> x,
-//      (y, i) -> y,
-//      (y, x) -> y,
-//      (y, y) -> y
-//    )
-//    new Monoid[Symbol](unit, product).sanityTest
-//  }
+//        operatorsUsed.distinct.size is operatorsUsed.size
+      }
+    }
+
+  test("can construct/verify monoids") {
+    import StockSymbols._
+    implicit val _: Set[Symbol] = Set(e, a, b)
+    val unit = makeNullaryOperator[Symbol](e)
+    val product = makeBinaryOperator[Symbol](
+      (e, e) -> e,
+      (e, a) -> a,
+      (e, b) -> b,
+      (a, e) -> a,
+      (a, a) -> a,
+      (a, b) -> a,
+      (b, e) -> b,
+      (b, a) -> b,
+      (b, b) -> b
+    )
+    new Monoid[Symbol](unit, product).sanityTest
+  }
 
 /*
   import com.fdilke.bewl.fsets.FiniteSets._

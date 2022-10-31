@@ -9,7 +9,7 @@ object StockStructures:
   def withMonoidOf3[RESULT](
     block: Set[Symbol] ?=> Sets.Monoid[Symbol] ?=> RESULT
   ): RESULT =
-    monoidFromTable(
+    withMonoidFromTable(
       e, a, b,
       a, a, b,
       b, a, b

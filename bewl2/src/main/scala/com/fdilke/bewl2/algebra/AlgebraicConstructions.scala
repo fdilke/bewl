@@ -49,7 +49,7 @@ object AlgebraicConstructions:
       throw new IllegalArgumentException("Not a valid monoid multiplication table: size " + square)
     }
 
-  def monoidFromTable[M, RESULT](
+  def withMonoidFromTable[M, RESULT](
     table: M*
   )(
     block: Set[M] ?=> Sets.Monoid[M] ?=> RESULT

@@ -24,22 +24,30 @@ trait AlgebraicStructures[
 
   val groups: AlgebraicTheory[UNIT] =
     AlgebraicTheory(ι, !, *)(
-      "left unit" law { ι * α := α },
-      "right unit" law { α * ι := α },
-      "left inverse" law { (!α) * α := ι },
-      "associative" law { (α * β) * γ := α * (β * γ) }
+      "left unit" law {
+        ι * α := α
+      },
+      "right unit" law {
+        α * ι := α
+      },
+      "left inverse" law {
+        (!α) * α := ι
+      },
+      "associative" law {
+        (α * β) * γ := α * (β * γ)
+      }
     )
 
-  class Group[G : DOT](
-   unit: NullaryOp[G],
-   multiply: BinaryOp[G],
-   inverse: UnaryOp[G]
+  class Group[G: DOT](
+    unit: NullaryOp[G],
+    multiply: BinaryOp[G],
+    inverse: UnaryOp[G]
   ) extends groups.Algebra[G](
     ι := unit,
     * := multiply,
     (!) := inverse
-  ):
-    def x[H : DOT]( // product sugar
+  ) :
+    def x[H: DOT]( // product sugar
       that: Group[H]
     ): Group[(G, H)] = {
       val product = (this: groups.Algebra[G]) x that
@@ -63,5 +71,51 @@ trait AlgebraicStructures[
   ) extends monoids.Algebra[M](
     ι := unit,
     * := multiply
-  ) // with Actions[M] with CommutativityCriterion
+  ) with Actions[M] // with CommutativityCriterion
+
+  trait Actions[M: DOT] {
+    val unit: NullaryOp[M]
+    val multiply: BinaryOp[M]
+
+    val actions: AlgebraicTheory[M] =
+      AlgebraicTheoryWithScalars[M](
+        II := unit,
+        *** := multiply
+      )(
+        II, **, ***
+      )( laws =
+        "right unit" law (α ** II := α),
+        "mixed associative" law ((α ** Φ) ** Ψ := α ** (Φ *** Ψ))
+      )
+
+    def action[A: DOT](
+      actionMultiply: (A, M) ~> A
+    ) =
+      Action[A](actionMultiply)
+
+    lazy val regularAction: Action[M] =
+      action[M](multiply)
+
+    def trivialAction[A: DOT]: Action[A] =
+      action[A]{ a_m => a_m.map{ _._1 } }
+
+    lazy val voidAction: Action[VOID] =
+      trivialAction[VOID]
+
+    class Action[A: DOT](
+     actionMultiply: BiArrow[A, M, A]
+   ) extends actions.Algebra[A](
+      ** := actionMultiply
+    ) {
+      // Formalism to make the product of two Actions an Action to facilitate sugar
+      def x[B: DOT](
+        that: Action[B]
+      ): Action[(A, B)] = {
+        val product = (this: actions.Algebra[A]) x that
+        new Action[(A, B)](
+          product.operatorAssignments.lookup(**).get
+        )
+      }
+    }
+  }
 }
