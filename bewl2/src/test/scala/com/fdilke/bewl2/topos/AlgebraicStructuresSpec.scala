@@ -276,28 +276,27 @@ class AlgebraicStructuresSpec extends RichFunSuite:
       }
   }
 
+  test("Monoid actions enforce the right unit law") {
+    implicit val _: Set[Int] = Set(1, 2)
+    intercept[IllegalArgumentException] {
+      withMonoidOf3a {
+        (_: Set[Symbol]) ?=> (monoid: Sets.Monoid[Symbol]) ?=>
+          monoid.action[Int](
+            Map(
+              (1, e) -> 2,
+              (1, a) -> 1,
+              (1, b) -> 1,
+              (2, e) -> 1,
+              (2, a) -> 2,
+              (2, b) -> 2
+            )
+          ).sanityTest
+      }
+    }.getMessage is "right unit law failed"
+  }
+
 /*
   describe("Monoid actions") {
-
-
-    it("enforce the right unit law") {
-      intercept[IllegalArgumentException] {
-        monoid4
-          .action[Symbol](
-            dot(a, b)
-          ) {
-            Function untupled Map(
-              (a, i) -> b,
-              (a, x) -> a,
-              (a, y) -> a,
-              (b, i) -> a,
-              (b, x) -> b,
-              (b, y) -> b
-            )
-          }
-          .sanityTest
-      }.getMessage shouldBe "right unit law failed"
-    }
 
     it("enforce the associative law") {
       intercept[IllegalArgumentException] {
