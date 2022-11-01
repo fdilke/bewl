@@ -282,40 +282,39 @@ class AlgebraicStructuresSpec extends RichFunSuite:
       withMonoidOf3a {
         (_: Set[Symbol]) ?=> (monoid: Sets.Monoid[Symbol]) ?=>
           monoid.action[Int](
-            Map(
-              (1, e) -> 2,
-              (1, a) -> 1,
-              (1, b) -> 1,
-              (2, e) -> 1,
-              (2, a) -> 2,
-              (2, b) -> 2
-            )
-          ).sanityTest
+          Map(
+          (1, e) -> 2,
+          (1, a) -> 1,
+          (1, b) -> 1,
+          (2, e) -> 1,
+          (2, a) -> 2,
+          (2, b) -> 2
+        )
+        ).sanityTest
       }
     }.getMessage is "right unit law failed"
   }
 
+  test("Monoid actions enforce the associative law") {
+    implicit val _: Set[Int] = Set(1, 2)
+    intercept[IllegalArgumentException] {
+      withMonoidOf3a {
+        (_: Set[Symbol]) ?=> (monoid: Sets.Monoid[Symbol]) ?=>
+          monoid.action[Int](
+            Map(
+              (1, e) -> 1,
+              (1, a) -> 2,
+              (1, b) -> 1,
+              (2, e) -> 2,
+              (2, a) -> 2,
+              (2, b) -> 1
+            )
+          ).sanityTest
+      }
+    }.getMessage is "mixed associative law failed"
+  }
 /*
   describe("Monoid actions") {
-
-    it("enforce the associative law") {
-      intercept[IllegalArgumentException] {
-        monoid4
-          .action[Symbol](
-            dot(a, b)
-          ) {
-            Function untupled Map(
-              (a, i) -> a,
-              (a, x) -> b,
-              (a, y) -> a,
-              (b, i) -> b,
-              (b, x) -> b,
-              (b, y) -> a
-            )
-          }
-          .sanityTest
-      }.getMessage shouldBe "mixed associative law failed"
-    }
 
     it("can validate arrows as morphisms") {
       val monoid1x = {
