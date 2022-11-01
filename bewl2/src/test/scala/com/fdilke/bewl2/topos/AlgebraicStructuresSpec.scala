@@ -142,8 +142,8 @@ class AlgebraicStructuresSpec extends RichFunSuite:
   }
 
   test("Monoids enforce the left unit law") {
+    import StockSymbols._
     intercept[IllegalArgumentException] {
-      import StockSymbols._
       implicit val _: Set[Symbol] = Set(e, a, b)
       val unit = makeNullaryOperator(e)
       val product = makeBinaryOperator(
@@ -160,6 +160,7 @@ class AlgebraicStructuresSpec extends RichFunSuite:
       new Monoid[Symbol](unit, product).sanityTest
     }.getMessage is "left unit law failed"
   }
+      import StockSymbols._
 
   test("Monoids enforce the right unit law") {
     import StockSymbols._
@@ -174,122 +175,63 @@ class AlgebraicStructuresSpec extends RichFunSuite:
       }
     }.getMessage is "right unit law failed"
   }
+
+  test("Monoids enforce associative multiplication") {
+    import StockSymbols._
+    intercept[IllegalArgumentException] {
+      withMonoidFromTable(
+        e, a, b,
+        a, b, b,
+        b, a, b
+      ) {
+        (_: Set[Symbol]) ?=> (monoid: Sets.Monoid[Symbol]) ?=>
+          monoid.sanityTest
+      }
+    }.getMessage is "associative law failed"
+  }
+
+  test("Monoids can validate the triadic monoid") {
+    val Seq(i, a, b, c, f, f2, g, g2) =
+      Seq[String]("i", "a", "b", "c", "f", "f2", "g", "g2").map { Symbol(_) }
+    withMonoidFromTable(
+      i, a, b, c, f,f2, g,g2,
+      a, a, a, a, a, a, a, a,
+      b, b, b, b, b, b, b, b,
+      c, c, c, c, c, c, c, c,
+      f, b, c, b,f2, f, b, b,
+      f2,c, b, c, f,f2, c, c,
+      g, c, a, a, a, a,g2,g,
+      g2,a, c, c, c, c, g,g2
+    ) {
+      (_: Set[Symbol]) ?=> (monoid: Sets.Monoid[Symbol]) ?=>
+        monoid.sanityTest
+    }
+  }
+
+  test("Monoids can test commutativity") {
+    import StockSymbols._
+    withMonoidFromTable(
+      e, a, b,
+      a, a, b,
+      b, b, b
+    ) {
+        (_: Set[Symbol]) ?=> (monoid: Sets.Monoid[Symbol]) ?=>
+          monoid.isCommutative is true
+      }
+    withMonoidFromTable(
+      e, a, b,
+      a, a, a,
+      b, b, b
+    ) {
+      (_: Set[Symbol]) ?=> (monoid: Sets.Monoid[Symbol]) ?=>
+        monoid.isCommutative is false
+    }
+  }
 /*
   import com.fdilke.bewl.fsets.FiniteSets._
 
   describe("Monoids") {
 
-
-
-    it("enforce associative multiplication") {
-      intercept[IllegalArgumentException] {
-        monoidFromTable(
-          i,
-          x,
-          y,
-          x,
-          y,
-          y,
-          y,
-          x,
-          y
-        ).sanityTest
-      }.getMessage shouldBe "associative law failed"
-    }
-
-    it("can validate the triadic monoid") {
-      monoidFromTable(
-        i,
-        a,
-        b,
-        c,
-        f,
-        f2,
-        g,
-        g2,
-        a,
-        a,
-        a,
-        a,
-        a,
-        a,
-        a,
-        a,
-        b,
-        b,
-        b,
-        b,
-        b,
-        b,
-        b,
-        b,
-        c,
-        c,
-        c,
-        c,
-        c,
-        c,
-        c,
-        c,
-        f,
-        b,
-        c,
-        b,
-        f2,
-        f,
-        b,
-        b,
-        f2,
-        c,
-        b,
-        c,
-        f,
-        f2,
-        c,
-        c,
-        g,
-        c,
-        a,
-        a,
-        a,
-        a,
-        g2,
-        g,
-        g2,
-        a,
-        c,
-        c,
-        c,
-        c,
-        g,
-        g2
-      ).sanityTest
-    }
-
-    it("can tell if a monoid is commutative") {
-      monoidFromTable(
-        i,
-        a,
-        b,
-        a,
-        a,
-        b,
-        b,
-        b,
-        b
-      ) should be(commutative)
-      monoidFromTable(
-        i,
-        a,
-        b,
-        a,
-        a,
-        a,
-        b,
-        b,
-        b
-      ) should not be (commutative)
-    }
   }
 
   val monoid4 =

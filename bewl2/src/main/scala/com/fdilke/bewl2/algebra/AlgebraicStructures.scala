@@ -71,7 +71,7 @@ trait AlgebraicStructures[
   ) extends monoids.Algebra[M](
     ι := unit,
     * := multiply
-  ) with Actions[M] // with CommutativityCriterion
+  ) with Actions[M]
 
   trait Actions[M: DOT] {
     val unit: NullaryOp[M]
@@ -118,4 +118,9 @@ trait AlgebraicStructures[
       }
     }
   }
+
+  extension(a: Algebra)
+    def isCommutative = a.satisfies(
+      α * β := β * α
+    )
 }
