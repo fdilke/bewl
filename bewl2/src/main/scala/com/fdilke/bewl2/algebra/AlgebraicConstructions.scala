@@ -68,7 +68,7 @@ object AlgebraicConstructions:
         i * carrierSize + j
       )
 
-    implicit val _: Set[M] = Set(carrierAsList: _*)
+    implicit val _: Set[M] = carrierAsList.toSet
     implicit val _: Sets.Monoid[M] =
       Sets.Monoid[M](
         makeNullaryOperator[M](
@@ -77,6 +77,41 @@ object AlgebraicConstructions:
         makeBinaryOperator[M](
           mappings: _*
         )
+      )
+
+    block
+
+  def withGroupFromTable[G, RESULT](
+    table: G*
+  )(
+    block: Set[G] ?=> Sets.Group[G] ?=> RESULT
+  ): RESULT =
+    val carrierSize = intSqrt(table.size)
+    val carrierAsList = table.take(carrierSize)
+
+    val mappings: Seq[((G, G), G)] =
+      for {
+        i <- 0 until carrierSize
+        j <- 0 until carrierSize
+      } yield (
+        carrierAsList(i),
+        carrierAsList(j)
+      ) -> table(
+        i * carrierSize + j
+      )
+
+    implicit val _: Set[G] = carrierAsList.toSet
+    val binOp = makeBinaryOperator[G](mappings: _*)
+    val theUnit: G = table.head
+    implicit val _: Sets.Group[G] =
+      Sets.Group[G](
+        unit = makeNullaryOperator[G](theUnit),
+        multiply = binOp,
+        inverse = { (g: G) =>
+          carrierAsList.find { h =>
+            binOp((g, h)) == theUnit
+          }.get
+        }
       )
 
     block

@@ -46,6 +46,22 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
     }
   }
 
+  test("Construct a group from a table") {
+    import StockSymbols._
+    val h: Symbol = e
+    implicit val _: Set[Symbol] = Set(e, a)
+    withGroupFromTable(
+      e, a,
+      a, e
+    ) {
+      (_: Set[Symbol]) ?=> (group: Group[Symbol]) ?=>
+      group.sanityTest
+      group.unit(()) is e
+      group.multiply(a, a) is e
+      group.inverse(a) is a
+    }
+  }
+
   test("Construct symmetric groups") {
     import StockSymbols._
     val h: Symbol = e
@@ -63,6 +79,7 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
       group.sanityTest
       group.unit(()) is Seq(0, 1)
       group.multiply(Seq(1, 0), Seq(1, 0)) is Seq(0, 1)
+      group.isCommutative is true
     }
     withSymmetricGroup(3) {
       (carrier: Set[Seq[Int]]) ?=> (group: Group[Seq[Int]]) ?=>
@@ -74,5 +91,13 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
       group.sanityTest
       group.unit(()) is Seq(0, 1, 2)
       group.multiply(Seq(1, 0, 2), Seq(1, 2, 0)) is Seq(2, 1, 0)
+      group.isCommutative is false
     }
+// takes too long! Can we at least check commutativity?    
+//    withSymmetricGroup(7) {
+//      (carrier: Set[Seq[Int]]) ?=> (group: Group[Seq[Int]]) ?=>
+//      carrier.size is 5040
+//      group.sanityTest
+//      group.isCommutative is false
+//    }
   }

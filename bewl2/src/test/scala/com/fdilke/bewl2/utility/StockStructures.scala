@@ -32,3 +32,15 @@ object StockStructures:
       1, 0,
       0, 0
     )(block)
+    
+  def with_S_3[RESULT](
+    block: Set[Symbol] ?=> Sets.Group[Symbol] ?=> RESULT
+  ): RESULT =
+    withGroupFromTable(
+      e, a, b, c, r, s,
+      a, e, s, r, c, b,
+      b, r, e, s, a, c,
+      c, s, r, e, b, a,
+      r, b, c, a, s, e,
+      s, c, a, b, e, r
+    )(block)

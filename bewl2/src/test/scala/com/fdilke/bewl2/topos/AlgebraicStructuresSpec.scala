@@ -405,86 +405,36 @@ class AlgebraicStructuresSpec extends RichFunSuite:
     }.getMessage is "left inverse law failed"
   }
 
-//  test("Groups can tell if a group is commutative") {
-//    implicit val _: Set[Symbol] = Set(e, a, b)
-//    val unit = makeNullaryOperator(e)
-//    val inverse = makeUnaryOperator(e -> e, a -> b, b -> a)
-//    val product = makeBinaryOperator(
-//      (e, e) -> e,
-//      (e, a) -> a,
-//      (e, b) -> b,
-//      (a, e) -> a,
-//      (a, a) -> b,
-//      (a, b) -> e,
-//      (b, e) -> b,
-//      (b, a) -> e,
-//      (b, b) -> a
-//    )
-//    new Group[Symbol](
-//      unit,
-//      product,
-//      inverse
-//    ).isCommutative is true
+  test("Groups can tell if a group is commutative or not") {
+    withSymmetricGroup(2) {
+      (_: Set[Seq[Int]]) ?=> (group: Group[Seq[Int]]) ?=>
+        group.isCommutative is true
+    }
+    withSymmetricGroup(3) {
+      (_: Set[Seq[Int]]) ?=> (group: Group[Seq[Int]]) ?=>
+        group.isCommutative is false
+    }
+  }
+
+  test("Groups verify explicitly that S_3 is not commutative") {
+    with_S_3 {
+      (carrier: Set[Symbol]) ?=> (group: Group[Symbol]) ?=>
+        carrier.size is 6
+        group.sanityTest
+        group.isCommutative is false
+    }
+  }
+
+//  test("Groups can be regarded as monoids") {
+//    val largerMonoid = endomorphismMonoid(dot(1, 2, 3)).monoid
+//    val (group, inject) = groupOfUnits(largerMonoid)
+//    val monoid = group.asMonoid
+//    monoid.sanityTest
+//    monoids.isMorphism(monoid, largerMonoid, inject) shouldBe true
 //  }
-  
+
 /*
-  describe("Groups") {
 
-
-
-    it("can tell if a group is not commutative") {
-      val group = groupOfUnits(
-        monoidFromTable(
-          i,
-          a,
-          b,
-          c,
-          r,
-          s,
-          a,
-          i,
-          s,
-          r,
-          c,
-          b,
-          b,
-          r,
-          i,
-          s,
-          a,
-          c,
-          c,
-          s,
-          r,
-          i,
-          b,
-          a,
-          r,
-          b,
-          c,
-          a,
-          s,
-          i,
-          s,
-          c,
-          a,
-          b,
-          i,
-          r
-        )
-      )._1
-      group.sanityTest
-      group.carrier.size shouldBe 6
-      group should not be commutative
-    }
-
-    it("can be regarded as monoids") {
-      val largerMonoid = endomorphismMonoid(dot(1, 2, 3)).monoid
-      val (group, inject) = groupOfUnits(largerMonoid)
-      val monoid = group.asMonoid
-      monoid.sanityTest
-      monoids.isMorphism(monoid, largerMonoid, inject) shouldBe true
-    }
   }
 
   describe("Lattices") {
