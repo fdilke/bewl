@@ -313,153 +313,123 @@ class AlgebraicStructuresSpec extends RichFunSuite:
       }
     }.getMessage is "mixed associative law failed"
   }
-/*
-  describe("Monoid actions") {
 
-    it("can validate arrows as morphisms") {
-      val monoid1x = {
-        val carrier = dot(i, x)
-        val unit = makeNullaryOperator(carrier, i)
-        val product =
-          makeBinaryOperator(carrier, (i, i) -> i, (i, x) -> x, (x, i) -> x, (x, x) -> x)
-        new Monoid[Symbol](carrier, unit, product)
-      }
-      monoid1x.sanityTest
-      val rightAction = {
-        val actionCarrier = dot(a, b)
-        val actionMultiply =
-          biArrow(
-            actionCarrier,
-            monoid1x.carrier,
-            actionCarrier
-          )(
-            (a, i) -> a,
-            (a, x) -> a,
-            (b, i) -> b,
-            (b, x) -> a
+  test("Monoid actions can validate arrows as morphisms") {
+    withMonoid_1_0 { // was 'monoid1x'
+      (_: Set[Int]) ?=> (monoid_1_0: Sets.Monoid[Int]) ?=>
+      monoid_1_0.sanityTest
+      implicit val _: Set[Symbol] = Set(a, b)
+      val rightAction: monoid_1_0.Action[Symbol] =
+        monoid_1_0.action[Symbol](
+          Map(
+            (a, 1) -> a,
+            (a, 0) -> a,
+            (b, 1) -> b,
+            (b, 0) -> a
           )
-        new monoid1x.Action[Symbol](
-          actionCarrier,
-          actionMultiply
         )
-      }
       rightAction.sanityTest
-      val rightAction2 = {
-        val actionCarrier = dot(c, d, e)
-        val actionMultiply =
-          biArrow(
-            actionCarrier,
-            monoid1x.carrier,
-            actionCarrier
-          )(
-            (c, i) -> c,
-            (c, x) -> d,
-            (d, i) -> d,
-            (d, x) -> d,
-            (e, i) -> e,
-            (e, x) -> e
+      implicit val _:Set[String] = Set("c", "d", "e")
+      val rightAction2: monoid_1_0.Action[String] =
+        monoid_1_0.action[String](
+          Map(
+            ("c", 1) -> "c",
+            ("c", 0) -> "d",
+            ("d", 1) -> "d",
+            ("d", 0) -> "d",
+            ("e", 1) -> "e",
+            ("e", 0) -> "e"
           )
-        new monoid1x.Action[Symbol](
-          actionCarrier,
-          actionMultiply
         )
-      }
       rightAction2.sanityTest
-      val actionMorphism = arrow(rightAction.carrier, rightAction2.carrier)(
-        a -> d,
-        b -> c
+      val actionMorphism: Symbol => String = Map(
+        a -> "d",
+        b -> "c"
       )
-      monoid1x.actions.isMorphism(rightAction, rightAction2, actionMorphism) shouldBe true
-      val nonActionMorphism =
-        arrow(
-          rightAction.carrier,
-          rightAction2.carrier
-        )(
-          a -> c,
-          b -> c
-        )
-      monoid1x.actions.isMorphism(
-        rightAction,
-        rightAction2,
-        nonActionMorphism
-      ) shouldBe false
-    }
+      monoid_1_0.actions.isMorphism(
+        rightAction, rightAction2, actionMorphism
+      ) is true
+      val nonActionMorphism: Symbol => String = Map(
+        a -> "c",
+        b -> "c"
+      )
+      monoid_1_0.actions.isMorphism(
+        rightAction, rightAction2, nonActionMorphism
+      ) is false
+   }
   }
 
-  describe("Groups") {
-    it("can be defined with an appropriate unit, multiplication and inverse") {
-      val carrier = dot(i, x, y)
-      val unit = makeNullaryOperator(carrier, i)
-      val inverse = makeUnaryOperator(carrier, i -> i, x -> y, y -> x)
-      val product = makeBinaryOperator(
-        carrier,
-        (i, i) -> i,
-        (i, x) -> x,
-        (i, y) -> y,
-        (x, i) -> x,
-        (x, x) -> y,
-        (x, y) -> i,
-        (y, i) -> y,
-        (y, x) -> i,
-        (y, y) -> x
-      )
-      new Group[Symbol](
-        carrier,
+  test("Groups can be defined with an appropriate unit, multiplication and inverse") {
+    implicit val _: Set[Symbol] = Set(e, a, b)
+    val unit = makeNullaryOperator(e)
+    val inverse = makeUnaryOperator(e -> e, a -> b, b -> a)
+    val product = makeBinaryOperator(
+      (e, e) -> e,
+      (e, a) -> a,
+      (e, b) -> b,
+      (a, e) -> a,
+      (a, a) -> b,
+      (a, b) -> e,
+      (b, e) -> b,
+      (b, a) -> e,
+      (b, b) -> a
+    )
+    new Sets.Group[Symbol](
+      unit,
+      product,
+      inverse
+    ).sanityTest
+  }
+
+  test("Groups must have inverses for every element") {
+    implicit val _: Set[Symbol] = Set(e, a, b)
+    val unit = makeNullaryOperator(e)
+    val inverse = makeUnaryOperator(e -> e, a -> b, b -> a)
+    val product = makeBinaryOperator(
+      (e, e) -> e,
+      (e, a) -> a,
+      (e, b) -> b,
+      (a, e) -> a,
+      (a, a) -> a,
+      (a, b) -> a,
+      (b, e) -> b,
+      (b, a) -> b,
+      (b, b) -> b
+    )
+    intercept[IllegalArgumentException] {
+      new Sets.Group[Symbol](
         unit,
         product,
         inverse
       ).sanityTest
-    }
+    }.getMessage is "left inverse law failed"
+  }
 
-    it("must have inverses for every element") {
-      val carrier = dot(i, x, y)
-      val unit = makeNullaryOperator(carrier, i)
-      val inverse = makeUnaryOperator(carrier, i -> i, x -> y, y -> x)
-      val product = makeBinaryOperator(
-        carrier,
-        (i, i) -> i,
-        (i, x) -> x,
-        (i, y) -> y,
-        (x, i) -> x,
-        (x, x) -> x,
-        (x, y) -> x,
-        (y, i) -> y,
-        (y, x) -> y,
-        (y, y) -> y
-      )
-      intercept[IllegalArgumentException] {
-        new Group[Symbol](
-          carrier,
-          unit,
-          product,
-          inverse
-        ).sanityTest
-      }.getMessage shouldBe "left inverse law failed"
-    }
+  test("Groups can tell if a group is commutative") {
+    implicit val _: Set[Symbol] = Set(e, a, b)
+    val unit = makeNullaryOperator(e)
+    val inverse = makeUnaryOperator(e -> e, a -> b, b -> a)
+    val product = makeBinaryOperator(
+      (e, e) -> e,
+      (e, a) -> a,
+      (e, b) -> b,
+      (a, e) -> a,
+      (a, a) -> b,
+      (a, b) -> e,
+      (b, e) -> b,
+      (b, a) -> e,
+      (b, b) -> a
+    )
+    new Group[Symbol](
+      unit,
+      product,
+      inverse
+    ).isCommutative is true
+  }
+/*
+  describe("Groups") {
 
-    it("can tell if a group is commutative") {
-      val carrier = dot(i, x, y)
-      val unit = makeNullaryOperator(carrier, i)
-      val inverse = makeUnaryOperator(carrier, i -> i, x -> y, y -> x)
-      val product = makeBinaryOperator(
-        carrier,
-        (i, i) -> i,
-        (i, x) -> x,
-        (i, y) -> y,
-        (x, i) -> x,
-        (x, x) -> y,
-        (x, y) -> i,
-        (y, i) -> y,
-        (y, x) -> i,
-        (y, y) -> x
-      )
-      new Group[Symbol](
-        carrier,
-        unit,
-        product,
-        inverse
-      ) shouldBe commutative
-    }
+
 
     it("can tell if a group is not commutative") {
       val group = groupOfUnits(

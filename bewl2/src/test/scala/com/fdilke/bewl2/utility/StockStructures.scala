@@ -24,3 +24,11 @@ object StockStructures:
       a, a, a,
       b, b, b
     )(block)
+    
+  def withMonoid_1_0[RESULT](
+    block: Set[Int] ?=> Sets.Monoid[Int] ?=> RESULT
+  ): RESULT =
+    withMonoidFromTable(
+      1, 0,
+      0, 0
+    )(block)
