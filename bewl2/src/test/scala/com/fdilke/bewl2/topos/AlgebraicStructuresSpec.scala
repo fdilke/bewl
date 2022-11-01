@@ -405,27 +405,28 @@ class AlgebraicStructuresSpec extends RichFunSuite:
     }.getMessage is "left inverse law failed"
   }
 
-  test("Groups can tell if a group is commutative") {
-    implicit val _: Set[Symbol] = Set(e, a, b)
-    val unit = makeNullaryOperator(e)
-    val inverse = makeUnaryOperator(e -> e, a -> b, b -> a)
-    val product = makeBinaryOperator(
-      (e, e) -> e,
-      (e, a) -> a,
-      (e, b) -> b,
-      (a, e) -> a,
-      (a, a) -> b,
-      (a, b) -> e,
-      (b, e) -> b,
-      (b, a) -> e,
-      (b, b) -> a
-    )
-    new Group[Symbol](
-      unit,
-      product,
-      inverse
-    ).isCommutative is true
-  }
+//  test("Groups can tell if a group is commutative") {
+//    implicit val _: Set[Symbol] = Set(e, a, b)
+//    val unit = makeNullaryOperator(e)
+//    val inverse = makeUnaryOperator(e -> e, a -> b, b -> a)
+//    val product = makeBinaryOperator(
+//      (e, e) -> e,
+//      (e, a) -> a,
+//      (e, b) -> b,
+//      (a, e) -> a,
+//      (a, a) -> b,
+//      (a, b) -> e,
+//      (b, e) -> b,
+//      (b, a) -> e,
+//      (b, b) -> a
+//    )
+//    new Group[Symbol](
+//      unit,
+//      product,
+//      inverse
+//    ).isCommutative is true
+//  }
+  
 /*
   describe("Groups") {
 

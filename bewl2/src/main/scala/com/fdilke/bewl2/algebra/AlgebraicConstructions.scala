@@ -80,3 +80,29 @@ object AlgebraicConstructions:
       )
 
     block
+
+  def withSymmetricGroup[RESULT](
+    degree: Int
+  )(
+    block: Set[Seq[Int]] ?=> Sets.Group[Seq[Int]] ?=> RESULT
+  ): RESULT =
+    val symbols: Seq[Int] = (0 until degree)
+    implicit val permutations: Set[Seq[Int]] =
+      symbols.permutations.toSet[Seq[Int]]
+
+    implicit val _: Sets.Group[Seq[Int]] =
+      Sets.Group[Seq[Int]](
+        unit = makeNullaryOperator[Seq[Int]](symbols),
+        multiply = { (p1: Seq[Int], p2: Seq[Int]) =>
+          symbols map { s => p2(p1(s))}
+        },
+        inverse = { (p: Seq[Int]) =>
+          val array: Array[Int] = new Array[Int](degree)
+          symbols.foreach { s =>
+            array(p(s)) = s
+          }
+          array.toSeq
+        }
+      )
+
+    block

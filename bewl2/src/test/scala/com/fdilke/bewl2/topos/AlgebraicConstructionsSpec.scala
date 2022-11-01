@@ -23,7 +23,7 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
   import topos.StandardTermsAndOperators.***
   import topos._
 
-  test("We can construct cyclic groups") {
+  test("Construct cyclic groups") {
     withCyclicGroup(order = 17) {
       [Int17] => (_: Set[Int17]) ?=> (_: Int17 =:= Int) ?=> (_: Int =:= Int17) ?=> (group17: Group[Int17]) ?=>
         summon[Set[Int17]].size is 17
@@ -31,7 +31,7 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
     }
   }
 
-  test("We can construct a monoid from a table") {
+  test("Construct a monoid from a table") {
     import StockSymbols._
     val h: Symbol = e
     implicit val _: Set[Symbol] = Set(e, a)
@@ -39,9 +39,40 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
       e, a,
       a, e
     ) {
-      (_: Set[Symbol]) ?=> (monoid: Monoid[Symbol]) ?=>   
+      (_: Set[Symbol]) ?=> (monoid: Monoid[Symbol]) ?=>
       monoid.sanityTest
       monoid.unit(()) is e
       monoid.multiply(a, a) is e
+    }
+  }
+
+  test("Construct symmetric groups") {
+    import StockSymbols._
+    val h: Symbol = e
+    implicit val _: Set[Symbol] = Set(e, a)
+    withSymmetricGroup(1) {
+      (carrier: Set[Seq[Int]]) ?=> (group: Group[Seq[Int]]) ?=>
+      carrier is Set(Seq(0))
+      group.sanityTest
+      group.unit(()) is Seq(0)
+      group.multiply(Seq(0), Seq(0)) is Seq(0)
+    }
+    withSymmetricGroup(2) {
+      (carrier: Set[Seq[Int]]) ?=> (group: Group[Seq[Int]]) ?=>
+      carrier is Set(Seq(0, 1), Seq(1, 0))
+      group.sanityTest
+      group.unit(()) is Seq(0, 1)
+      group.multiply(Seq(1, 0), Seq(1, 0)) is Seq(0, 1)
+    }
+    withSymmetricGroup(3) {
+      (carrier: Set[Seq[Int]]) ?=> (group: Group[Seq[Int]]) ?=>
+      carrier is Set(
+        Seq(0, 1, 2),
+        Seq(1, 0, 2), Seq(0, 2, 1), Seq(2, 1, 0),
+        Seq(1, 2, 0), Seq(2, 0, 1)
+      )
+      group.sanityTest
+      group.unit(()) is Seq(0, 1, 2)
+      group.multiply(Seq(1, 0, 2), Seq(1, 2, 0)) is Seq(2, 1, 0)
     }
   }

@@ -39,9 +39,9 @@ trait AlgebraicStructures[
     )
 
   class Group[G: DOT](
-    unit: NullaryOp[G],
-    multiply: BinaryOp[G],
-    inverse: UnaryOp[G]
+    val unit: NullaryOp[G],
+    val multiply: BinaryOp[G],
+    val inverse: UnaryOp[G]
   ) extends groups.Algebra[G](
     ι := unit,
     * := multiply,
