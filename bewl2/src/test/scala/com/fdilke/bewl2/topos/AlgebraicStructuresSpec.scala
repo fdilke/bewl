@@ -1,27 +1,24 @@
 package com.fdilke.bewl2.topos
 
+import com.fdilke.bewl2.algebra.AlgebraicConstructions.*
 import com.fdilke.bewl2.algebra.Principal
 import com.fdilke.bewl2.sets.Sets
-import munit.FunSuite
-import munit.Clue.generate
 import com.fdilke.bewl2.sets.SetsUtilities.*
-import com.fdilke.bewl2.utility.{Direction, StockStructures}
-import Direction.*
-import com.fdilke.bewl2.algebra.AlgebraicConstructions.*
+import com.fdilke.bewl2.utility.Direction.*
+import com.fdilke.bewl2.utility.StockStructures.*
+import com.fdilke.bewl2.utility.StockSymbols.*
+import com.fdilke.bewl2.utility.{Direction, RichFunSuite}
+import munit.Clue.generate
+import munit.FunSuite
 
 import scala.Function.tupled
 import scala.language.postfixOps
-import com.fdilke.bewl2.utility.RichFunSuite
-import com.fdilke.bewl2.utility.StockSymbols
 
 class AlgebraicStructuresSpec extends RichFunSuite:
 
   private val topos = com.fdilke.bewl2.sets.Sets
-  import topos.StandardTermsAndOperators._
-  import topos.StandardTermsAndOperators.~
-  import topos.StandardTermsAndOperators.**
-  import topos.StandardTermsAndOperators.***
-  import topos._
+  import topos.*
+  import topos.StandardTermsAndOperators.*
 
   test("Algebraic theories support binary multiplication of their algebras") {
     withCyclicGroup(order = 2) {
@@ -86,9 +83,6 @@ class AlgebraicStructuresSpec extends RichFunSuite:
   }
 
   test("Algebraic theories support binary multiplication of their algebras, even with scalar extensions") {
-    import StockSymbols._
-    import StockStructures._
-
     withMonoidOf3 {
       (_: Set[Symbol]) ?=> (monoidOf3: Sets.Monoid[Symbol]) ?=>
         implicit val _: Set[String] = Set("a", "b")
@@ -124,7 +118,6 @@ class AlgebraicStructuresSpec extends RichFunSuite:
     }
 
   test("Can construct/verify monoids") {
-    import StockSymbols._
     implicit val _: Set[Symbol] = Set(e, a, b)
     val unit = makeNullaryOperator[Symbol](e)
     val product = makeBinaryOperator[Symbol](
@@ -142,7 +135,6 @@ class AlgebraicStructuresSpec extends RichFunSuite:
   }
 
   test("Monoids enforce the left unit law") {
-    import StockSymbols._
     intercept[IllegalArgumentException] {
       implicit val _: Set[Symbol] = Set(e, a, b)
       val unit = makeNullaryOperator(e)
@@ -160,10 +152,8 @@ class AlgebraicStructuresSpec extends RichFunSuite:
       new Monoid[Symbol](unit, product).sanityTest
     }.getMessage is "left unit law failed"
   }
-      import StockSymbols._
 
   test("Monoids enforce the right unit law") {
-    import StockSymbols._
     intercept[IllegalArgumentException] {
       withMonoidFromTable(
         e, a, b,
@@ -177,7 +167,6 @@ class AlgebraicStructuresSpec extends RichFunSuite:
   }
 
   test("Monoids enforce associative multiplication") {
-    import StockSymbols._
     intercept[IllegalArgumentException] {
       withMonoidFromTable(
         e, a, b,
@@ -209,7 +198,6 @@ class AlgebraicStructuresSpec extends RichFunSuite:
   }
 
   test("Monoids can test commutativity") {
-    import StockSymbols._
     withMonoidFromTable(
       e, a, b,
       a, a, b,
@@ -227,34 +215,24 @@ class AlgebraicStructuresSpec extends RichFunSuite:
         monoid.isCommutative is false
     }
   }
+
+  test("Monoids include the off-the-shelf regular action") {
+    withMonoidOf3a {
+      (_: Set[Symbol]) ?=> (monoid: Sets.Monoid[Symbol]) ?=>
+        val regularAction: monoid.Action[Symbol] =
+          monoid.regularAction
+
+        regularAction.sanityTest
+    }
+  }
 /*
   import com.fdilke.bewl.fsets.FiniteSets._
 
   describe("Monoids") {
-
   }
 
-  val monoid4 =
-    monoidFromTable(
-      i,
-      x,
-      y,
-      x,
-      x,
-      x,
-      y,
-      y,
-      y
-    )
 
   describe("Monoid actions") {
-    it("include the off-the-shelf regular action") {
-      val regularAction: monoid4.Action[Symbol] =
-        monoid4.regularAction
-
-      regularAction.sanityTest
-      regularAction.actionCarrier shouldBe monoid4.carrier
-    }
 
     it("include the off-the-shelf trivial action") {
       val sampleCarrier =
