@@ -11,7 +11,7 @@ import com.fdilke.bewl2.utility.{Direction, RichFunSuite}
 import munit.Clue.generate
 import munit.FunSuite
 
-import scala.Function.tupled
+import scala.Function.{tupled, untupled}
 import scala.language.postfixOps
 
 class AlgebraicStructuresSpec extends RichFunSuite:
@@ -225,43 +225,60 @@ class AlgebraicStructuresSpec extends RichFunSuite:
         regularAction.sanityTest
     }
   }
-/*
-  import com.fdilke.bewl.fsets.FiniteSets._
 
-  describe("Monoids") {
-  }
-
-
-  describe("Monoid actions") {
-
-    it("include the off-the-shelf trivial action") {
-      val sampleCarrier =
-        dot("Lom", "Samazan", "Ky", "Ogar")
-      val trivialAction: monoid4.Action[String] =
-        monoid4.trivialAction(
-          sampleCarrier
-        )
+  test("Monoid actions include the off-the-shelf trivial action") {
+    implicit val _: Set[String] =
+      Set("Lom", "Samazan", "Ky", "Ogar")
+    withMonoidOf3a {
+      (_: Set[Symbol]) ?=> (monoid: Sets.Monoid[Symbol]) ?=>
+      val trivialAction: monoid.Action[String] =
+        monoid.trivialAction[String]
 
       trivialAction.sanityTest
-      trivialAction.actionCarrier shouldBe sampleCarrier
     }
+  }
 
-    it("can be constructed and validated") {
-      monoid4
-        .action[Symbol](
-          dot(a, b)
-        ) {
-          Function untupled Map(
-            (a, i) -> a,
-            (a, x) -> a,
-            (a, y) -> a,
-            (b, i) -> b,
-            (b, x) -> b,
-            (b, y) -> b
-          )
+  test("Monoid actions can be constructed and validated") {
+    maskSetDot(
+      Set[Symbol](a, b)
+    ) {
+      [S] => (_: Set[S]) ?=> (_: S =:= Symbol) ?=> (_: Symbol =:= S) ?=>
+      withMonoidOf3a {
+        (_: Set[Symbol]) ?=> (monoid: Sets.Monoid[Symbol]) ?=>
+          monoid.action[S](
+            Map[(S, Symbol), S](
+              (a : S, e) -> (a : S),
+              (a : S, a) -> (a : S),
+              (a : S, b) -> (a : S),
+              (b : S, e) -> (b : S),
+              (b : S, a) -> (b : S),
+              (b : S, b) -> (b : S)
+            )
+          ).sanityTest
         }
-        .sanityTest
-    }
+      }
+  }
+
+  test("Monoid actions can be constructed and validated (simpler version)") {
+    implicit val _: Set[Int] = Set(1, 2)
+    withMonoidOf3a {
+      (_: Set[Symbol]) ?=> (monoid: Sets.Monoid[Symbol]) ?=>
+        monoid.action[Int](
+          Map(
+            (1, e) -> 1,
+            (1, a) -> 1,
+            (1, b) -> 1,
+            (2, e) -> 2,
+            (2, a) -> 2,
+            (2, b) -> 2
+          )
+        ).sanityTest
+      }
+  }
+
+/*
+  describe("Monoid actions") {
+
 
     it("enforce the right unit law") {
       intercept[IllegalArgumentException] {
