@@ -123,7 +123,7 @@ class AlgebraicStructuresSpec extends RichFunSuite:
       }
     }
 
-  test("can construct/verify monoids") {
+  test("Can construct/verify monoids") {
     import StockSymbols._
     implicit val _: Set[Symbol] = Set(e, a, b)
     val unit = makeNullaryOperator[Symbol](e)
@@ -141,63 +141,45 @@ class AlgebraicStructuresSpec extends RichFunSuite:
     new Monoid[Symbol](unit, product).sanityTest
   }
 
+  test("Monoids enforce the left unit law") {
+    intercept[IllegalArgumentException] {
+      import StockSymbols._
+      implicit val _: Set[Symbol] = Set(e, a, b)
+      val unit = makeNullaryOperator(e)
+      val product = makeBinaryOperator(
+        (e, e) -> e,
+        (e, a) -> e,
+        (e, b) -> e,
+        (a, e) -> a,
+        (a, a) -> a,
+        (a, b) -> a,
+        (b, e) -> b,
+        (b, a) -> b,
+        (b, b) -> b
+      )
+      new Monoid[Symbol](unit, product).sanityTest
+    }.getMessage is "left unit law failed"
+  }
+
+  test("Monoids enforce the right unit law") {
+    import StockSymbols._
+    intercept[IllegalArgumentException] {
+      withMonoidFromTable(
+        e, a, b,
+        e, a, b,
+        e, a, b
+      ) {
+        (_: Set[Symbol]) ?=> (monoid: Sets.Monoid[Symbol]) ?=>
+        monoid.sanityTest
+      }
+    }.getMessage is "right unit law failed"
+  }
 /*
   import com.fdilke.bewl.fsets.FiniteSets._
 
   describe("Monoids") {
-    it("can be constructed and verified") {
-      val carrier = dot(i, x, y)
-      val unit = makeNullaryOperator(carrier, i)
-      val product = makeBinaryOperator(
-        carrier,
-        (i, i) -> i,
-        (i, x) -> x,
-        (i, y) -> y,
-        (x, i) -> x,
-        (x, x) -> x,
-        (x, y) -> x,
-        (y, i) -> y,
-        (y, x) -> y,
-        (y, y) -> y
-      )
-      new Monoid[Symbol](carrier, unit, product).sanityTest
-    }
 
-    it("enforce the left unit element") {
-      intercept[IllegalArgumentException] {
-        val carrier = dot(i, x, y)
-        val unit = makeNullaryOperator(carrier, i)
-        val product = makeBinaryOperator(
-          carrier,
-          (i, i) -> i,
-          (i, x) -> i,
-          (i, y) -> i,
-          (x, i) -> x,
-          (x, x) -> x,
-          (x, y) -> x,
-          (y, i) -> y,
-          (y, x) -> y,
-          (y, y) -> y
-        )
-        new Monoid[Symbol](carrier, unit, product).sanityTest
-      }.getMessage shouldBe "left unit law failed"
-    }
 
-    it("enforce the right unit law") {
-      intercept[IllegalArgumentException] {
-        monoidFromTable(
-          i,
-          x,
-          y,
-          i,
-          x,
-          y,
-          i,
-          x,
-          y
-        ).sanityTest
-      }.getMessage shouldBe "right unit law failed"
-    }
 
     it("enforce associative multiplication") {
       intercept[IllegalArgumentException] {
