@@ -16,9 +16,9 @@ trait AlgebraicTheories[
   VOID,
   UNIT,
   BEWL,
-  →[_, _]
+  >[_, _]
 ] {
-  topos: Topos[DOT, CTXT, VOID, UNIT, BEWL, →] =>
+  topos: Topos[DOT, CTXT, VOID, UNIT, BEWL, >] =>
 
   type NullaryOp[X] = UNIT ~> X
   type UnaryOp[X] = X ~> X

@@ -11,7 +11,7 @@ trait BaseTopos[
   VOID,
   UNIT,
   BEWL,
-  →[_, _]
+  >[_, _]
 ]:
   val mappable: Mappable[CTXT] =
     Mappable[CTXT]
@@ -32,7 +32,7 @@ trait BaseTopos[
   def uncachedExponentialObject[
     X: DOT,
     Y: DOT
-  ]: DOT[X → Y]
+  ]: DOT[X > Y]
 
   def productMagic[A: DOT, B: DOT](
     ca: CTXT[A],
@@ -49,10 +49,10 @@ trait BaseTopos[
   def fromZero[X: DOT]: VOID ~> X
   val truth: UNIT ~> BEWL
 
-  def evaluation[X: DOT, Y: DOT]: (X → Y, X) ~> Y
+  def evaluation[X: DOT, Y: DOT]: (X > Y, X) ~> Y
   def transpose[X: DOT, Y: DOT, Z: DOT](
     xy2z: (X, Y) ~> Z
-  ): X ~> (Y → Z)
+  ): X ~> (Y > Z)
   def doEqualizer[X: DOT, Y: DOT, RESULT](
     f: X ~> Y,
     f2: X ~> Y
@@ -80,9 +80,9 @@ trait Topos[
   VOID,
   UNIT,
   BEWL,
-  →[_, _]
-] extends BaseTopos[DOT, CTXT, VOID, UNIT, BEWL, →]
-  with AlgebraicMachinery[DOT, CTXT, VOID, UNIT, BEWL, →]:
+  >[_, _]
+] extends BaseTopos[DOT, CTXT, VOID, UNIT, BEWL, >]
+  with AlgebraicMachinery[DOT, CTXT, VOID, UNIT, BEWL, >]:
 
   final inline def arrow[X: DOT, Y: DOT]( // occasionally useful
     f: CTXT[X] => CTXT[Y]
@@ -127,10 +127,10 @@ trait Topos[
     )
 
   private val memoizedExponential:
-    [X, Y] => ((DOT[X], DOT[Y])) => DOT[X → Y]
+    [X, Y] => ((DOT[X], DOT[Y])) => DOT[X > Y]
   = Memoize[
       [X, Y] =>> (DOT[X], DOT[Y]),
-      [X, Y] =>> DOT[X → Y]
+      [X, Y] =>> DOT[X > Y]
     ](
       [X, Y] => (dots: (DOT[X], DOT[Y])) => {
         implicit val dotX: DOT[X] = dots._1
@@ -142,7 +142,7 @@ trait Topos[
   implicit def exponentialObject[
       X: DOT,
       Y: DOT
-  ]: DOT[X → Y] =
+  ]: DOT[X > Y] =
     memoizedExponential[X, Y](
       dot[X],
       dot[Y]
@@ -206,8 +206,8 @@ object Topos:
     VOID,
     UNIT,
     BEWL,
-    →[_, _]
+    >[_, _]
   ](
-   implicit topos: Topos[DOT, CTXT, VOID, UNIT, BEWL, →]
-  ): Topos[DOT, CTXT, VOID, UNIT, BEWL, →] =
+   implicit topos: Topos[DOT, CTXT, VOID, UNIT, BEWL, >]
+  ): Topos[DOT, CTXT, VOID, UNIT, BEWL, >] =
     topos

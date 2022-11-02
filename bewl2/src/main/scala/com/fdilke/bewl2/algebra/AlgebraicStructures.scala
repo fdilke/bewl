@@ -14,9 +14,9 @@ trait AlgebraicStructures[
   VOID,
   UNIT,
   BEWL,
-  →[_, _]
-] extends AlgebraicTheories[DOT, CTXT, VOID, UNIT, BEWL, →] {
-  topos: Topos[DOT, CTXT, VOID, UNIT, BEWL, →] =>
+  >[_, _]
+] extends AlgebraicTheories[DOT, CTXT, VOID, UNIT, BEWL, >] {
+  topos: Topos[DOT, CTXT, VOID, UNIT, BEWL, >] =>
 
   import StandardTermsAndOperators._
   import StandardTermsAndOperators.!

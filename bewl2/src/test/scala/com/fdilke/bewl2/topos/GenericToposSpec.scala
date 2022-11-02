@@ -11,9 +11,9 @@ abstract class GenericToposSpec[
   VOID,
   UNIT,
   BEWL,
-  →[_, _]
+  >[_, _]
 ](implicit
- val topos: Topos[DOT, CTXT, VOID, UNIT, BEWL, →]
+ val topos: Topos[DOT, CTXT, VOID, UNIT, BEWL, >]
 ) extends FunSuite:
 
   import topos.*
@@ -149,11 +149,11 @@ abstract class GenericToposSpec[
   }
 
   test("can construct exponential diagrams") {
-    sanityTest[BAR → BAZ]
-    val eval: (BAR → BAZ, BAR) ~> BAZ  =
+    sanityTest[BAR > BAZ]
+    val eval: (BAR > BAZ, BAR) ~> BAZ  =
       evaluation[BAR, BAZ]
     sanityTest(eval)
-    val foo2bar2baz: FOO ~> (BAR → BAZ) =
+    val foo2bar2baz: FOO ~> (BAR > BAZ) =
       transpose(foobar2baz)
     sanityTest(foo2bar2baz)
 
@@ -163,16 +163,16 @@ abstract class GenericToposSpec[
       arrow[(FOO, BAR), BAZ] { (cFooBar: CTXT[(FOO, BAR)]) =>
         val cFoo: CTXT[FOO] = π0[FOO, BAR](cFooBar)
         val cBar: CTXT[BAR] = π1[FOO, BAR](cFooBar)
-        val fnBarBaz: CTXT[BAR → BAZ] = foo2bar2baz(cFoo)
-        val cTuple = productMagic[BAR → BAZ, BAR](fnBarBaz, cBar)
+        val fnBarBaz: CTXT[BAR > BAZ] = foo2bar2baz(cFoo)
+        val cTuple = productMagic[BAR > BAZ, BAR](fnBarBaz, cBar)
         eval(cTuple)
       }
     )
   }
 
   test("caches exponentials") {
-    val fooToBar1: DOT[FOO → BAR] = dot[FOO → BAR]
-    val fooToBar2: DOT[FOO → BAR] = dot[FOO → BAR]
+    val fooToBar1: DOT[FOO > BAR] = dot[FOO > BAR]
+    val fooToBar2: DOT[FOO > BAR] = dot[FOO > BAR]
     assert(
       (fooToBar1.asInstanceOf[Object]) eq (fooToBar2.asInstanceOf[Object])
     )

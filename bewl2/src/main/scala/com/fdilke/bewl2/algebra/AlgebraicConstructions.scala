@@ -18,9 +18,9 @@ trait AlgebraicConstructions[
   VOID,
   UNIT,
   BEWL,
-  →[_, _]
+  >[_, _]
 ] {
-  topos: Topos[DOT, CTXT, VOID, UNIT, BEWL, →] =>
+  topos: Topos[DOT, CTXT, VOID, UNIT, BEWL, >] =>
 }
 
 // Constructions specific to Sets (and maybe other topoi) live here

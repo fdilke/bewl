@@ -18,11 +18,11 @@ trait AlgebraicMachinery[
   VOID,
   UNIT,
   BEWL,
-  →[_, _]
-] extends AlgebraicTheories[DOT, CTXT, VOID, UNIT, BEWL, →]
-  with AlgebraicStructures[DOT, CTXT, VOID, UNIT, BEWL, →]
-  with AlgebraicConstructions[DOT, CTXT, VOID, UNIT, BEWL, →]:
-  topos: Topos[DOT, CTXT, VOID, UNIT, BEWL, →] =>
+  >[_, _]
+] extends AlgebraicTheories[DOT, CTXT, VOID, UNIT, BEWL, >]
+  with AlgebraicStructures[DOT, CTXT, VOID, UNIT, BEWL, >]
+  with AlgebraicConstructions[DOT, CTXT, VOID, UNIT, BEWL, >]:
+  topos: Topos[DOT, CTXT, VOID, UNIT, BEWL, >] =>
 
 
 
