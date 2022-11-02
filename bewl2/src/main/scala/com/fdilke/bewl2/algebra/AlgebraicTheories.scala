@@ -517,9 +517,10 @@ trait AlgebraicTheories[
       )
 
     def isMorphism[A : DOT, B : DOT](
-      sourceAlgebra: Algebra[A],
-      targetAlgebra: Algebra[B],
       arrow: A ~> B
+    )(implicit
+      sourceAlgebra: Algebra[A],
+      targetAlgebra: Algebra[B]
     ): Boolean =
       operators forall {
         case op: ScalarConstant =>

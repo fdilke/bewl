@@ -31,30 +31,23 @@ class AlgebraicStructuresSpec extends RichFunSuite:
               group3.sanityTest
               group6.sanityTest
 
-              val group2x3: Group[(Int2, Int3)] = group2 x group3
+              // TODO: bake this in, as with products of dots
+              implicit val group2x3: Group[(Int2, Int3)] = group2 x group3
               group2x3.sanityTest
 
               groups.isMorphism(
-                group2x3,
-                group2,
-                { _ => 0 }
+                { _ => 0 }: ((Int2, Int3)) => Int2
               ) is true
 
               groups.isMorphism(
-                group2x3,
-                group2,
-                { _ => 1 }
+                { _ => 1 }: ((Int2, Int3)) => Int2
               ) is false
 
               groups.isMorphism(
-                group2x3,
-                group2,
                 π0[Int2, Int3]
               ) is true
 
               groups.isMorphism(
-                group2x3,
-                group3,
                 π1[Int2, Int3]
               ) is true
 
@@ -63,8 +56,6 @@ class AlgebraicStructuresSpec extends RichFunSuite:
               chineseRemainder.isIsoPlaceholderTrue is true
 
               groups.isMorphism(
-                group6,
-                group2x3,
                 chineseRemainder
               ) is true
 
@@ -73,8 +64,6 @@ class AlgebraicStructuresSpec extends RichFunSuite:
               notChineseRemainder.isIsoPlaceholderTrue is true
 
               groups.isMorphism(
-                group6,
-                group2x3,
                 notChineseRemainder
               ) is false
             }
@@ -89,22 +78,21 @@ class AlgebraicStructuresSpec extends RichFunSuite:
         val scalarMultiply: ((String, Symbol)) => String =
           case (s, m) => monoidOf3.multiply(Symbol(s), m).name
 
-        val anAction = monoidOf3.action[String](scalarMultiply) // was bar
-        import monoidOf3.regularAction
+        implicit val anAction: monoidOf3.Action[String] =
+          monoidOf3.action[String](scalarMultiply)
+        implicit val regularAction: monoidOf3.Action[Symbol] =
+          monoidOf3.regularAction
 
-        val product: monoidOf3.Action[(String, Symbol)] =
+        // TODO: should be baked in
+        implicit val product: monoidOf3.Action[(String, Symbol)] =
           anAction x regularAction
 
         product.sanityTest
         product.operatorAssignments.lookup(II).get(()) is e
         monoidOf3.actions.isMorphism[(String, Symbol), String](
-          product,
-          anAction,
           π0[String, Symbol]
         ) is true
         monoidOf3.actions.isMorphism[(String, Symbol), Symbol](
-          product,
-          regularAction,
           π1[String, Symbol]
         ) is true
 
@@ -319,7 +307,7 @@ class AlgebraicStructuresSpec extends RichFunSuite:
       (_: Set[Int]) ?=> (monoid_1_0: Sets.Monoid[Int]) ?=>
       monoid_1_0.sanityTest
       implicit val _: Set[Symbol] = Set(a, b)
-      val rightAction: monoid_1_0.Action[Symbol] =
+      implicit val rightAction: monoid_1_0.Action[Symbol] =
         monoid_1_0.action[Symbol](
           Map(
             (a, 1) -> a,
@@ -330,7 +318,7 @@ class AlgebraicStructuresSpec extends RichFunSuite:
         )
       rightAction.sanityTest
       implicit val _:Set[String] = Set("c", "d", "e")
-      val rightAction2: monoid_1_0.Action[String] =
+      implicit val rightAction2: monoid_1_0.Action[String] =
         monoid_1_0.action[String](
           Map(
             ("c", 1) -> "c",
@@ -347,14 +335,14 @@ class AlgebraicStructuresSpec extends RichFunSuite:
         b -> "c"
       )
       monoid_1_0.actions.isMorphism(
-        rightAction, rightAction2, actionMorphism
+        actionMorphism
       ) is true
       val nonActionMorphism: Symbol => String = Map(
         a -> "c",
         b -> "c"
       )
       monoid_1_0.actions.isMorphism(
-        rightAction, rightAction2, nonActionMorphism
+        nonActionMorphism
       ) is false
    }
   }

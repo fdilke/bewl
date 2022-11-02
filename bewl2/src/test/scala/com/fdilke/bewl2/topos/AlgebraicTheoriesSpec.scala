@@ -332,21 +332,24 @@ class AlgebraicTheoriesSpec extends RichFunSuite:
         -1 -> 1
       )
 
-    val setsWithInvolution = AlgebraicTheory(~)(~(~α) := α)
-    val algebraStrings = new setsWithInvolution.Algebra[String](
-      (~) := minusStrings
-    )
-    val algebraInts = new setsWithInvolution.Algebra[Int](
-      (~) := minusInts
-    )
+    val setsWithInvolution: AlgebraicTheory[Unit] =
+      AlgebraicTheory(~)(~(~α) := α)
+    implicit val algebraStrings: setsWithInvolution.Algebra[String] =
+      new setsWithInvolution.Algebra[String](
+        (~) := minusStrings
+      )
+    implicit val algebraInts: setsWithInvolution.Algebra[Int] =
+      new setsWithInvolution.Algebra[Int](
+        (~) := minusInts
+      )
     algebraStrings.sanityTest
     algebraInts.sanityTest
 
     val morphism: String => Int = Map("+" -> 1, "-" -> -1)
-    setsWithInvolution.isMorphism(algebraStrings, algebraInts, morphism) is true
+    setsWithInvolution.isMorphism(morphism) is true
 
     val notAMorphism: String => Int = Map("+" -> 1, "-" -> 1)
-    setsWithInvolution.isMorphism(algebraStrings, algebraInts, notAMorphism) is false
+    setsWithInvolution.isMorphism(notAMorphism) is false
   }
 
   test("Algebraic theories can validate morphisms preserving constants") {
@@ -355,15 +358,17 @@ class AlgebraicTheoriesSpec extends RichFunSuite:
     implicit val carrierStrings: Set[String] = Set[String]("samson", "delilah")
     val pointStrings: Unit => String = makeNullaryOperator("delilah")
 
-    val pointedSets = AlgebraicTheory(o)()
-    val algebraStrings = new pointedSets.Algebra[String](o := pointStrings)
-    val algebraInts = new pointedSets.Algebra[Int](o := pointInts)
+    val pointedSets: AlgebraicTheory[Unit] = AlgebraicTheory(o)()
+    implicit val algebraStrings: pointedSets.Algebra[String] =
+      new pointedSets.Algebra[String](o := pointStrings)
+    implicit val algebraInts: pointedSets.Algebra[Int] =
+      new pointedSets.Algebra[Int](o := pointInts)
 
     val morphism: String => Int = Map("samson" -> 1, "delilah" -> 0)
     val notAMorphism: String => Int = Map("samson" -> 1, "delilah" -> 1)
 
-    pointedSets.isMorphism(algebraStrings, algebraInts, morphism) is true
-    pointedSets.isMorphism(algebraStrings, algebraInts, notAMorphism) is false
+    pointedSets.isMorphism(morphism) is true
+    pointedSets.isMorphism(notAMorphism) is false
   }
 
   test("Algebraic theories can validate morphisms preserving binary operations") {
@@ -372,14 +377,16 @@ class AlgebraicTheoriesSpec extends RichFunSuite:
       (x, y) => (x + y) % 4
     }
 
-    val magmas = AlgebraicTheory(*)()
-    val algebra = new magmas.Algebra[Int](* := multiplication)
+    val magmas: AlgebraicTheory[Unit] =
+      AlgebraicTheory(*)()
+    implicit val algebra: magmas.Algebra[Int] =
+      new magmas.Algebra[Int](* := multiplication)
 
     val morphism: Int => Int = Map(0 -> 0, 1 -> 2, 2 -> 0, 3 -> 2)
     val notAMorphism: Int => Int = Map(0 -> 1, 1 -> 2, 2 -> 3, 3 -> 0)
 
-    magmas.isMorphism(algebra, algebra, morphism) is true
-    magmas.isMorphism(algebra, algebra, notAMorphism) is false
+    magmas.isMorphism(morphism) is true
+    magmas.isMorphism(notAMorphism) is false
   }
 
   test("Algebraic theories can validate morphisms preserving mixed operations with scalars") {
@@ -391,15 +398,17 @@ class AlgebraicTheoriesSpec extends RichFunSuite:
         (false, q) -> true
       )
 
-    val weakActsOverAPointedMagma = AlgebraicTheoryWithScalars[Symbol](II := pointScalar)(II, **)()
-    val algebra = new weakActsOverAPointedMagma.Algebra[Boolean](** := multiplication)
+    val weakActsOverAPointedMagma: AlgebraicTheory[Symbol] =
+      AlgebraicTheoryWithScalars[Symbol](II := pointScalar)(II, **)()
+    implicit val algebra: weakActsOverAPointedMagma.Algebra[Boolean] =
+      new weakActsOverAPointedMagma.Algebra[Boolean](** := multiplication)
     algebra.sanityTest
 
     val morphism: Boolean => Boolean = Map(true -> false, false -> true)
     val notAMorphism: Boolean => Boolean = Map(true -> true, false -> true)
 
-    weakActsOverAPointedMagma.isMorphism(algebra, algebra, morphism) is true
-    weakActsOverAPointedMagma.isMorphism(algebra, algebra, notAMorphism) is false
+    weakActsOverAPointedMagma.isMorphism(morphism) is true
+    weakActsOverAPointedMagma.isMorphism(notAMorphism) is false
   }
 
   test("Algebraic theories support named laws with error reporting when they fail") {
