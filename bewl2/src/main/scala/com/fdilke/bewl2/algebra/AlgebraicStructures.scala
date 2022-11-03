@@ -57,6 +57,8 @@ trait AlgebraicStructures[
         product.operatorAssignments.lookup(!).get
       )
     }
+    lazy val asMonoid: Monoid[G] =
+      new Monoid[G](unit, multiply)
 
   val monoids: AlgebraicTheory[UNIT] =
     AlgebraicTheory(ι, *)(

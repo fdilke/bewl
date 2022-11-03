@@ -9,10 +9,13 @@ import com.fdilke.bewl2.utility.Direction
 import Direction.*
 import com.fdilke.bewl2.algebra.AlgebraicConstructions.*
 import com.fdilke.bewl2.utility.StockSymbols
+import com.fdilke.bewl2.utility.StockStructures._
 
 import scala.Function.tupled
 import scala.language.postfixOps
 import com.fdilke.bewl2.utility.RichFunSuite
+
+import scala.collection.immutable.Set
 
 class AlgebraicConstructionsSpec extends RichFunSuite:
 
@@ -104,11 +107,24 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
   test("Construct the monoid of endomorphisms") {
     import StockSymbols._
     implicit val _: Set[Symbol] = Set(e, a, b)
-    Sets.withEndomorphismMonoid[Symbol, Unit] {
+    withEndomorphismMonoid[Symbol, Unit] {
       [E] => (carrier: Set[E]) ?=> (eMonoid: EndomorphismMonoid[E, Symbol]) ?=>
       eMonoid.sanityTest
       carrier.size is 27
       val standardAction: eMonoid.Action[Symbol] = eMonoid.standardAction
       standardAction.sanityTest
+    }
+  }
+
+  test("Construct the group of units") {
+    withMonoid_1_0 {
+      (_: Set[Int]) ?=> (_: Sets.Monoid[Int]) ?=>
+        withGroupOfUnits[Int, Unit] {
+          [U] => (carrier: Set[U]) ?=> (groupU: Group[U]) ?=> (embed: U => Int) =>
+          groupU.sanityTest
+          carrier.size is 1
+          implicit val _: Monoid[U] = groupU.asMonoid
+          monoids.isMorphism(embed) is true
+        }
     }
   }

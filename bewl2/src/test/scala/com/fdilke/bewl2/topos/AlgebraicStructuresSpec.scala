@@ -303,7 +303,7 @@ class AlgebraicStructuresSpec extends RichFunSuite:
   }
 
   test("Monoid actions can validate arrows as morphisms") {
-    withMonoid_1_0 { // was 'monoid1x'
+    withMonoid_1_0 {
       (_: Set[Int]) ?=> (monoid_1_0: Sets.Monoid[Int]) ?=>
       monoid_1_0.sanityTest
       implicit val _: Set[Symbol] = Set(a, b)
