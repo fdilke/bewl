@@ -70,46 +70,33 @@ trait AlgebraicConstructions[
   )(
     implicit monoid: Monoid[M]
   ): RESULT =
-    val doubleProduct: (M, M) ~> (M, M) = c_mm =>
-      productMagic[M, M](
+    val doubleProduct: (M, M) ~> (M, M) =
+      c_mm => productMagic[M, M](
         monoid.multiply(productMagic[M, M](c_mm.map{ _._1 }, c_mm.map{ _._2 })),
         monoid.multiply(productMagic[M, M](c_mm.map{ _._2 }, c_mm.map{ _._1 }))
       )
-    val oneOne: (M, M) ~> (M, M) = {
-      val mm_to_1: (M, M) ~> M = monoid.unit o toUnit[(M, M)]
+    val oneOne: (M, M) ~> (M, M) =
+      val mm_to_1: (M, M) ~> M =
+        monoid.unit o toUnit[(M, M)]
       (mm_to_1 x mm_to_1)
-    }
     doubleProduct.?=(oneOne) {
       [G] => (equalizer: Equalizer[G, (M, M)]) => (_: DOT[G]) ?=>
-//        val piff: UNIT ~> (M, M) = monoid.unit x monoid.unit
-        val theUnit: UNIT ~> G =
-          equalizer.restrict[UNIT](monoid.unit x monoid.unit)
-        val theMultiply: (G, G) ~> G =
-          equalizer.restrict[(G, G)] { (gg: CTXT[(G, G)]) =>
-            // multiply (m, m_)*(n, n_) = (m*n, n_*m_)
-            val hoffle: CTXT[((M, M), (M, M))] =
-              productMagic[(M, M), (M, M)](
-                equalizer.inclusion(gg.map { _._1 }), // (m, m_)
-                equalizer.inclusion(gg.map { _._2 }) // (n, n_)
-              )
-            val beegle: CTXT[(M, M)] =
-              productMagic[M, M](
-                monoid.multiply(hoffle.map{ _._1 }),
-                monoid.multiply(hoffle.map{ _._2 }),
-              )
-            beegle
-          }
-        val theInverse: G ~> G =
-          equalizer.restrict[G] { (g: CTXT[G]) =>
-            equalizer.inclusion(g).map {
-              case (m, n) => (n, m)
-            }
-          }
         implicit val _: Group[G] =
           new Group(
-            unit = theUnit,
-            multiply = theMultiply,
-            inverse = theInverse
+            unit = equalizer.restrict[UNIT](
+              monoid.unit x monoid.unit
+            ),
+            multiply = equalizer.restrict[(G, G)] { (gg: CTXT[(G, G)]) =>
+              productMagic[M, M]( // multiply (m, m_)*(n, n_) = (m*n, n_*m_)
+                monoid.multiply(equalizer.inclusion(gg.map { _._1 })), // (m, m_)
+                monoid.multiply(equalizer.inclusion(gg.map { _._2 }))  // (n, n_)
+              )
+            },
+            inverse = equalizer.restrict[G] { (g: CTXT[G]) =>
+              equalizer.inclusion(g).map {
+                case (m, n) => (n, m)
+              }
+            }
           )
         val embed: G ~> M =
           π0[M, M] o equalizer.inclusion
