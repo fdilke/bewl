@@ -37,15 +37,13 @@ trait AlgebraicConstructions[
     implicit exponential: DOT[X > X]
   ): RESULT =
     type E = X > X
-    val nameOfId = id[X].name
-    val reval: CTXT[(X > X, X)] => CTXT[X] = evaluation[X, X]
     def spiffyMul(c_fgx: CTXT[((E, E), X)]): CTXT[X] =
       val sniffle: CTXT[(E, X)] =
         c_fgx.map {
           case ((f: E, g: E), x: X) =>
             (f, x)
         }
-      val c_fx: CTXT[X] = reval(sniffle)
+      val c_fx: CTXT[X] = evaluation[X, X].apply(sniffle)
       val c_g_fx: CTXT[(E, X)] =
         productMagic[E, X](
           c_fgx.map {
@@ -59,24 +57,17 @@ trait AlgebraicConstructions[
           case (g: E, fx: X) =>
             (g, fx)
         }
-      val c_gfx: CTXT[X] = reval(hiff)
-      c_gfx
+      evaluation[X, X].apply(
+        c_g_fx.map {
+          case (g: E, fx: X) =>
+            (g, fx)
+        }
+      )
 
-    //    val myMul: CTXT[(E, E)] => CTXT[E] = { c =>
-////      val f: CTXT[E] = c.map { _._1 }
-////      val g: CTXT[E] = c.map { _._2 }
-////  evaluation is a (X > Y, X) ~> Y
-////  i.e. here a CTXT[(X > Y, X)] => CTXT[X]
-//      c.map {
-//        case (f: E, g: E) => f // not the answer
-//      }
-//    }
-//    val myMul2: (E, E) ~> E = myMul
-    val myMul2 = transpose(spiffyMul)
     implicit val _: EndomorphismMonoid[E, X] =
       new Monoid[E](
-        unit = nameOfId,
-        multiply = myMul2
+        unit = id[X].name,
+        multiply = transpose(spiffyMul)
       ) with EndomorphismMonoid[E, X] {
         override val standardAction: Action[X] =
           action[X] { (x_e: CTXT[(X, E)]) =>
@@ -84,10 +75,10 @@ trait AlgebraicConstructions[
               x_e.map {
                 case (x, e) => (e, x)
               }
-            reval(e_x)
+            evaluation[X, X].apply(e_x)
           }
       }
-    block[X > X]
+    block[E]
 }
 
 // Constructions specific to Sets (and maybe other topoi) live here
