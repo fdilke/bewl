@@ -198,6 +198,14 @@ trait Topos[
     inline final def sanityTest: Unit =
       Topos.this.sanityTest[X, Y](f)
 
+    final def name: UNIT ~> (X > Y) =
+      val whiffle: ((UNIT, X)) ~> X = π1[UNIT, X]
+      // val piffle: ((UNIT, X)) ~> Y = f o whiffle
+      transpose(f o whiffle)
+
+//  val foo2bar2baz: FOO ~> (BAR > BAZ) =
+//    transpose(foobar2baz)
+
 
 object Topos:
   inline def apply[

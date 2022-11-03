@@ -121,3 +121,16 @@ case class Captured[S](s: S):
 
 //  def max[T](x: T, y: T)(using ord: DOT[T]): T = ???
 //  val p: [T] => (x: T, y: T) => (ord: DOT[T]) ?=> T = max
+
+trait Actioner {
+  def apply[A]: Set[A]
+}
+
+def actioner[B]: Actioner =
+  new Actioner {
+    def apply[A]: Set[A] = Set.empty
+  }
+
+def woosh: Unit =
+  actioner[Int].apply[Boolean]
+  actioner[Int][Boolean]

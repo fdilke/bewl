@@ -93,11 +93,22 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
       group.multiply(Seq(1, 0, 2), Seq(1, 2, 0)) is Seq(2, 1, 0)
       group.isCommutative is false
     }
-// takes too long! Can we at least check commutativity?    
-//    withSymmetricGroup(7) {
-//      (carrier: Set[Seq[Int]]) ?=> (group: Group[Seq[Int]]) ?=>
-//      carrier.size is 5040
-//      group.sanityTest
-//      group.isCommutative is false
-//    }
+    withSymmetricGroup(4) { // even 5 is a stretch :(
+      (carrier: Set[Seq[Int]]) ?=> (group: Group[Seq[Int]]) ?=>
+      carrier.size is 24
+      group.sanityTest
+      group.isCommutative is false
+    }
+  }
+
+  test("Construct the monoid of endomorphisms") {
+    import StockSymbols._
+    implicit val _: Set[Symbol] = Set(e, a, b)
+    Sets.withEndomorphismMonoid[Symbol, Unit] {
+      [E] => (carrier: Set[E]) ?=> (eMonoid: EndomorphismMonoid[E, Symbol]) ?=>
+      eMonoid.sanityTest
+      carrier.size is 27
+      val standardAction: eMonoid.Action[Symbol] = eMonoid.standardAction
+      standardAction.sanityTest
+    }
   }

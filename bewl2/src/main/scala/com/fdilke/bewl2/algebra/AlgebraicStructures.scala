@@ -90,7 +90,7 @@ trait AlgebraicStructures[
 
     def action[A: DOT](
       actionMultiply: (A, M) ~> A
-    ) =
+    ): Action[A] =
       Action[A](actionMultiply)
 
     lazy val regularAction: Action[M] =
