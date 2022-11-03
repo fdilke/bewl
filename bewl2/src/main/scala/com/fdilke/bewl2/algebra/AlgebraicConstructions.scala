@@ -37,13 +37,12 @@ trait AlgebraicConstructions[
     implicit exponential: DOT[X > X]
   ): RESULT =
     type E = X > X
+
     def spiffyMul(c_fgx: CTXT[((E, E), X)]): CTXT[X] =
-      val sniffle: CTXT[(E, X)] =
-        c_fgx.map {
+      val c_fx: CTXT[X] = applicate(c_fgx) {
           case ((f: E, g: E), x: X) =>
             (f, x)
         }
-      val c_fx: CTXT[X] = evaluation[X, X].apply(sniffle)
       val c_g_fx: CTXT[(E, X)] =
         productMagic[E, X](
           c_fgx.map {
@@ -52,17 +51,10 @@ trait AlgebraicConstructions[
           },
           c_fx
         )
-      val hiff: CTXT[(E, X)] =
-        c_g_fx.map {
-          case (g: E, fx: X) =>
-            (g, fx)
-        }
-      evaluation[X, X].apply(
-        c_g_fx.map {
-          case (g: E, fx: X) =>
-            (g, fx)
-        }
-      )
+      applicate(c_g_fx) {
+        case (g: E, fx: X) =>
+          (g, fx)
+      }
 
     implicit val _: EndomorphismMonoid[E, X] =
       new Monoid[E](
@@ -71,11 +63,9 @@ trait AlgebraicConstructions[
       ) with EndomorphismMonoid[E, X] {
         override val standardAction: Action[X] =
           action[X] { (x_e: CTXT[(X, E)]) =>
-            val e_x: CTXT[(E, X)] =
-              x_e.map {
-                case (x, e) => (e, x)
-              }
-            evaluation[X, X].apply(e_x)
+            applicate(x_e) {
+              case (x, e) => (e, x)
+            }
           }
       }
     block[E]

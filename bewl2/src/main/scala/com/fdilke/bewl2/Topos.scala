@@ -4,6 +4,7 @@ import scala.annotation.targetName
 import com.fdilke.bewl2.Mappable
 import com.fdilke.bewl2.algebra.AlgebraicMachinery
 import com.fdilke.bewl2.helper.Memoize
+import Mappable.*
 
 trait BaseTopos[
   DOT[_],
@@ -146,6 +147,15 @@ trait Topos[
     memoizedExponential[X, Y](
       dot[X],
       dot[Y]
+    )
+
+  inline def applicate[X: DOT, T, Y: DOT](
+    ctxt: CTXT[T]
+  )(
+    f: T => (X > Y, X)
+  ): CTXT[Y] =
+    evaluation[X, Y].apply(
+      ctxt.map(f)
     )
 
   type BiArrow[X, Y, Z] = (X, Y) ~> Z
