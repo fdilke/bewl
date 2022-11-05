@@ -86,10 +86,19 @@ trait AlgebraicConstructions[
             unit = equalizer.restrict[UNIT](
               monoid.unit x monoid.unit
             ),
-            multiply = equalizer.restrict[(G, G)] { (gg: CTXT[(G, G)]) =>
-              productMagic[M, M]( // multiply (m, m_)*(n, n_) = (m*n, n_*m_)
-                monoid.multiply(equalizer.inclusion(gg.map { _._1 })), // (m, m_)
-                monoid.multiply(equalizer.inclusion(gg.map { _._2 }))  // (n, n_)
+            multiply = equalizer.restrict[(G, G)] { (c_gg: CTXT[(G, G)]) =>
+              val c_m_m__n_n_ : CTXT[((M, M), (M, M))] =
+                productMagic(
+                  equalizer.inclusion(c_gg.map { gg => gg._1 }),
+                  equalizer.inclusion(c_gg.map { gg => gg._2 })
+                )
+              productMagic(
+                monoid.multiply(c_m_m__n_n_.map {
+                  case ((m, m_), (n, n_)) => (m, n)
+                }),
+                monoid.multiply(c_m_m__n_n_.map {
+                  case ((m, m_), (n, n_)) => (n_, m_)
+                })
               )
             },
             inverse = equalizer.restrict[G] { (g: CTXT[G]) =>

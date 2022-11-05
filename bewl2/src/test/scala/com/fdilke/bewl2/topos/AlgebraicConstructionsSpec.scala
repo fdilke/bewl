@@ -127,4 +127,14 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
           monoids.isMorphism(embed) is true
         }
     }
+    implicit val _: Set[Int] = Set(1, 2, 3)
+    withEndomorphismMonoid[Int, Unit] {
+      [E] => (_: Set[E]) ?=> (largerMonoid: EndomorphismMonoid[E, Int]) ?=>
+        withGroupOfUnits[E, Unit] {
+          [U] => (symmetries: Set[U]) ?=> (groupU: Group[U]) ?=> (embed: U => E) =>
+            symmetries.size is 6
+            groupU.sanityTest
+            groupU.isCommutative is false
+        }
+    }
   }

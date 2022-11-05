@@ -413,13 +413,18 @@ class AlgebraicStructuresSpec extends RichFunSuite:
     }
   }
 
-//  test("Groups can be regarded as monoids") {
-//    val largerMonoid = endomorphismMonoid(dot(1, 2, 3)).monoid
-//    val (group, inject) = groupOfUnits(largerMonoid)
-//    val monoid = group.asMonoid
-//    monoid.sanityTest
-//    monoids.isMorphism(monoid, largerMonoid, inject) shouldBe true
-//  }
+  test("Groups can be regarded as monoids") {
+    implicit val _: Set[Int] = Set(1, 2, 3)
+    withEndomorphismMonoid[Int, Unit] {
+      [E] => (_: Set[E]) ?=> (largerMonoid: EndomorphismMonoid[E, Int]) ?=>
+        withGroupOfUnits[E, Unit] {
+          [U] => (_: Set[U]) ?=> (groupU: Group[U]) ?=> (embed: U => E) =>
+            implicit val monoidU: Monoid[U] = groupU.asMonoid
+            monoidU.sanityTest
+            monoids.isMorphism(embed) is true
+          }
+    }
+  }
 
 /*
 
