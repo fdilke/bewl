@@ -126,18 +126,19 @@ trait AlgebraicStructures[
       α * β := β * α
     )
 
-  val lattices = AlgebraicTheory(⊥, ⊤, ∨, ∧)(
-    "commutative ∨" law (α ∨ β := β ∨ α),
-    "associative ∨" law ((α ∨ β) ∨ γ := α ∨ (β ∨ γ)),
-    "unit ⊥ for ∨" law (⊥ ∨ α := α),
+  val lattices: AlgebraicTheory[UNIT] =
+    AlgebraicTheory(⊥, ⊤, ∨, ∧)(
+      "commutative ∨" law (α ∨ β := β ∨ α),
+      "associative ∨" law ((α ∨ β) ∨ γ := α ∨ (β ∨ γ)),
+      "unit ⊥ for ∨" law (⊥ ∨ α := α),
 
-    "commutative ∧" law (α ∧ β := β ∧ α),
-    "associative ∧" law ((α ∧ β) ∧ γ := α ∧ (β ∧ γ)),
-    "unit ⊤ for ∧" law (⊤ ∧ α := α),
+      "commutative ∧" law (α ∧ β := β ∧ α),
+      "associative ∧" law ((α ∧ β) ∧ γ := α ∧ (β ∧ γ)),
+      "unit ⊤ for ∧" law (⊤ ∧ α := α),
 
-    "absorptive ∧ over ∨" law (α ∧ (α ∨ β) := α),
-    "absorptive ∨ over ∧" law (α ∨ (α ∧ β) := α)
-  )
+      "absorptive ∧ over ∨" law (α ∧ (α ∨ β) := α),
+      "absorptive ∨ over ∧" law (α ∨ (α ∧ β) := α)
+    )
 
   class Lattice[L: DOT](
     val bottom: NullaryOp[L],
@@ -149,5 +150,27 @@ trait AlgebraicStructures[
     ⊤ := top,
     ∧ := meet,
     ∨ := join
+  )
+
+  val heytingAlgebras: AlgebraicTheory[UNIT] =
+    lattices.extend(→)(moreLaws =
+      "self implication" law (α → α := ⊤),
+      "modus ponens" law (α ∧ (α → β) := α ∧ β),
+      "implication supersedes" law (α ∧ (β → α) := α),
+      "left distributive →/∧" law (α → (β ∧ γ) := (α → β) ∧ (α → γ))
+    )
+
+  class HeytingAlgebra[H: DOT](
+    val bottom: NullaryOp[H],
+    val top: NullaryOp[H],
+    val meet: BinaryOp[H],
+    val join: BinaryOp[H],
+    val implies: BinaryOp[H]
+  ) extends heytingAlgebras.Algebra[H](
+    ⊥ := bottom,
+    ⊤ := top,
+    ∧ := meet,
+    ∨ := join,
+    → := implies
   )
 }
