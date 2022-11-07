@@ -426,26 +426,26 @@ class AlgebraicStructuresSpec extends RichFunSuite:
     }
   }
 
+  test("Lattices can be defined and verified") {
+    implicit val _: Set[Int] = 0 to 7 toSet
+    val bottom: Unit => Int = makeNullaryOperator[Int](0)
+    val top: Unit => Int = makeNullaryOperator[Int](7)
+    val meet: ((Int, Int)) => Int = tupled { _ & _ }
+    val join: ((Int, Int)) => Int = tupled { _ | _ }
+
+    new Lattice[Int](
+      bottom,
+      top,
+      meet,
+      join
+    ).sanityTest
+  }
+
 /*
 
   }
 
   describe("Lattices") {
-    it("can be defined and verified") {
-      val carrier = dot(0 to 7: _*)
-      val bottom = makeNullaryOperator(carrier, 0)
-      val top = makeNullaryOperator(carrier, 7)
-      val meet = bifunctionAsBiArrow(carrier) { _ & _ }
-      val join = bifunctionAsBiArrow(carrier) { _ | _ }
-
-      new Lattice[Int](
-        carrier,
-        bottom,
-        top,
-        meet,
-        join
-      ).sanityTest
-    }
   }
 
   describe("Heyting algebras") {

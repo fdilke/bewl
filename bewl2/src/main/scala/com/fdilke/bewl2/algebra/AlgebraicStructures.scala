@@ -125,4 +125,29 @@ trait AlgebraicStructures[
     def isCommutative = a.satisfies(
       α * β := β * α
     )
+
+  val lattices = AlgebraicTheory(⊥, ⊤, ∨, ∧)(
+    "commutative ∨" law (α ∨ β := β ∨ α),
+    "associative ∨" law ((α ∨ β) ∨ γ := α ∨ (β ∨ γ)),
+    "unit ⊥ for ∨" law (⊥ ∨ α := α),
+
+    "commutative ∧" law (α ∧ β := β ∧ α),
+    "associative ∧" law ((α ∧ β) ∧ γ := α ∧ (β ∧ γ)),
+    "unit ⊤ for ∧" law (⊤ ∧ α := α),
+
+    "absorptive ∧ over ∨" law (α ∧ (α ∨ β) := α),
+    "absorptive ∨ over ∧" law (α ∨ (α ∧ β) := α)
+  )
+
+  class Lattice[L: DOT](
+    val bottom: NullaryOp[L],
+    val top: NullaryOp[L],
+    val meet: BinaryOp[L],
+    val join: BinaryOp[L]
+  ) extends lattices.Algebra[L](
+    ⊥ := bottom,
+    ⊤ := top,
+    ∧ := meet,
+    ∨ := join
+  )
 }
