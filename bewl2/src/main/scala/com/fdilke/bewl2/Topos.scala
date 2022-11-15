@@ -5,6 +5,7 @@ import com.fdilke.bewl2.Mappable
 import com.fdilke.bewl2.algebra.AlgebraicMachinery
 import com.fdilke.bewl2.helper.Memoize
 import Mappable.*
+import com.fdilke.bewl2.logic.LogicalOperations
 
 trait BaseTopos[
   DOT[_],
@@ -83,7 +84,8 @@ trait Topos[
   BEWL,
   >[_, _]
 ] extends BaseTopos[DOT, CTXT, VOID, UNIT, BEWL, >]
-  with AlgebraicMachinery[DOT, CTXT, VOID, UNIT, BEWL, >]:
+  with AlgebraicMachinery[DOT, CTXT, VOID, UNIT, BEWL, >]
+  with LogicalOperations[DOT, CTXT, VOID, UNIT, BEWL, >]:
 
   final inline def arrow[X: DOT, Y: DOT]( // occasionally useful
     f: CTXT[X] => CTXT[Y]
@@ -212,6 +214,8 @@ trait Topos[
       val whiffle: ((UNIT, X)) ~> X = π1[UNIT, X]
       // val piffle: ((UNIT, X)) ~> Y = f o whiffle
       transpose(f o whiffle)
+
+// TODO: ^ sort this out
 
 //  val foo2bar2baz: FOO ~> (BAR > BAZ) =
 //    transpose(foobar2baz)

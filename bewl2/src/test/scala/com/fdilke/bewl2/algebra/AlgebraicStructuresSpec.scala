@@ -1,4 +1,4 @@
-package com.fdilke.bewl2.topos
+package com.fdilke.bewl2.algebra
 
 import com.fdilke.bewl2.algebra.AlgebraicConstructions.*
 import com.fdilke.bewl2.algebra.Principal

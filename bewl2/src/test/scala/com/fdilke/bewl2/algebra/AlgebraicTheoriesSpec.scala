@@ -1,8 +1,8 @@
-package com.fdilke.bewl2.topos
+package com.fdilke.bewl2.algebra
 
-import com.fdilke.bewl2.sets.SetsUtilities._
+import com.fdilke.bewl2.sets.SetsUtilities.*
+import com.fdilke.bewl2.utility.Direction.*
 import com.fdilke.bewl2.utility.{Direction, RichFunSuite}
-import Direction._
 
 import scala.Function.tupled
 import scala.language.postfixOps
@@ -11,11 +11,8 @@ import scala.language.postfixOps
 class AlgebraicTheoriesSpec extends RichFunSuite:
 
   private val topos = com.fdilke.bewl2.sets.Sets
-  import topos.StandardTermsAndOperators._
-  import topos.StandardTermsAndOperators.~
-  import topos.StandardTermsAndOperators.**
-  import topos.StandardTermsAndOperators.***
-  import topos._
+  import topos.*
+  import topos.StandardTermsAndOperators.*
 
 
   test("Simple and compound terms can describe their own free variables") {

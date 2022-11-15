@@ -1,30 +1,24 @@
-package com.fdilke.bewl2.topos
+package com.fdilke.bewl2.algebra
 
+import com.fdilke.bewl2.algebra.AlgebraicConstructions.*
 import com.fdilke.bewl2.algebra.Principal
 import com.fdilke.bewl2.sets.Sets
-import munit.FunSuite
-import munit.Clue.generate
 import com.fdilke.bewl2.sets.SetsUtilities.*
-import com.fdilke.bewl2.utility.Direction
-import Direction.*
-import com.fdilke.bewl2.algebra.AlgebraicConstructions.*
-import com.fdilke.bewl2.utility.StockSymbols
-import com.fdilke.bewl2.utility.StockStructures._
+import com.fdilke.bewl2.utility.Direction.*
+import com.fdilke.bewl2.utility.StockStructures.*
+import com.fdilke.bewl2.utility.{Direction, RichFunSuite, StockSymbols}
+import munit.Clue.generate
+import munit.FunSuite
 
 import scala.Function.tupled
-import scala.language.postfixOps
-import com.fdilke.bewl2.utility.RichFunSuite
-
 import scala.collection.immutable.Set
+import scala.language.postfixOps
 
 class AlgebraicConstructionsSpec extends RichFunSuite:
 
   private val topos = com.fdilke.bewl2.sets.Sets
-  import topos.StandardTermsAndOperators._
-  import topos.StandardTermsAndOperators.~
-  import topos.StandardTermsAndOperators.**
-  import topos.StandardTermsAndOperators.***
-  import topos._
+  import topos.*
+  import topos.StandardTermsAndOperators.*
 
   test("Construct cyclic groups") {
     withCyclicGroup(order = 17) {
@@ -35,7 +29,7 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
   }
 
   test("Construct a monoid from a table") {
-    import StockSymbols._
+    import StockSymbols.*
     val h: Symbol = e
     implicit val _: Set[Symbol] = Set(e, a)
     withMonoidFromTable(
@@ -50,7 +44,7 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
   }
 
   test("Construct a group from a table") {
-    import StockSymbols._
+    import StockSymbols.*
     val h: Symbol = e
     implicit val _: Set[Symbol] = Set(e, a)
     withGroupFromTable(
@@ -66,7 +60,7 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
   }
 
   test("Construct symmetric groups") {
-    import StockSymbols._
+    import StockSymbols.*
     val h: Symbol = e
     implicit val _: Set[Symbol] = Set(e, a)
     withSymmetricGroup(1) {
@@ -105,7 +99,7 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
   }
 
   test("Construct the monoid of endomorphisms") {
-    import StockSymbols._
+    import StockSymbols.*
     implicit val _: Set[Symbol] = Set(e, a, b)
     withEndomorphismMonoid[Symbol, Unit] {
       [E] => (carrier: Set[E]) ?=> (eMonoid: EndomorphismMonoid[E, Symbol]) ?=>
