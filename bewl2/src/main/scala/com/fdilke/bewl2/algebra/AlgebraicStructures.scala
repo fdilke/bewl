@@ -38,7 +38,7 @@ trait AlgebraicStructures[
       }
     )
 
-  class Group[G: DOT](
+  class Group[G: Dot](
     val unit: NullaryOp[G],
     val multiply: BinaryOp[G],
     val inverse: UnaryOp[G]
@@ -47,7 +47,7 @@ trait AlgebraicStructures[
     * := multiply,
     (!) := inverse
   ) :
-    def x[H: DOT]( // product sugar
+    def x[H: Dot]( // product sugar
       that: Group[H]
     ): Group[(G, H)] = {
       val product = (this: groups.Algebra[G]) x that
@@ -67,7 +67,7 @@ trait AlgebraicStructures[
       "associative" law ((α * β) * γ := α * (β * γ))
     )
 
-  class Monoid[M: DOT](
+  class Monoid[M: Dot](
     val unit: NullaryOp[M],
     val multiply: BinaryOp[M]
   ) extends monoids.Algebra[M](
@@ -75,7 +75,7 @@ trait AlgebraicStructures[
     * := multiply
   ) with Actions[M]
 
-  trait Actions[M: DOT] {
+  trait Actions[M: Dot] {
     val unit: NullaryOp[M]
     val multiply: BinaryOp[M]
 
@@ -90,7 +90,7 @@ trait AlgebraicStructures[
         "mixed associative" law ((α ** Φ) ** Ψ := α ** (Φ *** Ψ))
       )
 
-    def action[A: DOT](
+    def action[A: Dot](
       actionMultiply: (A, M) ~> A
     ): Action[A] =
       Action[A](actionMultiply)
@@ -98,19 +98,19 @@ trait AlgebraicStructures[
     lazy val regularAction: Action[M] =
       action[M](multiply)
 
-    def trivialAction[A: DOT]: Action[A] =
+    def trivialAction[A: Dot]: Action[A] =
       action[A]{ a_m => a_m.map{ _._1 } }
 
     lazy val voidAction: Action[VOID] =
       trivialAction[VOID]
 
-    class Action[A: DOT](
+    class Action[A: Dot](
      actionMultiply: BiArrow[A, M, A]
    ) extends actions.Algebra[A](
       ** := actionMultiply
     ) {
       // Formalism to make the product of two Actions an Action to facilitate sugar
-      def x[B: DOT](
+      def x[B: Dot](
         that: Action[B]
       ): Action[(A, B)] = {
         val product = (this: actions.Algebra[A]) x that
@@ -140,7 +140,7 @@ trait AlgebraicStructures[
       "absorptive ∨ over ∧" law (α ∨ (α ∧ β) := α)
     )
 
-  class Lattice[L: DOT](
+  class Lattice[L: Dot](
     val bottom: NullaryOp[L],
     val top: NullaryOp[L],
     val meet: BinaryOp[L],
@@ -160,7 +160,7 @@ trait AlgebraicStructures[
       "left distributive →/∧" law (α → (β ∧ γ) := (α → β) ∧ (α → γ))
     )
 
-  class HeytingAlgebra[H: DOT](
+  class HeytingAlgebra[H: Dot](
     val bottom: NullaryOp[H],
     val top: NullaryOp[H],
     val meet: BinaryOp[H],

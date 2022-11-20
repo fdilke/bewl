@@ -9,120 +9,145 @@ import scala.language.postfixOps
 implicit object Sets extends Topos[
   Set, [A] =>> A, Void, Unit, Boolean, Map
 ]:
-  override def equalArrows[X: Set, Y: Set](
-   f1: X => Y,
-   f2: X => Y
+  override def rawEqualArrows[X, Y](
+    dotX: Set[X],
+    dotY: Set[Y],
+    f1: X => Y,
+    f2: X => Y
  ): Boolean =
-    implicitly[Set[X]].forall { x =>
+    dotX.forall { x =>
       f1(x) == f2(x)
     }
 
-  override def uncachedProductObject[
-    X: Set,
-    Y: Set
-  ]: Set[(X, Y)] =
+  override def uncachedProductObject[X, Y](
+    dotX: Set[X],
+    dotY: Set[Y]
+  ): Set[(X, Y)] =
     for {
-      x <- dot[X]
-      y <- dot[Y]
+      x <- dotX
+      y <- dotY
     } yield
       (x, y)
 
-  override def productMagic[A: Set, B: Set](
-    a: A,
-    b: B
-  ): (A, B) =
-    (a, b)
+  override def rawProductMagic[X, Y](
+    dotX: Set[X],
+    dotY: Set[Y],
+    x: X,
+    y: Y
+  ): (X, Y) =
+    (x, y)
 
-  override def uncachedExponentialObject[
-    X: Set,
-    Y: Set
-  ]: Set[X Map Y] =
-    allMaps(dot[X], dot[Y]).toSet
+  override def uncachedExponentialObject[X, Y](
+    dotX: Set[X],
+    dotY: Set[Y]
+  ): Set[X Map Y] =
+    allMaps(dotX, dotY).toSet
 
-  override def sanityTest[X: Set]: Unit = ()
+  override def rawSanityTest[X](
+    dotX: Set[X]
+  ): Unit = ()
   
-  override def sanityTest[X: Set, Y: Set](
+  override def rawSanityTest[X, Y](
+    dotX: Set[X],
+    dotY: Set[Y],
     f: X ~> Y
   ): Unit =
-    dot[X].foreach { x =>
-      if (!dot[Y].contains(f(x)))
-        throw new IllegalArgumentException(s"target outside range: ${f(x)} not found in ${dot[Y]}")
+    dotX.foreach { x =>
+      if (!dotY.contains(f(x)))
+        throw new IllegalArgumentException(s"target outside range: ${f(x)} not found in $dotY")
     }
 
-  override implicit val unitDot: Set[Unit] = Set(())
-  override implicit val zeroDot: Set[Void] = Set.empty
-  override implicit val omegaDot: Set[Boolean] = Set(true, false)
+  override def rawUnitDot: Set[Unit] = Set(())
+  override def rawZeroDot: Set[Void] = Set.empty
+  override def rawOmegaDot: Set[Boolean] = Set(true, false)
   override val truth: Unit => Boolean = _ => true
 
-  override def fromZero[X: Set]: Void => X = { _ =>
+  override def rawFromZero[X](dotX: Set[X]): Void => X = { _ =>
     throw new IllegalArgumentException("Encountered a VOID")
   }
 
-  override def toUnit[X: Set]: X => Unit = {
+  override def rawToUnit[X](
+    dotX: Set[X]
+  ): X => Unit = {
     _ => ()
   }
 
-  override def evaluation[X: Set, Y: Set]: ((X Map Y, X)) => Y =
+  override def rawEvaluation[X, Y](
+    dotX: Set[X],
+    dotY: Set[Y]
+  ): ((X Map Y, X)) => Y =
     (xMapY, x) => xMapY(x)
 
-  override def transpose[X: Set, Y: Set, Z: Set](
+  override def rawTranspose[X, Y, Z](
+    dotX: Set[X],
+    dotY: Set[Y],
+    dotZ: Set[Z],
     xy2z: ((X, Y)) => Z
   ): X => (Y Map Z) =
     x => Map.from(
-      implicitly[Set[Y]] map { y =>
+      dotY map { y =>
         y -> xy2z( (x, y) )
       }
     )
 
-  override def doEqualizer[X: Set, Y: Set, RESULT](
+  override def rawDoEqualizer[X, Y, RESULT](
+    dotX: Set[X],
+    dotY: Set[Y],
     f: X => Y,
     f2: X => Y
   )(
-    capture: [A] => Equalizer[A, X] => Set[A] ?=> RESULT
+    capture: [A] => RawEqualizer[A, X] => Set[A] => RESULT
   ): RESULT =
     inline def maskType[A](
       dotA: Set[A],
       theInclusion: A => X,
-      theRestriction: [R] => (R ~> X) => Set[R] ?=> (R ~> A)
+      theRestriction: [R] => (R ~> X) => Set[R] => (R ~> A)
     ): RESULT =
-      given Set[A] = dotA
       capture[A](
-        new Equalizer[A, X] {
+        new RawEqualizer[A, X] {
           override val inclusion: A ~> X =
             theInclusion
-          override def restrict[R: Set](
+
+          override def restrict[R](
+            dotR: Set[R],
             arrow: R ~> X
           ): R ~> A =
-            theRestriction(arrow)
+            theRestriction(arrow)(dotR)
         }
-      )
+      )(dotA)
+
     type X_ = X
     val whereEqual: Set[X_] =
-      summon[Set[X]] filter { x =>
+      dotX.filter { x =>
         f(x) == f2(x)
       }
     maskType[X_](
-      dotA =whereEqual,
+      dotA = whereEqual,
       theInclusion = identity,
-      theRestriction = [R] => (arrow: R ~> X) => (rr: Set[R]) ?=> {
+      theRestriction = [R] => (arrow: R ~> X) => (rr: Set[R]) => {
         (r: R) => arrow(r)
       }
     )
 
-  override def chiForMonic[X: Set, Y: Set](
+  override def rawChiForMonic[X, Y](
+    dotX: Set[X],
+    dotY: Set[Y],
     monic: X => Y
   ): Y => Boolean =
-    y => summon[Set[X]] exists { x =>
+    y => dotX.exists { x =>
       monic(x) == y
     }
 
-  override def backDivideMonic[X: Set, Y: Set, A: Set](
-     arrow: X => Y,
-     monic: A => Y
+  override def rawBackDivideMonic[X, Y, A](
+    dotX: Set[X],
+    dotY: Set[Y],
+    dotA: Set[A],
+    arrow: X => Y,
+    monic: A => Y
   ): X => A =
     x => {
       val target: Y = arrow(x)
-      summon[Set[A]] find { a =>
+      dotA.find { a =>
         monic(a) == target
       } get
     }

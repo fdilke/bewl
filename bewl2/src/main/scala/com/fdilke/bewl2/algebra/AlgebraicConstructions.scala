@@ -22,14 +22,14 @@ trait AlgebraicConstructions[
 ] {
   topos: Topos[DOT, CTXT, VOID, UNIT, BEWL, >] =>
 
-  trait EndomorphismMonoid[E: DOT, X : DOT] extends Monoid[E] with Actions[E] {
+  trait EndomorphismMonoid[E: Dot, X : Dot] extends Monoid[E] with Actions[E] {
     val standardAction: Action[X]
   }
 
-  def withEndomorphismMonoid[X : DOT, RESULT](
-    block: [E] => DOT[E] ?=> EndomorphismMonoid[E, X] ?=> RESULT
+  def withEndomorphismMonoid[X : Dot, RESULT](
+    block: [E] => Dot[E] ?=> EndomorphismMonoid[E, X] ?=> RESULT
   )(
-    implicit exponential: DOT[X > X]
+    implicit exponential: Dot[X > X]
   ): RESULT =
     type E = X > X
 
@@ -65,8 +65,8 @@ trait AlgebraicConstructions[
       }
     block[E]
 
-  def withGroupOfUnits[M : DOT, RESULT](
-    block: [G] => DOT[G] ?=> Group[G] ?=> (embed: G ~> M) => RESULT
+  def withGroupOfUnits[M : Dot, RESULT](
+    block: [G] => Dot[G] ?=> Group[G] ?=> (embed: G ~> M) => RESULT
   )(
     implicit monoid: Monoid[M]
   ): RESULT =
@@ -80,7 +80,7 @@ trait AlgebraicConstructions[
         monoid.unit o toUnit[(M, M)]
       (mm_to_1 x mm_to_1)
     doubleProduct.?=(oneOne) {
-      [G] => (equalizer: Equalizer[G, (M, M)]) => (_: DOT[G]) ?=>
+      [G] => (equalizer: Equalizer[G, (M, M)]) => (_: Dot[G]) ?=>
         implicit val _: Group[G] =
           new Group(
             unit = equalizer.restrict[UNIT](
@@ -119,12 +119,12 @@ object AlgebraicConstructions:
   def withCyclicGroup[R](
     order: Int
   )(
-    block: [I] => Set[I] ?=> I =:= Int ?=> Int =:= I ?=> Sets.Group[I] ?=> R
+    block: [I] => Sets.Dot[I] ?=> I =:= Int ?=> Int =:= I ?=> Sets.Group[I] ?=> R
   ): R =
-    maskSetDot[Int, R](
+    Sets.withDotMask[Int, R](
       dot = 0 until order toSet
     ) {
-      [I] => (_: Set[I]) ?=> (_: I =:= Int) ?=> (_: Int =:= I) ?=>
+      [I] => (_: Sets.Dot[I]) ?=> (_: I =:= Int) ?=> (_: Int =:= I) ?=>
         implicit val _: Sets.Group[I] =
           new Sets.Group[I](
             makeNullaryOperator[I](0),
@@ -142,7 +142,7 @@ object AlgebraicConstructions:
   def withMonoidFromTable[M, RESULT](
     table: M*
   )(
-    block: Set[M] ?=> Sets.Monoid[M] ?=> RESULT
+    block: Sets.Dot[M] ?=> Sets.Monoid[M] ?=> RESULT
   ): RESULT =
     val carrierSize = intSqrt(table.size)
     val carrierAsList = table.take(carrierSize)
@@ -158,23 +158,24 @@ object AlgebraicConstructions:
         i * carrierSize + j
       )
 
-    implicit val _: Set[M] = carrierAsList.toSet
-    implicit val _: Sets.Monoid[M] =
-      Sets.Monoid[M](
-        makeNullaryOperator[M](
-          table.head
-        ),
-        makeBinaryOperator[M](
-          mappings: _*
+    Sets.withDot(carrierAsList.toSet) {
+      implicit val _: Sets.Monoid[M] =
+        Sets.Monoid[M](
+          makeNullaryOperator[M](
+            table.head
+          ),
+          makeBinaryOperator[M](
+            mappings: _*
+          )
         )
-      )
 
-    block
+      block
+    }
 
   def withGroupFromTable[G, RESULT](
     table: G*
   )(
-    block: Set[G] ?=> Sets.Group[G] ?=> RESULT
+    block: Sets.Dot[G] ?=> Sets.Group[G] ?=> RESULT
   ): RESULT =
     val carrierSize = intSqrt(table.size)
     val carrierAsList = table.take(carrierSize)
@@ -190,44 +191,46 @@ object AlgebraicConstructions:
         i * carrierSize + j
       )
 
-    implicit val _: Set[G] = carrierAsList.toSet
-    val binOp = makeBinaryOperator[G](mappings: _*)
-    val theUnit: G = table.head
-    implicit val _: Sets.Group[G] =
-      Sets.Group[G](
-        unit = makeNullaryOperator[G](theUnit),
-        multiply = binOp,
-        inverse = { (g: G) =>
-          carrierAsList.find { h =>
-            binOp((g, h)) == theUnit
-          }.get
-        }
-      )
+    Sets.withDot(carrierAsList.toSet) {
+      val binOp = makeBinaryOperator[G](mappings: _*)
+      val theUnit: G = table.head
+      implicit val _: Sets.Group[G] =
+        Sets.Group[G](
+          unit = makeNullaryOperator[G](theUnit),
+          multiply = binOp,
+          inverse = { (g: G) =>
+            carrierAsList.find { h =>
+              binOp((g, h)) == theUnit
+            }.get
+          }
+        )
 
-    block
+      block
+    }
 
   def withSymmetricGroup[RESULT](
     degree: Int
   )(
-    block: Set[Seq[Int]] ?=> Sets.Group[Seq[Int]] ?=> RESULT
+    block: Sets.Dot[Seq[Int]] ?=> Sets.Group[Seq[Int]] ?=> RESULT
   ): RESULT =
     val symbols: Seq[Int] = (0 until degree)
-    implicit val permutations: Set[Seq[Int]] =
+    Sets.withDot(
       symbols.permutations.toSet[Seq[Int]]
-
-    implicit val _: Sets.Group[Seq[Int]] =
-      Sets.Group[Seq[Int]](
-        unit = makeNullaryOperator[Seq[Int]](symbols),
-        multiply = { (p1: Seq[Int], p2: Seq[Int]) =>
-          symbols map { s => p2(p1(s))}
-        },
-        inverse = { (p: Seq[Int]) =>
-          val array: Array[Int] = new Array[Int](degree)
-          symbols.foreach { s =>
-            array(p(s)) = s
+    ) {
+      implicit val _: Sets.Group[Seq[Int]] =
+        Sets.Group[Seq[Int]](
+          unit = makeNullaryOperator[Seq[Int]](symbols),
+          multiply = { (p1: Seq[Int], p2: Seq[Int]) =>
+            symbols map { s => p2(p1(s)) }
+          },
+          inverse = { (p: Seq[Int]) =>
+            val array: Array[Int] = new Array[Int](degree)
+            symbols.foreach { s =>
+              array(p(s)) = s
+            }
+            array.toSeq
           }
-          array.toSeq
-        }
-      )
+        )
 
-    block
+      block
+    }

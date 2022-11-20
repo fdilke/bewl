@@ -10,7 +10,7 @@ trait RichFunSuite extends FunSuite:
 
   import Sets._
 
-  extension[A: Set, B: Set] (arrow: A => B)
+  extension[A: Dot, B: Dot] (arrow: A => B)
     inline def isArrow(arrow2: A => B): Unit =
       assert(arrow =!= arrow2)
     inline def isNotArrow(arrow2: A => B): Unit =

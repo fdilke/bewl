@@ -165,7 +165,7 @@ trait AlgebraicTheories[
    ) extends Term[S](Nil) {
     override val freeVariables: Seq[VariableTerm[_ <: AlgebraicSort]] = Seq(this)
 
-    def addToContext[S : DOT, T : DOT](
+    def addToContext[S : Dot, T : Dot](
       algebra: AlgebraicTheory[S]#Algebra[T]
     )(
       context: algebra.EvaluationContext[_]
@@ -234,8 +234,8 @@ trait AlgebraicTheories[
     name
   ) {
     def :=[
-      S : DOT,
-      T : DOT
+      S : Dot,
+      T : Dot
     ](
        nullaryOp: NullaryOp[T]
      ) =
@@ -251,7 +251,7 @@ trait AlgebraicTheories[
     name
   ) {
     def :=[
-      T : DOT
+      T : Dot
     ](
        nullaryOp: NullaryOp[T]
      ): OperatorPreassignment[T] =
@@ -261,13 +261,13 @@ trait AlgebraicTheories[
       }
   }
 
-  class OperatorPreassignment[S: DOT](
+  class OperatorPreassignment[S: Dot](
     op: Operator
   ) extends OperatorAssignment[UNIT, S](op)
 
   abstract case class OperatorAssignment[
-    T : DOT,
-    S : DOT
+    T : Dot,
+    S : Dot
   ](
      operator: Operator
    ) {
@@ -307,8 +307,8 @@ trait AlgebraicTheories[
   }
 
   case class OperatorAssignments[
-    T : DOT,
-    S : DOT
+    T : Dot,
+    S : Dot
   ](
      assignments: Seq[OperatorAssignment[T, S]]
    ) {
@@ -372,7 +372,7 @@ trait AlgebraicTheories[
       }.toSet ==
         operators.toSet
 
-    def crossedWith[U : DOT](
+    def crossedWith[U : Dot](
       that: OperatorAssignments[U, S]
     ): Seq[OperatorAssignment[(T, U), S]] =
       assignments map { assignment =>
@@ -454,7 +454,7 @@ trait AlgebraicTheories[
     name: String
   ) extends Operator(name, arity =2) {
     @targetName("definitionally")
-    def :=[S : DOT, T : DOT](
+    def :=[S : Dot, T : Dot](
       binaryOp: BinaryOp[T]
     ): OperatorAssignment[T, S] =
       new OperatorAssignment[T, S](operator = this) {
@@ -467,7 +467,7 @@ trait AlgebraicTheories[
     name: String
   ) extends Operator(name, arity = 2) {
     @targetName("definitionally")
-    def :=[T : DOT, S : DOT](
+    def :=[T : Dot, S : Dot](
       binaryOp: RightScalarBinaryOp[T, S]
     ): OperatorAssignment[T, S] =
       new OperatorAssignment[T, S](this) {
@@ -480,7 +480,7 @@ trait AlgebraicTheories[
     name: String
   ) extends Operator(name, 2) {
     @targetName("definitionally")
-    def :=[S : DOT](binaryOp: BinaryOp[S]) =
+    def :=[S : Dot](binaryOp: BinaryOp[S]) =
       new OperatorPreassignment[S](this) {
         override def lookupScalarBinaryOp =
           Some(binaryOp)
@@ -491,7 +491,7 @@ trait AlgebraicTheories[
     name: String
   ) extends Operator(name, arity = 1) {
     @targetName("definitionally")
-    def :=[S : DOT, T : DOT](unaryOp: UnaryOp[T]): OperatorAssignment[T, S] =
+    def :=[S : Dot, T : Dot](unaryOp: UnaryOp[T]): OperatorAssignment[T, S] =
       new OperatorAssignment[T, S](this) {
         override def lookupUnaryOp =
           Some(unaryOp)
@@ -499,7 +499,7 @@ trait AlgebraicTheories[
   }
 
   class AlgebraicTheory[
-    S : DOT
+    S : Dot
   ](
      preassignments: OperatorPreassignment[S]*
    )(
@@ -516,7 +516,7 @@ trait AlgebraicTheories[
         laws ++ moreLaws: _*
       )
 
-    def isMorphism[A : DOT, B : DOT](
+    def isMorphism[A : Dot, B : Dot](
       arrow: A ~> B
     )(implicit
       sourceAlgebra: Algebra[A],
@@ -591,7 +591,7 @@ trait AlgebraicTheories[
           )
       }
 
-    class Algebra[T : DOT](
+    class Algebra[T : Dot](
       private val assignments: OperatorAssignment[T, S]*
     ) { algebra =>
       val operatorAssignments: OperatorAssignments[T, S] =
@@ -601,7 +601,7 @@ trait AlgebraicTheories[
           }) ++ assignments
         )
 
-      def x[U : DOT](
+      def x[U : Dot](
         that: Algebra[U]
       ): Algebra[(T, U)] = {
         new Algebra[(T, U)](
@@ -624,7 +624,7 @@ trait AlgebraicTheories[
           }
       }
 
-      trait EvaluationContext[ROOT: DOT] {
+      trait EvaluationContext[ROOT: Dot] {
 
         def evaluatePrincipal(
           term: Term[Principal]
@@ -709,7 +709,7 @@ trait AlgebraicTheories[
           evaluatePrincipal(law.left) =!=
             evaluatePrincipal(law.right)
 
-        def spawnCompound[U: DOT](
+        def spawnCompound[U: Dot](
           symbol: String
         ): EvaluationContext[(U, ROOT)] =
           new CompoundEvaluationContext[U, ROOT](
@@ -749,7 +749,7 @@ trait AlgebraicTheories[
           }
       }
 
-      class CompoundEvaluationContext[HEAD : DOT, TAIL:DOT](
+      class CompoundEvaluationContext[HEAD : Dot, TAIL:Dot](
         name: String,
         val tail: EvaluationContext[TAIL]
       ) extends EvaluationContext[(HEAD, TAIL)] {
@@ -815,7 +815,7 @@ trait AlgebraicTheories[
       new AlgebraicTheory[UNIT]()(operators: _*)(laws: _*)
 
   object AlgebraicTheoryWithScalars:
-    def apply[S : DOT](
+    def apply[S : Dot](
       preassignments: OperatorPreassignment[S]*
     )(
       operators: Operator*

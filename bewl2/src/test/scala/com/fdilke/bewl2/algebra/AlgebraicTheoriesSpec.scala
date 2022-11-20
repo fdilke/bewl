@@ -78,7 +78,7 @@ class AlgebraicTheoriesSpec extends RichFunSuite:
   }
 
   test("An evaluation context can evaluate compound terms with unary operators") {
-      implicit val carrier: Set[Int] = Set[Int](0, 1, 2)
+    withDot(Set[Int](0, 1, 2)) {
       val theO: Unit => Int = makeNullaryOperator(0)
       val twiddle: Int => Int = makeUnaryOperator(
         0 -> 0,
@@ -104,120 +104,127 @@ class AlgebraicTheoriesSpec extends RichFunSuite:
       context.evaluatePrincipal(α) isArrow interpretα
       context.evaluatePrincipal(~(~α)) isArrow interpretα
     }
+  }
 
   test("An evaluation context can evaluate compound terms with binary operators") {
-    implicit val carrier: Set[String] = Set[String]("unit", "x")
-    val theO: Unit => String = makeNullaryOperator[String]("unit")
-    val plus = makeBinaryOperator[String](
-      ("unit", "unit") -> "unit",
-      ("x", "unit") -> "x",
-      ("unit", "x") -> "x",
-      ("x", "x") -> "x"
-    )
+    withDot(Set[String]("unit", "x")) {
+      val theO: Unit => String = makeNullaryOperator[String]("unit")
+      val plus = makeBinaryOperator[String](
+        ("unit", "unit") -> "unit",
+        ("x", "unit") -> "x",
+        ("unit", "x") -> "x",
+        ("x", "x") -> "x"
+      )
 
-    val pointedMagmas = AlgebraicTheory(o, +)()
-    val algebra = new pointedMagmas.Algebra[String]((+) := plus, o := theO)
-    val context: algebra.EvaluationContext[(String, Unit)] =
-      algebra.EvaluationContext(Seq(α)).asInstanceOf[
-        algebra.EvaluationContext[(String, Unit)]
-      ]
-    val interpretO: ((String, Unit)) => String = theO o toUnit[(String, Unit)]
-    val interpretα: ((String, Unit)) => String = context.evaluatePrincipal(α)
+      val pointedMagmas = AlgebraicTheory(o, +)()
+      val algebra = new pointedMagmas.Algebra[String]((+) := plus, o := theO)
+      val context: algebra.EvaluationContext[(String, Unit)] =
+        algebra.EvaluationContext(Seq(α)).asInstanceOf[
+          algebra.EvaluationContext[(String, Unit)]
+        ]
+      val interpretO: ((String, Unit)) => String = theO o toUnit[(String, Unit)]
+      val interpretα: ((String, Unit)) => String = context.evaluatePrincipal(α)
 
-    interpretα isNotArrow interpretO
-    context.evaluatePrincipal(o) isArrow interpretO
-    context.evaluatePrincipal(o + o) isArrow interpretO
-    context.evaluatePrincipal(o + α) isArrow interpretα
-    context.evaluatePrincipal(α + o) isArrow interpretα
-    context.evaluatePrincipal(α + o) isArrow interpretα
+      interpretα isNotArrow interpretO
+      context.evaluatePrincipal(o) isArrow interpretO
+      context.evaluatePrincipal(o + o) isArrow interpretO
+      context.evaluatePrincipal(o + α) isArrow interpretα
+      context.evaluatePrincipal(α + o) isArrow interpretα
+      context.evaluatePrincipal(α + o) isArrow interpretα
+    }
   }
 
   test("An evaluation context can evaluate compound terms with mixed binary operators") {
-    implicit val scalars: Set[Int] = Set[Int](0, 1, 2)
-    implicit val carrier: Set[String] = Set[String]("o", "i")
+    withDots(
+      Set[Int](0, 1, 2),
+      Set[String]("o", "i")
+    ) {
+      val theO: Unit => String = makeNullaryOperator[String]("o")
+      val scalar1: Unit => Int = makeNullaryOperator[Int](2)
+      val rightMultiply: BiArrow[String, Int, String] = Map(
+        ("o", 0) -> "o",
+        ("i", 0) -> "o",
+        ("o", 1) -> "i",
+        ("i", 1) -> "i",
+        ("o", 2) -> "i",
+        ("i", 2) -> "o"
+      )
 
-    val theO: Unit => String = makeNullaryOperator[String]("o")
-    val scalar1: Unit => Int = makeNullaryOperator[Int](2)
-    val rightMultiply: BiArrow[String, Int, String] = Map(
-      ("o", 0) -> "o",
-      ("i", 0) -> "o",
-      ("o", 1) -> "i",
-      ("i", 1) -> "i",
-      ("o", 2) -> "i",
-      ("i", 2) -> "o"
-    )
+      val pointedWeakActs: AlgebraicTheory[Int] =
+        AlgebraicTheoryWithScalars[Int](II := scalar1)(o, II, **)()
 
-    val pointedWeakActs: AlgebraicTheory[Int] =
-      AlgebraicTheoryWithScalars[Int](II := scalar1)(o, II, **)()
+      val minimalAlgebra = new pointedWeakActs.Algebra[String](
+        o := theO,
+        ** := rightMultiply
+      )
+      val context: minimalAlgebra.EvaluationContext[(String, Unit)] =
+        minimalAlgebra.EvaluationContext(Seq(α)).asInstanceOf[
+          minimalAlgebra.EvaluationContext[(String, Unit)]
+        ]
+      val interpretO: ((String, Unit)) => String = theO o toUnit[(String, Unit)]
+      val interpretI: ((String, Unit)) => String = makeNullaryOperator[String]("i") o toUnit[(String, Unit)]
 
-    val minimalAlgebra = new pointedWeakActs.Algebra[String](
-      o := theO,
-      ** := rightMultiply
-    )
-    val context: minimalAlgebra.EvaluationContext[(String, Unit)] =
-      minimalAlgebra.EvaluationContext(Seq(α)).asInstanceOf[
-        minimalAlgebra.EvaluationContext[(String, Unit)]
-      ]
-    val interpretO: ((String, Unit)) => String = theO o toUnit[(String, Unit)]
-    val interpretI: ((String, Unit)) => String = makeNullaryOperator[String]("i") o toUnit[(String, Unit)]
-
-    context.evaluatePrincipal(o) isArrow interpretO
-    context.evaluatePrincipal(o ** II) isArrow interpretI
-    context.evaluatePrincipal((α ** II) ** II) isArrow context.evaluatePrincipal(α)
+      context.evaluatePrincipal(o) isArrow interpretO
+      context.evaluatePrincipal(o ** II) isArrow interpretI
+      context.evaluatePrincipal((α ** II) ** II) isArrow context.evaluatePrincipal(α)
+    }
   }
 
   test("An evaluation context can do operations on scalars") {
-    implicit val scalars: Set[Int] = Set(0, 1, 2)
-    val scalar1: Unit => Int = makeNullaryOperator[Int](1)
-    val scalar2: Unit => Int = makeNullaryOperator[Int](2)
-    implicit val act: Set[Symbol] = Set(Symbol("x"))
-    val weakActsReferencingAMonoid: AlgebraicTheory[Int] =
-      AlgebraicTheoryWithScalars[Int](
-        II := scalar1,
-        *** := { (xy: (Int, Int)) =>
-          val (x, y) = xy
-          (x + y) % 3
-        }
-      )(**, ***)()
-    val algebra: weakActsReferencingAMonoid.Algebra[Symbol] =
-      new weakActsReferencingAMonoid.Algebra[Symbol](
-        ** := { (as: (Symbol, Int)) => Symbol("x") }
-      )
+    withDots(
+      Set[Int](0, 1, 2),
+      Set(Symbol("x"))
+    ) {
+      val scalar1: Unit => Int = makeNullaryOperator[Int](1)
+      val scalar2: Unit => Int = makeNullaryOperator[Int](2)
+      val weakActsReferencingAMonoid: AlgebraicTheory[Int] =
+        AlgebraicTheoryWithScalars[Int](
+          II := scalar1,
+          *** := { (xy: (Int, Int)) =>
+            val (x, y) = xy
+            (x + y) % 3
+          }
+        )(**, ***)()
+      val algebra: weakActsReferencingAMonoid.Algebra[Symbol] =
+        new weakActsReferencingAMonoid.Algebra[Symbol](
+          ** := { (as: (Symbol, Int)) => Symbol("x") }
+        )
 
-    algebra.EvaluationContext(Seq()).asInstanceOf[
-      algebra.EvaluationContext[Unit]
-    ].evaluateScalar(
-      II *** II
-    ) isArrow scalar2
+      algebra.EvaluationContext(Seq()).asInstanceOf[
+        algebra.EvaluationContext[Unit]
+      ].evaluateScalar(
+        II *** II
+      ) isArrow scalar2
 
-    algebra.EvaluationContext(Seq(α)).asInstanceOf[
-      algebra.EvaluationContext[(Symbol, Unit)]
-    ].evaluatePrincipal(
-      α
-    ) isArrow π0[Symbol, Unit] // (act *- I)
+      algebra.EvaluationContext(Seq(α)).asInstanceOf[
+        algebra.EvaluationContext[(Symbol, Unit)]
+      ].evaluatePrincipal(
+        α
+      ) isArrow π0[Symbol, Unit] // (act *- I)
 
-    algebra.EvaluationContext(Seq(α)).asInstanceOf[
-      algebra.EvaluationContext[(Symbol, Unit)]
-    ].evaluatePrincipal(
-      α ** II
-    ) isArrow π0[Symbol, Unit]
+      algebra.EvaluationContext(Seq(α)).asInstanceOf[
+        algebra.EvaluationContext[(Symbol, Unit)]
+      ].evaluatePrincipal(
+        α ** II
+      ) isArrow π0[Symbol, Unit]
 
-    algebra.EvaluationContext(Seq(Ψ)).asInstanceOf[
-      algebra.EvaluationContext[(Int, Unit)]
-    ].evaluateScalar(
-      Ψ
-    ) isArrow π0[Int, Unit]
+      algebra.EvaluationContext(Seq(Ψ)).asInstanceOf[
+        algebra.EvaluationContext[(Int, Unit)]
+      ].evaluateScalar(
+        Ψ
+      ) isArrow π0[Int, Unit]
 
-    algebra.EvaluationContext(Seq(Ψ)).asInstanceOf[
-      algebra.EvaluationContext[(Int, Unit)]
-    ].evaluateScalar(
-      ((Ψ *** II) *** II) *** II
-    ) isArrow π0[Int, Unit]
+      algebra.EvaluationContext(Seq(Ψ)).asInstanceOf[
+        algebra.EvaluationContext[(Int, Unit)]
+      ].evaluateScalar(
+        ((Ψ *** II) *** II) *** II
+      ) isArrow π0[Int, Unit]
+    }
   }
 
   test("Algebraic theories can encapsulate commutative magmas") {
     val commutativeMagmas = AlgebraicTheory(*)(α * β := β * α)
-    case class CommutativeMagma[T: Set](
+    case class CommutativeMagma[T: Dot](
       op: BinaryOp[T]
     ) extends commutativeMagmas.Algebra[T](* := op)
 
@@ -238,75 +245,88 @@ class AlgebraicTheoriesSpec extends RichFunSuite:
   }
 
   test("Algebraic theories can sanity-check their algebras for valid nullary operators") {
-    implicit val carrier: Set[Int] = Set(0)
-    val pointedSets = AlgebraicTheory(o)()
-    val badZero: Unit => Int = makeNullaryOperator[Int](1)
+    withDot(Set[Int](0)) {
+      val pointedSets = AlgebraicTheory(o)()
+      val badZero: Unit => Int = makeNullaryOperator[Int](1)
 
-    intercept[IllegalArgumentException] {
-      new pointedSets.Algebra[Int](o := badZero).sanityTest
+      intercept[IllegalArgumentException] {
+        new pointedSets.Algebra[Int](o := badZero).sanityTest
+      }
     }
   }
 
   test("Algebraic theories can sanity-check their algebras for valid unary operators") {
     val setsWithInvolution = AlgebraicTheory(~)(~(~α) := α)
-    implicit val carrier: Set[Int] = Set(0)
-    val invertBadRange: Int => Int = makeUnaryOperator[Int](0 -> 1)
-    intercept[IllegalArgumentException] {
-      new setsWithInvolution.Algebra[Int](
-        (~) := invertBadRange
-      ).sanityTest
+    withDot(Set[Int](0)) {
+      val invertBadRange: Int => Int = makeUnaryOperator[Int](0 -> 1)
+      intercept[IllegalArgumentException] {
+        new setsWithInvolution.Algebra[Int](
+          (~) := invertBadRange
+        ).sanityTest
+      }
     }
   }
 
   test("Algebraic theories can sanity-check their algebras for valid binary operators") {
     val magmas = AlgebraicTheory(*)()
-    implicit val carrier: Set[Int] = Set(1)
-    val combineBadRange: ((Int, Int)) => Int = tupled { _ + _ }
+    withDot(Set[Int](1)) {
+      val combineBadRange: ((Int, Int)) => Int = tupled {
+        _ + _
+      }
 
-    intercept[IllegalArgumentException] {
-      new magmas.Algebra[Int](
-        * := combineBadRange
-      ).sanityTest
+      intercept[IllegalArgumentException] {
+        new magmas.Algebra[Int](
+          * := combineBadRange
+        ).sanityTest
+      }
     }
   }
 
   test("Algebraic theories can sanity-check their algebras for scalar constants") {
-    implicit val scalars: Set[Int] = Set(0)
-    implicit val carrier: Set[String] = Set("x")
-    val badPointScalar: Unit => Int = makeNullaryOperator[Int](1)
+    withDots(
+      Set[Int](0),
+      Set[String]("x")
+    ) {
+      val badPointScalar: Unit => Int = makeNullaryOperator[Int](1)
 
-    val weakSetsOverAPointedSet =
-      AlgebraicTheoryWithScalars[Int](II := badPointScalar)(II)()
-    intercept[IllegalArgumentException] {
-      new weakSetsOverAPointedSet.Algebra[String]().sanityTest
+      val weakSetsOverAPointedSet =
+        AlgebraicTheoryWithScalars[Int](II := badPointScalar)(II)()
+      intercept[IllegalArgumentException] {
+        new weakSetsOverAPointedSet.Algebra[String]().sanityTest
+      }
     }
   }
 
   test("Algebraic theories can sanity-check their algebras for right scalar multiplications") {
-    implicit val scalars: Set[Int] = Set(0)
-    implicit val carrier: Set[Direction] = Set(Up)
-    val badScalarRightMultiplication : ((Direction, Int)) => Direction =
-      Map(
-        (Up, 0) -> Down
-      )
+    withDots(
+      Set[Int](0),
+      Set[Direction](Up)
+    ) {
+      val badScalarRightMultiplication: ((Direction, Int)) => Direction =
+        Map(
+          (Up, 0) -> Down
+        )
 
-    val weakActsOverASet =
-      AlgebraicTheoryWithScalars[Int]()(**)()
+      val weakActsOverASet =
+        AlgebraicTheoryWithScalars[Int]()(**)()
 
-    intercept[IllegalArgumentException] {
-      new weakActsOverASet.Algebra[Direction](
-        ** := badScalarRightMultiplication
-      ).sanityTest
+      intercept[IllegalArgumentException] {
+        new weakActsOverASet.Algebra[Direction](
+          ** := badScalarRightMultiplication
+        ).sanityTest
+      }
     }
   }
 
   test("Algebraic theories can sanity-check their algebras for scalar multiplications; sad case") {
-    implicit val scalars: Set[Int] = Set(0)
+    withDots(
+      Set[Int](0),
+      Set[String]("x")
+    ) {
       val badScalarMultiplication: ((Int, Int)) => Int =
         Map(
-            (0, 0) -> 1
-          )
-      implicit val carrier: Set[String] = Set("x")
+          (0, 0) -> 1
+        )
 
       val weakActsOverASet =
         AlgebraicTheoryWithScalars[Int](*** := badScalarMultiplication)(***)()
@@ -314,139 +334,150 @@ class AlgebraicTheoriesSpec extends RichFunSuite:
         new weakActsOverASet.Algebra[String]().sanityTest
       }
     }
+  }
 
   test("Algebraic theories can validate morphisms preserving unary operations") {
-    implicit val carrierString: Set[String] = Set("+", "-")
-    val minusStrings: String => String =
-      makeUnaryOperator[String](values =
-        "+" -> "-",
-        "-" -> "+"
-      )
-    implicit val carrierInts: Set[Int] = Set(1, -1)
-    val minusInts: Int => Int =
-      makeUnaryOperator[Int](values =
-        1 -> -1,
-        -1 -> 1
-      )
+    withDots(
+      Set[String]("+", "-"),
+      Set[Int](1, -1)
+    ) {
+      val minusStrings: String => String =
+        makeUnaryOperator[String](values =
+          "+" -> "-",
+          "-" -> "+"
+        )
+      val minusInts: Int => Int =
+        makeUnaryOperator[Int](values =
+          1 -> -1,
+          -1 -> 1
+        )
 
-    val setsWithInvolution: AlgebraicTheory[Unit] =
-      AlgebraicTheory(~)(~(~α) := α)
-    implicit val algebraStrings: setsWithInvolution.Algebra[String] =
-      new setsWithInvolution.Algebra[String](
-        (~) := minusStrings
-      )
-    implicit val algebraInts: setsWithInvolution.Algebra[Int] =
-      new setsWithInvolution.Algebra[Int](
-        (~) := minusInts
-      )
-    algebraStrings.sanityTest
-    algebraInts.sanityTest
+      val setsWithInvolution: AlgebraicTheory[Unit] =
+        AlgebraicTheory(~)(~(~α) := α)
+      implicit val algebraStrings: setsWithInvolution.Algebra[String] =
+        new setsWithInvolution.Algebra[String](
+          (~) := minusStrings
+        )
+      implicit val algebraInts: setsWithInvolution.Algebra[Int] =
+        new setsWithInvolution.Algebra[Int](
+          (~) := minusInts
+        )
+      algebraStrings.sanityTest
+      algebraInts.sanityTest
 
-    val morphism: String => Int = Map("+" -> 1, "-" -> -1)
-    setsWithInvolution.isMorphism(morphism) is true
+      val morphism: String => Int = Map("+" -> 1, "-" -> -1)
+      setsWithInvolution.isMorphism(morphism) is true
 
-    val notAMorphism: String => Int = Map("+" -> 1, "-" -> 1)
-    setsWithInvolution.isMorphism(notAMorphism) is false
+      val notAMorphism: String => Int = Map("+" -> 1, "-" -> 1)
+      setsWithInvolution.isMorphism(notAMorphism) is false
+    }
   }
 
   test("Algebraic theories can validate morphisms preserving constants") {
-    implicit val carrierInts: Set[Int] = Set[Int](0, 1, 2)
-    val pointInts: Unit => Int = makeNullaryOperator(0)
-    implicit val carrierStrings: Set[String] = Set[String]("samson", "delilah")
-    val pointStrings: Unit => String = makeNullaryOperator("delilah")
+    withDots(
+      Set[Int](0, 1, 2),
+      Set[String]("samson", "delilah")
+    ) {
+      val pointInts: Unit => Int = makeNullaryOperator(0)
+      val pointStrings: Unit => String = makeNullaryOperator("delilah")
 
-    val pointedSets: AlgebraicTheory[Unit] = AlgebraicTheory(o)()
-    implicit val algebraStrings: pointedSets.Algebra[String] =
-      new pointedSets.Algebra[String](o := pointStrings)
-    implicit val algebraInts: pointedSets.Algebra[Int] =
-      new pointedSets.Algebra[Int](o := pointInts)
+      val pointedSets: AlgebraicTheory[Unit] = AlgebraicTheory(o)()
+      implicit val algebraStrings: pointedSets.Algebra[String] =
+        new pointedSets.Algebra[String](o := pointStrings)
+      implicit val algebraInts: pointedSets.Algebra[Int] =
+        new pointedSets.Algebra[Int](o := pointInts)
 
-    val morphism: String => Int = Map("samson" -> 1, "delilah" -> 0)
-    val notAMorphism: String => Int = Map("samson" -> 1, "delilah" -> 1)
+      val morphism: String => Int = Map("samson" -> 1, "delilah" -> 0)
+      val notAMorphism: String => Int = Map("samson" -> 1, "delilah" -> 1)
 
-    pointedSets.isMorphism(morphism) is true
-    pointedSets.isMorphism(notAMorphism) is false
+      pointedSets.isMorphism(morphism) is true
+      pointedSets.isMorphism(notAMorphism) is false
+    }
   }
 
   test("Algebraic theories can validate morphisms preserving binary operations") {
-    implicit val carrierInts: Set[Int] = Set[Int](0, 1, 2, 3)
-    val multiplication: ((Int, Int)) => Int = tupled {
-      (x, y) => (x + y) % 4
+    withDot(Set[Int](0, 1, 2, 3)) {
+      val multiplication: ((Int, Int)) => Int = tupled {
+        (x, y) => (x + y) % 4
+      }
+
+      val magmas: AlgebraicTheory[Unit] =
+        AlgebraicTheory(*)()
+      implicit val algebra: magmas.Algebra[Int] =
+        new magmas.Algebra[Int](* := multiplication)
+
+      val morphism: Int => Int = Map(0 -> 0, 1 -> 2, 2 -> 0, 3 -> 2)
+      val notAMorphism: Int => Int = Map(0 -> 1, 1 -> 2, 2 -> 3, 3 -> 0)
+
+      magmas.isMorphism(morphism) is true
+      magmas.isMorphism(notAMorphism) is false
     }
-
-    val magmas: AlgebraicTheory[Unit] =
-      AlgebraicTheory(*)()
-    implicit val algebra: magmas.Algebra[Int] =
-      new magmas.Algebra[Int](* := multiplication)
-
-    val morphism: Int => Int = Map(0 -> 0, 1 -> 2, 2 -> 0, 3 -> 2)
-    val notAMorphism: Int => Int = Map(0 -> 1, 1 -> 2, 2 -> 3, 3 -> 0)
-
-    magmas.isMorphism(morphism) is true
-    magmas.isMorphism(notAMorphism) is false
   }
 
   test("Algebraic theories can validate morphisms preserving mixed operations with scalars") {
     val q = Symbol("q")
-    implicit val scalars: Set[Symbol] = Set(q)
-    val pointScalar: Unit => Symbol = makeNullaryOperator[Symbol](q)
-    val multiplication: ((Boolean, Symbol)) => Boolean = Map(
+    withDot(Set[Symbol](q)) {
+      val pointScalar: Unit => Symbol = makeNullaryOperator[Symbol](q)
+      val multiplication: ((Boolean, Symbol)) => Boolean = Map(
         (true, q) -> false,
         (false, q) -> true
       )
 
-    val weakActsOverAPointedMagma: AlgebraicTheory[Symbol] =
-      AlgebraicTheoryWithScalars[Symbol](II := pointScalar)(II, **)()
-    implicit val algebra: weakActsOverAPointedMagma.Algebra[Boolean] =
-      new weakActsOverAPointedMagma.Algebra[Boolean](** := multiplication)
-    algebra.sanityTest
+      val weakActsOverAPointedMagma: AlgebraicTheory[Symbol] =
+        AlgebraicTheoryWithScalars[Symbol](II := pointScalar)(II, **)()
+      implicit val algebra: weakActsOverAPointedMagma.Algebra[Boolean] =
+        new weakActsOverAPointedMagma.Algebra[Boolean](** := multiplication)
+      algebra.sanityTest
 
-    val morphism: Boolean => Boolean = Map(true -> false, false -> true)
-    val notAMorphism: Boolean => Boolean = Map(true -> true, false -> true)
+      val morphism: Boolean => Boolean = Map(true -> false, false -> true)
+      val notAMorphism: Boolean => Boolean = Map(true -> true, false -> true)
 
-    weakActsOverAPointedMagma.isMorphism(morphism) is true
-    weakActsOverAPointedMagma.isMorphism(notAMorphism) is false
+      weakActsOverAPointedMagma.isMorphism(morphism) is true
+      weakActsOverAPointedMagma.isMorphism(notAMorphism) is false
+    }
   }
 
   test("Algebraic theories support named laws with error reporting when they fail") {
-    implicit val carrier: Set[Int] = Set(1, -1)
-    val minusGood: Int => Int = Map(
-      1 -> -1,
-      -1 -> 1
-    )
-    val minusBad: Int => Int = Map(
-      1 -> 1,
-      -1 -> 1
-    )
+    withDot(Set[Int](1, -1)) {
+      val minusGood: Int => Int = Map(
+        1 -> -1,
+        -1 -> 1
+      )
+      val minusBad: Int => Int = Map(
+        1 -> 1,
+        -1 -> 1
+      )
 
-    val setsWithInvolution = AlgebraicTheory(~)(
-      "involutive" law (~(~α) := α)
-    )
-    new setsWithInvolution.Algebra[Int]((~) := minusGood).sanityTest
-    intercept[IllegalArgumentException] {
-      new setsWithInvolution.Algebra[Int]((~) := minusBad).sanityTest
-    }.getMessage.contains("involutive") is true
+      val setsWithInvolution = AlgebraicTheory(~)(
+        "involutive" law (~(~α) := α)
+      )
+      new setsWithInvolution.Algebra[Int]((~) := minusGood).sanityTest
+      intercept[IllegalArgumentException] {
+        new setsWithInvolution.Algebra[Int]((~) := minusBad).sanityTest
+      }.getMessage.contains("involutive") is true
+    }
   }
 
   test("Algebraic theories can verify additional laws once an algebra is constructed") {
-    implicit val carrier: Set[Int] = Set[Int](1, -1)
-    val minus: Int => Int = Map(
-      1 -> -1,
-      -1 -> 1
-    )
+    withDot(Set[Int](1, -1)) {
+      val minus: Int => Int = Map(
+        1 -> -1,
+        -1 -> 1
+      )
 
-    val setsWithInvolution = AlgebraicTheory(~)(
-      "involutive" law (~(~α) := α)
-    )
-    val algebra = new setsWithInvolution.Algebra[Int]((~) := minus)
-    algebra.sanityTest
+      val setsWithInvolution = AlgebraicTheory(~)(
+        "involutive" law (~(~α) := α)
+      )
+      val algebra = new setsWithInvolution.Algebra[Int]((~) := minus)
+      algebra.sanityTest
 
-    algebra.satisfies(
-      ~α := α
-    ) is false
-    algebra.satisfies(
-      ~α := ~(~(~α))
-    ) is true
+      algebra.satisfies(
+        ~α := α
+      ) is false
+      algebra.satisfies(
+        ~α := ~(~(~α))
+      ) is true
+    }
   }
 
   test("Algebraic theories can be extended by adding new constants/operations, and laws ") {
@@ -456,7 +487,7 @@ class AlgebraicTheoriesSpec extends RichFunSuite:
         "commutative" law( α * β := β * α ),
         "unit" law( α * ι := α )
       )
-    case class CommutativeMagmaWith1[T: Set](
+    case class CommutativeMagmaWith1[T: Dot](
       unit: NullaryOp[T],
       op: BinaryOp[T]
     ) extends commutativeMagmasWith1.Algebra[T](

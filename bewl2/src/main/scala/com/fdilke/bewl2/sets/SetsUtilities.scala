@@ -45,29 +45,30 @@ object SetsUtilities:
         m(seqToMap(a))
     }
 
-  def makeNullaryOperator[X: Set](
+  def makeNullaryOperator[X: Sets.Dot](
     value: X
   ): Unit => X =
     _ => value
 
-  def makeUnaryOperator[X: Set](
+  def makeUnaryOperator[X: Sets.Dot](
     values: (X, X)*
   ): X => X =
     val map: Map[X, X] = Map[X, X](values: _*)
-    if summon[Set[X]] != map.keySet then
+    if Sets.dot[X] != map.keySet then
       bail("incomplete or excessive unary operator definition")
     map
 
-  def makeBinaryOperator[X: Set](
+  def makeBinaryOperator[X: Sets.Dot](
     values: ((X, X), X)*
   ): ((X, X)) => X =
     val map: Map[(X, X), X] = Map[(X, X), X](values: _*)
     map
 
-  def maskSetDot[X, R](
+    // TODO: sort this out, separate from withDotMask
+  def sillyMaskSetDot[X, RESULT](
     dot: Set[X]
   )(
-    block: [X_] => Set[X_] ?=> (X_ =:= X) ?=> (X =:= X_) ?=> R
-  ): R =
+    block: [X_] => Set[X_] ?=> (X_ =:= X) ?=> (X =:= X_) ?=> RESULT
+  ): RESULT =
     implicit val _: Set[X] = dot
     block[X]

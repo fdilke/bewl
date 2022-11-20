@@ -3,11 +3,12 @@ package com.fdilke.bewl2.utility
 import com.fdilke.bewl2.algebra.AlgebraicConstructions._
 import StockSymbols._
 import com.fdilke.bewl2.sets.Sets
+import Sets._
 
 object StockStructures:
   // TODO: I'm sure this could have a better name, or be constructed differently: right dominant
   def withMonoidOf3[RESULT](
-    block: Set[Symbol] ?=> Sets.Monoid[Symbol] ?=> RESULT
+    block: Dot[Symbol] ?=> Monoid[Symbol] ?=> RESULT
   ): RESULT =
     withMonoidFromTable(
       e, a, b,
@@ -17,7 +18,7 @@ object StockStructures:
 
   // TODO: I'm sure this could have a better name, or be constructed differently: left dominant
   def withMonoidOf3a[RESULT](
-    block: Set[Symbol] ?=> Sets.Monoid[Symbol] ?=> RESULT
+    block: Dot[Symbol] ?=> Monoid[Symbol] ?=> RESULT
   ): RESULT =
     withMonoidFromTable(
       e, a, b,
@@ -26,7 +27,7 @@ object StockStructures:
     )(block)
     
   def withMonoid_1_0[RESULT](
-    block: Set[Int] ?=> Sets.Monoid[Int] ?=> RESULT
+    block: Dot[Int] ?=> Monoid[Int] ?=> RESULT
   ): RESULT =
     withMonoidFromTable(
       1, 0,
@@ -34,7 +35,7 @@ object StockStructures:
     )(block)
     
   def with_S_3[RESULT](
-    block: Set[Symbol] ?=> Sets.Group[Symbol] ?=> RESULT
+    block: Dot[Symbol] ?=> Group[Symbol] ?=> RESULT
   ): RESULT =
     withGroupFromTable(
       e, a, b, c, r, s,
