@@ -84,39 +84,39 @@ class Topos[
     f1: X ~> Y,
     f2: X ~> Y
   ): Boolean =
-    pretopos.rawEqualArrows(dot[X], dot[Y], f1, f2)
+    pretopos.equalArrows(dot[X], dot[Y], f1, f2)
 
   final inline def productMagic[X: Dot, Y: Dot](
     ca: CTXT[X],
     cb: CTXT[Y]
   ): CTXT[(X, Y)] =
-    pretopos.rawProductMagic(dot[X], dot[Y], ca, cb)
+    pretopos.productMagic(dot[X], dot[Y], ca, cb)
 
   final inline def sanityTest[X: Dot]: Unit =
-    pretopos.rawSanityTest(dot[X])
+    pretopos.sanityTest(dot[X])
 
   final inline def sanityTest[X: Dot, Y: Dot](
     f: X ~> Y
   ): Unit =
-    pretopos.rawSanityTest(dot[X], dot[Y], f)
+    pretopos.sanityTest(dot[X], dot[Y], f)
 
-  implicit val _: Dot[UNIT] = Dot(pretopos.rawUnitDot)
-  implicit val _: Dot[VOID] = Dot(pretopos.rawZeroDot)
-  implicit val _: Dot[BEWL] = Dot(pretopos.rawOmegaDot)
+  implicit val _: Dot[UNIT] = Dot(pretopos.unitDot)
+  implicit val _: Dot[VOID] = Dot(pretopos.zeroDot)
+  implicit val _: Dot[BEWL] = Dot(pretopos.omegaDot)
 
   final inline def toUnit[X: Dot]: X ~> UNIT =
-    pretopos.rawToUnit(dot[X])
+    pretopos.toUnit(dot[X])
 
   final inline def fromZero[X: Dot]: VOID ~> X =
-    pretopos.rawFromZero(dot[X])
+    pretopos.fromZero(dot[X])
 
   final inline def evaluation[X: Dot, Y: Dot]: (X > Y, X) ~> Y =
-    pretopos.rawEvaluation(dot[X], dot[Y])
+    pretopos.evaluation(dot[X], dot[Y])
 
   final inline def transpose[X: Dot, Y: Dot, Z: Dot](
     xy2z: (X, Y) ~> Z
   ): X ~> (Y > Z) =
-    pretopos.rawTranspose(dot[X], dot[Y], dot[Z], xy2z)
+    pretopos.transpose(dot[X], dot[Y], dot[Z], xy2z)
 
   final def doEqualizer[X: Dot, Y: Dot, RESULT](
     f: X ~> Y,
@@ -124,7 +124,7 @@ class Topos[
   )(
     capture: [A] => Equalizer[A, X] => Dot[A] ?=> RESULT
   ): RESULT =
-    pretopos.rawDoEqualizer(dot[X], dot[Y], f, f2)(
+    pretopos.doEqualizer(dot[X], dot[Y], f, f2)(
       [A] => (rawEqualizer: pretopos.RawEqualizer[A, X]) => (dotA: DOT[A]) => {
         implicit val _: Dot[A] = Dot(dotA)
         capture[A](new Equalizer[A, X] {
@@ -145,13 +145,13 @@ class Topos[
   final inline def chiForMonic[X: Dot, Y: Dot](
     monic: X ~> Y
   ): Y ~> BEWL =
-    pretopos.rawChiForMonic(dot[X], dot[Y], monic)
+    pretopos.chiForMonic(dot[X], dot[Y], monic)
 
   final inline def backDivideMonic[X: Dot, Y: Dot, A: Dot](
     arrow: X ~> Y,
     monic: A ~> Y
   ): X ~> A =
-    pretopos.rawBackDivideMonic(dot[X], dot[Y], dot[A], arrow, monic)
+    pretopos.backDivideMonic(dot[X], dot[Y], dot[A], arrow, monic)
 
   final inline def arrow[X: Dot, Y: Dot]( // TODO: do we need this?
     f: CTXT[X] => CTXT[Y]

@@ -20,7 +20,7 @@ trait PreTopos[
       arrow: R ~> X
     ): R ~> A
 
-  def rawEqualArrows[X, Y](
+  def equalArrows[X, Y](
     dotX: DOT[X],
     dotY: DOT[Y],
     f1: X ~> Y,
@@ -37,34 +37,34 @@ trait PreTopos[
     dotY: DOT[Y],
   ): DOT[X > Y]
 
-  def rawProductMagic[X, Y](
+  def productMagic[X, Y](
     dotX: DOT[X],
     dotY: DOT[Y],
     ca: CTXT[X],
     cb: CTXT[Y]
   ): CTXT[(X, Y)]
 
-  def rawSanityTest[X](dotX: DOT[X]): Unit
-  def rawSanityTest[X, Y](
+  def sanityTest[X](dotX: DOT[X]): Unit
+  def sanityTest[X, Y](
     dotX: DOT[X],
     dotY: DOT[Y],
     f: X ~> Y
   ): Unit
 
-  val rawUnitDot: DOT[UNIT]
-  val rawZeroDot: DOT[VOID]
-  val rawOmegaDot: DOT[BEWL]
-  def rawToUnit[X](dotX: DOT[X]): X ~> UNIT
-  def rawFromZero[X](dotX: DOT[X]): VOID ~> X
+  val unitDot: DOT[UNIT]
+  val zeroDot: DOT[VOID]
+  val omegaDot: DOT[BEWL]
+  def toUnit[X](dotX: DOT[X]): X ~> UNIT
+  def fromZero[X](dotX: DOT[X]): VOID ~> X
   val truth: UNIT ~> BEWL
-  def rawEvaluation[X, Y](dotX: DOT[X], dotY: DOT[Y]): (X > Y, X) ~> Y
-  def rawTranspose[X, Y, Z](
+  def evaluation[X, Y](dotX: DOT[X], dotY: DOT[Y]): (X > Y, X) ~> Y
+  def transpose[X, Y, Z](
     dotX: DOT[X],
     dotY: DOT[Y],
     dotZ: DOT[Z],
     xy2z: (X, Y) ~> Z
   ): X ~> (Y > Z)
-  def rawDoEqualizer[X, Y, RESULT](
+  def doEqualizer[X, Y, RESULT](
     dotX: DOT[X],
     dotY: DOT[Y],
     f: X ~> Y,
@@ -72,12 +72,12 @@ trait PreTopos[
   )(
     capture: [A] => RawEqualizer[A, X] => DOT[A] => RESULT
   ): RESULT
-  def rawChiForMonic[X, Y](
+  def chiForMonic[X, Y](
     dotX: DOT[X],
     dotY: DOT[Y],
     monic: X ~> Y
   ): Y ~> BEWL
-  def rawBackDivideMonic[X, Y, A](
+  def backDivideMonic[X, Y, A](
     dotX: DOT[X],
     dotY: DOT[Y],
     dotA: DOT[A],

@@ -8,7 +8,7 @@ import com.fdilke.bewl2.sets.SetsUtilities.allMaps
 import scala.language.postfixOps
 
 object PreSets extends PreTopos[Set, [A] =>> A, Void, Unit, Boolean, Map]:
-  override def rawEqualArrows[X, Y](
+  override def equalArrows[X, Y](
     dotX: Set[X],
     dotY: Set[Y],
     f1: X => Y,
@@ -28,7 +28,7 @@ object PreSets extends PreTopos[Set, [A] =>> A, Void, Unit, Boolean, Map]:
     } yield
       (x, y)
 
-  override def rawProductMagic[X, Y](
+  override def productMagic[X, Y](
     dotX: Set[X],
     dotY: Set[Y],
     x: X,
@@ -42,11 +42,11 @@ object PreSets extends PreTopos[Set, [A] =>> A, Void, Unit, Boolean, Map]:
   ): Set[X Map Y] =
     allMaps(dotX, dotY).toSet
 
-  override def rawSanityTest[X](
+  override def sanityTest[X](
     dotX: Set[X]
   ): Unit = ()
   
-  override def rawSanityTest[X, Y](
+  override def sanityTest[X, Y](
     dotX: Set[X],
     dotY: Set[Y],
     f: X ~> Y
@@ -56,28 +56,28 @@ object PreSets extends PreTopos[Set, [A] =>> A, Void, Unit, Boolean, Map]:
         throw new IllegalArgumentException(s"target outside range: ${f(x)} not found in $dotY")
     }
 
-  override val rawUnitDot: Set[Unit] = Set(())
-  override val rawZeroDot: Set[Void] = Set.empty
-  override val rawOmegaDot: Set[Boolean] = Set(true, false)
+  override val unitDot: Set[Unit] = Set(())
+  override val zeroDot: Set[Void] = Set.empty
+  override val omegaDot: Set[Boolean] = Set(true, false)
   override val truth: Unit => Boolean = _ => true
 
-  override def rawFromZero[X](dotX: Set[X]): Void => X = { _ =>
+  override def fromZero[X](dotX: Set[X]): Void => X = { _ =>
     throw new IllegalArgumentException("Encountered a VOID")
   }
 
-  override def rawToUnit[X](
+  override def toUnit[X](
     dotX: Set[X]
   ): X => Unit = {
     _ => ()
   }
 
-  override def rawEvaluation[X, Y](
+  override def evaluation[X, Y](
     dotX: Set[X],
     dotY: Set[Y]
   ): ((X Map Y, X)) => Y =
     (xMapY, x) => xMapY(x)
 
-  override def rawTranspose[X, Y, Z](
+  override def transpose[X, Y, Z](
     dotX: Set[X],
     dotY: Set[Y],
     dotZ: Set[Z],
@@ -89,7 +89,7 @@ object PreSets extends PreTopos[Set, [A] =>> A, Void, Unit, Boolean, Map]:
       }
     )
 
-  override def rawDoEqualizer[X, Y, RESULT](
+  override def doEqualizer[X, Y, RESULT](
     dotX: Set[X],
     dotY: Set[Y],
     f: X => Y,
@@ -128,7 +128,7 @@ object PreSets extends PreTopos[Set, [A] =>> A, Void, Unit, Boolean, Map]:
       }
     )
 
-  override def rawChiForMonic[X, Y](
+  override def chiForMonic[X, Y](
     dotX: Set[X],
     dotY: Set[Y],
     monic: X => Y
@@ -137,7 +137,7 @@ object PreSets extends PreTopos[Set, [A] =>> A, Void, Unit, Boolean, Map]:
       monic(x) == y
     }
 
-  override def rawBackDivideMonic[X, Y, A](
+  override def backDivideMonic[X, Y, A](
     dotX: Set[X],
     dotY: Set[Y],
     dotA: Set[A],
