@@ -13,12 +13,11 @@ import munit.FunSuite
 import scala.Function.tupled
 import scala.collection.immutable.Set
 import scala.language.postfixOps
+import com.fdilke.bewl2.sets.Sets
+import Sets.*
+import Sets.StandardTermsAndOperators.*
 
 class AlgebraicConstructionsSpec extends RichFunSuite:
-
-  private val topos = com.fdilke.bewl2.sets.Sets
-  import topos.*
-  import topos.StandardTermsAndOperators.*
 
   test("Construct cyclic groups") {
     withCyclicGroup(order = 17) {

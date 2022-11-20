@@ -7,99 +7,19 @@ import com.fdilke.bewl2.helper.Memoize
 import Mappable.*
 import com.fdilke.bewl2.logic.LogicalOperations
 
-trait BaseTopos[
-  DOT[_],
-  CTXT[_] : Mappable,
-  VOID,
-  UNIT,
-  BEWL,
-  >[_, _]
-]:
-  @targetName("topos arrow")
-  type ~>[X, Y] = CTXT[X] => CTXT[Y]
-
-  trait RawEqualizer[A, X]:
-    val inclusion: A ~> X
-    def restrict[R](
-      dotR: DOT[R],
-      arrow: R ~> X
-    ): R ~> A
-
-  def rawEqualArrows[X, Y](
-    dotX: DOT[X],
-    dotY: DOT[Y],
-    f1: X ~> Y,
-    f2: X ~> Y
-  ): Boolean
-
-  def uncachedProductObject[X, Y](
-    dotX: DOT[X],
-    dotY: DOT[Y],
-  ): DOT[(X, Y)]
-
-  def uncachedExponentialObject[X, Y](
-    dotX: DOT[X],
-    dotY: DOT[Y],
-  ): DOT[X > Y]
-
-  def rawProductMagic[X, Y](
-    dotX: DOT[X],
-    dotY: DOT[Y],
-    ca: CTXT[X],
-    cb: CTXT[Y]
-  ): CTXT[(X, Y)]
-
-  def rawSanityTest[X](dotX: DOT[X]): Unit
-  def rawSanityTest[X, Y](
-    dotX: DOT[X],
-    dotY: DOT[Y],
-    f: X ~> Y
-  ): Unit
-
-  def rawUnitDot: DOT[UNIT]
-  def rawZeroDot: DOT[VOID]
-  def rawOmegaDot: DOT[BEWL]
-  def rawToUnit[X](dotX: DOT[X]): X ~> UNIT
-  def rawFromZero[X](dotX: DOT[X]): VOID ~> X
-  val truth: UNIT ~> BEWL
-  def rawEvaluation[X, Y](dotX: DOT[X], dotY: DOT[Y]): (X > Y, X) ~> Y
-  def rawTranspose[X, Y, Z](
-    dotX: DOT[X],
-    dotY: DOT[Y],
-    dotZ: DOT[Z],
-    xy2z: (X, Y) ~> Z
-  ): X ~> (Y > Z)
-  def rawDoEqualizer[X, Y, RESULT](
-    dotX: DOT[X],
-    dotY: DOT[Y],
-    f: X ~> Y,
-    f2: X ~> Y
-  )(
-    capture: [A] => RawEqualizer[A, X] => DOT[A] => RESULT
-  ): RESULT
-  def rawChiForMonic[X, Y](
-    dotX: DOT[X],
-    dotY: DOT[Y],
-    monic: X ~> Y
-  ): Y ~> BEWL
-  def rawBackDivideMonic[X, Y, A](
-    dotX: DOT[X],
-    dotY: DOT[Y],
-    dotA: DOT[A],
-    arrow: X ~> Y,
-    monic: A ~> Y
-  ): X ~> A
-
-trait Topos[
+class Topos[
   DOT[_],
   CTXT[_]: Mappable,
   VOID,
   UNIT,
   BEWL,
   >[_, _]
-] extends BaseTopos[DOT, CTXT, VOID, UNIT, BEWL, >]
-  with AlgebraicMachinery[DOT, CTXT, VOID, UNIT, BEWL, >]
+](pretopos: PreTopos[DOT, CTXT, VOID, UNIT, BEWL, >])
+  extends AlgebraicMachinery[DOT, CTXT, VOID, UNIT, BEWL, >]
   with LogicalOperations[DOT, CTXT, VOID, UNIT, BEWL, >]:
+
+  @targetName("topos arrow")
+  type ~>[X, Y] = CTXT[X] => CTXT[Y]
 
   val mappable: Mappable[CTXT] =
     Mappable[CTXT]
@@ -164,39 +84,39 @@ trait Topos[
     f1: X ~> Y,
     f2: X ~> Y
   ): Boolean =
-    rawEqualArrows(dot[X], dot[Y], f1, f2)
+    pretopos.rawEqualArrows(dot[X], dot[Y], f1, f2)
 
   final inline def productMagic[X: Dot, Y: Dot](
     ca: CTXT[X],
     cb: CTXT[Y]
   ): CTXT[(X, Y)] =
-    rawProductMagic(dot[X], dot[Y], ca, cb)
+    pretopos.rawProductMagic(dot[X], dot[Y], ca, cb)
 
   final inline def sanityTest[X: Dot]: Unit =
-    rawSanityTest(dot[X])
+    pretopos.rawSanityTest(dot[X])
 
   final inline def sanityTest[X: Dot, Y: Dot](
     f: X ~> Y
   ): Unit =
-    rawSanityTest(dot[X], dot[Y], f)
+    pretopos.rawSanityTest(dot[X], dot[Y], f)
 
-  implicit val _: Dot[UNIT] = Dot(rawUnitDot)
-  implicit val _: Dot[VOID] = Dot(rawZeroDot)
-  implicit val _: Dot[BEWL] = Dot(rawOmegaDot)
+  implicit val _: Dot[UNIT] = Dot(pretopos.rawUnitDot)
+  implicit val _: Dot[VOID] = Dot(pretopos.rawZeroDot)
+  implicit val _: Dot[BEWL] = Dot(pretopos.rawOmegaDot)
 
   final inline def toUnit[X: Dot]: X ~> UNIT =
-    rawToUnit(dot[X])
+    pretopos.rawToUnit(dot[X])
 
   final inline def fromZero[X: Dot]: VOID ~> X =
-    rawFromZero(dot[X])
+    pretopos.rawFromZero(dot[X])
 
   final inline def evaluation[X: Dot, Y: Dot]: (X > Y, X) ~> Y =
-    rawEvaluation(dot[X], dot[Y])
+    pretopos.rawEvaluation(dot[X], dot[Y])
 
   final inline def transpose[X: Dot, Y: Dot, Z: Dot](
     xy2z: (X, Y) ~> Z
   ): X ~> (Y > Z) =
-    rawTranspose(dot[X], dot[Y], dot[Z], xy2z)
+    pretopos.rawTranspose(dot[X], dot[Y], dot[Z], xy2z)
 
   final def doEqualizer[X: Dot, Y: Dot, RESULT](
     f: X ~> Y,
@@ -204,8 +124,8 @@ trait Topos[
   )(
     capture: [A] => Equalizer[A, X] => Dot[A] ?=> RESULT
   ): RESULT =
-    rawDoEqualizer(dot[X], dot[Y], f, f2)(
-      [A] => (rawEqualizer: RawEqualizer[A, X]) => (dotA: DOT[A]) => {
+    pretopos.rawDoEqualizer(dot[X], dot[Y], f, f2)(
+      [A] => (rawEqualizer: pretopos.RawEqualizer[A, X]) => (dotA: DOT[A]) => {
         implicit val _: Dot[A] = Dot(dotA)
         capture[A](new Equalizer[A, X] {
           override val inclusion: A ~> X =
@@ -225,13 +145,13 @@ trait Topos[
   final inline def chiForMonic[X: Dot, Y: Dot](
     monic: X ~> Y
   ): Y ~> BEWL =
-    rawChiForMonic(dot[X], dot[Y], monic)
+    pretopos.rawChiForMonic(dot[X], dot[Y], monic)
 
   final inline def backDivideMonic[X: Dot, Y: Dot, A: Dot](
     arrow: X ~> Y,
     monic: A ~> Y
   ): X ~> A =
-    rawBackDivideMonic(dot[X], dot[Y], dot[A], arrow, monic)
+    pretopos.rawBackDivideMonic(dot[X], dot[Y], dot[A], arrow, monic)
 
   final inline def arrow[X: Dot, Y: Dot]( // TODO: do we need this?
     f: CTXT[X] => CTXT[Y]
@@ -253,14 +173,17 @@ trait Topos[
   final def toTrue[X: Dot]: X ~> BEWL =
     truth o toUnit[X]
 
+  final val truth: UNIT ~> BEWL =
+    pretopos.truth
+
   private val memoizedProduct:
     [X, Y] => ((Dot[X], Dot[Y])) => Dot[(X, Y)]
-  = Memoize[
+    = Memoize[
       [X, Y] =>> (Dot[X], Dot[Y]),
       [X, Y] =>> Dot[(X, Y)]
     ](
       [X, Y] => (dots: (Dot[X], Dot[Y])) => Dot(
-        uncachedProductObject[X, Y](
+        pretopos.uncachedProductObject[X, Y](
           dots._1.dot,
           dots._2.dot
         )
@@ -283,7 +206,7 @@ trait Topos[
       [X, Y] =>> Dot[X > Y]
     ](
       [X, Y] => (dots: (Dot[X], Dot[Y])) => Dot(
-        uncachedExponentialObject[X, Y](
+        pretopos.uncachedExponentialObject[X, Y](
           dots._1.dot,
           dots._2.dot
         )

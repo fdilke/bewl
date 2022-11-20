@@ -1,14 +1,13 @@
 package com.fdilke.bewl2.sets
 
+import com.fdilke.bewl2.PreTopos
 import com.fdilke.bewl2.Topos
 import com.fdilke.bewl2.Mappable
 import com.fdilke.bewl2.sets.SetsUtilities.allMaps
 
 import scala.language.postfixOps
 
-implicit object Sets extends Topos[
-  Set, [A] =>> A, Void, Unit, Boolean, Map
-]:
+object PreSets extends PreTopos[Set, [A] =>> A, Void, Unit, Boolean, Map]:
   override def rawEqualArrows[X, Y](
     dotX: Set[X],
     dotY: Set[Y],
@@ -57,9 +56,9 @@ implicit object Sets extends Topos[
         throw new IllegalArgumentException(s"target outside range: ${f(x)} not found in $dotY")
     }
 
-  override def rawUnitDot: Set[Unit] = Set(())
-  override def rawZeroDot: Set[Void] = Set.empty
-  override def rawOmegaDot: Set[Boolean] = Set(true, false)
+  override val rawUnitDot: Set[Unit] = Set(())
+  override val rawZeroDot: Set[Void] = Set.empty
+  override val rawOmegaDot: Set[Boolean] = Set(true, false)
   override val truth: Unit => Boolean = _ => true
 
   override def rawFromZero[X](dotX: Set[X]): Void => X = { _ =>
@@ -152,8 +151,9 @@ implicit object Sets extends Topos[
       } get
     }
 
-
-
+object Sets extends Topos[
+  Set, [A] =>> A, Void, Unit, Boolean, Map
+](PreSets)
 
   
 
