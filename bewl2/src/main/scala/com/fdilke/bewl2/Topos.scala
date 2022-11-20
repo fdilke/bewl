@@ -41,7 +41,7 @@ class Topos[
   )(
     block: Dot[X] ?=> RESULT
   ): RESULT =
-    implicit val _: Dot[X] = Dot(dot)
+    given Dot[X] = Dot(dot)
     block
 
   final inline def withDots[X, Y, RESULT](
@@ -100,9 +100,9 @@ class Topos[
   ): Unit =
     pretopos.sanityTest(dot[X], dot[Y], f)
 
-  implicit val _: Dot[UNIT] = Dot(pretopos.unitDot)
-  implicit val _: Dot[VOID] = Dot(pretopos.zeroDot)
-  implicit val _: Dot[BEWL] = Dot(pretopos.omegaDot)
+  given Dot[UNIT] = Dot(pretopos.unitDot)
+  given Dot[VOID] = Dot(pretopos.zeroDot)
+  given Dot[BEWL] = Dot(pretopos.omegaDot)
 
   final inline def toUnit[X: Dot]: X ~> UNIT =
     pretopos.toUnit(dot[X])
@@ -126,7 +126,7 @@ class Topos[
   ): RESULT =
     pretopos.doEqualizer(dot[X], dot[Y], f, f2)(
       [A] => (rawEqualizer: pretopos.RawEqualizer[A, X]) => (dotA: DOT[A]) => {
-        implicit val _: Dot[A] = Dot(dotA)
+        given Dot[A] = Dot(dotA)
         capture[A](new Equalizer[A, X] {
           override val inclusion: A ~> X =
             rawEqualizer.inclusion

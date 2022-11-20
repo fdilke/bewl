@@ -30,7 +30,7 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
   test("Construct a monoid from a table") {
     import StockSymbols.*
     val h: Symbol = e
-    implicit val _: Set[Symbol] = Set(e, a)
+    given Set[Symbol] = Set(e, a)
     withMonoidFromTable(
       e, a,
       a, e
@@ -112,7 +112,7 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
         [U] => (_: Dot[U]) ?=> (groupU: Group[U]) ?=> (embed: U => Int) =>
         groupU.sanityTest
         dot[U].size is 1
-        implicit val _: Monoid[U] = groupU.asMonoid
+        given Monoid[U] = groupU.asMonoid
         monoids.isMorphism(embed) is true
       }
     }

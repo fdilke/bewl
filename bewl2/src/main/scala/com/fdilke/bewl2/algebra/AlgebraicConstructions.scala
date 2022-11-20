@@ -51,7 +51,7 @@ trait AlgebraicConstructions[
           (g, fx)
       }
 
-    implicit val _: EndomorphismMonoid[E, X] =
+    given EndomorphismMonoid[E, X] =
       new Monoid[E](
         unit = id[X].name,
         multiply = transpose(spiffyMul)
@@ -81,7 +81,7 @@ trait AlgebraicConstructions[
       (mm_to_1 x mm_to_1)
     doubleProduct.?=(oneOne) {
       [G] => (equalizer: Equalizer[G, (M, M)]) => (_: Dot[G]) ?=>
-        implicit val _: Group[G] =
+        given Group[G] =
           new Group(
             unit = equalizer.restrict[UNIT](
               monoid.unit x monoid.unit
@@ -125,7 +125,7 @@ object AlgebraicConstructions:
       dot = 0 until order toSet
     ) {
       [I] => (_: Sets.Dot[I]) ?=> (_: I =:= Int) ?=> (_: Int =:= I) ?=>
-        implicit val _: Sets.Group[I] =
+        given Sets.Group[I] =
           new Sets.Group[I](
             makeNullaryOperator[I](0),
             tupled { (x, y) => (x + y) % order },
@@ -159,7 +159,7 @@ object AlgebraicConstructions:
       )
 
     Sets.withDot(carrierAsList.toSet) {
-      implicit val _: Sets.Monoid[M] =
+      given Sets.Monoid[M] =
         Sets.Monoid[M](
           makeNullaryOperator[M](
             table.head
@@ -194,7 +194,7 @@ object AlgebraicConstructions:
     Sets.withDot(carrierAsList.toSet) {
       val binOp = makeBinaryOperator[G](mappings: _*)
       val theUnit: G = table.head
-      implicit val _: Sets.Group[G] =
+      given Sets.Group[G] =
         Sets.Group[G](
           unit = makeNullaryOperator[G](theUnit),
           multiply = binOp,
@@ -217,7 +217,7 @@ object AlgebraicConstructions:
     Sets.withDot(
       symbols.permutations.toSet[Seq[Int]]
     ) {
-      implicit val _: Sets.Group[Seq[Int]] =
+      given Sets.Group[Seq[Int]] =
         Sets.Group[Seq[Int]](
           unit = makeNullaryOperator[Seq[Int]](symbols),
           multiply = { (p1: Seq[Int], p2: Seq[Int]) =>

@@ -70,5 +70,5 @@ object SetsUtilities:
   )(
     block: [X_] => Set[X_] ?=> (X_ =:= X) ?=> (X =:= X_) ?=> RESULT
   ): RESULT =
-    implicit val _: Set[X] = dot
+    given Set[X] = dot
     block[X]
