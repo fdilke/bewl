@@ -168,15 +168,13 @@ abstract class GenericToposSpec[
 
       // reconstruct the arrow from its transpose:
       // f(foo, bar) === eval(f*(foo), bar)
-      assert( foobar2baz =!=
-        arrow[(FOO, BAR), BAZ] { (cFooBar: CTXT[(FOO, BAR)]) =>
-          val cFoo: CTXT[FOO] = π0[FOO, BAR](cFooBar)
-          val cBar: CTXT[BAR] = π1[FOO, BAR](cFooBar)
-          val fnBarBaz: CTXT[BAR > BAZ] = foo2bar2baz(cFoo)
-          val cTuple = productMagic[BAR > BAZ, BAR](fnBarBaz, cBar)
-          eval(cTuple)
-        }
-      )
+      assert( foobar2baz =!= { (cFooBar: CTXT[(FOO, BAR)]) =>
+        val cFoo: CTXT[FOO] = π0[FOO, BAR](cFooBar)
+        val cBar: CTXT[BAR] = π1[FOO, BAR](cFooBar)
+        val fnBarBaz: CTXT[BAR > BAZ] = foo2bar2baz(cFoo)
+        val cTuple = productMagic[BAR > BAZ, BAR](fnBarBaz, cBar)
+        eval(cTuple)
+      })
     }
 
     test("caches exponentials") {

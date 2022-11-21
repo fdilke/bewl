@@ -19,7 +19,7 @@ class ExperimentalSpec extends FunSuite:
     val z: Seq[Int] = rattenberg {
       x => x + 1
     }
-// TODO: get -Yindent-colons to work
+// one day... get -Yindent-colons to work
 //    val y: Future[Int] = Future:
 //      2
     assertEquals(obtained, expected)

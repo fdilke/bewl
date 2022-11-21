@@ -97,7 +97,7 @@ class Topos[
       }
     }
 
-  final def withDotMask[X, RESULT]( // TODO: audit later. useful method? belongs elsewhere?
+  final def withDotMask[X, RESULT](
     dot: DOT[X]
   )(
     block: [X_] => Dot[X_] ?=> (X_ =:= X) ?=> (X =:= X_) ?=> RESULT
@@ -178,11 +178,6 @@ class Topos[
     monic: A ~> Y
   ): X ~> A =
     pretopos.backDivideMonic(dot[X], dot[Y], dot[A], arrow, monic)
-
-  final inline def arrow[X: Dot, Y: Dot]( // TODO: do we need this?
-    f: CTXT[X] => CTXT[Y]
-  ): X ~> Y =
-    f
 
   final inline def dot[X: Dot]: DOT[X] =
     implicitly[Dot[X]].dot
@@ -278,11 +273,7 @@ class Topos[
       Topos.this.sanityTest[X, Y](f)
 
     final def name: UNIT ~> (X > Y) =
-      val whiffle: ((UNIT, X)) ~> X = π1[UNIT, X]
-      // val piffle: ((UNIT, X)) ~> Y = f o whiffle
-      transpose(f o whiffle)
-
-// TODO: ^ sort this out
+      transpose(f o π1[UNIT, X])
 
 object Topos:
   inline def apply[

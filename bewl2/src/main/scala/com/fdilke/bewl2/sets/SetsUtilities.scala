@@ -64,7 +64,6 @@ object SetsUtilities:
     val map: Map[(X, X), X] = Map[(X, X), X](values: _*)
     map
 
-    // TODO: sort this out, separate from withDotMask
   def sillyMaskSetDot[X, RESULT](
     dot: Set[X]
   )(

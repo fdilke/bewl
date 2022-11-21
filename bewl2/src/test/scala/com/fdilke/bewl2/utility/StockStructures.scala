@@ -6,7 +6,7 @@ import com.fdilke.bewl2.sets.Sets
 import Sets._
 
 object StockStructures:
-  // TODO: I'm sure this could have a better name, or be constructed differently: right dominant
+  // right dominant
   def withMonoidOf3[RESULT](
     block: Dot[Symbol] ?=> Monoid[Symbol] ?=> RESULT
   ): RESULT =
@@ -16,7 +16,7 @@ object StockStructures:
       b, a, b
     )(block)
 
-  // TODO: I'm sure this could have a better name, or be constructed differently: left dominant
+  // left dominant
   def withMonoidOf3a[RESULT](
     block: Dot[Symbol] ?=> Monoid[Symbol] ?=> RESULT
   ): RESULT =

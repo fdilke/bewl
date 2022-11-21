@@ -30,7 +30,6 @@ class AlgebraicStructuresSpec extends RichFunSuite:
               group3.sanityTest
               group6.sanityTest
 
-              // TODO: bake this in, as with products of dots
               implicit val group2x3: Group[(Int2, Int3)] = group2 x group3
               group2x3.sanityTest
 
@@ -80,7 +79,6 @@ class AlgebraicStructuresSpec extends RichFunSuite:
           monoidOf3.withAction(scalarMultiply) {
             monoidOf3.withRegularAction {
 
-              // TODO: should be baked in
               implicit val product: monoidOf3.Action[(String, Symbol)] =
                 summon[monoidOf3.Action[String]] x summon[monoidOf3.Action[Symbol]]
 

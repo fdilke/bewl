@@ -1,21 +1,25 @@
 
+# TOO GNARLY (for now)
+- default RESULT type of Unit for situations like withAction[Int, Unit] ?
+  not quite, but could sort of do it with 'import experimental.namedTypeArguments'
+- refactor OperatorAssignment to be table-driven
+- in StockStructures, we laboriously implement left/right dominant monoids
+
 # DONE
 - done_todo.md as motivator inside project, or should these notes live there?
 - can protect Dot constructor?
 - locally cache products, so Dot[(X, Y)] lives inside the cache for Dot[X]. Ditto exponentials
 - there should really be tests for Memoize.type1 (didn't clone during refactor)
-
-# TOO GNARLY (for now)
-- default RESULT type of Unit for situations like withAction[Int, Unit] ?
-  not quite, but could sort of do it with 'import experimental.namedTypeArguments'
+- asMonoid => withMonoid
+- groups should be able to have actions
 
 # TODO
 - permutations, deep property of FinSet from card trick?
 - argument for storing UNIT, BEWL, etc as types within the topos, not type parameters?
   Saves passing a load of baggage around. Implications for users?
 - disentangle mask[]/sillyMask[] which should be a pure type operation
-- asMonoid => withMonoid
 - any implicits left in tests for algebraic machinery? any other unnecessary flummery with '?=>' ?
 - can improve how equalizerSituation / scope of implicits works in the generic topos tests?
 - convert in-code TODOs to entries here
-- groups should be able to have actions
+- instead of group x group: bake this in, as with products of dots; have an implicit. Same for actions
+- fix arrow.isIso which currently always returns true

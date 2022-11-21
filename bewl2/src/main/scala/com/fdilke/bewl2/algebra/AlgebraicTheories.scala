@@ -271,7 +271,6 @@ trait AlgebraicTheories[
   ](
      operator: Operator
    ) {
-    // TODO: refactor this to be table-driven
     def lookupPrincipalConstant: Option[NullaryOp[T]] = None
 
     def lookupUnaryOp: Option[UnaryOp[T]] = None
