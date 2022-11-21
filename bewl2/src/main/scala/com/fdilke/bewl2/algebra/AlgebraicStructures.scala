@@ -46,7 +46,7 @@ trait AlgebraicStructures[
     ι := unit,
     * := multiply,
     (!) := inverse
-  ) :
+  ) with Actions[G] :
     def x[H: Dot]( // product sugar
       that: Group[H]
     ): Group[(G, H)] = {

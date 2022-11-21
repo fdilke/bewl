@@ -442,6 +442,23 @@ class AlgebraicStructuresSpec extends RichFunSuite:
     }
   }
 
+  test("The action machinery for monoids also works with groups") {
+    withCyclicGroup(order = 6) { [Int6] => (_: Dot[Int6]) ?=> (_: Int6 =:= Int) ?=> (_: Int =:= Int6) ?=> (group6: Group[Int6]) ?=>
+      withDot(Set[Int](0, 1)) {
+        group6.withAction[Int, Unit] {
+          case (a: Int, m: Int6) => (a + m) % 2
+        } {
+          summon[group6.Action[Int]].sanityTest
+          group6.withRegularAction {
+            group6.actions.isMorphism[Int6, Int] {
+              _ % 2
+            } is true
+          }
+        }
+      }
+    }
+  }
+
   test("Lattices can be defined and verified") {
     withDot(0 to 7 toSet : Set[Int]) {
       val bottom: Unit => Int = makeNullaryOperator[Int](0)
