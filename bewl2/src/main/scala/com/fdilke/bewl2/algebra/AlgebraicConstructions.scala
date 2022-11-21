@@ -57,7 +57,7 @@ trait AlgebraicConstructions[
         multiply = transpose(spiffyMul)
       ) with EndomorphismMonoid[E, X] {
         override val standardAction: Action[X] =
-          action[X] { (x_e: CTXT[(X, E)]) =>
+          Action[X] { (x_e: CTXT[(X, E)]) =>
             applicate(x_e) {
               case (x, e) => (e, x)
             }

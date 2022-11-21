@@ -77,30 +77,30 @@ class AlgebraicStructuresSpec extends RichFunSuite:
           val scalarMultiply: ((String, Symbol)) => String =
             case (s, m) => monoidOf3.multiply(Symbol(s), m).name
 
-          implicit val anAction: monoidOf3.Action[String] =
-            monoidOf3.action[String](scalarMultiply)
-          implicit val regularAction: monoidOf3.Action[Symbol] =
-            monoidOf3.regularAction
+          monoidOf3.withAction(scalarMultiply) {
+            monoidOf3.withRegularAction {
 
-          // TODO: should be baked in
-          implicit val product: monoidOf3.Action[(String, Symbol)] =
-            anAction x regularAction
+              // TODO: should be baked in
+              implicit val product: monoidOf3.Action[(String, Symbol)] =
+                summon[monoidOf3.Action[String]] x summon[monoidOf3.Action[Symbol]]
 
-          product.sanityTest
-          product.operatorAssignments.lookup(II).get(()) is e
-          monoidOf3.actions.isMorphism[(String, Symbol), String](
-            π0[String, Symbol]
-          ) is true
-          monoidOf3.actions.isMorphism[(String, Symbol), Symbol](
-            π1[String, Symbol]
-          ) is true
+              product.sanityTest
+              product.operatorAssignments.lookup(II).get(()) is e
+              monoidOf3.actions.isMorphism[(String, Symbol), String](
+                π0[String, Symbol]
+              ) is true
+              monoidOf3.actions.isMorphism[(String, Symbol), Symbol](
+                π1[String, Symbol]
+              ) is true
 
-          val operatorsUsed =
-            product.operatorAssignments.assignments map {
-              _.operator
+              val operatorsUsed =
+                product.operatorAssignments.assignments map {
+                  _.operator
+                }
+
+              operatorsUsed.distinct.size is operatorsUsed.size
             }
-
-          operatorsUsed.distinct.size is operatorsUsed.size
+          }
         }
       }
     }
@@ -208,22 +208,21 @@ class AlgebraicStructuresSpec extends RichFunSuite:
 
   test("Monoids include the off-the-shelf regular action") {
     withMonoidOf3a {
-      (_: Dot[Symbol]) ?=> (monoid: Monoid[Symbol]) ?=>
-        val regularAction: monoid.Action[Symbol] =
-          monoid.regularAction
-
-        regularAction.sanityTest
+//      (_: Dot[Symbol]) ?=> (monoid: Monoid[Symbol]) ?=>
+      val monoid: Monoid[Symbol] = summon
+      monoid.withRegularAction {
+        summon[monoid.Action[Symbol]].sanityTest
+      }
     }
   }
 
   test("Monoid actions include the off-the-shelf trivial action") {
     withDot(Set[String]("Lom", "Samazan", "Ky", "Ogar")) {
       withMonoidOf3a {
-        (_: Dot[Symbol]) ?=> (monoid: Monoid[Symbol]) ?=>
-        val trivialAction: monoid.Action[String] =
-          monoid.trivialAction[String]
-
-        trivialAction.sanityTest
+        val monoid: Monoid[Symbol] = summon
+        monoid.withTrivialAction[String, Unit] {
+          summon[monoid.Action[String]].sanityTest
+        }
       }
     }
   }
@@ -235,7 +234,7 @@ class AlgebraicStructuresSpec extends RichFunSuite:
       [S] => (_: Dot[S]) ?=> (_: S =:= Symbol) ?=> (_: Symbol =:= S) ?=>
       withMonoidOf3a {
         (_: Dot[Symbol]) ?=> (monoid: Monoid[Symbol]) ?=>
-          monoid.action[S](
+          monoid.withAction[S, Unit](
             Map[(S, Symbol), S](
               (a : S, e) -> (a : S),
               (a : S, a) -> (a : S),
@@ -244,7 +243,9 @@ class AlgebraicStructuresSpec extends RichFunSuite:
               (b : S, a) -> (b : S),
               (b : S, b) -> (b : S)
             )
-          ).sanityTest
+          ){
+            summon[monoid.Action[S]].sanityTest
+          }
         }
       }
   }
@@ -252,7 +253,7 @@ class AlgebraicStructuresSpec extends RichFunSuite:
   test("Monoid actions can be constructed and validated (simpler version)") {
     withDot(Set[Int](1, 2)) {
       withMonoidOf3a { (_: Dot[Symbol]) ?=> (monoid: Monoid[Symbol]) ?=>
-        monoid.action[Int](
+        monoid.withAction[Int, Unit](
           Map(
             (1, e) -> 1,
             (1, a) -> 1,
@@ -261,7 +262,9 @@ class AlgebraicStructuresSpec extends RichFunSuite:
             (2, a) -> 2,
             (2, b) -> 2
           )
-        ).sanityTest
+        ) {
+          summon[monoid.Action[Int]].sanityTest
+        }
       }
     }
   }
@@ -271,16 +274,18 @@ class AlgebraicStructuresSpec extends RichFunSuite:
       intercept[IllegalArgumentException] {
         withMonoidOf3a {
           (_: Dot[Symbol]) ?=> (monoid: Monoid[Symbol]) ?=>
-            monoid.action[Int](
-            Map(
-            (1, e) -> 2,
-            (1, a) -> 1,
-            (1, b) -> 1,
-            (2, e) -> 1,
-            (2, a) -> 2,
-            (2, b) -> 2
-          )
-          ).sanityTest
+            monoid.withAction[Int, Unit](
+              Map(
+              (1, e) -> 2,
+              (1, a) -> 1,
+              (1, b) -> 1,
+              (2, e) -> 1,
+              (2, a) -> 2,
+              (2, b) -> 2
+            )
+          ) {
+              summon[monoid.Action[Int]].sanityTest
+            }
         }
       }.getMessage is "right unit law failed"
     }
@@ -291,7 +296,7 @@ class AlgebraicStructuresSpec extends RichFunSuite:
       intercept[IllegalArgumentException] {
         withMonoidOf3a {
           (_: Dot[Symbol]) ?=> (monoid: Monoid[Symbol]) ?=>
-            monoid.action[Int](
+            monoid.withAction[Int, Unit](
               Map(
                 (1, e) -> 1,
                 (1, a) -> 2,
@@ -300,7 +305,9 @@ class AlgebraicStructuresSpec extends RichFunSuite:
                 (2, a) -> 2,
                 (2, b) -> 1
               )
-            ).sanityTest
+            ) {
+              summon[monoid.Action[Int]].sanityTest
+            }
         }
       }.getMessage is "mixed associative law failed"
     }
@@ -310,19 +317,17 @@ class AlgebraicStructuresSpec extends RichFunSuite:
     withMonoid_1_0 { (_: Dot[Int]) ?=> (monoid_1_0: Monoid[Int]) ?=>
       monoid_1_0.sanityTest
       withDot(Set[Symbol](a, b)) {
-        implicit val rightAction: monoid_1_0.Action[Symbol] =
-          monoid_1_0.action[Symbol](
+        monoid_1_0.withAction[Symbol, Unit](
             Map(
               (a, 1) -> a,
               (a, 0) -> a,
               (b, 1) -> b,
               (b, 0) -> a
             )
-          )
-        rightAction.sanityTest
-        withDot(Set[String]("c", "d", "e")) {
-          implicit val rightAction2: monoid_1_0.Action[String] =
-            monoid_1_0.action[String](
+          ) {
+          summon[monoid_1_0.Action[Symbol]].sanityTest
+          withDot(Set[String]("c", "d", "e")) {
+            monoid_1_0.withAction[String, Unit](
               Map(
                 ("c", 1) -> "c",
                 ("c", 0) -> "d",
@@ -331,22 +336,24 @@ class AlgebraicStructuresSpec extends RichFunSuite:
                 ("e", 1) -> "e",
                 ("e", 0) -> "e"
               )
-            )
-          rightAction2.sanityTest
-          val actionMorphism: Symbol => String = Map(
-            a -> "d",
-            b -> "c"
-          )
-          monoid_1_0.actions.isMorphism(
-            actionMorphism
-          ) is true
-          val nonActionMorphism: Symbol => String = Map(
-            a -> "c",
-            b -> "c"
-          )
-          monoid_1_0.actions.isMorphism(
-            nonActionMorphism
-          ) is false
+            ) {
+              summon[monoid_1_0.Action[String]].sanityTest
+              val actionMorphism: Symbol => String = Map(
+                a -> "d",
+                b -> "c"
+              )
+              monoid_1_0.actions.isMorphism(
+                actionMorphism
+              ) is true
+              val nonActionMorphism: Symbol => String = Map(
+                a -> "c",
+                b -> "c"
+              )
+              monoid_1_0.actions.isMorphism(
+                nonActionMorphism
+              ) is false
+            }
+          }
         }
       }
     }

@@ -95,19 +95,32 @@ trait AlgebraicStructures[
         "mixed associative" law ((α ** Φ) ** Ψ := α ** (Φ *** Ψ))
       )
 
-    def action[A: Dot](
+    def withAction[A: Dot, RESULT](
       actionMultiply: (A, M) ~> A
-    ): Action[A] =
-      Action[A](actionMultiply)
+    )(
+      block: Action[A] ?=> RESULT
+    ): RESULT =
+      given Action[A] = Action[A](actionMultiply)
+      block
 
-    lazy val regularAction: Action[M] =
-      action[M](multiply)
+    def withRegularAction[RESULT](
+      block: Action[M] ?=> RESULT
+    ): RESULT =
+      given Action[M] = Action[M](multiply)
+      block
 
-    def trivialAction[A: Dot]: Action[A] =
-      action[A]{ a_m => a_m.map{ _._1 } }
+    def withTrivialAction[A: Dot, RESULT](
+       block: Action[A] ?=> RESULT
+    ): RESULT =
+      given Action[A] = Action[A]{ a_m => a_m.map{ _._1 } }
+      block
 
-    lazy val voidAction: Action[VOID] =
-      trivialAction[VOID]
+    def withVoidAction[RESULT](
+      block: Action[VOID] ?=> RESULT
+    ): RESULT =
+      withTrivialAction[VOID, RESULT] {
+        block
+      }
 
     class Action[A: Dot](
      actionMultiply: BiArrow[A, M, A]

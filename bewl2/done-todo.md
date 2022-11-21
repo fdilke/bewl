@@ -6,7 +6,8 @@
 - there should really be tests for Memoize.type1 (didn't clone during refactor)
 
 # TOO GNARLY (for now)
-
+- default RESULT type of Unit for situations like withAction[Int, Unit] ?
+  not quite, but could sort of do it with 'import experimental.namedTypeArguments'
 
 # TODO
 - permutations, deep property of FinSet from card trick?
@@ -18,4 +19,3 @@
 - can improve how equalizerSituation / scope of implicits works in the generic topos tests?
 - convert in-code TODOs to entries here
 - groups should be able to have actions
-
