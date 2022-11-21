@@ -112,8 +112,9 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
         [U] => (_: Dot[U]) ?=> (groupU: Group[U]) ?=> (embed: U => Int) =>
         groupU.sanityTest
         dot[U].size is 1
-        given Monoid[U] = groupU.asMonoid
-        monoids.isMorphism(embed) is true
+        groupU.withMonoid {
+          monoids.isMorphism[U, Int](embed) is true
+        }
       }
     }
     withDot(Set[Int](1, 2, 3)) {

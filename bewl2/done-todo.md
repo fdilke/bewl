@@ -16,3 +16,6 @@
 - asMonoid => withMonoid
 - any implicits left in tests for algebraic machinery? any other unnecessary flummery with '?=>' ?
 - can improve how equalizerSituation / scope of implicits works in the generic topos tests?
+- convert in-code TODOs to entries here
+- groups should be able to have actions
+

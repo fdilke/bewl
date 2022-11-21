@@ -426,9 +426,10 @@ class AlgebraicStructuresSpec extends RichFunSuite:
         [E] => (_: Dot[E]) ?=> (largerMonoid: EndomorphismMonoid[E, Int]) ?=>
           withGroupOfUnits[E, Unit] {
             [U] => (_: Dot[U]) ?=> (groupU: Group[U]) ?=> (embed: U => E) =>
-              implicit val monoidU: Monoid[U] = groupU.asMonoid
-              monoidU.sanityTest
-              monoids.isMorphism(embed) is true
+              groupU.withMonoid {
+                summon[Monoid[U]].sanityTest
+                monoids.isMorphism[U, E](embed) is true
+              }
             }
       }
     }

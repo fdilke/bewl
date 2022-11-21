@@ -57,8 +57,13 @@ trait AlgebraicStructures[
         product.operatorAssignments.lookup(!).get
       )
     }
-    lazy val asMonoid: Monoid[G] =
+    private lazy val asMonoid: Monoid[G] =
       new Monoid[G](unit, multiply)
+    def withMonoid[RESULT](
+      block: Monoid[G] ?=> RESULT
+    ): RESULT =
+      given Monoid[G] = asMonoid
+      block
 
   val monoids: AlgebraicTheory[UNIT] =
     AlgebraicTheory(ι, *)(
@@ -108,18 +113,15 @@ trait AlgebraicStructures[
      actionMultiply: BiArrow[A, M, A]
    ) extends actions.Algebra[A](
       ** := actionMultiply
-    ) {
-      // Formalism to make the product of two Actions an Action to facilitate sugar
-      def x[B: Dot](
+    ):
+      def x[B: Dot]( // Formalism to make the product of two Actions an Action to facilitate sugar
         that: Action[B]
-      ): Action[(A, B)] = {
+      ): Action[(A, B)] =
         val product = (this: actions.Algebra[A]) x that
         new Action[(A, B)](
           product.operatorAssignments.lookup(**).get
         )
-      }
     }
-  }
 
   extension(a: Algebra)
     def isCommutative = a.satisfies(
