@@ -23,7 +23,7 @@ class MemoizeSpec extends FunSuite:
       text.length
 
     val memoizedVanilla: String => Int =
-      Memoize.vanilla(vanillaFn)
+      Memoize(vanillaFn)
 
     def composite[X, Y](
       setXsetY: (Set[X], Set[Y])
@@ -39,9 +39,24 @@ class MemoizeSpec extends FunSuite:
         }
     )
 
+    def takeHead[X](
+      list: List[X]
+    ): X =
+      callCount.incrementAndGet()
+      list.head
+
+    val memoizedHead:
+        [X] => List[X] => X
+      = Memoize.type1[
+        [X] =>> List[X],
+        [X] =>> X
+    ](
+        [X] => (list: List[X]) => takeHead(list)
+    )
+
     val memoizedComposite:
         [X, Y] => ((Set[X], Set[Y])) => Set[X | Y]
-      = Memoize[
+      = Memoize.type2[
         [X, Y] =>> (Set[X], Set[Y]),
         [X, Y] =>> Set[X | Y]
     ](
@@ -70,6 +85,29 @@ class MemoizeSpec extends FunSuite:
     confirmVanilla
     callCountIs(1)
     confirmVanilla
+    callCountIs(1)
+  }
+
+  fixture.test("memoized function with 1 type arg acts as pass through") { scope =>
+    import scope._
+
+    val input =
+      List[Int](1, 2, 3)
+    val output =
+      1
+
+    def confirmHead =
+      assertEquals(
+        memoizedHead[Int](
+          input
+        ),
+        output
+      )
+
+    callCountIs(0)
+    confirmHead
+    callCountIs(1)
+    confirmHead
     callCountIs(1)
   }
 

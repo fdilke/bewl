@@ -1,20 +1,43 @@
 package com.fdilke.bewl2.helper
 
+import scala.collection.mutable
+
 object Memoize {
 
-  def vanilla[A, B](
+  def apply[A, B](
     fn: A => B
-  ): A => B = {
-    val resultMap =
-      scala.collection.mutable.Map[A, B]()
+  ): A => B =
+    val resultMap: mutable.Map[A, B] =
+      mutable.Map[A, B]()
 
-    a => resultMap.getOrElseUpdate(
-          a,
-          fn(a)
-        )
+    a => resultMap.getOrElseUpdate(a, fn(a))
+
+  def type1[
+    IN[_],
+    OUT[_]
+  ](
+    fn: [X] => IN[X] => OUT[X]
+  ): [X] => IN[X] => OUT[X] = {
+    def erasedFn(
+      in: IN[Nothing]
+    ): OUT[Nothing] =
+      fn[Nothing](
+        in
+      )
+    val memoizedErased =
+      Memoize[
+        IN[Nothing],
+        OUT[Nothing]
+      ](erasedFn)
+
+    [X] =>
+      (input: IN[X]) =>
+        memoizedErased(
+          input.asInstanceOf[IN[Nothing]]
+        ).asInstanceOf[OUT[X]]
   }
 
-  def apply[
+  def type2[
     IN[_, _],
     OUT[_, _]
   ](
@@ -23,11 +46,9 @@ object Memoize {
     def erasedFn(
       in: IN[Nothing, Nothing]
     ): OUT[Nothing, Nothing] =
-      fn[Nothing, Nothing](
-        in
-      )
-    val memoizedErased =
-      vanilla[
+      fn[Nothing, Nothing](in)
+    val memoizedErased: IN[Nothing, Nothing] => OUT[Nothing, Nothing] =
+      Memoize[
         IN[Nothing, Nothing],
         OUT[Nothing, Nothing]
       ](erasedFn)

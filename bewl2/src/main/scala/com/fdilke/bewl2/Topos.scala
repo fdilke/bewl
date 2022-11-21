@@ -30,11 +30,37 @@ class Topos[
       arrow: R ~> X
     ): R ~> A
 
-  class Dot[X]( // TODO: can we have something like "Dot[X] protected("?
+  class Dot[X] private[Topos](
     val dot: DOT[X]
   ) {
+    private[Topos] val memoizedProduct:
+      [Y] => Dot[Y] => Dot[(X, Y)]
+    = Memoize.type1[
+      [Y] =>> Dot[Y],
+      [Y] =>> Dot[(X, Y)]
+    ](
+      [Y] => (dotY: Dot[Y]) => Dot(
+        pretopos.uncachedProductObject[X, Y](
+          dot,
+          dotY.dot
+        )
+      )
+    )
 
-  } // TODO: protect the constructor
+    private[Topos] val memoizedExponential:
+      [Y] => Dot[Y] => Dot[X > Y]
+    = Memoize.type1[
+      [Y] =>> Dot[Y],
+      [Y] =>> Dot[X > Y]
+    ](
+      [Y] => (dotY: Dot[Y]) => Dot(
+        pretopos.uncachedExponentialObject[X, Y](
+          dot,
+          dotY.dot
+        )
+      )
+    )
+  }
 
   final def withDot[X, RESULT](
     dot: DOT[X]
@@ -176,49 +202,19 @@ class Topos[
   final val truth: UNIT ~> BEWL =
     pretopos.truth
 
-  private val memoizedProduct:
-    [X, Y] => ((Dot[X], Dot[Y])) => Dot[(X, Y)]
-    = Memoize[
-      [X, Y] =>> (Dot[X], Dot[Y]),
-      [X, Y] =>> Dot[(X, Y)]
-    ](
-      [X, Y] => (dots: (Dot[X], Dot[Y])) => Dot(
-        pretopos.uncachedProductObject[X, Y](
-          dots._1.dot,
-          dots._2.dot
-        )
-      )
-    )
-
   implicit def productObject[
       X: Dot,
       Y: Dot
   ]: Dot[(X, Y)] =
-    memoizedProduct[X, Y](
-      summon[Dot[X]],
+    summon[Dot[X]].memoizedProduct[Y](
       summon[Dot[Y]]
-    )
-
-  private val memoizedExponential:
-    [X, Y] => ((Dot[X], Dot[Y])) => Dot[X > Y]
-  = Memoize[
-      [X, Y] =>> (Dot[X], Dot[Y]),
-      [X, Y] =>> Dot[X > Y]
-    ](
-      [X, Y] => (dots: (Dot[X], Dot[Y])) => Dot(
-        pretopos.uncachedExponentialObject[X, Y](
-          dots._1.dot,
-          dots._2.dot
-        )
-      )
     )
 
   implicit def exponentialObject[
       X: Dot,
       Y: Dot
   ]: Dot[X > Y] =
-    memoizedExponential[X, Y](
-      summon[Dot[X]],
+    summon[Dot[X]].memoizedExponential[Y](
       summon[Dot[Y]]
     )
 
