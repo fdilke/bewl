@@ -17,12 +17,10 @@ class Topos[
 ](pretopos: PreTopos[DOT, CTXT, VOID, UNIT, BEWL, >])
   extends AlgebraicMachinery[DOT, CTXT, VOID, UNIT, BEWL, >]
   with LogicalOperations[DOT, CTXT, VOID, UNIT, BEWL, >]:
+  Ɛ =>
 
   @targetName("topos arrow")
   type ~>[X, Y] = CTXT[X] => CTXT[Y]
-
-  val mappable: Mappable[CTXT] =
-    Mappable[CTXT]
 
   trait Equalizer[A, X]:
     val inclusion: A ~> X
@@ -60,6 +58,10 @@ class Topos[
         )
       )
     )
+
+    lazy val diagonal: (X, X) ~> BEWL =
+      given Dot[X] = this
+      { (x: CTXT[X]) => pretopos.productMagic(dot, dot, x, x) }.chi
   }
 
   final def withDot[X, RESULT](
@@ -186,15 +188,18 @@ class Topos[
     identity[CTXT[X]]
 
   final def π0[X, Y]: (X, Y) ~> X =
-    c => mappable.map(c, _._1)
+    _.map { _._1 }
 
   final def π1[X, Y]: (X, Y) ~> Y =
-    c => mappable.map(c, _._2)
+    _.map { _._2 }
 
   final def toTrue[X: Dot]: X ~> BEWL =
     truth o toUnit[X]
 
-  final val truth: UNIT ~> BEWL =
+  final def =?=[X: Dot]: (X, X) ~> BEWL =
+    summon[Dot[X]].diagonal
+
+  final val truth: NullaryOp[BEWL] =
     pretopos.truth
 
   implicit def productObject[
@@ -223,6 +228,21 @@ class Topos[
     )
 
   type BiArrow[X, Y, Z] = (X, Y) ~> Z
+
+  extension[X: Dot, Y: Dot, Z: Dot] (
+    biArrow: BiArrow[X, Y, Z]
+  )
+    inline def apply[A: Dot](
+      f: A ~> X,
+      g: A ~> Y
+    ): A ~> Z =
+      biArrow o (f x g)
+
+    inline def apply(
+      x: CTXT[X],
+      y: CTXT[Y]
+    ): CTXT[Z] =
+      biArrow(productMagic(x, y))
 
   implicit final class RichArrow[X: Dot, Y: Dot](
     f: X ~> Y
@@ -272,7 +292,7 @@ class Topos[
     inline final def sanityTest: Unit =
       Topos.this.sanityTest[X, Y](f)
 
-    final def name: UNIT ~> (X > Y) =
+    final def name: NullaryOp[X > Y] =
       transpose(f o π1[UNIT, X])
 
 object Topos:

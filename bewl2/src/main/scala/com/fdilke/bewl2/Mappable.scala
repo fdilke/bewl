@@ -21,13 +21,12 @@ object Mappable {
   inline def apply[C[_]: Mappable]: Mappable[C] =
     implicitly
 
-  implicit class RichMappable[C[_]: Mappable, X](
+  extension[C[_]: Mappable, X](
     mappable: C[X]
-  ) {
+  )
     def map[Y](
       f: X => Y
     ): C[Y] =
       summon[Mappable[C]].map(mappable, f)
-  }
 }
 

@@ -21,5 +21,17 @@
 - any implicits left in tests for algebraic machinery? any other unnecessary flummery with '?=>' ?
 - can improve how equalizerSituation / scope of implicits works in the generic topos tests?
 - convert in-code TODOs to entries here
+- logical operations: construct the Heyting algebra of truth
 - instead of group x group: bake this in, as with products of dots; have an implicit. Same for actions
-- fix arrow.isIso which currently always returns true
+- fix arrow.isIso which currently always returns true. also epic, mono. also ideally section/retraction, image
+- nice if there could be a CompleteHA and not just a HA - need infinitary operations/laws
+- TODO: override, test equivalents
+- extension instead of RichArrow
+- sort out RichDot
+- proper names/scopes for the ∀ methods
+- biarrows acting on arrows: f(g, h) where g: X ~> Y, h: X ~> Z, f:(Y, Z) ~> W
+- instead of summon[Dot[X]] use Dot[X], as with Mappable
+- we don't need to store a mappable
+- role for those "(x)" tensorial extractors instead of cumbersome ab_ω.map { _._1 } etc in LogicalOps and elsewhere
+-   xx 
+- 

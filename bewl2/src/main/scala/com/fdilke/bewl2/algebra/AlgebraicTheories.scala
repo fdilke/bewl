@@ -720,7 +720,7 @@ trait AlgebraicTheories[
       object SimpleEvaluationContext extends EvaluationContext[UNIT] {
         override def evaluatePrincipal(
           term: Term[Principal]
-        ): UNIT ~> T =
+        ): NullaryOp[T] =
           term match {
             case term: PrincipalConstant =>
               evaluatePrincipalConstant(term)
@@ -733,7 +733,7 @@ trait AlgebraicTheories[
 
         override def evaluateScalar(
           term: Term[Scalar]
-        ): UNIT ~> S =
+        ): NullaryOp[S] =
           term match {
             case term: ScalarConstant =>
               evaluateScalarConstant(term)
@@ -810,6 +810,7 @@ trait AlgebraicTheories[
   }
 
   object AlgebraicTheory:
+    import topos.given
     def apply(operators: Operator*)(laws: Law*) =
       new AlgebraicTheory[UNIT]()(operators: _*)(laws: _*)
 

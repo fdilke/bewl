@@ -14,7 +14,6 @@ class AlgebraicTheoriesSpec extends RichFunSuite:
   import topos.*
   import topos.StandardTermsAndOperators.*
 
-
   test("Simple and compound terms can describe their own free variables") {
     α.freeVariables is Seq(α)
     (α * β).freeVariables is Seq(α, β)
