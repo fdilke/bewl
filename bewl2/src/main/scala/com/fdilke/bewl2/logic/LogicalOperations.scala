@@ -76,7 +76,7 @@ trait LogicalOperations[
 //  def isBoolean =
 //    (truth + falsity).isIso
 
-  extension(ω: CTXT[BEWL])
+  implicit class BewlOps(ω: CTXT[BEWL]):
     inline def →(that: CTXT[BEWL]) =
       omega.implies(ω, that)
 

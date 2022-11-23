@@ -142,7 +142,7 @@ trait AlgebraicStructures[
     )
 
   val lattices: AlgebraicTheory[UNIT] =
-    AlgebraicTheory(⊥, ⊤, (StandardTermsAndOperators.∨), (StandardTermsAndOperators.∧))(
+    AlgebraicTheory(⊥, ⊤, ∨, ∧)(
       "commutative ∨" law (α ∨ β := β ∨ α),
       "associative ∨" law ((α ∨ β) ∨ γ := α ∨ (β ∨ γ)),
       "unit ⊥ for ∨" law (⊥ ∨ α := α),
@@ -163,12 +163,12 @@ trait AlgebraicStructures[
   ) extends lattices.Algebra[L](
     ⊥ := bottom,
     ⊤ := top,
-    (StandardTermsAndOperators.∧) := meet,
-    (StandardTermsAndOperators.∨) := join
+    ∧ := meet,
+    ∨ := join
   )
 
   val heytingAlgebras: AlgebraicTheory[UNIT] =
-    lattices.extend(StandardTermsAndOperators.→)(moreLaws =
+    lattices.extend(→)(moreLaws =
       "self implication" law (α → α := ⊤),
       "modus ponens" law (α ∧ (α → β) := α ∧ β),
       "implication supersedes" law (α ∧ (β → α) := α),
@@ -184,8 +184,8 @@ trait AlgebraicStructures[
   ) extends heytingAlgebras.Algebra[H](
     ⊥ := bottom,
     ⊤ := top,
-    (StandardTermsAndOperators.∧) := meet,
-    (StandardTermsAndOperators.∨) := join,
-    (StandardTermsAndOperators.→) := implies
+    ∧ := meet,
+    ∨ := join,
+    → := implies
   )
 }

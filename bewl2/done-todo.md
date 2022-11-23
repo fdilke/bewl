@@ -4,6 +4,9 @@
   not quite, but could sort of do it with 'import experimental.namedTypeArguments'
 - refactor OperatorAssignment to be table-driven
 - in StockStructures, we laboriously implement left/right dominant monoids
+- nice if there could be a CompleteHA and not just a HA - need infinitary operations/laws
+- instead of summon[Dot[X]] use Dot[X], as with Mappable... bad idea: then have to use 'new'
+- extension instead of RichArrow.. bad idea, we then get confused about 'o'
 
 # DONE
 - done_todo.md as motivator inside project, or should these notes live there?
@@ -12,6 +15,11 @@
 - there should really be tests for Memoize.type1 (didn't clone during refactor)
 - asMonoid => withMonoid
 - groups should be able to have actions
+- we don't need to store a mappable
+- biarrows acting on arrows: f(g, h) where g: X ~> Y, h: X ~> Z, f:(Y, Z) ~> W
+- convert in-code TODOs to entries here
+- sort out RichDot... There is none
+- logical operations: construct the Heyting algebra of truth
 
 # TODO
 - permutations, deep property of FinSet from card trick?
@@ -20,18 +28,11 @@
 - disentangle mask[]/sillyMask[] which should be a pure type operation
 - any implicits left in tests for algebraic machinery? any other unnecessary flummery with '?=>' ?
 - can improve how equalizerSituation / scope of implicits works in the generic topos tests?
-- convert in-code TODOs to entries here
-- logical operations: construct the Heyting algebra of truth
 - instead of group x group: bake this in, as with products of dots; have an implicit. Same for actions
 - fix arrow.isIso which currently always returns true. also epic, mono. also ideally section/retraction, image
-- nice if there could be a CompleteHA and not just a HA - need infinitary operations/laws
-- TODO: override, test equivalents
-- extension instead of RichArrow
-- sort out RichDot
+- TODO: override, test equivalents for logical operations
 - proper names/scopes for the ∀ methods
-- biarrows acting on arrows: f(g, h) where g: X ~> Y, h: X ~> Z, f:(Y, Z) ~> W
-- instead of summon[Dot[X]] use Dot[X], as with Mappable
-- we don't need to store a mappable
 - role for those "(x)" tensorial extractors instead of cumbersome ab_ω.map { _._1 } etc in LogicalOps and elsewhere
--   xx 
-- 
+- xx 
+- expunge @targetName, no one is using Java to access this
+- for logical operations' Boolean operators extension, use an implicit class instead and then don't need StandardXxx.<and>
