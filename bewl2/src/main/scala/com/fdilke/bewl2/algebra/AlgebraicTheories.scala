@@ -824,7 +824,7 @@ trait AlgebraicTheories[
     ) =
       new AlgebraicTheory[S](preassignments: _*)(operators: _*)(laws: _*)
 
-  type Algebra = AlgebraicTheory[_]#Algebra[_]
+  type Variety = AlgebraicTheory[UNIT]
 }
 
 

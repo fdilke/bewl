@@ -85,7 +85,7 @@ class AlgebraicTheoriesSpec extends RichFunSuite:
         2 -> 1
       )
 
-      val pointedSetsWithOp: AlgebraicTheory[Unit] = AlgebraicTheory(o, ~)()
+      val pointedSetsWithOp: Variety = AlgebraicTheory(o, ~)()
       val algebra: pointedSetsWithOp.Algebra[Int] =
         new pointedSetsWithOp.Algebra[Int](
           (~) := twiddle,
@@ -351,7 +351,7 @@ class AlgebraicTheoriesSpec extends RichFunSuite:
           -1 -> 1
         )
 
-      val setsWithInvolution: AlgebraicTheory[Unit] =
+      val setsWithInvolution: Variety =
         AlgebraicTheory(~)(~(~α) := α)
       implicit val algebraStrings: setsWithInvolution.Algebra[String] =
         new setsWithInvolution.Algebra[String](
@@ -380,7 +380,7 @@ class AlgebraicTheoriesSpec extends RichFunSuite:
       val pointInts: Unit => Int = makeNullaryOperator(0)
       val pointStrings: Unit => String = makeNullaryOperator("delilah")
 
-      val pointedSets: AlgebraicTheory[Unit] = AlgebraicTheory(o)()
+      val pointedSets: Variety = AlgebraicTheory(o)()
       implicit val algebraStrings: pointedSets.Algebra[String] =
         new pointedSets.Algebra[String](o := pointStrings)
       implicit val algebraInts: pointedSets.Algebra[Int] =
@@ -400,7 +400,7 @@ class AlgebraicTheoriesSpec extends RichFunSuite:
         (x, y) => (x + y) % 4
       }
 
-      val magmas: AlgebraicTheory[Unit] =
+      val magmas: Variety =
         AlgebraicTheory(*)()
       implicit val algebra: magmas.Algebra[Int] =
         new magmas.Algebra[Int](* := multiplication)

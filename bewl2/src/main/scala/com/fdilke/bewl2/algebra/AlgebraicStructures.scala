@@ -22,7 +22,7 @@ trait AlgebraicStructures[
   import StandardTermsAndOperators.!
   import StandardTermsAndOperators.*
 
-  val groups: AlgebraicTheory[UNIT] =
+  val groups: Variety =
     AlgebraicTheory(ι, !, *)(
       "left unit" law {
         ι * α := α
@@ -65,7 +65,7 @@ trait AlgebraicStructures[
       given Monoid[G] = asMonoid
       block
 
-  val monoids: AlgebraicTheory[UNIT] =
+  val monoids: Variety =
     AlgebraicTheory(ι, *)(
       "left unit" law (ι * α := α),
       "right unit" law (α * ι := α),
@@ -136,12 +136,12 @@ trait AlgebraicStructures[
         )
     }
 
-  extension(a: Algebra)
+  extension(a: AlgebraicTheory[_]#Algebra[_])
     def isCommutative = a.satisfies(
       α * β := β * α
     )
 
-  val lattices: AlgebraicTheory[UNIT] =
+  val lattices: Variety =
     AlgebraicTheory(⊥, ⊤, ∨, ∧)(
       "commutative ∨" law (α ∨ β := β ∨ α),
       "associative ∨" law ((α ∨ β) ∨ γ := α ∨ (β ∨ γ)),
@@ -167,7 +167,7 @@ trait AlgebraicStructures[
     ∨ := join
   )
 
-  val heytingAlgebras: AlgebraicTheory[UNIT] =
+  val heytingAlgebras: Variety =
     lattices.extend(→)(moreLaws =
       "self implication" law (α → α := ⊤),
       "modus ponens" law (α ∧ (α → β) := α ∧ β),
