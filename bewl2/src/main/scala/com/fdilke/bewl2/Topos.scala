@@ -218,7 +218,7 @@ class Topos[
       summon[Dot[Y]]
     )
 
-  inline def applicate[X: Dot, T, Y: Dot](
+  final def applicate[X: Dot, T, Y: Dot](
     ctxt: CTXT[T]
   )(
     f: T => (X > Y, X)
@@ -226,6 +226,14 @@ class Topos[
     evaluation[X, Y].apply(
       ctxt.map(f)
     )
+
+  final def ∀[X: Dot]: (X > BEWL) ~> BEWL =
+    (truth o toUnit[X]).name.chi
+
+  final def ∀[X: Dot, Y: Dot](
+    f: (X, Y) ~> BEWL
+  ): X ~> BEWL =
+    ∀[Y] o transpose(f)
 
   type BiArrow[X, Y, Z] = (X, Y) ~> Z
 

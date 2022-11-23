@@ -23,12 +23,6 @@ trait LogicalOperations[
 
   class DefaultLogicalOperations extends LogicalOperations {
 
-    private def ∀[X: Dot]: (X > BEWL) ~> BEWL =
-      (truth o toUnit[X]).name.chi
-
-    private def forAll[X: Dot, Y: Dot](f: (X, Y) ~> BEWL): X ~> BEWL =
-      ∀[Y] o transpose(f)
-
     override val and: BiArrow[BEWL, BEWL, BEWL] =
       truth.x(truth).chi
 
@@ -38,10 +32,8 @@ trait LogicalOperations[
         π0[BEWL, BEWL] : BiArrow[BEWL, BEWL, BEWL]
       )
 
-//      omega.squared.forAll(omega) {
-//        case (a ⊕ b, ω) =>
     override val or: BiArrow[BEWL, BEWL, BEWL] =
-      forAll[(BEWL, BEWL), BEWL] {
+      ∀[(BEWL, BEWL), BEWL] {
         case ab_ω =>
           val ab = ab_ω.map { _._1 }
           val a = ab.map { _._1 }
@@ -51,7 +43,7 @@ trait LogicalOperations[
       }
 
     override val falsity: NullaryOp[BEWL] =
-      forAll[UNIT, BEWL] {
+      ∀[UNIT, BEWL] {
         case u_ω => // again, refactor
           val ω = u_ω.map { _._2 }
           ω

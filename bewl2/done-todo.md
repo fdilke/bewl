@@ -20,6 +20,7 @@
 - convert in-code TODOs to entries here
 - sort out RichDot... There is none
 - logical operations: construct the Heyting algebra of truth
+- for logical operations' Boolean operators extension, use an implicit class instead and then don't need StandardXxx.<and>
 
 # TODO
 - permutations, deep property of FinSet from card trick?
@@ -33,6 +34,4 @@
 - TODO: override, test equivalents for logical operations
 - proper names/scopes for the ∀ methods
 - role for those "(x)" tensorial extractors instead of cumbersome ab_ω.map { _._1 } etc in LogicalOps and elsewhere
-- xx 
 - expunge @targetName, no one is using Java to access this
-- for logical operations' Boolean operators extension, use an implicit class instead and then don't need StandardXxx.<and>
