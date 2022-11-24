@@ -400,18 +400,16 @@ trait AlgebraicTheories[
                 for {
                   op <- assignment.lookupBinaryOp
                   thatOp <- thatAssignment.lookupBinaryOp
-                } yield { (pair: CTXT[((T, U), (T, U))]) =>
-                  op(pair.map { tutu => tutu._1._1 -> tutu._2._1 }) ⊕
-                  thatOp(pair.map { tutu => tutu._1._2 -> tutu._2._2 })
+                } yield { case (t ⊕ u) ⊕ (t2 ⊕ u2) =>
+                    op(t ⊕ t2) ⊕ thatOp(u ⊕ u2)
                 }
 
               override def lookupRightScalarBinaryOp: Option[RightScalarBinaryOp[(T, U), S]] =
                 for {
                   op <- assignment.lookupRightScalarBinaryOp
                   thatOp <- thatAssignment.lookupRightScalarBinaryOp
-                } yield { (pair: CTXT[((T, U), S)]) =>
-                  op(pair.map { tu_s => tu_s._1._1 -> tu_s._2 }) ⊕
-                  thatOp(pair.map { tu_s => tu_s._1._2 -> tu_s._2 })
+                } yield { case (t ⊕ u) ⊕ s =>
+                  op(t ⊕ s) ⊕ thatOp(u ⊕ s)
                 }
 
               override def lookupScalarConstant: Option[NullaryOp[S]] =

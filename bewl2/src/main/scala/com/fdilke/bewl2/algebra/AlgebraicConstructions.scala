@@ -82,10 +82,10 @@ trait AlgebraicConstructions[
             unit = equalizer.restrict[UNIT](
               monoid.unit x monoid.unit
             ),
-            multiply = equalizer.restrict[(G, G)] { (c_gg: CTXT[(G, G)]) =>
+            multiply = equalizer.restrict[(G, G)] { case g ⊕ h =>
               val c_m_m__n_n_ : CTXT[((M, M), (M, M))] =
-                equalizer.inclusion(c_gg.map { gg => gg._1 }) ⊕
-                equalizer.inclusion(c_gg.map { gg => gg._2 })
+                equalizer.inclusion(g) ⊕
+                equalizer.inclusion(h)
                 
               monoid.multiply(c_m_m__n_n_.map {
                 case ((m, m_), (n, n_)) => (m, n)
