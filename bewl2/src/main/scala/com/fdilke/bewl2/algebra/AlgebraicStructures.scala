@@ -112,7 +112,7 @@ trait AlgebraicStructures[
     def withTrivialAction[A: Dot, RESULT](
        block: Action[A] ?=> RESULT
     ): RESULT =
-      given Action[A] = Action[A]{ a_m => a_m.map{ _._1 } }
+      given Action[A] = Action[A]{ case a ⊕ _ => a }
       block
 
     def withVoidAction[RESULT](

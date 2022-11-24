@@ -7,7 +7,6 @@
 - nice if there could be a CompleteHA and not just a HA - need infinitary operations/laws
 - instead of summon[Dot[X]] use Dot[X], as with Mappable... bad idea: then have to use 'new'
 - extension instead of RichArrow.. bad idea, we then get confused about 'o'
-- VanillaAlgebraicTheory instead of AlgebraicTheory[Unit]? Or maybe Variety.
 
 # DONE
 - done_todo.md as motivator inside project, or should these notes live there?
@@ -23,6 +22,7 @@
 - logical operations: construct the Heyting algebra of truth
 - for logical operations' Boolean operators extension, use an implicit class instead and then don't need StandardXxx.<and>
 - proper names/scopes for the ∀ methods
+- VanillaAlgebraicTheory instead of AlgebraicTheory[Unit]? Or maybe Variety.
 
 # TODO
 - permutations, deep property of FinSet from card trick?
@@ -33,6 +33,8 @@
 - can improve how equalizerSituation / scope of implicits works in the generic topos tests?
 - instead of group x group: bake this in, as with products of dots; have an implicit. Same for actions
 - fix arrow.isIso which currently always returns true. also epic, mono. also ideally section/retraction, image
+- 'rich arrow' features - separate tests for these
 - TODO: override, test equivalents for logical operations
-- role for those "(x)" tensorial extractors instead of cumbersome ab_ω.map { _._1 } etc in LogicalOps and elsewhere
+- role for those "(+) = ⊕" tensorial extractors instead of cumbersome ab_ω.map { _._1 } etc in LogicalOps and elsewhere
 - expunge @targetName, no one is using Java to access this
+- quantifiers -do same job for ∃ as for ∀. Plan on ∃[X], ∃[X, Y] separate operations. Lump in tests with logical ops.

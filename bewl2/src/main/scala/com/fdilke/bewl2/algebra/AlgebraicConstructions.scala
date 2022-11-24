@@ -72,8 +72,8 @@ trait AlgebraicConstructions[
   ): RESULT =
     val doubleProduct: (M, M) ~> (M, M) =
       c_mm => productMagic[M, M](
-        monoid.multiply(productMagic[M, M](c_mm.map{ _._1 }, c_mm.map{ _._2 })),
-        monoid.multiply(productMagic[M, M](c_mm.map{ _._2 }, c_mm.map{ _._1 }))
+        monoid.multiply(c_mm),
+        monoid.multiply(c_mm.map{ case (m, n) => (n, m) })
       )
     val oneOne: (M, M) ~> (M, M) =
       val mm_to_1: (M, M) ~> M =

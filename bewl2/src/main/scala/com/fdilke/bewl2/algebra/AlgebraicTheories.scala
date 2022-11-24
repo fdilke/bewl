@@ -383,10 +383,10 @@ trait AlgebraicTheories[
                 for {
                   op: UnaryOp[T] <- assignment.lookupUnaryOp
                   thatOp: UnaryOp[U] <- thatAssignment.lookupUnaryOp
-                } yield { (tu: CTXT[(T, U)]) =>
+                } yield { case t ⊕ u =>
                   productMagic[T, U](
-                    op(tu.map(_._1)),
-                    thatOp(tu.map(_._2))
+                    op(t),
+                    thatOp(u)
                   )
                 }
 
@@ -549,11 +549,11 @@ trait AlgebraicTheories[
               srcOp <- sourceAlgebra.operatorAssignments.lookup(op)
               tgtOp <- targetAlgebra.operatorAssignments.lookup(op)
             } yield {
-              (arrow o srcOp) =!= { (aa: CTXT[(A, A)]) =>
+              (arrow o srcOp) =!= { case a ⊕ b =>
                 tgtOp(
                   productMagic[B, B](
-                    arrow(aa.map{_._1}),
-                    arrow(aa.map{_._2})
+                    arrow(a),
+                    arrow(b)
                   )
                 )
               }
@@ -568,11 +568,11 @@ trait AlgebraicTheories[
               srcOp <- sourceAlgebra.operatorAssignments.lookup(op)
               tgtOp <- targetAlgebra.operatorAssignments.lookup(op)
             } yield {
-              (arrow o srcOp) =!= { (as: CTXT[(A, S)]) =>
+              (arrow o srcOp) =!= { case a ⊕ s =>
                 tgtOp(
                   productMagic[B, S](
-                    arrow(as.map {_._1}),
-                    as.map{_._2}
+                    arrow(a),
+                    s
                   )
                 )
               }

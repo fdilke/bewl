@@ -235,6 +235,16 @@ class Topos[
   ): X ~> BEWL =
     ∀[Y] o transpose(f)
 
+  object ⊕ :
+    def unapply[X: Dot, Y: Dot](
+      xy: CTXT[(X, Y)]
+    ): Option[(CTXT[X], CTXT[Y])] =
+      Some(xy.map{ _._1 }, xy.map { _._2 })
+
+  extension[X: Dot](x: CTXT[X])
+    def ⊕[Y: Dot](y: CTXT[Y]): CTXT[(X, Y)] =
+      productMagic(x, y)
+
   type BiArrow[X, Y, Z] = (X, Y) ~> Z
 
   extension[X: Dot, Y: Dot, Z: Dot] (
