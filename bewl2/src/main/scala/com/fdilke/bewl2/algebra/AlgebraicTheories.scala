@@ -384,10 +384,7 @@ trait AlgebraicTheories[
                   op: UnaryOp[T] <- assignment.lookupUnaryOp
                   thatOp: UnaryOp[U] <- thatAssignment.lookupUnaryOp
                 } yield { case t ⊕ u =>
-                  productMagic[T, U](
-                    op(t),
-                    thatOp(u)
-                  )
+                  op(t) ⊕ thatOp(u)
                 }
 
               override def lookupPrincipalConstant: Option[NullaryOp[(T, U)]] =
@@ -395,10 +392,8 @@ trait AlgebraicTheories[
                   op <- assignment.lookupPrincipalConstant
                   thatOp <- thatAssignment.lookupPrincipalConstant
                 } yield { (cu: CTXT[UNIT]) =>
-                  productMagic(
-                    op(cu),
-                    thatOp(cu)
-                  )
+                  op(cu) ⊕
+                  thatOp(cu)
                 }
 
               override def lookupBinaryOp: Option[BinaryOp[(T, U)]] =
@@ -406,10 +401,8 @@ trait AlgebraicTheories[
                   op <- assignment.lookupBinaryOp
                   thatOp <- thatAssignment.lookupBinaryOp
                 } yield { (pair: CTXT[((T, U), (T, U))]) =>
-                  productMagic(
-                    op(pair.map { tutu => tutu._1._1 -> tutu._2._1 }),
-                    thatOp(pair.map { tutu => tutu._1._2 -> tutu._2._2 }),
-                  )
+                  op(pair.map { tutu => tutu._1._1 -> tutu._2._1 }) ⊕
+                  thatOp(pair.map { tutu => tutu._1._2 -> tutu._2._2 })
                 }
 
               override def lookupRightScalarBinaryOp: Option[RightScalarBinaryOp[(T, U), S]] =
@@ -417,10 +410,8 @@ trait AlgebraicTheories[
                   op <- assignment.lookupRightScalarBinaryOp
                   thatOp <- thatAssignment.lookupRightScalarBinaryOp
                 } yield { (pair: CTXT[((T, U), S)]) =>
-                  productMagic(
-                    op(pair.map { tu_s => tu_s._1._1 -> tu_s._2 }),
-                    thatOp(pair.map { tu_s => tu_s._1._2 -> tu_s._2 }),
-                  )
+                  op(pair.map { tu_s => tu_s._1._1 -> tu_s._2 }) ⊕
+                  thatOp(pair.map { tu_s => tu_s._1._2 -> tu_s._2 })
                 }
 
               override def lookupScalarConstant: Option[NullaryOp[S]] =
@@ -551,10 +542,7 @@ trait AlgebraicTheories[
             } yield {
               (arrow o srcOp) =!= { case a ⊕ b =>
                 tgtOp(
-                  productMagic[B, B](
-                    arrow(a),
-                    arrow(b)
-                  )
+                  arrow(a) ⊕ arrow(b)
                 )
               }
             }
@@ -570,10 +558,7 @@ trait AlgebraicTheories[
             } yield {
               (arrow o srcOp) =!= { case a ⊕ s =>
                 tgtOp(
-                  productMagic[B, S](
-                    arrow(a),
-                    s
-                  )
+                  arrow(a) ⊕ s
                 )
               }
             }
@@ -656,10 +641,8 @@ trait AlgebraicTheories[
         ): ROOT ~> S =
           operatorAssignments.lookup(term.op) map { op => (r: CTXT[ROOT]) =>
             op(
-              productMagic[S, S](
-                evaluateScalar(term.left)(r),
-                evaluateScalar(term.right)(r)
-              )
+              evaluateScalar(term.left)(r) ⊕
+              evaluateScalar(term.right)(r)
             )
           } getOrElse bail(
             "Unknown operator in expression: " + term.op
@@ -670,10 +653,8 @@ trait AlgebraicTheories[
         ): ROOT ~> T =
           operatorAssignments.lookup(term.op) map { op => (r: CTXT[ROOT]) =>
             op(
-              productMagic[T, T](
-                evaluatePrincipal(term.left)(r),
-                evaluatePrincipal(term.right)(r)
-              )
+              evaluatePrincipal(term.left)(r) ⊕
+              evaluatePrincipal(term.right)(r)
             )
           } getOrElse bail(
             "Unknown operator in expression: " + term.op
@@ -684,10 +665,8 @@ trait AlgebraicTheories[
         ): ROOT ~> T =
           operatorAssignments.lookup(term.op) map { op => (r: CTXT[ROOT]) =>
             op(
-              productMagic[T, S](
-                evaluatePrincipal(term.left)(r),
-                evaluateScalar(term.right)(r)
-              )
+              evaluatePrincipal(term.left)(r) ⊕
+              evaluateScalar(term.right)(r)
             )
           } getOrElse bail(
             "Unknown operator in expression: " + term.op

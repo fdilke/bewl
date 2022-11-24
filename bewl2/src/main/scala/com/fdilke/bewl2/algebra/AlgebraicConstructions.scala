@@ -39,13 +39,10 @@ trait AlgebraicConstructions[
             (f, x)
         }
       val c_g_fx: CTXT[(E, X)] =
-        productMagic[E, X](
-          c_fgx.map {
-            case ((f: E, g: E), x: X) =>
-              g
-          },
-          c_fx
-        )
+        c_fgx.map {
+          case ((f: E, g: E), x: X) =>
+            g
+        } ⊕ c_fx
       applicate(c_g_fx) {
         case (g: E, fx: X) =>
           (g, fx)
@@ -71,10 +68,9 @@ trait AlgebraicConstructions[
     implicit monoid: Monoid[M]
   ): RESULT =
     val doubleProduct: (M, M) ~> (M, M) =
-      c_mm => productMagic[M, M](
-        monoid.multiply(c_mm),
+      c_mm =>
+        monoid.multiply(c_mm) ⊕
         monoid.multiply(c_mm.map{ case (m, n) => (n, m) })
-      )
     val oneOne: (M, M) ~> (M, M) =
       val mm_to_1: (M, M) ~> M =
         monoid.unit o toUnit[(M, M)]
@@ -88,18 +84,15 @@ trait AlgebraicConstructions[
             ),
             multiply = equalizer.restrict[(G, G)] { (c_gg: CTXT[(G, G)]) =>
               val c_m_m__n_n_ : CTXT[((M, M), (M, M))] =
-                productMagic(
-                  equalizer.inclusion(c_gg.map { gg => gg._1 }),
-                  equalizer.inclusion(c_gg.map { gg => gg._2 })
-                )
-              productMagic(
-                monoid.multiply(c_m_m__n_n_.map {
-                  case ((m, m_), (n, n_)) => (m, n)
-                }),
-                monoid.multiply(c_m_m__n_n_.map {
-                  case ((m, m_), (n, n_)) => (n_, m_)
-                })
-              )
+                equalizer.inclusion(c_gg.map { gg => gg._1 }) ⊕
+                equalizer.inclusion(c_gg.map { gg => gg._2 })
+                
+              monoid.multiply(c_m_m__n_n_.map {
+                case ((m, m_), (n, n_)) => (m, n)
+              }) ⊕
+              monoid.multiply(c_m_m__n_n_.map {
+                case ((m, m_), (n, n_)) => (n_, m_)
+              })
             },
             inverse = equalizer.restrict[G] { (g: CTXT[G]) =>
               equalizer.inclusion(g).map {

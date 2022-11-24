@@ -61,7 +61,7 @@ class Topos[
 
     lazy val diagonal: (X, X) ~> BEWL =
       given Dot[X] = this
-      { (x: CTXT[X]) => pretopos.productMagic(dot, dot, x, x) }.chi
+      { (x: CTXT[X]) => x ⊕ x }.chi
   }
 
   final def withDot[X, RESULT](
@@ -113,12 +113,6 @@ class Topos[
     f2: X ~> Y
   ): Boolean =
     pretopos.equalArrows(dot[X], dot[Y], f1, f2)
-
-  final inline def productMagic[X: Dot, Y: Dot](
-    ca: CTXT[X],
-    cb: CTXT[Y]
-  ): CTXT[(X, Y)] =
-    pretopos.productMagic(dot[X], dot[Y], ca, cb)
 
   final inline def sanityTest[X: Dot]: Unit =
     pretopos.sanityTest(dot[X])
@@ -243,7 +237,7 @@ class Topos[
 
   extension[X: Dot](x: CTXT[X])
     def ⊕[Y: Dot](y: CTXT[Y]): CTXT[(X, Y)] =
-      productMagic(x, y)
+      pretopos.productMagic(dot[X], dot[Y], x, y)
 
   type BiArrow[X, Y, Z] = (X, Y) ~> Z
 
@@ -260,7 +254,7 @@ class Topos[
       x: CTXT[X],
       y: CTXT[Y]
     ): CTXT[Z] =
-      biArrow(productMagic(x, y))
+      biArrow(x ⊕ y)
 
   implicit final class RichArrow[X: Dot, Y: Dot](
     f: X ~> Y
@@ -281,9 +275,7 @@ class Topos[
     inline final def x[Z: Dot](
      f2: X ~> Z
     ): X ~> (Y, Z) =
-      cx => productMagic[Y, Z](
-        f(cx), f2(cx)
-      )
+      cx => f(cx) ⊕ f2(cx)
 
     @targetName("arrow equalizers")
     inline final def ?=[RESULT](
