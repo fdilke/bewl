@@ -34,7 +34,10 @@
 - VanillaAlgebraicTheory instead of AlgebraicTheory[Unit]? Or maybe Variety.
 - role for those "(+) = ⊕" tensorial extractors instead of cumbersome ab_ω.map { _._1 } etc in LogicalOps and elsewhere
 - quantifiers -do same job for ∃ as for ∀. Plan on ∃[X], ∃[X, Y] separate operations. Separate tests from logical ops.
+- cache ∃[X], ∀[X] inside the dot
 - wherever we have f(a ⊕ b) consider an extension of biarrows so it can be f(a, b)
+- convenience untupling version of Equalizer.restrict() so that I don't need 'case x ⊕ y' in defining endo monoids
+- finesse away direct references to CTXT in cases of untupling: just need type <>[X, Y, Z] = (CTXT[X], CTXT[Y]) => CTXT[Z] or sn
 
 # TODO
 - permutations, deep property of FinSet from card trick?
@@ -51,10 +54,9 @@
 - topos of permutations
 - topos of group actions. Should be a separate class
 - when we have the topos of monoid actions, test topos.isBoolean
-- cache ∃[X], ∀[X] inside the dot
 - could there be: generalized algebraic structures (encompassing varieties, ones with scalars, HAs) so we could loop
   over a sequence of 'forms' (e.g. something representing NullaryOp[Principal]) and see all structures on a dot?
 - can I optimize away 'applicate'? I don't even understand what it does
-- convenience untupling version of Equalizer.restrict() so that I don't need 'case x ⊕ y' in defining endo monoids
 - define structures for rings and modules ; calculate the endomorphism ring of a module. Do homology? Injective hulls?
+- should productMagic be incorporated into Mappable so it's Map'n'Productable?
 - 

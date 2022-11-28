@@ -21,12 +21,20 @@ class Topos[
 
   @targetName("topos arrow")
   type ~>[X, Y] = CTXT[X] => CTXT[Y]
+  type BiArrow[X, Y, Z] = (X, Y) ~> Z
+  type UntupledBiArrow[P, Q, X] = (CTXT[P], CTXT[Q]) => CTXT[X]
 
   trait Equalizer[A, X]:
     val inclusion: A ~> X
     def restrict[R: Dot](
       arrow: R ~> X
     ): R ~> A
+    final inline def restrict[P: Dot, Q: Dot](
+      untupledArrow: UntupledBiArrow[P, Q, X]
+    ): (P, Q) ~> A =
+      restrict[(P, Q)] {
+        case p ⊕ q => untupledArrow(p, q)
+      }
 
   class Dot[X] private[Topos](
     val dot: DOT[X]
@@ -242,11 +250,11 @@ class Topos[
   ): X ~> BEWL =
     ∀[Y] o transpose(f)
 
-  final inline def ∀[X: Dot, Y: Dot]( // convenience version, untupled
-    f: (CTXT[X], CTXT[Y]) => CTXT[BEWL]
+  final inline def ∀[X: Dot, Y: Dot](
+    untupledFn: UntupledBiArrow[X, Y, BEWL]
   ): X ~> BEWL =
     ∀[X, Y]{
-      case x ⊕ y => f(x, y)
+      case x ⊕ y => untupledFn(x, y)
     }
 
   // given f: X -> omega then: "∃x: f(x)" is ∀ω (∀x: f(x) => ω) => ω"
@@ -258,11 +266,11 @@ class Topos[
   ): X ~> BEWL =
     ∃[Y] o transpose(f)
 
-  final inline def ∃[X: Dot, Y: Dot]( // convenience version, untupled
-    f: (CTXT[X], CTXT[Y]) => CTXT[BEWL]
+  final inline def ∃[X: Dot, Y: Dot](
+    untupledFn: UntupledBiArrow[X, Y, BEWL]
   ): X ~> BEWL =
     ∃[X, Y]{
-      case x ⊕ y => f(x, y)
+      case x ⊕ y => untupledFn(x, y)
     }
 
   object ⊕ :
@@ -274,8 +282,6 @@ class Topos[
   extension[X: Dot](x: CTXT[X])
     def ⊕[Y: Dot](y: CTXT[Y]): CTXT[(X, Y)] =
       pretopos.productMagic(dot[X], dot[Y], x, y)
-
-  type BiArrow[X, Y, Z] = (X, Y) ~> Z
 
   extension[X: Dot, Y: Dot, Z: Dot] (
     biArrow: BiArrow[X, Y, Z]

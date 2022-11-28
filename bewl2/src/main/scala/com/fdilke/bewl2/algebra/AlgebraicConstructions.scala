@@ -33,7 +33,7 @@ trait AlgebraicConstructions[
   ): RESULT =
     type E = X > X
 
-    def spiffyMul(c_fgx: CTXT[((E, E), X)]): CTXT[X] =
+    def applyPair(c_fgx: CTXT[((E, E), X)]): CTXT[X] =
       val c_fx: CTXT[X] = applicate(c_fgx) {
           case ((f: E, g: E), x: X) =>
             (f, x)
@@ -51,7 +51,7 @@ trait AlgebraicConstructions[
     given EndomorphismMonoid[E, X] =
       new Monoid[E](
         unit = id[X].name,
-        multiply = transpose(spiffyMul)
+        multiply = transpose(applyPair)
       ) with EndomorphismMonoid[E, X] {
         override val standardAction: Action[X] =
           Action[X] { (x_e: CTXT[(X, E)]) =>
@@ -82,7 +82,7 @@ trait AlgebraicConstructions[
             unit = equalizer.restrict[UNIT](
               monoid.unit x monoid.unit
             ),
-            multiply = equalizer.restrict[(G, G)] { case g ⊕ h =>
+            multiply = equalizer.restrict[G, G] { (g, h) =>
               val c_m_m__n_n_ : CTXT[((M, M), (M, M))] =
                 equalizer.inclusion(g) ⊕
                 equalizer.inclusion(h)
