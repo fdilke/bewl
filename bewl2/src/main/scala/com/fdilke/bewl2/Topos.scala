@@ -31,6 +31,8 @@ class Topos[
   class Dot[X] private[Topos](
     val dot: DOT[X]
   ) {
+    given Dot[X] = this
+
     private[Topos] val memoizedProduct:
       [Y] => Dot[Y] => Dot[(X, Y)]
     = Memoize.type1[
@@ -60,8 +62,19 @@ class Topos[
     )
 
     lazy val diagonal: (X, X) ~> BEWL =
-      given Dot[X] = this
       { (x: CTXT[X]) => x ⊕ x }.chi
+
+    final def ∃ : (X > BEWL) ~> BEWL =
+      val evalPredicate: (X > BEWL, X) ~> BEWL =
+        evaluation[X, BEWL]
+      Ɛ.∀[X > BEWL, BEWL] { case f ⊕ ω =>
+        (Ɛ.∀[BEWL, X] { case χ ⊕ x =>
+          evalPredicate(f ⊕ x) → χ
+        }: BEWL ~> BEWL) (ω) → ω
+      }
+
+    final def ∀ : (X > BEWL) ~> BEWL =
+      (truth o toUnit[X]).name.chi
   }
 
   final def withDot[X, RESULT](
@@ -222,7 +235,7 @@ class Topos[
     )
 
   final def ∀[X: Dot]: (X > BEWL) ~> BEWL =
-    (truth o toUnit[X]).name.chi
+    summon[Dot[X]].∀
 
   final def ∀[X: Dot, Y: Dot](
     f: (X, Y) ~> BEWL
@@ -231,13 +244,7 @@ class Topos[
 
   // given f: X -> omega then: "∃x: f(x)" is ∀ω (∀x: f(x) => ω) => ω"
   final def ∃[X: Dot]: (X > BEWL) ~> BEWL =
-    val evalPredicate: (X > BEWL, X) ~> BEWL =
-      evaluation[X, BEWL]
-    ∀[X > BEWL, BEWL] { case f ⊕ ω =>
-      (∀[BEWL, X] { case χ ⊕ x =>
-        evalPredicate(f ⊕ x) → χ
-      } : BEWL ~> BEWL )(ω) → ω
-    }
+    summon[Dot[X]].∃
 
   final def ∃[X: Dot, Y: Dot](
     f: (X, Y) ~> BEWL
