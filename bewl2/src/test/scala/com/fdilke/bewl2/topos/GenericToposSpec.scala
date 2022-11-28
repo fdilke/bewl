@@ -172,8 +172,7 @@ abstract class GenericToposSpec[
         val cFoo: CTXT[FOO] = π0[FOO, BAR](cFooBar)
         val cBar: CTXT[BAR] = π1[FOO, BAR](cFooBar)
         val fnBarBaz: CTXT[BAR > BAZ] = foo2bar2baz(cFoo)
-        val cTuple = fnBarBaz ⊕ cBar
-        eval(cTuple)
+        eval(fnBarBaz, cBar)
       })
     }
 

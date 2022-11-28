@@ -65,11 +65,11 @@ class Topos[
       { (x: CTXT[X]) => x ⊕ x }.chi
 
     final def ∃ : (X > BEWL) ~> BEWL =
-      val evalPredicate: (X > BEWL, X) ~> BEWL =
+      val evalPredicate: BiArrow[X > BEWL, X, BEWL] =
         evaluation[X, BEWL]
-      Ɛ.∀[X > BEWL, BEWL] { case f ⊕ ω =>
-        (Ɛ.∀[BEWL, X] { case χ ⊕ x =>
-          evalPredicate(f ⊕ x) → χ
+      Ɛ.∀[X > BEWL, BEWL]{ (f, ω) =>
+        (Ɛ.∀[BEWL, X] { (χ, x) =>
+          evalPredicate(f, x) → χ
         }: BEWL ~> BEWL) (ω) → ω
       }
 
@@ -242,6 +242,13 @@ class Topos[
   ): X ~> BEWL =
     ∀[Y] o transpose(f)
 
+  final inline def ∀[X: Dot, Y: Dot]( // convenience version, untupled
+    f: (CTXT[X], CTXT[Y]) => CTXT[BEWL]
+  ): X ~> BEWL =
+    ∀[X, Y]{
+      case x ⊕ y => f(x, y)
+    }
+
   // given f: X -> omega then: "∃x: f(x)" is ∀ω (∀x: f(x) => ω) => ω"
   final def ∃[X: Dot]: (X > BEWL) ~> BEWL =
     summon[Dot[X]].∃
@@ -250,6 +257,13 @@ class Topos[
     f: (X, Y) ~> BEWL
   ): X ~> BEWL =
     ∃[Y] o transpose(f)
+
+  final inline def ∃[X: Dot, Y: Dot]( // convenience version, untupled
+    f: (CTXT[X], CTXT[Y]) => CTXT[BEWL]
+  ): X ~> BEWL =
+    ∃[X, Y]{
+      case x ⊕ y => f(x, y)
+    }
 
   object ⊕ :
     def unapply[X: Dot, Y: Dot](

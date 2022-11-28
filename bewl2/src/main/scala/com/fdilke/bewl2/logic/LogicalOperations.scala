@@ -40,7 +40,7 @@ trait LogicalOperations[
 
     override val falsity: NullaryOp[BEWL] =
       ∀[UNIT, BEWL] {
-        case _ ⊕ ω => ω
+        (_, ω) => ω
       }
   }
 

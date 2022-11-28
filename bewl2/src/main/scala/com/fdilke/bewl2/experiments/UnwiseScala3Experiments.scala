@@ -89,3 +89,29 @@ object UnwiseScala3Experiments {
 //  def variableThing2(name: String): Node[String] =
 //    new BranchNode[String](BranchNode.this, BranchNode.this)
 }
+
+// It would be nice if this could be made to work:
+// wrap functions taking an untupled biarrow and pass them to something expecting a tupled one
+// instead, for now, we have convenience versions of ∀[X, Y] which take the untupled
+//
+//  inline def untupledBiArrow[X: Dot, Y: Dot, Z: Dot](
+//    block: (CTXT[X], CTXT[Y]) => CTXT[Z]
+//  ): BiArrow[X, Y, Z] = {
+//    case x ⊕ y => block(x, y)
+//  }
+
+//  implicit class FunnyExtension[X: Dot, Y: Dot, Z: Dot](
+//    typedQuantifier: ((X, Y) ~> Z) => (X ~> Z)
+//  ):
+//    def apply(
+//      untupledBlock: (CTXT[X], CTXT[Y]) => CTXT[Z]
+//    ): X ~> Z =
+//      typedQuantifier {
+//        case (x: CTXT[X]) ⊕ (y: CTXT[Y]) => untupledBlock(x, y)
+//      }
+
+//  extension[RESULT[_, _, _]](
+//    block: [X, Y, Z] => Dot[X] ?=> Dot[Y] ?=> Dot[Z] ?=> ((CTXT[X], CTXT[Y]) => CTXT[Z]) => RESULT[X, Y, Z]
+//  ): RESULT = {
+//    case x ⊕ y => block(x, y)
+//  }

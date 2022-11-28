@@ -13,6 +13,10 @@
 - extension instead of RichArrow.. bad idea, we then get confused about 'o'
 - unbundle stuff that doesn't need to be part of the topos proper: logic? algebraic theories?
  
+# LEGITIMATELY POSTPONED
+- simplify ∃ def by adding an extension so we can have f(x) instead of eval(f, x) for f: X ~> Y.
+  Also simplify use of eval(fnBarBaz, cBar) in generic. Do this when there's more code, see if it affects performance
+
 # DONE
 - done_todo.md as motivator inside project, or should these notes live there?
 - can protect Dot constructor?
@@ -30,6 +34,7 @@
 - VanillaAlgebraicTheory instead of AlgebraicTheory[Unit]? Or maybe Variety.
 - role for those "(+) = ⊕" tensorial extractors instead of cumbersome ab_ω.map { _._1 } etc in LogicalOps and elsewhere
 - quantifiers -do same job for ∃ as for ∀. Plan on ∃[X], ∃[X, Y] separate operations. Separate tests from logical ops.
+- wherever we have f(a ⊕ b) consider an extension of biarrows so it can be f(a, b)
 
 # TODO
 - permutations, deep property of FinSet from card trick?
@@ -46,9 +51,10 @@
 - topos of permutations
 - topos of group actions. Should be a separate class
 - when we have the topos of monoid actions, test topos.isBoolean
-- simplify ∃ def by adding an extension so we can have f(x) instead of eval(f, x) for f: X ~> Y
 - cache ∃[X], ∀[X] inside the dot
-- wherever we have f(a ⊕ b) consider an extension of biarrows so it can be f(a, b)
 - could there be: generalized algebraic structures (encompassing varieties, ones with scalars, HAs) so we could loop
   over a sequence of 'forms' (e.g. something representing NullaryOp[Principal]) and see all structures on a dot?
-- x
+- can I optimize away 'applicate'? I don't even understand what it does
+- convenience untupling version of Equalizer.restrict() so that I don't need 'case x ⊕ y' in defining endo monoids
+- define structures for rings and modules ; calculate the endomorphism ring of a module. Do homology? Injective hulls?
+- 
