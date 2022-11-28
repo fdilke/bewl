@@ -91,6 +91,12 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
       group.sanityTest
       group.isCommutative is false
     }
+//    withSymmetricGroup(6) { // a handy benchmark for future optimisations
+//      (_: Dot[Seq[Int]]) ?=> (group: Group[Seq[Int]]) ?=>
+//        dot[Seq[Int]].size is 720
+//        group.sanityTest
+//        group.isCommutative is false
+//    }
   }
 
   test("Construct the monoid of endomorphisms") {

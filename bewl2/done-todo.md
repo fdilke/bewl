@@ -2,6 +2,14 @@
 - L-T topologies. Can think of as quantifiers? Kernels of Heyting morphisms as per Matt F's paper?
 - can model geometric morphisms, X: Topos -> Y: Topos?
 - read Moerdijk & MacLane again, also the TTT book, and Four Czechs
+ 
+# CONJECTURES ABOUT LFTs (locally finite topoi)
+- ?every module has an injective hull
+- ? Wedderburn holds - every division ring is a field - may follow mechanically from Brauer group machinery
+- can we embed any X in an injective by considering X -> omega^X, extending to endo of omega^X ... ?
+- is an image of an injective also injective? It is for sets, trivially. Fails in action category?
+- Verify theorem that the inj hull of a subdirectly irreducible is again such. Finitely many of these?
+- Is there always a generator? And therefore a cogenerator..?
 
 # TOO GNARLY (for now)
 - default RESULT type of Unit for situations like withAction[Int, Unit] ?
@@ -38,11 +46,12 @@
 - wherever we have f(a ⊕ b) consider an extension of biarrows so it can be f(a, b)
 - convenience untupling version of Equalizer.restrict() so that I don't need 'case x ⊕ y' in defining endo monoids
 - finesse away direct references to CTXT in cases of untupling: just need type <>[X, Y, Z] = (CTXT[X], CTXT[Y]) => CTXT[Z] or sn
+- expunge @targetName, no one is using Java to access this
 
 # TODO
 - permutations, deep property of FinSet from card trick?
 - argument for storing UNIT, BEWL, etc as types within the topos, not type parameters?
-  Saves passing a load of baggage around. Implications for users?
+  Saves passing a load of baggage around. Implications for users? Performance? Test calc of S_5
 - disentangle mask[]/sillyMask[] which should be a pure type operation
 - any implicits left in tests for algebraic machinery? any other unnecessary flummery with '?=>' ?
 - can improve how equalizerSituation / scope of implicits works in the generic topos tests?
@@ -50,7 +59,6 @@
 - 'rich arrow' features - separate tests for these (need full quantifiers)
 - fix arrow.isIso which currently always returns true. also epic, mono. also ideally section/retraction, image
 - TODO: override, test equivalents for logical operations
-- expunge @targetName, no one is using Java to access this
 - topos of permutations
 - topos of group actions. Should be a separate class
 - when we have the topos of monoid actions, test topos.isBoolean

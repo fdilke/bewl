@@ -1,7 +1,5 @@
 package com.fdilke.bewl2
 
-import scala.annotation.targetName
-
 trait PreTopos[
   DOT[_],
   CTXT[_] : Mappable,
@@ -10,7 +8,6 @@ trait PreTopos[
   BEWL,
   >[_, _]
 ]:
-  @targetName("topos arrow")
   type ~>[X, Y] = CTXT[X] => CTXT[Y]
 
   trait RawEqualizer[A, X]:

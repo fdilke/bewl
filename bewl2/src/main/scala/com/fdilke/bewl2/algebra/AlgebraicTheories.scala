@@ -4,11 +4,8 @@ import com.fdilke.bewl2.Mappable
 import com.fdilke.bewl2.Topos
 import com.fdilke.utility.Shortcuts.*
 
-import scala.annotation.targetName
 import scala.language.{dynamics, postfixOps}
 import Mappable._
-
-import scala.annotation.targetName
 
 trait AlgebraicTheories[
   DOT[_],
@@ -441,7 +438,6 @@ trait AlgebraicTheories[
   class AbstractBinaryOp(
     name: String
   ) extends Operator(name, arity =2) {
-    @targetName("definitionally")
     def :=[S : Dot, T : Dot](
       binaryOp: BinaryOp[T]
     ): OperatorAssignment[T, S] =
@@ -454,7 +450,6 @@ trait AlgebraicTheories[
   class AbstractRightScalarBinaryOp(
     name: String
   ) extends Operator(name, arity = 2) {
-    @targetName("definitionally")
     def :=[T : Dot, S : Dot](
       binaryOp: RightScalarBinaryOp[T, S]
     ): OperatorAssignment[T, S] =
@@ -467,7 +462,6 @@ trait AlgebraicTheories[
   class AbstractScalarBinaryOp(
     name: String
   ) extends Operator(name, 2) {
-    @targetName("definitionally")
     def :=[S : Dot](binaryOp: BinaryOp[S]) =
       new OperatorPreassignment[S](this) {
         override def lookupScalarBinaryOp =
@@ -478,7 +472,6 @@ trait AlgebraicTheories[
   class AbstractUnaryOp(
     name: String
   ) extends Operator(name, arity = 1) {
-    @targetName("definitionally")
     def :=[S : Dot, T : Dot](unaryOp: UnaryOp[T]): OperatorAssignment[T, S] =
       new OperatorAssignment[T, S](this) {
         override def lookupUnaryOp =

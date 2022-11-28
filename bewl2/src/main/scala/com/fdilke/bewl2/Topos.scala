@@ -1,6 +1,5 @@
 package com.fdilke.bewl2
 
-import scala.annotation.targetName
 import com.fdilke.bewl2.Mappable
 import com.fdilke.bewl2.algebra.AlgebraicMachinery
 import com.fdilke.bewl2.helper.Memoize
@@ -19,7 +18,6 @@ class Topos[
   with LogicalOperations[DOT, CTXT, VOID, UNIT, BEWL, >]:
   Ɛ =>
 
-  @targetName("topos arrow")
   type ~>[X, Y] = CTXT[X] => CTXT[Y]
   type BiArrow[X, Y, Z] = (X, Y) ~> Z
   type UntupledBiArrow[P, Q, X] = (CTXT[P], CTXT[Q]) => CTXT[X]
@@ -301,25 +299,21 @@ class Topos[
   implicit final class RichArrow[X: Dot, Y: Dot](
     f: X ~> Y
   ):
-    @targetName("arrow equality")
     inline final def =!=(
       f2: X ~> Y
     ): Boolean =
       equalArrows(f, f2)
 
-    @targetName("arrow composition")
     inline final def o[V: Dot](
       f2: V ~> X
     ): V ~> Y =
       f compose f2
 
-    @targetName("arrow multiplication")
     inline final def x[Z: Dot](
      f2: X ~> Z
     ): X ~> (Y, Z) =
       cx => f(cx) ⊕ f2(cx)
 
-    @targetName("arrow equalizers")
     inline final def ?=[RESULT](
      f2: X ~> Y
     )(
@@ -327,17 +321,14 @@ class Topos[
     ): RESULT =
       doEqualizer(f, f2)(capture)
 
-    @targetName("characteristic of a monic")
     inline final def chi: Y ~> BEWL =
       chiForMonic(f)
 
-    @targetName("backdivision by a monic")
     inline final def \[A: Dot](
       monic: A ~> Y
     ): X ~> A =
       backDivideMonic(f, monic)
       
-    @targetName("test for iso") // TODO: fix!!
     final def isIsoPlaceholderTrue: Boolean =
       true
 

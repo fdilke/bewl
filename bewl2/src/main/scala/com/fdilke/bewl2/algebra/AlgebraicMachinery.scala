@@ -4,7 +4,6 @@ import com.fdilke.bewl2.Topos
 import com.fdilke.bewl2.Mappable
 import com.fdilke.utility.Shortcuts.*
 
-import scala.annotation.targetName
 import scala.language.{dynamics, postfixOps}
 import Mappable._
 
