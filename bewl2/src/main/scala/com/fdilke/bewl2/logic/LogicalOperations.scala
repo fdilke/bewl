@@ -35,18 +35,12 @@ trait LogicalOperations[
     override val or: BiArrow[BEWL, BEWL, BEWL] =
       ∀[(BEWL, BEWL), BEWL] {
         case (a ⊕ b) ⊕ ω =>
-//          val ab = ab_ω.map { _._1 }
-//          val a = ab.map { _._1 }
-//          val b = ab.map { _._2 }
-//          val ω = ab_ω.map { _._2 } // TODO: refactor using tensorial extractors "(x)"
           (a → ω ∧ (b → ω)) → ω
       }
 
     override val falsity: NullaryOp[BEWL] =
       ∀[UNIT, BEWL] {
-        case u_ω => // again, refactor
-          val ω = u_ω.map { _._2 }
-          ω
+        case _ ⊕ ω => ω
       }
   }
 

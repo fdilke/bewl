@@ -229,6 +229,21 @@ class Topos[
   ): X ~> BEWL =
     ∀[Y] o transpose(f)
 
+  // given f: X -> omega then: "∃x: f(x)" is ∀ω (∀x: f(x) => ω) => ω"
+  final def ∃[X: Dot]: (X > BEWL) ~> BEWL =
+    val evalPredicate: (X > BEWL, X) ~> BEWL =
+      evaluation[X, BEWL]
+    ∀[X > BEWL, BEWL] { case f ⊕ ω =>
+      (∀[BEWL, X] { case χ ⊕ x =>
+        evalPredicate(f ⊕ x) → χ
+      } : BEWL ~> BEWL )(ω) → ω
+    }
+
+  final def ∃[X: Dot, Y: Dot](
+    f: (X, Y) ~> BEWL
+  ): X ~> BEWL =
+    ∃[Y] o transpose(f)
+
   object ⊕ :
     def unapply[X: Dot, Y: Dot](
       xy: CTXT[(X, Y)]
