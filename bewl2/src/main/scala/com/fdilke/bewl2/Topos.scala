@@ -243,6 +243,11 @@ class Topos[
   final def ∀[X: Dot]: (X > BEWL) ~> BEWL =
     summon[Dot[X]].∀
 
+  final def ∀[X: Dot](
+    fn: X ~> BEWL
+  ): Boolean =
+    fn =!= (truth o toUnit[X])
+
   final def ∀[X: Dot, Y: Dot](
     f: (X, Y) ~> BEWL
   ): X ~> BEWL =
@@ -329,6 +334,11 @@ class Topos[
     ): X ~> A =
       backDivideMonic(f, monic)
       
+//    final def isMonic: Boolean =
+//      ∀[(X, Y)] { case x ⊕ y =>
+//        (f(x) =?= f(y)) → (x =?= y)
+//      }
+
     final def isIsoPlaceholderTrue: Boolean =
       true
 

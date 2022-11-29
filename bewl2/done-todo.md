@@ -1,8 +1,13 @@
+# NON-CODING
+- sanity test symmetric group S_6 with '-Xmx3G'
+- get tests working with Metals
+
 # THEORETICAL
 - L-T topologies. Can think of as quantifiers? Kernels of Heyting morphisms as per Matt F's paper?
 - can model geometric morphisms, X: Topos -> Y: Topos?
 - read Moerdijk & MacLane again, also the TTT book, and Four Czechs
- 
+- work out details of 'metrics' approach to H-valued sets
+
 # CONJECTURES ABOUT LFTs (locally finite topoi)
 - ?every module has an injective hull
 - ? Wedderburn holds - every division ring is a field - may follow mechanically from Brauer group machinery
@@ -20,7 +25,7 @@
 - instead of summon[Dot[X]] use Dot[X], as with Mappable... bad idea: then have to use 'new'
 - extension instead of RichArrow.. bad idea, we then get confused about 'o'
 - unbundle stuff that doesn't need to be part of the topos proper: logic? algebraic theories?
- 
+
 # LEGITIMATELY POSTPONED
 - simplify ∃ def by adding an extension so we can have f(x) instead of eval(f, x) for f: X ~> Y.
   Also simplify use of eval(fnBarBaz, cBar) in generic. Do this when there's more code, see if it affects performance
@@ -67,4 +72,6 @@
 - can I optimize away 'applicate'? I don't even understand what it does
 - define structures for rings and modules ; calculate the endomorphism ring of a module. Do homology? Injective hulls?
 - should productMagic be incorporated into Mappable so it's Map'n'Productable?
-- 
+- image factorizations. do we need congruences for this?
+- if we have rich internal arrows, X > Y (postponed above) test for being monic/epic/iso, compose 'em (caching the machinery...)
+- can we have Option[X] implicitly generating a dot that is X*?

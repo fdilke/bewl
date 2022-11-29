@@ -28,14 +28,20 @@ class QuantifiersSpec extends RichFunSuite:
         Map( 1 -> true,  2 -> true,  3 -> true  ) -> true
       )
       withDot(Set[String]("123", "12")) {
-        val hee: String ~> Boolean = ∀[String, Int] { case (text, i) =>
+        ∀[String, Int] { case (text, i) =>
           text contains s"$i"
-        }
-        hee isArrow Map[String, Boolean](
+        } isArrow Map[String, Boolean](
           "123" -> true,
-          "12"  -> false
+          "12" -> false
         )
       }
+    }
+  }
+
+  test("Universal quantifiers (budget boolean version) work as expected for sets") {
+    withDot(Set[Int](1, 2, 3)) {
+      ∀[Int]{ _ % 2 == 0 } is false
+      ∀[Int]{ _ < 5 } is true
     }
   }
 
