@@ -240,13 +240,13 @@ class Topos[
       ctxt.map(f)
     )
 
-  final def ∀[X: Dot]: (X > BEWL) ~> BEWL =
-    summon[Dot[X]].∀
-
   final def ∀[X: Dot](
     fn: X ~> BEWL
   ): Boolean =
     fn =!= (truth o toUnit[X])
+
+  final def ∀[X: Dot]: (X > BEWL) ~> BEWL =
+    summon[Dot[X]].∀
 
   final def ∀[X: Dot, Y: Dot](
     f: (X, Y) ~> BEWL
@@ -259,6 +259,11 @@ class Topos[
     ∀[X, Y]{
       case x ⊕ y => untupledFn(x, y)
     }
+
+  final def ∃[X: Dot](
+    fn: X ~> BEWL
+  ): Boolean =
+    !(fn =!= (falsity o toUnit[X]))
 
   // given f: X -> omega then: "∃x: f(x)" is ∀ω (∀x: f(x) => ω) => ω"
   final def ∃[X: Dot]: (X > BEWL) ~> BEWL =
