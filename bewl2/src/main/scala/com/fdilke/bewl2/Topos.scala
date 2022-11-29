@@ -209,7 +209,7 @@ class Topos[
   final def toTrue[X: Dot]: X ~> BEWL =
     truth o toUnit[X]
 
-  final def =?=[X: Dot]: (X, X) ~> BEWL =
+  final def =?=[X: Dot]: BiArrow[X, X, BEWL] =
     summon[Dot[X]].diagonal
 
   final val truth: NullaryOp[BEWL] =
@@ -291,6 +291,9 @@ class Topos[
     def ⊕[Y: Dot](y: CTXT[Y]): CTXT[(X, Y)] =
       pretopos.productMagic(dot[X], dot[Y], x, y)
 
+    inline def =?=(x2: CTXT[X]): CTXT[BEWL] =
+      (Ɛ.=?=[X]: BiArrow[X, X, BEWL])(x, x2)
+
   extension[X: Dot, Y: Dot, Z: Dot] (
     biArrow: BiArrow[X, Y, Z]
   )
@@ -339,10 +342,10 @@ class Topos[
     ): X ~> A =
       backDivideMonic(f, monic)
       
-//    final def isMonic: Boolean =
-//      ∀[(X, Y)] { case x ⊕ y =>
-//        (f(x) =?= f(y)) → (x =?= y)
-//      }
+    final def isMonic: Boolean =
+      ∀[(X, X)] { case x1 ⊕ x2 =>
+        (f(x1) =?= f(x2)) → (x1 =?= x2)
+      }
 
     final def isIsoPlaceholderTrue: Boolean =
       true
