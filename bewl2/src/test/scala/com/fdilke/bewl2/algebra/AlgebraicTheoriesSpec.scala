@@ -39,25 +39,25 @@ class AlgebraicTheoriesSpec extends RichFunSuite:
 
   test("An evaluation context for one term over an empty theory is just a uniproduct") {
     val algebra = new unstructuredSets.Algebra[Boolean]()
-    val context: algebra.EvaluationContext[(Boolean, Unit)] =
+    val context: algebra.EvaluationContext[Boolean] =
       algebra.EvaluationContext(Seq(α)).asInstanceOf[
-        algebra.EvaluationContext[(Boolean, Unit)]
+        algebra.EvaluationContext[Boolean]
       ]
-    val evalA: ((Boolean, Unit)) => Boolean = context.evaluatePrincipal(α)
+    val evalA: Boolean => Boolean = context.evaluatePrincipal(α)
 
-    evalA isArrow π0[Boolean, Unit]
+    evalA isArrow id[Boolean]
     evalA.isIso is true
   }
 
   test("An evaluation context for two terms over an empty theory is just a biproduct") {
     val algebra = new unstructuredSets.Algebra[Boolean]()
-    val context: algebra.EvaluationContext[(Boolean, (Boolean, Unit))] =
+    val context: algebra.EvaluationContext[(Boolean, Boolean)] =
       algebra.EvaluationContext(Seq(α, β)).asInstanceOf[
-        algebra.EvaluationContext[(Boolean, (Boolean, Unit))]
+        algebra.EvaluationContext[(Boolean, Boolean)]
       ]
 
-    val to_a: ((Boolean, (Boolean, Unit))) => Boolean = context.evaluatePrincipal(α)
-    val to_b: ((Boolean, (Boolean, Unit))) => Boolean = context.evaluatePrincipal(β)
+    val to_a: ((Boolean, Boolean)) => Boolean = context.evaluatePrincipal(α)
+    val to_b: ((Boolean, Boolean)) => Boolean = context.evaluatePrincipal(β)
 
     to_a isNotArrow to_b
     (to_a x to_b).isIso is true
@@ -67,13 +67,13 @@ class AlgebraicTheoriesSpec extends RichFunSuite:
 
     val pointedSets = AlgebraicTheory(o)()
     val algebra = new pointedSets.Algebra[Boolean](o := theO)
-    val context: algebra.EvaluationContext[(Boolean, Unit)] =
+    val context: algebra.EvaluationContext[Boolean] =
       algebra.EvaluationContext(Seq(α)).asInstanceOf[
-        algebra.EvaluationContext[(Boolean, Unit)]
+        algebra.EvaluationContext[Boolean]
       ]
 
     theO o toUnit[Boolean] isArrow {
-      context.evaluatePrincipal(o)(_, ())
+      context.evaluatePrincipal(o)
     }
   }
 
@@ -92,12 +92,12 @@ class AlgebraicTheoriesSpec extends RichFunSuite:
           (~) := twiddle,
           o := theO
         )
-      val context: algebra.EvaluationContext[(Int, Unit)] = // or Unit, Int ??
+      val context: algebra.EvaluationContext[Int] =
         algebra.EvaluationContext(Seq(α)).asInstanceOf[
-          algebra.EvaluationContext[(Int, Unit)]
+          algebra.EvaluationContext[Int]
         ]
-      val interpretO: ((Int, Unit)) => Int = theO o toUnit[(Int, Unit)]
-      val interpretα: ((Int, Unit)) => Int = context.evaluatePrincipal(α)
+      val interpretO: Int => Int = theO o toUnit[Int]
+      val interpretα: Int => Int = context.evaluatePrincipal(α)
       interpretα isNotArrow interpretO
       context.evaluatePrincipal(o) isArrow interpretO
       context.evaluatePrincipal(~o) isArrow interpretO
@@ -118,12 +118,12 @@ class AlgebraicTheoriesSpec extends RichFunSuite:
 
       val pointedMagmas = AlgebraicTheory(o, +)()
       val algebra = new pointedMagmas.Algebra[String]((+) := plus, o := theO)
-      val context: algebra.EvaluationContext[(String, Unit)] =
+      val context: algebra.EvaluationContext[String] =
         algebra.EvaluationContext(Seq(α)).asInstanceOf[
-          algebra.EvaluationContext[(String, Unit)]
+          algebra.EvaluationContext[String]
         ]
-      val interpretO: ((String, Unit)) => String = theO o toUnit[(String, Unit)]
-      val interpretα: ((String, Unit)) => String = context.evaluatePrincipal(α)
+      val interpretO: String => String = theO o toUnit[String]
+      val interpretα: String => String = context.evaluatePrincipal(α)
 
       interpretα isNotArrow interpretO
       context.evaluatePrincipal(o) isArrow interpretO
@@ -157,12 +157,12 @@ class AlgebraicTheoriesSpec extends RichFunSuite:
         o := theO,
         ** := rightMultiply
       )
-      val context: minimalAlgebra.EvaluationContext[(String, Unit)] =
+      val context: minimalAlgebra.EvaluationContext[String] =
         minimalAlgebra.EvaluationContext(Seq(α)).asInstanceOf[
-          minimalAlgebra.EvaluationContext[(String, Unit)]
+          minimalAlgebra.EvaluationContext[String]
         ]
-      val interpretO: ((String, Unit)) => String = theO o toUnit[(String, Unit)]
-      val interpretI: ((String, Unit)) => String = makeNullaryOperator[String]("i") o toUnit[(String, Unit)]
+      val interpretO: String => String = theO o toUnit[String]
+      val interpretI: String => String = makeNullaryOperator[String]("i") o toUnit[String]
 
       context.evaluatePrincipal(o) isArrow interpretO
       context.evaluatePrincipal(o ** II) isArrow interpretI
@@ -197,28 +197,28 @@ class AlgebraicTheoriesSpec extends RichFunSuite:
       ) isArrow scalar2
 
       algebra.EvaluationContext(Seq(α)).asInstanceOf[
-        algebra.EvaluationContext[(Symbol, Unit)]
+        algebra.EvaluationContext[Symbol]
       ].evaluatePrincipal(
         α
-      ) isArrow π0[Symbol, Unit] // (act *- I)
+      ) isArrow id[Symbol]
 
       algebra.EvaluationContext(Seq(α)).asInstanceOf[
-        algebra.EvaluationContext[(Symbol, Unit)]
+        algebra.EvaluationContext[Symbol]
       ].evaluatePrincipal(
         α ** II
-      ) isArrow π0[Symbol, Unit]
+      ) isArrow id[Symbol]
 
       algebra.EvaluationContext(Seq(Ψ)).asInstanceOf[
-        algebra.EvaluationContext[(Int, Unit)]
+        algebra.EvaluationContext[Int]
       ].evaluateScalar(
         Ψ
-      ) isArrow π0[Int, Unit]
+      ) isArrow id[Int]
 
       algebra.EvaluationContext(Seq(Ψ)).asInstanceOf[
-        algebra.EvaluationContext[(Int, Unit)]
+        algebra.EvaluationContext[Int]
       ].evaluateScalar(
         ((Ψ *** II) *** II) *** II
-      ) isArrow π0[Int, Unit]
+      ) isArrow id[Int]
     }
   }
 

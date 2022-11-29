@@ -85,19 +85,24 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
       group.multiply(Seq(1, 0, 2), Seq(1, 2, 0)) is Seq(2, 1, 0)
       group.isCommutative is false
     }
-    withSymmetricGroup(4) { // even 5 is a stretch :(
+    withSymmetricGroup(4) { // could do 5 at a stretch :(
       (_: Dot[Seq[Int]]) ?=> (group: Group[Seq[Int]]) ?=>
       dot[Seq[Int]].size is 24
       group.sanityTest
       group.isCommutative is false
     }
-//    withSymmetricGroup(6) { // a handy benchmark for future optimisations
-//      (_: Dot[Seq[Int]]) ?=> (group: Group[Seq[Int]]) ?=>
-//        dot[Seq[Int]].size is 720
-//        group.sanityTest
-//        group.isCommutative is false
-//    }
   }
+
+  if (false)
+    test("(Benchmark, sanity test S_5)") {
+      import StockSymbols.*
+      withSymmetricGroup(5) {
+        (_: Dot[Seq[Int]]) ?=> (group: Group[Seq[Int]]) ?=>
+          dot[Seq[Int]].size is 120
+          group.sanityTest
+          group.isCommutative is false
+      }
+    }
 
   test("Construct the monoid of endomorphisms") {
     import StockSymbols.*

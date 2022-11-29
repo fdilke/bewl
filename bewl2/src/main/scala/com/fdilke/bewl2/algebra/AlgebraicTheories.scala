@@ -680,7 +680,7 @@ trait AlgebraicTheories[
 
         def spawnCompound[U: Dot](
           symbol: String
-        ): EvaluationContext[(U, ROOT)] =
+        ): EvaluationContext[_] =
           new CompoundEvaluationContext[U, ROOT](
             symbol,
             this
@@ -715,6 +715,52 @@ trait AlgebraicTheories[
               bail(
                 "No variables available for scalar term: " + term
               )
+          }
+
+        override def spawnCompound[U: Dot](
+          symbol: String
+        ): EvaluationContext[_] =
+          new UnaryEvaluationContext[U](
+            symbol
+          )
+      }
+
+      class UnaryEvaluationContext[U: Dot](
+        name: String
+      ) extends EvaluationContext[U] {
+
+        override def evaluatePrincipal(
+          term: Term[Principal]
+        ): U ~> T =
+          term match {
+            case VariableTerm(symbol, _) if symbol == name =>
+              id[U].asInstanceOf[U ~> T]
+
+            case term: BinaryOpTerm[Principal] =>
+              evaluateBinaryOpTerm(term)
+
+            case term: BinaryRightScalarOpTerm =>
+              evaluateBinaryRightScalarOpTerm(term)
+
+            case term: UnaryOpTerm[Principal] =>
+              evaluateUnaryOpTerm(term)
+
+            case _ =>
+              SimpleEvaluationContext.evaluatePrincipal(term) o toUnit[U]
+          }
+
+        override def evaluateScalar(
+          term: Term[Scalar]
+        ): U ~> S =
+          term match {
+            case VariableTerm(symbol, _) if symbol == name =>
+              id[U].asInstanceOf[U ~> S]
+
+            case term: BinaryScalarOpTerm =>
+              evaluateBinaryScalarOpTerm(term)
+
+            case _ =>
+              SimpleEvaluationContext.evaluateScalar(term) o toUnit[U]
           }
       }
 
