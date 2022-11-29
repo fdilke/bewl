@@ -51,7 +51,7 @@ class AlgebraicStructuresSpec extends RichFunSuite:
 
               val chineseRemainder: Int6 => (Int2, Int3) =
                 { i => (i % 2, i % 3) }
-              chineseRemainder.isIsoPlaceholderTrue is true
+              chineseRemainder.isIso is true
 
               groups.isMorphism(
                 chineseRemainder
@@ -59,7 +59,7 @@ class AlgebraicStructuresSpec extends RichFunSuite:
 
               val notChineseRemainder: Int6 => (Int2, Int3) =
                 { i => ((i + 1) % 2, (i + 2) % 3) }
-              notChineseRemainder.isIsoPlaceholderTrue is true
+              notChineseRemainder.isIso is true
 
               groups.isMorphism(
                 notChineseRemainder

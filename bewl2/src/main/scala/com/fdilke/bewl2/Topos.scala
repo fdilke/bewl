@@ -354,8 +354,8 @@ class Topos[
         }
       )
 
-    final def isIsoPlaceholderTrue: Boolean =
-      true
+    final def isIso: Boolean =
+      isMonic && isEpic
 
     inline final def sanityTest: Unit =
       Topos.this.sanityTest[X, Y](f)

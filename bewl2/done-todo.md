@@ -75,3 +75,5 @@
 - image factorizations. do we need congruences for this?
 - if we have rich internal arrows, X > Y (postponed above) test for being monic/epic/iso, compose 'em (caching the machinery...)
 - can we have Option[X] implicitly generating a dot that is X*?
+- compute the inverse of a morphism. AGain inefficient before. Can we just backdivide from the identity?
+- 

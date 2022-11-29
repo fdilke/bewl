@@ -6,7 +6,6 @@ import com.fdilke.bewl2.utility.{Direction, RichFunSuite}
 
 import scala.Function.tupled
 import scala.language.postfixOps
-//import munit.Clue.generate
 
 class AlgebraicTheoriesSpec extends RichFunSuite:
 
@@ -40,12 +39,14 @@ class AlgebraicTheoriesSpec extends RichFunSuite:
 
   test("An evaluation context for one term over an empty theory is just a uniproduct") {
     val algebra = new unstructuredSets.Algebra[Boolean]()
-    val context: algebra.EvaluationContext[(Unit, Boolean)] =
+    val context: algebra.EvaluationContext[(Boolean, Unit)] =
       algebra.EvaluationContext(Seq(α)).asInstanceOf[
-        algebra.EvaluationContext[(Unit, Boolean)]
+        algebra.EvaluationContext[(Boolean, Unit)]
       ]
-    val evalA: ((Unit, Boolean)) => Boolean = context.evaluatePrincipal(α)
-    evalA.isIsoPlaceholderTrue is true
+    val evalA: ((Boolean, Unit)) => Boolean = context.evaluatePrincipal(α)
+
+    evalA isArrow π0[Boolean, Unit]
+    evalA.isIso is true
   }
 
   test("An evaluation context for two terms over an empty theory is just a biproduct") {
@@ -59,7 +60,7 @@ class AlgebraicTheoriesSpec extends RichFunSuite:
     val to_b: ((Boolean, (Boolean, Unit))) => Boolean = context.evaluatePrincipal(β)
 
     to_a isNotArrow to_b
-    (to_a x to_b).isIsoPlaceholderTrue is true
+    (to_a x to_b).isIso is true
   }
 
   test("An evaluation context for one term can evaluate constants") {

@@ -52,3 +52,29 @@ class RichArrowSpec extends RichFunSuite:
       }
     }
   }
+
+  test("Can tell if an arrow is iso") {
+    withDot(Set[Int](1, 2, 3)) {
+      withDot(Set[Char]('A', 'B', 'C', 'D')) {
+        val epicNotMonic: Char ~> Int = Map(
+          'A' -> 1,
+          'B' -> 2,
+          'C' -> 2,
+          'D' -> 3,
+        )
+        epicNotMonic.isIso is false
+        val monicNotEpic: Int ~> Char = Map(
+          1 -> 'A',
+          2 -> 'C',
+          3 -> 'B'
+        )
+        monicNotEpic.isIso is false
+        val iso: Int ~> Int = Map(
+          1 -> 2,
+          2 -> 3,
+          3 -> 1
+        )
+        iso.isIso is true
+      }
+    }
+  }
