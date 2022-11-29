@@ -32,3 +32,23 @@ class RichArrowSpec extends RichFunSuite:
       }
     }
   }
+  test("Can tell if an arrow is epic") {
+    withDot(Set[Int](1, 2, 3)) {
+      withDot(Set[Char]('A', 'B', 'C', 'D')) {
+        val nonEpic: Char ~> Int = Map(
+          'A' -> 1,
+          'B' -> 2,
+          'C' -> 2,
+          'D' -> 1,
+        )
+        nonEpic.isEpic is false
+        val epic: Char ~> Int = Map(
+          'A' -> 1,
+          'B' -> 3,
+          'C' -> 2,
+          'D' -> 1,
+        )
+        epic.isEpic is true
+      }
+    }
+  }

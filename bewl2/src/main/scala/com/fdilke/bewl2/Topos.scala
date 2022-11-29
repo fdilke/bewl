@@ -347,6 +347,13 @@ class Topos[
         (f(x1) =?= f(x2)) → (x1 =?= x2)
       }
 
+    final def isEpic: Boolean =
+      ∀[Y](
+        ∃[Y, X] { (y, x) =>
+          y =?= f(x)
+        }
+      )
+
     final def isIsoPlaceholderTrue: Boolean =
       true
 
