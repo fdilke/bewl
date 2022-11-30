@@ -47,3 +47,23 @@ Can we not finesse away phi? Or tell something about the permutations of A over 
 Does it help to make explicit the inverse of π, to which all the same reasoning applies - so we could dissect it, too?
 Possibly there's a mangled version of g (say g') for which we can deduce that:
 (a, b) -> (a, g(a, b)) is bijective ... but that would force g to split into a permutation  xi: A -> πB
+
+later: can restore from any permutation of π(AxB) by permuting columns, then rows, then columns
+so canonical surjection 
+  (m!)^n x (n!)^m x (m!)^n => (mn)! 
+Is this uniform? Arithmetically could it be?
+No; for example if mn-1 is prime, the RHS doesn't divide the LHS, so it can't be uniform.
+
+2!^3 = 8, 3!^2 = 36. So this is 8 * 36 * 8 = 2304 vs 6! = 720 ... factor of 3.
+Or, 36 * 8 * 36 = 10368 ... factor of 14.
+Can use Bewl to investigate this, given action on symmetry group.
+Verify surjectivity, investigate uniformity.
+
+(Discussion on Mathstodon about this)
+
+The theorem can be rewritten as a statement about subgroups of S_mn.
+If we let H =~= S_m^n be the subgroup of S_mn preserving rows, and
+L =~= S_n^m the subgroup preserving columns, this says that S_mn = KHK = HKH,
+so any double coset of H meets K and vice versa. You might say they're "entangled" or "complementary".
+
+Good stretch goal for Bewl to verify all this using symmetric groups.
