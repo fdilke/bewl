@@ -1,12 +1,16 @@
 # NON-CODING
 - sanity test symmetric group S_6 with '-Xmx3G'
 - get tests working with Metals
+- move algo stuff to another repo; it doesn't belong here. Ditto cocantorian stuff
 
 # THEORETICAL
 - L-T topologies. Can think of as quantifiers? Kernels of Heyting morphisms as per Matt F's paper?
 - can model geometric morphisms, X: Topos -> Y: Topos?
 - read Moerdijk & MacLane again, also the TTT book, and Four Czechs
 - work out details of 'metrics' approach to H-valued sets
+
+# BEWL AS TOOL
+- for card shuffle calc: verify surjectivity, investigate uniformity. Good stretch goal
 
 # CONJECTURES ABOUT LFTs (locally finite topoi)
 - ?every module has an injective hull
@@ -76,4 +80,5 @@
 - if we have rich internal arrows, X > Y (postponed above) test for being monic/epic/iso, compose 'em (caching the machinery...)
 - can we have Option[X] implicitly generating a dot that is X*?
 - compute the inverse of a morphism. AGain inefficient before. Can we just backdivide from the identity?
+- does the symmetry group come with an action on n? it should do. Can use for card shuffle calc
 - 

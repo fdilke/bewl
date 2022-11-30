@@ -64,10 +64,3 @@ object SetsUtilities:
     val map: Map[(X, X), X] = Map[(X, X), X](values: _*)
     map
 
-  def sillyMaskSetDot[X, RESULT](
-    dot: Set[X]
-  )(
-    block: [X_] => Set[X_] ?=> (X_ =:= X) ?=> (X =:= X_) ?=> RESULT
-  ): RESULT =
-    given Set[X] = dot
-    block[X]
