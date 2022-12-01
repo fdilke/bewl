@@ -95,28 +95,24 @@ object PreSets extends PreTopos[Set, [A] =>> A, Void, Unit, Boolean, Map]:
     f: X => Y,
     f2: X => Y
   )(
-    capture: [A] => RawEqualizer[A, X] => Set[A] => RESULT
+    block: [A] => RawEqualizer[A, X] => Set[A] => RESULT
   ): RESULT =
-    type X_ = X
-    val whereEqual: Set[X_] =
+    block[X](
+      new RawEqualizer[X, X] {
+        override val inclusion: X ~> X =
+          identity[X]
+
+        override def restrict[R](
+          dotR: Set[R],
+          arrow: R ~> X
+        ): R ~> X =
+          arrow
+      }
+    )(
       dotX.filter { x =>
         f(x) == f2(x)
       }
-
-    val theRestriction: [R] => (R ~> X) => Set[R] => (R ~> X) =
-      [R] => (arrow: R ~> X) => (rr: Set[R]) => { (r: R) => arrow(r) }
-    val xEqualsX =
-        new RawEqualizer[X, X] {
-          override val inclusion: X ~> X =
-            identity[X]
-
-          override def restrict[R](
-            dotR: Set[R],
-            arrow: R ~> X
-          ): R ~> X =
-            theRestriction(arrow)(dotR)
-        }
-    capture[X](xEqualsX)(whereEqual)
+    )
 
   override def chiForMonic[X, Y](
     dotX: Set[X],

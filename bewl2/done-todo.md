@@ -3,6 +3,10 @@
 - get tests working with Metals
 - move algo stuff to another repo; it doesn't belong here. Ditto cocantorian stuff
 
+# SPECULATIVE
+- could Scala macros enable even deeper integration for Bewl? Or functional mottoes at least?
+- added morphism enumeration. So committed to local finiteness. Could this be lifted?
+
 # THEORETICAL
 - L-T topologies. Can think of as quantifiers? Kernels of Heyting morphisms as per Matt F's paper?
 - can model geometric morphisms, X: Topos -> Y: Topos?
@@ -19,6 +23,8 @@
 - is an image of an injective also injective? It is for sets, trivially. Fails in action category?
 - Verify theorem that the inj hull of a subdirectly irreducible is again such. Finitely many of these?
 - Is there always a generator? And therefore a cogenerator..?
+- can we construct the injective hull of a module? is this guaranteed to exist? Say even in FinSet?
+  Yes by this paper: https://www.ias.ac.in/article/fulltext/pmsc/109/04/0345-0351
 
 # TOO GNARLY (for now)
 - default RESULT type of Unit for situations like withAction[Int, Unit] ?
@@ -56,12 +62,12 @@
 - convenience untupling version of Equalizer.restrict() so that I don't need 'case x ⊕ y' in defining endo monoids
 - finesse away direct references to CTXT in cases of untupling: just need type <>[X, Y, Z] = (CTXT[X], CTXT[Y]) => CTXT[Z] or sn
 - expunge @targetName, no one is using Java to access this
+- disentangle mask[]/sillyMask[] which should be a pure type operation
 
 # TODO
 - permutations, deep property of FinSet from card trick?
 - argument for storing UNIT, BEWL, etc as types within the topos, not type parameters?
   Saves passing a load of baggage around. Implications for users? Performance? Test calc of S_5
-- disentangle mask[]/sillyMask[] which should be a pure type operation
 - any implicits left in tests for algebraic machinery? any other unnecessary flummery with '?=>' ?
 - can improve how equalizerSituation / scope of implicits works in the generic topos tests?
 - instead of group x group: bake this in, as with products of dots; have an implicit. Same for actions
