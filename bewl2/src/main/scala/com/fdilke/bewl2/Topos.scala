@@ -361,10 +361,17 @@ class Topos[
     final def name: NullaryOp[X > Y] =
       transpose(f o π1[UNIT, X])
 
-//    final def factorize[RESULT](
-//      block: [I] => Dot[I] ?=> (epic: FOO ~> I, monic: I ~> BAR) => RESULT
-//    ): RESULT =
-//      val equalizer = arrowImage(f)
+    final def factorize[RESULT](
+      block: [I] => Dot[I] ?=> (epic: X ~> I, monic: I ~> Y) => RESULT
+    ): RESULT =
+      ∃[Y, X] { (y, x) =>
+        y =?= f(x)
+      } whereTrue { [I] => (_: Dot[I]) ?=> (equalizer: Equalizer[I, Y]) =>
+        block[I](
+          epic = equalizer.restrict(f),
+          monic = equalizer.inclusion
+        )
+      }
 
   extension[X: Dot](f: X ~> BEWL)
     def whereTrue[RESULT](

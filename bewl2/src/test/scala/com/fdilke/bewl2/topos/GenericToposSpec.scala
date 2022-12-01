@@ -172,16 +172,14 @@ abstract class GenericToposSpec[
       (foo2ImageOfBar  appears)
     }
 
-//    test("can factorize arrows into 'monic o epic'") {
-//      for {
-//        arrow <- morphisms[FOO, BAR]
-//      } {
-//        arrow.factorize { [I] => Dot[I] ?=> (epic: FOO ~> I, monic: I ~> BAR) =>
-//        assert { epic.isEpic }
-//        assert { monic.isMonic }
-//        assert { arrow =!= ( epic o monic ) }
-//      }
-//    }
+    test("can factorize arrows into 'monic o epic'") {
+      for { arrow <- morphisms[FOO, BAR] }
+        arrow.factorize { [I] => (_: Dot[I]) ?=> (epic: FOO ~> I, monic: I ~> BAR) =>
+          assert { epic.isEpic }
+          assert { monic.isMonic }
+          assert { arrow =!= ( monic o epic ) }
+        }
+    }
 
     test("consistently calculates arrows from the initial to the terminal") {
       assert( toUnit[VOID] =!= fromZero[UNIT] )
