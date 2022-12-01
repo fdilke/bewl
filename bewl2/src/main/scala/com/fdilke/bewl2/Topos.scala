@@ -128,12 +128,6 @@ class Topos[
         block[X]
       }
 
-  final inline def equalArrows[X: Dot, Y: Dot](
-    f1: X ~> Y,
-    f2: X ~> Y
-  ): Boolean =
-    pretopos.equalArrows(dot[X], dot[Y], f1, f2)
-
   final inline def sanityTest[X: Dot]: Unit =
     pretopos.sanityTest(dot[X])
 
@@ -216,6 +210,9 @@ class Topos[
   final val truth: NullaryOp[BEWL] =
     pretopos.truth
 
+  final def morphisms[X: Dot, Y: Dot]: Iterable[X ~> Y] =
+    pretopos.enumerateMorphisms(dot[X], dot[Y])
+    
   implicit def productObject[
       X: Dot,
       Y: Dot
@@ -316,7 +313,7 @@ class Topos[
     inline final def =!=(
       f2: X ~> Y
     ): Boolean =
-      equalArrows(f, f2)
+      pretopos.equalArrows(dot[X], dot[Y], f, f2)
 
     inline final def o[V: Dot](
       f2: V ~> X

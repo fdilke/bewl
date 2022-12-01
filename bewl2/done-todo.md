@@ -87,4 +87,5 @@
 - can we have Option[X] implicitly generating a dot that is X*?
 - compute the inverse of a morphism. AGain inefficient before. Can we just backdivide from the identity?
 - does the symmetry group come with an action on n? it should do. Can use for card shuffle calc
+- turn Mappable into ProductMappable, an annoying kid brother of one of the Haskell submonadics
 - 

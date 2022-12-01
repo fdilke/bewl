@@ -54,6 +54,7 @@ trait PreTopos[
   def toUnit[X](dotX: DOT[X]): X ~> UNIT
   def fromZero[X](dotX: DOT[X]): VOID ~> X
   val truth: UNIT ~> BEWL
+  def enumerateMorphisms[X, Y](dotX: DOT[X], dotY: DOT[Y]): Iterable[X ~> Y]
   def evaluation[X, Y](dotX: DOT[X], dotY: DOT[Y]): (X > Y, X) ~> Y
   def transpose[X, Y, Z](
     dotX: DOT[X],

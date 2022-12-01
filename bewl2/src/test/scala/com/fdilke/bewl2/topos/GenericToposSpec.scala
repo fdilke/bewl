@@ -2,7 +2,7 @@ package com.fdilke.bewl2.topos
 
 import com.fdilke.bewl2.Topos
 import munit.FunSuite
-
+import scala.language.postfixOps
 import java.io.File
 
 abstract class GenericToposSpec[
@@ -21,9 +21,6 @@ abstract class GenericToposSpec[
   type FOO
   type BAR
   type BAZ
-//  implicit val dotFoo: Dot[FOO]
-//  implicit val dotBar: Dot[BAR]
-//  implicit val dotBaz: Dot[BAZ]
 
   case class EqualizerSituation[S: Dot, M: Dot, T: Dot](
     r: S ~> M,
@@ -138,9 +135,13 @@ abstract class GenericToposSpec[
       val fooTo1: FOO ~> UNIT = toUnit[FOO]
       fooTo1.sanityTest
 
-      assert(
+      val arrows: Iterable[FOO ~> UNIT] = morphisms[FOO, UNIT]
+      assert { arrows.size == 1 }
+      assert { arrows.head =!= fooTo1 }
+
+      assert {
         (toUnit[BAR] o foo2bar) =!= fooTo1
-      )
+      }
     }
 
     test("the zero object behaves") {
@@ -148,10 +149,39 @@ abstract class GenericToposSpec[
       val barFrom0: VOID ~> BAR = fromZero[BAR]
       barFrom0.sanityTest
 
+      val arrows: Iterable[VOID ~> BAR] = morphisms[VOID, BAR]
+      assert { arrows.size == 1 }
+      assert { arrows.head =!= barFrom0 }
+
       assert(
         (foo2bar o fromZero[FOO]) =!= barFrom0
       )
     }
+
+    test("has enumeration of arrows") {
+      extension [X: Dot, Y: Dot](arrow: X ~> Y)
+        def appears: Unit =
+          assert {
+            morphisms[X, Y] exists { _ =!= arrow }
+          }
+
+      (foo2bar         appears)
+      (foo2baz         appears)
+      (foobar2baz      appears)
+      (monicBar2baz    appears)
+      (foo2ImageOfBar  appears)
+    }
+
+//    test("can factorize arrows into 'monic o epic'") {
+//      for {
+//        arrow <- morphisms[FOO, BAR]
+//      } {
+//        arrow.factorize { [I] => Dot[I] ?=> (epic: FOO ~> I, monic: I ~> BAR) =>
+//        assert { epic.isEpic }
+//        assert { monic.isMonic }
+//        assert { arrow =!= ( epic o monic ) }
+//      }
+//    }
 
     test("consistently calculates arrows from the initial to the terminal") {
       assert( toUnit[VOID] =!= fromZero[UNIT] )

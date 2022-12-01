@@ -61,6 +61,12 @@ object PreSets extends PreTopos[Set, [A] =>> A, Void, Unit, Boolean, Map]:
   override val omegaDot: Set[Boolean] = Set(true, false)
   override val truth: Unit => Boolean = _ => true
 
+  override def enumerateMorphisms[X, Y](
+    dotX: Set[X],
+    dotY: Set[Y]
+  ): Iterable[X => Y] =
+    allMaps(dotX, dotY)
+
   override def fromZero[X](dotX: Set[X]): Void => X = { _ =>
     throw new IllegalArgumentException("Encountered a VOID")
   }
