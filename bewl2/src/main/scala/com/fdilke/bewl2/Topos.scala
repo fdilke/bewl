@@ -158,7 +158,7 @@ class Topos[
     f: X ~> Y,
     f2: X ~> Y
   )(
-    capture: [A] => Equalizer[A, X] => Dot[A] ?=> RESULT
+    capture: [A] => Dot[A] ?=> Equalizer[A, X] => RESULT
   ): RESULT =
     pretopos.doEqualizer(dot[X], dot[Y], f, f2)(
       [A] => (rawEqualizer: pretopos.RawEqualizer[A, X]) => (dotA: DOT[A]) => {
@@ -212,7 +212,7 @@ class Topos[
 
   final def morphisms[X: Dot, Y: Dot]: Iterable[X ~> Y] =
     pretopos.enumerateMorphisms(dot[X], dot[Y])
-    
+
   implicit def productObject[
       X: Dot,
       Y: Dot
@@ -328,7 +328,7 @@ class Topos[
     inline final def ?=[RESULT](
      f2: X ~> Y
     )(
-      capture: [A] => Equalizer[A, X] => (zzz: Dot[A]) ?=> RESULT
+      capture: [A] => Dot[A] ?=> Equalizer[A, X] => RESULT
     ): RESULT =
       doEqualizer(f, f2)(capture)
 
@@ -360,6 +360,20 @@ class Topos[
 
     final def name: NullaryOp[X > Y] =
       transpose(f o π1[UNIT, X])
+
+//    final def factorize[RESULT](
+//      block: [I] => Dot[I] ?=> (epic: FOO ~> I, monic: I ~> BAR) => RESULT
+//    ): RESULT =
+//      val equalizer = arrowImage(f)
+
+  extension[X: Dot](f: X ~> BEWL)
+    def whereTrue[RESULT](
+      capture: [A] => Dot[A] ?=> Equalizer[A, X] => RESULT
+    ) =
+      f.?=(toTrue[X]) {
+        capture
+      }
+
 
 object Topos:
   inline def apply[

@@ -74,7 +74,7 @@ trait AlgebraicConstructions[
         monoid.unit o toUnit[(M, M)]
       (mm_to_1 x mm_to_1)
     doubleProduct.?=(oneOne) {
-      [G] => (equalizer: Equalizer[G, (M, M)]) => (_: Dot[G]) ?=>
+      [G] => (_: Dot[G]) ?=> (equalizer: Equalizer[G, (M, M)]) =>
         given Group[G] =
           new Group(
             unit = equalizer.restrict[UNIT](

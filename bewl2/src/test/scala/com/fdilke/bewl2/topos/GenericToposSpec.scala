@@ -224,7 +224,7 @@ abstract class GenericToposSpec[
           ss: Dot[S], mm: Dot[M], tt: Dot[T]
         ) ?=>
           s.?=(t) {
-            [A] => (equalizer: Equalizer[A, M]) => (aa: Dot[A]) ?=>
+            [A] => (aa: Dot[A]) ?=> (equalizer: Equalizer[A, M]) =>
               val e = equalizer.inclusion
               assert {
                 (s o e) =!= (t o e)

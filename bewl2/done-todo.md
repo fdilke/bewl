@@ -35,6 +35,8 @@
 - instead of summon[Dot[X]] use Dot[X], as with Mappable... bad idea: then have to use 'new'
 - extension instead of RichArrow.. bad idea, we then get confused about 'o'
 - unbundle stuff that doesn't need to be part of the topos proper: logic? algebraic theories?
+- turn Mappable into ProductMappable, an annoying kid brother of one of the Haskell submonadics
+  We can't - it's specific to DOT[_], at least potentially. Review when there are more topoi.
 
 # LEGITIMATELY POSTPONED
 - simplify ∃ def by adding an extension so we can have f(x) instead of eval(f, x) for f: X ~> Y.
@@ -63,6 +65,7 @@
 - finesse away direct references to CTXT in cases of untupling: just need type <>[X, Y, Z] = (CTXT[X], CTXT[Y]) => CTXT[Z] or sn
 - expunge @targetName, no one is using Java to access this
 - disentangle mask[]/sillyMask[] which should be a pure type operation
+- enumerate morphisms
 
 # TODO
 - permutations, deep property of FinSet from card trick?
@@ -87,5 +90,3 @@
 - can we have Option[X] implicitly generating a dot that is X*?
 - compute the inverse of a morphism. AGain inefficient before. Can we just backdivide from the identity?
 - does the symmetry group come with an action on n? it should do. Can use for card shuffle calc
-- turn Mappable into ProductMappable, an annoying kid brother of one of the Haskell submonadics
-- 
