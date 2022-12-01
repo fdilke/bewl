@@ -97,36 +97,26 @@ object PreSets extends PreTopos[Set, [A] =>> A, Void, Unit, Boolean, Map]:
   )(
     capture: [A] => RawEqualizer[A, X] => Set[A] => RESULT
   ): RESULT =
-    inline def maskType[A](
-      dotA: Set[A],
-      theInclusion: A => X,
-      theRestriction: [R] => (R ~> X) => Set[R] => (R ~> A)
-    ): RESULT =
-      capture[A](
-        new RawEqualizer[A, X] {
-          override val inclusion: A ~> X =
-            theInclusion
-
-          override def restrict[R](
-            dotR: Set[R],
-            arrow: R ~> X
-          ): R ~> A =
-            theRestriction(arrow)(dotR)
-        }
-      )(dotA)
-
     type X_ = X
     val whereEqual: Set[X_] =
       dotX.filter { x =>
         f(x) == f2(x)
       }
-    maskType[X_](
-      dotA = whereEqual,
-      theInclusion = identity,
-      theRestriction = [R] => (arrow: R ~> X) => (rr: Set[R]) => {
-        (r: R) => arrow(r)
-      }
-    )
+
+    val theRestriction: [R] => (R ~> X) => Set[R] => (R ~> X) =
+      [R] => (arrow: R ~> X) => (rr: Set[R]) => { (r: R) => arrow(r) }
+    val xEqualsX =
+        new RawEqualizer[X, X] {
+          override val inclusion: X ~> X =
+            identity[X]
+
+          override def restrict[R](
+            dotR: Set[R],
+            arrow: R ~> X
+          ): R ~> X =
+            theRestriction(arrow)(dotR)
+        }
+    capture[X](xEqualsX)(whereEqual)
 
   override def chiForMonic[X, Y](
     dotX: Set[X],

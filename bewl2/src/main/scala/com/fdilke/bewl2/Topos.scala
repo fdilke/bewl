@@ -5,6 +5,7 @@ import com.fdilke.bewl2.algebra.AlgebraicMachinery
 import com.fdilke.bewl2.helper.Memoize
 import Mappable.*
 import com.fdilke.bewl2.logic.LogicalOperations
+import com.fdilke.utility.Mask
 
 class Topos[
   DOT[_],
@@ -123,9 +124,9 @@ class Topos[
   )(
     block: [X_] => Dot[X_] ?=> (X_ =:= X) ?=> (X =:= X_) ?=> RESULT
   ): RESULT =
-    withDot(dot) {
-      block[X]
-    }
+      withDot(dot) {
+        block[X]
+      }
 
   final inline def equalArrows[X: Dot, Y: Dot](
     f1: X ~> Y,

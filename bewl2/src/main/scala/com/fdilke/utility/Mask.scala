@@ -2,6 +2,15 @@ package com.fdilke.utility
 
 object Mask:
 
+  inline def mask[X, INPUT[_], OUTPUT](
+    input: INPUT[X]
+  )(
+    block: [X_] => INPUT[X_] => (X_ =:= X) ?=> (X =:= X_) ?=> OUTPUT
+  ): OUTPUT =
+    block[X](input)
+
+object MaskScratchpad:
+
   def mask[X, RESULT](
     block: [X_] => (X_ =:= X) ?=> (X =:= X_) ?=> RESULT
   ): RESULT =
