@@ -1,8 +1,7 @@
 package com.fdilke.bewl2.algebra
 
 import com.fdilke.bewl2.sets.SetsUtilities.*
-import com.fdilke.bewl2.utility.Direction.*
-import com.fdilke.bewl2.utility.{Direction, RichFunSuite}
+import com.fdilke.bewl2.utility.RichFunSuite
 
 import scala.Function.tupled
 import scala.language.postfixOps
@@ -300,18 +299,18 @@ class AlgebraicTheoriesSpec extends RichFunSuite:
   test("Algebraic theories can sanity-check their algebras for right scalar multiplications") {
     withDots(
       Set[Int](0),
-      Set[Direction](Up)
+      Set[String]("x")
     ) {
-      val badScalarRightMultiplication: ((Direction, Int)) => Direction =
+      val badScalarRightMultiplication: BiArrow[String, Int, String] =
         Map(
-          (Up, 0) -> Down
+          ("x", 0) -> "y"
         )
 
       val weakActsOverASet =
         AlgebraicTheoryWithScalars[Int]()(**)()
 
       intercept[IllegalArgumentException] {
-        new weakActsOverASet.Algebra[Direction](
+        new weakActsOverASet.Algebra[String](
           ** := badScalarRightMultiplication
         ).sanityTest
       }

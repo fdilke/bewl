@@ -3,12 +3,11 @@ package com.fdilke.bewl2.sets
 import com.fdilke.bewl2.Topos
 import com.fdilke.bewl2.sets.Sets
 import com.fdilke.bewl2.topos.GenericToposSpec
-import com.fdilke.bewl2.utility.Direction
 import munit.FunSuite
+import Piggis.Direction
 import Direction._
 
 class SetsSpec extends GenericToposSpec()(Sets):
-
   import topos.*
 
   override type FOO = Direction
@@ -69,6 +68,6 @@ class SetsSpec extends GenericToposSpec()(Sets):
         }
       )
     }
-    
+
 
 

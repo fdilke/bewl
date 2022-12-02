@@ -66,6 +66,7 @@
 - expunge @targetName, no one is using Java to access this
 - disentangle mask[]/sillyMask[] which should be a pure type operation
 - enumerate morphisms
+- abstract code used for suits into withEnum ; remap the Direction code via this
 
 # TODO
 - permutations, deep property of FinSet from card trick?
@@ -90,6 +91,5 @@
 - can we have Option[X] implicitly generating a dot that is X*?
 - compute the inverse of a morphism. Again inefficient before. Can we just backdivide from the identity?
 - does the symmetry group come with an action on n? it should do. Can use for card shuffle calc
-- abstract code used for suits into withEnum ; remap the Direction code via this
-- withAutomorphismGroup which condenses withEndomorphismMonoid and withGroupOfUnits
-- 
+- withAutomorphismGroup which condenses withEndomorphismMonoid and withGroupOfUnits. Refactor existing uses
+- minor: can I have GenericToposSpec(using Sets) rather than bodgily passing an implicit with an extra set of parens

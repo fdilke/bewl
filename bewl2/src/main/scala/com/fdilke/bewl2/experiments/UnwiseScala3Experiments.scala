@@ -115,3 +115,11 @@ object UnwiseScala3Experiments {
 //  ): RESULT = {
 //    case x ⊕ y => block(x, y)
 //  }
+
+object Wiggis:
+  enum Arity:
+    case Nullary, Unary
+
+object EnumFrenzy extends App:
+  import Wiggis._
+  println("arities: " + Arity.values)

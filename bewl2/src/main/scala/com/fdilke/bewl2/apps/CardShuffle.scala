@@ -1,7 +1,8 @@
 package com.fdilke.bewl2.apps
 
-import com.fdilke.bewl2.sets.Sets
+import com.fdilke.bewl2.sets.{Sets, SetsUtilities}
 import Sets.*
+import SetsUtilities.*
 import scala.language.postfixOps
 
 // Investigating the 'card shuffle' property of FinSet: that in the group of permutations G = Aut(A x B),
@@ -14,9 +15,12 @@ object CardShuffle extends App:
 
   val numbers: Set[Int] = (1 to 13).toSet
 
-//  withDot(Suit.values.toSet) { // TODO: <== abstract into withEnum
-//    withEndomorphismMonoid[Int, Unit] {
-//      [E] => (_: Dot[E]) ?=> (_: EndomorphismMonoid[E, Int]) ?=>
-//
-//    }
-//  }
+  withDot(numbers) {
+    withEnum[Suit] {
+      withEndomorphismMonoid[Suit, Unit] { [E] => (_: Dot[E]) ?=> (_: EndomorphismMonoid[E, Suit]) ?=>
+        withEndomorphismMonoid[Int, Unit] { [E] => (_: Dot[E]) ?=> (_: EndomorphismMonoid[E, Int]) ?=>
+
+        }
+      }
+    }
+  }

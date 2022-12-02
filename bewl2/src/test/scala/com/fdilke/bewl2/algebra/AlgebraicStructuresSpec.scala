@@ -4,10 +4,9 @@ import com.fdilke.bewl2.algebra.AlgebraicConstructions.*
 import com.fdilke.bewl2.algebra.Principal
 import com.fdilke.bewl2.sets.Sets
 import com.fdilke.bewl2.sets.SetsUtilities.*
-import com.fdilke.bewl2.utility.Direction.*
 import com.fdilke.bewl2.utility.StockStructures.*
 import com.fdilke.bewl2.utility.StockSymbols.*
-import com.fdilke.bewl2.utility.{Direction, RichFunSuite}
+import com.fdilke.bewl2.utility.RichFunSuite
 import munit.Clue.generate
 import munit.FunSuite
 
