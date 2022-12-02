@@ -13,7 +13,6 @@ import munit.FunSuite
 import scala.Function.tupled
 import scala.collection.immutable.Set
 import scala.language.postfixOps
-import com.fdilke.bewl2.sets.Sets
 import Sets.*
 import Sets.StandardTermsAndOperators.*
 
@@ -94,8 +93,7 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
   }
 
   if (false)
-    test("(Benchmark, sanity test S_5)") {
-      import StockSymbols.*
+    test("(Benchmark, sanity test S_5)") {*
       withSymmetricGroup(5) {
         (_: Dot[Seq[Int]]) ?=> (group: Group[Seq[Int]]) ?=>
           dot[Seq[Int]].size is 120

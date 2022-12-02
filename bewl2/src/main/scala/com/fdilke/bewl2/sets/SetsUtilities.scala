@@ -1,7 +1,12 @@
 package com.fdilke.bewl2.sets
 
 import scala.language.postfixOps
-import com.fdilke.utility.Shortcuts._
+import com.fdilke.utility.Shortcuts.*
+import Sets.*
+import com.fdilke.utility.EnumValues
+
+import scala.deriving.Mirror
+import scala.compiletime.{constValue, constValueTuple}
 
 object SetsUtilities:
   def allMaps[A, B](
@@ -64,3 +69,16 @@ object SetsUtilities:
     val map: Map[(X, X), X] = Map[(X, X), X](values: _*)
     map
 
+  inline def withEnum[ENUM]( // refactor when I have named type arguments
+    block: Dot[ENUM] ?=> Unit
+  ): Unit =
+    withEnum[ENUM, Unit](block)
+
+  inline def withEnum[ENUM, RESULT](
+    block: Dot[ENUM] ?=> RESULT
+  ): RESULT =
+    withDot[ENUM, RESULT](
+      EnumValues[ENUM].toSet
+    ) {
+      block
+    }

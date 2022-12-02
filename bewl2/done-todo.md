@@ -88,5 +88,8 @@
 - image factorizations. do we need congruences for this?
 - if we have rich internal arrows, X > Y (postponed above) test for being monic/epic/iso, compose 'em (caching the machinery...)
 - can we have Option[X] implicitly generating a dot that is X*?
-- compute the inverse of a morphism. AGain inefficient before. Can we just backdivide from the identity?
+- compute the inverse of a morphism. Again inefficient before. Can we just backdivide from the identity?
 - does the symmetry group come with an action on n? it should do. Can use for card shuffle calc
+- abstract code used for suits into withEnum ; remap the Direction code via this
+- withAutomorphismGroup which condenses withEndomorphismMonoid and withGroupOfUnits
+- 
