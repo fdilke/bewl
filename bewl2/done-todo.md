@@ -37,6 +37,8 @@
 - unbundle stuff that doesn't need to be part of the topos proper: logic? algebraic theories?
 - turn Mappable into ProductMappable, an annoying kid brother of one of the Haskell submonadics
   We can't - it's specific to DOT[_], at least potentially. Review when there are more topoi.
+- argument for storing UNIT, BEWL, etc as types within the topos, not type parameters?
+  Saves passing a load of baggage around. Implications for users? Performance? Test calc of S_5. Foresee imports clunkier.
 
 # LEGITIMATELY POSTPONED
 - simplify ∃ def by adding an extension so we can have f(x) instead of eval(f, x) for f: X ~> Y.
@@ -70,8 +72,6 @@
 
 # TODO
 - permutations, deep property of FinSet from card trick?
-- argument for storing UNIT, BEWL, etc as types within the topos, not type parameters?
-  Saves passing a load of baggage around. Implications for users? Performance? Test calc of S_5
 - any implicits left in tests for algebraic machinery? any other unnecessary flummery with '?=>' ?
 - can improve how equalizerSituation / scope of implicits works in the generic topos tests?
 - instead of group x group: bake this in, as with products of dots; have an implicit. Same for actions
@@ -93,3 +93,6 @@
 - does the symmetry group come with an action on n? it should do. Can use for card shuffle calc
 - withAutomorphismGroup which condenses withEndomorphismMonoid and withGroupOfUnits. Refactor existing uses
 - minor: can I have GenericToposSpec(using Sets) rather than bodgily passing an implicit with an extra set of parens
+- use withAutos/withEndos pattern again for algebras; loop over the sequence of operators
+- replace ~> with > (both of them), > with ~> ?
+- -

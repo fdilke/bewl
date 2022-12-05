@@ -105,10 +105,9 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
     import StockSymbols.*
     withDot(Set[Symbol](e, a, b)) {
       withEndomorphismMonoid[Symbol, Unit] {
-        [E] => (_: Dot[E]) ?=> (eMonoid: EndomorphismMonoid[E, Symbol]) ?=>
-          eMonoid.sanityTest
+        [E] => (_: Dot[E]) ?=> (monoid: Monoid[E]) ?=> (standardAction: monoid.Action[Symbol]) ?=>
+        monoid.sanityTest
         dot[E].size is 27
-        val standardAction: eMonoid.Action[Symbol] = eMonoid.standardAction
         standardAction.sanityTest
       }
     }
@@ -127,7 +126,7 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
     }
     withDot(Set[Int](1, 2, 3)) {
       withEndomorphismMonoid[Int, Unit] {
-        [E] => (_: Dot[E]) ?=> (_: EndomorphismMonoid[E, Int]) ?=>
+        [E] => (_: Dot[E]) ?=> (monoid: Monoid[E]) ?=> (standardAction: monoid.Action[Int]) ?=>
           withGroupOfUnits[E, Unit] {
             [U] => (_: Dot[U]) ?=> (groupU: Group[U]) ?=> (embed: U => E) =>
               dot[U].size is 6
@@ -137,3 +136,16 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
       }
     }
   }
+
+//  test("Construct the internal automorphism group") {
+//    import StockSymbols.*
+//    withDot(Set[Symbol](e, a, b, c)) {
+//      withAutomorphismGroup[Symbol, Unit] {
+//        [G] => (_: Dot[G]) ?=> (eGroup: EndomorphismGroup[G, Symbol]) ?=>
+//          eGroup.sanityTest
+//        dot[E].size is 24
+//        val standardAction: eGroup.Action[Symbol] = eGroup.standardAction
+//        standardAction.sanityTest
+//      }
+//    }
+//  }

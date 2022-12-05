@@ -17,8 +17,10 @@ object CardShuffle extends App:
 
   withDot(numbers) {
     withEnum[Suit] {
-      withEndomorphismMonoid[Suit, Unit] { [E] => (_: Dot[E]) ?=> (_: EndomorphismMonoid[E, Suit]) ?=>
-        withEndomorphismMonoid[Int, Unit] { [E] => (_: Dot[E]) ?=> (_: EndomorphismMonoid[E, Int]) ?=>
+      withEndomorphismMonoid[Suit, Unit] { [E] => (_: Dot[E]) ?=>
+        (monoidSuit: Monoid[E]) ?=> (_: monoidSuit.Action[Suit]) ?=>
+        withEndomorphismMonoid[Int, Unit] { [F] => (_: Dot[F]) ?=>
+        (monoidInt: Monoid[F]) ?=> (_: monoidInt.Action[Int]) ?=>
 
         }
       }

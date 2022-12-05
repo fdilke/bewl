@@ -20,12 +20,8 @@ trait AlgebraicConstructions[
 ] {
   topos: Topos[DOT, CTXT, VOID, UNIT, BEWL, >] =>
 
-  trait EndomorphismMonoid[E: Dot, X : Dot] extends Monoid[E] with Actions[E] {
-    val standardAction: Action[X]
-  }
-
   def withEndomorphismMonoid[X : Dot, RESULT](
-    block: [E] => Dot[E] ?=> EndomorphismMonoid[E, X] ?=> RESULT
+    block: [E] => Dot[E] ?=> (monoid: Monoid[E]) ?=> monoid.Action[X] ?=> RESULT
   )(
     implicit exponential: Dot[X > X]
   ): RESULT =
@@ -46,17 +42,16 @@ trait AlgebraicConstructions[
           (g, fx)
       }
 
-    given EndomorphismMonoid[E, X] =
+    implicit val monoid: Monoid[E] =
       new Monoid[E](
         unit = id[X].name,
         multiply = transpose(applyPair)
-      ) with EndomorphismMonoid[E, X] {
-        override val standardAction: Action[X] =
-          Action[X] { (x_e: CTXT[(X, E)]) =>
-            applicate(x_e) {
-              case (x, e) => (e, x)
-            }
-          }
+      )
+    implicit val action: monoid.Action[X] =
+      monoid.Action[X] { (x_e: CTXT[(X, E)]) =>
+        applicate(x_e) {
+          case (x, e) => (e, x)
+        }
       }
     block[E]
 
@@ -102,7 +97,18 @@ trait AlgebraicConstructions[
           π0[M, M] o equalizer.inclusion
         block[G](embed)
     }
+
+//  def withAutomorphismGroup[X : Dot, RESULT](
+//    block: [A] => Dot[A] ?=> (group: Group[A]) ?=> group.Action[X] ?=> RESULT
+//  ): RESULT =
+//    withEndomorphismMonoid[X, RESULT] {
+//      [E] => (_: Dot[E]) ?=> (monoid: E]) ?=> (action: monoid.Action[Int]) ?=>
+//        withGroupOfUnits[E, RESULT] {
+//          [A] => (_: Dot[A]) ?=> (group: Group[A]) ?=> (embed: A => E) =>
+//            given group.Action[X] = ...
+//        }
 }
+
 
 // Constructions specific to Sets (and maybe other topoi) live here
 object AlgebraicConstructions:
