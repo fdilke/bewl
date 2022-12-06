@@ -123,3 +123,12 @@ object Wiggis:
 object EnumFrenzy extends App:
   import Wiggis._
   println("arities: " + Arity.values)
+
+object MultipleTraits:
+  trait Theory:
+    trait Algebra
+  val widgets: Theory = new Theory {}
+  val doodads: Theory = new Theory {}
+  // but then can't do this, 'trait Algebra is extended twice'
+  // trait HyperSquiddle extends widgets.Algebra with doodads.Algebra
+

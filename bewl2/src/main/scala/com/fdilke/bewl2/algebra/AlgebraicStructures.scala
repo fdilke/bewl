@@ -122,8 +122,8 @@ trait AlgebraicStructures[
       }
 
     class Action[A: Dot](
-     actionMultiply: BiArrow[A, M, A]
-   ) extends actions.Algebra[A](
+      val actionMultiply: BiArrow[A, M, A]
+    ) extends actions.Algebra[A](
       ** := actionMultiply
     ):
       def x[B: Dot]( // Formalism to make the product of two Actions an Action to facilitate sugar
@@ -133,6 +133,15 @@ trait AlgebraicStructures[
         new Action[(A, B)](
           product.operatorAssignments.lookup(**).get
         )
+
+      def induced[G: Dot](
+        morphism: G ~> M
+      )(
+        implicit group: Group[G]
+      ): group.Action[A] =
+        group.Action[A]{ case a ⊕ g =>
+          actionMultiply(a, morphism(g))
+        }
     }
 
   extension(a: AlgebraicTheory[_]#Algebra[_])

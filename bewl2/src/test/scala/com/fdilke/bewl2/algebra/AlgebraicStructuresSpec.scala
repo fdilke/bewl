@@ -15,6 +15,7 @@ import scala.language.postfixOps
 import com.fdilke.bewl2.sets.Sets
 import Sets.*
 import Sets.StandardTermsAndOperators.*
+import com.fdilke.utility.Shortcuts.*
 
 class AlgebraicStructuresSpec extends RichFunSuite:
 
@@ -205,7 +206,6 @@ class AlgebraicStructuresSpec extends RichFunSuite:
 
   test("Monoids include the off-the-shelf regular action") {
     withMonoidOf3a {
-//      (_: Dot[Symbol]) ?=> (monoid: Monoid[Symbol]) ?=>
       val monoid: Monoid[Symbol] = summon
       monoid.withRegularAction {
         summon[monoid.Action[Symbol]].sanityTest
@@ -435,6 +435,24 @@ class AlgebraicStructuresSpec extends RichFunSuite:
                 monoids.isMorphism[U, E](embed) is true
               }
             }
+      }
+    }
+  }
+
+  test("A group action can be induced from a monoid one via a morphism") {
+    withCyclicGroup(4) { [I] => (_: Dot[I]) ?=> (i2int : I =:= Int) ?=> (_ : Int =:= I) ?=> (groupI : Group[I]) ?=>
+      withCyclicGroup(4) { [J] => (_: Dot[J]) ?=>(_: J =:= Int) ?=> (int2j: Int =:= J) ?=> (groupJ: Group[J]) ?=>
+        val iToJ: I => J = { x =>
+          transmute[I, Int, J](groupI.multiply(x, x))
+        }
+        groups.isMorphism(iToJ) is true
+        groupJ.withMonoid{ (monoidJ: Monoid[J]) ?=>
+          monoidJ.withRegularAction { (actionJ: monoidJ.Action[J]) ?=>
+            val actionI: groupI.Action[J] = actionJ.induced(iToJ)
+            actionI.sanityTest
+            actionI.actionMultiply(1, 3) is 3
+          }
+        }
       }
     }
   }

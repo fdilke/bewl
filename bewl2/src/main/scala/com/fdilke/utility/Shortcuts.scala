@@ -5,3 +5,14 @@ object Shortcuts:
     throw new IllegalArgumentException(
       message
     )
+
+  inline def transmute[P, Q](p: P)(implicit
+    pToQ: P =:= Q
+  ): Q =
+    pToQ.substituteCo[[X] =>> X](p)
+
+  inline def transmute[P, Q, R](p: P)(using
+    P =:= Q,
+    Q =:= R
+  ): R =
+    transmute[Q, R](transmute[P, Q](p))
