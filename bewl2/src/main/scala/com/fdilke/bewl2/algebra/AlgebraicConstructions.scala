@@ -98,15 +98,20 @@ trait AlgebraicConstructions[
         block[G](embed)
     }
 
-//  def withAutomorphismGroup[X : Dot, RESULT](
-//    block: [A] => Dot[A] ?=> (group: Group[A]) ?=> group.Action[X] ?=> RESULT
-//  ): RESULT =
-//    withEndomorphismMonoid[X, RESULT] {
-//      [E] => (_: Dot[E]) ?=> (monoid: E]) ?=> (action: monoid.Action[Int]) ?=>
-//        withGroupOfUnits[E, RESULT] {
-//          [A] => (_: Dot[A]) ?=> (group: Group[A]) ?=> (embed: A => E) =>
-//            given group.Action[X] = ...
-//        }
+  def withAutomorphismGroup[X : Dot, RESULT](
+    block: [A] => Dot[A] ?=> (group: Group[A]) ?=> group.Action[X] ?=> RESULT
+  ): RESULT =
+    withEndomorphismMonoid[X, RESULT] {
+      [E] => (_: Dot[E]) ?=> (monoid: Monoid[E]) ?=> (action: monoid.Action[X]) ?=>
+      withGroupOfUnits[E, RESULT] {
+        [A] => (_: Dot[A]) ?=> (group: Group[A]) ?=> (embed: A ~> E) =>
+          // ??? : RESULT
+          given group.Action[X] = group.Action[X] { case x ⊕ a =>
+            action.actionMultiply(x, embed(a))
+          }
+          block[A]
+        }
+      }
 }
 
 

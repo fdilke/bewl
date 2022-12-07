@@ -137,15 +137,14 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
     }
   }
 
-//  test("Construct the internal automorphism group") {
-//    import StockSymbols.*
-//    withDot(Set[Symbol](e, a, b, c)) {
-//      withAutomorphismGroup[Symbol, Unit] {
-//        [G] => (_: Dot[G]) ?=> (eGroup: EndomorphismGroup[G, Symbol]) ?=>
-//          eGroup.sanityTest
-//        dot[E].size is 24
-//        val standardAction: eGroup.Action[Symbol] = eGroup.standardAction
-//        standardAction.sanityTest
-//      }
-//    }
-//  }
+  test("Construct the internal automorphism group") {
+    import StockSymbols.*
+    withDot(Set[Symbol](e, a, b, c)) {
+      withAutomorphismGroup[Symbol, Unit] {
+        [G] => (_: Dot[G]) ?=> (group: Group[G]) ?=> (action: group.Action[Symbol]) ?=>
+        group.sanityTest
+        action.sanityTest
+        dot[G].size is 24
+      }
+    }
+  }

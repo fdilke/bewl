@@ -1,6 +1,5 @@
 # NON-CODING
 - sanity test symmetric group S_6 with '-Xmx3G'
-- get tests working with Metals
 - move algo stuff to another repo; it doesn't belong here. Ditto cocantorian stuff
 
 # SPECULATIVE
@@ -12,6 +11,7 @@
 - can model geometric morphisms, X: Topos -> Y: Topos?
 - read Moerdijk & MacLane again, also the TTT book, and Four Czechs
 - work out details of 'metrics' approach to H-valued sets
+- how much of the theory of (finite) groups carries over to LFTs?
 
 # BEWL AS TOOL
 - for card shuffle calc: verify surjectivity, investigate uniformity. Good stretch goal
@@ -69,6 +69,7 @@
 - disentangle mask[]/sillyMask[] which should be a pure type operation
 - enumerate morphisms
 - abstract code used for suits into withEnum ; remap the Direction code via this
+- get tests working with Metals - do via the Flask icon for convenience. Or a launch does it
 
 # TODO
 - permutations, deep property of FinSet from card trick?
@@ -95,4 +96,4 @@
 - minor: can I have GenericToposSpec(using Sets) rather than bodgily passing an implicit with an extra set of parens
 - use withAutos/withEndos pattern again for algebras; loop over the sequence of operators
 - replace ~> with > (both of them), > with ~> ?
-- -
+- 'idiomatic' use of operations, so we should be able to talk about a * g if a suitable group and action are in scope
