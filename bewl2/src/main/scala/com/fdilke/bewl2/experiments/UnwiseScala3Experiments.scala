@@ -1,5 +1,6 @@
 package com.fdilke.bewl2.experiments
 
+import com.fdilke.bewl2.sets.Sets
 object UnwiseScala3Experiments {
 
   trait Crappable[A, CTXT[_] /* <: Mappable[A, CTXT]] */ ] { self: CTXT[A] =>
@@ -132,3 +133,69 @@ object MultipleTraits:
   // but then can't do this, 'trait Algebra is extended twice'
   // trait HyperSquiddle extends widgets.Algebra with doodads.Algebra
 
+/* This served its purpose but now causes weird internal Metals errors in the log  
+object CurriedDependentImplicits:
+  trait FauxGroup[A]:
+    trait Action[B]
+  trait FauxDot[A]
+  def noddy(
+    block: FauxDot[Seq[Int]] ?=> FauxGroup[Seq[Int]] ?=> Unit
+  ): Unit = ()
+  noddy { (dot: FauxDot[Seq[Int]]) ?=> (group: FauxGroup[Seq[Int]]) ?=>
+    ()
+  }
+  def noddy2(
+    block: FauxDot[Seq[Int]] ?=> FauxDot[Int] ?=> FauxGroup[Seq[Int]] ?=> Unit
+  ): Unit = ()
+  noddy2 { (dot: FauxDot[Seq[Int]]) ?=> (dotInt: FauxDot[Int]) ?=> (group: FauxGroup[Seq[Int]]) ?=>
+    ()
+  }
+  // def noddy3(
+  //   block: FauxDot[Seq[Int]] ?=> (group: FauxGroup[Seq[Int]]) ?=> (action: group.Action[Int]) ?=> Unit
+  // ): Unit = ()
+  // noddy3 { (dot: FauxDot[Seq[Int]]) ?=> (group: FauxGroup[Seq[Int]]) ?=> (action: group.Action[Int]) ?=> 
+  //   ()
+  // }
+  def noddy4(
+    block: [E] => Sets.Dot[E] ?=> (monoid: Sets.Monoid[E]) ?=> monoid.Action[Int] ?=> Unit
+  ): Unit = ()
+  noddy4 {
+    [E] => (_ : Sets.Dot[E]) ?=> (monoid: Sets.Monoid[E]) ?=> (action: monoid.Action[Int]) ?=>
+      ()
+  }
+  def noddy5(
+    block: [E] => Sets.Dot[E] ?=> (monoid: Sets.Monoid[E]) ?=> monoid.Action[Int] ?=> Unit
+  ): Unit = ()
+  noddy5 {
+    [E] => (dot : Sets.Dot[E]) ?=> (monoid: Sets.Monoid[E]) ?=> (action: monoid.Action[Int]) ?=>
+    // [E] => (_ : Sets.Dot[E]) ?=> (monoid: Monoid[E]) ?=> monoid.Action[X] ?=>
+      ()
+  }
+  def noddy6(
+    block: (group: Sets.Group[Seq[Int]]) ?=> group.Action[Int] => Unit
+  ): Unit = ()
+  noddy6 {
+    (group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) =>
+      ()
+  }
+  def noddy7(
+    block: Sets.Dot[Seq[Int]] ?=> (group: Sets.Group[Seq[Int]]) ?=> group.Action[Int] => Unit
+  ): Unit = ()
+  noddy7 {
+    (dot : Sets.Dot[Seq[Int]]) ?=> (group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) =>
+      ()
+  }
+  def noddy8(
+    block: Sets.Dot[Seq[Int]] ?=> Sets.Dot[Int] ?=> (group: Sets.Group[Seq[Int]]) ?=> group.Action[Int] => Unit
+  ): Unit = ()
+  noddy8 {
+    (dot : Sets.Dot[Seq[Int]]) ?=> (ints: Sets.Dot[Int]) ?=> (group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) =>
+      ()
+  }
+  // def noddy4(
+  //   block: FauxDot[Seq[Int]] ?=> (dotInt: FauxDot[Int]) ?=> (group: FauxGroup[Seq[Int]]) ?=> (action: group.Action[Int]) ?=> Unit
+  // ): Unit = ()
+  // noddy4 { (dot: FauxDot[Seq[Int]]) ?=> (group: FauxGroup[Seq[Int]]) ?=> (action: group.Action[Int]) ?=> 
+  //   ()
+  // }
+*/

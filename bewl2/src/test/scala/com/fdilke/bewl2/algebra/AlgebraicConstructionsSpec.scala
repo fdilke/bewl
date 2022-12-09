@@ -56,23 +56,26 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
 
   test("Construct symmetric groups") {
     import StockSymbols.*
-    withSymmetricGroup(1) {
-      (_: Dot[Seq[Int]]) ?=> (group: Group[Seq[Int]]) ?=>
+
+    withSymmetricGroup(1) { (ints : Sets.Dot[Int], seqs: Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => 
       dot[Seq[Int]] is Set(Seq(0))
       group.sanityTest
       group.unit(()) is Seq(0)
       group.multiply(Seq(0), Seq(0)) is Seq(0)
+      action.sanityTest
+      action.actionMultiply(0, Seq(0)) is 0
     }
-    withSymmetricGroup(2) {
-      (_: Dot[Seq[Int]]) ?=> (group: Group[Seq[Int]]) ?=>
+    withSymmetricGroup(2) { (ints : Sets.Dot[Int], seqs: Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => 
       dot[Seq[Int]] is Set(Seq(0, 1), Seq(1, 0))
       group.sanityTest
       group.unit(()) is Seq(0, 1)
       group.multiply(Seq(1, 0), Seq(1, 0)) is Seq(0, 1)
+      dot[Int] is Set(0, 1)
+      action.sanityTest
+      action.actionMultiply(1, Seq(1, 0)) is 0
       group.isCommutative is true
     }
-    withSymmetricGroup(3) {
-      (_: Dot[Seq[Int]]) ?=> (group: Group[Seq[Int]]) ?=>
+    withSymmetricGroup(3) { (ints : Sets.Dot[Int], seqs: Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => 
       dot[Seq[Int]] is Set(
         Seq(0, 1, 2),
         Seq(1, 0, 2), Seq(0, 2, 1), Seq(2, 1, 0),
@@ -81,23 +84,29 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
       group.sanityTest
       group.unit(()) is Seq(0, 1, 2)
       group.multiply(Seq(1, 0, 2), Seq(1, 2, 0)) is Seq(2, 1, 0)
+      dot[Int] is Set(0, 1, 2)
+      action.sanityTest
+      action.actionMultiply(0, Seq(1, 0, 2)) is 1
       group.isCommutative is false
     }
-    withSymmetricGroup(4) { // could do 5 at a stretch :(
-      (_: Dot[Seq[Int]]) ?=> (group: Group[Seq[Int]]) ?=>
+    withSymmetricGroup(4) { (ints : Sets.Dot[Int], seqs: Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => 
       dot[Seq[Int]].size is 24
       group.sanityTest
+      dot[Int] is Set(0, 1, 2, 3)
+      action.sanityTest
+      action.actionMultiply(2, Seq(1, 0, 3, 2)) is 3
       group.isCommutative is false
     }
   }
 
   if (false)
     test("(Benchmark, sanity test S_5)") {*
-      withSymmetricGroup(5) {
-        (_: Dot[Seq[Int]]) ?=> (group: Group[Seq[Int]]) ?=>
-          dot[Seq[Int]].size is 120
-          group.sanityTest
-          group.isCommutative is false
+      withSymmetricGroup(5) { (ints : Sets.Dot[Int], seqs: Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => 
+        dot[Seq[Int]].size is 120
+        group.sanityTest
+        action.sanityTest
+        action.actionMultiply(2, Seq(1, 0, 4, 3, 2)) is 4
+        group.isCommutative is false
       }
     }
 

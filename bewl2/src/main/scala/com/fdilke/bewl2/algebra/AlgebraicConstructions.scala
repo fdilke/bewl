@@ -213,13 +213,14 @@ object AlgebraicConstructions:
   def withSymmetricGroup[RESULT](
     degree: Int
   )(
-    block: Sets.Dot[Seq[Int]] ?=> Sets.Group[Seq[Int]] ?=> RESULT
+    block: (ints : Sets.Dot[Int], seqs: Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => RESULT
   ): RESULT =
     val symbols: Seq[Int] = (0 until degree)
-    Sets.withDot(
+    Sets.withDots(
+      symbols.toSet[Int],
       symbols.permutations.toSet[Seq[Int]]
     ) {
-      given Sets.Group[Seq[Int]] =
+      implicit val group: Sets.Group[Seq[Int]] =
         Sets.Group[Seq[Int]](
           unit = makeNullaryOperator[Seq[Int]](symbols),
           multiply = { (p1: Seq[Int], p2: Seq[Int]) =>
@@ -233,6 +234,8 @@ object AlgebraicConstructions:
             array.toSeq
           }
         )
-
-      block
+      val action: group.Action[Int] = group.Action[Int] { (i, seq) =>
+        seq(i)
+      }
+      block(action)
     }

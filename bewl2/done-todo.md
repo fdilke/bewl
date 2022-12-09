@@ -10,7 +10,8 @@
 - L-T topologies. Can think of as quantifiers? Kernels of Heyting morphisms as per Matt F's paper?
 - can model geometric morphisms, X: Topos -> Y: Topos?
 - read Moerdijk & MacLane again, also the TTT book, and Four Czechs
-- work out details of 'metrics' approach to H-valued sets
+- work out details of 'metrics' approach to H-valued sets:
+  like top trumps / book or record details / mappings to DISCRETE or LINEAR?
 - how much of the theory of (finite) groups carries over to LFTs?
 
 # BEWL AS TOOL
@@ -25,6 +26,7 @@
 - Is there always a generator? And therefore a cogenerator..?
 - can we construct the injective hull of a module? is this guaranteed to exist? Say even in FinSet?
   Yes by this paper: https://www.ias.ac.in/article/fulltext/pmsc/109/04/0345-0351
+  There is another paper somewhere which gives an algorithm for constructing it (algos on finite rings)
 
 # TOO GNARLY (for now)
 - default RESULT type of Unit for situations like withAction[Int, Unit] ?
@@ -97,3 +99,7 @@
 - use withAutos/withEndos pattern again for algebras; loop over the sequence of operators
 - replace ~> with > (both of them), > with ~> ?
 - 'idiomatic' use of operations, so we should be able to talk about a * g if a suitable group and action are in scope
+- if calculating S_13 via endos-then-units is too much, use special purpose code from symm-group, integrate?
+- formalize the 'drivers' by putting them all in a ToposDrivers trait? There are likely to be more.
+- extend withSymmetricGroup to also include the action on ints
+- lose the implicit exponential [X > X], shouldn't need it

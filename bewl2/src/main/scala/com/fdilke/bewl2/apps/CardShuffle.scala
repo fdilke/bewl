@@ -15,6 +15,7 @@ object CardShuffle extends App:
 
   val numbers: Set[Int] = (1 to 13).toSet
 
+  println("The great task begins.")  
   withDot(numbers) {
     withEnum[Suit] {
       withEndomorphismMonoid[Suit, Unit] { [E] => (_: Dot[E]) ?=>
@@ -26,3 +27,5 @@ object CardShuffle extends App:
       }
     }
   }
+
+  println("Aaaaand scene.")

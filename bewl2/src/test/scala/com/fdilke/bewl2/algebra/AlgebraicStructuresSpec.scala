@@ -405,13 +405,11 @@ class AlgebraicStructuresSpec extends RichFunSuite:
   }
 
   test("Groups can tell if a group is commutative or not") {
-    withSymmetricGroup(2) {
-      (_: Dot[Seq[Int]]) ?=> (group: Group[Seq[Int]]) ?=>
-        group.isCommutative is true
+    withSymmetricGroup(2) { (ints : Sets.Dot[Int], seqs: Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => 
+      group.isCommutative is true
     }
-    withSymmetricGroup(3) {
-      (_: Dot[Seq[Int]]) ?=> (group: Group[Seq[Int]]) ?=>
-        group.isCommutative is false
+    withSymmetricGroup(3) { (ints : Sets.Dot[Int], seqs: Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => 
+      group.isCommutative is false
     }
   }
 
