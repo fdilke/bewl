@@ -79,7 +79,7 @@ trait AlgebraicStructures[
     * := multiply
   ) with Actions[M]
 
-  trait Actions[M: Dot] {
+  trait Actions[M: Dot]:
     val unit: NullaryOp[M]
     val multiply: BinaryOp[M]
 
@@ -142,7 +142,31 @@ trait AlgebraicStructures[
         group.Action[A]{ case a ⊕ g =>
           actionMultiply(a, morphism(g))
         }
-    }
+
+      def preserving[Q: Dot, RESULT](
+        arrow: A ~> Q
+      ) (
+        block: [P] => (dotP : Dot[P]) ?=> (groupP: Group[P]) ?=> (embed: P ~> M) => RESULT
+      ) (
+        implicit groupM: Group[M] // note, this is a kludge
+      ): RESULT =
+        ∀[M, A] { (m, a) =>
+          arrow(a) =?= arrow(actionMultiply(a, m))
+        } whereTrue { [P] => (dotP: Dot[P]) ?=> (equalizer: Equalizer[P, M]) =>
+          implicit val groupP: Group[P] = new Group[P](
+            unit = equalizer.restrict(groupM.unit),
+            multiply = equalizer.restrict { (p, q) => 
+              groupM.multiply(
+                equalizer.inclusion(p),
+                equalizer.inclusion(q)
+              )
+            },
+            inverse = equalizer.restrict { p =>
+              groupM.inverse(equalizer.inclusion(p))
+            }
+          )
+          block[P](equalizer.inclusion)
+        }
 
   extension(a: AlgebraicTheory[_]#Algebra[_])
     def isCommutative = a.satisfies(

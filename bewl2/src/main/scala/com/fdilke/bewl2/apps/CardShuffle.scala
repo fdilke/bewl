@@ -9,21 +9,19 @@ import scala.language.postfixOps
 // we have G = KHK where H (resp. K) is the subgroup of column (resp. row) preserving transformations.
 
 enum Suit:
-  case Hearts, Clubs, Spades, Diamonds
+  case Hearts, Clubs // , Spades, Diamonds
 
 object CardShuffle extends App:
 
-  val numbers: Set[Int] = (1 to 13).toSet
+  val numbers: Set[Int] = (1 to 3).toSet // (1 to 13).toSet
 
   println("The great task begins.")  
   withDot(numbers) {
     withEnum[Suit] {
-      withEndomorphismMonoid[Suit, Unit] { [E] => (_: Dot[E]) ?=>
-        (monoidSuit: Monoid[E]) ?=> (_: monoidSuit.Action[Suit]) ?=>
-        withEndomorphismMonoid[Int, Unit] { [F] => (_: Dot[F]) ?=>
-        (monoidInt: Monoid[F]) ?=> (_: monoidInt.Action[Int]) ?=>
-
-        }
+      withAutomorphismGroup[(Suit, Int), Unit] {
+        [A] => (_ : Dot[A]) ?=> (group: Group[A]) ?=> (action: group.Action[(Suit, Int)]) ?=>
+          ()
+        // ∀
       }
     }
   }

@@ -133,7 +133,7 @@ object MultipleTraits:
   // but then can't do this, 'trait Algebra is extended twice'
   // trait HyperSquiddle extends widgets.Algebra with doodads.Algebra
 
-/* This served its purpose but now causes weird internal Metals errors in the log  
+/* This served its purpose but now causes weird internal Metals errors in the log  ... actually it's ok */
 object CurriedDependentImplicits:
   trait FauxGroup[A]:
     trait Action[B]
@@ -198,4 +198,3 @@ object CurriedDependentImplicits:
   // noddy4 { (dot: FauxDot[Seq[Int]]) ?=> (group: FauxGroup[Seq[Int]]) ?=> (action: group.Action[Int]) ?=> 
   //   ()
   // }
-*/

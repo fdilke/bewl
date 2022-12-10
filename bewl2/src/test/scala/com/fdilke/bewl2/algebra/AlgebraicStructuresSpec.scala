@@ -455,6 +455,26 @@ class AlgebraicStructuresSpec extends RichFunSuite:
     }
   }
 
+  test("Pick out the subgroup preserving an arrow from an action") {
+    withDots(
+      Set[String]("a", "b"),
+      Set[Int](0, 1)
+    ) {
+      withAutomorphismGroup[(String, Int), Unit] { 
+        [A] => (_ : Dot[A]) ?=> (group: Group[A]) ?=> (action: group.Action[(String, Int)]) ?=>
+          // val arrow: ((String, Int) => Int = π0[String, Int]
+          action.preserving(
+            π0[String, Int]
+          ) { [P] => (_ : Dot[P]) ?=> (groupP: Group[P]) ?=> (embed: P => A) =>
+            groupP.sanityTest
+            dot[P].size is 4
+            // dot[P].map(embed) is Set[Seq[Int]]( Seq(0, 1, 2), Seq(1, 2, 0), Seq(2, 0, 1) )
+            action.induced[P](embed).sanityTest
+          }
+      }
+    }
+  }
+
   test("The action machinery for monoids also works with groups") {
     withCyclicGroup(order = 6) { [Int6] => (_: Dot[Int6]) ?=> (_: Int6 =:= Int) ?=> (_: Int =:= Int6) ?=> (group6: Group[Int6]) ?=>
       withDot(Set[Int](0, 1)) {

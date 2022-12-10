@@ -103,3 +103,5 @@
 - formalize the 'drivers' by putting them all in a ToposDrivers trait? There are likely to be more.
 - extend withSymmetricGroup to also include the action on ints
 - lose the implicit exponential [X > X], shouldn't need it
+- fix up so: Group extends Actions[Group], then induction and preservation can be type safe
+- coproducts. Definitely have a driver architecture for these. Use Either or | as we used tuples for products?
