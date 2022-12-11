@@ -3,7 +3,7 @@ package com.fdilke.bewl2.sets
 import com.fdilke.bewl2.PreTopos
 import com.fdilke.bewl2.Topos
 import com.fdilke.bewl2.Mappable
-import com.fdilke.bewl2.sets.SetsUtilities.allMaps
+import com.fdilke.bewl2.sets.SetsUtilities.*
 
 import scala.language.postfixOps
 
@@ -153,6 +153,38 @@ object Sets extends Topos[
       override val or: BiArrow[Boolean, Boolean, Boolean] = { _ | _ }
       override val falsity: NullaryOp[Boolean] = { _ => false }
 
+  override lazy val autoFinder: AutomorphismFinder =
+    new AutomorphismFinder:
+      override def withAutomorphismGroup[X : Dot, RESULT](
+        block: [A] => Dot[A] ?=> (group: Group[A]) ?=> group.Action[X] ?=> RESULT
+      ): RESULT =
+        val seqX: Seq[X] = dot[X].toSeq
+        val numbers: Seq[Int] = seqX.indices
+        withDot[Seq[Int], RESULT](
+          numbers.permutations.toSet[Seq[Int]]
+        ) {
+          implicit val group: Sets.Group[Seq[Int]] =
+            Sets.Group[Seq[Int]](
+              unit = makeNullaryOperator[Seq[Int]](numbers),
+              multiply = { (p1: Seq[Int], p2: Seq[Int]) =>
+                numbers map { s => p2(p1(s)) }
+              },
+              inverse = { (p: Seq[Int]) =>
+                val array: Array[Int] = new Array[Int](seqX.size)
+                numbers.foreach { s =>
+                  array(p(s)) = s
+                }
+                array.toSeq
+              }
+            )
+          val index: Map[X, Int] = Map(
+            seqX.zip(numbers) :_*
+          )
+          given group.Action[X] = group.Action[X] { (x, seq) =>
+            seqX(seq(index(x)))
+          }
+          block[Seq[Int]]
+        }
 
   
 

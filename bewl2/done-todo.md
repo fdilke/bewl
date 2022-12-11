@@ -105,4 +105,4 @@
 - lose the implicit exponential [X > X], shouldn't need it
 - fix up so: Group extends Actions[Group], then induction and preservation can be type safe
 - coproducts. Definitely have a driver architecture for these. Use Either or | as we used tuples for products?
-- full driver pattern/test for logops, autos, coproducts
+- full driver pattern/test for logops, autos, coproducts and reengineer withSymmetricGroup
