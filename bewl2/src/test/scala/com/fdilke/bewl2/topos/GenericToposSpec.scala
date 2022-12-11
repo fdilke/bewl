@@ -4,6 +4,7 @@ import com.fdilke.bewl2.Topos
 import munit.FunSuite
 import scala.language.postfixOps
 import java.io.File
+import com.fdilke.utility.Mask._
 
 abstract class GenericToposSpec[
   DOT[_],
@@ -250,3 +251,25 @@ abstract class GenericToposSpec[
       }
     }
   }
+
+  test("overrides the logops driver correctly, if at all") {
+    if (!(logicalOperations.isInstanceOf[DefaultLogicalOperations])) {
+      val defaultLogOps: LogicalOperations = new DefaultLogicalOperations
+      val heyting: HeytingAlgebra[BEWL] =
+        new HeytingAlgebra[BEWL](
+          defaultLogOps.falsity,
+          truth,
+          defaultLogOps.and,
+          defaultLogOps.or,
+          defaultLogOps.implies
+      )
+      mask[BEWL, HeytingAlgebra, Unit](heyting) { 
+        [ALTBEWL] => (altHeyting: HeytingAlgebra[ALTBEWL]) => (_ : ALTBEWL =:= BEWL) ?=> (_ : BEWL =:= ALTBEWL) ?=>
+          val reallyBewl: ALTBEWL ~> BEWL =
+            summon[ALTBEWL =:= BEWL].substituteCo[CTXT]
+          given Dot[ALTBEWL] = summon[BEWL =:= ALTBEWL].substituteCo[Dot](summon[Dot[BEWL]])
+          given HeytingAlgebra[ALTBEWL] = altHeyting
+          assert { heytingAlgebras.isMorphism(reallyBewl) }
+        }
+      }
+    }

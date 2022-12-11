@@ -145,7 +145,14 @@ object PreSets extends PreTopos[Set, [A] =>> A, Void, Unit, Boolean, Map]:
 
 object Sets extends Topos[
   Set, [A] =>> A, Void, Unit, Boolean, Map
-](PreSets)
+](PreSets):
+  override lazy val logicalOperations: LogicalOperations =
+    new LogicalOperations:
+      override val and: BiArrow[Boolean, Boolean, Boolean] = { _ & _ }
+      override val implies: BiArrow[Boolean, Boolean, Boolean] = { !(_) | _ }
+      override val or: BiArrow[Boolean, Boolean, Boolean] = { _ | _ }
+      override val falsity: NullaryOp[Boolean] = { _ => false }
+
 
   
 
