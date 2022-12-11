@@ -168,6 +168,11 @@ trait AlgebraicStructures[
           block[P](equalizer.inclusion)
         }
 
+      def toExponent: M ~> (A > A) =
+        transpose[M, A, A] { case m ⊕ a => 
+          actionMultiply(a, m)
+        }
+
   extension(a: AlgebraicTheory[_]#Algebra[_])
     def isCommutative = a.satisfies(
       α * β := β * α

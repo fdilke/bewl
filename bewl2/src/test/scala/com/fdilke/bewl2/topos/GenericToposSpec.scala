@@ -250,20 +250,19 @@ abstract class GenericToposSpec[
         (monicBar2baz o restriction) =!= foo2ImageOfBar
       }
     }
-  }
-
-  test("overrides the logops driver correctly, if at all") {
-    if (!(logicalOperations.isInstanceOf[DefaultLogicalOperations])) {
-      val defaultLogOps: LogicalOperations = new DefaultLogicalOperations
-      val heyting: HeytingAlgebra[BEWL] =
-        new HeytingAlgebra[BEWL](
-          defaultLogOps.falsity,
-          truth,
-          defaultLogOps.and,
-          defaultLogOps.or,
-          defaultLogOps.implies
-      )
-      mask[BEWL, HeytingAlgebra, Unit](heyting) { 
+    
+    test("overrides the logops driver correctly, if at all") {
+      if (!(logicalOperations.isInstanceOf[DefaultLogicalOperations])) {
+        val defaultLogOps: LogicalOperations = new DefaultLogicalOperations
+        val heyting: HeytingAlgebra[BEWL] =
+          new HeytingAlgebra[BEWL](
+            defaultLogOps.falsity,
+            truth,
+            defaultLogOps.and,
+            defaultLogOps.or,
+            defaultLogOps.implies
+            )
+        mask[BEWL, HeytingAlgebra, Unit](heyting) { 
         [ALTBEWL] => (altHeyting: HeytingAlgebra[ALTBEWL]) => (_ : ALTBEWL =:= BEWL) ?=> (_ : BEWL =:= ALTBEWL) ?=>
           val reallyBewl: ALTBEWL ~> BEWL =
             summon[ALTBEWL =:= BEWL].substituteCo[CTXT]
@@ -273,3 +272,28 @@ abstract class GenericToposSpec[
         }
       }
     }
+            
+    test("overrides the automorphism finder correctly, if at all") {
+      if (! autoFinder.isInstanceOf[DefaultAutomorphismFinder]) {
+        val defaultAutoFinder: AutomorphismFinder = new DefaultAutomorphismFinder
+        autoFinder.withAutomorphismGroup[FOO, Unit] {
+          [A] => (_ : Dot[A]) ?=> (group: Group[A]) ?=> (action: group.Action[FOO]) ?=>
+          defaultAutoFinder.withAutomorphismGroup[FOO, Unit] {
+          [D] => (_ : Dot[D]) ?=> (groupD: Group[D]) ?=> (actionD: groupD.Action[FOO]) ?=>
+            val groupIso: D ~> A = actionD.toExponent \ action.toExponent
+            assert { groups.isMorphism(groupIso) }
+            assert { groupIso.isIso }
+            mask[FOO, groupD.Action, Unit](
+              action.induced(groupIso)
+            ) { [F] => (actionF: groupD.Action[F]) => (f2foo : F =:= FOO) ?=> (foo2f : FOO =:= F) ?=>
+              given Dot[F] = foo2f.substituteCo[Dot](summon[Dot[FOO]])
+              val realFoo: F ~> FOO = f2foo.substituteCo[CTXT]
+              given groupD.Action[F] = actionF
+              assert { realFoo.isIso }
+              assert { groupD.actions.isMorphism(realFoo) }
+            }
+          }
+        }
+      }
+    }
+  }
