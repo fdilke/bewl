@@ -72,15 +72,18 @@
 - enumerate morphisms
 - abstract code used for suits into withEnum ; remap the Direction code via this
 - get tests working with Metals - do via the Flask icon for convenience. Or a launch does it
+- withAutomorphismGroup which condenses withEndomorphismMonoid and withGroupOfUnits. Refactor existing uses
+- fix arrow.isIso which currently always returns true. also epic, mono. determine image
+- 'rich arrow' features - separate tests for these (need full quantifiers)
+- does the symmetry group come with an action on n? it should do. Can use for card shuffle calc
 
 # TODO
 - permutations, deep property of FinSet from card trick?
 - any implicits left in tests for algebraic machinery? any other unnecessary flummery with '?=>' ?
 - can improve how equalizerSituation / scope of implicits works in the generic topos tests?
 - instead of group x group: bake this in, as with products of dots; have an implicit. Same for actions
-- 'rich arrow' features - separate tests for these (need full quantifiers)
-- fix arrow.isIso which currently always returns true. also epic, mono. also ideally section/retraction, image
 - TODO: override, test equivalents for logical operations
+- can easily do section and retraction? what did we use those for in Bewl 1?
 - topos of permutations
 - topos of group actions. Should be a separate class
 - when we have the topos of monoid actions, test topos.isBoolean
@@ -93,15 +96,13 @@
 - if we have rich internal arrows, X > Y (postponed above) test for being monic/epic/iso, compose 'em (caching the machinery...)
 - can we have Option[X] implicitly generating a dot that is X*?
 - compute the inverse of a morphism. Again inefficient before. Can we just backdivide from the identity?
-- does the symmetry group come with an action on n? it should do. Can use for card shuffle calc
-- withAutomorphismGroup which condenses withEndomorphismMonoid and withGroupOfUnits. Refactor existing uses
 - minor: can I have GenericToposSpec(using Sets) rather than bodgily passing an implicit with an extra set of parens
 - use withAutos/withEndos pattern again for algebras; loop over the sequence of operators
 - replace ~> with > (both of them), > with ~> ?
 - 'idiomatic' use of operations, so we should be able to talk about a * g if a suitable group and action are in scope
 - if calculating S_13 via endos-then-units is too much, use special purpose code from symm-group, integrate?
 - formalize the 'drivers' by putting them all in a ToposDrivers trait? There are likely to be more.
-- extend withSymmetricGroup to also include the action on ints
 - lose the implicit exponential [X > X], shouldn't need it
 - fix up so: Group extends Actions[Group], then induction and preservation can be type safe
 - coproducts. Definitely have a driver architecture for these. Use Either or | as we used tuples for products?
+- full driver pattern/test for logops, autos, coproducts

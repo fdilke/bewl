@@ -22,8 +22,6 @@ trait AlgebraicConstructions[
 
   def withEndomorphismMonoid[X : Dot, RESULT](
     block: [E] => Dot[E] ?=> (monoid: Monoid[E]) ?=> monoid.Action[X] ?=> RESULT
-  )(
-    implicit exponential: Dot[X > X]
   ): RESULT =
     type E = X > X
 
