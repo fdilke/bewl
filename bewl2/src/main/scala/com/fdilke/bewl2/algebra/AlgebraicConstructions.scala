@@ -224,17 +224,16 @@ object AlgebraicConstructions:
       block
     }
 
-  def withSymmetricGroup[RESULT](
+  def withSymmetricGroupNoAction[RESULT](
     degree: Int
   )(
-    block: (ints : Sets.Dot[Int], seqs: Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => RESULT
+    block: (seqs: Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=> RESULT
   ): RESULT =
     val symbols: Seq[Int] = (0 until degree)
-    Sets.withDots(
-      symbols.toSet[Int],
+    Sets.withDot(
       symbols.permutations.toSet[Seq[Int]]
     ) {
-      implicit val group: Sets.Group[Seq[Int]] =
+      given Sets.Group[Seq[Int]] =
         Sets.Group[Seq[Int]](
           unit = makeNullaryOperator[Seq[Int]](symbols),
           multiply = { (p1: Seq[Int], p2: Seq[Int]) =>
@@ -248,8 +247,22 @@ object AlgebraicConstructions:
             array.toSeq
           }
         )
-      val action: group.Action[Int] = group.Action[Int] { (i, seq) =>
-        seq(i)
+      block
+    }
+
+  def withSymmetricGroup[RESULT](
+    degree: Int
+  )(
+    block: (ints : Sets.Dot[Int], seqs: Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => RESULT
+  ): RESULT =
+    withSymmetricGroupNoAction[RESULT](degree) { (_ : Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=>
+      Sets.withDot(
+        (0 until degree).toSet[Int]
+      ) {
+        block(
+          group.Action[Int] { (i, seq) =>
+            seq(i)
+          }          
+        )
       }
-      block(action)
     }
