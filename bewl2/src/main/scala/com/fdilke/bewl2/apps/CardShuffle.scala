@@ -9,11 +9,12 @@ import scala.language.postfixOps
 // we have G = KHK where H (resp. K) is the subgroup of column (resp. row) preserving transformations.
 
 enum Suit:
-  case Hearts, Clubs // , Spades, Diamonds
+  case Hearts, Clubs, Spades // , Diamonds
 
 object CardShuffle extends App:
 
-  val numbers: Set[Int] = (1 to 2).toSet // (1 to 13).toSet
+  val numbers: Set[Int] = (1 to 3).toSet // (1 to 13).toSet
+  val startTime = System.currentTimeMillis()
 
   println("The great task begins.")  
   withDot(numbers) {
@@ -37,4 +38,6 @@ object CardShuffle extends App:
     }
   }    
 
-  println("Aaaaand scene.")
+  val endTime = System.currentTimeMillis()
+  val totalSec = (endTime - startTime)/1000
+  println(s"Calculation completed ($totalSec sec).")
