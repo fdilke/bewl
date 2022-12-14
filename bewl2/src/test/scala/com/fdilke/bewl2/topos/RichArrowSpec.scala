@@ -53,6 +53,12 @@ class RichArrowSpec extends RichFunSuite:
     }
   }
 
+  test("performance test for epic") {
+    withDot((1 to 8).toSet[Int]) {
+      π0[Int, Int].isEpic is true
+    }
+  }
+
   test("Can tell if an arrow is iso") {
     withDot(Set[Int](1, 2, 3)) {
       withDot(Set[Char]('A', 'B', 'C', 'D')) {

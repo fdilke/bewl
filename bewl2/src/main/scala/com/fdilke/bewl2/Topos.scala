@@ -346,11 +346,7 @@ class Topos[
       }
 
     final def isEpic: Boolean =
-      ∀[Y](
-        ∃[Y, X] { (y, x) =>
-          y =?= f(x)
-        }
-      )
+      epicVerifier.isEpic(f)
 
     final def isIso: Boolean =
       isMonic && isEpic
@@ -372,6 +368,24 @@ class Topos[
           monic = equalizer.inclusion
         )
       }
+
+  trait EpicVerifier:
+    def isEpic[X: Dot, Y: Dot](
+      arrow: X ~> Y
+    ): Boolean
+
+  class DefaultEpicVerifier extends EpicVerifier:
+    override def isEpic[X: Dot, Y: Dot](
+      arrow: X ~> Y
+    ): Boolean =
+      ∀[Y](
+        ∃[Y, X] { (y, x) =>
+          y =?= arrow(x)
+        }
+      )
+
+  lazy val epicVerifier: EpicVerifier =
+    new DefaultEpicVerifier
 
   extension[X: Dot](f: X ~> BEWL)
     def whereTrue[RESULT](

@@ -157,7 +157,7 @@ object Sets extends Topos[
     new AutomorphismFinder:
       override def withAutomorphismGroup[X : Dot, RESULT](
         block: [A] => Dot[A] ?=> (group: Group[A]) ?=> group.Action[X] ?=> RESULT
-      ): RESULT =
+        ): RESULT =
         val seqX: Seq[X] = dot[X].toSeq
         val numbers: Seq[Int] = seqX.indices
         withDot[Seq[Int], RESULT](
@@ -185,6 +185,14 @@ object Sets extends Topos[
           }
           block[Seq[Int]]
         }
+        
+  override lazy val epicVerifier: EpicVerifier =
+    new EpicVerifier:
+      override def isEpic[X: Dot, Y: Dot](
+        arrow: X ~> Y
+      ): Boolean =
+        dot[X].map(arrow).size == dot[Y].size
+
 
   
 

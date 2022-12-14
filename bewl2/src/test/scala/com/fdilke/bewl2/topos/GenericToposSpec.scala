@@ -272,6 +272,21 @@ abstract class GenericToposSpec[
         }
       }
     }
+
+    test("overrides the epic verifier correctly, if at all") {
+      if (!(epicVerifier.isInstanceOf[DefaultEpicVerifier])) {
+        val defaultEpicVerifier: EpicVerifier = new DefaultEpicVerifier
+        morphisms[FOO, BAR].foreach { arrow =>
+          assert { arrow.isEpic == defaultEpicVerifier.isEpic(arrow) }
+        }
+        morphisms[BAR, FOO].foreach { arrow =>
+          assert { arrow.isEpic == defaultEpicVerifier.isEpic(arrow) }
+        }
+        morphisms[FOO, FOO].foreach { arrow =>
+          assert { arrow.isEpic == defaultEpicVerifier.isEpic(arrow) }
+        }
+      }
+    }
             
     test("overrides the automorphism finder correctly, if at all") {
       if (! autoFinder.isInstanceOf[DefaultAutomorphismFinder]) {
