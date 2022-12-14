@@ -20,10 +20,16 @@ object CardShuffle extends App:
     withEnum[Suit] {
       withAutomorphismGroup[(Suit, Int), Unit] {
         [A] => (_ : Dot[A]) ?=> (group: Group[A]) ?=> (action: group.Action[(Suit, Int)]) ?=>
-          ()
+          action.preserving(π0[Suit, Int]) { [H] => (dotH : Dot[H]) ?=> (groupH: Group[H]) ?=> (embed: H ~> A) =>
+            action.preserving(π1[Suit, Int]) { [K] => (dotK : Dot[K]) ?=> (groupK: Group[K]) ?=> (embed: K ~> A) =>
+              // val khk: ((K, H), K) => A = { case ((k, h), k2) =>
+              // }
+              ()
+            }
+          }
         // ∀
       }
     }
-  }
+  }    
 
   println("Aaaaand scene.")

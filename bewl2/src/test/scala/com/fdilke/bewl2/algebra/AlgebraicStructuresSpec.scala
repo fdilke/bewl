@@ -528,3 +528,20 @@ class AlgebraicStructuresSpec extends RichFunSuite:
         ).sanityTest
       }
     }
+
+  test("Can use infix * for multiplication in the context of a group") {
+    withMonoidOf3 { (_: Dot[Symbol]) ?=> (monoidOf3: Monoid[Symbol]) ?=>
+      (a * e) is a
+      (a * b) is b
+    }
+  }
+
+  test("Can use infix * for multiplication and unary ~ for inversion in the context of a group") {
+    withSymmetricGroup(3) { (ints : Sets.Dot[Int], seqs: Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => 
+      val a: Seq[Int] = Seq(1, 0, 2)
+      val b: Seq[Int] = Seq(0, 2, 1)
+      (a * b) is Seq(2, 0, 1)
+      ~(a * b) is Seq(1, 2, 0)
+    }
+  }
+  

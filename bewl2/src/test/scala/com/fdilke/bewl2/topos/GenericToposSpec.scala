@@ -277,14 +277,14 @@ abstract class GenericToposSpec[
       if (! autoFinder.isInstanceOf[DefaultAutomorphismFinder]) {
         val defaultAutoFinder: AutomorphismFinder = new DefaultAutomorphismFinder
         autoFinder.withAutomorphismGroup[FOO, Unit] {
-          [A] => (_ : Dot[A]) ?=> (group: Group[A]) ?=> (action: group.Action[FOO]) ?=>
+          [A] => (_ : Dot[A]) ?=> (group: Group[A]) ?=> (actionA: group.Action[FOO]) ?=>
           defaultAutoFinder.withAutomorphismGroup[FOO, Unit] {
           [D] => (_ : Dot[D]) ?=> (groupD: Group[D]) ?=> (actionD: groupD.Action[FOO]) ?=>
-            val groupIso: D ~> A = actionD.toExponent \ action.toExponent
+            val groupIso: D ~> A = actionD.toExponent \ actionA.toExponent
             assert { groups.isMorphism(groupIso) }
             assert { groupIso.isIso }
             mask[FOO, groupD.Action, Unit](
-              action.induced(groupIso)
+              actionA.induced(groupIso)
             ) { [F] => (actionF: groupD.Action[F]) => (f2foo : F =:= FOO) ?=> (foo2f : FOO =:= F) ?=>
               given Dot[F] = foo2f.substituteCo[Dot](summon[Dot[FOO]])
               val realFoo: F ~> FOO = f2foo.substituteCo[CTXT]

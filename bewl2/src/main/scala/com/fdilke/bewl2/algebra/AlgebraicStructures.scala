@@ -64,6 +64,16 @@ trait AlgebraicStructures[
       given Monoid[G] = asMonoid
       block
 
+  implicit class RichMonoidElement[M: Dot: Monoid](a: CTXT[M]):
+    def *(b: CTXT[M]): CTXT[M] =
+      summon[Monoid[M]].multiply(a, b)
+
+  implicit class RichGroupElement[G: Dot: Group](a: CTXT[G]):
+    def *(b: CTXT[G]): CTXT[G] =
+      summon[Group[G]].multiply(a, b)
+    def unary_~ =
+      summon[Group[G]].inverse(a)
+
   val monoids: Variety =
     AlgebraicTheory(ι, *)(
       "left unit" law (ι * α := α),
