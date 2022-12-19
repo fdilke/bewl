@@ -440,14 +440,11 @@ class Topos[
     def apply[X: Dot]: PartialArrowClassifier[X, _] =
       val evalPredicate: BiArrow[X > BEWL, X, BEWL] =
         evaluation[X, BEWL]
-      val snickett: (X > BEWL, (X, X)) ~> BEWL =
-        {
+      val isSubSingleton: (X > BEWL) ~> BEWL =
+        ∀[X > BEWL, (X, X)] {
           case p ⊕ (x ⊕ y) =>
             (evalPredicate(p ⊕ x) ∧ evalPredicate(p ⊕ y)) → (x =?= y)
         }
-      val isSubSingleton: (X > BEWL) ~> BEWL =
-        ∀[X > BEWL, (X, X)] (snickett)
-      // ???
       isSubSingleton.whereTrue { 
         [OX] => (dotOptionX : Dot[OX]) ?=> (equalizer : Equalizer[OX, X > BEWL]) =>
           new PartialArrowClassifier[X, OX]:
@@ -461,18 +458,14 @@ class Topos[
               monic: V ~> W,
               arrow: V ~> X
             ): W ~> OX =
-              val higgidy: W ~> (X > BEWL) = 
-                transpose[W, X, BEWL] { case t ⊕ a =>
-                  val piggidy: W ~> BEWL = 
-                    ∃[W, V] { case t ⊕ s  =>
-                      ( arrow(s) =?= a ) ∧ ( monic(s) =?= t )
-                    }
-                  piggidy(t)
+              equalizer.restrict(
+                transpose[W, X, BEWL] { case w ⊕ x =>
+                  (∃[W, V] { case w ⊕ v  =>
+                      ( arrow(v) =?= x ) ∧ ( monic(v) =?= w )
+                  } : W ~> BEWL)(w)
                 }
-              equalizer.restrict(higgidy)
+              )
       }
-
-// pelix
 
 object Topos:
   inline def apply[

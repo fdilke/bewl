@@ -121,35 +121,3 @@ class RichDotAndArrowSpec extends RichFunSuite:
     }
   }
 
-      // val set = dot(0, 1)
-      // val pac = set.pac
-      // pac.classifier should have size 3
-      // pac.include should have(
-      //   source(set),
-      //   target(pac.classifier)
-      // )
-      // pac.include shouldBe monic
-      // pac.⏊ should have(
-      //   source(I),
-      //   target(pac.classifier)
-      // )
-      // pac.⏊ shouldBe pac.extend(O.toI, set.fromO)
-      // Seq(0, 1).map(pac.⏊(())) shouldBe Seq(false, false)
-
-      // val foo = dot(a, b)
-      // val subFoo = dot(true)
-      // val inclusion = arrow(subFoo, foo)(true -> a)
-      // val subFoo2set = arrow(subFoo, set)(true -> 1)
-
-      // val foo2setStar = pac.extend(inclusion, subFoo2set)
-      // foo2setStar should have(
-      //   source(foo),
-      //   target(pac.classifier)
-      // )
-      // val imageOf0 = pac.include(0)
-      // val imageOf1 = pac.include(1)
-      // foo2setStar(a) shouldBe imageOf1
-
-      // foo2setStar(b) shouldBe pac.⏊(())
-      // foo2setStar(b) should not be imageOf0
-      // foo2setStar(b) should not be imageOf1
