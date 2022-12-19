@@ -82,6 +82,15 @@ class Topos[
 
     final def ∀ : (X > BEWL) ~> BEWL =
       (truth o toUnit[X]).name.chi
+
+    lazy val singleton: X ~> (X > BEWL) =
+      transpose[X, X, BEWL]{
+        // case x ⊕ y => x =?= y
+        =?=[X]
+      }
+
+    lazy val pac: PartialArrowClassifier[X, _] =
+      PartialArrowClassifier[X]
   }
 
   final def withDot[X, RESULT](
@@ -214,21 +223,37 @@ class Topos[
     pretopos.enumerateMorphisms(dot[X], dot[Y])
 
   implicit def productObject[
-      X: Dot,
-      Y: Dot
+    X: Dot,
+    Y: Dot
   ]: Dot[(X, Y)] =
     summon[Dot[X]].memoizedProduct[Y](
       summon[Dot[Y]]
     )
 
   implicit def exponentialObject[
-      X: Dot,
-      Y: Dot
+    X: Dot,
+    Y: Dot
   ]: Dot[X > Y] =
     summon[Dot[X]].memoizedExponential[Y](
       summon[Dot[Y]]
     )
 
+  inline def withPac[X: Dot, RESULT](
+    block: [OPTION_X] => Dot[OPTION_X] ?=> PartialArrowClassifier[X, OPTION_X] => RESULT
+  ): RESULT =
+    summon[Dot[X]].pac.withMe(block)
+
+  // TODO: would require OPTION[_] to be a fixed type, may be able to finesse
+  // final inline def some[X: Dot]: X ~> Option[X] =
+  //   _.map { Some(_) }
+  // final inline def none[X: Dot]: UNIT ~> Option[X] =
+  //   summon[Dot[X]].pac.none
+  // final inline def extendAlong[V: Dot, W: Dot, X: Dot](
+  //   monic: V ~> W,
+  //   arrow: V ~> X
+  // ): W ~> Option[X] =
+  //   summon[Dot[X]].pac.extendAlong[V, W](monic, arrow)
+    
   final def applicate[X: Dot, T, Y: Dot](
     ctxt: CTXT[T]
   )(
@@ -387,6 +412,9 @@ class Topos[
   lazy val epicVerifier: EpicVerifier =
     new DefaultEpicVerifier
 
+  inline final def singleton[X: Dot]: X ~> (X > BEWL) =
+    summon[Dot[X]].singleton
+
   extension[X: Dot](f: X ~> BEWL)
     def whereTrue[RESULT](
       capture: [A] => Dot[A] ?=> Equalizer[A, X] => RESULT
@@ -395,6 +423,56 @@ class Topos[
         capture
       }
 
+  trait PartialArrowClassifier[X: Dot, OPTION_X: Dot]:
+    final val classifier: Dot[OPTION_X] = summon[Dot[OPTION_X]]
+    val some: X ~> OPTION_X
+    val none: UNIT ~> OPTION_X
+    def extendAlong[V: Dot, W: Dot](
+      monic: V ~> W,
+      arrow: V ~> X
+    ): W ~> OPTION_X
+    final def withMe[RESULT](
+      block: [OX] => Dot[OX] ?=> PartialArrowClassifier[X, OX] => RESULT
+    ): RESULT =
+      block[OPTION_X](this)
+
+  object PartialArrowClassifier:
+    def apply[X: Dot]: PartialArrowClassifier[X, _] =
+      val evalPredicate: BiArrow[X > BEWL, X, BEWL] =
+        evaluation[X, BEWL]
+      val snickett: (X > BEWL, (X, X)) ~> BEWL =
+        {
+          case p ⊕ (x ⊕ y) =>
+            (evalPredicate(p ⊕ x) ∧ evalPredicate(p ⊕ y)) → (x =?= y)
+        }
+      val isSubSingleton: (X > BEWL) ~> BEWL =
+        ∀[X > BEWL, (X, X)] (snickett)
+      // ???
+      isSubSingleton.whereTrue { 
+        [OX] => (dotOptionX : Dot[OX]) ?=> (equalizer : Equalizer[OX, X > BEWL]) =>
+          new PartialArrowClassifier[X, OX]:
+            override val some: X ~> OX = 
+              equalizer.restrict(singleton[X])
+            override val none: UNIT ~> OX = 
+              equalizer.restrict(
+                transpose[UNIT, X, BEWL] { case u ⊕ _ => falsity(u) }
+              )
+            override def extendAlong[V: Dot, W: Dot](
+              monic: V ~> W,
+              arrow: V ~> X
+            ): W ~> OX =
+              val higgidy: W ~> (X > BEWL) = 
+                transpose[W, X, BEWL] { case t ⊕ a =>
+                  val piggidy: W ~> BEWL = 
+                    ∃[W, V] { case t ⊕ s  =>
+                      ( arrow(s) =?= a ) ∧ ( monic(s) =?= t )
+                    }
+                  piggidy(t)
+                }
+              equalizer.restrict(higgidy)
+      }
+
+// pelix
 
 object Topos:
   inline def apply[
