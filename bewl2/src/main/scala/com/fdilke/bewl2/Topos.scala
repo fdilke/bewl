@@ -22,6 +22,7 @@ class Topos[
   type ~>[X, Y] = CTXT[X] => CTXT[Y]
   type BiArrow[X, Y, Z] = (X, Y) ~> Z
   type UntupledBiArrow[P, Q, X] = (CTXT[P], CTXT[Q]) => CTXT[X]
+  type OPTION[X] = optionator.OPTION[X]
 
   trait Equalizer[A, X]:
     val inclusion: A ~> X
@@ -89,7 +90,7 @@ class Topos[
         =?=[X]
       }
 
-    lazy val pac: PartialArrowClassifier[X, _] =
+    lazy val pac: PartialArrowClassifier[X, OPTION[X]] =
       optionator.partialArrowClassifier[X]
   }
 
@@ -239,7 +240,7 @@ class Topos[
     )
 
   inline def withPac[X: Dot, RESULT](
-    block: [OPTION_X] => Dot[OPTION_X] ?=> PartialArrowClassifier[X, OPTION_X] => RESULT
+    block: Dot[OPTION[X]] ?=> PartialArrowClassifier[X, OPTION[X]] => RESULT
   ): RESULT =
     summon[Dot[X]].pac.withMe(block)
 
@@ -432,15 +433,15 @@ class Topos[
       arrow: V ~> X
     ): W ~> OPTION_X
     final def withMe[RESULT](
-      block: [OX] => Dot[OX] ?=> PartialArrowClassifier[X, OX] => RESULT
+      block: Dot[OPTION_X] ?=> PartialArrowClassifier[X, OPTION_X] => RESULT
     ): RESULT =
-      block[OPTION_X](this)
+      block(this)
 
   trait Optionator:
     type OPTION[X]
     def partialArrowClassifier[X: Dot]: PartialArrowClassifier[X, OPTION[X]]
 
-  lazy val optionator: Optionator = DefaultOptionator
+  val optionator: Optionator = DefaultOptionator
 
   object DefaultOptionator extends Optionator:
     override type OPTION[X] = X > BEWL
