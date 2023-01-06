@@ -107,4 +107,5 @@
 - coproducts. Definitely have a driver architecture for these. Use Either or | as we used tuples for products?
 - full driver pattern/test for logops, autos, coproducts, EitherX and reengineer withSymmetricGroup;
   also those can all have an object as their default implementation
-  
+- can we have s*m as a shortcut when s is in an M-action, M a monoid? where would extension method go? Also for groups
+

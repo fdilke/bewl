@@ -239,10 +239,8 @@ class Topos[
       summon[Dot[Y]]
     )
 
-  inline def withPac[X: Dot, RESULT](
-    block: Dot[OPTION[X]] ?=> PartialArrowClassifier[X, OPTION[X]] => RESULT
-  ): RESULT =
-    summon[Dot[X]].pac.withMe(block)
+  implicit def optionDot[X: Dot]: Dot[OPTION[X]] =
+    summon[Dot[X]].pac.classifier
 
   final inline def some[X: Dot]: X ~> OPTION[X] =
     summon[Dot[X]].pac.some
@@ -432,10 +430,6 @@ class Topos[
       monic: V ~> W,
       arrow: V ~> X
     ): W ~> OPTION_X
-    final def withMe[RESULT](
-      block: Dot[OPTION_X] ?=> PartialArrowClassifier[X, OPTION_X] => RESULT
-    ): RESULT =
-      block(this)
 
   trait Optionator:
     type OPTION[X]
