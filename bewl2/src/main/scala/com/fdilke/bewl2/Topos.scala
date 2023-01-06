@@ -437,12 +437,14 @@ class Topos[
       block[OPTION_X](this)
 
   trait Optionator:
-    def partialArrowClassifier[X: Dot]: PartialArrowClassifier[X, _]
+    type OPTION[X]
+    def partialArrowClassifier[X: Dot]: PartialArrowClassifier[X, OPTION[X]]
 
   lazy val optionator: Optionator = DefaultOptionator
 
   object DefaultOptionator extends Optionator:
-    def partialArrowClassifier[X: Dot]: PartialArrowClassifier[X, _] =
+    override type OPTION[X] = X > BEWL
+    override def partialArrowClassifier[X: Dot]: PartialArrowClassifier[X, OPTION[X]] =
       val evalPredicate: BiArrow[X > BEWL, X, BEWL] =
         evaluation[X, BEWL]
       val isSubSingleton: (X > BEWL) ~> BEWL =
@@ -452,7 +454,7 @@ class Topos[
         }
       isSubSingleton.whereTrue { 
         [OX] => (dotOptionX : Dot[OX]) ?=> (equalizer : Equalizer[OX, X > BEWL]) =>
-          new PartialArrowClassifier[X, OX]:
+          (new PartialArrowClassifier[X, OX]:
             override val some: X ~> OX = 
               equalizer.restrict(singleton[X])
             override val none: UNIT ~> OX = 
@@ -470,6 +472,7 @@ class Topos[
                   } : W ~> BEWL)(w)
                 }
               )
+          ).asInstanceOf[PartialArrowClassifier[X, OPTION[X]]]
       }
 
 object Topos:
