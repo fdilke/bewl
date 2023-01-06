@@ -90,7 +90,7 @@ class Topos[
       }
 
     lazy val pac: PartialArrowClassifier[X, _] =
-      PartialArrowClassifier[X]
+      optionator.partialArrowClassifier[X]
   }
 
   final def withDot[X, RESULT](
@@ -436,8 +436,13 @@ class Topos[
     ): RESULT =
       block[OPTION_X](this)
 
-  object PartialArrowClassifier:
-    def apply[X: Dot]: PartialArrowClassifier[X, _] =
+  trait Optionator:
+    def partialArrowClassifier[X: Dot]: PartialArrowClassifier[X, _]
+
+  lazy val optionator: Optionator = DefaultOptionator
+
+  object DefaultOptionator extends Optionator:
+    def partialArrowClassifier[X: Dot]: PartialArrowClassifier[X, _] =
       val evalPredicate: BiArrow[X > BEWL, X, BEWL] =
         evaluation[X, BEWL]
       val isSubSingleton: (X > BEWL) ~> BEWL =
