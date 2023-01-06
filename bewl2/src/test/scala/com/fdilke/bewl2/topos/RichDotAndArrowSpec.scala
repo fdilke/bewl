@@ -105,17 +105,15 @@ class RichDotAndArrowSpec extends RichFunSuite:
     ) {
       withPac[Int, Unit] { (_ : Dot[OPTION[Int]]) ?=> (pac: PartialArrowClassifier[Int, OPTION[Int]]) => 
         dot[OPTION[Int]].size is 3
-        val someInt: Int => OPTION[Int] = pac.some
-        someInt.isMonic is true
-        val noneInt: Unit => OPTION[Int] = pac.none
-        noneInt.isMonic is true
-        pac.extendAlong(toUnit[Void], fromZero[Int]) isArrow noneInt
+        some[Int].isMonic is true
+        none[Int].isMonic is true
+        (extendAlong(toUnit[Void], fromZero[Int]) : Unit => OPTION[Int]) isArrow (none[Int] : Unit => OPTION[Int])
 
         val monic: Symbol ~> Boolean = { _ => true }
         val symbolToInt: Symbol ~> Int = { _ => 0 }
-        pac.extendAlong(monic, symbolToInt) isArrow Map[Boolean, OPTION[Int]](
-          true -> someInt(0),
-          false -> noneInt(())
+        (extendAlong(monic, symbolToInt) : Boolean => OPTION[Int]) isArrow Map[Boolean, OPTION[Int]](
+          true -> (some[Int] : Int => OPTION[Int])(0),
+          false -> (none[Int]: Unit => OPTION[Int])(())
         )
       }
     }

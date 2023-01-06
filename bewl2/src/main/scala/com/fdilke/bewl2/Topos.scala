@@ -244,16 +244,16 @@ class Topos[
   ): RESULT =
     summon[Dot[X]].pac.withMe(block)
 
-  // TODO: would require OPTION[_] to be a fixed type, may be able to finesse
-  // final inline def some[X: Dot]: X ~> Option[X] =
-  //   _.map { Some(_) }
-  // final inline def none[X: Dot]: UNIT ~> Option[X] =
-  //   summon[Dot[X]].pac.none
-  // final inline def extendAlong[V: Dot, W: Dot, X: Dot](
-  //   monic: V ~> W,
-  //   arrow: V ~> X
-  // ): W ~> Option[X] =
-  //   summon[Dot[X]].pac.extendAlong[V, W](monic, arrow)
+  final inline def some[X: Dot]: X ~> OPTION[X] =
+    summon[Dot[X]].pac.some
+
+  final inline def none[X: Dot]: UNIT ~> OPTION[X] =
+    summon[Dot[X]].pac.none
+  final inline def extendAlong[V: Dot, W: Dot, X: Dot](
+    monic: V ~> W,
+    arrow: V ~> X
+  ): W ~> OPTION[X] =
+    summon[Dot[X]].pac.extendAlong[V, W](monic, arrow)
     
   final def applicate[X: Dot, T, Y: Dot](
     ctxt: CTXT[T]
