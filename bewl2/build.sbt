@@ -10,6 +10,7 @@ lazy val root = project
         "-Yindent-colons",
 //        "-language:experimental.fewerBraces"
     ),
+    ThisBuild/scalacOptions ++= Seq("-unchecked", "-deprecation"),
     libraryDependencies ++= Seq(
         "org.scalameta" %% "munit" % "1.0.0-M3" % Test,
         "org.typelevel" % "cats-core_3" % "2.7.0"

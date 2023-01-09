@@ -5,7 +5,7 @@ import com.fdilke.bewl2.algebra.AlgebraicMachinery
 import com.fdilke.bewl2.helper.Memoize
 import Mappable.*
 import com.fdilke.bewl2.logic.LogicalOperations
-import com.fdilke.utility.Mask
+import com.fdilke.utility.Mask._
 
 class Topos[
   DOT[_],
@@ -22,7 +22,7 @@ class Topos[
   type ~>[X, Y] = CTXT[X] => CTXT[Y]
   type BiArrow[X, Y, Z] = (X, Y) ~> Z
   type UntupledBiArrow[P, Q, X] = (CTXT[P], CTXT[Q]) => CTXT[X]
-  type OPTION[X] = optionator.OPTION[X]
+  /* opaque */ type OPTION[X] = optionator.OPTION[X]
 
   trait Equalizer[A, X]:
     val inclusion: A ~> X
@@ -136,6 +136,16 @@ class Topos[
   ): RESULT =
       withDot(dot) {
         block[X]
+      }
+
+  final def maskDot[X: Dot, RESULT](
+    block: [X_] => Dot[X_] ?=> (X_ =:= X) ?=> (X =:= X_) ?=> RESULT
+  ): RESULT =
+      mask[X, Dot, RESULT](
+        summon[Dot[X]]
+      ) { [X_] => (dot: Dot[X_]) => (_ : X_ =:= X) ?=> (_ : X =:= X_) ?=>
+        given Dot[X_] = dot
+        block[X_]
       }
 
   final inline def sanityTest[X: Dot]: Unit =
@@ -303,7 +313,7 @@ class Topos[
       case x ⊕ y => untupledFn(x, y)
     }
 
-  object ⊕ :
+  object `⊕` :
     def unapply[X: Dot, Y: Dot](
       xy: CTXT[(X, Y)]
     ): Option[(CTXT[X], CTXT[Y])] =

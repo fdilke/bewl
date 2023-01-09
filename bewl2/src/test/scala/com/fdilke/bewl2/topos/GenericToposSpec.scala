@@ -71,7 +71,7 @@ abstract class GenericToposSpec[
     Dot[FOO],
     Dot[BAR],
     Dot[BAZ]
-  ): Unit = {
+  ): Unit =
     import fixtures.*
 
     test("identity arrows have sane equality semantics") {
@@ -311,4 +311,23 @@ abstract class GenericToposSpec[
         }
       }
     }
-  }
+
+    test("overrides the optionator correctly, if at all") {
+      if (true || ! optionator.isInstanceOf[DefaultOptionator.type]) {
+        type D_OPTION[X] = DefaultOptionator.OPTION[X]
+        maskDot[FOO, Unit] { [F] => (_ : Dot[F]) ?=> (_ : F =:= FOO) ?=> (_ : FOO =:= F) ?=>
+          val altPac: PartialArrowClassifier[F, D_OPTION[F]] = DefaultOptionator.partialArrowClassifier[F]
+          given Dot[D_OPTION[F]] = altPac.classifier
+          val f2foo: F ~> FOO = summon[F =:= FOO].substituteCo[CTXT]
+          val foo2f: FOO ~> F = summon[FOO =:= F].substituteCo[CTXT]
+          val extend: D_OPTION[F] ~> OPTION[FOO] =
+            extendAlong[F, D_OPTION[F], FOO](altPac.some, f2foo)
+          val extendInv: OPTION[FOO] ~> D_OPTION[F] =
+            altPac.extendAlong[FOO, OPTION[FOO]](some[FOO], foo2f)
+          assert { extend.isIso }
+          assert { extendInv.isIso }
+          assert { (extend o extendInv) =!= id[OPTION[FOO]] }
+          assert { (extendInv o extend) =!= id[D_OPTION[F]] }
+        }
+      }
+    }
