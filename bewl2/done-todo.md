@@ -109,5 +109,6 @@
   also those can all have an object as their default implementation
 - can we have s*m as a shortcut when s is in an M-action, M a monoid? where would extension method go? Also for groups
 - do we really need both X_ =:= X _and_ X =:= X_ in all of those type declarations?
+- make OPTION[_] opaque. Currently this makes compiling the tests hang forever (which ones?)
 
 
