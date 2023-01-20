@@ -66,4 +66,4 @@ If we let H =~= S_m^n be the subgroup of S_mn preserving rows, and
 L =~= S_n^m the subgroup preserving columns, this says that S_mn = KHK = HKH,
 so any double coset of H meets K and vice versa. You might say they're "entangled" or "complementary".
 
-Good stretch goal for Bewl to verify all this using symmetric groups.
+Good stretch goal for Bewl to verify all this using symmetric groups...done for low order (about 3x4)
