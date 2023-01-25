@@ -4,17 +4,6 @@ import com.fdilke.bewl2.utility.RichFunSuite
 
 class GreenReesSpec extends RichFunSuite:
 
-  test("Can calculate a segment index from a word") {
-    intercept[java.lang.IllegalArgumentException]{
-      segmentIndex(Seq())
-    }
-    segmentIndex(Seq(0)) is 0
-    segmentIndex(Seq(0, 1)) is 1
-    segmentIndex(Seq(0, 1, 2)) is 2
-    segmentIndex(Seq(0, 2, 0, 1, 2, 0)) is 3
-    segmentIndex(Seq(2, 0, 0, 2, 1, 0, 2)) is 4
-  }
-
   test("Can extract left segments from a word") {
     intercept[java.lang.IllegalArgumentException]{
       extractLeftSegment(Seq())

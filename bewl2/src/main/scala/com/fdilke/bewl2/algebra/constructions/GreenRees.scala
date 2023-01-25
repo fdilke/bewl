@@ -1,5 +1,7 @@
 package com.fdilke.bewl2.algebra.constructions
 
+import scala.annotation.tailrec
+
 // See green-rees-theory.md
 
 object GreenRees {
@@ -8,20 +10,22 @@ object GreenRees {
     val (rightSegmentR, rightLetter) = extractLeftSegment(word.reverse)
     Factorization(leftSegment, leftLetter, rightLetter, rightSegmentR.reverse)
 
-  def segmentIndex[H](word: Seq[H]): Int =
-    if word.isEmpty then
-      throw new IllegalArgumentException("can't extract segment from empty word")
+  @tailrec private def extractLeftSegmentHelper[H](
+    segment: Seq[H],
+    seen: Seq[H],
+    lettersRemaining: Set[H]
+  ): (Seq[H], H) =
+    val letter = segment.head
+    val newLettersRemaining = lettersRemaining - letter
+    if (newLettersRemaining.isEmpty) then
+      (seen, letter)
     else
-      word.indices.find { i =>
-        val segment = word.slice(0, i+1)
-        word.forall { segment.contains }
-      }.get
+      extractLeftSegmentHelper(segment.tail, seen :+ letter, newLettersRemaining)
 
   def extractLeftSegment[H](word: Seq[H]): (Seq[H], H) =
-    val lastIndex: Int = segmentIndex(word)
-    val leftSegment = word.slice(0, lastIndex)
-    val leftLetter = word(lastIndex)
-    (leftSegment, leftLetter)
+    if word.isEmpty then
+      throw new IllegalArgumentException("can't extract segment from empty word")
+    extractLeftSegmentHelper(word, Seq.empty, word.toSet)
 
   case class Factorization[H](
     leftSegment: Seq[H],
