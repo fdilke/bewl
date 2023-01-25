@@ -6,8 +6,9 @@ import scala.annotation.tailrec
 
 object GreenRees {
   def factorize[H](word: Seq[H]): Factorization[H] =
-    val (leftSegment, leftLetter) = extractLeftSegment(word)
-    val (rightSegmentR, rightLetter) = extractLeftSegment(word.reverse)
+    val allLetters = word.toSet
+    val (leftSegment, leftLetter) = extractLeftSegment(word, allLetters)
+    val (rightSegmentR, rightLetter) = extractLeftSegment(word.reverse, allLetters)
     Factorization(leftSegment, leftLetter, rightLetter, rightSegmentR.reverse)
 
   @tailrec private def extractLeftSegmentHelper[H](
@@ -22,10 +23,18 @@ object GreenRees {
     else
       extractLeftSegmentHelper(segment.tail, seen :+ letter, newLettersRemaining)
 
-  def extractLeftSegment[H](word: Seq[H]): (Seq[H], H) =
+  def extractLeftSegment[H](
+    word: Seq[H],
+    allLetters: Set[H]
+  ): (Seq[H], H) =
     if word.isEmpty then
       throw new IllegalArgumentException("can't extract segment from empty word")
     extractLeftSegmentHelper(word, Seq.empty, word.toSet)
+
+  def extractLeftSegment[H](
+    word: Seq[H]
+  ): (Seq[H], H) =
+    extractLeftSegment(word, word.toSet)
 
   case class Factorization[H](
     leftSegment: Seq[H],

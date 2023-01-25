@@ -16,3 +16,7 @@ Is there a property of monads here waiting to be extracted?
 Btw, do we know that every monad on FinSet is strong? Is there a quick proof?
 What kind of topos property is this?
 
+what are the monoliths in this variety? Guessing they have a simple structure.
+
+One could ask also if idempotent monoids have 'enough injectives': there's a universal algebra
+result characterizing this (need congruence extension property, etc etc) so maybe not.
