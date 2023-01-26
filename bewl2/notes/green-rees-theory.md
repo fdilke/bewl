@@ -20,3 +20,7 @@ what are the monoliths in this variety? Guessing they have a simple structure.
 
 One could ask also if idempotent monoids have 'enough injectives': there's a universal algebra
 result characterizing this (need congruence extension property, etc etc) so maybe not.
+
+I believe there's a simple way to generate a 'canonical form' which standardizes and simplifies the
+calculations. and may even produce 'a shortest' word representing each equivalence class.
+Rather than try and prove this, I'll first see if it works empirically.

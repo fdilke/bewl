@@ -13,6 +13,8 @@
 - work out details of 'metrics' approach to H-valued sets:
   like top trumps / book or record details / mappings to DISCRETE or LINEAR?
 - how much of the theory of (finite) groups carries over to LFTs?
+- Motivating question: for what monoids M is the truth object a cogenerator?
+For groups, only when G = 1.
 
 # BEWL AS TOOL
 - for card shuffle calc: verify surjectivity, investigate uniformity. Good stretch goal
