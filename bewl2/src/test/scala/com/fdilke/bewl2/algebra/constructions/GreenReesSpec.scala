@@ -24,3 +24,12 @@ class GreenReesSpec extends RichFunSuite:
     Seq(2, 1, 1, 0, 0, 2, 1, 2).factorize is Factorization(Seq(2, 1, 1), 0, 0, Seq(2, 1, 2))
   }
 
+  test("Can use strings interchangeably with Seq[Char]") {
+    intercept[java.lang.IllegalArgumentException]{
+      Seq[Int]().factorize
+    }
+    "a".factorize is Factorization("", 'a', 'a', Seq())
+    "abc".factorize is Factorization("ab", 'c', 'a', "bc")
+    "abbc".factorize is Factorization("abb", 'c', 'a', "bbc")
+    "cbbaacbc".factorize is Factorization("cbb", 'a', 'a', "cbc")
+  }
