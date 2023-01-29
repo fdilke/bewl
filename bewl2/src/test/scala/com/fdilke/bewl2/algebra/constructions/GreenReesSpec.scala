@@ -58,3 +58,15 @@ class GreenReesSpec extends RichFunSuite:
     Factorization("cbb", 'a', 'c', "ba").recombine is "cbbacba"
     Factorization("cbb", 'a', 'c', "ba").recombine is "cbbacba"
   }
+
+  test("Canonical form for words") {
+    "".canonical is ""
+    "a".canonical is "a"
+    "abc".canonical is "abc"
+    "aa".canonical is "a"
+    "abab".canonical is "ab"
+    "abcabc".canonical is "abc"
+    "gababg".canonical is "gabg"
+    "gabcabcgabc".canonical is "gabc"
+    "bacbcabc".canonical is "bacabc"
+  }

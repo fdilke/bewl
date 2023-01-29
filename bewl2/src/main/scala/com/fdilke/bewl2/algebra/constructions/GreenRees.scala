@@ -31,6 +31,12 @@ object GreenRees {
       else
         word.factorize =!= word2.factorize
 
+    def canonical: Seq[H] =
+      if (word.isEmpty) then
+        word
+      else
+        word.factorize.canonical
+
   @tailrec private def extractLeftSegmentHelper[H](  
     segment: Seq[H],
     seen: Seq[H],
@@ -66,4 +72,11 @@ object GreenRees {
         case Some(i) => left.slice(0, i) ++ right
       }
 
+    def canonical: Seq[H] =
+      Factorization(
+        leftSegment.canonical,
+        leftLetter,
+        rightLetter,
+        rightSegment
+      ).recombine
 }
