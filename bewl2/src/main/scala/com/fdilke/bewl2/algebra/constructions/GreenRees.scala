@@ -55,4 +55,15 @@ object GreenRees {
       (leftLetter == other.leftLetter) &&
       (rightLetter == other.rightLetter) &&
       (rightSegment =!= other.rightSegment)
+
+    def recombine: Seq[H] =
+      val left = leftSegment :+ leftLetter
+      val right = rightLetter +: rightSegment
+      left.indices.find { i =>
+        right.startsWith(left.slice(i, left.size))
+      } match {
+        case None => left ++ right
+        case Some(i) => left.slice(0, i) ++ right
+      }
+
 }

@@ -45,3 +45,18 @@ class GreenReesSpec extends RichFunSuite:
     ("bacabc" =!= "babcabc") is false
     ("xzyzxzy" =!= "xzy") is true
   }
+  
+  test("Can optimally 'recombine' a factorization") {
+    def recombineString(leftSeg: String, leftChar: Char, rightChar: Char, rightSeg: String): String =
+      new String(Factorization(leftSeg, leftChar, rightChar, rightSeg).recombine.toArray)
+
+    recombineString("", 'a', 'a', "") is "a"
+    recombineString("", 'a', 'b', "") is "ab"
+    recombineString("b", 'a', 'b', "a") is "ba"
+    recombineString("bac", 'd', 'b', "acd") is "bacd"
+    recombineString("bac", 'd', 'a', "cdb") is "bacdb"
+    recombineString("bac", 'd', 'c', "dba") is "bacdba"
+    recombineString("bac", 'd', 'd', "bac") is "bacdbac"
+    recombineString("cbb", 'a', 'a', "cbc") is "cbbacbc"
+    recombineString("cbb", 'a', 'c', "ba") is "cbbacba"
+  }
