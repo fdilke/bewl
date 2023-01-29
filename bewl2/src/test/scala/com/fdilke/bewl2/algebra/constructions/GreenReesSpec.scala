@@ -70,3 +70,7 @@ class GreenReesSpec extends RichFunSuite:
     "gabcabcgabc".canonical is "gabc"
     "bacbcabc".canonical is "bacabc"
   }
+
+  test("Higher level tests for canonical forms") {
+    // "abcd".combinations()
+  }

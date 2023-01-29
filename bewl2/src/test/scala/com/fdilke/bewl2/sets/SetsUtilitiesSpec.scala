@@ -85,3 +85,21 @@ class SetsUtilitiesSpec extends RichFunSuite:
     }
     called.get() is true
   }
+
+  test("enumerate sequences of a given length on given symbols") {
+    sequencesOfLength("", 0).toSeq is Seq[Seq[Char]]("")
+    sequencesOfLength("a", 0).toSeq is Seq[Seq[Char]]("")
+    sequencesOfLength("ab", 1).toSeq is Seq[Seq[Char]]("a", "b")
+    sequencesOfLength("ab", 2).toSeq is Seq[Seq[Char]]("aa", "ba", "ab", "bb")
+    sequencesOfLength("abc", 2).toSeq is Seq[Seq[Char]](
+      "aa", "ba", "ca", 
+      "ab", "bb", "cb", 
+      "ac", "bc", "cc"
+    )
+    sequencesOfLength("ab", 3).toSeq is Seq[Seq[Char]](
+      "aaa", "baa", 
+      "aba", "bba",
+      "aab", "bab",
+      "abb", "bbb"
+    )
+  }

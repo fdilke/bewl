@@ -35,6 +35,19 @@ object SetsUtilities:
       } :_*
     )
 
+  def sequencesOfLength[H](
+    letters: Seq[H],
+    length: Int
+  ): Iterable[Seq[H]] =
+    if (letters.isEmpty || length == 0) then
+      Iterable(Seq.empty)
+    else for {
+      seq <- sequencesOfLength(letters, length - 1)
+      letter <- letters
+    } yield {
+      letter +: seq
+    }
+
   def allNaryOps(
     arity: Int,
     order: Int
