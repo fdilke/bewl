@@ -8,6 +8,10 @@ trait RichFunSuite extends FunSuite:
     inline def is(b: A): Unit =
       assertEquals(a, b)
 
+  extension(letters: Seq[Char])
+    inline def is(text: String): Unit =
+      assertEquals(letters, text.toSeq)
+      
   import Sets._
 
   implicit class arrowComparisons[A: Dot, B: Dot](arrow: A => B):

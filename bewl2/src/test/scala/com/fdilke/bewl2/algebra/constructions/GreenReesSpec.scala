@@ -47,16 +47,14 @@ class GreenReesSpec extends RichFunSuite:
   }
   
   test("Can optimally 'recombine' a factorization") {
-    def recombineString(leftSeg: String, leftChar: Char, rightChar: Char, rightSeg: String): String =
-      new String(Factorization(leftSeg, leftChar, rightChar, rightSeg).recombine.toArray)
-
-    recombineString("", 'a', 'a', "") is "a"
-    recombineString("", 'a', 'b', "") is "ab"
-    recombineString("b", 'a', 'b', "a") is "ba"
-    recombineString("bac", 'd', 'b', "acd") is "bacd"
-    recombineString("bac", 'd', 'a', "cdb") is "bacdb"
-    recombineString("bac", 'd', 'c', "dba") is "bacdba"
-    recombineString("bac", 'd', 'd', "bac") is "bacdbac"
-    recombineString("cbb", 'a', 'a', "cbc") is "cbbacbc"
-    recombineString("cbb", 'a', 'c', "ba") is "cbbacba"
+    Factorization("", 'a', 'a', "").recombine is "a"
+    Factorization("", 'a', 'b', "").recombine is "ab"
+    Factorization("b", 'a', 'b', "a").recombine is "ba"
+    Factorization("bac", 'd', 'b', "acd").recombine is "bacd"
+    Factorization("bac", 'd', 'a', "cdb").recombine is "bacdb"
+    Factorization("bac", 'd', 'c', "dba").recombine is "bacdba"
+    Factorization("bac", 'd', 'd', "bac").recombine is "bacdbac"
+    Factorization("cbb", 'a', 'a', "cbc").recombine is "cbbacbc"
+    Factorization("cbb", 'a', 'c', "ba").recombine is "cbbacba"
+    Factorization("cbb", 'a', 'c', "ba").recombine is "cbbacba"
   }
