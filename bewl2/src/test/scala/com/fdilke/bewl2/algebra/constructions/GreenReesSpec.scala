@@ -33,3 +33,15 @@ class GreenReesSpec extends RichFunSuite:
     "abbc".factorize is Factorization("abb", 'c', 'a', "bbc")
     "cbbaacbc".factorize is Factorization("cbb", 'a', 'a', "cbc")
   }
+
+  test("Can check words for equivalence") {
+    ("" =!= "") is true
+    ("x" =!= "") is false
+    ("" =!= "x") is false
+    ("ab" =!= "bc") is false
+    ("abc" =!= "abc") is true
+    // and the interesting cases
+    ("bacabc" =!= "bacbcabc") is true
+    ("bacabc" =!= "babcabc") is false
+    ("xzyzxzy" =!= "xzy") is true
+  }

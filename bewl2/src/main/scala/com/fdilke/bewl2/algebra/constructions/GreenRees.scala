@@ -23,6 +23,14 @@ object GreenRees {
         throw new IllegalArgumentException("can't extract segment from empty word")
       extractLeftSegmentHelper(word, Seq.empty, word.toSet)
 
+    def =!=(word2: Seq[H]): Boolean =
+      if (word.isEmpty) then
+        word2.isEmpty
+      else if (word2.isEmpty) then
+        false
+      else
+        word.factorize =!= word2.factorize
+
   @tailrec private def extractLeftSegmentHelper[H](  
     segment: Seq[H],
     seen: Seq[H],
@@ -41,5 +49,10 @@ object GreenRees {
     leftLetter: H,
     rightLetter: H,
     rightSegment: Seq[H]
-  )
+  ):
+    def =!=(other: Factorization[H]): Boolean =
+      (leftSegment =!= other.leftSegment) &&
+      (leftLetter == other.leftLetter) &&
+      (rightLetter == other.rightLetter) &&
+      (rightSegment =!= other.rightSegment)
 }
