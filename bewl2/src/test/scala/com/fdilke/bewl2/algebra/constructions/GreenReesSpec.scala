@@ -1,6 +1,7 @@
 package com.fdilke.bewl2.algebra.constructions
 import GreenRees.*
 import com.fdilke.bewl2.utility.RichFunSuite
+import com.fdilke.bewl2.sets.SetsUtilities.*
 
 class GreenReesSpec extends RichFunSuite:
 
@@ -72,5 +73,13 @@ class GreenReesSpec extends RichFunSuite:
   }
 
   test("Higher level tests for canonical forms") {
-    // "abcd".combinations()
+    for {
+      length <- (0 to 6).toSeq
+      seq <- sequencesOfLength("abc", length)
+    } {
+      val canon: Seq[Char] = seq.canonical
+      (canon.length <= seq.length) is true
+      (canon =!= seq) is true
+      (canon.canonical == canon) is true
+    }
   }
