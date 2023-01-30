@@ -37,6 +37,9 @@ object GreenRees {
       else
         word.factorize.canonical
 
+    def *(word2: Seq[H]): Seq[H] =
+      (word ++ word2).canonical
+
   @tailrec private def extractLeftSegmentHelper[H](  
     segment: Seq[H],
     seen: Seq[H],

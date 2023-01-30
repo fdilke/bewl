@@ -83,3 +83,39 @@ class GreenReesSpec extends RichFunSuite:
       (canon.canonical == canon) is true
     }
   }
+
+  test("Can multiply words with automatic reduction to canonical form") {
+    ("" * "") is ""
+    ("a" * "") is "a"
+    ("" * "a") is "a"
+    ("a" * "a") is "a"
+    ("a" * "b") is "ab"
+    ("a" * "ab") is "ab"
+    ("ab" * "ab") is "ab"
+    ("ab" * "ab") is "ab"
+    ("bacb" * "cabc") is "bacabc"
+  }
+
+  // test("Can generate the free idempotent monoid as a raw set of canonicals") {
+  //   for {
+  //     (numLetters, expectedSize) <- Seq(0 -> 1, 1 -> 2, 2 -> 7, 3 -> 160)
+  //   } {
+  //     val letters = "abcde".slice(0, numLetters)
+  //     val rawMonoid: Set[Seq[Char]] = canonicalWords(letters)
+  //     rawMonoid.size is expectedSize
+  //     for {
+  //       x <- rawMonoid
+  //     } {
+  //       (x * x) is x
+  //       (x * "") is x
+  //       ("" * x) is x
+  //     }
+  //     for {
+  //       x <- rawMonoid
+  //       y <- rawMonoid
+  //       z <- rawMonoid
+  //     } {
+  //       ((x * y) * z) is (x * (y * z))
+  //     }
+  //   }
+  // }
