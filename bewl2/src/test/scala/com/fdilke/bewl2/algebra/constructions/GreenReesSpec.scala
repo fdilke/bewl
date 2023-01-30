@@ -48,28 +48,28 @@ class GreenReesSpec extends RichFunSuite:
   }
   
   test("Can optimally 'recombine' a factorization") {
-    Factorization("", 'a', 'a', "").recombine is "a"
-    Factorization("", 'a', 'b', "").recombine is "ab"
-    Factorization("b", 'a', 'b', "a").recombine is "ba"
-    Factorization("bac", 'd', 'b', "acd").recombine is "bacd"
-    Factorization("bac", 'd', 'a', "cdb").recombine is "bacdb"
-    Factorization("bac", 'd', 'c', "dba").recombine is "bacdba"
-    Factorization("bac", 'd', 'd', "bac").recombine is "bacdbac"
-    Factorization("cbb", 'a', 'a', "cbc").recombine is "cbbacbc"
-    Factorization("cbb", 'a', 'c', "ba").recombine is "cbbacba"
-    Factorization("cbb", 'a', 'c', "ba").recombine is "cbbacba"
+    Factorization("", 'a', 'a', "").recombine be "a"
+    Factorization("", 'a', 'b', "").recombine be "ab"
+    Factorization("b", 'a', 'b', "a").recombine be "ba"
+    Factorization("bac", 'd', 'b', "acd").recombine be "bacd"
+    Factorization("bac", 'd', 'a', "cdb").recombine be "bacdb"
+    Factorization("bac", 'd', 'c', "dba").recombine be "bacdba"
+    Factorization("bac", 'd', 'd', "bac").recombine be "bacdbac"
+    Factorization("cbb", 'a', 'a', "cbc").recombine be "cbbacbc"
+    Factorization("cbb", 'a', 'c', "ba").recombine be "cbbacba"
+    Factorization("cbb", 'a', 'c', "ba").recombine be "cbbacba"
   }
 
   test("Canonical form for words") {
-    "".canonical is ""
-    "a".canonical is "a"
-    "abc".canonical is "abc"
-    "aa".canonical is "a"
-    "abab".canonical is "ab"
-    "abcabc".canonical is "abc"
-    "gababg".canonical is "gabg"
-    "gabcabcgabc".canonical is "gabc"
-    "bacbcabc".canonical is "bacabc"
+    "".canonical be ""
+    "a".canonical be "a"
+    "abc".canonical be "abc"
+    "aa".canonical be "a"
+    "abab".canonical be "ab"
+    "abcabc".canonical be "abc"
+    "gababg".canonical be "gabg"
+    "gabcabcgabc".canonical be "gabc"
+    "bacbcabc".canonical be "bacabc"
   }
 
   test("Higher level tests for canonical forms") {
@@ -85,37 +85,38 @@ class GreenReesSpec extends RichFunSuite:
   }
 
   test("Can multiply words with automatic reduction to canonical form") {
-    ("" * "") is ""
-    ("a" * "") is "a"
-    ("" * "a") is "a"
-    ("a" * "a") is "a"
-    ("a" * "b") is "ab"
-    ("a" * "ab") is "ab"
-    ("ab" * "ab") is "ab"
-    ("ab" * "ab") is "ab"
-    ("bacb" * "cabc") is "bacabc"
+    ("" * "") be ""
+    ("a" * "") be "a"
+    ("" * "a") be "a"
+    ("a" * "a") be "a"
+    ("a" * "b") be "ab"
+    ("a" * "ab") be "ab"
+    ("ab" * "ab") be "ab"
+    ("ab" * "ab") be "ab"
+    ("bacb" * "cabc") be "bacabc"
   }
 
-  // test("Can generate the free idempotent monoid as a raw set of canonicals") {
-  //   for {
-  //     (numLetters, expectedSize) <- Seq(0 -> 1, 1 -> 2, 2 -> 7, 3 -> 160)
-  //   } {
-  //     val letters = "abcde".slice(0, numLetters)
-  //     val rawMonoid: Set[Seq[Char]] = canonicalWords(letters)
-  //     rawMonoid.size is expectedSize
-  //     for {
-  //       x <- rawMonoid
-  //     } {
-  //       (x * x) is x
-  //       (x * "") is x
-  //       ("" * x) is x
-  //     }
-  //     for {
-  //       x <- rawMonoid
-  //       y <- rawMonoid
-  //       z <- rawMonoid
-  //     } {
-  //       ((x * y) * z) is (x * (y * z))
-  //     }
-  //   }
-  // }
+  if (false)
+    test("Can generate the free idempotent monoid as a raw set of canonicals") {
+      for {
+        (numLetters, expectedSize) <- Seq(0 -> 1, 1 -> 2, 2 -> 7, 3 -> 160)
+      } {
+        val letters = "abcde".slice(0, numLetters)
+        val rawMonoid: Set[Seq[Char]] = canonicalWords(letters)
+        rawMonoid.size is expectedSize
+        for {
+          x <- rawMonoid
+        } {
+          (x * x) is x
+          (x * "") is x
+          ("" * x) is x
+        }
+        for {
+          x <- rawMonoid
+          y <- rawMonoid
+          z <- rawMonoid
+        } {
+          ((x * y) * z) is (x * (y * z))
+        }
+      }
+    }

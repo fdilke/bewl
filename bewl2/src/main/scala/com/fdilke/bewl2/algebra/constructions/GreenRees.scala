@@ -4,7 +4,7 @@ import scala.annotation.tailrec
 
 // See green-rees-theory.md
 
-object GreenRees {
+object GreenRees:
 
   extension[H](word: Seq[H])
     def factorize: Factorization[H] =
@@ -53,6 +53,11 @@ object GreenRees {
       extractLeftSegmentHelper(segment.tail, seen :+ letter, newLettersRemaining)
     
 
+  def canonicalWords[H](
+    letters: Seq[H]
+  ): Set[Seq[H]] =
+    ???
+
   case class Factorization[H](
     leftSegment: Seq[H],
     leftLetter: H,
@@ -82,4 +87,4 @@ object GreenRees {
         rightLetter,
         rightSegment
       ).recombine
-}
+
