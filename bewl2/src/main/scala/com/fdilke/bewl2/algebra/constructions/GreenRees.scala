@@ -1,6 +1,7 @@
 package com.fdilke.bewl2.algebra.constructions
 
 import scala.annotation.tailrec
+import com.fdilke.utility.IterateToFixed
 
 // See green-rees-theory.md
 
@@ -52,11 +53,14 @@ object GreenRees:
     else
       extractLeftSegmentHelper(segment.tail, seen :+ letter, newLettersRemaining)
     
-
   def canonicalWords[H](
     letters: Seq[H]
   ): Set[Seq[H]] =
-    ???
+    IterateToFixed[Set[Seq[H]]](
+      (letters.map { Seq(_) } :+ Seq.empty).toSet
+    ) { set => // appallingly inefficient?
+      set.flatMap { seq => set.map { _ * seq }}
+    }
 
   case class Factorization[H](
     leftSegment: Seq[H],
@@ -85,6 +89,6 @@ object GreenRees:
         leftSegment.canonical,
         leftLetter,
         rightLetter,
-        rightSegment
+        rightSegment.canonical
       ).recombine
 

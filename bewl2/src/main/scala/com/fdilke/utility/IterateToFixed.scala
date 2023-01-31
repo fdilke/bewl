@@ -8,7 +8,7 @@ object IterateToFixed:
     initial: T
   )(
     fn: T => T
-  ) = {
+  ): T =
     @tailrec def iterateOn(
       value: T
     ): T = {
@@ -19,4 +19,3 @@ object IterateToFixed:
         iterateOn(next)
     }
     iterateOn(initial)
-  }

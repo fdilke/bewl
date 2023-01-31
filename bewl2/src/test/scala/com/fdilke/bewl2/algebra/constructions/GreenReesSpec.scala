@@ -65,6 +65,9 @@ class GreenReesSpec extends RichFunSuite:
     "a".canonical be "a"
     "abc".canonical be "abc"
     "aa".canonical be "a"
+    "aab".canonical be "ab"
+    "baa".canonical be "ba"
+    "baab".canonical be "bab"
     "abab".canonical be "ab"
     "abcabc".canonical be "abc"
     "gababg".canonical be "gabg"
@@ -96,27 +99,27 @@ class GreenReesSpec extends RichFunSuite:
     ("bacb" * "cabc") be "bacabc"
   }
 
-  if (false)
-    test("Can generate the free idempotent monoid as a raw set of canonicals") {
+  // if (false) 
+  test("Can generate the free idempotent monoid as a raw set of canonicals") {
+    for {
+      (numLetters, expectedSize) <- Seq(0 -> 1, 1 -> 2, 2 -> 7 /* , 3 -> 160 */)
+    } {
+      val letters = "abcde".slice(0, numLetters)
+      val rawMonoid: Set[Seq[Char]] = canonicalWords(letters)
+      rawMonoid.size is expectedSize
       for {
-        (numLetters, expectedSize) <- Seq(0 -> 1, 1 -> 2, 2 -> 7, 3 -> 160)
+        x <- rawMonoid
       } {
-        val letters = "abcde".slice(0, numLetters)
-        val rawMonoid: Set[Seq[Char]] = canonicalWords(letters)
-        rawMonoid.size is expectedSize
-        for {
-          x <- rawMonoid
-        } {
-          (x * x) is x
-          (x * "") is x
-          ("" * x) is x
-        }
-        for {
-          x <- rawMonoid
-          y <- rawMonoid
-          z <- rawMonoid
-        } {
-          ((x * y) * z) is (x * (y * z))
-        }
+        (x * x) is x
+        (x * "") is x
+        ("" * x) is x
+      }
+      for {
+        x <- rawMonoid
+        y <- rawMonoid
+        z <- rawMonoid
+      } {
+        ((x * y) * z) is (x * (y * z))
       }
     }
+  }
