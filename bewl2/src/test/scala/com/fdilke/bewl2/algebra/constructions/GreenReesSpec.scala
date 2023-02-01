@@ -102,7 +102,7 @@ class GreenReesSpec extends RichFunSuite:
   // if (false) 
   test("Can generate the free idempotent monoid as a raw set of canonicals") {
     for {
-      (numLetters, expectedSize) <- Seq(0 -> 1, 1 -> 2, 2 -> 7 /* , 3 -> 160 */)
+      (numLetters, expectedSize) <- Seq(0 -> 1, 1 -> 2, 2 -> 7 /* 3 -> 160 */)
     } {
       val letters = "abcde".slice(0, numLetters)
       val rawMonoid: Set[Seq[Char]] = canonicalWords(letters)

@@ -57,9 +57,16 @@ object GreenRees:
     letters: Seq[H]
   ): Set[Seq[H]] =
     IterateToFixed[Set[Seq[H]]](
-      (letters.map { Seq(_) } :+ Seq.empty).toSet
+      Set(Seq.empty[H])
+      // (letters.map { Seq(_) } :+ Seq.empty).toSet
     ) { set => // appallingly inefficient?
-      set.flatMap { seq => set.map { _ * seq }}
+      set union (for {
+        letter <- letters.toSet
+        seq <- set
+      } yield {
+        Seq(letter) * seq
+      })
+      // set.flatMap { seq => set.map { _ * seq }}
     }
 
   case class Factorization[H](
