@@ -99,13 +99,14 @@ class GreenReesSpec extends RichFunSuite:
     ("bacb" * "cabc") be "bacabc"
   }
 
-  // if (false) 
-  test("Can generate the free idempotent monoid as a raw set of canonicals") {
+  private def testCanonicalWords(
+    canonicalsFunc: Seq[Char] => Set[Seq[Char]]
+    ): Unit =
     for {
-      (numLetters, expectedSize) <- Seq(0 -> 1, 1 -> 2, 2 -> 7 /* 3 -> 160 */)
+      (numLetters, expectedSize) <- Seq(0 -> 1, 1 -> 2, 2 -> 7, 3 -> 160 /*, 4 -> 300000  */)
     } {
       val letters = "abcde".slice(0, numLetters)
-      val rawMonoid: Set[Seq[Char]] = canonicalWords(letters)
+      val rawMonoid: Set[Seq[Char]] = canonicalsFunc(letters)
       rawMonoid.size is expectedSize
       for {
         x <- rawMonoid
@@ -114,12 +115,20 @@ class GreenReesSpec extends RichFunSuite:
         (x * "") is x
         ("" * x) is x
       }
-      for {
-        x <- rawMonoid
-        y <- rawMonoid
-        z <- rawMonoid
-      } {
-        ((x * y) * z) is (x * (y * z))
+      if (numLetters < 3)
+        for {
+          x <- rawMonoid
+          y <- rawMonoid
+          z <- rawMonoid
+        } {
+          ((x * y) * z) is (x * (y * z))
+        }
       }
-    }
+      
+  test("Can generate the free idempotent monoid as a raw set of canonicals, by squares") {
+    testCanonicalWords(canonicalWordsBySquares[Char])
+  }
+
+  test("Can generate the free idempotent monoid as a raw set of canonicals, by letters") {
+    testCanonicalWords(canonicalWordsByLetters[Char])
   }

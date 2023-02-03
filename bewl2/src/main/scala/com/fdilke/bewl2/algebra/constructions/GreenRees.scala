@@ -41,6 +41,12 @@ object GreenRees:
     def *(word2: Seq[H]): Seq[H] =
       (word ++ word2).canonical
 
+  extension[H](set: Set[Seq[H]])
+    def *(set2: Set[Seq[H]]): Set[Seq[H]] =
+      set.flatMap { seq => 
+        set.map { _ * seq }
+      }
+
   @tailrec private def extractLeftSegmentHelper[H](  
     segment: Seq[H],
     seen: Seq[H],
@@ -53,12 +59,20 @@ object GreenRees:
     else
       extractLeftSegmentHelper(segment.tail, seen :+ letter, newLettersRemaining)
     
-  def canonicalWords[H](
+  def canonicalWordsBySquares[H](
+    letters: Seq[H]
+  ): Set[Seq[H]] =
+    IterateToFixed[Set[Seq[H]]](
+      (letters.map { Seq(_) } :+ Seq.empty).toSet
+    ) { set => // appallingly inefficient?
+      set * set
+    }
+
+  def canonicalWordsByLetters[H](
     letters: Seq[H]
   ): Set[Seq[H]] =
     IterateToFixed[Set[Seq[H]]](
       Set(Seq.empty[H])
-      // (letters.map { Seq(_) } :+ Seq.empty).toSet
     ) { set => // appallingly inefficient?
       set union (for {
         letter <- letters.toSet
@@ -66,7 +80,6 @@ object GreenRees:
       } yield {
         Seq(letter) * seq
       })
-      // set.flatMap { seq => set.map { _ * seq }}
     }
 
   case class Factorization[H](
