@@ -164,6 +164,17 @@ class GreenReesSpec extends RichFunSuite:
     }
   }
 
+  test("calculate the Green ordering") {
+    ("" <~ "") is true
+    ("" <~ "a") is true
+    ("a" <~ "b") is false
+    ("ab" <~ "b") is false
+    ("ab" <~ "ab") is true
+    ("ab" <~ "aba") is true
+    ("aba" <~ "ab") is true
+    ("caba" <~ "cab") is true
+  }
+
 object LittleProg extends App:
   // val words: Set[String] =
   //   enumerateWordsByTree("abcd").map { x => new String(x.toArray) }

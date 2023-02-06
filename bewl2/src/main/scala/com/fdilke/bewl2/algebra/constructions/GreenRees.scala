@@ -27,6 +27,9 @@ object GreenRees:
         throw new IllegalArgumentException("can't extract segment from empty word")
       extractLeftSegmentHelper(word, Seq.empty, word.toSet)
 
+    def <~(word2: Seq[H]): Boolean =
+      (word ++ word2) =!= word2
+
     def =!=(word2: Seq[H]): Boolean =
       if (word.isEmpty) then
         word2.isEmpty
@@ -49,6 +52,10 @@ object GreenRees:
       set.flatMap { seq => 
         set.map { _ * seq }
       }
+
+  // extension(word: String)
+  //   def <~(word2: String): Boolean =
+  //     word.toSeq <~ word2.toSeq
 
   // extension[H](letter: H)
   //   def *(seq: Seq[H]): Seq[H] =
