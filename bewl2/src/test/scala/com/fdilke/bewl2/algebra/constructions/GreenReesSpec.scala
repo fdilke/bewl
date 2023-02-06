@@ -99,12 +99,18 @@ class GreenReesSpec extends RichFunSuite:
     ("bacb" * "cabc") be "bacabc"
   }
 
-  private def testCanonicalWords(
+  test("Calculate orders of free monoids") {
+    val expectedSizes: Seq[Int] = Seq(1, 2, 7, 160, 332381)
+    for { i <- expectedSizes.indices } {
+      orderFree(i) is BigInt(expectedSizes(i))
+    }
+  }
+
+  private def testEnumerateWords(
     canonicalsFunc: Seq[Char] => Set[Seq[Char]]
-    ): Unit =
-    for {
-      (numLetters, expectedSize) <- Seq(0 -> 1, 1 -> 2, 2 -> 7, 3 -> 160 /*, 4 -> 300000  */)
-    } {
+  ): Unit =
+    for { numLetters <- 0 to 3 } {
+      val expectedSize = orderFree(numLetters).toInt
       val letters = "abcde".slice(0, numLetters)
       val rawMonoid: Set[Seq[Char]] = canonicalsFunc(letters)
       rawMonoid.size is expectedSize
@@ -123,12 +129,66 @@ class GreenReesSpec extends RichFunSuite:
         } {
           ((x * y) * z) is (x * (y * z))
         }
-      }
+    }
       
-  test("Can generate the free idempotent monoid as a raw set of canonicals, by squares") {
-    testCanonicalWords(canonicalWordsBySquares[Char])
+  test("Generate the free idempotent monoid as a raw set, by squares") {
+    testEnumerateWords(enumerateWordsBySquares[Char])
   }
 
-  test("Can generate the free idempotent monoid as a raw set of canonicals, by letters") {
-    testCanonicalWords(canonicalWordsByLetters[Char])
+  test("Generate the free idempotent monoid as a raw set, by letters") {
+    testEnumerateWords(enumerateWordsByLetters[Char])
+  }
+
+  test("Generate the free idempotent monoid as a raw set, by tree") {
+    testEnumerateWords(enumerateWordsByTree[Char])
+  }
+
+  // test("More tests of the tree") {
+  //   enumerateWordsByTree("abcd").size is 332381
+  // }
+    
+  test("Check the longest canonical word on each alphabet") {
+    val expected: Seq[Int] = Seq(0, 1, 3, 8, 18)
+    for (n <- 0 to 3) {
+      val letters: String = "abcde".slice(0, n)
+      val longest: Int =
+        enumerateWordsByTree(letters).map { _.length }.max
+      longest is expected(n)
+    }
+  }
+
+  test("stochastic calculation of the longest canonical word") {
+    val expected: Seq[Int] = Seq(0, 1, 3, 8, 18)
+    for (n <- 0 to 4) {
+      stochasticLongest(n) is expected(n)
+    }
+  }
+
+object LittleProg extends App:
+  // val words: Set[String] =
+  //   enumerateWordsByTree("abcd").map { x => new String(x.toArray) }
+  // for { word <- words }   {
+  //   print(word + "\t")
+  // }
+  // println("\n" + words.size + "total")
+
+  // for { n <- 1 to 30 } {
+  //   val size = orderFree(n)
+  //   val numDigitsRoot = size.toString().length() / n
+  //   println("" + n + "\t" + numDigitsRoot)
+  // }
+
+  // for (n <- 0 to 4) {
+  //   val letters: String = "abcde".slice(0, n)
+  //   val words: Set[String] =
+  //     enumerateWordsByTree(letters).map { x => new String(x.toArray) }
+  //     val maxLength: Int =
+  //       words.map { _.length }.max
+  //       val longest = 
+  //         words.filter { _.length == maxLength }
+  //         println(s"$n\t$maxLength\t${longest.size}\t${longest.head}")
+  //       }
+
+  for (n <- 0 to 10) {
+    println("" + n + "\t" + stochasticLongest(n))
   }
