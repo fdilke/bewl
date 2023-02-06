@@ -94,8 +94,11 @@ trait AlgebraicTheories[
   sealed trait Term[
     X <: AlgebraicSort
   ](
-     val freeVariables: Seq[VariableTerm[_ <: AlgebraicSort]]
+     val initFreeVariables: Seq[VariableTerm[_ <: AlgebraicSort]]
    ) extends Dynamic {
+    def freeVariables: Seq[VariableTerm[_ <: AlgebraicSort]] =
+      initFreeVariables
+      
     def applyDynamic(
       name: String
     )(
@@ -160,7 +163,8 @@ trait AlgebraicTheories[
      symbol: String,
      isScalar: Boolean
    ) extends Term[S](Nil) {
-    override val freeVariables: Seq[VariableTerm[_ <: AlgebraicSort]] = Seq(this)
+    override def freeVariables: Seq[VariableTerm[_ <: AlgebraicSort]] =
+      Seq(this)
 
     def addToContext[S : Dot, T : Dot](
       algebra: AlgebraicTheory[S]#Algebra[T]
