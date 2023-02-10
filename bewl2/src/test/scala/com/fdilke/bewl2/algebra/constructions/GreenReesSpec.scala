@@ -2,6 +2,7 @@ package com.fdilke.bewl2.algebra.constructions
 import GreenRees.*
 import com.fdilke.bewl2.utility.RichFunSuite
 import com.fdilke.bewl2.sets.SetsUtilities.*
+import java.util.concurrent.atomic.AtomicBoolean
 
 class GreenReesSpec extends RichFunSuite:
 
@@ -100,9 +101,10 @@ class GreenReesSpec extends RichFunSuite:
   }
 
   test("Calculate orders of free monoids") {
-    val expectedSizes: Seq[Int] = Seq(1, 2, 7, 160, 332381)
+    val expectedSizes: Seq[BigInt] =
+      Seq(1, 2, 7, 160, 332381).map { BigInt(_) } ++ Seq(BigInt("2751884514766"))
     for { i <- expectedSizes.indices } {
-      orderFree(i) is BigInt(expectedSizes(i))
+      orderFree(i) is expectedSizes(i)
     }
   }
 
@@ -157,10 +159,10 @@ class GreenReesSpec extends RichFunSuite:
     }
   }
 
-  test("stochastic calculation of the longest canonical word") {
-    val expected: Seq[Int] = Seq(0, 1, 3, 8, 18)
+  test("calculation of the length longest canonical word") {
+    val expected: Seq[Int] = Seq(0, 1, 3, 8, 18, 36)
     for (n <- 0 to 4) {
-      stochasticLongest(n) is expected(n)
+      longestLength(n) is expected(n)
     }
   }
 
@@ -175,6 +177,17 @@ class GreenReesSpec extends RichFunSuite:
     ("caba" <~ "cab") is true
   }
 
+  test("calculate the Green R equivalence") {
+    ("" R "") is true
+    ("" R "a") is false
+    ("a" R "b") is false
+    ("ab" R "b") is false
+    ("ab" R "ab") is true
+    ("ab" R "aba") is true
+    ("aba" R "ab") is true
+    ("caba" R "cab") is true
+  }
+  
 object LittleProg extends App:
   // val words: Set[String] =
   //   enumerateWordsByTree("abcd").map { x => new String(x.toArray) }
@@ -201,5 +214,29 @@ object LittleProg extends App:
   //       }
 
   for (n <- 0 to 10) {
-    println("" + n + "\t" + stochasticLongest(n))
+    println("" + n + "\t" + longestLength(n))
   }
+
+object IsRACongruence extends App:
+  val degree = 3
+  val letters: String = "abcde".slice(0, degree)
+  val words: Set[String] =
+      enumerateWordsByTree(letters).map { x => new String(x.toArray) }
+  val broken= new AtomicBoolean
+  for {
+    word <- words
+    word2 <- words
+  } {
+    if (word R word2) {
+      for { letter <- letters } {
+        if ((word + letter).canonical != (word2 + letter).canonical) {
+          println(s"broken on $word, $word2, $letter")
+          broken.set(true)
+        }
+      }
+    }
+  }
+  if (broken.get)
+    println("Broken")
+  else
+    println("All ok")

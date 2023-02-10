@@ -8,6 +8,7 @@ lazy val root = project
     scalacOptions ++= Seq(
         // "-Yrangepos",
         "-Yindent-colons",
+        "-explain",
 //        "-language:experimental.fewerBraces"
     ),
     ThisBuild/scalacOptions ++= Seq("-unchecked", "-deprecation" /*, "-rangepos" */),

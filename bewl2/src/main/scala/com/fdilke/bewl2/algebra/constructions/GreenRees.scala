@@ -30,6 +30,9 @@ object GreenRees:
     def <~(word2: Seq[H]): Boolean =
       (word ++ word2) =!= word2
 
+    def R(word2: Seq[H]): Boolean =
+      (word <~ word2) && (word2 <~ word)
+
     def =!=(word2: Seq[H]): Boolean =
       if (word.isEmpty) then
         word2.isEmpty
@@ -114,20 +117,13 @@ object GreenRees:
   def combinations(n: Int, k: Int): BigInt =
     permutations(n) / (permutations(k) * permutations(n - k))    
 
-  def stochasticLongest(n: Int): Int =
-    if (n == 0)
-      0
-    else
-      val random = new Random
-      var longest: Int = -1
-      for { i <- 0 to 1000 } {
-        var word: Seq[Int] = Seq.empty // 0 until n
-        for { j <- 0 to (n*100) } {
-          word = Seq(random.nextInt(n)) * word
-          longest = Math.max(longest, word.size)
-        }
-      }
-      longest
+  def longestLength(n: Int): Int =
+    n match {
+      case 0 => 0
+      case 1 => 1
+      case 2 => 3
+      case _ => 2 * longestLength(n-1) + 2
+    }
 
 class AlphabetContext[H](
   alphabet: Seq[H]
