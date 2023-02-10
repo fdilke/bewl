@@ -16,3 +16,8 @@ object Shortcuts:
     Q =:= R
   ): R =
     transmute[Q, R](transmute[P, Q](p))
+
+  extension(letters: Seq[Char])
+    inline def string: String =
+      new String(letters.toArray)
+

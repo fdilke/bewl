@@ -3,6 +3,7 @@ import GreenRees.*
 import com.fdilke.bewl2.utility.RichFunSuite
 import com.fdilke.bewl2.sets.SetsUtilities.*
 import java.util.concurrent.atomic.AtomicBoolean
+import com.fdilke.utility.Shortcuts._
 
 class GreenReesSpec extends RichFunSuite:
 
@@ -76,7 +77,7 @@ class GreenReesSpec extends RichFunSuite:
     "bacbcabc".canonical be "bacabc"
   }
 
-  test("Higher level tests for canonical forms") {
+  test("Canonical form function is idempotent, non-length-increasing") {
     for {
       length <- (0 to 6).toSeq
       seq <- sequencesOfLength("abc", length)
@@ -87,6 +88,21 @@ class GreenReesSpec extends RichFunSuite:
       (canon.canonical == canon) is true
     }
   }
+
+  // TODO: fix
+  // test("Canonical form is lex-minimal word of the same length") {
+  //   for {
+  //     length <- (0 to 6).toSeq
+  //     seq <- sequencesOfLength("abc", length)
+  //   } {
+  //     val canon: Seq[Char] = seq.canonical
+  //     for { seq2 <- sequencesOfLength("abc", length) } {
+  //       if (seq =!= seq2) {
+  //         (canon.string <= seq.string) is true
+  //       }
+  //     }
+  //   }
+  // }
 
   test("Can multiply words with automatic reduction to canonical form") {
     ("" * "") be ""
@@ -159,10 +175,33 @@ class GreenReesSpec extends RichFunSuite:
     }
   }
 
-  test("calculation of the length longest canonical word") {
-    val expected: Seq[Int] = Seq(0, 1, 3, 8, 18, 36)
-    for (n <- 0 to 4) {
+  test("calculation of the length of the longest canonical word") {
+    val expected: Seq[Int] = Seq(0, 1, 3, 8, 18, 38)
+    for (n <- expected.indices) {
       longestLength(n) is expected(n)
+    }
+  }
+
+  test("calculation of a longest canonical word") {
+    val expected: Seq[String] =
+      Seq("", "a", "aba", "abacabcb", "abacabcbdabdbcbdcd" 
+        // "abacabcbdabdbcbdcdeabdbcbdcdebdedcdece"
+        // TODO: fix
+      )
+
+    for (n <- expected.indices) {
+      val letters: String = "abcde".slice(0, n)
+      val word: String = longestWord(letters).string
+      println(s"word = '$word' expected(n) = '${expected(n)}'")
+      word is expected(n)
+      word.length() is longestLength(n)
+      word.canonical.string is word
+    }
+    // also each longest word is a prefix of the next one:
+    for (n <- expected.indices.tail) {
+      val prevWord = expected(n-1)
+      val word = expected(n)
+      word.startsWith(prevWord) is true
     }
   }
 
@@ -187,56 +226,4 @@ class GreenReesSpec extends RichFunSuite:
     ("aba" R "ab") is true
     ("caba" R "cab") is true
   }
-  
-object LittleProg extends App:
-  // val words: Set[String] =
-  //   enumerateWordsByTree("abcd").map { x => new String(x.toArray) }
-  // for { word <- words }   {
-  //   print(word + "\t")
-  // }
-  // println("\n" + words.size + "total")
 
-  // for { n <- 1 to 30 } {
-  //   val size = orderFree(n)
-  //   val numDigitsRoot = size.toString().length() / n
-  //   println("" + n + "\t" + numDigitsRoot)
-  // }
-
-  // for (n <- 0 to 4) {
-  //   val letters: String = "abcde".slice(0, n)
-  //   val words: Set[String] =
-  //     enumerateWordsByTree(letters).map { x => new String(x.toArray) }
-  //     val maxLength: Int =
-  //       words.map { _.length }.max
-  //       val longest = 
-  //         words.filter { _.length == maxLength }
-  //         println(s"$n\t$maxLength\t${longest.size}\t${longest.head}")
-  //       }
-
-  for (n <- 0 to 10) {
-    println("" + n + "\t" + longestLength(n))
-  }
-
-object IsRACongruence extends App:
-  val degree = 3
-  val letters: String = "abcde".slice(0, degree)
-  val words: Set[String] =
-      enumerateWordsByTree(letters).map { x => new String(x.toArray) }
-  val broken= new AtomicBoolean
-  for {
-    word <- words
-    word2 <- words
-  } {
-    if (word R word2) {
-      for { letter <- letters } {
-        if ((word + letter).canonical != (word2 + letter).canonical) {
-          println(s"broken on $word, $word2, $letter")
-          broken.set(true)
-        }
-      }
-    }
-  }
-  if (broken.get)
-    println("Broken")
-  else
-    println("All ok")

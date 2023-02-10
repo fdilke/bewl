@@ -125,6 +125,47 @@ object GreenRees:
       case _ => 2 * longestLength(n-1) + 2
     }
 
+  def longest0[H](letters: Seq[H]): Seq[H] =
+    letters match {
+      case Seq() => Seq()
+      case Seq(a) => Seq(a)
+      case Seq(a, b) => Seq(a, b, a)
+      case _ => 
+        val numLetters = letters.size
+        val a = letters.head
+        val z = letters.last
+        longest0(letters.slice(0, numLetters-1)) ++ Seq(z, a) ++
+          longest0(letters.slice(1, numLetters))
+    }
+
+  def longestWord[H](letters: Seq[H]): Seq[H] =
+    letters match {
+      case Seq() => Seq()
+      case Seq(a) => Seq(a)
+      case Seq(a, b) => Seq(a, b, a)
+      case _ => 
+        val numLetters = letters.size
+        val a = letters.head
+        val z = letters.last
+        longestWord(letters.slice(0, numLetters-1)) ++ Seq(z, a) ++
+          longestWord(interchange(letters.slice(1, numLetters)))
+    }
+
+  private def interchange[H](word: Seq[H]): Seq[H] =
+    val len = word.size
+    if (len <= 2)
+      word
+    else if (len == 4)
+      word
+    else
+      word.slice(0, len-2) :+ word(len-1) :+ word(len-2)
+
+  private def interchange0[H](word: Seq[H]): Seq[H] =
+    if (word.size <= 2)
+      word
+    else
+      word(0) +: word(2) +: word(1) +: word.slice(3, word.size)
+
 class AlphabetContext[H](
   alphabet: Seq[H]
 ) extends Traversable[Seq[H]]:
