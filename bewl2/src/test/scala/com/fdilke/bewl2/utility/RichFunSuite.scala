@@ -2,6 +2,7 @@ package com.fdilke.bewl2.utility
 
 import munit.FunSuite
 import com.fdilke.bewl2.sets.Sets
+import com.fdilke.utility.Shortcuts._
 
 trait RichFunSuite extends FunSuite:
 
@@ -15,7 +16,7 @@ trait RichFunSuite extends FunSuite:
 
   extension(letters: Seq[Char])
     inline def be(text: String): Unit =
-      assertEquals(letters, text.toSeq)
+      assertEquals(letters.string, text)
 
   // extension(text: String)
   //   inline def is(letters: Seq[Char]): Unit =

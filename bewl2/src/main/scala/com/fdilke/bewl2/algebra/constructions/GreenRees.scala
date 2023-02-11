@@ -47,6 +47,36 @@ object GreenRees:
       else
         word.factorize.canonical
 
+    def slowcan(using Ordering[H]): Seq[H] =
+      val letters: Seq[H] = word.distinct.sorted
+      IterateToFixed(
+        Seq.empty[H]
+      ) { can =>
+        if word =!= can then
+          can
+        else
+          letters map { letter =>
+            can :+ letter
+          } find { newCan =>
+            println("trying " + newCan + " for word: " + word)
+            println("(newCan <~ word) = " + (newCan <~ word))
+            println("!(newCan =!= can) = " + !(newCan =!= can))
+            // println("!(newCan <~ can) = " + !(newCan <~ can))
+            println(s"that's !($newCan =!= $can)")
+            (newCan <~ word) && !(newCan =!= can) // && !(newCan <~ can))
+          } match {
+            case None => throw new IllegalArgumentException(
+              s"""can't extend "$can" in context of "$word""""
+            )
+            case Some(newCan) =>
+              if (newCan.size > word.size + 2)
+                throw new IllegalArgumentException(
+                  "this is insane: word = " + word
+                )
+              newCan
+          }
+        }
+
     def *(word2: Seq[H]): Seq[H] =
       (word ++ word2).canonical
 

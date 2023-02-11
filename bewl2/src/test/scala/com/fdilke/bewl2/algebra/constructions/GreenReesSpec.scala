@@ -62,6 +62,22 @@ class GreenReesSpec extends RichFunSuite:
     Factorization("cbb", 'a', 'c', "ba").recombine be "cbbacba"
   }
 
+  if (false) // TODO: fix
+    test("The 'slow' (i.e. more theoretically grounded) canonical form for words") {
+      // "".slowcan be ""
+      // "a".slowcan be "a"
+      "abc".slowcan be "abc"
+      // "aa".slowcan be "a"
+      // "aab".slowcan be "ab"
+      // "baa".slowcan be "ba"
+      // "baab".slowcan be "bab"
+      // "abab".slowcan be "ab"
+      // "abcabc".slowcan be "abc"
+      // "gababg".slowcan be "gabg"
+      // "gabcabcgabc".slowcan be "gabc"
+      // "bacbcabc".slowcan be "bacabc"
+    }
+
   test("Canonical form for words") {
     "".canonical be ""
     "a".canonical be "a"
@@ -192,7 +208,7 @@ class GreenReesSpec extends RichFunSuite:
     for (n <- expected.indices) {
       val letters: String = "abcde".slice(0, n)
       val word: String = longestWord(letters).string
-      println(s"word = '$word' expected(n) = '${expected(n)}'")
+      // println(s"word = '$word' expected(n) = '${expected(n)}'")
       word is expected(n)
       word.length() is longestLength(n)
       word.canonical.string is word
