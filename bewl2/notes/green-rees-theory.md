@@ -24,3 +24,27 @@ result characterizing this (need congruence extension property, etc etc) so mayb
 I believe there's a simple way to generate a 'canonical form' which standardizes and simplifies the
 calculations. and may even produce 'a shortest' word representing each equivalence class.
 Rather than try and prove this, I'll first see if it works empirically.
+
+later: Yes. But what you really need is a canonical form that is also lexicographically earliest.
+Left with a bit of a residue of not-so-successful formas and calculations.
+
+Rename all that to GascoignePeesXxx as an interesting experiment
+Start again with something based on String rather than Seq[H], because
+Strings are not really interchangeable with Seq[Char] and it's a pain
+also: we need H to be orderable and that's a pain too
+Pick out the successful bits of that. Maybe have canonical1 as the original,
+not-best algorithm, develop a better canonical in stages
+
+Also I believe this is what the Green theory's eggbox diagram will
+look like for IM(n) the free idempotent monoid on n letters:
+For finite monoids D = J ; for IM(n) this is the set of letters in a word.
+So IM(n) has 2^n D-classes.
+Within each D-class it only depends on the set of letters, say there are k of them
+So we have E(k) in each H-class and there are B(k)^2 of them, B(k) being the
+number of L- (or equivalently R-)classes. (E for egg, B for box)
+So we have another equation:
+
+|I(n)| = (horrid sum) = SUM_k=0^n { E(k) * B(k)^2 }
+where the formulae for E and B are probably not too bad.
+Something else I should model
+

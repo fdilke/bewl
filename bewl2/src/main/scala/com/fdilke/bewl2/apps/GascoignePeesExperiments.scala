@@ -1,6 +1,7 @@
 package com.fdilke.bewl2.apps
-import com.fdilke.bewl2.algebra.constructions.GreenRees._
-import com.fdilke.utility.Shortcuts._
+
+import com.fdilke.bewl2.algebra.constructions.GascoignePees.*
+import com.fdilke.utility.Shortcuts.*
 import java.util.concurrent.atomic.AtomicBoolean
 
 object LittleProg extends App:

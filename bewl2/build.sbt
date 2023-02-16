@@ -12,7 +12,7 @@ lazy val root = project
 //        "-language:experimental.fewerBraces"
     ),
     ThisBuild/scalacOptions ++= Seq("-unchecked", "-deprecation" /*, "-rangepos" */),
-    Test / javaOptions += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000",
+    // Test / javaOptions += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000",
     libraryDependencies ++= Seq(
         "org.scalameta" %% "munit" % "1.0.0-M3" % Test,
         "org.typelevel" % "cats-core_3" % "2.7.0"
