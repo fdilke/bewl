@@ -14,11 +14,16 @@ class GreenReesSpec extends RichFunSuite:
     intercept[java.lang.IllegalArgumentException]{
       "".leftSegment
     }
-    "a".leftSegment is "a"
-    "ab".leftSegment is "ab"
-    "abc".leftSegment is "abc"
-    "caacbac".leftSegment is "caacb"
-    "abacab".leftSegment is "abac"
-    "bcnofne".leftSegment is "bcnofne"
-    "daguerrotype".leftSegment is "daguerrotyp"
+    "a".leftSegment is ("", 'a')
+    "ab".leftSegment is ("a", 'b')
+    "abc".leftSegment is ("ab", 'c')
+    "caacbac".leftSegment is ("caac", 'b')
+    "abacab".leftSegment is ("aba", 'c')
+    "bcnofne".leftSegment is ("bcnofn", 'e')
+    "daguerrotype".leftSegment is ("daguerroty", 'p')
   }
+
+  // test("Can factorize a word") {
+  //   "".factorize is None
+  //   "a".factorize is Factorization()
+  // }

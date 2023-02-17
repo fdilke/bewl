@@ -5,12 +5,12 @@ import com.fdilke.utility.Shortcuts.*
 
 object GreenRees:
   extension(word: String)
-    def leftSegment: String =
+    def leftSegment: (String, Char) =
       if (word.isEmpty)
         throw new IllegalArgumentException("can't extract segment from empty word")      
       else
         val (prefix, last) = extractLeftSegmentHelper(word, "", word.toSet)
-        (prefix :+ last).string
+        (prefix.string, last)
 
   @tailrec private def extractLeftSegmentHelper(  
     segment: Seq[Char],
