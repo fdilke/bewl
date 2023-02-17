@@ -25,9 +25,30 @@ class GreenReesSpec extends RichFunSuite:
 
   test("Can factorize a word") {
     "".factorize is None
-    "a".factorize is Some(Factorization("", 'a', 'a', ""))
-    "ab".factorize is Some(Factorization("a", 'b', 'a', "b"))
-    "abc".factorize is Some(Factorization("ab", 'c', 'a', "bc"))
-    "caacbac".factorize is Some(Factorization("caac", 'b', 'b', "ac"))
-    "abacab".factorize is Some(Factorization("aba", 'c', 'c', "ab"))
+    "a".factorize is Some(Factorization(None, 'a', 'a', None))
+    "ab".factorize is Some(
+      Factorization(
+        "a".factorize, 'b', 'a', "b".factorize
+      )
+    )
+    "abc".factorize is Some(
+      Factorization(
+        "ab".factorize, 'c', 'a', "bc".factorize
+      )
+    )
+    "aba".factorize is Some(
+      Factorization(
+        "a".factorize, 'b', 'b', "a".factorize
+      )
+    )
+    "caacbac".factorize is Some(
+      Factorization(
+        "caac".factorize, 'b', 'b', "ac".factorize
+      )
+    )
+    "abacab".factorize is Some(
+      Factorization(
+        "aba".factorize, 'c', 'c', "ab".factorize
+      )
+    )
   }

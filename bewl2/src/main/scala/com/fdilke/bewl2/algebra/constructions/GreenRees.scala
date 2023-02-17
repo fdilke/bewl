@@ -20,10 +20,10 @@ object GreenRees:
         val (suffixReversed, rightEnd) = word.reverse.leftSegment
         Some(
           Factorization(
-            prefix = prefix,
+            prefix = prefix.factorize,
             leftEnd = leftEnd,
             rightEnd = rightEnd,
-            suffix = suffixReversed.reverse
+            suffix = suffixReversed.reverse.factorize
           )
         )
 
@@ -44,9 +44,9 @@ object GreenRees:
       )
 
 case class Factorization(
-  prefix : String,
+  prefix : Option[Factorization],
   leftEnd : Char,
   rightEnd : Char,
-  suffix : String
+  suffix : Option[Factorization]
 )
 
