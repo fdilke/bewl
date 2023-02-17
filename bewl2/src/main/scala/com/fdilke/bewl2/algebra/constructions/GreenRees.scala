@@ -2,6 +2,7 @@ package com.fdilke.bewl2.algebra.constructions
 
 import scala.annotation.tailrec
 import com.fdilke.utility.Shortcuts.*
+import com.fdilke.bewl2.algebra.constructions.GreenRees.factorize
 
 object GreenRees:
   extension(word: String)
@@ -20,10 +21,10 @@ object GreenRees:
         val (suffixReversed, rightEnd) = word.reverse.leftSegment
         Some(
           Factorization(
-            prefix = prefix.factorize,
+            prefix = prefix,
             leftEnd = leftEnd,
             rightEnd = rightEnd,
-            suffix = suffixReversed.reverse.factorize
+            suffix = suffixReversed.reverse
           )
         )
 
@@ -53,3 +54,18 @@ case class Factorization(
   suffix : Option[Factorization]
 )
 
+object Factorization:
+  def apply(
+    prefix: String,
+    leftEnd: Char,
+    rightEnd: Char,
+    suffix: String
+  ): Factorization =
+    Factorization(
+      prefix.factorize,
+      leftEnd,
+      rightEnd,
+      suffix.factorize
+    )
+
+    
