@@ -52,3 +52,15 @@ class GreenReesSpec extends RichFunSuite:
       )
     )
   }
+
+  test("Can check words for equivalence") {
+    ("" =!= "") is true
+    ("x" =!= "") is false
+    ("" =!= "x") is false
+    ("ab" =!= "bc") is false
+    ("abc" =!= "abc") is true
+    // and the interesting cases
+    ("bacabc" =!= "bacbcabc") is true
+    ("bacabc" =!= "babcabc") is false
+    ("xzyzxzy" =!= "xzy") is true
+  }

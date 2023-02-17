@@ -27,6 +27,9 @@ object GreenRees:
           )
         )
 
+    def =!=(word2: String): Boolean =
+      word.factorize == word2.factorize
+
   @tailrec private def extractLeftSegmentHelper(  
     segment: Seq[Char],
     seen: Seq[Char],
