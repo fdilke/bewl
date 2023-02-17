@@ -12,6 +12,21 @@ object GreenRees:
         val (prefix, last) = extractLeftSegmentHelper(word, "", word.toSet)
         (prefix.string, last)
 
+    def factorize: Option[Factorization] =
+      if word.isEmpty() then
+        None
+      else
+        val (prefix, leftEnd) = word.leftSegment
+        val (suffixReversed, rightEnd) = word.reverse.leftSegment
+        Some(
+          Factorization(
+            prefix = prefix,
+            leftEnd = leftEnd,
+            rightEnd = rightEnd,
+            suffix = suffixReversed.reverse
+          )
+        )
+
   @tailrec private def extractLeftSegmentHelper(  
     segment: Seq[Char],
     seen: Seq[Char],
@@ -27,5 +42,11 @@ object GreenRees:
         seen :+ letter,
         newLettersRemaining
       )
-        
+
+case class Factorization(
+  prefix : String,
+  leftEnd : Char,
+  rightEnd : Char,
+  suffix : String
+)
 

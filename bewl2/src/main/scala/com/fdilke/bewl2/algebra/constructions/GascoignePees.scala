@@ -11,11 +11,11 @@ import scala.util.Random
 object GascoignePees:
 
   extension[H](word: Seq[H])
-    def factorize: Factorization[H] =
+    def factorize: Factoring[H] =
       val allLetters: Set[H] = word.toSet
       val (leftSeg: Seq[H], leftLetter: H) = word.leftSegment(allLetters)
       val (rightSegR, rightLetter): (Seq[H], H) = word.reverse.leftSegment(allLetters)
-      Factorization(leftSeg, leftLetter, rightLetter, rightSegR.reverse)
+      Factoring(leftSeg, leftLetter, rightLetter, rightSegR.reverse)
       
     def leftSegment: (Seq[H], H) =
       leftSegment(word.toSet)
@@ -234,13 +234,13 @@ class AlphabetContext[H](
   override def iterator: Iterator[Seq[H]] =
     root.iterator
   
-case class Factorization[H](
+case class Factoring[H](
   leftSegment: Seq[H],
   leftLetter: H,
   rightLetter: H,
   rightSegment: Seq[H]
 ):
-  def =!=(other: Factorization[H]): Boolean =
+  def =!=(other: Factoring[H]): Boolean =
     (leftSegment =!= other.leftSegment) &&
     (leftLetter == other.leftLetter) &&
     (rightLetter == other.rightLetter) &&
@@ -257,7 +257,7 @@ case class Factorization[H](
     }
 
   def canonical: Seq[H] =
-    Factorization(
+    Factoring(
       leftSegment.canonical,
       leftLetter,
       rightLetter,

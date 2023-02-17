@@ -4,7 +4,7 @@ import com.fdilke.bewl2.utility.RichFunSuite
 import com.fdilke.bewl2.sets.SetsUtilities.*
 import java.util.concurrent.atomic.AtomicBoolean
 import com.fdilke.utility.Shortcuts._
-import com.fdilke.bewl2.algebra.constructions.Factorization
+import com.fdilke.bewl2.algebra.constructions.Factoring
 
 class GascoignePeesSpec extends RichFunSuite:
 
@@ -22,20 +22,20 @@ class GascoignePeesSpec extends RichFunSuite:
     intercept[java.lang.IllegalArgumentException]{
       Seq[Int]().factorize
     }
-    Seq(0).factorize is Factorization(Seq(), 0, 0, Seq())
-    Seq(0, 1, 2).factorize is Factorization(Seq(0, 1), 2, 0, Seq(1, 2))
-    Seq(0, 1, 1, 2).factorize is Factorization(Seq(0, 1, 1), 2, 0, Seq(1, 1, 2))
-    Seq(2, 1, 1, 0, 0, 2, 1, 2).factorize is Factorization(Seq(2, 1, 1), 0, 0, Seq(2, 1, 2))
+    Seq(0).factorize is Factoring(Seq(), 0, 0, Seq())
+    Seq(0, 1, 2).factorize is Factoring(Seq(0, 1), 2, 0, Seq(1, 2))
+    Seq(0, 1, 1, 2).factorize is Factoring(Seq(0, 1, 1), 2, 0, Seq(1, 1, 2))
+    Seq(2, 1, 1, 0, 0, 2, 1, 2).factorize is Factoring(Seq(2, 1, 1), 0, 0, Seq(2, 1, 2))
   }
 
   test("Can use strings interchangeably with Seq[Char]") {
     intercept[java.lang.IllegalArgumentException]{
       Seq[Int]().factorize
     }
-    "a".factorize is Factorization("", 'a', 'a', Seq())
-    "abc".factorize is Factorization("ab", 'c', 'a', "bc")
-    "abbc".factorize is Factorization("abb", 'c', 'a', "bbc")
-    "cbbaacbc".factorize is Factorization("cbb", 'a', 'a', "cbc")
+    "a".factorize is Factoring("", 'a', 'a', Seq())
+    "abc".factorize is Factoring("ab", 'c', 'a', "bc")
+    "abbc".factorize is Factoring("abb", 'c', 'a', "bbc")
+    "cbbaacbc".factorize is Factoring("cbb", 'a', 'a', "cbc")
   }
 
   test("Can check words for equivalence") {
@@ -51,16 +51,16 @@ class GascoignePeesSpec extends RichFunSuite:
   }
   
   test("Can optimally 'recombine' a factorization") {
-    Factorization("", 'a', 'a', "").recombine be "a"
-    Factorization("", 'a', 'b', "").recombine be "ab"
-    Factorization("b", 'a', 'b', "a").recombine be "ba"
-    Factorization("bac", 'd', 'b', "acd").recombine be "bacd"
-    Factorization("bac", 'd', 'a', "cdb").recombine be "bacdb"
-    Factorization("bac", 'd', 'c', "dba").recombine be "bacdba"
-    Factorization("bac", 'd', 'd', "bac").recombine be "bacdbac"
-    Factorization("cbb", 'a', 'a', "cbc").recombine be "cbbacbc"
-    Factorization("cbb", 'a', 'c', "ba").recombine be "cbbacba"
-    Factorization("cbb", 'a', 'c', "ba").recombine be "cbbacba"
+    Factoring("", 'a', 'a', "").recombine be "a"
+    Factoring("", 'a', 'b', "").recombine be "ab"
+    Factoring("b", 'a', 'b', "a").recombine be "ba"
+    Factoring("bac", 'd', 'b', "acd").recombine be "bacd"
+    Factoring("bac", 'd', 'a', "cdb").recombine be "bacdb"
+    Factoring("bac", 'd', 'c', "dba").recombine be "bacdba"
+    Factoring("bac", 'd', 'd', "bac").recombine be "bacdbac"
+    Factoring("cbb", 'a', 'a', "cbc").recombine be "cbbacbc"
+    Factoring("cbb", 'a', 'c', "ba").recombine be "cbbacba"
+    Factoring("cbb", 'a', 'c', "ba").recombine be "cbbacba"
   }
 
   if (false) // TODO: fix

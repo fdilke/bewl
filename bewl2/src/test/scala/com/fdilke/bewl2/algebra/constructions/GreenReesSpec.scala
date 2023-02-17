@@ -5,7 +5,7 @@ import com.fdilke.bewl2.utility.RichFunSuite
 import com.fdilke.bewl2.sets.SetsUtilities.*
 import java.util.concurrent.atomic.AtomicBoolean
 import com.fdilke.utility.Shortcuts._
-import com.fdilke.bewl2.algebra.constructions.Factorization
+import com.fdilke.bewl2.algebra.constructions.Factoring
 import GreenRees.*
 
 class GreenReesSpec extends RichFunSuite:
@@ -23,7 +23,11 @@ class GreenReesSpec extends RichFunSuite:
     "daguerrotype".leftSegment is ("daguerroty", 'p')
   }
 
-  // test("Can factorize a word") {
-  //   "".factorize is None
-  //   "a".factorize is Factorization()
-  // }
+  test("Can factorize a word") {
+    "".factorize is None
+    "a".factorize is Some(Factorization("", 'a', 'a', ""))
+    "ab".factorize is Some(Factorization("a", 'b', 'a', "b"))
+    "abc".factorize is Some(Factorization("ab", 'c', 'a', "bc"))
+    "caacbac".factorize is Some(Factorization("caac", 'b', 'b', "ac"))
+    "abacab".factorize is Some(Factorization("aba", 'c', 'c', "ab"))
+  }
