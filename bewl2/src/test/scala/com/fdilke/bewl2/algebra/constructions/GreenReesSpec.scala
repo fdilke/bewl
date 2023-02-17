@@ -28,27 +28,27 @@ class GreenReesSpec extends RichFunSuite:
     "a".factorize is Some(Factorization(None, 'a', 'a', None))
     "ab".factorize is Some(
       Factorization(
-        "a".factorize, 'b', 'a', "b".factorize
+        "a", 'b', 'a', "b"
       )
     )
     "abc".factorize is Some(
       Factorization(
-        "ab".factorize, 'c', 'a', "bc".factorize
+        "ab", 'c', 'a', "bc"
       )
     )
     "aba".factorize is Some(
       Factorization(
-        "a".factorize, 'b', 'b', "a".factorize
+        "a", 'b', 'b', "a"
       )
     )
     "caacbac".factorize is Some(
       Factorization(
-        "caac".factorize, 'b', 'b', "ac".factorize
+        "caac", 'b', 'b', "ac"
       )
     )
     "abacab".factorize is Some(
       Factorization(
-        "aba".factorize, 'c', 'c', "ab".factorize
+        "aba", 'c', 'c', "ab"
       )
     )
   }
