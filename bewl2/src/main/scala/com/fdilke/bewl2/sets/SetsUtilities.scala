@@ -48,6 +48,12 @@ object SetsUtilities:
       letter +: seq
     }
 
+  def wordsOfLength(
+    letters: String,
+    length: Int
+  ): Iterable[String] =
+    sequencesOfLength(letters, length) map { _.string }
+
   def allNaryOps(
     arity: Int,
     order: Int

@@ -72,3 +72,31 @@ class GreenReesSpec extends RichFunSuite:
       "bacbcabc".canonical is "bacabc"
   }
 
+  test("Canonical form function is idempotent, non-length-increasing") {
+    for {
+      length <- (0 to 6).toSeq
+      word <- wordsOfLength("abc", length)
+    } {
+      val canon: String = word.canonical
+      (canon.length <= word.length) is true
+      (canon =!= word) is true
+      (canon.canonical == canon) is true
+    }
+  }
+
+  test("Canonical form is lex-minimal word of the same length") {
+    for {
+      length <- (0 to 6).toSeq
+      word <- wordsOfLength("abc", length)
+    } {
+      val canon: String = word.canonical
+      for { word2 <- wordsOfLength("abc", length) } {
+        if (word =!= word2) {
+          (canon.length <= word2.length) is true
+          if (canon.length == word2.length) {
+            (canon <= word) is true
+          }
+        }
+      }
+    }
+  }
