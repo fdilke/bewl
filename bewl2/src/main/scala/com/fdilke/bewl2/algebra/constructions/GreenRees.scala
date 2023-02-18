@@ -34,6 +34,9 @@ object GreenRees:
     def canonical: String =
       canonicalFactorize(word.factorize)
 
+    def *(word2: String) =
+      (word + word2).canonical
+
   def canonicalFactorize(
     maybeFac: Option[Factorization]
   ): String =

@@ -100,3 +100,15 @@ class GreenReesSpec extends RichFunSuite:
       }
     }
   }
+
+  test("Can multiply words with automatic reduction to canonical form") {
+    ("" * "") is  ""
+    ("a" * "") is  "a"
+    ("" * "a") is  "a"
+    ("a" * "a") is  "a"
+    ("a" * "b") is  "ab"
+    ("a" * "ab") is  "ab"
+    ("ab" * "ab") is  "ab"
+    ("ab" * "ab") is  "ab"
+    ("bacb" * "cabc") is  "bacabc"
+  }
