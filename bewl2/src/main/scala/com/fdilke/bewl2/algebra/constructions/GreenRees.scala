@@ -31,6 +31,16 @@ object GreenRees:
     def =!=(word2: String): Boolean =
       word.factorize == word2.factorize
 
+    def canonical: String =
+      canonicalFactorize(word.factorize)
+
+  def canonicalFactorize(
+    maybeFac: Option[Factorization]
+  ): String =
+      maybeFac.map {
+        _.canonical
+      } getOrElse ""
+
   @tailrec private def extractLeftSegmentHelper(  
     segment: Seq[Char],
     seen: Seq[Char],
@@ -61,7 +71,12 @@ object GreenRees:
     leftEnd : Char,
     rightEnd : Char,
     suffix : Option[Factorization]
-  )
+  ):
+    def canonical: String =
+      sandwich(
+        canonicalFactorize(prefix) :+ leftEnd,
+        rightEnd +: canonicalFactorize(suffix),
+      )
 
   object Factorization:
     def apply(

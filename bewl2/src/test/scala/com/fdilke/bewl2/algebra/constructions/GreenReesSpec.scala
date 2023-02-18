@@ -57,3 +57,18 @@ class GreenReesSpec extends RichFunSuite:
     sandwich("cbba", "cba") is "cbbacba"
   }
 
+  test("compute canonical form for words") {
+      "".canonical is ""
+      "a".canonical is "a"
+      "abc".canonical is "abc"
+      "aa".canonical is "a"
+      "aab".canonical is "ab"
+      "baa".canonical is "ba"
+      "baab".canonical is "bab"
+      "abab".canonical is "ab"
+      "abcabc".canonical is "abc"
+      "gababg".canonical is "gabg"
+      "gabcabcgabc".canonical is "gabc"
+      "bacbcabc".canonical is "bacabc"
+  }
+
