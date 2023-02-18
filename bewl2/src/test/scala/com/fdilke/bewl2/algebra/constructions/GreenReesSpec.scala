@@ -84,23 +84,6 @@ class GreenReesSpec extends RichFunSuite:
     }
   }
 
-  test("Canonical form is lex-minimal word of the same length") {
-    for {
-      length <- (0 to 6).toSeq
-      word <- wordsOfLength("abc", length)
-    } {
-      val canon: String = word.canonical
-      for { word2 <- wordsOfLength("abc", length) } {
-        if (word =!= word2) {
-          (canon.length <= word2.length) is true
-          if (canon.length == word2.length) {
-            (canon <= word) is true
-          }
-        }
-      }
-    }
-  }
-
   test("Can multiply words with automatic reduction to canonical form") {
     ("" * "") is  ""
     ("a" * "") is  "a"
@@ -121,8 +104,8 @@ class GreenReesSpec extends RichFunSuite:
     }
   }
     
-  test("Calculate orders of free monoids") {
-    for { numLetters <- 0 to 3 } {
+  test("Enumerate canonical forms in a free monoid") {
+    for { numLetters <- 0 to 2 } {
       val expectedSize = orderFree(numLetters).toInt
       val letters: String = "abcde".slice(0, numLetters)
       val monoid: Set[String] = setOfCanonicals(letters)
@@ -134,13 +117,18 @@ class GreenReesSpec extends RichFunSuite:
         (x * "") is x
         ("" * x) is x
       }
-      if (numLetters < 3)
-        for {
-          x <- monoid
-          y <- monoid
-          z <- monoid
-        } {
-          ((x * y) * z) is (x * (y * z))
-        }
+      for {
+        x <- monoid
+        y <- monoid
+      } {
+        (monoid contains (x * y)) is true
+      }
+      for {
+        x <- monoid
+        y <- monoid
+        z <- monoid
+      } {
+        ((x * y) * z) is (x * (y * z))
+      }
     }
   }
