@@ -5,7 +5,6 @@ import com.fdilke.bewl2.utility.RichFunSuite
 import com.fdilke.bewl2.sets.SetsUtilities.*
 import java.util.concurrent.atomic.AtomicBoolean
 import com.fdilke.utility.Shortcuts._
-import com.fdilke.bewl2.algebra.constructions.Factoring
 import GreenRees.*
 
 class GreenReesSpec extends RichFunSuite:
@@ -44,3 +43,17 @@ class GreenReesSpec extends RichFunSuite:
     ("bacabc" =!= "babcabc") is false
     ("xzyzxzy" =!= "xzy") is true
   }
+
+  test("Can calculate 'sandwiched least common multiple' of two words") {
+    sandwich("", "") is ""
+    sandwich("a", "") is "a"
+    sandwich("a", "a") is "a"
+    sandwich("ab", "b") is "ab"
+    sandwich("ab", "a") is "aba"
+    sandwich("ba", "ba") is "ba"
+    sandwich("bac", "acd") is "bacd"
+    sandwich("bac", "cdb") is "bacdb"
+    sandwich("cbba", "bba") is "cbba"
+    sandwich("cbba", "cba") is "cbbacba"
+  }
+

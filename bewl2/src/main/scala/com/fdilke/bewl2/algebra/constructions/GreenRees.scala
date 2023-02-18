@@ -47,25 +47,33 @@ object GreenRees:
         newLettersRemaining
       )
 
-case class Factorization(
-  prefix : Option[Factorization],
-  leftEnd : Char,
-  rightEnd : Char,
-  suffix : Option[Factorization]
-)
+  // Find the shortest word with a given prefix and suffix
+  def sandwich(prefix: String, suffix: String) =
+    prefix.indices.find { i =>
+      suffix.startsWith(prefix.slice(i, prefix.size))
+    } match {
+      case None => prefix ++ suffix
+      case Some(i) => prefix.slice(0, i) ++ suffix
+    }
 
-object Factorization:
-  def apply(
-    prefix: String,
-    leftEnd: Char,
-    rightEnd: Char,
-    suffix: String
-  ): Factorization =
-    Factorization(
-      prefix.factorize,
-      leftEnd,
-      rightEnd,
-      suffix.factorize
-    )
+  case class Factorization(
+    prefix : Option[Factorization],
+    leftEnd : Char,
+    rightEnd : Char,
+    suffix : Option[Factorization]
+  )
 
-    
+  object Factorization:
+    def apply(
+      prefix: String,
+      leftEnd: Char,
+      rightEnd: Char,
+      suffix: String
+    ): Factorization =
+      Factorization(
+        prefix.factorize,
+        leftEnd,
+        rightEnd,
+        suffix.factorize
+      )
+
