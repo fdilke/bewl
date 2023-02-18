@@ -112,3 +112,12 @@ class GreenReesSpec extends RichFunSuite:
     ("ab" * "ab") is  "ab"
     ("bacb" * "cabc") is  "bacabc"
   }
+
+  test("Calculate orders of free monoids") {
+    val expectedSizes: Seq[BigInt] =
+      Seq(1, 2, 7, 160, 332381).map { BigInt(_) } ++ Seq(BigInt("2751884514766"))
+    for { i <- expectedSizes.indices } {
+      orderFree(i) is expectedSizes(i)
+    }
+  }
+

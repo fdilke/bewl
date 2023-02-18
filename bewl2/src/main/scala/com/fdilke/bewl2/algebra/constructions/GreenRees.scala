@@ -69,6 +69,19 @@ object GreenRees:
       case Some(i) => prefix.slice(0, i) ++ suffix
     }
 
+  private def permutations(n: Int): BigInt =  
+    (1 to n).map(BigInt(_)).foldLeft(BigInt(1))(_ * _)
+
+  private def combinations(n: Int, k: Int): BigInt =
+    permutations(n) / (permutations(k) * permutations(n - k))    
+
+  def orderFree(n: Int): BigInt =
+    (for { k <- 0 to n } yield {
+      (for { i <- 1 to k } yield {
+        BigInt(k - i + 1).pow(BigInt(2).pow(i).toInt)
+      }).product * combinations(n, k)
+    }).sum
+
   case class Factorization(
     prefix : Option[Factorization],
     leftEnd : Char,
