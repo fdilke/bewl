@@ -120,4 +120,27 @@ class GreenReesSpec extends RichFunSuite:
       orderFree(i) is expectedSizes(i)
     }
   }
-
+    
+  test("Calculate orders of free monoids") {
+    for { numLetters <- 0 to 3 } {
+      val expectedSize = orderFree(numLetters).toInt
+      val letters: String = "abcde".slice(0, numLetters)
+      val monoid: Set[String] = setOfCanonicals(letters)
+      monoid.size is expectedSize
+      for {
+        x <- monoid
+      } {
+        (x * x) is x
+        (x * "") is x
+        ("" * x) is x
+      }
+      if (numLetters < 3)
+        for {
+          x <- monoid
+          y <- monoid
+          z <- monoid
+        } {
+          ((x * y) * z) is (x * (y * z))
+        }
+    }
+  }

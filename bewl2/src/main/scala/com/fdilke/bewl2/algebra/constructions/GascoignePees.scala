@@ -196,43 +196,43 @@ object GascoignePees:
     else
       word(0) +: word(2) +: word(1) +: word.slice(3, word.size)
 
-class AlphabetContext[H](
-  alphabet: Seq[H]
-) extends Traversable[Seq[H]]:
-  class WordNode(
-    val canonical: Seq[H]
-  ) extends Iterable[Seq[H]]:
-    lazy val continuation: Map[H, WordNode] =
-      alphabet.map { letter =>
-        letter -> {
-        val next: Seq[H] = (canonical :+ letter).canonical
-        if (next.length > canonical.length)
-          WordNode(next)
-        else
-          lookup(next)
+  class AlphabetContext[H](
+    alphabet: Seq[H]
+  ) extends Traversable[Seq[H]]:
+    class WordNode(
+      val canonical: Seq[H]
+    ) extends Iterable[Seq[H]]:
+      lazy val continuation: Map[H, WordNode] =
+        alphabet.map { letter =>
+          letter -> {
+          val next: Seq[H] = (canonical :+ letter).canonical
+          if (next.length > canonical.length)
+            WordNode(next)
+          else
+            lookup(next)
+          }
+        }.toMap
+
+      override def iterator: Iterator[Seq[H]] =
+        Iterator(canonical) ++
+          alphabet.iterator.flatMap { letter =>
+            val next = continuation(letter)
+            if (next.canonical.length > canonical.length)
+              next.iterator
+            else
+              Iterator.empty
+          }
+          
+      def lookup(seq: Seq[H]): WordNode =
+        seq.foldLeft[WordNode](root) { (node, letter) =>
+          node.continuation(letter)
         }
-      }.toMap
+      
+    val root: WordNode =
+      WordNode(Seq.empty)
 
     override def iterator: Iterator[Seq[H]] =
-      Iterator(canonical) ++
-        alphabet.iterator.flatMap { letter =>
-          val next = continuation(letter)
-          if (next.canonical.length > canonical.length)
-            next.iterator
-          else
-            Iterator.empty
-        }
-        
-    def lookup(seq: Seq[H]): WordNode =
-      seq.foldLeft[WordNode](root) { (node, letter) =>
-        node.continuation(letter)
-      }
-    
-  val root: WordNode =
-    WordNode(Seq.empty)
-
-  override def iterator: Iterator[Seq[H]] =
-    root.iterator
+      root.iterator
   
 case class Factoring[H](
   leftSegment: Seq[H],

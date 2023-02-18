@@ -82,6 +82,11 @@ object GreenRees:
       }).product * combinations(n, k)
     }).sum
 
+  def setOfCanonicals(
+    letters: String
+  ): Set[String] =
+    AlphabetContext(letters).toSet
+
   case class Factorization(
     prefix : Option[Factorization],
     leftEnd : Char,
@@ -108,3 +113,40 @@ object GreenRees:
         suffix.factorize
       )
 
+  class AlphabetContext(
+    alphabet: String
+  ) extends Traversable[String]:
+    class WordNode(
+      val canonical: String
+    ) extends Iterable[String]:
+      lazy val continuation: Map[Char, WordNode] =
+        alphabet.map { letter =>
+          letter -> {
+          val next: String = (canonical :+ letter).canonical
+          if (next.length > canonical.length)
+            WordNode(next)
+          else
+            lookup(next)
+          }
+        }.toMap
+
+      override def iterator: Iterator[String] =
+        Iterator(canonical) ++
+          alphabet.iterator.flatMap { letter =>
+            val next = continuation(letter)
+            if (next.canonical.length > canonical.length)
+              next.iterator
+            else
+              Iterator.empty
+          }
+          
+      def lookup(seq: String): WordNode =
+        seq.foldLeft[WordNode](root) { (node, letter) =>
+          node.continuation(letter)
+        }
+      
+    val root: WordNode =
+      WordNode("")
+
+    override def iterator: Iterator[String] =
+      root.iterator
