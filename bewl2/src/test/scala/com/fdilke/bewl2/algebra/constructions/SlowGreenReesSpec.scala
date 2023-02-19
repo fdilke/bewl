@@ -8,19 +8,17 @@ import GreenRees.*
 
 abstract class SlowGreenReesSpec extends RichFunSuite:
   
-  test("Canonical form is lex-minimal word of the same length") {
+  test("Canonical form is shortest equivalent word") {
     for {
       length <- (0 to 6).toSeq
       word <- wordsOfLength("abc", length)
     } {
       val canon: String = word.canonical
       for { word2 <- wordsOfLength("abc", length) } {
-        if (word =!= word2) {
-          (canon.length <= word2.length) is true
-          if (canon.length == word2.length) {
-            (canon <= word) is true
-          }
-        }
+        if (word =!= word2) 
+          ( (canon == word2) || 
+            (canon.length < word2.length)
+          ) is true
       }
     }
   }
