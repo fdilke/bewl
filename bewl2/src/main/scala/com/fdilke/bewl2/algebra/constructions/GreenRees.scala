@@ -2,7 +2,6 @@ package com.fdilke.bewl2.algebra.constructions
 
 import scala.annotation.tailrec
 import com.fdilke.utility.Shortcuts.*
-import com.fdilke.bewl2.algebra.constructions.GreenRees.factorize
 
 object GreenRees:
   extension(word: String)
@@ -13,36 +12,14 @@ object GreenRees:
         val (prefix, last) = extractLeftSegmentHelper(word, "", word.toSet)
         (prefix.string, last)
 
-    def factorize: Option[Factorization] =
-      if word.isEmpty() then
-        None
-      else
-        val (prefix, leftEnd) = word.leftSegment
-        val (suffixReversed, rightEnd) = word.reverse.leftSegment
-        Some(
-          Factorization(
-            prefix = prefix,
-            leftEnd = leftEnd,
-            rightEnd = rightEnd,
-            suffix = suffixReversed.reverse
-          )
-        )
-
     def =!=(word2: String): Boolean =
-      word.factorize == word2.factorize
+      Factorization(word) == Factorization(word2)
 
     def canonical: String =
-      canonicalFactorize(word.factorize)
+      Factorization(word).toWord
 
     def *(word2: String) =
       (word + word2).canonical
-
-  def canonicalFactorize(
-    maybeFac: Option[Factorization]
-  ): String =
-      maybeFac.map {
-        _.canonical
-      } getOrElse ""
 
   @tailrec private def extractLeftSegmentHelper(  
     segment: Seq[Char],
@@ -86,31 +63,55 @@ object GreenRees:
     letters: String
   ): Set[String] =
     AlphabetContext(letters).toSet
+    
+  trait Wordable {
+    def toWord: String
+  }
 
   case class Factorization(
-    prefix : Option[Factorization],
+    components: Option[(Prefix, Suffix)]
+  ) extends Wordable:
+    override def toWord: String =
+      components map { case (prefix, suffix) => 
+        sandwich(prefix.toWord, suffix.toWord)
+      } getOrElse ""
+  
+  case class Prefix(
+    prefix : Factorization,
     leftEnd : Char,
+  ) extends Wordable:
+    override def toWord: String =
+      prefix.toWord :+ leftEnd
+
+  object Prefix:
+    def apply(word: String): Prefix =
+      val (prefix, letter) = leftSegment(word)
+      Prefix(Factorization(prefix), letter)
+
+  case class Suffix(
     rightEnd : Char,
-    suffix : Option[Factorization]
-  ):
-    def canonical: String =
-      sandwich(
-        canonicalFactorize(prefix) :+ leftEnd,
-        rightEnd +: canonicalFactorize(suffix),
-      )
+    suffix : Factorization
+  ) extends Wordable:
+    override def toWord: String =
+      rightEnd +: suffix.toWord
+
+  object Suffix:
+    def apply(word: String): Suffix =
+      val (xiffus, letter) = leftSegment(word.reverse)
+      Suffix(letter, Factorization(xiffus.reverse))
 
   object Factorization:
     def apply(
-      prefix: String,
-      leftEnd: Char,
-      rightEnd: Char,
-      suffix: String
+      word: String,
     ): Factorization =
       Factorization(
-        prefix.factorize,
-        leftEnd,
-        rightEnd,
-        suffix.factorize
+        if word.isEmpty() then
+          None
+        else
+          Some(
+              Prefix(word),
+              Suffix(word)
+            )
       )
 
   class AlphabetContext(

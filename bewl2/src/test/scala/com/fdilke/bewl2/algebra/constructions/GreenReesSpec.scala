@@ -23,13 +23,31 @@ class GreenReesSpec extends RichFunSuite:
   }
 
   test("Can factorize a word") {
-    "".factorize is None
-    "a".factorize is Some(Factorization(None, 'a', 'a', None))
-    "ab".factorize is Some(Factorization("a", 'b', 'a', "b"))
-    "abc".factorize is Some(Factorization("ab", 'c', 'a', "bc"))
-    "aba".factorize is Some(Factorization("a", 'b', 'b', "a"))
-    "caacbac".factorize is Some(Factorization("caac", 'b', 'b', "ac"))
-    "abacab".factorize is Some(Factorization("aba", 'c', 'c', "ab"))
+    Factorization("") is Factorization(None)
+    Factorization("a") is Factorization(Some(
+      Prefix(Factorization(None), 'a'), 
+      Suffix('a', Factorization(None))
+    ))
+    Factorization("ab") is Factorization(Some(
+      Prefix(Factorization("a"), 'b'), 
+      Suffix('a', Factorization("b"))
+    ))
+    Factorization("abc") is Factorization(Some(
+      Prefix(Factorization("ab"), 'c'), 
+      Suffix('a', Factorization("bc"))
+    ))
+    Factorization("aba") is Factorization(Some(
+      Prefix(Factorization("a"), 'b'), 
+      Suffix('b', Factorization("a"))
+    ))
+    Factorization("caacbac") is Factorization(Some(
+      Prefix(Factorization("caac"), 'b'), 
+      Suffix('b', Factorization("ac"))
+    ))
+    Factorization("abacab") is Factorization(Some(
+      Prefix(Factorization("aba"), 'c'), 
+      Suffix('c', Factorization("ab"))
+    ))
   }
 
   test("Can check words for equivalence") {
