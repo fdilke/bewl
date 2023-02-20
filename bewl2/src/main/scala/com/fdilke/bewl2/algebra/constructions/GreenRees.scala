@@ -75,14 +75,14 @@ object GreenRees:
   ): Set[String] =
     AlphabetContext(letters).toSet
     
-  trait Wordable {
-    def toWord: String
+  trait HasLazyWord {
+    lazy val toWord: String
   }
 
   case class Factorization(
     components: Option[(Prefix, Suffix)]
-  ) extends Wordable:
-    override def toWord: String =
+  ) extends HasLazyWord:
+    override lazy val toWord: String =
       components map { case (prefix, suffix) => 
         sandwich(prefix.toWord, suffix.toWord)
       } getOrElse ""
@@ -94,8 +94,8 @@ object GreenRees:
   case class Prefix(
     prefix : Factorization,
     leftEnd : Char,
-  ) extends Wordable:
-    override def toWord: String =
+  ) extends HasLazyWord:
+    override lazy val toWord: String =
       prefix.toWord :+ leftEnd
 
   object Prefix:
@@ -106,8 +106,8 @@ object GreenRees:
   case class Suffix(
     rightEnd : Char,
     suffix : Factorization
-  ) extends Wordable:
-    override def toWord: String =
+  ) extends HasLazyWord:
+    override lazy val toWord: String =
       rightEnd +: suffix.toWord
 
   object Suffix:
