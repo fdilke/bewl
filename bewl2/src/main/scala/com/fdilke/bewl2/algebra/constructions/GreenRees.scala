@@ -18,6 +18,9 @@ object GreenRees:
     def R(word2: String): Boolean =
       Factorization(word).optionalPrefix == Factorization(word2).optionalPrefix
 
+    def L(word2: String): Boolean =
+      Factorization(word).optionalSuffix == Factorization(word2).optionalSuffix
+
     def canonical: String =
       Factorization(word).toWord
 
@@ -85,6 +88,8 @@ object GreenRees:
       } getOrElse ""
     def optionalPrefix: Option[Prefix] =
       components map { _._1 }
+    def optionalSuffix: Option[Suffix] =
+      components map { _._2 }
   
   case class Prefix(
     prefix : Factorization,

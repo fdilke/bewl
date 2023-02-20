@@ -128,11 +128,26 @@ class GreenReesSpec extends RichFunSuite:
     ("a" R "a") is true
     ("a" R "ab") is false
     ("ab" R "aba") is true
+    ("ab" R "bab") is false
     ("acb" R "acbc") is true
     ("acb" R "acba") is true
-    ("acb" R "acba") is true
+    ("acb" R "acbb") is true
     ("acb" R "acd") is false
     ("acba" R "acbc") is true
+  }
+
+  test("Calculate Green's L relation") {
+    ("" L "") is true
+    ("" L "a") is false
+    ("a" L "a") is true
+    ("a" L "ab") is false
+    ("ab" L "aba") is false
+    ("ab" L "bab") is true
+    ("acb" L "cacb") is true
+    ("acb" L "bacb") is true
+    ("acb" L "aacb") is true
+    ("acb" L "acd") is false
+    ("cacb" L "bacb") is true
   }
 
   test("Enumerate canonical forms in a free monoid") {
