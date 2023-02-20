@@ -122,6 +122,19 @@ class GreenReesSpec extends RichFunSuite:
     }
   }
     
+  test("Calculate Green's R relation") {
+    ("" R "") is true
+    ("" R "a") is false
+    ("a" R "a") is true
+    ("a" R "ab") is false
+    ("ab" R "aba") is true
+    ("acb" R "acbc") is true
+    ("acb" R "acba") is true
+    ("acb" R "acba") is true
+    ("acb" R "acd") is false
+    ("acba" R "acbc") is true
+  }
+
   test("Enumerate canonical forms in a free monoid") {
     for { numLetters <- 0 to 2 } {
       val expectedSize = orderFree(numLetters).toInt

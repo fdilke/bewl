@@ -15,6 +15,9 @@ object GreenRees:
     def =!=(word2: String): Boolean =
       Factorization(word) == Factorization(word2)
 
+    def R(word2: String): Boolean =
+      Factorization(word).optionalPrefix == Factorization(word2).optionalPrefix
+
     def canonical: String =
       Factorization(word).toWord
 
@@ -59,6 +62,11 @@ object GreenRees:
       }).product * combinations(n, k)
     }).sum
 
+  // def oldSetOfCanonicals( // TODO: delete with AlphabetContext stuff
+  //   letters: String
+  // ): Set[String] =
+  //   AlphabetContext(letters).toSet
+
   def setOfCanonicals(
     letters: String
   ): Set[String] =
@@ -75,6 +83,8 @@ object GreenRees:
       components map { case (prefix, suffix) => 
         sandwich(prefix.toWord, suffix.toWord)
       } getOrElse ""
+    def optionalPrefix: Option[Prefix] =
+      components map { _._1 }
   
   case class Prefix(
     prefix : Factorization,
