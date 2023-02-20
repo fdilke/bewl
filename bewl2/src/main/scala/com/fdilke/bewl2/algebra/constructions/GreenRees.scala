@@ -65,6 +65,37 @@ object GreenRees:
       }).product * combinations(n, k)
     }).sum
 
+  def prefixesUsingAll(letters: String): Iterable[Prefix] =
+    if (letters.isEmpty)
+      Iterable.empty
+    else for {
+      letter <- (letters : Iterable[Char])
+      without = letters filterNot { _ == letter }
+      factorization <- facsUsingAll(without)
+    } yield
+      Prefix(factorization, letter)
+
+  def suffixesUsingAll(letters: String): Iterable[Suffix] =
+    if (letters.isEmpty)
+      Iterable.empty
+    else for {
+      letter <- (letters : Iterable[Char])
+      without = letters filterNot { _ == letter }
+      factorization <- facsUsingAll(without)
+    } yield
+      Suffix(letter, factorization)
+
+  def facsUsingAll(letters: String): Iterable[Factorization] =
+    if (letters.isEmpty())
+      Iterable(
+        Factorization.empty
+      )
+    else for {
+        prefix <- prefixesUsingAll(letters)
+        suffix <- suffixesUsingAll(letters)
+      } yield
+        Factorization(Some((prefix, suffix)))
+
   // def oldSetOfCanonicals( // TODO: delete with AlphabetContext stuff
   //   letters: String
   // ): Set[String] =
@@ -90,6 +121,27 @@ object GreenRees:
       components map { _._1 }
     def optionalSuffix: Option[Suffix] =
       components map { _._2 }
+    override def toString: String =
+      components match {
+        case None => "0"
+        case Some(p -> s) => s"(${p.toWord}:${s.toWord})"
+      }
+
+  object Factorization:
+    def apply(
+      word: String,
+    ): Factorization =
+      Factorization(
+        if word.isEmpty() then
+          None
+        else
+          Some(
+              Prefix(word),
+              Suffix(word)
+            )
+      )
+    val empty: Factorization =
+      Factorization(None)
   
   case class Prefix(
     prefix : Factorization,
@@ -114,20 +166,6 @@ object GreenRees:
     def apply(word: String): Suffix =
       val (xiffus, letter) = leftSegment(word.reverse)
       Suffix(letter, Factorization(xiffus.reverse))
-
-  object Factorization:
-    def apply(
-      word: String,
-    ): Factorization =
-      Factorization(
-        if word.isEmpty() then
-          None
-        else
-          Some(
-              Prefix(word),
-              Suffix(word)
-            )
-      )
 
   class AlphabetContext(
     alphabet: String

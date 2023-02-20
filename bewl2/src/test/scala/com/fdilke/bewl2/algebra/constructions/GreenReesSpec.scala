@@ -23,10 +23,10 @@ class GreenReesSpec extends RichFunSuite:
   }
 
   test("Can factorize a word") {
-    Factorization("") is Factorization(None)
+    Factorization("") is Factorization.empty
     Factorization("a") is Factorization(Some(
-      Prefix(Factorization(None), 'a'), 
-      Suffix('a', Factorization(None))
+      Prefix(Factorization.empty, 'a'), 
+      Suffix('a', Factorization.empty)
     ))
     Factorization("ab") is Factorization(Some(
       Prefix(Factorization("a"), 'b'), 
@@ -148,6 +148,61 @@ class GreenReesSpec extends RichFunSuite:
     ("acb" L "aacb") is true
     ("acb" L "acd") is false
     ("cacb" L "bacb") is true
+  }
+
+  test("List all the prefixes") {
+    prefixesUsingAll("a") is Seq(
+      Prefix(Factorization.empty, 'a')
+    )
+
+    val abPrefixes: Seq[String] = prefixesUsingAll("ab").toSeq.map { _.toWord }
+    val abPrefixesAsSet: Set[String] = abPrefixes.toSet
+    abPrefixesAsSet.size is abPrefixes.size
+    abPrefixesAsSet is Set("ab", "ba")
+
+    val abcPrefixes: Seq[String] = prefixesUsingAll("abc").toSeq.map { _.toWord }
+    val abcPrefixesAsSet: Set[String] = abcPrefixes.toSet
+    abcPrefixesAsSet.size is abcPrefixes.size
+    abcPrefixesAsSet is Set(
+      "abc", "abac",
+      "bac", "babc",
+      "acb", "acab",
+      "cab", "cacb",
+      "bca", "bcba",
+      "cba", "cbca"
+    )
+  }
+
+  test("List all the suffixes") {
+    suffixesUsingAll("a") is Seq(
+      Suffix('a', Factorization.empty)
+    )
+
+    val abSuffixes: Seq[String] = suffixesUsingAll("ab").toSeq.map { _.toWord }
+    val abSuffixesAsSet: Set[String] = abSuffixes.toSet
+    abSuffixesAsSet.size is abSuffixes.size
+    abSuffixesAsSet is Set("ab", "ba")
+
+    val abcSuffixes: Seq[String] = suffixesUsingAll("abc").toSeq.map { _.toWord }
+    val abcSuffixesAsSet: Set[String] = abcSuffixes.toSet
+    abcSuffixesAsSet.size is abcSuffixes.size
+    abcSuffixesAsSet is Set(
+      "cba", "caba",
+      "cab", "cbab",
+      "bca", "baca",
+      "bac", "bcac",
+      "acb", "abcb",
+      "abc", "acbc"
+    )
+  }
+
+  test("List factorizations using all letters") {
+    val abFactorizations: Seq[String] = facsUsingAll("ab").toSeq.map { _.toWord }
+    val abFactorizationsAsSet: Set[String] = abFactorizations.toSet
+    abFactorizationsAsSet.size is abFactorizations.size
+    abFactorizationsAsSet is Set(
+      "ab", "ba", "aba", "bab"
+    )
   }
 
   test("Enumerate canonical forms in a free monoid") {
