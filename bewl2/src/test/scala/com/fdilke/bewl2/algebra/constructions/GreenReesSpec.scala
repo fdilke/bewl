@@ -254,13 +254,16 @@ class GreenReesSpec extends RichFunSuite:
     }
   }
 
-  // test("Unpack the free i-monoid into a disjoint union of eggboxes") {
-  //   for { numLetters <- 0 to 3 } {
-  //     val letters: String = alphabetOfSize(numLetters)
-  //     val eggboxes: Seq[Seq[String]] = subsetsOf(letters.toSet).toSeq.map { subset =>
-  //       facsUsingAll(subset.toSeq.string).toSeq.map { _.toWord }
-  //     }
-  //     val canonicals: Set[String] = setOfCanonicals(letters)
-  //     eggboxes.flatten
-  //   }
-  // }
+  test("Unpack the free i-monoid into a disjoint union of eggboxes") {
+    for { numLetters <- 0 to 3 } {
+      val letters: String = alphabetOfSize(numLetters)
+      val eggboxes: Seq[Seq[String]] = subsetsOf(letters.toSet).toSeq.map { subset =>
+        facsUsingAll(subset.toSeq.string).toSeq.map { _.toWord }
+      }
+      val canonicals: Iterable[String] = enumerateCanonicals(letters)
+      for { canonical <- canonicals } {
+        eggboxes.count { _.contains(canonical) } is 1
+      }
+      eggboxes.flatten.toSet is canonicals.toSet
+    }
+  }
