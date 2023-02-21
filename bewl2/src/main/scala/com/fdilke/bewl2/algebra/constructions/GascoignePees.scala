@@ -3,7 +3,6 @@ package com.fdilke.bewl2.algebra.constructions
 import scala.annotation.tailrec
 import com.fdilke.utility.IterateToFixed
 import GascoignePees.*
-import java.math.BigInteger
 import scala.util.Random
 
 // See green-rees-theory.md

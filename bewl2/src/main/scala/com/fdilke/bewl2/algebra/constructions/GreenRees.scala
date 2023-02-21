@@ -91,15 +91,23 @@ object GreenRees:
         Factorization.empty
       )
     else for {
-        prefix <- prefixesUsingAll(letters)
-        suffix <- suffixesUsingAll(letters)
-      } yield
-        Factorization(Some((prefix, suffix)))
+      prefix <- prefixesUsingAll(letters)
+      suffix <- suffixesUsingAll(letters)
+    } yield
+      Factorization(Some((prefix, suffix)))
 
-  // def oldSetOfCanonicals( // TODO: delete with AlphabetContext stuff
-  //   letters: String
-  // ): Set[String] =
-  //   AlphabetContext(letters).toSet
+  // The number of R-classes among words including all letters from an alphabet of size n
+  def eggBoxSize(n: Int): BigInt =
+    n match {
+      case 0 => BigInt(1)
+      case _ => n * eggBoxSize(n - 1).pow(2)
+    }
+
+  // def numCanonicals(n: Int): BigInt =
+  //   n match {
+  //     case 0 => BigInt(1)
+  //     case _ => eggBoxSize(n) * 2
+  //   }
 
   def setOfCanonicals(
     letters: String

@@ -197,12 +197,26 @@ class GreenReesSpec extends RichFunSuite:
   }
 
   test("List factorizations using all letters") {
+    facsUsingAll("") is Seq(Factorization.empty)
+    facsUsingAll("a") is Seq(Factorization("a"))
     val abFactorizations: Seq[String] = facsUsingAll("ab").toSeq.map { _.toWord }
     val abFactorizationsAsSet: Set[String] = abFactorizations.toSet
     abFactorizationsAsSet.size is abFactorizations.size
     abFactorizationsAsSet is Set(
       "ab", "ba", "aba", "bab"
     )
+  }
+
+  test("Calculate the 'eggbox' function which counts the enumerated factorizations") {
+    for { numLetters <- 0 to 3 } {
+      val letters: String = "abcde".slice(0, numLetters)
+      val boxSize = eggBoxSize(numLetters).toInt
+      println("numLetters: " + numLetters + " boxSize = " + boxSize)
+      if numLetters > 0 then
+        prefixesUsingAll(letters).size is boxSize
+        suffixesUsingAll(letters).size is boxSize
+      facsUsingAll(letters).size is (boxSize * boxSize)
+    }
   }
 
   test("Enumerate canonical forms in a free monoid") {
