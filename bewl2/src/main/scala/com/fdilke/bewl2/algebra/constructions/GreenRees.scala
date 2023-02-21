@@ -60,10 +60,15 @@ object GreenRees:
 
   def orderFree(n: Int): BigInt =
     (for { k <- 0 to n } yield {
-      (for { i <- 1 to k } yield {
-        BigInt(k - i + 1).pow(BigInt(2).pow(i).toInt)
-      }).product * combinations(n, k)
+      combinations(n, k) * eggBoxSize(k).pow(2)
     }).sum
+
+  // The number of R-classes in the D-class of words including all letters from an alphabet of size n
+  def eggBoxSize(n: Int): BigInt =
+    n match {
+      case 0 => BigInt(1)
+      case _ => n * eggBoxSize(n - 1).pow(2)
+    }
 
   def prefixesUsingAll(letters: String): Iterable[Prefix] =
     if (letters.isEmpty)
@@ -95,19 +100,6 @@ object GreenRees:
       suffix <- suffixesUsingAll(letters)
     } yield
       Factorization(Some((prefix, suffix)))
-
-  // The number of R-classes among words including all letters from an alphabet of size n
-  def eggBoxSize(n: Int): BigInt =
-    n match {
-      case 0 => BigInt(1)
-      case _ => n * eggBoxSize(n - 1).pow(2)
-    }
-
-  // def numCanonicals(n: Int): BigInt =
-  //   n match {
-  //     case 0 => BigInt(1)
-  //     case _ => eggBoxSize(n) * 2
-  //   }
 
   def setOfCanonicals(
     letters: String
