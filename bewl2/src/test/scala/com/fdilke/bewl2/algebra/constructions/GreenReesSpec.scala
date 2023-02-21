@@ -211,7 +211,6 @@ class GreenReesSpec extends RichFunSuite:
     for { numLetters <- 0 to 3 } {
       val letters: String = "abcde".slice(0, numLetters)
       val boxSize = eggBoxSize(numLetters).toInt
-      println("numLetters: " + numLetters + " boxSize = " + boxSize)
       if numLetters > 0 then
         prefixesUsingAll(letters).size is boxSize
         suffixesUsingAll(letters).size is boxSize
@@ -219,7 +218,7 @@ class GreenReesSpec extends RichFunSuite:
     }
   }
 
-  test("Enumerate canonical forms in a free monoid") {
+  test("Enumerate canonical forms in a free i-monoid") {
     for { numLetters <- 0 to 2 } {
       val expectedSize = orderFree(numLetters).toInt
       val letters: String = "abcde".slice(0, numLetters)
@@ -246,4 +245,8 @@ class GreenReesSpec extends RichFunSuite:
         ((x * y) * z) is (x * (y * z))
       }
     }
+  }
+
+  test("Unpack the free i-monoid into a disjoint union of eggboxes") {
+    // TODO loop over subsets
   }

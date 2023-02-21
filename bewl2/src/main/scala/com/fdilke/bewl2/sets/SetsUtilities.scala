@@ -101,3 +101,12 @@ object SetsUtilities:
     ) {
       block
     }
+
+  def subsetsOf[H](set: Set[H]): Iterable[Set[H]] =
+    if (set.isEmpty)
+      Iterable(Set.empty[H])
+    else for {
+      element <- (set : Iterable[H])
+      theRest <- subsetsOf(set - element)
+      both <- Iterable[Set[H]](theRest, theRest + element)
+    } yield both

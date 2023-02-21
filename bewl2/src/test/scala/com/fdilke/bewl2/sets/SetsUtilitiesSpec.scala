@@ -103,3 +103,23 @@ class SetsUtilitiesSpec extends RichFunSuite:
       "abb", "bbb"
     )
   }
+
+    test("enumerate subsets of a set") {
+      subsetsOf(Set[Void]()).toSeq is Seq(Set.empty[Void])
+      subsetsOf(Set(0)).toSeq is Seq[Set[Int]](Set.empty, Set(0))
+
+      val subsets2: Seq[Set[Int]] = subsetsOf(Set(0, 1)).toSeq
+      subsets2.size is 4
+      subsets2.toSet is Set[Set[Int]](
+        Set.empty, Set(0), Set(1), Set(0, 1)
+      )
+
+      val subsets3: Seq[Set[Int]] = subsetsOf(Set(0, 1, 2)).toSeq
+      subsets3.size is 8
+      subsets3.toSet is Set[Set[Int]](
+        Set.empty,
+        Set(0), Set(1), Set(2),
+        Set(0, 1), Set(0, 2), Set(1, 2),
+        Set(0, 1, 2)
+      )
+    }
