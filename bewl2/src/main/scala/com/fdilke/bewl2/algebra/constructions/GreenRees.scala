@@ -43,6 +43,11 @@ object GreenRees:
         newLettersRemaining
       )
 
+  def alphabetOfSize(numLetters: Int) =
+    ((0 until numLetters) map { i =>
+      (i + 'a'.toInt).toChar
+    }).string
+
   // Find the shortest word with a given prefix and suffix
   def sandwich(prefix: String, suffix: String) =
     prefix.indices.find { i =>
@@ -101,10 +106,10 @@ object GreenRees:
     } yield
       Factorization(Some((prefix, suffix)))
 
-  def setOfCanonicals(
+  def enumerateCanonicals(
     letters: String
-  ): Set[String] =
-    AlphabetContext(letters).toSet
+  ): Iterable[String] =
+    AlphabetContext(letters)
     
   trait HasLazyWord {
     lazy val toWord: String

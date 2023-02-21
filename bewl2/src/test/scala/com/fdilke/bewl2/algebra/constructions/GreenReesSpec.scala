@@ -9,6 +9,13 @@ import GreenRees.*
 
 class GreenReesSpec extends RichFunSuite:
 
+  test("Can create standard alphabets") {
+    alphabetOfSize(0) is ""
+    alphabetOfSize(1) is "a"
+    alphabetOfSize(2) is "ab"
+    alphabetOfSize(26) is "abcdefghijklmnopqrstuvwxyz"
+  }
+
   test("Can extract left segments from a word") {
     intercept[java.lang.IllegalArgumentException]{
       "".leftSegment
@@ -209,7 +216,7 @@ class GreenReesSpec extends RichFunSuite:
 
   test("Calculate the 'eggbox' function which counts the enumerated factorizations") {
     for { numLetters <- 0 to 3 } {
-      val letters: String = "abcde".slice(0, numLetters)
+      val letters: String = alphabetOfSize(numLetters)
       val boxSize = eggBoxSize(numLetters).toInt
       if numLetters > 0 then
         prefixesUsingAll(letters).size is boxSize
@@ -221,8 +228,8 @@ class GreenReesSpec extends RichFunSuite:
   test("Enumerate canonical forms in a free i-monoid") {
     for { numLetters <- 0 to 2 } {
       val expectedSize = orderFree(numLetters).toInt
-      val letters: String = "abcde".slice(0, numLetters)
-      val monoid: Set[String] = setOfCanonicals(letters)
+      val letters: String = alphabetOfSize(numLetters)
+      val monoid: Set[String] = enumerateCanonicals(letters).toSet
       monoid.size is expectedSize
       for {
         x <- monoid
@@ -247,6 +254,13 @@ class GreenReesSpec extends RichFunSuite:
     }
   }
 
-  test("Unpack the free i-monoid into a disjoint union of eggboxes") {
-    // TODO loop over subsets
-  }
+  // test("Unpack the free i-monoid into a disjoint union of eggboxes") {
+  //   for { numLetters <- 0 to 3 } {
+  //     val letters: String = alphabetOfSize(numLetters)
+  //     val eggboxes: Seq[Seq[String]] = subsetsOf(letters.toSet).toSeq.map { subset =>
+  //       facsUsingAll(subset.toSeq.string).toSeq.map { _.toWord }
+  //     }
+  //     val canonicals: Set[String] = setOfCanonicals(letters)
+  //     eggboxes.flatten
+  //   }
+  // }
