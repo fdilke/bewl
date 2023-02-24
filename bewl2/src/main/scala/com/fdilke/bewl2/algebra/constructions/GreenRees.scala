@@ -75,6 +75,14 @@ object GreenRees:
       case _ => n * eggBoxSize(n - 1).pow(2)
     }
 
+  def longestLength(n: Int): Int =
+    n match {
+      case 0 => 0
+      case 1 => 1
+      case 2 => 3
+      case _ => 2 * longestLength(n-1) + 2
+    }
+
   def prefixesUsingAll(letters: String): Iterable[Prefix] =
     if (letters.isEmpty)
       Iterable.empty

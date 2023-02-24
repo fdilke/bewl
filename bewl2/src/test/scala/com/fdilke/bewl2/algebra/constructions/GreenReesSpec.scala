@@ -267,3 +267,10 @@ class GreenReesSpec extends RichFunSuite:
       eggboxes.flatten.toSet is canonicals.toSet
     }
   }
+
+  test("calculation of the length of the longest canonical word") {
+    val expected: Seq[Int] = Seq(0, 1, 3, 8, 18, 38)
+    for (n <- expected.indices) {
+      longestLength(n) is expected(n)
+    }
+  }
