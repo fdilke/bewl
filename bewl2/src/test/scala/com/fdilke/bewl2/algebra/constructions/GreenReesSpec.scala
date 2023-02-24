@@ -274,3 +274,25 @@ class GreenReesSpec extends RichFunSuite:
       longestLength(n) is expected(n)
     }
   }
+
+  test("calculation of a longest canonical word") {
+    val expected: Seq[String] =
+      Seq("", "a", "aba", "abacabcb", "abacabcbdabdbcbdcd",
+        "abacabcbdabdbcbdcdeabcbdbcdcebcecdcede",
+        "abacabcbdabdbcbdcdeabcbdbcdcebcecdcedefabcbdbcdcfbcfcdcfdfebcdcecdedfcdfdedfef"
+      )
+
+    for (n <- expected.indices) {
+      val word: String = longestWord(n)
+      word is expected(n)
+      word.length() is longestLength(n)
+      word.isCanonical is true
+    }
+
+    // also each longest word is a prefix of the next one:
+    for (n <- expected.indices.tail) {
+      val prevWord = expected(n-1)
+      val word = expected(n)
+      word.startsWith(prevWord) is true
+    }
+  }

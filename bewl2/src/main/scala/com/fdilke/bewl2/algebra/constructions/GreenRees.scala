@@ -24,6 +24,9 @@ object GreenRees:
     def canonical: String =
       Factorization(word).toWord
 
+    def isCanonical: Boolean =
+      word.canonical == word
+
     def *(word2: String) =
       (word + word2).canonical
 
@@ -82,6 +85,52 @@ object GreenRees:
       case 2 => 3
       case _ => 2 * longestLength(n-1) + 2
     }
+
+  def longestWord(numLetters: Int): String =
+    longestWord(alphabetOfSize(numLetters))
+
+  def longestWord(letters: String): String =
+    (letters: Seq[Char]) match {
+      case Seq() => letters
+      case Seq(a) => letters
+      case Seq(a, b) => Seq(a, b, a).string
+      case _ =>
+        val numLetters: Int = letters.size
+        val a: Char = letters.head
+        val z: Char = letters.last
+        val za: String = Seq(z, a).string
+        val tail: String = letters.slice(1, numLetters)
+        val letters_1: String = letters.slice(0, numLetters-1)
+
+        val prevLongest = longestWord(letters_1)
+        val (rearranged: String, candidate: String) =
+          tail.permutations.map { rearranged =>
+            rearranged -> (prevLongest + za + longestWord(rearranged))
+          } filter { case (rearranged, candidate) =>
+            // println("--------")
+            // println("numLetters       = " + numLetters)
+            // println("rearranged       = " + rearranged)
+            // println("candidate        : " + (prevLongest + "|" + za + "|" + longestWord(rearranged)))
+            // println("candidate length = " + candidate.length() + " vs. " + longestLength(numLetters))
+            candidate.canonical == candidate
+          } minBy { case (_, candidate) =>
+            candidate
+          }
+
+        candidate
+    }
+
+    // letters match {
+    //   case Seq() => Seq()
+    //   case Seq(a) => Seq(a)
+    //   case Seq(a, b) => Seq(a, b, a)
+    //   case _ => 
+    //     val numLetters = letters.size
+    //     val a = letters.head
+    //     val z = letters.last
+    //     longestWord(letters.slice(0, numLetters-1)) ++ Seq(z, a) ++
+    //       longestWord(interchange(letters.slice(1, numLetters)))
+    // }
 
   def prefixesUsingAll(letters: String): Iterable[Prefix] =
     if (letters.isEmpty)
