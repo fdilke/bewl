@@ -11,11 +11,11 @@ object IterateToFixed:
   ): T =
     @tailrec def iterateOn(
       value: T
-    ): T = {
+    ): T =
       val next = fn(value)
       if (next == value)
         value
       else
         iterateOn(next)
-    }
+        
     iterateOn(initial)

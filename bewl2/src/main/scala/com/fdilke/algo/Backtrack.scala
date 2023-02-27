@@ -8,15 +8,6 @@ object Backtrack {
     NextStep[KEY, VALUE]
   ]
 
-  // optimize away
-//  def nodeWith[KEY, VALUE](
-//    key: KEY
-//  )(
-//    fn: (VALUE, Map[KEY, VALUE]) => NextStep[KEY, VALUE]
-//  ): DecisionNode[KEY, VALUE] =
-//    map =>
-//      assuming(map, key)(fn)
-
   def assuming[KEY, VALUE](
     map: Map[KEY, VALUE],
     key: KEY
@@ -30,7 +21,6 @@ object Backtrack {
         key,
         map2 => fn(map2(key), map2)
       )
-    
   
   sealed trait NextStep[KEY, VALUE]
 

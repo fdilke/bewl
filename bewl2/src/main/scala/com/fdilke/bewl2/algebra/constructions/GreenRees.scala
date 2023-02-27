@@ -2,6 +2,7 @@ package com.fdilke.bewl2.algebra.constructions
 
 import scala.annotation.tailrec
 import com.fdilke.utility.Shortcuts.*
+import com.fdilke.utility.IterateToFixed
 
 object GreenRees:
   extension(word: String)
@@ -86,39 +87,112 @@ object GreenRees:
       case _ => 2 * longestLength(n-1) + 2
     }
 
+  // def longestWord(numLetters: Int): String =
+  //   val letters: String = alphabetOfSize(numLetters)
+  //   IterateToFixed("") { word =>
+  //     letters map { letter =>
+  //       word :+ letter
+  //     } find { candidate =>
+  //       candidate.isCanonical
+  //     } match {
+  //       case None => word
+  //       case Some(candidate) => candidate
+  //     }
+  //   }
+
   def longestWord(numLetters: Int): String =
-    longestWord(alphabetOfSize(numLetters))
+    if (numLetters == 0)
+      ""
+    else
+      val prevLongest = longestWord(numLetters - 1)
+      val requiredLength = longestLength(numLetters)
+      val letters: String = alphabetOfSize(numLetters)
+      def explore(prefix: String) : Option[String] =
+        if prefix.length() == requiredLength then
+          Some(prefix)
+        else
+          letters.iterator.map { letter =>
+            prefix :+ letter
+          }.filter { 
+            _.isCanonical
+          }.map(explore).find {
+            case None => false
+            case Some(solution) => true
+          }.flatten
 
-  def longestWord(letters: String): String =
-    (letters: Seq[Char]) match {
-      case Seq() => letters
-      case Seq(a) => letters
-      case Seq(a, b) => Seq(a, b, a).string
-      case _ =>
-        val numLetters: Int = letters.size
-        val a: Char = letters.head
-        val z: Char = letters.last
-        val za: String = Seq(z, a).string
-        val tail: String = letters.slice(1, numLetters)
-        val letters_1: String = letters.slice(0, numLetters-1)
+      explore(prevLongest) match {
+          case None => throw IllegalArgumentException("aarg")
+          case Some(candidate) => candidate
+      }
 
-        val prevLongest = longestWord(letters_1)
-        val (rearranged: String, candidate: String) =
-          tail.permutations.map { rearranged =>
-            rearranged -> (prevLongest + za + longestWord(rearranged))
-          } filter { case (rearranged, candidate) =>
-            // println("--------")
-            // println("numLetters       = " + numLetters)
-            // println("rearranged       = " + rearranged)
-            // println("candidate        : " + (prevLongest + "|" + za + "|" + longestWord(rearranged)))
-            // println("candidate length = " + candidate.length() + " vs. " + longestLength(numLetters))
-            candidate.canonical == candidate
-          } minBy { case (_, candidate) =>
-            candidate
-          }
 
-        candidate
-    }
+  private def remapString(
+    calculated: String,
+    source: String,
+    target: String
+  ): String =
+    calculated.map { char =>
+      val index: Int = source.indexOf(char)
+      target(index)
+    }    
+
+  // terminally cockeyed and can't ever work. See 'least letter' algo below
+  // def longestWord(letters: String): String =
+  //   (letters: Seq[Char]) match {
+  //     case Seq() => letters
+  //     case Seq(a) => letters
+  //     case Seq(a, b) => Seq(a, b, a).string
+  //     case _ =>
+  //       val numLetters: Int = letters.size
+  //       val a: Char = letters.head
+  //       val z: Char = letters.last
+  //       val za: String = Seq(z, a).string
+  //       val tail: String = letters.slice(1, numLetters)
+  //       val letters_1: String = letters.slice(0, numLetters-1)
+
+  //       val prevLongest: String = longestWord(letters_1)
+  //       val longestOnTail: String = remapString(prevLongest, letters_1, tail)
+  //       if (longestOnTail != longestWord(tail))
+  //         throw new IllegalArgumentException("xxx")
+
+  //       val (rearranged: String, candidate: String) =
+  //         tail.permutations.map { rearranged => 
+  //             // calc longestWord(rearranged), more optimally
+  //             val remapped: String = 
+  //               remapString(longestOnTail, tail, rearranged)
+  //             // println("-------")
+  //             // println("longestOnTail: " + longestOnTail)
+  //             // println("tail:          " + tail)
+  //             // println("rearranged:    " + rearranged)
+  //             // println("remapped:      " + remapped)
+  //             // println("lW(rearranged):" + longestWord(rearranged))
+  //             if (remapped != longestWord(rearranged)) {
+  //               Thread.sleep(1000)
+  //               println("-------!!!")
+  //               println("longestOnTail: " + longestOnTail)
+  //               println("tail:          " + tail)
+  //               println("rearranged:    " + rearranged)
+  //               println("remapped:      " + remapped)
+  //               println("lW(rearranged):" + longestWord(rearranged))
+  //               println("not the same: [" + remapped + "] [" + longestWord(rearranged) + "]")
+  //               println("-------???")
+  //               throw new IllegalArgumentException("yyy")
+  //             }
+
+  //             rearranged -> (prevLongest + za + remapped)
+  //         } filter { case (rearranged, candidate) =>
+  //           // println("--------")
+  //           // println("numLetters       = " + numLetters)
+  //           // println("rearranged       = " + rearranged)
+  //           // println("candidate        : " + (prevLongest + "|" + za + "|" + longestWord(rearranged)))
+  //           // println("candidate length = " + candidate.length() + " vs. " + longestLength(numLetters))
+  //           candidate.canonical == candidate
+  //         } minBy { case (_, candidate) =>
+  //           candidate
+  //         }
+
+  //       candidate
+  //   }
 
     // letters match {
     //   case Seq() => Seq()
