@@ -277,8 +277,8 @@ class GreenReesSpec extends RichFunSuite:
 
   test("calculation of a longest canonical word") {
     val expected: Seq[String] =
-      Seq("", "a", "aba", "abacabcb", "abacabcbdabdbcbdcd"
-        // "abacabcbdabdbcbdcdeabcbdbcdcebcecdcede"
+      Seq("", "a", "aba", "abacabcb", "abacabcbdabdbcbdcd",
+        // "abacabcbdabdbcbdcdeabcbdbcdcebcecdcede",
         // "abacabcbdabdbcbdcdeabcbdbcdcebcecdcedefabcbdbcdcfbcfcdcfdfebcdcecdedfcdfdedfef"
       )
 
