@@ -36,3 +36,25 @@ object CheckCanonicalTimings extends App:
     println(s"$degree\t${canon}\t${canonTime}\t${canonSlowTime}")
   }
 
+object ShowEggboxDegree3 extends App:
+  val degree = 3
+  val letters = alphabetOfSize(degree)
+  val prefixes = prefixesUsingAll(letters)
+  val suffixes = suffixesUsingAll(letters)
+  val padLength = longestLength(degree) + 1
+  def pad(text: String) =
+    text.padTo(padLength, ' ')
+
+  print(pad("R \\ L"))
+  for { suff <- suffixes} {
+    print(pad(suff.toWord))
+  }
+  println()
+  for { pre <- prefixes} {
+    print(pad(pre.toWord))
+    for { suff <- suffixes} {
+      val product = pre.toWord * suff.toWord
+      print(pad(product))
+    }
+    println()
+  }
