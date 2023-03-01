@@ -30,8 +30,8 @@ object EarliestLongestWordOfDeg4 extends App:
 object CheckCanonicalTimings extends App:
   for (degree <- 0 to 4) {
     val letters: String = alphabetOfSize(degree)
-    val (canonSlow, canonSlowTime) = TimeIt { enumerateCanonicals(letters).size }
-    val (canon, canonTime) = TimeIt { enumerateCanonicalsSlow(letters).size }
+    val (canonSlow, canonSlowTime) = TimeIt { enumerateCanonicalsSlow(letters).size }
+    val (canon, canonTime) = TimeIt { enumerateCanonicals(letters).size }
     assert { canon == canonSlow }
     println(s"$degree\t${canon}\t${canonTime}s\t${canonSlowTime}")
   }
