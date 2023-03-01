@@ -110,3 +110,8 @@ object SetsUtilities:
       theRest <- subsetsOf(set - element)
       both <- Iterable[Set[H]](theRest, theRest + element)
     } yield both
+
+  def subsetsOfString(letters: String): Iterable[String] =
+    subsetsOf(letters.toSet) map {
+      _.toSeq.string
+    }

@@ -229,7 +229,7 @@ class GreenReesSpec extends RichFunSuite:
     for { numLetters <- 0 to 2 } {
       val expectedSize = orderFree(numLetters).toInt
       val letters: String = alphabetOfSize(numLetters)
-      val monoid: Set[String] = enumerateCanonicals(letters).toSet
+      val monoid: Set[String] = enumerateCanonicalsSlow(letters).toSet
       monoid.size is expectedSize
       for {
         x <- monoid
@@ -260,11 +260,20 @@ class GreenReesSpec extends RichFunSuite:
       val eggboxes: Seq[Seq[String]] = subsetsOf(letters.toSet).toSeq.map { subset =>
         facsUsingAll(subset.toSeq.string).toSeq.map { _.toWord }
       }
-      val canonicals: Iterable[String] = enumerateCanonicals(letters)
+      val canonicals: Iterable[String] = enumerateCanonicalsSlow(letters)
       for { canonical <- canonicals } {
         eggboxes.count { _.contains(canonical) } is 1
       }
       eggboxes.flatten.toSet is canonicals.toSet
+    }
+  }
+
+  test("alternative calculation of canonicals") {
+    for { numLetters <- 0 to 3 } {
+      val alphabet = alphabetOfSize(numLetters)
+      val set: Set[String] = enumerateCanonicals(alphabet).toSet
+      val setSlow: Set[String] = enumerateCanonicalsSlow(alphabet).toSet
+      setSlow is set
     }
   }
 
@@ -290,7 +299,7 @@ class GreenReesSpec extends RichFunSuite:
 
       if (n <= 3) {
         val canonicals: Iterable[String] =
-          enumerateCanonicals(alphabetOfSize(n))
+          enumerateCanonicalsSlow(alphabetOfSize(n))
         val longest: Int =
           canonicals.map { _.length }.max
         longest is expected(n).length()

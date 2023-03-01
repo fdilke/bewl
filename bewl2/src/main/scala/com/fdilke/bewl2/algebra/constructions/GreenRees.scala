@@ -3,6 +3,7 @@ package com.fdilke.bewl2.algebra.constructions
 import scala.annotation.tailrec
 import com.fdilke.utility.Shortcuts.*
 import com.fdilke.utility.IterateToFixed
+import com.fdilke.bewl2.sets.SetsUtilities._
 
 object GreenRees:
   extension(word: String)
@@ -87,19 +88,6 @@ object GreenRees:
       case _ => 2 * longestLength(n-1) + 2
     }
 
-  // def longestWord(numLetters: Int): String =
-  //   val letters: String = alphabetOfSize(numLetters)
-  //   IterateToFixed("") { word =>
-  //     letters map { letter =>
-  //       word :+ letter
-  //     } find { candidate =>
-  //       candidate.isCanonical
-  //     } match {
-  //       case None => word
-  //       case Some(candidate) => candidate
-  //     }
-  //   }
-
   def longestWord(numLetters: Int): String =
     if (numLetters == 0)
       ""
@@ -136,76 +124,6 @@ object GreenRees:
       target(index)
     }    
 
-  // terminally cockeyed and can't ever work. See 'least letter' algo below
-  // def longestWord(letters: String): String =
-  //   (letters: Seq[Char]) match {
-  //     case Seq() => letters
-  //     case Seq(a) => letters
-  //     case Seq(a, b) => Seq(a, b, a).string
-  //     case _ =>
-  //       val numLetters: Int = letters.size
-  //       val a: Char = letters.head
-  //       val z: Char = letters.last
-  //       val za: String = Seq(z, a).string
-  //       val tail: String = letters.slice(1, numLetters)
-  //       val letters_1: String = letters.slice(0, numLetters-1)
-
-  //       val prevLongest: String = longestWord(letters_1)
-  //       val longestOnTail: String = remapString(prevLongest, letters_1, tail)
-  //       if (longestOnTail != longestWord(tail))
-  //         throw new IllegalArgumentException("xxx")
-
-  //       val (rearranged: String, candidate: String) =
-  //         tail.permutations.map { rearranged => 
-  //             // calc longestWord(rearranged), more optimally
-  //             val remapped: String = 
-  //               remapString(longestOnTail, tail, rearranged)
-  //             // println("-------")
-  //             // println("longestOnTail: " + longestOnTail)
-  //             // println("tail:          " + tail)
-  //             // println("rearranged:    " + rearranged)
-  //             // println("remapped:      " + remapped)
-  //             // println("lW(rearranged):" + longestWord(rearranged))
-  //             if (remapped != longestWord(rearranged)) {
-  //               Thread.sleep(1000)
-  //               println("-------!!!")
-  //               println("longestOnTail: " + longestOnTail)
-  //               println("tail:          " + tail)
-  //               println("rearranged:    " + rearranged)
-  //               println("remapped:      " + remapped)
-  //               println("lW(rearranged):" + longestWord(rearranged))
-  //               println("not the same: [" + remapped + "] [" + longestWord(rearranged) + "]")
-  //               println("-------???")
-  //               throw new IllegalArgumentException("yyy")
-  //             }
-
-  //             rearranged -> (prevLongest + za + remapped)
-  //         } filter { case (rearranged, candidate) =>
-  //           // println("--------")
-  //           // println("numLetters       = " + numLetters)
-  //           // println("rearranged       = " + rearranged)
-  //           // println("candidate        : " + (prevLongest + "|" + za + "|" + longestWord(rearranged)))
-  //           // println("candidate length = " + candidate.length() + " vs. " + longestLength(numLetters))
-  //           candidate.canonical == candidate
-  //         } minBy { case (_, candidate) =>
-  //           candidate
-  //         }
-
-  //       candidate
-  //   }
-
-    // letters match {
-    //   case Seq() => Seq()
-    //   case Seq(a) => Seq(a)
-    //   case Seq(a, b) => Seq(a, b, a)
-    //   case _ => 
-    //     val numLetters = letters.size
-    //     val a = letters.head
-    //     val z = letters.last
-    //     longestWord(letters.slice(0, numLetters-1)) ++ Seq(z, a) ++
-    //       longestWord(interchange(letters.slice(1, numLetters)))
-    // }
-
   def prefixesUsingAll(letters: String): Iterable[Prefix] =
     if (letters.isEmpty)
       Iterable.empty
@@ -238,6 +156,15 @@ object GreenRees:
       Factorization(Some((prefix, suffix)))
 
   def enumerateCanonicals(
+    letters: String
+  ): Iterable[String] =
+    for {
+      alphabet <- subsetsOfString(letters)
+      fac <- facsUsingAll(alphabet)
+    } yield
+      fac.toWord
+
+  def enumerateCanonicalsSlow(
     letters: String
   ): Iterable[String] =
     AlphabetContext(letters)

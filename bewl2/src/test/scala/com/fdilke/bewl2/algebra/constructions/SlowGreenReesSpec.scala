@@ -27,7 +27,7 @@ abstract class SlowGreenReesSpec extends RichFunSuite:
     for { numLetters <- 0 to 3 } {
       val expectedSize = orderFree(numLetters).toInt
       val letters: String = "abcde".slice(0, numLetters)
-      val monoid: Set[String] = enumerateCanonicals(letters).toSet
+      val monoid: Set[String] = enumerateCanonicalsSlow(letters).toSet
       monoid.size is expectedSize
       for {
         x <- monoid
@@ -68,7 +68,7 @@ abstract class SlowGreenReesSpec extends RichFunSuite:
 
       if (n <= 3) {
         val canonicals: Iterable[String] =
-          enumerateCanonicals(alphabetOfSize(n))
+          enumerateCanonicalsSlow(alphabetOfSize(n))
         val longest: Int =
           canonicals.map { _.length }.max
         longest is expected(n).length()
