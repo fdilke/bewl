@@ -33,6 +33,6 @@ object CheckCanonicalTimings extends App:
     val (canonSlow, canonSlowTime) = TimeIt { enumerateCanonicalsSlow(letters).size }
     val (canon, canonTime) = TimeIt { enumerateCanonicals(letters).size }
     assert { canon == canonSlow }
-    println(s"$degree\t${canon}\t${canonTime}s\t${canonSlowTime}")
+    println(s"$degree\t${canon}\t${canonTime}\t${canonSlowTime}")
   }
 

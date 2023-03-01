@@ -11,13 +11,13 @@ object TimeIt {
       case _ if runTime < 1000 => s"${runTime}ms"
       case _ if runTime < 60000 => 
         val numSec = runTime / 1000.0
-        s"${numSec}sec"
+        "%.2f".format(numSec) + "sec"
       case _ if runTime < 3600000 => 
         val numMin = runTime / 60000.0
-        s"${numMin}min"
+        "%.2f".format(numMin) + "min"
       case _ =>
         val numHours = runTime / 3600000.0
-        s"${numHours}hours"
+        "%.2f".format(numHours) + "hours"
     }
     (result, stringRep)
 }
