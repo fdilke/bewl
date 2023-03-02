@@ -12,7 +12,7 @@ import com.fdilke.bewl2.utility.RichFunSuite
 import java.util.concurrent.atomic.AtomicBoolean
 
 class SetsUtilitiesSpec extends RichFunSuite:
-  test("enumerates all maps between two sets") {
+  test("enumerates all maps between two sets"):
       allMaps(Set(1, 2), Set("a", "b", "c")).map { f =>
           Seq(f(1), f(2))
       }.toSeq is
@@ -27,27 +27,22 @@ class SetsUtilitiesSpec extends RichFunSuite:
          Seq("b", "c"),
          Seq("c", "c")
       )
-  }
 
-  test("gives sensible results even when the source is empty") {
+  test("gives sensible results even when the source is empty"):
     allMaps(Set[String](), Set(0)).size is 1
-  }
 
-  test("gives sensible results even when the target is empty") {
+  test("gives sensible results even when the target is empty"):
     allMaps(Set(0), Set()).isEmpty is true
-  }
 
-  test("gives sensible results even when both source and target are empty") {
+  test("gives sensible results even when both source and target are empty"):
     allMaps(Set(), Set()).size is 1
-  }
 
-  test("enumerates n-ary operations: degenerate case of binaries on 1") {
+  test("enumerates n-ary operations: degenerate case of binaries on 1"):
     (allNaryOps(arity = 2, order = 1) map { f =>
       f(0, 0)
     }).toSeq is Seq(0)
-  }
 
-  test("enumerates n-ary operations: degenerate case of unaries on 2") {
+  test("enumerates n-ary operations: degenerate case of unaries on 2"):
     (allNaryOps(arity = 1, order = 2) map { f =>
       f(0) -> f(1)
     }).toSeq is
@@ -57,7 +52,6 @@ class SetsUtilitiesSpec extends RichFunSuite:
         0 -> 1,
         1 -> 1
       )
-  }
 
   test("enumerates n-ary operations: even more degenerate case of nullaries on 0") {
     allNaryOps(arity = 0, order = 0).toSeq is Seq.empty
@@ -73,7 +67,7 @@ class SetsUtilitiesSpec extends RichFunSuite:
       )
   }
 
-  test("compact notation for importing enumerations into FinSet") {
+  test("compact notation for importing enumerations into FinSet"):
     enum Suit:
       case Hearts, Clubs, Spades, Diamonds
 
@@ -84,9 +78,8 @@ class SetsUtilitiesSpec extends RichFunSuite:
       called.set(true)
     }
     called.get() is true
-  }
 
-  test("enumerate sequences of a given length on given symbols") {
+  test("enumerate sequences of a given length on given symbols"):
     sequencesOfLength("", 0).toSeq is Seq[Seq[Char]]("")
     sequencesOfLength("a", 0).toSeq is Seq[Seq[Char]]("")
     sequencesOfLength("ab", 1).toSeq is Seq[Seq[Char]]("a", "b")
@@ -102,24 +95,22 @@ class SetsUtilitiesSpec extends RichFunSuite:
       "aab", "bab",
       "abb", "bbb"
     )
-  }
 
-    test("enumerate subsets of a set") {
-      subsetsOf(Set[Void]()).toSeq is Seq(Set.empty[Void])
-      subsetsOf(Set(0)).toSeq is Seq[Set[Int]](Set.empty, Set(0))
+  test("enumerate subsets of a set"):
+    subsetsOf(Set[Void]()).toSeq is Seq(Set.empty[Void])
+    subsetsOf(Set(0)).toSeq is Seq[Set[Int]](Set.empty, Set(0))
 
-      val subsets2: Seq[Set[Int]] = subsetsOf(Set(0, 1)).toSeq
-      subsets2.size is 4
-      subsets2.toSet is Set[Set[Int]](
-        Set.empty, Set(0), Set(1), Set(0, 1)
-      )
+    val subsets2: Seq[Set[Int]] = subsetsOf(Set(0, 1)).toSeq
+    subsets2.size is 4
+    subsets2.toSet is Set[Set[Int]](
+      Set.empty, Set(0), Set(1), Set(0, 1)
+    )
 
-      val subsets3: Seq[Set[Int]] = subsetsOf(Set(0, 1, 2)).toSeq
-      subsets3.size is 8
-      subsets3.toSet is Set[Set[Int]](
-        Set.empty,
-        Set(0), Set(1), Set(2),
-        Set(0, 1), Set(0, 2), Set(1, 2),
-        Set(0, 1, 2)
-      )
-    }
+    val subsets3: Seq[Set[Int]] = subsetsOf(Set(0, 1, 2)).toSeq
+    subsets3.size is 8
+    subsets3.toSet is Set[Set[Int]](
+      Set.empty,
+      Set(0), Set(1), Set(2),
+      Set(0, 1), Set(0, 2), Set(1, 2),
+      Set(0, 1, 2)
+    )

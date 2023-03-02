@@ -16,45 +16,40 @@ import Sets.*
 import Sets.StandardTermsAndOperators.*
 
 class AlgebraicConstructionsSpec extends RichFunSuite:
-
-  test("Construct cyclic groups") {
+  
+  test("Construct cyclic groups"):
     withCyclicGroup(order = 17) {
       [Int17] => (_: Dot[Int17]) ?=> (_: Int17 =:= Int) ?=> (_: Int =:= Int17) ?=> (group17: Group[Int17]) ?=>
         dot[Int17].size is 17
         group17.sanityTest
-    }
-  }
-
-  test("Construct a monoid from a table") {
+      }
+      
+  test("Construct a monoid from a table"):
     import StockSymbols.*
     val h: Symbol = e
     given Set[Symbol] = Set(e, a)
     withMonoidFromTable(
       e, a,
       a, e
-    ) {
+    ):
       (_: Dot[Symbol]) ?=> (monoid: Monoid[Symbol]) ?=>
       monoid.sanityTest
       monoid.unit(()) is e
       monoid.multiply(a, a) is e
-    }
-  }
 
-  test("Construct a group from a table") {
+  test("Construct a group from a table"):
     import StockSymbols.*
     withGroupFromTable(
       e, a,
       a, e
-    ) {
+    ):
       (_: Dot[Symbol]) ?=> (group: Group[Symbol]) ?=>
         group.sanityTest
         group.unit(()) is e
         group.multiply(a, a) is e
         group.inverse(a) is a
-    }
-  }
 
-  test("Construct symmetric groups") {
+  test("Construct symmetric groups"):
     import StockSymbols.*
 
     withSymmetricGroup(1) { (ints : Sets.Dot[Int], seqs: Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => 
@@ -97,10 +92,9 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
       action.actionMultiply(2, Seq(1, 0, 3, 2)) is 3
       group.isCommutative is false
     }
-  }
 
   if (false)
-    test("(Benchmark, sanity test S_5)") {*
+    test("(Benchmark, sanity test S_5)"):
       withSymmetricGroup(5) { (ints : Sets.Dot[Int], seqs: Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => 
         dot[Seq[Int]].size is 120
         group.sanityTest
@@ -108,7 +102,6 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
         action.actionMultiply(2, Seq(1, 0, 4, 3, 2)) is 4
         group.isCommutative is false
       }
-    }
 
   test("Construct the monoid of endomorphisms") {
     import StockSymbols.*
@@ -122,7 +115,7 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
     }
   }
 
-  test("Construct the group of units") {
+  test("Construct the group of units"):
     withMonoid_1_0 { (_: Dot[Int]) ?=> (_: Monoid[Int]) ?=>
       withGroupOfUnits[Int, Unit] {
         [U] => (_: Dot[U]) ?=> (groupU: Group[U]) ?=> (embed: U => Int) =>
@@ -133,7 +126,7 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
         }
       }
     }
-    withDot(Set[Int](1, 2, 3)) {
+    withDot(Set[Int](1, 2, 3)):
       withEndomorphismMonoid[Int, Unit] {
         [E] => (_: Dot[E]) ?=> (monoid: Monoid[E]) ?=> (standardAction: monoid.Action[Int]) ?=>
           withGroupOfUnits[E, Unit] {
@@ -143,17 +136,13 @@ class AlgebraicConstructionsSpec extends RichFunSuite:
               groupU.isCommutative is false
           }
       }
-    }
-  }
 
-  test("Construct the internal automorphism group") {
+  test("Construct the internal automorphism group"):
     import StockSymbols.*
-    withDot(Set[Symbol](e, a, b, c)) {
+    withDot(Set[Symbol](e, a, b, c)):
       withAutomorphismGroup[Symbol, Unit] {
         [G] => (_: Dot[G]) ?=> (group: Group[G]) ?=> (action: group.Action[Symbol]) ?=>
         group.sanityTest
         action.sanityTest
         dot[G].size is 24
       }
-    }
-  }

@@ -15,7 +15,7 @@ import Sets._
 
 class QuantifiersSpec extends RichFunSuite:
 
-  test("Universal quantifiers work as expected for sets") {
+  test("Universal quantifiers work as expected for sets"):
     withDot(Set[Int](1, 2, 3)) {
       ∀[Int] isArrow Map[Map[Int, Boolean], Boolean](
         Map( 1 -> false, 2 -> false, 3 -> false ) -> false,
@@ -36,16 +36,14 @@ class QuantifiersSpec extends RichFunSuite:
         )
       }
     }
-  }
 
-  test("Universal quantifiers (budget boolean version) work as expected for sets") {
+  test("Universal quantifiers (budget boolean version) work as expected for sets"):
     withDot(Set[Int](1, 2, 3)) {
       ∀[Int]{ _ % 2 == 0 } is false
       ∀[Int]{ _ < 5 } is true
     }
-  }
 
-  test("Existential quantifiers work as expected for sets") {
+  test("Existential quantifiers work as expected for sets"):
     withDot(Set[Int](1, 2, 3)) {
       ∃[Int] isArrow Map[Map[Int, Boolean], Boolean](
         Map( 1 -> false, 2 -> false, 3 -> false ) -> false,
@@ -69,10 +67,8 @@ class QuantifiersSpec extends RichFunSuite:
       }
     }
 
-    test("Existential quantifiers (budget boolean version) work as expected for sets") {
-      withDot(Set[Int](1, 2, 3)) {
-        ∃[Int]{ _ % 7 == 5 } is false
-        ∃[Int]{ _ < 2 } is true
-      }
+  test("Existential quantifiers (budget boolean version) work as expected for sets"):
+    withDot(Set[Int](1, 2, 3)) {
+      ∃[Int]{ _ % 7 == 5 } is false
+      ∃[Int]{ _ < 2 } is true
     }
-  }

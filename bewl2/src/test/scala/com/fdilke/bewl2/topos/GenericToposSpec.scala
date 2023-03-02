@@ -74,29 +74,26 @@ abstract class GenericToposSpec[
   ): Unit =
     import fixtures.*
 
-    test("identity arrows have sane equality semantics") {
+    test("identity arrows have sane equality semantics"):
       assert(
         identity[CTXT[FOO]] =!= id[FOO]
       )
       assert(
         id[FOO] =!= id[FOO]
       )
-    }
 
-    test("identity arrows obey composition laws") {
+    test("identity arrows obey composition laws"):
       assert( (foo2bar o id[FOO]) =!= foo2bar)
       assert( (id[BAR] o foo2bar) =!= foo2bar)
-    }
 
-    test("sane fixtures") {
+    test("sane fixtures"):
       sanityTest[FOO]
       sanityTest[BAR]
       sanityTest[BAZ]
       sanityTest(foo2bar)
       sanityTest(foobar2baz)
-    }
 
-    test("biproduct diagrams work") {
+    test("biproduct diagrams work"):
       sanityTest[(BAR, BAZ)]
       val productArrow: FOO ~> (BAR, BAZ) = foo2bar x foo2baz
       productArrow.sanityTest
@@ -115,23 +112,20 @@ abstract class GenericToposSpec[
       assert(
         recombine =!= id[(BAR, BAZ)]
       )
-    }
 
-    test("distinguishes projection arrows") {
+    test("distinguishes projection arrows"):
       assert(!(
         π0[FOO, FOO] =!= π1[FOO, FOO]
       ))
-    }
 
-    test("caches products") {
+    test("caches products"):
       val fooXbar1: Dot[(FOO, BAR)] = summon[Dot[(FOO, BAR)]]
       val fooXbar2: Dot[(FOO, BAR)] = summon[Dot[(FOO, BAR)]]
       assert(
         (fooXbar1.asInstanceOf[Object]) eq (fooXbar2.asInstanceOf[Object])
       )
-    }
 
-    test("the unit object behaves") {
+    test("the unit object behaves"):
       sanityTest[UNIT]
       val fooTo1: FOO ~> UNIT = toUnit[FOO]
       fooTo1.sanityTest
@@ -143,9 +137,8 @@ abstract class GenericToposSpec[
       assert {
         (toUnit[BAR] o foo2bar) =!= fooTo1
       }
-    }
 
-    test("the zero object behaves") {
+    test("the zero object behaves"):
       sanityTest[VOID]
       val barFrom0: VOID ~> BAR = fromZero[BAR]
       barFrom0.sanityTest
@@ -157,9 +150,8 @@ abstract class GenericToposSpec[
       assert(
         (foo2bar o fromZero[FOO]) =!= barFrom0
       )
-    }
 
-    test("has enumeration of arrows") {
+    test("has enumeration of arrows"):
       extension [X: Dot, Y: Dot](arrow: X ~> Y)
         def appears: Unit =
           assert {
@@ -171,22 +163,19 @@ abstract class GenericToposSpec[
       (foobar2baz      appears)
       (monicBar2baz    appears)
       (foo2ImageOfBar  appears)
-    }
 
-    test("can factorize arrows into 'monic o epic'") {
+    test("can factorize arrows into 'monic o epic'"):
       for { arrow <- morphisms[FOO, BAR] }
         arrow.factorize { [I] => (_: Dot[I]) ?=> (epic: FOO ~> I, monic: I ~> BAR) =>
           assert { epic.isEpic }
           assert { monic.isMonic }
           assert { arrow =!= ( monic o epic ) }
         }
-    }
 
-    test("consistently calculates arrows from the initial to the terminal") {
+    test("consistently calculates arrows from the initial to the terminal"):
       assert( toUnit[VOID] =!= fromZero[UNIT] )
-    }
 
-    test("can construct exponential diagrams") {
+    test("can construct exponential diagrams"):
       sanityTest[BAR > BAZ]
       val eval: (BAR > BAZ, BAR) ~> BAZ  =
         evaluation[BAR, BAZ]
@@ -203,17 +192,15 @@ abstract class GenericToposSpec[
         val fnBarBaz: CTXT[BAR > BAZ] = foo2bar2baz(cFoo)
         eval(fnBarBaz, cBar)
       })
-    }
 
-    test("caches exponentials") {
+    test("caches exponentials"):
       val fooToBar1: Dot[FOO > BAR] = summon[Dot[FOO > BAR]]
       val fooToBar2: Dot[FOO > BAR] = summon[Dot[FOO > BAR]]
       assert(
         (fooToBar1.asInstanceOf[Object]) eq (fooToBar2.asInstanceOf[Object])
       )
-    }
 
-    test("calculates equalizers") {
+    test("calculates equalizers"):
       equalizerSituation[Unit](
         [S, M, T] => (
           r: S ~> M,
@@ -233,9 +220,8 @@ abstract class GenericToposSpec[
               }
           }
       )
-    }
 
-    test("has a subobject classifier") {
+    test("has a subobject classifier"):
       sanityTest[BEWL]
       sanityTest(truth)
       // sanityTest(falsity)
@@ -249,9 +235,8 @@ abstract class GenericToposSpec[
       assert {
         (monicBar2baz o restriction) =!= foo2ImageOfBar
       }
-    }
     
-    test("overrides the logops driver correctly, if at all") {
+    test("overrides the logops driver correctly, if at all"):
       if (!(logicalOperations.isInstanceOf[DefaultLogicalOperations])) {
         val defaultLogOps: LogicalOperations = new DefaultLogicalOperations
         val heyting: HeytingAlgebra[BEWL] =
@@ -271,9 +256,8 @@ abstract class GenericToposSpec[
           assert { heytingAlgebras.isMorphism(reallyBewl) }
         }
       }
-    }
 
-    test("overrides the epic verifier correctly, if at all") {
+    test("overrides the epic verifier correctly, if at all"):
       if (!(epicVerifier.isInstanceOf[DefaultEpicVerifier])) {
         val defaultEpicVerifier: EpicVerifier = new DefaultEpicVerifier
         morphisms[FOO, BAR].foreach { arrow =>
@@ -286,9 +270,8 @@ abstract class GenericToposSpec[
           assert { arrow.isEpic == defaultEpicVerifier.isEpic(arrow) }
         }
       }
-    }
             
-    test("overrides the automorphism finder correctly, if at all") {
+    test("overrides the automorphism finder correctly, if at all"):
       if (! autoFinder.isInstanceOf[DefaultAutomorphismFinder]) {
         val defaultAutoFinder: AutomorphismFinder = new DefaultAutomorphismFinder
         autoFinder.withAutomorphismGroup[FOO, Unit] {
@@ -310,9 +293,8 @@ abstract class GenericToposSpec[
           }
         }
       }
-    }
 
-    test("overrides the optionator correctly, if at all") {
+    test("overrides the optionator correctly, if at all"):
       if (true || ! optionator.isInstanceOf[DefaultOptionator.type]) {
         type D_OPTION[X] = DefaultOptionator.OPTION[X]
         maskDot[FOO, Unit] { [F] => (_ : Dot[F]) ?=> (_ : F =:= FOO) ?=> (_ : FOO =:= F) ?=>
@@ -330,4 +312,3 @@ abstract class GenericToposSpec[
           assert { (extendInv o extend) =!= id[D_OPTION[F]] }
         }
       }
-    }

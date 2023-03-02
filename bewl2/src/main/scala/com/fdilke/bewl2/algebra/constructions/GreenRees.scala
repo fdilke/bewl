@@ -2,7 +2,6 @@ package com.fdilke.bewl2.algebra.constructions
 
 import scala.annotation.tailrec
 import com.fdilke.utility.Shortcuts.*
-import com.fdilke.utility.IterateToFixed
 import com.fdilke.bewl2.sets.SetsUtilities._
 
 object GreenRees:

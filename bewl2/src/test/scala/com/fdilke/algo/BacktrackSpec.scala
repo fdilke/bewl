@@ -4,7 +4,7 @@ import com.fdilke.algo.Backtrack._
 import munit.FunSuite
 
 class BacktrackSpec extends FunSuite:
-  test("enumerates the void") {
+  test("enumerates the void"):
     lazy val nodeVoid: DecisionNode[Int, Boolean] =
       _ => MapInvalid.asInstanceOf[NextStep[Int, Boolean]]
 
@@ -15,9 +15,8 @@ class BacktrackSpec extends FunSuite:
       ).toSet,
       Set.empty
     )
-  }
 
-  test("enumerates all injections { 0, 1 } -> Boolean") {
+  test("enumerates all injections { 0, 1 } -> Boolean"):
     lazy val nodeInjections01Bool: DecisionNode[Int, Boolean] =
       map => map.size match {
         case 0 => MapContinue(0, nodeInjections01Bool)
@@ -39,4 +38,3 @@ class BacktrackSpec extends FunSuite:
         Map( 1 -> true, 0 -> false )
       )
     )
-  }

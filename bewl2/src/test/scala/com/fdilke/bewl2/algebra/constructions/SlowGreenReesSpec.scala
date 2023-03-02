@@ -8,7 +8,7 @@ import GreenRees.*
 
 abstract class SlowGreenReesSpec extends RichFunSuite:
   
-  test("Canonical form is shortest equivalent word") {
+  test("Canonical form is shortest equivalent word"):
     for {
       length <- (0 to 6).toSeq
       word <- wordsOfLength("abc", length)
@@ -21,9 +21,8 @@ abstract class SlowGreenReesSpec extends RichFunSuite:
           ) is true
       }
     }
-  }
 
-  test("Enumerate canonical forms in a free monoid") {
+  test("Enumerate canonical forms in a free monoid"):
     for { numLetters <- 0 to 3 } {
       val expectedSize = orderFree(numLetters).toInt
       val letters: String = "abcde".slice(0, numLetters)
@@ -51,9 +50,8 @@ abstract class SlowGreenReesSpec extends RichFunSuite:
           ((x * y) * z) is (x * (y * z))
         }
     }
-  }
 
-  test("calculation of a longest canonical word") {
+  test("calculation of a longest canonical word"):
     val expected: Seq[String] =
       Seq("", "a", "aba", "abacabcb", "abacabcbdabdbcbdcd",
         "abacabcbdabdbcbdcdeabcbdbcdcebcecdcede"
@@ -82,4 +80,3 @@ abstract class SlowGreenReesSpec extends RichFunSuite:
       val word = expected(n)
       word.startsWith(prevWord) is true
     }
-  }

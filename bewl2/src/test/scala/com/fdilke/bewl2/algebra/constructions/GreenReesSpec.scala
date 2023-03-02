@@ -9,14 +9,13 @@ import GreenRees.*
 
 class GreenReesSpec extends RichFunSuite:
 
-  test("Can create standard alphabets") {
+  test("Can create standard alphabets"):
     alphabetOfSize(0) is ""
     alphabetOfSize(1) is "a"
     alphabetOfSize(2) is "ab"
     alphabetOfSize(26) is "abcdefghijklmnopqrstuvwxyz"
-  }
 
-  test("Can extract left segments from a word") {
+  test("Can extract left segments from a word"):
     intercept[java.lang.IllegalArgumentException]{
       "".leftSegment
     }
@@ -27,9 +26,8 @@ class GreenReesSpec extends RichFunSuite:
     "abacab".leftSegment is ("aba", 'c')
     "bcnofne".leftSegment is ("bcnofn", 'e')
     "daguerrotype".leftSegment is ("daguerroty", 'p')
-  }
 
-  test("Can factorize a word") {
+  test("Can factorize a word"):
     Factorization("") is Factorization.empty
     Factorization("a") is Factorization(Some(
       Prefix(Factorization.empty, 'a'), 
@@ -55,9 +53,8 @@ class GreenReesSpec extends RichFunSuite:
       Prefix(Factorization("aba"), 'c'), 
       Suffix('c', Factorization("ab"))
     ))
-  }
 
-  test("Can check words for equivalence") {
+  test("Can check words for equivalence"):
     ("" =!= "") is true
     ("x" =!= "") is false
     ("" =!= "x") is false
@@ -67,9 +64,8 @@ class GreenReesSpec extends RichFunSuite:
     ("bacabc" =!= "bacbcabc") is true
     ("bacabc" =!= "babcabc") is false
     ("xzyzxzy" =!= "xzy") is true
-  }
 
-  test("Can calculate 'sandwiched least common multiple' of two words") {
+  test("Can calculate 'sandwiched least common multiple' of two words"):
     sandwich("", "") is ""
     sandwich("a", "") is "a"
     sandwich("a", "a") is "a"
@@ -80,9 +76,8 @@ class GreenReesSpec extends RichFunSuite:
     sandwich("bac", "cdb") is "bacdb"
     sandwich("cbba", "bba") is "cbba"
     sandwich("cbba", "cba") is "cbbacba"
-  }
 
-  test("compute canonical form for words") {
+  test("compute canonical form for words"):
       "".canonical is ""
       "a".canonical is "a"
       "abc".canonical is "abc"
@@ -95,9 +90,8 @@ class GreenReesSpec extends RichFunSuite:
       "gababg".canonical is "gabg"
       "gabcabcgabc".canonical is "gabc"
       "bacbcabc".canonical is "bacabc"
-  }
 
-  test("Canonical form function is idempotent, non-length-increasing") {
+  test("Canonical form function is idempotent, non-length-increasing"):
     for {
       length <- (0 to 6).toSeq
       word <- wordsOfLength("abc", length)
@@ -107,9 +101,8 @@ class GreenReesSpec extends RichFunSuite:
       (canon =!= word) is true
       (canon.canonical == canon) is true
     }
-  }
 
-  test("Can multiply words with automatic reduction to canonical form") {
+  test("Can multiply words with automatic reduction to canonical form"):
     ("" * "") is  ""
     ("a" * "") is  "a"
     ("" * "a") is  "a"
@@ -119,17 +112,15 @@ class GreenReesSpec extends RichFunSuite:
     ("ab" * "ab") is  "ab"
     ("ab" * "ab") is  "ab"
     ("bacb" * "cabc") is  "bacabc"
-  }
 
-  test("Calculate orders of free monoids") {
+  test("Calculate orders of free monoids"):
     val expectedSizes: Seq[BigInt] =
       Seq(1, 2, 7, 160, 332381).map { BigInt(_) } ++ Seq(BigInt("2751884514766"))
     for { i <- expectedSizes.indices } {
       orderFree(i) is expectedSizes(i)
     }
-  }
     
-  test("Calculate Green's R relation") {
+  test("Calculate Green's R relation"):
     ("" R "") is true
     ("" R "a") is false
     ("a" R "a") is true
@@ -141,9 +132,8 @@ class GreenReesSpec extends RichFunSuite:
     ("acb" R "acbb") is true
     ("acb" R "acd") is false
     ("acba" R "acbc") is true
-  }
 
-  test("Calculate Green's L relation") {
+  test("Calculate Green's L relation"):
     ("" L "") is true
     ("" L "a") is false
     ("a" L "a") is true
@@ -155,13 +145,11 @@ class GreenReesSpec extends RichFunSuite:
     ("acb" L "aacb") is true
     ("acb" L "acd") is false
     ("cacb" L "bacb") is true
-  }
 
-  test("List all the prefixes") {
+  test("List all the prefixes"):
     prefixesUsingAll("a") is Seq(
       Prefix(Factorization.empty, 'a')
     )
-
     val abPrefixes: Seq[String] = prefixesUsingAll("ab").toSeq.map { _.toWord }
     val abPrefixesAsSet: Set[String] = abPrefixes.toSet
     abPrefixesAsSet.size is abPrefixes.size
@@ -178,9 +166,8 @@ class GreenReesSpec extends RichFunSuite:
       "bca", "bcba",
       "cba", "cbca"
     )
-  }
 
-  test("List all the suffixes") {
+  test("List all the suffixes"):
     suffixesUsingAll("a") is Seq(
       Suffix('a', Factorization.empty)
     )
@@ -201,9 +188,8 @@ class GreenReesSpec extends RichFunSuite:
       "acb", "abcb",
       "abc", "acbc"
     )
-  }
 
-  test("List factorizations using all letters") {
+  test("List factorizations using all letters"):
     facsUsingAll("") is Seq(Factorization.empty)
     facsUsingAll("a") is Seq(Factorization("a"))
     val abFactorizations: Seq[String] = facsUsingAll("ab").toSeq.map { _.toWord }
@@ -212,9 +198,8 @@ class GreenReesSpec extends RichFunSuite:
     abFactorizationsAsSet is Set(
       "ab", "ba", "aba", "bab"
     )
-  }
 
-  test("Calculate the 'eggbox' function which counts the enumerated factorizations") {
+  test("Calculate the 'eggbox' function which counts the enumerated factorizations"):
     for { numLetters <- 0 to 3 } {
       val letters: String = alphabetOfSize(numLetters)
       val boxSize = eggBoxSize(numLetters).toInt
@@ -223,9 +208,8 @@ class GreenReesSpec extends RichFunSuite:
         suffixesUsingAll(letters).size is boxSize
       facsUsingAll(letters).size is (boxSize * boxSize)
     }
-  }
-
-  test("Enumerate canonical forms in a free i-monoid") {
+  
+  test("Enumerate canonical forms in a free i-monoid"):
     for { numLetters <- 0 to 2 } {
       val expectedSize = orderFree(numLetters).toInt
       val letters: String = alphabetOfSize(numLetters)
@@ -252,9 +236,8 @@ class GreenReesSpec extends RichFunSuite:
         ((x * y) * z) is (x * (y * z))
       }
     }
-  }
 
-  test("Unpack the free i-monoid into a disjoint union of eggboxes") {
+  test("Unpack the free i-monoid into a disjoint union of eggboxes"):
     for { numLetters <- 0 to 3 } {
       val letters: String = alphabetOfSize(numLetters)
       val eggboxes: Seq[Seq[String]] = subsetsOf(letters.toSet).toSeq.map { subset =>
@@ -266,25 +249,22 @@ class GreenReesSpec extends RichFunSuite:
       }
       eggboxes.flatten.toSet is canonicals.toSet
     }
-  }
 
-  test("alternative calculation of canonicals") {
+  test("alternative calculation of canonicals"):
     for { numLetters <- 0 to 3 } {
       val alphabet = alphabetOfSize(numLetters)
       val set: Set[String] = enumerateCanonicals(alphabet).toSet
       val setSlow: Set[String] = enumerateCanonicalsSlow(alphabet).toSet
       setSlow is set
     }
-  }
 
-  test("calculation of the length of the longest canonical word") {
+  test("calculation of the length of the longest canonical word"):
     val expected: Seq[Int] = Seq(0, 1, 3, 8, 18, 38)
     for (n <- expected.indices) {
       longestLength(n) is expected(n)
     }
-  }
 
-  test("calculation of a longest canonical word") {
+  test("calculation of a longest canonical word"):
     val expected: Seq[String] =
       Seq("", "a", "aba", "abacabcb", "abacabcbdabdbcbdcd",
         // "abacabcbdabdbcbdcdeabcbdbcdcebcecdcede",
@@ -313,4 +293,3 @@ class GreenReesSpec extends RichFunSuite:
       val word = expected(n)
       word.startsWith(prevWord) is true
     }
-  }

@@ -22,13 +22,6 @@ object MaskScratchpad:
     block[X]
 
 
-  // def mask[X, F[_], RESULT](
-  //   fx: F[X]
-  // ) (
-  //   block: [X_] => (X_ =:= X) ?=> (X =:= X_) ?=> F[X_] => RESULT
-  // ): RESULT =
-  //   block[X](fx)
-
   def sillyMaskExperimental[X, INPUT[_], OUTPUT[_]](
     input: INPUT[X]
   )(

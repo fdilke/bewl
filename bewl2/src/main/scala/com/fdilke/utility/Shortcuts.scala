@@ -2,9 +2,7 @@ package com.fdilke.utility
 
 object Shortcuts:
   def bail(message: String) =
-    throw new IllegalArgumentException(
-      message
-    )
+    throw new IllegalArgumentException(message)
 
   inline def transmute[P, Q](p: P)(implicit
     pToQ: P =:= Q

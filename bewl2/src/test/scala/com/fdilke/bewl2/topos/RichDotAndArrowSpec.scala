@@ -15,7 +15,7 @@ import Sets._
 import com.fdilke.bewl2.utility.StockSymbols.*
 
 class RichDotAndArrowSpec extends RichFunSuite:
-  test("Can tell if an arrow is monic") {
+  test("Can tell if an arrow is monic"):
     withDot(Set[Int](1, 2, 3)) {
       withDot(Set[Char]('A', 'B', 'C', 'D')) {
         val nonMonic: Int ~> Char = Map(
@@ -32,8 +32,8 @@ class RichDotAndArrowSpec extends RichFunSuite:
         monic.isMonic is true
       }
     }
-  }
-  test("Can tell if an arrow is epic") {
+
+  test("Can tell if an arrow is epic"):
     withDot(Set[Int](1, 2, 3)) {
       withDot(Set[Char]('A', 'B', 'C', 'D')) {
         val nonEpic: Char ~> Int = Map(
@@ -52,15 +52,13 @@ class RichDotAndArrowSpec extends RichFunSuite:
         epic.isEpic is true
       }
     }
-  }
 
-  test("performance test for epic") {
+  test("performance test for epic"):
     withDot((1 to 8).toSet[Int]) {
       π0[Int, Int].isEpic is true
     }
-  }
 
-  test("Can tell if an arrow is iso") {
+  test("Can tell if an arrow is iso"):
     withDot(Set[Int](1, 2, 3)) {
       withDot(Set[Char]('A', 'B', 'C', 'D')) {
         val epicNotMonic: Char ~> Int = Map(
@@ -84,9 +82,8 @@ class RichDotAndArrowSpec extends RichFunSuite:
         iso.isIso is true
       }
     }
-  }
 
-  test("Singletons are interpreted correctly for sets") {
+  test("Singletons are interpreted correctly for sets"):
     withDot(
       Set[Int](0, 1)
     ) {
@@ -96,9 +93,8 @@ class RichDotAndArrowSpec extends RichFunSuite:
         1 -> Map[Int, Boolean](0 -> false, 1 -> true)
       )
     }
-  }
 
-  test("Partial arrow classifier has correct attributes") {
+  test("Partial arrow classifier has correct attributes"):
     withDots(
       Set[Int](0, 1),
       Set[Symbol](a)
@@ -115,5 +111,4 @@ class RichDotAndArrowSpec extends RichFunSuite:
         false -> (none[Int]: Unit => OPTION[Int])(())
       )
     }
-  }
 

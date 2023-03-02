@@ -12,15 +12,13 @@ class EnumValuesSpec extends RichFunSuite:
     case Hearts, Diamonds, Clubs, Spades
   import Suit.*
 
-  test("Can fetch the values from an enumeration") {
+  test("Can fetch the values from an enumeration"):
     EnumValues[Suit].toSeq is Seq[Suit](Hearts, Diamonds, Clubs, Spades)
-  }
 
-  test("Can fetch the values from an enumeration, via an abstraction layer") {
+  test("Can fetch the values from an enumeration, via an abstraction layer"):
     inline def fancyFun[E]: Array[E] =
       EnumValues[E]
 
     fancyFun[Suit].toSeq is Seq[Suit](Hearts, Diamonds, Clubs, Spades)
-  }
 
 

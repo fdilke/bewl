@@ -22,7 +22,7 @@ class SetsSpec extends GenericToposSpec()(Sets):
       Set[Direction](Up, Down),
       Set[String]("one", "two", "three"),
       Set[Int](1, 2, 3, 4)
-    ) {
+    ):
       block(
         new ToposFixtures {
           override val foo2bar: Direction ~> String =
@@ -68,7 +68,6 @@ class SetsSpec extends GenericToposSpec()(Sets):
             )
         }
       )
-    }
 
 
 

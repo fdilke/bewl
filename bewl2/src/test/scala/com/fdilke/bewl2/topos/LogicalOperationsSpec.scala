@@ -15,7 +15,7 @@ import Sets._
 
 class LogicalOperationsSpec extends RichFunSuite:
 
-  test("The truth object has the correct binary operations for logical operations") {
+  test("The truth object has the correct binary operations for logical operations"):
     omega.sanityTest
 
     val logOps: LogicalOperations = logicalOperations
@@ -25,11 +25,9 @@ class LogicalOperationsSpec extends RichFunSuite:
     implies isArrow { !_ | _ }
     or isArrow { _ | _ }
     falsity isArrow { _ => false }
-  }
 
-  test("The truth object has the correct binary operations for logical operations as enrichments") {
+  test("The truth object has the correct binary operations for logical operations as enrichments"):
     tupled { (_: Boolean) ∧ (_: Boolean) } isArrow { _ & _ }
     tupled { (_: Boolean) → (_: Boolean) } isArrow { !_ | _ }
     tupled { (_: Boolean) ∨ (_: Boolean) } isArrow { _ | _ }
-  }
 
