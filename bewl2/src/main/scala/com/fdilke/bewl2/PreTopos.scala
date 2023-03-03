@@ -2,7 +2,7 @@ package com.fdilke.bewl2
 
 trait PreTopos[
   DOT[_],
-  CTXT[_] : Mappable,
+  CTXT[_] : ProductMappable,
   VOID,
   UNIT,
   BEWL,
@@ -33,13 +33,6 @@ trait PreTopos[
     dotX: DOT[X],
     dotY: DOT[Y],
   ): DOT[X > Y]
-
-  def productMagic[X, Y](
-    dotX: DOT[X],
-    dotY: DOT[Y],
-    ca: CTXT[X],
-    cb: CTXT[Y]
-  ): CTXT[(X, Y)]
 
   def sanityTest[X](dotX: DOT[X]): Unit
   def sanityTest[X, Y](

@@ -1,15 +1,15 @@
 package com.fdilke.bewl2
 
-import com.fdilke.bewl2.Mappable
+import com.fdilke.bewl2.ProductMappable
 import com.fdilke.bewl2.algebra.AlgebraicMachinery
 import com.fdilke.bewl2.helper.Memoize
-import Mappable.*
+import ProductMappable.*
 import com.fdilke.bewl2.logic.LogicalOperations
 import com.fdilke.utility.Mask._
 
 class Topos[
   DOT[_],
-  CTXT[_]: Mappable,
+  CTXT[_]: ProductMappable,
   VOID,
   UNIT,
   BEWL,
@@ -320,9 +320,6 @@ class Topos[
       Some(xy.map{ _._1 }, xy.map { _._2 })
 
   extension[X: Dot](x: CTXT[X])
-    def ⊕[Y: Dot](y: CTXT[Y]): CTXT[(X, Y)] =
-      pretopos.productMagic(dot[X], dot[Y], x, y)
-
     inline def =?=(x2: CTXT[X]): CTXT[BEWL] =
       (Ɛ.=?=[X]: BiArrow[X, X, BEWL])(x, x2)
 
@@ -483,7 +480,7 @@ class Topos[
 object Topos:
   inline def apply[
     DOT[_],
-    CTXT[A]: Mappable,
+    CTXT[A]: ProductMappable,
     VOID,
     UNIT,
     BEWL,

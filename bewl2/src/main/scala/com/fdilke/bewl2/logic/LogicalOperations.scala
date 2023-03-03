@@ -1,12 +1,12 @@
 package com.fdilke.bewl2.logic
 
 import com.fdilke.bewl2.algebra.AlgebraicMachinery
-import com.fdilke.bewl2.{Mappable, Topos}
-import Mappable._
+import com.fdilke.bewl2.{ProductMappable, Topos}
+import ProductMappable._
 
 trait LogicalOperations[
   DOT[_],
-  CTXT[_] : Mappable,
+  CTXT[_] : ProductMappable,
   VOID,
   UNIT,
   BEWL,

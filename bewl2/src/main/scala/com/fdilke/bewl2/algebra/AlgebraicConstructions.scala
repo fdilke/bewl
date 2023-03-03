@@ -1,18 +1,18 @@
 package com.fdilke.bewl2.algebra
 
-import com.fdilke.bewl2.Mappable
+import com.fdilke.bewl2.ProductMappable
 import com.fdilke.bewl2.Topos
 import com.fdilke.utility.Shortcuts.*
 
 import scala.language.{dynamics, postfixOps}
-import Mappable.*
+import ProductMappable.*
 import com.fdilke.bewl2.sets.Sets
 import com.fdilke.bewl2.sets.SetsUtilities._
 import Function.tupled
 
 trait AlgebraicConstructions[
   DOT[_],
-  CTXT[_]: Mappable,
+  CTXT[_]: ProductMappable,
   VOID,
   UNIT,
   BEWL,

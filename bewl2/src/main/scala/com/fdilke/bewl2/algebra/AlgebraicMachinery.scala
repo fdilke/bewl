@@ -1,11 +1,11 @@
 package com.fdilke.bewl2.algebra
 
 import com.fdilke.bewl2.Topos
-import com.fdilke.bewl2.Mappable
+import com.fdilke.bewl2.ProductMappable
 import com.fdilke.utility.Shortcuts.*
 
 import scala.language.{dynamics, postfixOps}
-import Mappable._
+import ProductMappable._
 
 sealed trait AlgebraicSort
 class Principal extends AlgebraicSort
@@ -13,7 +13,7 @@ class Scalar extends AlgebraicSort
 
 trait AlgebraicMachinery[
   DOT[_],
-  CTXT[_]: Mappable,
+  CTXT[_]: ProductMappable,
   VOID,
   UNIT,
   BEWL,

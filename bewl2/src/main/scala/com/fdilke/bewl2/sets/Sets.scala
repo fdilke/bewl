@@ -2,7 +2,7 @@ package com.fdilke.bewl2.sets
 
 import com.fdilke.bewl2.PreTopos
 import com.fdilke.bewl2.Topos
-import com.fdilke.bewl2.Mappable
+import com.fdilke.bewl2.ProductMappable
 import com.fdilke.bewl2.sets.SetsUtilities.*
 
 import scala.language.postfixOps
@@ -27,14 +27,6 @@ object PreSets extends PreTopos[Set, [A] =>> A, Void, Unit, Boolean, Map]:
       y <- dotY
     } yield
       (x, y)
-
-  override def productMagic[X, Y](
-    dotX: Set[X],
-    dotY: Set[Y],
-    x: X,
-    y: Y
-  ): (X, Y) =
-    (x, y)
 
   override def uncachedExponentialObject[X, Y](
     dotX: Set[X],

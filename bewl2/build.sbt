@@ -7,7 +7,7 @@ lazy val root = project
     scalaVersion := "3.3.0-RC3", // "3.2.2",
     scalacOptions ++= Seq(
         // "-Yrangepos",
-        "-Yindent-colons",
+        // "-Yindent-colons",
         "-explain",
 //        "-language:experimental.fewerBraces"
     ),
