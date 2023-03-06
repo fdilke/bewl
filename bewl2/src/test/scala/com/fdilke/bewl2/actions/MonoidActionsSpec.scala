@@ -16,7 +16,7 @@ object MonoidActionsSpec:
         monoidOf3.actionTopos
     }
 
-class MonoidActionsSpec extends GenericToposSpec()(Sets):
+class MonoidActionsSpec extends GenericToposSpec()(Sets /* topos = MonoidActionsSpec.actionTopos */):
   import topos.*
 
   override type FOO = Direction
