@@ -88,8 +88,10 @@ trait AlgebraicStructures[
     ι := unit,
     * := multiply
   ) with Actions[M]:
+    type RightIdeal = M > BEWL
+
     lazy val actionTopos =
-      MonoidActions(this: Monoid[M])
+      toposOfMonoidActions(this: Monoid[M])
 
   trait Actions[M: Dot]:
     val unit: NullaryOp[M]

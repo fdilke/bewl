@@ -14,119 +14,125 @@ trait MonoidActions[
 ] extends AlgebraicMachinery[DOT, CTXT, VOID, UNIT, BEWL, >]:
   topos: Topos[DOT, CTXT, VOID, UNIT, BEWL, >] =>
 
-  class MonoidActions[M: Dot](
+  def toposOfMonoidActions[M: Dot](
     monoid: Monoid[M]
-  ) extends Topos[
-    Set, [A] =>> A, Void, Unit, Boolean, Map
-  ](PreMonoidActions(monoid)):
-    val pig = 1
+  ): Topos[monoid.Action, [A] =>> A, VOID, UNIT, monoid.RightIdeal, Map] =
+    // val pretopos = new PreTopos[
+    new Topos[monoid.Action, [A] =>> A, VOID, UNIT, monoid.RightIdeal, Map](      
+      new PreTopos[
+        monoid.Action, [A] =>> A, VOID, UNIT, monoid.RightIdeal, Map
+      ]:
+        override val unitDot: monoid.Action[UNIT] =
+          ???
 
-  class PreMonoidActions[M: Dot](
-    monoid: Monoid[M]
-  ) extends PreTopos[Set, [A] =>> A, Void, Unit, Boolean, Map]:
-    override val unitDot: Set[Unit] =
-      ???
+        override val zeroDot: monoid.Action[VOID] =
+          ???
 
-    override val zeroDot: Set[Void] =
-      ???
+        override val omegaDot: monoid.Action[monoid.RightIdeal] =
+          ???
 
-    override val omegaDot: Set[Boolean] =
-      ???
+        override val truth: UNIT => monoid.RightIdeal =
+          ???
 
-    override val truth: Unit => Boolean =
-      ???
+        override def equalArrows[X, Y](
+          dotX: monoid.Action[X],
+          dotY: monoid.Action[Y],
+          f1: X => Y,
+          f2: X => Y
+        ): Boolean =
+          ???
 
-    override def equalArrows[X, Y](
-      dotX: Set[X],
-      dotY: Set[Y],
-      f1: X => Y,
-      f2: X => Y
-    ): Boolean =
-      ???
+        override def uncachedProductObject[X, Y](
+          dotX: monoid.Action[X],
+          dotY: monoid.Action[Y]
+        ): monoid.Action[(X, Y)] =
+          ???
 
-    override def uncachedProductObject[X, Y](
-      dotX: Set[X],
-      dotY: Set[Y]
-    ): Set[(X, Y)] =
-      ???
+        override def uncachedExponentialObject[X, Y](
+          dotX: monoid.Action[X],
+          dotY: monoid.Action[Y]
+        ): monoid.Action[X Map Y] =
+          ???
+        
+        override def sanityTest[X](
+          dotX: monoid.Action[X]
+        ): Unit =
+          ???
 
-    override def uncachedExponentialObject[X, Y](
-      dotX: Set[X],
-      dotY: Set[Y]
-    ): Set[X Map Y] =
-      ???
-    
-    override def sanityTest[X](
-      dotX: Set[X]
-    ): Unit =
-      ???
+        override def sanityTest[X, Y](
+          dotX: monoid.Action[X],
+          dotY: monoid.Action[Y],
+          f: X ~> Y
+        ): Unit =
+          ???
 
-    override def sanityTest[X, Y](
-      dotX: Set[X],
-      dotY: Set[Y],
-      f: X ~> Y
-    ): Unit =
-      ???
+        override def enumerateMorphisms[X, Y](
+          dotX: monoid.Action[X],
+          dotY: monoid.Action[Y]
+        ): Iterable[X => Y] =
+          ???
 
-    override def enumerateMorphisms[X, Y](
-      dotX: Set[X],
-      dotY: Set[Y]
-    ): Iterable[X => Y] =
-      ???
+        override def fromZero[X](dotX: monoid.Action[X]): VOID => X =
+          ???
 
-    override def fromZero[X](dotX: Set[X]): Void => X =
-      ???
+        override def toUnit[X](
+          dotX: monoid.Action[X]
+        ): X => UNIT =
+          ???
 
-    override def toUnit[X](
-      dotX: Set[X]
-    ): X => Unit =
-      ???
+        override def evaluation[X, Y](
+          dotX: monoid.Action[X],
+          dotY: monoid.Action[Y]
+        ): ((X Map Y, X)) => Y =
+          ???
 
-    override def evaluation[X, Y](
-      dotX: Set[X],
-      dotY: Set[Y]
-    ): ((X Map Y, X)) => Y =
-      ???
+        override def transpose[X, Y, Z](
+          dotX: monoid.Action[X],
+          dotY: monoid.Action[Y],
+          dotZ: monoid.Action[Z],
+          xy2z: ((X, Y)) => Z
+        ): X => (Y Map Z) =
+          ???
 
-    override def transpose[X, Y, Z](
-      dotX: Set[X],
-      dotY: Set[Y],
-      dotZ: Set[Z],
-      xy2z: ((X, Y)) => Z
-    ): X => (Y Map Z) =
-      ???
+        override def doEqualizer[X, Y, RESULT](
+          dotX: monoid.Action[X],
+          dotY: monoid.Action[Y],
+          f: X => Y,
+          f2: X => Y
+        )(
+          block: [A] => RawEqualizer[A, X] => monoid.Action[A] => RESULT
+        ): RESULT =
+          ???
 
-    override def doEqualizer[X, Y, RESULT](
-      dotX: Set[X],
-      dotY: Set[Y],
-      f: X => Y,
-      f2: X => Y
-    )(
-      block: [A] => RawEqualizer[A, X] => Set[A] => RESULT
-    ): RESULT =
-      ???
+        override def chiForMonic[X, Y](
+          dotX: monoid.Action[X],
+          dotY: monoid.Action[Y],
+          monic: X => Y
+        ): Y => monoid.RightIdeal =
+          ???
 
-    override def chiForMonic[X, Y](
-      dotX: Set[X],
-      dotY: Set[Y],
-      monic: X => Y
-    ): Y => Boolean =
-      ???
+        override def backDivideMonic[X, Y, A](
+          dotX: monoid.Action[X],
+          dotY: monoid.Action[Y],
+          dotA: monoid.Action[A],
+          arrow: X => Y,
+          monic: A => Y
+        ): X => A =
+          ???
+    )
 
-    override def backDivideMonic[X, Y, A](
-      dotX: Set[X],
-      dotY: Set[Y],
-      dotA: Set[A],
-      arrow: X => Y,
-      monic: A => Y
-    ): X => A =
-      ???
+  // class MonoidActions[M: Dot](
+  //   val monoid: Monoid[M]
+  // )
 
+  // class MonoidActions[M: Dot](
+  //   val monoid: Monoid[M]
+  // ) extends Topos[
+  //   monoid.Action, [A] =>> A, VOID, UNIT, monoid.RightIdeal, Map
+  // ](PreMonoidActions(monoid))
 
-
-
-
-
-
-
+  // class PreMonoidActions[M: Dot](
+  //   val monoid: Monoid[M]
+  // ) extends 
+  
 
