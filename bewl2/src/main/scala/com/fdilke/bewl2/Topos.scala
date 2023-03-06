@@ -5,6 +5,7 @@ import com.fdilke.bewl2.algebra.AlgebraicMachinery
 import com.fdilke.bewl2.helper.Memoize
 import ProductMappable.*
 import com.fdilke.bewl2.logic.LogicalOperations
+import com.fdilke.bewl2.actions.MonoidActions
 import com.fdilke.utility.Mask._
 
 class Topos[
@@ -16,7 +17,8 @@ class Topos[
   >[_, _]
 ](pretopos: PreTopos[DOT, CTXT, VOID, UNIT, BEWL, >])
   extends AlgebraicMachinery[DOT, CTXT, VOID, UNIT, BEWL, >]
-  with LogicalOperations[DOT, CTXT, VOID, UNIT, BEWL, >]:
+  with LogicalOperations[DOT, CTXT, VOID, UNIT, BEWL, >]
+  with ToposConstructions[DOT, CTXT, VOID, UNIT, BEWL, >]:
   Ɛ =>
 
   type ~>[X, Y] = CTXT[X] => CTXT[Y]
@@ -489,3 +491,14 @@ object Topos:
    implicit topos: Topos[DOT, CTXT, VOID, UNIT, BEWL, >]
   ): Topos[DOT, CTXT, VOID, UNIT, BEWL, >] =
     topos
+
+trait ToposConstructions[
+  DOT[_],
+  CTXT[_]: ProductMappable,
+  VOID,
+  UNIT,
+  BEWL,
+  >[_, _]
+] extends MonoidActions[DOT, CTXT, VOID, UNIT, BEWL, >]:
+  topos: Topos[DOT, CTXT, VOID, UNIT, BEWL, >] =>
+

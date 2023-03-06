@@ -87,7 +87,9 @@ trait AlgebraicStructures[
   ) extends monoids.Algebra[M](
     ι := unit,
     * := multiply
-  ) with Actions[M]
+  ) with Actions[M]:
+    lazy val actionTopos =
+      MonoidActions(this: Monoid[M])
 
   trait Actions[M: Dot]:
     val unit: NullaryOp[M]
