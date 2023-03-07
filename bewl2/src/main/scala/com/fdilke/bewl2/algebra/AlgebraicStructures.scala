@@ -141,6 +141,9 @@ trait AlgebraicStructures[
     ) extends actions.Algebra[A](
       ** := actionMultiply
     ):
+      def dot: Dot[A] =
+        summon
+        
       def x[B: Dot]( // Formalism to make the product of two Actions an Action to facilitate sugar
         that: Action[B]
       ): Action[(A, B)] =
