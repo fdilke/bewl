@@ -16,11 +16,11 @@ trait MonoidActions[
 
   def toposOfMonoidActions[M: Dot](
     monoid: Monoid[M]
-  ): Topos[monoid.Action, [A] =>> A, VOID, UNIT, monoid.RightIdeal, Map] =
+  ): Topos[monoid.Action, [A] =>> A, VOID, UNIT, monoid.RightIdeal, monoid.InternalMap] =
     // val pretopos = new PreTopos[
-    new Topos[monoid.Action, [A] =>> A, VOID, UNIT, monoid.RightIdeal, Map](      
+    new Topos[monoid.Action, [A] =>> A, VOID, UNIT, monoid.RightIdeal, monoid.InternalMap](      
       new PreTopos[
-        monoid.Action, [A] =>> A, VOID, UNIT, monoid.RightIdeal, Map
+        monoid.Action, [A] =>> A, VOID, UNIT, monoid.RightIdeal, monoid.InternalMap
       ]:
         override val unitDot: monoid.Action[UNIT] =
           ???
@@ -51,7 +51,7 @@ trait MonoidActions[
         override def uncachedExponentialObject[X, Y](
           dotX: monoid.Action[X],
           dotY: monoid.Action[Y]
-        ): monoid.Action[X Map Y] =
+        ): monoid.Action[monoid.InternalMap[X, Y]] =
           ???
         
         override def sanityTest[X](
@@ -83,7 +83,7 @@ trait MonoidActions[
         override def evaluation[X, Y](
           dotX: monoid.Action[X],
           dotY: monoid.Action[Y]
-        ): ((X Map Y, X)) => Y =
+        ): ((monoid.InternalMap[X, Y], X)) => Y =
           ???
 
         override def transpose[X, Y, Z](
@@ -91,7 +91,7 @@ trait MonoidActions[
           dotY: monoid.Action[Y],
           dotZ: monoid.Action[Z],
           xy2z: ((X, Y)) => Z
-        ): X => (Y Map Z) =
+        ): X => monoid.InternalMap[Y, Z] =
           ???
 
         override def doEqualizer[X, Y, RESULT](
@@ -120,19 +120,4 @@ trait MonoidActions[
         ): X => A =
           ???
     )
-
-  // class MonoidActions[M: Dot](
-  //   val monoid: Monoid[M]
-  // )
-
-  // class MonoidActions[M: Dot](
-  //   val monoid: Monoid[M]
-  // ) extends Topos[
-  //   monoid.Action, [A] =>> A, VOID, UNIT, monoid.RightIdeal, Map
-  // ](PreMonoidActions(monoid))
-
-  // class PreMonoidActions[M: Dot](
-  //   val monoid: Monoid[M]
-  // ) extends 
   
-
