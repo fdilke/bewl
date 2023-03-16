@@ -115,5 +115,6 @@ For groups, only when G = 1.
 - clean up the use of =:= so we only have one-way equivalence
 - ensure an appropriate =:= is implicitly available for the ideal calculation
 - now we can turn an xxx[I] into an xxx[M > BEWL] and back through official channels
+- in the action topos code, can we use "*" and not have to refer to monoid.multiply?
 
 

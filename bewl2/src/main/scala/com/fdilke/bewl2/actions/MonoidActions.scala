@@ -106,7 +106,14 @@ trait MonoidActions[
           dotX: monoid.Action[X],
           dotY: monoid.Action[Y]
         ): Iterable[X ~> Y] =
-          ???
+          given Ɛ.Dot[X] = dotX.dot
+          given Ɛ.Dot[Y] = dotY.dot
+          Ɛ.morphisms[X, Y] filter { (f: X ~> Y) =>
+            Ɛ.∀[(X, M)] { case x ⊕ m =>
+              f(dotX.actionMultiply(x, m)) =?=
+                dotY.actionMultiply(f(x), m)
+            }
+          }
 
         override def fromZero[X](
           dotX: monoid.Action[X]
@@ -142,7 +149,32 @@ trait MonoidActions[
         )(
           block: [A] => RawEqualizer[A, X] => monoid.Action[A] => RESULT
         ): RESULT =
-          ???
+          given Ɛ.Dot[X] = dotX.dot
+          given Ɛ.Dot[Y] = dotY.dot
+          Ɛ.doEqualizer(f, f2) {
+            [A] => (_: Dot[A]) ?=> (equalizer: Ɛ.Equalizer[A, X]) =>
+              block[A](
+                new RawEqualizer[A, X]:
+                  override val inclusion: A ~> X =
+                    equalizer.inclusion
+                  override def restrict[R](
+                    dotR: monoid.Action[R],
+                    arrow: R ~> X
+                  ): R ~> A =
+                    given Ɛ.Dot[R] = dotR.dot
+                    equalizer.restrict[R](arrow)
+              )(
+                monoid.Action[A](
+                  equalizer.restrict {
+                    case a ⊕ m =>
+                      dotX.actionMultiply(
+                        equalizer.inclusion(a),
+                        m
+                      )
+                  }
+                )
+              )
+          }
 
         override def chiForMonic[X, Y](
           dotX: monoid.Action[X],
