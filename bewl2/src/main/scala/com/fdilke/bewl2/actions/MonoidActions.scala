@@ -31,7 +31,32 @@ trait MonoidActions[
             summon[monoid.Action[VOID]]
 
         override val omegaDot: monoid.Action[monoid.RightIdeal] =
-          ???
+          val evalPredicate: BiArrow[M > BEWL, M, BEWL] =
+            Ɛ.evaluation[M, BEWL]
+          val respectsAction: (M > BEWL) ~> BEWL =
+            Ɛ.∀[M > BEWL, (M, M)]{ (χ, a_m) =>
+              a_m match {
+                case a ⊕ m =>
+                  evalPredicate(χ, a) → 
+                    evalPredicate(χ, monoid.multiply(a, m))
+              }
+            }
+          respectsAction.whereTrue[monoid.Action[monoid.RightIdeal]] { 
+          [I] => (_: Dot[I]) ?=> (equalizer: Equalizer[I, M > BEWL]) =>
+
+            val qull: (I, M) ~> (M > BEWL) =
+              Ɛ.transpose[(I, M), M, BEWL]{
+              case (i ⊕ m) ⊕ n =>
+                evalPredicate(
+                  equalizer.inclusion(i),
+                  monoid.multiply(m, n)
+                )
+            }
+
+            val wigg: monoid.Action[I] =
+              monoid.Action(equalizer.restrict(qull))
+            wigg.asInstanceOf[monoid.Action[monoid.RightIdeal]]
+          }
 
         override val truth: UNIT ~> monoid.RightIdeal =
           ???
@@ -76,13 +101,17 @@ trait MonoidActions[
         ): Iterable[X ~> Y] =
           ???
 
-        override def fromZero[X](dotX: monoid.Action[X]): VOID ~> X =
-          ???
+        override def fromZero[X](
+          dotX: monoid.Action[X]
+        ): VOID ~> X =
+          given Ɛ.Dot[X] = dotX.dot
+          Ɛ.fromZero[X]
 
         override def toUnit[X](
           dotX: monoid.Action[X]
         ): X ~> UNIT =
-          ???
+          given Ɛ.Dot[X] = dotX.dot
+          Ɛ.toUnit[X]
 
         override def evaluation[X, Y](
           dotX: monoid.Action[X],
@@ -122,6 +151,9 @@ trait MonoidActions[
           arrow: X ~> Y,
           monic: A ~> Y
         ): X ~> A =
-          ???
+          given Ɛ.Dot[X] = dotX.dot
+          given Ɛ.Dot[Y] = dotY.dot
+          given Ɛ.Dot[A] = dotA.dot
+          Ɛ.backDivideMonic[X, Y, A](arrow, monic)
     )
   

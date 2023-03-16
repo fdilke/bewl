@@ -88,7 +88,7 @@ trait AlgebraicStructures[
     ι := unit,
     * := multiply
   ) with Actions[M]:
-    type RightIdeal = M > BEWL
+    opaque type RightIdeal = M > BEWL
     type InternalMap[T, U] = (M, T) > U
 
     lazy val actionTopos =
