@@ -44,22 +44,24 @@ trait MonoidActions[
           respectsAction.whereTrue[monoid.Action[monoid.RightIdeal]] { 
           [I] => (_: Dot[I]) ?=> (equalizer: Equalizer[I, M > BEWL]) =>
 
-            val qull: (I, M) ~> (M > BEWL) =
+            val leftDivide: (I, M) ~> (M > BEWL) =
               Ɛ.transpose[(I, M), M, BEWL]{
-              case (i ⊕ m) ⊕ n =>
-                evalPredicate(
-                  equalizer.inclusion(i),
-                  monoid.multiply(m, n)
-                )
+                case (i ⊕ m) ⊕ n =>
+                  evalPredicate(
+                    equalizer.inclusion(i),
+                    monoid.multiply(m, n)
+                  )
             }
 
-            val wigg: monoid.Action[I] =
-              monoid.Action(equalizer.restrict(qull))
-            wigg.asInstanceOf[monoid.Action[monoid.RightIdeal]]
+            val rightIdeals: monoid.Action[I] =
+              monoid.Action(equalizer.restrict(leftDivide))
+            rightIdeals.asInstanceOf[monoid.Action[monoid.RightIdeal]]
           }
 
         override val truth: UNIT ~> monoid.RightIdeal =
-          ???
+          val fullRightIdeal: UNIT ~> (M > BEWL) =
+            Ɛ.transpose[UNIT, M, BEWL](toTrue[(UNIT, M)])
+          fullRightIdeal.asInstanceOf[UNIT ~> monoid.RightIdeal]
 
         override def equalArrows[X, Y](
           dotX: monoid.Action[X],
@@ -75,7 +77,8 @@ trait MonoidActions[
           dotX: monoid.Action[X],
           dotY: monoid.Action[Y]
         ): monoid.Action[(X, Y)] =
-          ???
+          given Ɛ.Dot[Y] = dotY.dot
+          dotX.x(dotY)
 
         override def uncachedExponentialObject[X, Y](
           dotX: monoid.Action[X],
@@ -86,14 +89,18 @@ trait MonoidActions[
         override def sanityTest[X](
           dotX: monoid.Action[X]
         ): Unit =
-          ???
+          dotX.sanityTest
 
         override def sanityTest[X, Y](
           dotX: monoid.Action[X],
           dotY: monoid.Action[Y],
           f: X ~> Y
         ): Unit =
-          ???
+          given Ɛ.Dot[X] = dotX.dot
+          given Ɛ.Dot[Y] = dotY.dot
+          given monoid.Action[X] = dotX
+          given monoid.Action[Y] = dotY
+          assert { monoid.actions.isMorphism(f) }
 
         override def enumerateMorphisms[X, Y](
           dotX: monoid.Action[X],
