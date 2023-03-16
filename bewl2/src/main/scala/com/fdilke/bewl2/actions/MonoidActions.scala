@@ -181,7 +181,16 @@ trait MonoidActions[
           dotY: monoid.Action[Y],
           monic: X ~> Y
         ): Y ~> monoid.RightIdeal =
-          ???
+          given Ɛ.Dot[X] = dotX.dot
+          given Ɛ.Dot[Y] = dotY.dot
+          val chi: Y ~> (M > BEWL) =
+            Ɛ.transpose[Y, M, BEWL]( // define a (Y, M) ~> BEWL
+              Ɛ.∃[(Y, M), X]{
+                case (y ⊕ m) ⊕ x =>
+                  dotY.actionMultiply(y, m) =?= monic(x)
+              }
+            )
+          chi.asInstanceOf[Y ~> monoid.RightIdeal]
 
         override def backDivideMonic[X, Y, A](
           dotX: monoid.Action[X],
