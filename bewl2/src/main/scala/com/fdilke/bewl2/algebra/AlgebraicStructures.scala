@@ -89,7 +89,7 @@ trait AlgebraicStructures[
     * := multiply
   ) with Actions[M]:
     opaque type RightIdeal = M > BEWL
-    type InternalMap[T, U] = (M, T) > U
+    opaque type InternalMap[T, U] = (M, T) > U
 
     lazy val actionTopos =
       toposOfMonoidActions(this: Monoid[M])

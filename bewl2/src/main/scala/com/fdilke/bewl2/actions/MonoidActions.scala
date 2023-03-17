@@ -3,6 +3,7 @@ package com.fdilke.bewl2.actions
 import com.fdilke.bewl2.algebra.AlgebraicMachinery
 import com.fdilke.bewl2.ProductMappable
 import com.fdilke.bewl2.{ PreTopos, Topos }
+import com.fdilke.bewl2.ProductMappable.⊕
 
 trait MonoidActions[
   DOT[_],
@@ -83,8 +84,31 @@ trait MonoidActions[
         override def uncachedExponentialObject[X, Y](
           dotX: monoid.Action[X],
           dotY: monoid.Action[Y]
-        ): monoid.Action[monoid.InternalMap[X, Y]] =
-          ???
+        ): monoid.Action[monoid.InternalMap[X, Y]] = // (M, X) > Y
+          given Ɛ.Dot[X] = dotX.dot
+          given Ɛ.Dot[Y] = dotY.dot
+          val eval: ((M, X) > Y, (M, X)) ~> Y =
+            Ɛ.evaluation[(M, X), Y]
+          val isMorphism: ((M, X) > Y) ~> BEWL =
+            Ɛ.∀[(M, X) > Y, ((M, X), M)] {
+              case phi ⊕ ((m ⊕ x) ⊕ n) =>
+                dotY.actionMultiply(eval(phi, m ⊕ x), n) =?= 
+                  eval(phi, monoid.multiply(m, n) ⊕ dotX.actionMultiply(x, n))
+            }
+          isMorphism.whereTrue {
+            [A] => (_ : Ɛ.Dot[A]) ?=> (equalizer: Ɛ.Equalizer[A, ((M, X) > Y)]) =>
+              val action: monoid.Action[A] =
+                monoid.Action {
+                  equalizer.restrict(
+                    Ɛ.transpose[(A, M), (M, X), Y]{ case (a ⊕ m) ⊕ (n ⊕ x) =>
+                      val phi: CTXT[(M, X) > Y] =
+                        equalizer.inclusion(a)
+                      eval(phi, monoid.multiply(m, n) ⊕ x)                  
+                    }
+                  )
+                }
+              action.asInstanceOf[monoid.Action[monoid.InternalMap[X, Y]]]
+            }
         
         override def sanityTest[X](
           dotX: monoid.Action[X]
