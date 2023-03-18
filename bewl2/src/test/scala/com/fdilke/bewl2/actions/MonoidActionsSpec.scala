@@ -9,8 +9,14 @@ import com.fdilke.bewl2.utility.StockStructures._
 import StockEnums.Direction
 import Direction._
 import MonoidActionsSpec._
+import com.fdilke.bewl2.utility.Opacity
 
 object MonoidActionsSpec:
+  val Seq(i, x, y): Seq[Symbol] = 
+    Seq[String]("i", "x", "y").map { Symbol(_) }
+  val Seq(xR, yR): Seq[ROPE] =
+    Seq[String]("x", "y").map { Rope.blur[[A] =>> A](_) }
+
   val monoidOf3: Sets.Monoid[Symbol] =
     withMonoidOf3:
       summon
@@ -32,17 +38,39 @@ object MonoidActionsSpec:
   val barAction: monoidOf3.Action[String] =
     actionOnStrings("x", "y")
 
-  val bazAction: monoidOf3.Action[String] =
-    actionOnStrings("i", "x", "y")
-  
-class MonoidActionsSpec
-/*
-class MonoidActionsSpec extends GenericToposSpec()(MonoidActionsSpec.actionTopos):
+  object Rope extends Opacity[String]
+  type ROPE = Rope.theType
+  val bazAction: monoidOf3.Action[ROPE] =
+    Rope.blur(actionOnStrings("i", "x", "y"))
+
+  val intAction: monoidOf3.Action[Int] =
+    Sets.withDot(
+      Set[Int](0, 1, 2, 3)
+    ):
+      monoidOf3.Action[Int](
+        (n: Int, r: Symbol) =>
+          if (n == 0)
+            0
+          else
+            r match {
+              case `i` => n
+              case `x` => 1
+              case `y` => 2
+            }
+      )
+
+  val boolAction: monoidOf3.Action[Boolean] =
+    monoidOf3.Action[Boolean](
+      (b: Boolean, _: Symbol) =>
+        b
+    )
+
+abstract class MonoidActionsSpec extends GenericToposSpec()(MonoidActionsSpec.actionTopos):
   import topos.*
 
   override type FOO = Symbol
   override type BAR = String
-  override type BAZ = String
+  override type BAZ = ROPE
 
   override def withTestDots(
     block: Dot[FOO] ?=> Dot[BAR] ?=> Dot[BAZ] ?=> ToposFixtures => Unit
@@ -50,54 +78,58 @@ class MonoidActionsSpec extends GenericToposSpec()(MonoidActionsSpec.actionTopos
     withDots(
       fooAction,
       barAction,
-      bazAction
+      bazAction,
+      intAction,
+      boolAction
     ):
       block(
         new ToposFixtures {
-          override val foo2bar: Direction ~> String =
-            Map[Direction, String](elems =
-              Up -> "one",
-              Down -> "two"
+          override val foo2bar: Symbol ~> String = { _.name }
+          override val foo2baz: Symbol ~> ROPE =
+            s => Rope.blur[[A] =>> A](s.name)
+
+          override val monicBar2baz: String ~> ROPE =
+            Rope.blur[[A] =>> A](_)
+
+          override val foobar2baz: (Symbol, String) ~> ROPE = 
+            Map(
+              (i, "x") -> xR,
+              (x, "x") -> xR,
+              (y, "x") -> yR,
+              (i, "y") -> yR,
+              (x, "y") -> xR,
+              (y, "y") -> yR
             )
 
-          override val foo2baz: Direction ~> Int =
-            Map[Direction, Int](elems =
-              Up -> 3,
-              Down -> 2
-            )
-
-          override val monicBar2baz: String ~> Int =
-            Map[String, Int](elems =
-              "one" -> 2,
-              "two" -> 3,
-              "three" -> 1
-            )
-
-          override val foobar2baz: (Direction, String) ~> Int =
-            Map[(Direction, String), Int](elems =
-              (Up, "one") -> 2,
-              (Down, "one") -> 3,
-              (Up, "two") -> 1,
-              (Down, "two") -> 2,
-              (Up, "three") -> 2,
-              (Down, "three") -> 3
-            )
-
-          override val foo2ImageOfBar: Direction ~> Int =
-            Map[Direction, Int](elems =
-              Up -> 3,
-              Down -> 2
+          override val foo2ImageOfBar: Symbol ~> ROPE =
+            Map(
+              i -> yR, 
+              x -> xR,
+              y -> yR
             )
 
           override val equalizerSituation: EqualizerSituation[_, _, _] =
-            new EqualizerSituation[FOO, BAR, BAZ](
-              foo2bar,
-              Map[String, Int]("one" -> 1, "two" -> 2, "three" -> 3),
-              Map[String, Int]("one" -> 1, "two" -> 2, "three" -> 1)
+            EqualizerSituation[FOO, Int, Boolean](
+              Map(
+                i -> 1,
+                x -> 1,
+                y -> 2
+              ),
+              Map(
+                0 -> true,
+                1 -> true,
+                2 -> true,
+                3 -> true
+              ),
+              Map(
+                0 -> false,
+                1 -> true,
+                2 -> true,
+                3 -> true
+              )
             )
         }
       )
-*/
 
 
 

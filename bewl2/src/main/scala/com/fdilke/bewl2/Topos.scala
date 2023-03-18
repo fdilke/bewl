@@ -131,6 +131,45 @@ class Topos[
       }
     }
 
+  final inline def withDots[X, Y, Z, W, RESULT](
+    dotX: DOT[X],
+    dotY: DOT[Y],
+    dotZ: DOT[Z],
+    dotW: DOT[W]
+  )(
+    block: Dot[X] ?=> Dot[Y] ?=> Dot[Z] ?=> Dot[W] ?=> RESULT
+  ): RESULT =
+    withDot(dotX) {
+      withDot(dotY) {
+        withDot(dotZ) {
+          withDot(dotW) {
+            block
+          }
+        }
+      }
+    }
+
+  final inline def withDots[X, Y, Z, W, V, RESULT](
+    dotX: DOT[X],
+    dotY: DOT[Y],
+    dotZ: DOT[Z],
+    dotW: DOT[W],
+    dotV: DOT[V]
+  )(
+    block: Dot[X] ?=> Dot[Y] ?=> Dot[Z] ?=> Dot[W] ?=> Dot[V] ?=> RESULT
+  ): RESULT =
+    withDot(dotX) {
+      withDot(dotY) {
+        withDot(dotZ) {
+          withDot(dotW) {
+            withDot(dotV) {
+              block
+            }
+          }
+        }
+      }
+    }
+
   final def withDotMask[X, RESULT](
     dot: DOT[X]
   )(
