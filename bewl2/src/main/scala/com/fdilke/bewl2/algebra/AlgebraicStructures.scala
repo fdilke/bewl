@@ -91,8 +91,8 @@ trait AlgebraicStructures[
     opaque type RightIdeal = M > BEWL
     opaque type InternalMap[T, U] = (M, T) > U
 
-    lazy val actionTopos =
-      toposOfMonoidActions(this: Monoid[M])
+    lazy val actionTopos: Topos[Action, CTXT, VOID, UNIT, RightIdeal, InternalMap] =
+      toposOfMonoidActions(this)
 
   trait Actions[M: Dot]:
     val unit: NullaryOp[M]

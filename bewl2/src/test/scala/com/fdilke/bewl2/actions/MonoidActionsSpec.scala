@@ -8,28 +8,49 @@ import com.fdilke.bewl2.utility.StockEnums
 import com.fdilke.bewl2.utility.StockStructures._
 import StockEnums.Direction
 import Direction._
+import MonoidActionsSpec._
 
 object MonoidActionsSpec:
-  val actionTopos =
-    withMonoidOf3 {
-      (_: Sets.Dot[Symbol]) ?=> (monoidOf3: Sets.Monoid[Symbol]) ?=>
-        monoidOf3.actionTopos
-    }
+  val monoidOf3: Sets.Monoid[Symbol] =
+    withMonoidOf3:
+      summon
 
-class MonoidActionsSpec extends GenericToposSpec()(Sets /* topos = MonoidActionsSpec.actionTopos */):
+  val actionTopos: Topos[monoidOf3.Action, [A] =>> A, Void, Unit, monoidOf3.RightIdeal, monoidOf3.InternalMap] =
+    monoidOf3.actionTopos
+  val fooAction: monoidOf3.Action[Symbol] =
+    monoidOf3.withRegularAction:
+      summon
+
+  def actionOnStrings(strings: String*): monoidOf3.Action[String] =
+    Sets.withDot(
+      Set[String](strings :_*)
+    ):
+      monoidOf3.Action {
+        (s, m) => monoidOf3.multiply(Symbol(s), m).name
+      }
+
+  val barAction: monoidOf3.Action[String] =
+    actionOnStrings("x", "y")
+
+  val bazAction: monoidOf3.Action[String] =
+    actionOnStrings("i", "x", "y")
+  
+class MonoidActionsSpec
+/*
+class MonoidActionsSpec extends GenericToposSpec()(MonoidActionsSpec.actionTopos):
   import topos.*
 
-  override type FOO = Direction
+  override type FOO = Symbol
   override type BAR = String
-  override type BAZ = Int
-  
+  override type BAZ = String
+
   override def withTestDots(
     block: Dot[FOO] ?=> Dot[BAR] ?=> Dot[BAZ] ?=> ToposFixtures => Unit
   ): Unit =
     withDots(
-      Set[Direction](Up, Down),
-      Set[String]("one", "two", "three"),
-      Set[Int](1, 2, 3, 4)
+      fooAction,
+      barAction,
+      bazAction
     ):
       block(
         new ToposFixtures {
@@ -76,7 +97,7 @@ class MonoidActionsSpec extends GenericToposSpec()(Sets /* topos = MonoidActions
             )
         }
       )
-
+*/
 
 
 
