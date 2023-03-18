@@ -117,7 +117,7 @@ trait MonoidActions[
           given Ɛ.Dot[X] = dotX.dot
           given Ɛ.Dot[Y] = dotY.dot
           val eval: ((M, X) > Y, (M, X)) ~> Y =
-            Ɛ.evaluation[(M, X), Y]          
+            Ɛ.evaluation[(M, X), Y]
           val higherEval: ((M, X) > Y, X) ~> Y = {
             case phi ⊕ x =>
               val i: CTXT[M] = globalElement(monoid.unit, x)
@@ -131,7 +131,16 @@ trait MonoidActions[
           dotZ: monoid.Action[Z],
           xy2z: ((X, Y)) ~> Z
         ): X ~> monoid.InternalMap[Y, Z] =
-          ???
+          given Ɛ.Dot[X] = dotX.dot
+          given Ɛ.Dot[Y] = dotY.dot
+          given Ɛ.Dot[Z] = dotZ.dot
+          val pre: (X, (M, Y)) ~> Z = {
+            case x ⊕ (m ⊕ y) =>
+              xy2z(dotX.actionMultiply(x, m) ⊕ y)
+          }
+          val xy2zTran: X ~> ((M, Y) > Z) =
+            Ɛ.transpose[X, (M, Y), Z](pre)
+          xy2zTran.asInstanceOf[X ~> monoid.InternalMap[Y, Z]]
 
         override def sanityTest[X](
           dotX: monoid.Action[X]
