@@ -165,6 +165,12 @@ class Topos[
   final inline def toUnit[X: Dot]: X ~> UNIT =
     pretopos.toUnit(dot[X])
 
+  def globalElement[M: Dot, X : Dot](
+    element: UNIT ~> M,
+    x: CTXT[X]
+  ): CTXT[M] =
+    element((toUnit[X] : X ~> UNIT)(x))
+
   final inline def fromZero[X: Dot]: VOID ~> X =
     pretopos.fromZero(dot[X])
 

@@ -84,7 +84,7 @@ trait MonoidActions[
         override def uncachedExponentialObject[X, Y](
           dotX: monoid.Action[X],
           dotY: monoid.Action[Y]
-        ): monoid.Action[monoid.InternalMap[X, Y]] = // (M, X) > Y
+        ): monoid.Action[monoid.InternalMap[X, Y]] =
           given Ɛ.Dot[X] = dotX.dot
           given Ɛ.Dot[Y] = dotY.dot
           val eval: ((M, X) > Y, (M, X)) ~> Y =
@@ -103,13 +103,36 @@ trait MonoidActions[
                     Ɛ.transpose[(A, M), (M, X), Y]{ case (a ⊕ m) ⊕ (n ⊕ x) =>
                       val phi: CTXT[(M, X) > Y] =
                         equalizer.inclusion(a)
-                      eval(phi, monoid.multiply(m, n) ⊕ x)                  
+                      eval(phi, monoid.multiply(m, n) ⊕ x)
                     }
                   )
                 }
               action.asInstanceOf[monoid.Action[monoid.InternalMap[X, Y]]]
             }
-        
+
+        override def evaluation[X, Y](
+          dotX: monoid.Action[X],
+          dotY: monoid.Action[Y]
+        ): (monoid.InternalMap[X, Y], X) ~> Y =
+          given Ɛ.Dot[X] = dotX.dot
+          given Ɛ.Dot[Y] = dotY.dot
+          val eval: ((M, X) > Y, (M, X)) ~> Y =
+            Ɛ.evaluation[(M, X), Y]          
+          val higherEval: ((M, X) > Y, X) ~> Y = {
+            case phi ⊕ x =>
+              val i: CTXT[M] = globalElement(monoid.unit, x)
+              eval(phi, i ⊕ x)
+          }
+          higherEval.asInstanceOf[(monoid.InternalMap[X, Y], X) ~> Y]
+
+        override def transpose[X, Y, Z](
+          dotX: monoid.Action[X],
+          dotY: monoid.Action[Y],
+          dotZ: monoid.Action[Z],
+          xy2z: ((X, Y)) ~> Z
+        ): X ~> monoid.InternalMap[Y, Z] =
+          ???
+
         override def sanityTest[X](
           dotX: monoid.Action[X]
         ): Unit =
@@ -150,20 +173,6 @@ trait MonoidActions[
         ): X ~> UNIT =
           given Ɛ.Dot[X] = dotX.dot
           Ɛ.toUnit[X]
-
-        override def evaluation[X, Y](
-          dotX: monoid.Action[X],
-          dotY: monoid.Action[Y]
-        ): ((monoid.InternalMap[X, Y], X)) ~> Y =
-          ???
-
-        override def transpose[X, Y, Z](
-          dotX: monoid.Action[X],
-          dotY: monoid.Action[Y],
-          dotZ: monoid.Action[Z],
-          xy2z: ((X, Y)) ~> Z
-        ): X ~> monoid.InternalMap[Y, Z] =
-          ???
 
         override def doEqualizer[X, Y, RESULT](
           dotX: monoid.Action[X],
