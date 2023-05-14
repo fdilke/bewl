@@ -4,7 +4,7 @@ lazy val root = project
     name := "bewl2",
     description := "Experimental version of topos DSL us Scala 3",
     version := "0.1.0",
-    scalaVersion := "3.3.0-RC3", // "3.2.2",
+    scalaVersion := "3.3.0-RC4", // "3.2.2",
     scalacOptions ++= Seq(
         // "-Yrangepos",
         // "-Yindent-colons",

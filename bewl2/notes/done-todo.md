@@ -6,15 +6,27 @@
 - could Scala macros enable even deeper integration for Bewl? Or functional mottoes at least?
 - added morphism enumeration. So committed to local finiteness. Could this be lifted?
 
+# PERIPHERAL
+- is the group of all finite-support permutations of N =~= the universal locally finite group? Outer autos?
+- when do permmutations commute? answer this in simple cases? then investigate 'Schwarz situation' where
+a and b are an involution apart, or prescribed orders, and we can ask for the order of <a, b>
+- Graph of a group with elements adjacent if their difference is an involution = ?
+  Note G acts on this, and the involutions are precisely the neighbours of 1. Odd group would be discrete.
+  In general the component of 1 would be a characteristic subgroup whose index is odd. Example? Split ext?
+  Note can a product of oddly many involutions ever be 1? Yes, a.b.ab = 1. Does general case reduce to this?
+about those type constraints >:>, =:= etc in Scala:
+  https://stackoverflow.com/questions/3427345/what-do-and-mean-in-scala-2-8-and-where-are-they-documented
+
 # THEORETICAL
 - L-T topologies. Can think of as quantifiers? Kernels of Heyting morphisms as per Matt F's paper?
 - can model geometric morphisms, X: Topos -> Y: Topos?
 - read Moerdijk & MacLane again, also the TTT book, and Four Czechs
+- significance of every monad on set being (trivially/canonically/uniquely) strong...?
 - work out details of 'metrics' approach to H-valued sets:
   like top trumps / book or record details / mappings to DISCRETE or LINEAR?
 - how much of the theory of (finite) groups carries over to LFTs?
-- Motivating question: for what monoids M is the truth object a cogenerator?
-For groups, only when G = 1.
+- Motivating question: for what monoids M is the truth object a cogenerator? For groups, only when G = 1.
+- define the category of tables, then 'closure' of a table. Is this an idempotent monad? What are the algebras?
 
 # BEWL AS TOOL
 - for card shuffle calc: verify surjectivity, investigate uniformity. Good stretch goal
