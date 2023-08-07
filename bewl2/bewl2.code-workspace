@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"window.title": "Nu Tittle",
+		"files.watcherExclude": {
+			"**/target": true
+		}
+	}
+}
