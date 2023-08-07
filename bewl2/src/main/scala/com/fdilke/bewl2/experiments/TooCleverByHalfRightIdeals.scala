@@ -1,7 +1,7 @@
 package com.fdilke.bewl2.experiments
 
 class TooCleverByHalfRightIdeals:
-  // type RI = rightIdeals.RIGHT_IDEAL
+  // type RI = r\ightIdeals.RIGHT_IDEAL
   lazy val rightIdeals: RightIdeals =
     nastyCalc()
 

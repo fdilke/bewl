@@ -16,6 +16,9 @@ a and b are an involution apart, or prescribed orders, and we can ask for the or
   Note can a product of oddly many involutions ever be 1? Yes, a.b.ab = 1. Does general case reduce to this?
 about those type constraints >:>, =:= etc in Scala:
   https://stackoverflow.com/questions/3427345/what-do-and-mean-in-scala-2-8-and-where-are-they-documented
+is there a tool that makes a bunch of CSVs into a database? Thought I saw one. Would be v useful.
+do a systematic search for permutations p, q that are "adjacent" (= they differ by an involution) and have
+  orders m,n (which can be 4, 5 say) and then we have "levels" of some hypothetical hyperbolic game
 
 # THEORETICAL
 - L-T topologies. Can think of as quantifiers? Kernels of Heyting morphisms as per Matt F's paper?
@@ -128,5 +131,6 @@ about those type constraints >:>, =:= etc in Scala:
 - ensure an appropriate =:= is implicitly available for the ideal calculation
 - now we can turn an xxx[I] into an xxx[M > BEWL] and back through official channels
 - in the action topos code, can we use "*" and not have to refer to monoid.multiply?
+- get rid of all the asInstanceOf's, by some appropriate mechanism of tagging
 
 
