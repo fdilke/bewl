@@ -131,6 +131,5 @@ do a systematic search for permutations p, q that are "adjacent" (= they differ 
 - ensure an appropriate =:= is implicitly available for the ideal calculation
 - now we can turn an xxx[I] into an xxx[M > BEWL] and back through official channels
 - in the action topos code, can we use "*" and not have to refer to monoid.multiply?
-- get rid of all the asInstanceOf's, by some appropriate mechanism of tagging
-
+- get rid of all the asInstanceOf's, by some appropriate mechanism of tagging... notes on retooling equalizer
 
