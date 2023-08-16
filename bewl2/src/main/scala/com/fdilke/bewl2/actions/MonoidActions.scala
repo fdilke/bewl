@@ -156,6 +156,7 @@ trait MonoidActions[
           given Ɛ.Dot[Y] = dotY.dot
           given monoid.Action[X] = dotX
           given monoid.Action[Y] = dotY
+          Ɛ.sanityTest[X, Y](f)
           assert { monoid.actions.isMorphism(f) }
 
         override def enumerateMorphisms[X, Y](

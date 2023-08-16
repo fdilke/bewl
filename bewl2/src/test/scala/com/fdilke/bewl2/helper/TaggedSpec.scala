@@ -14,6 +14,8 @@ class TaggedSpec extends RichFunSuite:
     val tagged: Int Tagged Boolean = obj.tag[Boolean]
     val untagged: Int = tagged.untag
     untagged is obj
+    // val cast: Int = tagged.asInstanceOf[Int]
+    // cast is obj
 
   test("Can tag and untag compound types"):
     case class Widget(degree: Int)
@@ -21,6 +23,8 @@ class TaggedSpec extends RichFunSuite:
     val tagged: Widget Tagged List[Array[String]] = obj.tag[List[Array[String]]]
     val untagged: Widget = tagged.untag
     untagged is obj
+    // val cast: Widget = tagged.asInstanceOf[Widget]
+    // cast is obj
 
 
 

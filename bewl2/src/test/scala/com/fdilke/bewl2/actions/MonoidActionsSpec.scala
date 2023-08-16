@@ -12,10 +12,10 @@ import MonoidActionsSpec._
 import com.fdilke.bewl2.utility.Opacity
 
 object MonoidActionsSpec:
-  val Seq(i, x, y): Seq[Symbol] = 
-    Seq[String]("i", "x", "y").map { Symbol(_) }
-  val Seq(xR, yR): Seq[ROPE] =
-    Seq[String]("x", "y").map { Rope.blur[[A] =>> A](_) }
+  val Seq(e, a, b): Seq[Symbol] = 
+    Seq[String]("e", "a", "b").map { Symbol(_) }
+  val Seq(aR, bR): Seq[ROPE] =
+    Seq[String]("a", "b").map { Rope.blur[[A] =>> A](_) }
 
   val monoidOf3: Sets.Monoid[Symbol] =
     withMonoidOf3:
@@ -36,12 +36,12 @@ object MonoidActionsSpec:
       }
 
   val barAction: monoidOf3.Action[String] =
-    actionOnStrings("x", "y")
+    actionOnStrings("a", "b")
 
   object Rope extends Opacity[String]
   type ROPE = Rope.theType
   val bazAction: monoidOf3.Action[ROPE] =
-    Rope.blur(actionOnStrings("i", "x", "y"))
+    Rope.blur(actionOnStrings("e", "a", "b"))
 
   val intAction: monoidOf3.Action[Int] =
     Sets.withDot(
@@ -53,19 +53,43 @@ object MonoidActionsSpec:
             0
           else
             r match {
-              case `i` => n
-              case `x` => 1
-              case `y` => 2
+              case `e` => n
+              case `a` => 1
+              case `b` => 2
             }
       )
 
   val boolAction: monoidOf3.Action[Boolean] =
     monoidOf3.Action[Boolean](
-      (b: Boolean, _: Symbol) =>
-        b
+      (f: Boolean, _: Symbol) =>
+        f
     )
 
-abstract class MonoidActionsSpec extends GenericToposSpec()(MonoidActionsSpec.actionTopos):
+object EvenTackierProbe extends App:
+  println("I bet you never see this text")
+  Thread.sleep(1000)
+
+object TackyProbe extends App:
+  type FOO = Symbol
+  type BAR = String
+  import MonoidActionsSpec.*
+  import actionTopos.* 
+
+  println("I'm going to perform an action")
+  withDots(fooAction, barAction):
+    sanityTest[FOO]
+    sanityTest[BAR]
+    val foo2bar: Symbol ~> String = Map(e -> "a", a -> "a", b -> "b")
+    println("Sanity testing over the monoid")
+    sanityTest(foo2bar)
+    println(s"Enumerating morphisms...")
+    morphisms[FOO, BAR].foreach { m =>
+      println(s"Morphism: $m")
+    }
+    println(s"Enumerating morphisms...done")
+  println("I'm going to perform an action... how was that?")
+
+class MonoidActionsSpec extends GenericToposSpec()(MonoidActionsSpec.actionTopos):
   import topos.*
 
   override type FOO = Symbol
@@ -84,7 +108,11 @@ abstract class MonoidActionsSpec extends GenericToposSpec()(MonoidActionsSpec.ac
     ):
       block(
         new ToposFixtures {
-          override val foo2bar: Symbol ~> String = { _.name }
+          override val foo2bar: Symbol ~> String =
+            Map(
+              e -> "a", a -> "a", b -> "b"
+            )
+
           override val foo2baz: Symbol ~> ROPE =
             s => Rope.blur[[A] =>> A](s.name)
 
@@ -93,27 +121,27 @@ abstract class MonoidActionsSpec extends GenericToposSpec()(MonoidActionsSpec.ac
 
           override val foobar2baz: (Symbol, String) ~> ROPE = 
             Map(
-              (i, "x") -> xR,
-              (x, "x") -> xR,
-              (y, "x") -> yR,
-              (i, "y") -> yR,
-              (x, "y") -> xR,
-              (y, "y") -> yR
+              (e, "a") -> aR,
+              (a, "a") -> aR,
+              (b, "a") -> bR,
+              (e, "b") -> bR,
+              (a, "b") -> aR,
+              (b, "b") -> bR
             )
 
           override val foo2ImageOfBar: Symbol ~> ROPE =
             Map(
-              i -> yR, 
-              x -> xR,
-              y -> yR
+              e -> bR, 
+              a -> aR,
+              b -> bR
             )
 
           override val equalizerSituation: EqualizerSituation[_, _, _] =
             EqualizerSituation[FOO, Int, Boolean](
               Map(
-                i -> 1,
-                x -> 1,
-                y -> 2
+                e -> 1,
+                a -> 1,
+                b -> 2
               ),
               Map(
                 0 -> true,

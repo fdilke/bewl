@@ -132,4 +132,15 @@ do a systematic search for permutations p, q that are "adjacent" (= they differ 
 - now we can turn an xxx[I] into an xxx[M > BEWL] and back through official channels
 - in the action topos code, can we use "*" and not have to refer to monoid.multiply?
 - get rid of all the asInstanceOf's, by some appropriate mechanism of tagging... notes on retooling equalizer
-
+  but this is confusing: "Opaque types supersede value classes and allow you to set up an abstraction barrier without causing additional boxing overhead."
+  So, I can't use "extends AnyVal" anymore? Or are there "inline classes" (No), or some other way to do it?
+  Maybe we have Alias[T] which provides another type A as an alias of T and a way to turn H[T] into H[A] and vice versa...
+  this sounds a lot like an A =:= T.
+  So now when we do an equalizer on maps T => U we wind up with an alias A of T, an A =:= T and a Dot[A].
+  This would be strikingly similar to how it works at the moment.
+  Remind me what problem we are trying to solve...
+  That Monoid[M].RightIdeal needs to sort of explicitly be M > BEWL.
+  Concluding this is the right way to do it. Why exactly did we need asInstanceOf[]?
+  Should be able to do without it. There can be an inline helper method in Monoid that does the map.
+  All this because there is in fact a type error somewhere, and the asInstanceOf[]s are a chink in the armour.
+  
