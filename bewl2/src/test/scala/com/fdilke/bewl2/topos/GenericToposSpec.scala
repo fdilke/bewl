@@ -155,29 +155,16 @@ abstract class GenericToposSpec[
       )
 
     test("has enumeration of arrows"):
-      println("UUU 0")
       extension [X: Dot, Y: Dot](arrow: X ~> Y)
         def appears: Unit =
-          // val pig: Boolean = morphisms[X, Y] exists { _ =!= arrow }
-          // if (!pig) {
-          //   throw new IllegalStateException("xxx")
-          // }
-          // ()
           assert {
             morphisms[X, Y] exists { _ =!= arrow }
           }
-
-      println("UUU 1 v")
       (foo2bar         appears)
-      println("UUU 2")
       (foo2baz         appears)
-      println("UUU 3")
       (foobar2baz      appears)
-      println("UUU 4")
       (monicBar2baz    appears)
-      println("UUU 5")
       (foo2ImageOfBar  appears)
-      println("UUU 6")
 
     test("can factorize arrows into 'monic o epic'"):
       for { arrow <- morphisms[FOO, BAR] }
