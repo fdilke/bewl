@@ -18,7 +18,6 @@ trait MonoidActions[
   def toposOfMonoidActions[M: Dot](
     monoid: Monoid[M]
   ): Topos[monoid.Action, CTXT, VOID, UNIT, monoid.RightIdeal, monoid.InternalMap] =
-    // val pretopos = new PreTopos[
     new Topos[monoid.Action, CTXT, VOID, UNIT, monoid.RightIdeal, monoid.InternalMap](      
       new PreTopos[
         monoid.Action, CTXT, VOID, UNIT, monoid.RightIdeal, monoid.InternalMap
@@ -90,8 +89,8 @@ trait MonoidActions[
           val eval: ((M, X) > Y, (M, X)) ~> Y =
             Ɛ.evaluation[(M, X), Y]
           val isMorphism: ((M, X) > Y) ~> BEWL =
-            Ɛ.∀[(M, X) > Y, ((M, X), M)] {
-              case phi ⊕ ((m ⊕ x) ⊕ n) =>
+            Ɛ.∀[(M, X) > Y, M, X, M] {
+              (phi, m, x, n) =>
                 dotY.actionMultiply(eval(phi, m ⊕ x), n) =?= 
                   eval(phi, monoid.multiply(m, n) ⊕ dotX.actionMultiply(x, n))
             }

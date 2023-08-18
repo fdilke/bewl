@@ -295,9 +295,9 @@ abstract class GenericToposSpec[
           }
         }
       }
-
+  
     test("overrides the optionator correctly, if at all"):
-      if (true || ! optionator.isInstanceOf[DefaultOptionator.type]) {
+      if (! optionator.isInstanceOf[DefaultOptionator.type]) {
         type D_OPTION[X] = DefaultOptionator.OPTION[X]
         maskDot[FOO, Unit] { [F] => (_ : Dot[F]) ?=> (_ : F =:= FOO) ?=> (_ : FOO =:= F) ?=>
           val altPac: PartialArrowClassifier[F, D_OPTION[F]] = DefaultOptionator.partialArrowClassifier[F]

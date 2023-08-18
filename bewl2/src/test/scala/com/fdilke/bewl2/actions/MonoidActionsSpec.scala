@@ -10,6 +10,9 @@ import StockEnums.Direction
 import Direction._
 import MonoidActionsSpec._
 import com.fdilke.bewl2.utility.Opacity
+import com.fdilke.utility.TimeIt
+import com.fdilke.bewl2.utility.RichFunSuite
+import cats.syntax.monoid
 
 object MonoidActionsSpec:
   val Seq(e, a, b): Seq[Symbol] = 
@@ -65,9 +68,6 @@ object MonoidActionsSpec:
         f
     )
 
-object EvenTackierProbe extends App:
-  println("I bet you never see this text")
-  Thread.sleep(1000)
 
 object TackyProbe extends App:
   type FOO = Symbol
@@ -80,6 +80,9 @@ object TackyProbe extends App:
     sanityTest[FOO]
     sanityTest[BAR]
     val foo2bar: Symbol ~> String = Map(e -> "a", a -> "a", b -> "b")
+    println("Computing logical operations")
+    val (logOps, msg) = TimeIt { logicalOperations }
+    println(s"Computing logical operations: done ($msg)")
     println("Sanity testing over the monoid")
     sanityTest(foo2bar)
     println(s"Enumerating morphisms...")
@@ -88,6 +91,7 @@ object TackyProbe extends App:
     }
     println(s"Enumerating morphisms...done")
   println("I'm going to perform an action... how was that?")
+
 
 class MonoidActionsSpec extends GenericToposSpec()(MonoidActionsSpec.actionTopos):
   import topos.*

@@ -339,6 +339,28 @@ class Topos[
       case x ⊕ y => untupledFn(x, y)
     }
 
+  final def ∀[X: Dot, Y: Dot, Z: Dot](
+    f: (CTXT[X], CTXT[Y], CTXT[Z]) => CTXT[BEWL]
+  ): X ~> BEWL =
+    ∀[X, Y] { (x, y) =>
+      val piff: Y ~> BEWL =
+        (∀[Y, Z] { (y, z) =>
+          f(x, y, z)
+        })
+      piff(y)
+    }
+
+  final def ∀[X: Dot, Y: Dot, Z: Dot, W: Dot](
+    f: (CTXT[X], CTXT[Y], CTXT[Z], CTXT[W]) => CTXT[BEWL]
+  ): X ~> BEWL =
+    ∀[X, Y] { (x, y) =>
+      val piff: Y ~> BEWL =
+        (∀[Y, Z, W] { (y, z, w) =>
+          f(x, y, z, w)
+        })
+      piff(y)
+    }
+
   final def ∃[X: Dot](
     fn: X ~> BEWL
   ): Boolean =
