@@ -152,33 +152,6 @@ trait FiniteSetsMonoidAssistant extends BaseFiniteSets {
               }
             }
 
-            private def oldMorphismsTo[B](
-              target: FiniteSetsActionAnalysis[B]
-            ) = {
-              val targetAction = target.action
-              val targetCarrier =
-                targetAction.actionCarrier
-
-              mapsBetween(
-                ActionComponent[M, A, ({ type λ[T] = monoid.Action[T] })#λ](
-                  allGenerators,
-                  action,
-                  generatorsWithRelators
-                ),
-                ActionComponent[M, B, ({ type λ[T] = monoid.Action[T] })#λ](
-                  target.actionSplitting.allGenerators,
-                  targetAction,
-                  Seq.empty // don't use 'em
-                )
-              ).map {
-                functionAsArrow(
-                  action.actionCarrier,
-                  targetCarrier,
-                  _
-                )
-              }
-            }
-
             override def morphismsTo[B](
               target: FiniteSetsActionAnalysis[B]
             ) = {
