@@ -103,9 +103,7 @@ class CoPitcher[P, C: Compact, H: Hausdorff](
   ): Boolean =
     other match {
       case other: CoPitcher[P, C, H] =>
-        forAll[P] { p =>
-          function(p) == other.function(p)
-        }(
+        forAll[P](p => function(p) == other.function(p))(
           Pitcher.compactness[P, C]
         )
       case _ => false
@@ -114,4 +112,3 @@ class CoPitcher[P, C: Compact, H: Hausdorff](
   override def hashCode(): Int =
     Hausdorff.intKey(this)
 }
-

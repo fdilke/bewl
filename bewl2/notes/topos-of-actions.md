@@ -62,3 +62,11 @@ The relators are just generators of the action defined by a congruence on the or
 resulting from the implicit mapping from a free action defined by the generators.
 So we can use the same algorithm to calculate those efficiently.
 
+(I suspect that my current algo, which goes to the trouble of calculating all the maximal
+monogenics, could be replaced by a much simpler one which just looped over the elements
+removing anything redundant. Plan on eventually doing this for Bewl II.)
+We also factor each action into "connected components" in the obvious way.
+
+This is just an irreducible representation of it as a coproduct.
+
+

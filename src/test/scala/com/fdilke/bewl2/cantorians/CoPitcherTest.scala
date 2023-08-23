@@ -143,9 +143,15 @@ class CoPitcherTest extends AnyFunSpec {
       val dyad2: Dyad[Int] = Dyad(6, 5, 0, 2)
       val dyad3: Dyad[Int] = Dyad(8, 8, 0, 8, 9, 9, 0, 9)
 
-      CoPitcher[Cantorian, Boolean, Int](dyad(_)) shouldBe CoPitcher[Cantorian, Boolean, Int](dyad(_))
-      CoPitcher[Cantorian, Boolean, Int](dyad(_)) shouldBe CoPitcher[Cantorian, Boolean, Int](dyad2(_))
-      CoPitcher[Cantorian, Boolean, Int](dyad(_)) shouldNot be(CoPitcher[Cantorian, Boolean, Int](dyad3(_)))
+      CoPitcher[Cantorian, Boolean, Int](dyad(_)) shouldBe CoPitcher[Cantorian, Boolean, Int](
+        dyad(_)
+      )
+      CoPitcher[Cantorian, Boolean, Int](dyad(_)) shouldBe CoPitcher[Cantorian, Boolean, Int](
+        dyad2(_)
+      )
+      CoPitcher[Cantorian, Boolean, Int](dyad(_)) shouldNot be(
+        CoPitcher[Cantorian, Boolean, Int](dyad3(_))
+      )
     }
   }
 }

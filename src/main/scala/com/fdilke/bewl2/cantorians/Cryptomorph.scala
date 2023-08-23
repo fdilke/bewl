@@ -30,9 +30,9 @@ object Cryptomorph {
   def apply[
     H: Hausdorff
   ](
-     seq: H*
-   ): Cryptomorph[H] =
+    seq: H*
+  ): Cryptomorph[H] =
     Cryptomorph[Dyad[H], H](
-      Dyad(seq :_*)
+      Dyad(seq: _*)
     )
 }

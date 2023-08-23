@@ -126,11 +126,14 @@ class CryptomorphTest extends AnyFunSpec {
     }
     it("can be instantiated from an argument list like the equivalent Dyad") {
       Cryptomorph[Int](
-        6, 5, 0, 2
+        6,
+        5,
+        0,
+        2
       ) shouldBe
-      Cryptomorph[Dyad[Int], Int](
-        Dyad(6, 5, 0, 2)
-      )
+        Cryptomorph[Dyad[Int], Int](
+          Dyad(6, 5, 0, 2)
+        )
     }
   }
 }

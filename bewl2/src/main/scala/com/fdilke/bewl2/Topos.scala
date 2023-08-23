@@ -26,6 +26,15 @@ class Topos[
   type UntupledBiArrow[P, Q, X] = (CTXT[P], CTXT[Q]) => CTXT[X]
   /* opaque */ type OPTION[X] = optionator.OPTION[X]
 
+  trait ToolkitBuilder:
+    type TOOLKIT[_]
+    def buildToolkit[X : Dot]: TOOLKIT[X]
+
+  val toolkitBuilder: ToolkitBuilder =
+    new ToolkitBuilder:
+      type TOOLKIT[_] = Unit
+      def buildToolkit[X : Dot]: TOOLKIT[X] = ()
+
   trait Equalizer[A, X]:
     val inclusion: A ~> X
     def restrict[R: Dot](
@@ -42,6 +51,8 @@ class Topos[
     val dot: DOT[X]
   ) {
     given Dot[X] = this
+    lazy val toolkit: toolkitBuilder.TOOLKIT[X] =
+      toolkitBuilder.buildToolkit[X]
 
     private[Topos] val memoizedProduct:
       [Y] => Dot[Y] => Dot[(X, Y)]

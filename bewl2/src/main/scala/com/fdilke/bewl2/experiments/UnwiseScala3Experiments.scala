@@ -198,3 +198,63 @@ object CurriedDependentImplicits:
   // noddy4 { (dot: FauxDot[Seq[Int]]) ?=> (group: FauxGroup[Seq[Int]]) ?=> (action: group.Action[Int]) ?=> 
   //   ()
   // }
+
+object OverridingInnerClasses:
+  class Twiglet {
+    class Piglet(x: Int)
+    class Val
+  }
+  class Sniglet extends Twiglet { // can't
+  // class Piglet(x: Int) extends super.Piglet
+    // class Val extends Twiglet#Val
+  }
+  abstract class Topos[DOT[_]] {
+    abstract class DefaultDot[X](dot: DOT[X]) { me: Dot[X] =>
+    }
+    type Dot[X] <: DefaultDot[X]
+    def Dot[X](dot: DOT[X]): Dot[X]
+  }
+
+  class FancyTopos[DOT[_]] extends Topos[DOT] {
+    class LocalDot[X](dot: DOT[X]) extends DefaultDot[X](dot){
+    }
+    override type Dot[X] = LocalDot[X]
+    override def Dot[X](dot: DOT[X]): Dot[X] =
+      new LocalDot(dot)
+  }
+
+// object OverridingTypes:
+//   class Higgidy:
+//     type X = List[Boolean]
+//   class Piggidy extends Higgidy:
+//     override type X = Seq[Boolean]
+
+// object OverridingInnerClasses2:
+//   class Topos[DOT[_]]:
+//     class DefaultDot[X](dot: DOT[X])
+//     class DotFactory:
+//       type Dot[X] >: DefaultDot[X]
+//       def Dot[X](dot: DOT[X]): Dot[X]
+//     val dotFactory: DotFactory =
+//       new DotFactory:
+//         type Dot[X] = DefaultDot[X]
+//         override def Dot[X](dot: DOT[X]): Dot[X] =
+//           DefaultDot[X](dot)
+
+// object OverridingInnerClasses3:
+//   class Topos[DOT[_]]:
+//     class ToolkitBuilder:
+//       type TOOLKIT[_]
+//       def buildToolkit[X : DOT]: TOOLKIT[X]
+//     class DotFactory:
+//       type Dot[X] >: DefaultDot[X]
+//       def Dot[X](dot: DOT[X]): Dot[X]
+//     val dotFactory: DotFactory =
+//       new DotFactory:
+//         type Dot[X] = DefaultDot[X]
+//         override def Dot[X](dot: DOT[X]): Dot[X] =
+//           DefaultDot[X](dot)
+
+//   class PiggyTopos[DOT[_]] extends Topos[DOT]:
+//     class InnerPig extends InnerHig
+
