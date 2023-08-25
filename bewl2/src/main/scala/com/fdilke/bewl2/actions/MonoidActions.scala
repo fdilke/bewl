@@ -245,5 +245,30 @@ trait MonoidActions[
           given Ɛ.Dot[Y] = dotY.dot
           given Ɛ.Dot[A] = dotA.dot
           Ɛ.backDivideMonic[X, Y, A](arrow, monic)
-    )
-  
+    ) {
+        override val toolkitBuilder: ToolkitBuilder =
+        new ToolkitBuilder:
+          type TOOLKIT[X] = Unit
+          def buildToolkit[X : Dot]: TOOLKIT[X] = ()
+    }
+
+  trait ActionAnalysis[A]
+  class DefaultActionAnalysis[A] extends ActionAnalysis[A]
+
+  trait MonoidAssistant:
+    type ACTION_ANALYSIS[A] <: ActionAnalysis[A]
+    def actionAnalyzer[M : Dot](monoid: Monoid[M]) : monoid.ActionAnalyzer[ACTION_ANALYSIS]
+
+  object DefaultMonoidAssistant extends MonoidAssistant:
+    override type ACTION_ANALYSIS[A] = DefaultActionAnalysis[A]
+    override def actionAnalyzer[M : Dot](
+      monoid: Monoid[M]
+    ) : monoid.ActionAnalyzer[DefaultActionAnalysis] =
+      new monoid.ActionAnalyzer:
+        override def analyze[A : Dot](
+          action: monoid.Action[A]
+        ) : DefaultActionAnalysis[A] =
+          new DefaultActionAnalysis[A]
+
+  protected val monoidAssistant: MonoidAssistant =
+    DefaultMonoidAssistant

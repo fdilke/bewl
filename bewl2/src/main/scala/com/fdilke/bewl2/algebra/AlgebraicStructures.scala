@@ -136,6 +136,11 @@ trait AlgebraicStructures[
         block
       }
 
+    trait ActionAnalyzer[ACTION_ANALYSIS[_] <: ActionAnalysis[_]]:
+      def analyze[A : Dot](
+        action: Action[A]
+      ) : ACTION_ANALYSIS[A]
+
     class Action[A: Dot](
       val actionMultiply: BiArrow[A, M, A]
     ) extends actions.Algebra[A](

@@ -30,7 +30,7 @@ class Topos[
     type TOOLKIT[_]
     def buildToolkit[X : Dot]: TOOLKIT[X]
 
-  val toolkitBuilder: ToolkitBuilder =
+  protected val toolkitBuilder: ToolkitBuilder =
     new ToolkitBuilder:
       type TOOLKIT[_] = Unit
       def buildToolkit[X : Dot]: TOOLKIT[X] = ()
