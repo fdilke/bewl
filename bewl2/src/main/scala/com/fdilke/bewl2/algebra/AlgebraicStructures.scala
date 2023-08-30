@@ -136,7 +136,7 @@ trait AlgebraicStructures[
         block
       }
 
-    trait ActionAnalyzer[ACTION_ANALYSIS[_] <: ActionAnalysis[_]]:
+    trait ActionAnalyzer[ACTION_ANALYSIS[_]]:
       def analyze[A : Dot](
         action: Action[A]
       ) : ACTION_ANALYSIS[A]

@@ -252,11 +252,10 @@ trait MonoidActions[
           def buildToolkit[X : Dot]: TOOLKIT[X] = ()
     }
 
-  trait ActionAnalysis[A]
-  class DefaultActionAnalysis[A] extends ActionAnalysis[A]
+  class DefaultActionAnalysis[A]
 
   trait MonoidAssistant:
-    type ACTION_ANALYSIS[A] <: ActionAnalysis[A]
+    type ACTION_ANALYSIS[A]
     def actionAnalyzer[M : Dot](monoid: Monoid[M]) : monoid.ActionAnalyzer[ACTION_ANALYSIS]
 
   object DefaultMonoidAssistant extends MonoidAssistant:
@@ -264,7 +263,7 @@ trait MonoidActions[
     override def actionAnalyzer[M : Dot](
       monoid: Monoid[M]
     ) : monoid.ActionAnalyzer[DefaultActionAnalysis] =
-      new monoid.ActionAnalyzer:
+      new monoid.ActionAnalyzer[DefaultActionAnalysis]:
         override def analyze[A : Dot](
           action: monoid.Action[A]
         ) : DefaultActionAnalysis[A] =
