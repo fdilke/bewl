@@ -76,3 +76,11 @@ trait PreTopos[
     monic: A ~> Y
   ): X ~> A
 
+  trait ToolkitBuilder:
+    type TOOLKIT[_]
+    def buildToolkit[X](dot: DOT[X]): TOOLKIT[X]
+
+  val toolkitBuilder: ToolkitBuilder =
+    new ToolkitBuilder:
+      type TOOLKIT[_] = Unit
+      def buildToolkit[X](dot: DOT[X]): Unit = ()

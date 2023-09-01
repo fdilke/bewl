@@ -15,7 +15,7 @@ class Topos[
   UNIT,
   BEWL,
   >[_, _]
-](pretopos: PreTopos[DOT, CTXT, VOID, UNIT, BEWL, >])
+](val pretopos: PreTopos[DOT, CTXT, VOID, UNIT, BEWL, >])
   extends AlgebraicMachinery[DOT, CTXT, VOID, UNIT, BEWL, >]
   with LogicalOperations[DOT, CTXT, VOID, UNIT, BEWL, >]
   with ToposConstructions[DOT, CTXT, VOID, UNIT, BEWL, >]:
@@ -25,15 +25,6 @@ class Topos[
   type BiArrow[X, Y, Z] = (X, Y) ~> Z
   type UntupledBiArrow[P, Q, X] = (CTXT[P], CTXT[Q]) => CTXT[X]
   /* opaque */ type OPTION[X] = optionator.OPTION[X]
-
-  trait ToolkitBuilder:
-    type TOOLKIT[_]
-    def buildToolkit[X : Dot]: TOOLKIT[X]
-
-  protected val toolkitBuilder: ToolkitBuilder =
-    new ToolkitBuilder:
-      type TOOLKIT[_] = Unit
-      def buildToolkit[X : Dot]: TOOLKIT[X] = ()
 
   trait Equalizer[A, X]:
     val inclusion: A ~> X
@@ -51,8 +42,8 @@ class Topos[
     val dot: DOT[X]
   ) {
     given Dot[X] = this
-    lazy val toolkit: toolkitBuilder.TOOLKIT[X] =
-      toolkitBuilder.buildToolkit[X]
+    lazy val toolkit: pretopos.toolkitBuilder.TOOLKIT[X] =
+      pretopos.toolkitBuilder.buildToolkit[X](dot)
 
     private[Topos] val memoizedProduct:
       [Y] => Dot[Y] => Dot[(X, Y)]
