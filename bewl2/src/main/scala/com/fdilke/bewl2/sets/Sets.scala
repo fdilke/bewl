@@ -30,7 +30,9 @@ object PreSets extends PreTopos[Set, [A] =>> A, Void, Unit, Boolean, Map]:
 
   override def uncachedExponentialObject[X, Y](
     dotX: Set[X],
-    dotY: Set[Y]
+    unitX: toolkitBuilder.TOOLKIT[X],
+    dotY: Set[Y],
+    unitY: toolkitBuilder.TOOLKIT[Y]
   ): Set[X Map Y] =
     allMaps(dotX, dotY).toSet
 

@@ -68,7 +68,9 @@ class Topos[
       [Y] => (dotY: Dot[Y]) => Dot(
         pretopos.uncachedExponentialObject[X, Y](
           dot,
-          dotY.dot
+          toolkit,
+          dotY.dot,
+          dotY.toolkit
         )
       )
     )

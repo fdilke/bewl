@@ -82,7 +82,9 @@ trait MonoidActions[
 
         override def uncachedExponentialObject[X, Y](
           dotX: monoid.Action[X],
-          dotY: monoid.Action[Y]
+          toolkitX: toolkitBuilder.TOOLKIT[X],
+          dotY: monoid.Action[Y],
+          toolkitY: toolkitBuilder.TOOLKIT[Y]
         ): monoid.Action[monoid.InternalMap[X, Y]] =
           given Ɛ.Dot[X] = dotX.dot
           given Ɛ.Dot[Y] = dotY.dot

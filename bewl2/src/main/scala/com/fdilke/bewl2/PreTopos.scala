@@ -31,7 +31,9 @@ trait PreTopos[
 
   def uncachedExponentialObject[X, Y](
     dotX: DOT[X],
+    toolkitX: toolkitBuilder.TOOLKIT[X],
     dotY: DOT[Y],
+    toolkitY: toolkitBuilder.TOOLKIT[Y]
   ): DOT[X > Y]
 
   def sanityTest[X](dotX: DOT[X]): Unit
