@@ -139,16 +139,11 @@ trait MonoidActions[
 
         override def enumerateMorphisms[X, Y](
           dotX: monoid.Action[X],
-          dotY: monoid.Action[Y]
+          toolkitX: monoidAssistant.ACTION_ANALYSIS[X],
+          dotY: monoid.Action[Y],
+          toolkitY: monoidAssistant.ACTION_ANALYSIS[Y]
         ): Iterable[X ~> Y] =
-          given Ɛ.Dot[X] = dotX.dot
-          given Ɛ.Dot[Y] = dotY.dot
-          Ɛ.morphisms[X, Y] filter { (f: X ~> Y) =>
-            Ɛ.∀[(X, M)] { case x ⊕ m =>
-              f(dotX.actionMultiply(x, m)) =?=
-                dotY.actionMultiply(f(x), m)
-            }
-          }
+          toolkitBuilder.enumerateMorphisms[X, Y](dotX, toolkitX, dotY, toolkitY)
 
         override def fromZero[X](
           dotX: monoid.Action[X]
@@ -268,6 +263,20 @@ trait MonoidActions[
                     }
                   action.asInstanceOf[monoid.Action[monoid.InternalMap[X, Y]]]
                 }
+            def enumerateMorphisms[X, Y](
+              dotX: monoid.Action[X],
+              toolkitX: monoidAssistant.ACTION_ANALYSIS[X],
+              dotY: monoid.Action[Y],
+              toolkitY: monoidAssistant.ACTION_ANALYSIS[Y]
+            ): Iterable[X ~> Y] =
+              given Ɛ.Dot[X] = dotX.dot
+              given Ɛ.Dot[Y] = dotY.dot
+              Ɛ.morphisms[X, Y] filter { (f: X ~> Y) =>
+                Ɛ.∀[(X, M)] { case x ⊕ m =>
+                  f(dotX.actionMultiply(x, m)) =?=
+                    dotY.actionMultiply(f(x), m)
+                }
+              }
     )
 
   trait ActionAnalysis[A, ACTION_ANALYSIS[AA] <: ActionAnalysis[AA, ACTION_ANALYSIS]]

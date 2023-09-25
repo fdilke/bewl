@@ -281,7 +281,12 @@ class Topos[
     pretopos.truth
 
   final def morphisms[X: Dot, Y: Dot]: Iterable[X ~> Y] =
-    pretopos.enumerateMorphisms(dot[X], dot[Y])
+    pretopos.enumerateMorphisms(
+      dot[X], 
+      summon[Dot[X]].toolkit,
+      dot[Y],
+      summon[Dot[Y]].toolkit
+    )
 
   implicit def productObject[
     X: Dot,

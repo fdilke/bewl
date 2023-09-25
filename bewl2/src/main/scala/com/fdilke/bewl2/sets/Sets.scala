@@ -1,31 +1,12 @@
 package com.fdilke.bewl2.sets
 
 import com.fdilke.bewl2.topos.PreTopos
+import com.fdilke.bewl2.topos.PreToposWithDefaultToolkit
 import com.fdilke.bewl2.topos.Topos
 import com.fdilke.bewl2.topos.ProductMappable
 import com.fdilke.bewl2.sets.SetsUtilities.*
 
 import scala.language.postfixOps
-
-trait PreToposWithDefaultToolkit[
-  DOT[_],
-  CTXT[_] : ProductMappable,
-  VOID,
-  UNIT,
-  BEWL,
-  >[_, _]
-] extends PreTopos[
-  DOT,
-  CTXT,
-  VOID,
-  UNIT,
-  BEWL,
-  >
-]:
-  type TOOLKIT[_] = Unit
-  val toolkitBuilder: ToolkitBuilder =
-    new ToolkitBuilder:
-      def buildToolkit[X](dot: DOT[X]): Unit = ()
 
 object PreSets extends PreToposWithDefaultToolkit[Set, [A] =>> A, Void, Unit, Boolean, Map]:
   override def equalArrows[X, Y](
@@ -77,7 +58,9 @@ object PreSets extends PreToposWithDefaultToolkit[Set, [A] =>> A, Void, Unit, Bo
 
   override def enumerateMorphisms[X, Y](
     dotX: Set[X],
-    dotY: Set[Y]
+    unitX: TOOLKIT[X],
+    dotY: Set[Y],
+    unitY: TOOLKIT[Y]
   ): Iterable[X => Y] =
     allMaps(dotX, dotY)
 

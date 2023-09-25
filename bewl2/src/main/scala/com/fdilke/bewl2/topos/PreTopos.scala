@@ -49,7 +49,12 @@ trait PreTopos[
   def toUnit[X](dotX: DOT[X]): X ~> UNIT
   def fromZero[X](dotX: DOT[X]): VOID ~> X
   val truth: UNIT ~> BEWL
-  def enumerateMorphisms[X, Y](dotX: DOT[X], dotY: DOT[Y]): Iterable[X ~> Y]
+  def enumerateMorphisms[X, Y](
+    dotX: DOT[X],
+    toolkitX: TOOLKIT[X],
+    dotY: DOT[Y],
+    toolkitY: TOOLKIT[Y]
+  ): Iterable[X ~> Y]
   def evaluation[X, Y](dotX: DOT[X], dotY: DOT[Y]): (X > Y, X) ~> Y
   def transpose[X, Y, Z](
     dotX: DOT[X],
@@ -83,3 +88,22 @@ trait PreTopos[
     def buildToolkit[X](dot: DOT[X]): TOOLKIT[X]
   val toolkitBuilder: ToolkitBuilder
 
+trait PreToposWithDefaultToolkit[
+  DOT[_],
+  CTXT[_] : ProductMappable,
+  VOID,
+  UNIT,
+  BEWL,
+  >[_, _]
+] extends PreTopos[
+  DOT,
+  CTXT,
+  VOID,
+  UNIT,
+  BEWL,
+  >
+]:
+  type TOOLKIT[_] = Unit
+  val toolkitBuilder: ToolkitBuilder =
+    new ToolkitBuilder:
+      def buildToolkit[X](dot: DOT[X]): Unit = ()
