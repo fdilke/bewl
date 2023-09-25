@@ -1,6 +1,6 @@
 package com.fdilke.bewl2.actions
 
-import com.fdilke.bewl2.Topos
+import com.fdilke.bewl2.topos.Topos
 import com.fdilke.bewl2.sets.Sets
 import com.fdilke.bewl2.topos.GenericToposSpec
 import munit.FunSuite

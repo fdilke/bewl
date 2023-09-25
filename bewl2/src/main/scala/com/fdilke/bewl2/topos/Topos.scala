@@ -1,6 +1,5 @@
-package com.fdilke.bewl2
+package com.fdilke.bewl2.topos
 
-import com.fdilke.bewl2.ProductMappable
 import com.fdilke.bewl2.algebra.AlgebraicMachinery
 import com.fdilke.bewl2.helper.Memoize
 import ProductMappable.*
@@ -42,7 +41,7 @@ class Topos[
     val dot: DOT[X]
   ) {
     given Dot[X] = this
-    lazy val toolkit: pretopos.toolkitBuilder.TOOLKIT[X] =
+    lazy val toolkit: pretopos.TOOLKIT[X] =
       pretopos.toolkitBuilder.buildToolkit[X](dot)
 
     private[Topos] val memoizedProduct:
@@ -497,7 +496,7 @@ class Topos[
   extension[X: Dot](f: X ~> BEWL)
     def whereTrue[RESULT](
       capture: [A] => Dot[A] ?=> Equalizer[A, X] => RESULT
-    ) =
+    ): RESULT =
       f.?=(toTrue[X]) {
         capture
       }

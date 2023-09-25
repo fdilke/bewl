@@ -1,4 +1,4 @@
-package com.fdilke.bewl2
+package com.fdilke.bewl2.topos
 
 trait PreTopos[
   DOT[_],
@@ -31,9 +31,9 @@ trait PreTopos[
 
   def uncachedExponentialObject[X, Y](
     dotX: DOT[X],
-    toolkitX: toolkitBuilder.TOOLKIT[X],
+    toolkitX: TOOLKIT[X],
     dotY: DOT[Y],
-    toolkitY: toolkitBuilder.TOOLKIT[Y]
+    toolkitY: TOOLKIT[Y]
   ): DOT[X > Y]
 
   def sanityTest[X](dotX: DOT[X]): Unit
@@ -78,11 +78,8 @@ trait PreTopos[
     monic: A ~> Y
   ): X ~> A
 
+  type TOOLKIT[_]
   trait ToolkitBuilder:
-    type TOOLKIT[_]
     def buildToolkit[X](dot: DOT[X]): TOOLKIT[X]
+  val toolkitBuilder: ToolkitBuilder
 
-  val toolkitBuilder: ToolkitBuilder =
-    new ToolkitBuilder:
-      type TOOLKIT[_] = Unit
-      def buildToolkit[X](dot: DOT[X]): Unit = ()

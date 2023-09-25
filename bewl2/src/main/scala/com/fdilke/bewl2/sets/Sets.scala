@@ -1,13 +1,33 @@
 package com.fdilke.bewl2.sets
 
-import com.fdilke.bewl2.PreTopos
-import com.fdilke.bewl2.Topos
-import com.fdilke.bewl2.ProductMappable
+import com.fdilke.bewl2.topos.PreTopos
+import com.fdilke.bewl2.topos.Topos
+import com.fdilke.bewl2.topos.ProductMappable
 import com.fdilke.bewl2.sets.SetsUtilities.*
 
 import scala.language.postfixOps
 
-object PreSets extends PreTopos[Set, [A] =>> A, Void, Unit, Boolean, Map]:
+trait PreToposWithDefaultToolkit[
+  DOT[_],
+  CTXT[_] : ProductMappable,
+  VOID,
+  UNIT,
+  BEWL,
+  >[_, _]
+] extends PreTopos[
+  DOT,
+  CTXT,
+  VOID,
+  UNIT,
+  BEWL,
+  >
+]:
+  type TOOLKIT[_] = Unit
+  val toolkitBuilder: ToolkitBuilder =
+    new ToolkitBuilder:
+      def buildToolkit[X](dot: DOT[X]): Unit = ()
+
+object PreSets extends PreToposWithDefaultToolkit[Set, [A] =>> A, Void, Unit, Boolean, Map]:
   override def equalArrows[X, Y](
     dotX: Set[X],
     dotY: Set[Y],
@@ -30,9 +50,9 @@ object PreSets extends PreTopos[Set, [A] =>> A, Void, Unit, Boolean, Map]:
 
   override def uncachedExponentialObject[X, Y](
     dotX: Set[X],
-    unitX: toolkitBuilder.TOOLKIT[X],
+    unitX: TOOLKIT[X],
     dotY: Set[Y],
-    unitY: toolkitBuilder.TOOLKIT[Y]
+    unitY: TOOLKIT[Y]
   ): Set[X Map Y] =
     allMaps(dotX, dotY).toSet
 

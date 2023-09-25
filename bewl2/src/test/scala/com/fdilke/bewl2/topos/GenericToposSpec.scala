@@ -1,6 +1,6 @@
 package com.fdilke.bewl2.topos
 
-import com.fdilke.bewl2.Topos
+import com.fdilke.bewl2.topos.Topos
 import munit.FunSuite
 import scala.language.postfixOps
 import java.io.File

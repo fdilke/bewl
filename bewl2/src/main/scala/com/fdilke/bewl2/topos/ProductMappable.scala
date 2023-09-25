@@ -1,4 +1,4 @@
-package com.fdilke.bewl2
+package com.fdilke.bewl2.topos
 
 trait ProductMappable[CTXT[_]]:
   def map[A, B](

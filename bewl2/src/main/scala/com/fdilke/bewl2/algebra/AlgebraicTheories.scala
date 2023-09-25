@@ -1,7 +1,7 @@
 package com.fdilke.bewl2.algebra
 
-import com.fdilke.bewl2.ProductMappable
-import com.fdilke.bewl2.Topos
+import com.fdilke.bewl2.topos.ProductMappable
+import com.fdilke.bewl2.topos.Topos
 import com.fdilke.utility.Shortcuts.*
 
 import scala.language.{dynamics, postfixOps}

@@ -1,7 +1,7 @@
 package com.fdilke.bewl2.logic
 
 import com.fdilke.bewl2.algebra.AlgebraicMachinery
-import com.fdilke.bewl2.{ProductMappable, Topos}
+import com.fdilke.bewl2.topos.{ProductMappable, Topos}
 import ProductMappable._
 import com.fdilke.utility.TimeIt
 

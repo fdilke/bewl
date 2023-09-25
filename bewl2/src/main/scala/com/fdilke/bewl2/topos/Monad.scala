@@ -1,4 +1,4 @@
-package com.fdilke.bewl2
+package com.fdilke.bewl2.topos
 
 trait Monad[CTXT[_]] {
   def eta[A](a : A) : CTXT[A]
