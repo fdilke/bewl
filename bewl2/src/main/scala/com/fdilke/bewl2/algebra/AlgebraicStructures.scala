@@ -89,7 +89,6 @@ trait AlgebraicStructures[
     * := multiply
   ) with Actions[M]:
     opaque type RightIdeal = M > BEWL
-    opaque type InternalMap[T, U] = (M, T) > U
 
     lazy val actionTopos: Topos[Action, CTXT, VOID, UNIT, RightIdeal, InternalMap] =
       toposOfMonoidActions(this)
@@ -97,6 +96,7 @@ trait AlgebraicStructures[
   trait Actions[M: Dot]:
     val unit: NullaryOp[M]
     val multiply: BinaryOp[M]
+    opaque type InternalMap[T, U] = (M, T) > U
 
     val actions: AlgebraicTheory[M] =
       AlgebraicTheoryWithScalars[M](
@@ -136,10 +136,19 @@ trait AlgebraicStructures[
         block
       }
 
-    trait ActionAnalyzer[ACTION_ANALYSIS[AA] <: ActionAnalysis[AA, ACTION_ANALYSIS]]:
+    trait ActionAnalyzer:
+      type ACTION_ANALYSIS[A] <: ActionAnalysis[A, Action, InternalMap, ACTION_ANALYSIS]        
       def analyze[A](
         action: Action[A]
       ) : ACTION_ANALYSIS[A]
+
+    class DefaultActionAnalysis[A](
+      actionA: Action[A]
+    ) extends ActionAnalysis[A, Action, InternalMap, DefaultActionAnalysis]:
+      def makeExponential[B](
+        toolkitY: DefaultActionAnalysis[B]
+      ): Action[InternalMap[A, B]] =
+        ??? // move from toolkitBuilder in monoid action topos code
 
     class Action[A: Dot](
       val actionMultiply: BiArrow[A, M, A]

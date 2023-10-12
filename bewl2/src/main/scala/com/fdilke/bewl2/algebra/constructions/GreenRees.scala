@@ -231,7 +231,7 @@ object GreenRees:
 
   class AlphabetContext(
     alphabet: String
-  ) extends Traversable[String]:
+  ) extends Iterable[String]:
     class WordNode(
       val canonical: String
     ) extends Iterable[String]:

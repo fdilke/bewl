@@ -82,9 +82,9 @@ trait MonoidActions[
 
         override def uncachedExponentialObject[X, Y](
           dotX: monoid.Action[X],
-          toolkitX: monoidAssistant.ACTION_ANALYSIS[X],
+          toolkitX: analyzer.ACTION_ANALYSIS[X],
           dotY: monoid.Action[Y],
-          toolkitY: monoidAssistant.ACTION_ANALYSIS[Y]
+          toolkitY: analyzer.ACTION_ANALYSIS[Y]
         ): monoid.Action[monoid.InternalMap[X, Y]] =
           toolkitBuilder.makeExponential[X, Y](dotX, toolkitX, dotY, toolkitY)
 
@@ -139,9 +139,9 @@ trait MonoidActions[
 
         override def enumerateMorphisms[X, Y](
           dotX: monoid.Action[X],
-          toolkitX: monoidAssistant.ACTION_ANALYSIS[X],
+          toolkitX: analyzer.ACTION_ANALYSIS[X],
           dotY: monoid.Action[Y],
-          toolkitY: monoidAssistant.ACTION_ANALYSIS[Y]
+          toolkitY: analyzer.ACTION_ANALYSIS[Y]
         ): Iterable[X ~> Y] =
           toolkitBuilder.enumerateMorphisms[X, Y](dotX, toolkitX, dotY, toolkitY)
 
@@ -220,24 +220,23 @@ trait MonoidActions[
           given Ɛ.Dot[A] = dotA.dot
           Ɛ.backDivideMonic[X, Y, A](arrow, monic)
 
-        private val analyzer: monoid.ActionAnalyzer[Ɛ.monoidAssistant.ACTION_ANALYSIS] =
+        val analyzer: monoid.ActionAnalyzer =
           Ɛ.monoidAssistant.actionAnalyzer[M](monoid)
 
-
-        override type TOOLKIT[A] = Ɛ.monoidAssistant.ACTION_ANALYSIS[A]
+        override type TOOLKIT[A] = analyzer.ACTION_ANALYSIS[A]
         override val toolkitBuilder: MyToolkitBuilder.type =
           MyToolkitBuilder
 
         object MyToolkitBuilder extends ToolkitBuilder:
             override def buildToolkit[A](
               theAction: monoid.Action[A]
-            ): Ɛ.monoidAssistant.ACTION_ANALYSIS[A] =
+            ): analyzer.ACTION_ANALYSIS[A] =
               analyzer.analyze(theAction)
             def makeExponential[X, Y](
               dotX: monoid.Action[X], 
-              toolkitX: Ɛ.monoidAssistant.ACTION_ANALYSIS[X],
+              toolkitX: analyzer.ACTION_ANALYSIS[X],
               dotY: monoid.Action[Y],
-              toolkitY: Ɛ.monoidAssistant.ACTION_ANALYSIS[Y]
+              toolkitY: analyzer.ACTION_ANALYSIS[Y]
             ): monoid.Action[monoid.InternalMap[X, Y]] =
               given Ɛ.Dot[X] = dotX.dot
               given Ɛ.Dot[Y] = dotY.dot
@@ -265,9 +264,9 @@ trait MonoidActions[
                 }
             def enumerateMorphisms[X, Y](
               dotX: monoid.Action[X],
-              toolkitX: monoidAssistant.ACTION_ANALYSIS[X],
+              toolkitX: analyzer.ACTION_ANALYSIS[X],
               dotY: monoid.Action[Y],
-              toolkitY: monoidAssistant.ACTION_ANALYSIS[Y]
+              toolkitY: analyzer.ACTION_ANALYSIS[Y]
             ): Iterable[X ~> Y] =
               given Ɛ.Dot[X] = dotX.dot
               given Ɛ.Dot[Y] = dotY.dot
@@ -279,23 +278,29 @@ trait MonoidActions[
               }
     )
 
-  trait ActionAnalysis[A, ACTION_ANALYSIS[AA] <: ActionAnalysis[AA, ACTION_ANALYSIS]]
-  class DefaultActionAnalysis[A] extends ActionAnalysis[A, DefaultActionAnalysis]
+  trait ActionAnalysis[
+    A,
+    ACTION[_],
+    INTERNAL_MAP[_, _],
+    ACTION_ANALYSIS[AA] <: ActionAnalysis[AA, ACTION, INTERNAL_MAP, ACTION_ANALYSIS]
+  ]:
+    def makeExponential[B](
+      analysisB: ACTION_ANALYSIS[B]
+    ): ACTION[INTERNAL_MAP[A, B]]
 
   trait MonoidAssistant:
-    type ACTION_ANALYSIS[A] <: ActionAnalysis[A, ACTION_ANALYSIS]
-    def actionAnalyzer[M : Dot](monoid: Monoid[M]) : monoid.ActionAnalyzer[ACTION_ANALYSIS]
+    def actionAnalyzer[M : Dot](monoid: Monoid[M]) : monoid.ActionAnalyzer
 
   object DefaultMonoidAssistant extends MonoidAssistant:
-    override type ACTION_ANALYSIS[A] = DefaultActionAnalysis[A]
     override def actionAnalyzer[M : Dot](
       monoid: Monoid[M]
-    ) : monoid.ActionAnalyzer[DefaultActionAnalysis] =
-      new monoid.ActionAnalyzer[DefaultActionAnalysis]:
+    ) : monoid.ActionAnalyzer =
+      new monoid.ActionAnalyzer:
+        override type ACTION_ANALYSIS[A] = monoid.DefaultActionAnalysis[A]
         override def analyze[A](
           action: monoid.Action[A]
-        ) : DefaultActionAnalysis[A] =
-          new DefaultActionAnalysis[A]
+        ) : monoid.DefaultActionAnalysis[A] =
+          new monoid.DefaultActionAnalysis[A](action)
 
   protected val monoidAssistant: MonoidAssistant =
     DefaultMonoidAssistant
