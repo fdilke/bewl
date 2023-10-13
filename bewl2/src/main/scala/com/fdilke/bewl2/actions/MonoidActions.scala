@@ -139,11 +139,11 @@ trait MonoidActions[
 
         override def enumerateMorphisms[X, Y](
           dotX: monoid.Action[X],
-          toolkitX: analyzer.ACTION_ANALYSIS[X],
+          analysisX: analyzer.ACTION_ANALYSIS[X],
           dotY: monoid.Action[Y],
-          toolkitY: analyzer.ACTION_ANALYSIS[Y]
+          analysisY: analyzer.ACTION_ANALYSIS[Y]
         ): Iterable[X ~> Y] =
-          toolkitBuilder.enumerateMorphisms[X, Y](dotX, toolkitX, dotY, toolkitY)
+          analysisX.enumerateMorphisms(analysisY)
 
         override def fromZero[X](
           dotX: monoid.Action[X]
@@ -232,20 +232,6 @@ trait MonoidActions[
               theAction: monoid.Action[A]
             ): analyzer.ACTION_ANALYSIS[A] =
               analyzer.analyze(theAction)
-            def enumerateMorphisms[X, Y](
-              dotX: monoid.Action[X],
-              toolkitX: analyzer.ACTION_ANALYSIS[X],
-              dotY: monoid.Action[Y],
-              toolkitY: analyzer.ACTION_ANALYSIS[Y]
-            ): Iterable[X ~> Y] =
-              given Ɛ.Dot[X] = dotX.dot
-              given Ɛ.Dot[Y] = dotY.dot
-              Ɛ.morphisms[X, Y] filter { (f: X ~> Y) =>
-                Ɛ.∀[(X, M)] { case x ⊕ m =>
-                  f(dotX.actionMultiply(x, m)) =?=
-                    dotY.actionMultiply(f(x), m)
-                }
-              }
     )
 
   trait ActionAnalysis[
@@ -257,6 +243,9 @@ trait MonoidActions[
     def makeExponential[B](
       analysisB: ACTION_ANALYSIS[B]
     ): ACTION[INTERNAL_MAP[A, B]]
+    def enumerateMorphisms[B](
+      analysisB: ACTION_ANALYSIS[B]
+    ): Iterable[A ~> B]
 
   trait MonoidAssistant:
     def actionAnalyzer[M : Dot](monoid: Monoid[M]) : monoid.ActionAnalyzer

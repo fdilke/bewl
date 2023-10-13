@@ -145,7 +145,7 @@ trait AlgebraicStructures[
     class DefaultActionAnalysis[A](
       val action: Action[A]
     ) extends ActionAnalysis[A, Action, InternalMap, DefaultActionAnalysis]:
-      def makeExponential[B](
+      override def makeExponential[B](
         analysisB: DefaultActionAnalysis[B]
       ): Action[InternalMap[A, B]] =
         given Dot[A] = action.dot
@@ -154,24 +154,35 @@ trait AlgebraicStructures[
           evaluation[(M, A), B]
         val isMorphism: ((M, A) > B) ~> BEWL =
           ∀[(M, A) > B, M, A, M] {
-            (phi, m, x, n) =>
-              analysisB.action.actionMultiply(eval(phi, m ⊕ x), n) =?= 
-                eval(phi, multiply(m, n) ⊕ action.actionMultiply(x, n))
+            (phi, m, a, n) =>
+              analysisB.action.actionMultiply(eval(phi, m ⊕ a), n) =?= 
+                eval(phi, multiply(m, n) ⊕ action.actionMultiply(a, n))
           }
         isMorphism.whereTrue {
           [F] => (_ : Dot[F]) ?=> (equalizer: Equalizer[F, ((M, A) > B)]) =>
             val action: Action[F] =
               Action {
                 equalizer.restrict(
-                  transpose[(F, M), (M, A), B]{ case (a ⊕ m) ⊕ (n ⊕ x) =>
+                  transpose[(F, M), (M, A), B]{ case (f ⊕ m) ⊕ (n ⊕ a) =>
                     val phi: CTXT[(M, A) > B] =
-                      equalizer.inclusion(a)
-                    eval(phi, multiply(m, n) ⊕ x)
+                      equalizer.inclusion(f)
+                    eval(phi, multiply(m, n) ⊕ a)
                   }
                 )
               }
             action.asInstanceOf[Action[InternalMap[A, B]]]
           }
+      override def enumerateMorphisms[B](
+        analysisB: DefaultActionAnalysis[B]
+      ): Iterable[A ~> B] =
+        given Dot[A] = action.dot
+        given Dot[B] = analysisB.action.dot
+        morphisms[A, B] filter { (f: A ~> B) =>
+          ∀[(A, M)] { case a ⊕ m =>
+            f(action.actionMultiply(a, m)) =?=
+              analysisB.action.actionMultiply(f(a), m)
+          }
+        }
 
     class Action[A: Dot](
       val actionMultiply: BiArrow[A, M, A]
