@@ -82,11 +82,11 @@ trait MonoidActions[
 
         override def uncachedExponentialObject[X, Y](
           dotX: monoid.Action[X],
-          toolkitX: analyzer.ACTION_ANALYSIS[X],
+          analysisX: analyzer.ACTION_ANALYSIS[X],
           dotY: monoid.Action[Y],
-          toolkitY: analyzer.ACTION_ANALYSIS[Y]
+          analysisY: analyzer.ACTION_ANALYSIS[Y]
         ): monoid.Action[monoid.InternalMap[X, Y]] =
-          toolkitBuilder.makeExponential[X, Y](dotX, toolkitX, dotY, toolkitY)
+          analysisX.makeExponential(analysisY)
 
         override def evaluation[X, Y](
           dotX: monoid.Action[X],
@@ -232,36 +232,6 @@ trait MonoidActions[
               theAction: monoid.Action[A]
             ): analyzer.ACTION_ANALYSIS[A] =
               analyzer.analyze(theAction)
-            def makeExponential[X, Y](
-              dotX: monoid.Action[X], 
-              toolkitX: analyzer.ACTION_ANALYSIS[X],
-              dotY: monoid.Action[Y],
-              toolkitY: analyzer.ACTION_ANALYSIS[Y]
-            ): monoid.Action[monoid.InternalMap[X, Y]] =
-              given Ɛ.Dot[X] = dotX.dot
-              given Ɛ.Dot[Y] = dotY.dot
-              val eval: ((M, X) > Y, (M, X)) ~> Y =
-                Ɛ.evaluation[(M, X), Y]
-              val isMorphism: ((M, X) > Y) ~> BEWL =
-                Ɛ.∀[(M, X) > Y, M, X, M] {
-                  (phi, m, x, n) =>
-                    dotY.actionMultiply(eval(phi, m ⊕ x), n) =?= 
-                      eval(phi, monoid.multiply(m, n) ⊕ dotX.actionMultiply(x, n))
-                }
-              isMorphism.whereTrue {
-                [A] => (_ : Ɛ.Dot[A]) ?=> (equalizer: Ɛ.Equalizer[A, ((M, X) > Y)]) =>
-                  val action: monoid.Action[A] =
-                    monoid.Action {
-                      equalizer.restrict(
-                        Ɛ.transpose[(A, M), (M, X), Y]{ case (a ⊕ m) ⊕ (n ⊕ x) =>
-                          val phi: CTXT[(M, X) > Y] =
-                            equalizer.inclusion(a)
-                          eval(phi, monoid.multiply(m, n) ⊕ x)
-                        }
-                      )
-                    }
-                  action.asInstanceOf[monoid.Action[monoid.InternalMap[X, Y]]]
-                }
             def enumerateMorphisms[X, Y](
               dotX: monoid.Action[X],
               toolkitX: analyzer.ACTION_ANALYSIS[X],

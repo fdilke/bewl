@@ -143,12 +143,35 @@ trait AlgebraicStructures[
       ) : ACTION_ANALYSIS[A]
 
     class DefaultActionAnalysis[A](
-      actionA: Action[A]
+      val action: Action[A]
     ) extends ActionAnalysis[A, Action, InternalMap, DefaultActionAnalysis]:
       def makeExponential[B](
-        toolkitY: DefaultActionAnalysis[B]
+        analysisB: DefaultActionAnalysis[B]
       ): Action[InternalMap[A, B]] =
-        ??? // move from toolkitBuilder in monoid action topos code
+        given Dot[A] = action.dot
+        given Dot[B] = analysisB.action.dot
+        val eval: ((M, A) > B, (M, A)) ~> B =
+          evaluation[(M, A), B]
+        val isMorphism: ((M, A) > B) ~> BEWL =
+          ∀[(M, A) > B, M, A, M] {
+            (phi, m, x, n) =>
+              analysisB.action.actionMultiply(eval(phi, m ⊕ x), n) =?= 
+                eval(phi, multiply(m, n) ⊕ action.actionMultiply(x, n))
+          }
+        isMorphism.whereTrue {
+          [F] => (_ : Dot[F]) ?=> (equalizer: Equalizer[F, ((M, A) > B)]) =>
+            val action: Action[F] =
+              Action {
+                equalizer.restrict(
+                  transpose[(F, M), (M, A), B]{ case (a ⊕ m) ⊕ (n ⊕ x) =>
+                    val phi: CTXT[(M, A) > B] =
+                      equalizer.inclusion(a)
+                    eval(phi, multiply(m, n) ⊕ x)
+                  }
+                )
+              }
+            action.asInstanceOf[Action[InternalMap[A, B]]]
+          }
 
     class Action[A: Dot](
       val actionMultiply: BiArrow[A, M, A]
