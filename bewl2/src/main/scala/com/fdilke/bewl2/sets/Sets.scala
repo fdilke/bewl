@@ -5,6 +5,7 @@ import com.fdilke.bewl2.topos.PreToposWithDefaultToolkit
 import com.fdilke.bewl2.topos.Topos
 import com.fdilke.bewl2.topos.ProductMappable
 import com.fdilke.bewl2.sets.SetsUtilities.*
+import com.fdilke.utility.Shortcuts.*
 
 import scala.language.postfixOps
 
@@ -140,9 +141,28 @@ object PreSets extends PreToposWithDefaultToolkit[Set, [A] =>> A, Void, Unit, Bo
       } get
     }
 
-object Sets extends Topos[
+class BaseSets extends Topos[
   Set, [A] =>> A, Void, Unit, Boolean, Map
 ](PreSets):
+  def makeNullaryOperator[X: Dot](
+    value: X
+  ): Unit => X =
+    _ => value
+
+  def makeUnaryOperator[X: Dot](
+    values: (X, X)*
+  ): X => X =
+    val map: Map[X, X] = Map[X, X](values: _*)
+    if dot[X] != map.keySet then
+      bail("incomplete or excessive unary operator definition")
+    map
+
+  def makeBinaryOperator[X: Dot](
+    values: ((X, X), X)*
+  ): ((X, X)) => X =
+    val map: Map[(X, X), X] = Map[(X, X), X](values: _*)
+    map
+
   override lazy val logicalOperations: LogicalOperations =
     new LogicalOperations:
       override val and: BiArrow[Boolean, Boolean, Boolean] = { _ & _ }
@@ -160,8 +180,8 @@ object Sets extends Topos[
         withDot[Seq[Int], RESULT](
           numbers.permutations.toSet[Seq[Int]]
         ) {
-          implicit val group: Sets.Group[Seq[Int]] =
-            Sets.Group[Seq[Int]](
+          implicit val group: Group[Seq[Int]] =
+            Group[Seq[Int]](
               unit = makeNullaryOperator[Seq[Int]](numbers),
               multiply = { (p1: Seq[Int], p2: Seq[Int]) =>
                 numbers map { s => p2(p1(s)) }
@@ -211,6 +231,8 @@ object Sets extends Topos[
                   v => monic(v) == w
                 }.map(arrow)
         }
+
+object Sets extends BaseSets
 
 
   

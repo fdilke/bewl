@@ -7,6 +7,7 @@ import com.fdilke.utility.Shortcuts.*
 import scala.language.{dynamics, postfixOps}
 import ProductMappable.*
 import com.fdilke.bewl2.sets.Sets
+import Sets.{ makeNullaryOperator, makeBinaryOperator }
 import com.fdilke.bewl2.sets.SetsUtilities._
 import Function.tupled
 

@@ -69,25 +69,6 @@ object SetsUtilities:
         m(seqToMap(a))
     }
 
-  def makeNullaryOperator[X: Sets.Dot](
-    value: X
-  ): Unit => X =
-    _ => value
-
-  def makeUnaryOperator[X: Sets.Dot](
-    values: (X, X)*
-  ): X => X =
-    val map: Map[X, X] = Map[X, X](values: _*)
-    if Sets.dot[X] != map.keySet then
-      bail("incomplete or excessive unary operator definition")
-    map
-
-  def makeBinaryOperator[X: Sets.Dot](
-    values: ((X, X), X)*
-  ): ((X, X)) => X =
-    val map: Map[(X, X), X] = Map[(X, X), X](values: _*)
-    map
-
   inline def withEnum[ENUM]( // refactor when I have named type arguments
     block: Dot[ENUM] ?=> Unit
   ): Unit =
