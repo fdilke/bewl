@@ -1,14 +1,13 @@
 package com.fdilke.bewl2.sets
 
 import com.fdilke.bewl2.topos.Topos
-import com.fdilke.bewl2.sets.Sets
 import com.fdilke.bewl2.topos.GenericToposSpec
 import munit.FunSuite
 import com.fdilke.bewl2.utility.StockEnums
 import StockEnums.Direction
 import Direction._
 
-class SetsSpec extends GenericToposSpec()(Sets):
+class SetsSpec extends GenericToposSpec(Sets):
   import topos.*
 
   override type FOO = Direction

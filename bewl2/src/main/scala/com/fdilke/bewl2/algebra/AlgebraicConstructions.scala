@@ -151,44 +151,6 @@ object AlgebraicConstructions:
         block[I]
     }
 
-  private def intSqrt(square: Int) =
-    (1 to square).find(n => n * n == square).getOrElse {
-      throw new IllegalArgumentException("Not a valid monoid multiplication table: size " + square)
-    }
-
-  def withMonoidFromTable[M, RESULT](
-    table: M*
-  )(
-    block: Sets.Dot[M] ?=> Sets.Monoid[M] ?=> RESULT
-  ): RESULT =
-    val carrierSize = intSqrt(table.size)
-    val carrierAsList = table.take(carrierSize)
-
-    val mappings: Seq[((M, M), M)] =
-      for {
-        i <- 0 until carrierSize
-        j <- 0 until carrierSize
-      } yield (
-        carrierAsList(i),
-        carrierAsList(j)
-      ) -> table(
-        i * carrierSize + j
-      )
-
-    Sets.withDot(carrierAsList.toSet) {
-      given Sets.Monoid[M] =
-        Sets.Monoid[M](
-          makeNullaryOperator[M](
-            table.head
-          ),
-          makeBinaryOperator[M](
-            mappings: _*
-          )
-        )
-
-      block
-    }
-
   def withGroupFromTable[G, RESULT](
     table: G*
   )(

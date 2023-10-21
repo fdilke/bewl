@@ -13,7 +13,7 @@ abstract class GenericToposSpec[
   UNIT,
   BEWL,
   >[_, _]
-](implicit
+](
  val topos: Topos[DOT, CTXT, VOID, UNIT, BEWL, >]
 ) extends FunSuite:
 

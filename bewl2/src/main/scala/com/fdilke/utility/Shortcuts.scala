@@ -19,3 +19,7 @@ object Shortcuts:
     inline def string: String =
       new String(letters.toArray)
 
+  def intSqrt(square: Int) =
+    (1 to square).find(n => n * n == square).getOrElse {
+      throw new IllegalArgumentException("Not a valid monoid multiplication table: size " + square)
+    }

@@ -163,6 +163,39 @@ class BaseSets extends Topos[
     val map: Map[(X, X), X] = Map[(X, X), X](values: _*)
     map
 
+  def withMonoidFromTable[M, RESULT](
+    table: M*
+  )(
+    block: Dot[M] ?=> Monoid[M] ?=> RESULT
+  ): RESULT =
+    val carrierSize = intSqrt(table.size)
+    val carrierAsList = table.take(carrierSize)
+
+    val mappings: Seq[((M, M), M)] =
+      for {
+        i <- 0 until carrierSize
+        j <- 0 until carrierSize
+      } yield (
+        carrierAsList(i),
+        carrierAsList(j)
+      ) -> table(
+        i * carrierSize + j
+      )
+
+    withDot(carrierAsList.toSet) {
+      given Monoid[M] =
+        Monoid[M](
+          makeNullaryOperator[M](
+            table.head
+          ),
+          makeBinaryOperator[M](
+            mappings: _*
+          )
+        )
+
+      block
+    }
+
   override lazy val logicalOperations: LogicalOperations =
     new LogicalOperations:
       override val and: BiArrow[Boolean, Boolean, Boolean] = { _ & _ }
@@ -233,6 +266,12 @@ class BaseSets extends Topos[
         }
 
 object Sets extends BaseSets
+
+object FastSets extends BaseSets:
+  override protected val monoidAssistant: MonoidAssistant = new MonoidAssistant:
+    override def actionAnalyzer[M : Dot](monoid: Monoid[M]) : monoid.ActionAnalyzer =
+      ???
+
 
 
   

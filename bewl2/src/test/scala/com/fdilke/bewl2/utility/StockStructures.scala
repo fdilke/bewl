@@ -3,39 +3,46 @@ package com.fdilke.bewl2.utility
 import com.fdilke.bewl2.algebra.AlgebraicConstructions._
 import StockSymbols._
 import com.fdilke.bewl2.sets.Sets
-import Sets._
+import com.fdilke.bewl2.sets.BaseSets
 
 object StockStructures:
   // right dominant
   def withMonoidOf3[RESULT](
-    block: Dot[Symbol] ?=> Monoid[Symbol] ?=> RESULT
+    baseSets: BaseSets
+  )(
+    block: baseSets.Dot[Symbol] ?=> baseSets.Monoid[Symbol] ?=> RESULT
   ): RESULT =
-    withMonoidFromTable(
+    baseSets.withMonoidFromTable(
       e, a, b,
       a, a, b,
       b, a, b
     )(block)
 
+  def withMonoidOf3[RESULT](
+    block: Sets.Dot[Symbol] ?=> Sets.Monoid[Symbol] ?=> RESULT
+  ): RESULT =
+    withMonoidOf3(Sets)(block)
+
   // left dominant
   def withMonoidOf3a[RESULT](
-    block: Dot[Symbol] ?=> Monoid[Symbol] ?=> RESULT
+    block: Sets.Dot[Symbol] ?=> Sets.Monoid[Symbol] ?=> RESULT
   ): RESULT =
-    withMonoidFromTable(
+    Sets.withMonoidFromTable(
       e, a, b,
       a, a, a,
       b, b, b
     )(block)
     
   def withMonoid_1_0[RESULT](
-    block: Dot[Int] ?=> Monoid[Int] ?=> RESULT
+    block: Sets.Dot[Int] ?=> Sets.Monoid[Int] ?=> RESULT
   ): RESULT =
-    withMonoidFromTable(
+    Sets.withMonoidFromTable(
       1, 0,
       0, 0
     )(block)
     
   def with_S_3[RESULT](
-    block: Dot[Symbol] ?=> Group[Symbol] ?=> RESULT
+    block: Sets.Dot[Symbol] ?=> Sets.Group[Symbol] ?=> RESULT
   ): RESULT =
     withGroupFromTable(
       e, a, b, c, r, s,
