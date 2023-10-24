@@ -267,10 +267,7 @@ class BaseSets extends Topos[
 
 object Sets extends BaseSets
 
-object FastSets extends BaseSets:
-  override protected val monoidAssistant: MonoidAssistant = new MonoidAssistant:
-    override def actionAnalyzer[M : Dot](monoid: Monoid[M]) : monoid.ActionAnalyzer =
-      ???
+object FastSets extends BaseSets with SetsMonoidAssistant
 
 
 
