@@ -1,5 +1,6 @@
-package com.fdilke.bewl.helper
+package com.fdilke.bewl2.helper
 
+import com.fdilke.utility.IterateToFixed
 import scala.language.postfixOps
 
 // A 0-based, functional tribute to the original Numerical Recipes

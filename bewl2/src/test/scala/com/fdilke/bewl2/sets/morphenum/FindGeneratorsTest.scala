@@ -1,8 +1,8 @@
-package com.fdilke.bewl.fsets.morphenum
+package com.fdilke.bewl2.sets.morphenum
 
-import com.fdilke.bewl.fsets.FiniteSets
-import com.fdilke.bewl.fsets.FiniteSets.ToposOfMonoidActions
-import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
+import com.fdilke.bewl2.sets.FastSets
+import FastSets.ToposOfMonoidActions
+import com.fdilke.bewl2.topos.algebra.KnownMonoids.monoidOf3
 import org.scalatest.matchers.should.Matchers._
 import com.fdilke.bewl.helper.StandardSymbols.{i, x, y}
 import org.scalatest.freespec.AnyFreeSpec

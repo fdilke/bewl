@@ -1,14 +1,13 @@
-package com.fdilke.bewl.fsets.morphenum
+package com.fdilke.bewl2.sets.morphenum
 
-import com.fdilke.bewl.fsets.FiniteSetsUtilities._
-import com.fdilke.bewl.helper.BuildEquivalence
+import com.fdilke.bewl2.sets.SetsUtilities._
+import com.fdilke.bewl2.helper.BuildEquivalence
 import scala.language.postfixOps
-import com.fdilke.bewl.fsets.FiniteSets
-import FiniteSets.{>, makeDot}
+import com.fdilke.bewl2.sets.FastSets
 
 object FiniteSetsPresentedAction {
   def apply[M, A](
-    monoid: FiniteSets.Monoid[M]
+    monoid: FastSets.Monoid[M]
   )(
     generatorsWithRelators: Seq[GeneratorWithRelators[M, A]]
   ): monoid.PresentedAction[Int] = {

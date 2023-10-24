@@ -1,4 +1,4 @@
-package com.fdilke.bewl.fsets.morphenum
+package com.fdilke.bewl2.sets.morphenum
 
 import scala.language.postfixOps
 

@@ -48,20 +48,20 @@ trait ActionSplitter extends BaseSets {
         M,
         ({ type λ[T] = monoid.Action[T] })#λ
       ] {
-        private val monoidElements =
-          monoid.carrier.elements
+        private val monoidElements: Set[M] =
+          monoid.dot.dot
 
-        private val findGenerators =
+        private val generatorFinder: GeneratorFinder[M, monoid.Action] =
           FindGenerators.forMonoid(monoid)
 
-        private val findPresentation =
-          FindPresentation.forMonoid(monoid)
+        private val presentationFinder: PresentationFinder[M, monoid.Action] =
+          PresentationFinder.forMonoid(monoid, generatorFinder)
 
         override def splitAction[A](
           action: monoid.Action[A]
         ) = {
           val allGenerators: Seq[A] =
-            findGenerators.apply(action) generators
+            generatorFinder.findGenerators(action) generators
           val indexedGenerators: Seq[(A, Int)] =
             allGenerators.zipWithIndex
           val actionMultiply: BiArrow[A, M, A] =
@@ -95,19 +95,18 @@ trait ActionSplitter extends BaseSets {
           ] = { block =>
             val componentGenerators: Seq[A] =
               block.map(allGenerators)
-            val componentAction: monoid.Action[A] =
-              monoid.action(
-                makeDot(
-                  for {
+            val componentSet: Set[A] = {
+              for {
                     cg <- componentGenerators
                     m <- monoidElements
                   } yield actionMultiply(cg, m)
-                )
-              )(
-                actionMultiply
-              )
+                }.toSet
+            val componentAction: monoid.Action[A] =
+              withDot(componentSet) {
+                monoid.Action { actionMultiply }
+              }
             val componentPresentation: Seq[GeneratorWithRelators[M, A]] =
-              findPresentation(
+              presentationFinder.findPresentation(
                 componentAction,
                 componentGenerators
               )

@@ -1,37 +1,47 @@
-package com.fdilke.bewl.fsets.morphenum
+package com.fdilke.bewl2.sets.morphenum
 
-import com.fdilke.bewl.fsets.BaseFiniteSets
-import com.fdilke.bewl.helper.⊕
-import ⊕._
+import com.fdilke.bewl2.sets.BaseSets
 import scala.Function.tupled
 import scala.language.{postfixOps, reflectiveCalls}
 
-trait FindPresentation extends BaseFiniteSets {
+trait FindPresentation extends BaseSets:
   Ɛ: FindGenerators =>
 
-  object FindPresentation {
-    def forMonoid[M](
-      monoid: Monoid[M]
-    ): {
-      def apply[A](
-        action: monoid.Action[A],
-        generators: Seq[A]
-      ): Seq[GeneratorWithRelators[M, A]]
-    } =
-      new Object {
-        private val findGenerators: {
-          def apply[A](
-            action: monoid.Action[A]
-          ): FindGeneratorAnalysis[M, A]
-        } =
-          FindGenerators.forMonoid(
-            monoid
-          )
+  trait PresentationFinder[M, ACTION[_]]:
+      def findPresentation[A](action: ACTION[A], generators: Seq[A]): Seq[GeneratorWithRelators[M, A]]
 
-        def apply[A](
-          action: monoid.Action[A],
-          generators: Seq[A]
-        ) =
+  object PresentationFinder:
+    def forMonoid[M](
+      monoid: Monoid[M],
+      generatorFinder: GeneratorFinder[M, monoid.Action]
+    ): PresentationFinder[M, monoid.Action] =
+      new PresentationFinder[M, monoid.Action]:
+        private def specialGenerators[A](
+          action: monoid.Action[A], 
+          g: A, 
+          h: A
+        ): Seq[(M, M)] =
+          val specialActionSet: Set[(M, M)] =
+            (for { 
+              m <- monoid.dot.dot
+              n <- monoid.dot.dot if (
+                action.actionMultiply(g, m) ==
+                  action.actionMultiply(h, n)
+              )
+            } yield (m, n)).toSet
+          val specialAction: monoid.Action[(M, M)] =
+            withDot(specialActionSet) {
+              given Dot[M] = monoid.dot
+              monoid.Action[(M, M)] { (pair, m) =>
+                pair match {
+                  case p ⊕ q =>
+                    monoid.multiply(p, m) -> monoid.multiply(q, m)
+                }
+              }
+            }            
+          generatorFinder.findGenerators(specialAction).generators
+
+        override def findPresentation[A](action: monoid.Action[A], generators: Seq[A]): Seq[GeneratorWithRelators[M, A]] =
           generators.zipWithIndex.map(tupled { (g, j) =>
             GeneratorWithRelators[M, A](
               g,
@@ -41,28 +51,13 @@ trait FindPresentation extends BaseFiniteSets {
                   .take(j + 1)
                   .zipWithIndex
                   .flatMap(tupled { (h, i) =>
-                    findGenerators(
-                      monoid.action(
-                        monoid.carrier.squared.where {
-                          case m ⊕ n =>
-                            action.actionMultiply(g, m) ==
-                              action.actionMultiply(h, n)
-                        }
-                      ) { (pair, m) =>
-                        pair match {
-                          case p ⊕ q =>
-                            monoid.multiply(p, m) ⊕
-                              monoid.multiply(q, m)
-                        }
-                      }
-                    ).generators.map {
-                      case m ⊕ n =>
+                    specialGenerators(action, g, h).map {
+                      case (m, n) =>
                         Relator(m, i, n)
                     }
                   })
               )
             )
           })
-      }
-  }
-}
+        
+          

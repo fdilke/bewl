@@ -1,10 +1,10 @@
-package com.fdilke.bewl.fsets.morphenum
+package com.fdilke.bewl2.sets.morphenum
 
-import com.fdilke.bewl.fsets.FiniteSets
-import com.fdilke.bewl.fsets.FiniteSets.ActionComponent
-import com.fdilke.bewl.fsets.FiniteSetsUtilities.{dot, elementsOf}
-import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
-import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3.Action
+import com.fdilke.bewl2.sets.FastSets
+import com.fdilke.bewl2.sets.FiniteSets.ActionComponent
+import com.fdilke.bewl2.sets.FiniteSetsUtilities.{dot, elementsOf}
+import com.fdilke.bewl2.topos.algebra.KnownMonoids.monoidOf3
+import com.fdilke.bewl2.topos.algebra.KnownMonoids.monoidOf3.Action
 import org.scalatest.matchers.should.Matchers._
 
 import org.scalatest.freespec.AnyFreeSpec

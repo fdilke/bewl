@@ -2,7 +2,7 @@ package com.fdilke.bewl2.algebra
 
 import com.fdilke.bewl2.topos.ProductMappable
 import com.fdilke.bewl2.topos.Topos
-import com.fdilke.utility.Shortcuts.*
+import com.fdilke.utility.Shortcuts._
 
 import scala.language.{dynamics, postfixOps}
 import ProductMappable._
@@ -88,6 +88,7 @@ trait AlgebraicStructures[
     ι := unit,
     * := multiply
   ) with Actions[M]:
+    val dot: Dot[M] = summon
     opaque type RightIdeal = M > BEWL
 
     lazy val actionTopos: Topos[Action, CTXT, VOID, UNIT, RightIdeal, InternalMap] =

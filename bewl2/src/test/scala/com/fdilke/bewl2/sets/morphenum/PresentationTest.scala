@@ -1,11 +1,11 @@
-package com.fdilke.bewl.fsets.morphenum
+package com.fdilke.bewl2.sets.morphenum
 
-import com.fdilke.bewl.fsets.FiniteSets
-import com.fdilke.bewl.fsets.FiniteSets.{>, ToposOfMonoidActions, VOID}
-import com.fdilke.bewl.fsets.FiniteSetsUtilities._
-import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
+import com.fdilke.bewl2.sets.FiniteSets
+import com.fdilke.bewl2.sets.FiniteSets.{>, ToposOfMonoidActions, VOID}
+import com.fdilke.bewl2.sets.FiniteSetsUtilities._
+import com.fdilke.bewl2.topos.algebra.KnownMonoids.monoidOf3
 import org.scalatest.freespec.AnyFreeSpec
-import com.fdilke.bewl.helper.StandardSymbols.{a, b, c, i, iso, r, s, source, target, x, y}
+import com.fdilke.bewl2.helper.StandardSymbols.{a, b, c, i, iso, r, s, source, target, x, y}
 import org.scalatest.matchers.should.Matchers._
 
 import scala.language.{existentials, reflectiveCalls}

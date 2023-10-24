@@ -1,7 +1,7 @@
-package com.fdilke.bewl.fsets.morphenum
+package com.fdilke.bewl2.sets.morphenum
 
-import com.fdilke.bewl.fsets.FiniteSets
-import com.fdilke.bewl.fsets.FiniteSets.{
+import com.fdilke.bewl3.sets.FiniteSets
+import com.fdilke.bewl2.sets.FiniteSets.{
   >,
   FindGeneratorAnalysis,
   FindGenerators,

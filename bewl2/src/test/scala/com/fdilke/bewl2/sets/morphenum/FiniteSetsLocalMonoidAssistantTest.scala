@@ -1,16 +1,16 @@
-package com.fdilke.bewl.fsets.morphenum
+package com.fdilke.bewl2.sets.morphenum
 
-import com.fdilke.bewl.fsets.FiniteSets
-import com.fdilke.bewl.fsets.FiniteSets.{
+import com.fdilke.bewl2.sets.FiniteSets
+import com.fdilke.bewl2.sets.FiniteSets.{
   >,
   bifunctionAsBiArrow,
   functionAsArrow,
   LocalMonoidAssistant,
   ToposOfMonoidActions
 }
-import com.fdilke.bewl.fsets.FiniteSetsUtilities._
-import com.fdilke.bewl.helper.⊕
-import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
+import com.fdilke.bewl2.sets.FiniteSetsUtilities._
+import com.fdilke.bewl2.helper.⊕
+import com.fdilke.bewl2.topos.algebra.KnownMonoids.monoidOf3
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers._
 import com.fdilke.bewl.helper.StandardSymbols.{i, source, target, x, y}

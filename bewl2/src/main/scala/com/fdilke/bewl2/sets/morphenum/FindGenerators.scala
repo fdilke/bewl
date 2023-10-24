@@ -1,6 +1,6 @@
-package com.fdilke.bewl.fsets.morphenum
+package com.fdilke.bewl2.sets.morphenum
 
-import com.fdilke.bewl.fsets.{BaseFiniteSets, FiniteSets}
+import com.fdilke.bewl2.sets.{BaseSets, FastSets}
 
 import scala.language.postfixOps
 
@@ -17,29 +17,28 @@ trait AbstractCyclics[A] {
   def <<(a: A): AbstractCyclics[A]
 }
 
-trait FindGenerators extends BaseFiniteSets {
+trait FindGenerators extends BaseSets {
 
   trait FindGeneratorAnalysis[M, A] {
     val initialCyclics: AbstractCyclics[A]
     val generators: Seq[A]
   }
 
+  trait GeneratorFinder[M, ACTION[_]]:
+    def findGenerators[A](action: ACTION[A]): FindGeneratorAnalysis[M, A]
+
   object FindGenerators {
     def forMonoid[M](
       monoid: Monoid[M]
-    ): {
-      def apply[A](
-        action: monoid.Action[A]
-      ): FindGeneratorAnalysis[M, A]
-    } =
-      new Object {
-        private val monoidElements =
-          monoid.carrier.elements
+    ): GeneratorFinder[M, monoid.Action] =
+      new GeneratorFinder[M, monoid.Action]:
+        private val monoidElements: Set[M] =
+          monoid.dot.dot
 
-        def apply[A](action: monoid.Action[A]) =
-          new FindGeneratorAnalysis[M, A] {
-            private val actionElements =
-              action.carrier.elements
+        def findGenerators[A](action: monoid.Action[A]): FindGeneratorAnalysis[M, A] =
+          new FindGeneratorAnalysis[M, A]:
+            private val actionElements: Set[A] =
+              action.dot.dot
 
             case class Cyclic(
               override val generator: A
@@ -109,5 +108,4 @@ trait FindGenerators extends BaseFiniteSets {
               new MaximalCyclics
           }
       }
-  }
-}
+
