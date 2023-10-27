@@ -264,3 +264,12 @@ class SampleTestFType[A] extends TestFType[A, SampleTestFType]
 object Pigg:
   trait ActionAnalysis[A, ACTION_ANALYSIS[AA] <: ActionAnalysis[AA, ACTION_ANALYSIS]]
   class DefaultActionAnalysis[A] extends ActionAnalysis[A, DefaultActionAnalysis]
+
+object FurtherFTypes:
+  trait ActionAnalysis[
+    A,
+    ACTION[_],
+    INTERNAL_MAP[_, _],
+    ACTION_ANALYSIS[AA] <: ActionAnalysis[AA, ACTION, INTERNAL_MAP, ACTION_ANALYSIS]
+  ]
+  class SetsActionAnalysis[A] extends ActionAnalysis[A, List, Map, SetsActionAnalysis]

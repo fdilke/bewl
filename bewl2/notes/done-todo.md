@@ -1,6 +1,7 @@
 # NON-CODING
 - sanity test symmetric group S_6 with '-Xmx3G'
 - move algo stuff to another repo; it doesn't belong here. Ditto cocantorian stuff
+- sort out jdk21 compatibility for Bewl 1, also fix for Bewl 2 if necc
 
 # SPECULATIVE
 - could Scala macros enable even deeper integration for Bewl? Or functional mottoes at least?
@@ -143,4 +144,5 @@ do a systematic search for permutations p, q that are "adjacent" (= they differ 
   Concluding this is the right way to do it. Why exactly did we need asInstanceOf[]?
   Should be able to do without it. There can be an inline helper method in Monoid that does the map.
   All this because there is in fact a type error somewhere, and the asInstanceOf[]s are a chink in the armour.
+  
   

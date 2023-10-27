@@ -5,14 +5,22 @@ import com.fdilke.bewl2.helper.BuildEquivalence
 import scala.language.postfixOps
 import com.fdilke.bewl2.sets.FastSets
 
-object FiniteSetsPresentedAction {
+trait PresentedAction[A, ACTION[_]]:
+  val action: ACTION[A]
+  def project[B](
+    otherAction: ACTION[B],
+    targetElements: Seq[B]
+  ): A => B
+  def sanityTest: Unit
+
+object FiniteSetsPresentedAction:
   def apply[M, A](
     monoid: FastSets.Monoid[M]
   )(
     generatorsWithRelators: Seq[GeneratorWithRelators[M, A]]
-  ): monoid.PresentedAction[Int] = {
+  ): PresentedAction[Int, monoid.Action] =
     val monoidElements: List[M] =
-      elementsOf(monoid.carrier).toList
+      monoid.dot.dot.toList
     val lookupMonoid: Map[M, Int] =
       monoidElements.zipWithIndex.toMap
     val generators: List[A] =
@@ -20,7 +28,7 @@ object FiniteSetsPresentedAction {
     val lookupGenerator: Map[A, Int] =
       generators.zipWithIndex.toMap
 
-    val words = makeDot(generators).x(monoid.carrier)
+    // val words = makeDot(generators).x(monoid.carrier)
 
     def indexOfWord(g: A, m: M): Int =
       lookupGenerator(g) * monoidElements.size + lookupMonoid(m)
@@ -43,38 +51,32 @@ object FiniteSetsPresentedAction {
         )
       )
 
-    val wordIndices = equivalenceTable.toSet
-    val wordIndicesDot = makeDot(wordIndices)
-
-    new monoid.PresentedAction[Int] {
-      override val action: monoid.Action[Int] =
-        monoid.action(wordIndicesDot) { (index, n) =>
-          val (g, m) = wordOfIndex(index)
-          val mn = monoid.multiply(m, n)
-          val product = equivalenceTable(
-            indexOfWord(g, mn)
-          )
-          product
-        }
-      override def project[B](
-        otherAction: monoid.Action[B],
-        targetElements: Seq[B]
-      ): Int > B =
-        wordIndicesDot(otherAction.actionCarrier) { index =>
+    val wordIndices: Set[Int] = equivalenceTable.toSet
+    FastSets.withDot(wordIndices):
+      new PresentedAction[Int, monoid.Action]:
+        override val action: monoid.Action[Int] =
+          monoid.Action{ (index, n) =>
+            val (g, m) = wordOfIndex(index)
+            val mn = monoid.multiply(m, n)
+            val product = equivalenceTable(
+              indexOfWord(g, mn)
+            )
+            product
+          }
+        override def project[B](
+          otherAction: monoid.Action[B],
+          targetElements: Seq[B]
+        ): Int => B = index =>
           val (g, m) = wordOfIndex(index)
           otherAction.actionMultiply(
             targetElements(lookupGenerator(g)),
             m
           )
-        }
-      override def sanityTest: Unit = {
-        for {
-          (gr, i) <- generatorsWithRelators.zipWithIndex
-          relator <- gr.relators
-        } assert(relator.otherIndex <= i)
-
-        action.sanityTest
-      }
-    }
-  }
-}
+        override def sanityTest: Unit =
+          for
+            (gr, i) <- generatorsWithRelators.zipWithIndex
+            relator <- gr.relators
+          do
+            assert(relator.otherIndex <= i)
+          action.sanityTest
+    

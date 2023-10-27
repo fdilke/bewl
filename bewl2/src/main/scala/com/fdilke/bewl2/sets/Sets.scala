@@ -6,6 +6,7 @@ import com.fdilke.bewl2.topos.Topos
 import com.fdilke.bewl2.topos.ProductMappable
 import com.fdilke.bewl2.sets.SetsUtilities.*
 import com.fdilke.utility.Shortcuts.*
+import com.fdilke.bewl2.sets.morphenum.SetsMonoidAssistant
 
 import scala.language.postfixOps
 

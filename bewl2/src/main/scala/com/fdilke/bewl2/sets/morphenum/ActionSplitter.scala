@@ -11,7 +11,7 @@ trait ActionSplitter extends BaseSets {
   case class ActionComponent[
     M,
     A,
-    ACTION[B]
+    ACTION[_]
   ](
     componentGenerators: Seq[A],
     componentAction: ACTION[A],
@@ -23,7 +23,7 @@ trait ActionSplitter extends BaseSets {
   case class ActionSplitting[
     M,
     A,
-    ACTION[B]
+    ACTION[_]
   ](
     allGenerators: Seq[A],
     components: Seq[
@@ -39,23 +39,13 @@ trait ActionSplitter extends BaseSets {
 
   object ActionSplitter {
     def forMonoid[M](
-      monoid: Monoid[M]
-    ): ActionSplitter[
-      M,
-      ({ type λ[T] = monoid.Action[T] })#λ
-    ] =
-      new ActionSplitter[
-        M,
-        ({ type λ[T] = monoid.Action[T] })#λ
-      ] {
+      monoid: Monoid[M],
+      generatorFinder: GeneratorFinder[M, monoid.Action],
+      presentationFinder: PresentationFinder[M, monoid.Action]
+    ): ActionSplitter[M, monoid.Action] =
+      new ActionSplitter[M, monoid.Action] {
         private val monoidElements: Set[M] =
           monoid.dot.dot
-
-        private val generatorFinder: GeneratorFinder[M, monoid.Action] =
-          FindGenerators.forMonoid(monoid)
-
-        private val presentationFinder: PresentationFinder[M, monoid.Action] =
-          PresentationFinder.forMonoid(monoid, generatorFinder)
 
         override def splitAction[A](
           action: monoid.Action[A]

@@ -98,6 +98,10 @@ trait AlgebraicStructures[
     val unit: NullaryOp[M]
     val multiply: BinaryOp[M]
     opaque type InternalMap[T, U] = (M, T) > U
+    
+    // TODO: get rid of these by refactoring with Tagged[]
+    def hackTag[TYPE[_], T, U](tag: TYPE[(M, T) > U]): TYPE[InternalMap[T, U]] = tag
+    def reverseHackTag[TYPE[_], T, U](tag: TYPE[InternalMap[T, U]]): TYPE[(M, T) > U] = tag
 
     val actions: AlgebraicTheory[M] =
       AlgebraicTheoryWithScalars[M](

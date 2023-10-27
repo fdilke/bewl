@@ -27,7 +27,7 @@ trait FindGenerators extends BaseSets {
   trait GeneratorFinder[M, ACTION[_]]:
     def findGenerators[A](action: ACTION[A]): FindGeneratorAnalysis[M, A]
 
-  object FindGenerators {
+  object GeneratorFinder {
     def forMonoid[M](
       monoid: Monoid[M]
     ): GeneratorFinder[M, monoid.Action] =
