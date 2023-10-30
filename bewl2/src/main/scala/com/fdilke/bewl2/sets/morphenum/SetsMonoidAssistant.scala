@@ -29,39 +29,36 @@ trait SetsMonoidAssistant extends BaseSets:
         // override def analyze[A](action: monoid.Action[A]): FarceActionAnalysis[monoid.Action, monoid.InternalMap, A] =
         //   ???
 
-        override type ACTION_ANALYSIS[A] = SetsActionParalysis[A]
+        override type ACTION_ANALYSIS[A] = SetsActionAnalysis[A]
 
-        // private val generatorFinder: GeneratorFinder[M, monoid.Action] =
-        //   GeneratorFinder.forMonoid(monoid)
+        private val generatorFinder: GeneratorFinder[M, monoid.Action] =
+          GeneratorFinder.forMonoid(monoid)
 
-        // private val presentationFinder: PresentationFinder[M, monoid.Action] =
-        //   PresentationFinder.forMonoid(monoid, generatorFinder)
+        private val presentationFinder: PresentationFinder[M, monoid.Action] =
+          PresentationFinder.forMonoid(monoid, generatorFinder)
 
-        // private val actionSplitter: ActionSplitter[M, monoid.Action] =
-        //   ActionSplitter.forMonoid(monoid, generatorFinder, presentationFinder)
+        private val actionSplitter: ActionSplitter[M, monoid.Action] =
+          ActionSplitter.forMonoid(monoid, generatorFinder, presentationFinder)
 
-        // private val monoidElements: Set[M] =
-        //   monoid.dot.dot
+        private val monoidElements: Set[M] =
+          monoid.dot.dot
 
-        override def analyze[A](action: monoid.Action[A]): SetsActionParalysis[A] =
-          new SetsActionParalysis[A](action)
+        override def analyze[A](action: monoid.Action[A]): SetsActionAnalysis[A] =
+          new SetsActionAnalysis[A](action)
 
         override def makeExponential[A, B](
-          analysisA: SetsActionParalysis[A],
-          analysisB: SetsActionParalysis[B]
+          analysisA: SetsActionAnalysis[A],
+          analysisB: SetsActionAnalysis[B]
         ): monoid.Action[monoid.InternalMap[A, B]] = 
-          ??? // null.asInstanceOf[monoid.Action[monoid.InternalMap[A, B]]]
-        override def enumerateMorphisms[A, B](
-          src: SetsActionParalysis[A],
-          target: SetsActionParalysis[B]
-        ): Iterable[Map[A, B]] =
-          ???
+          analysisA.makeExponential(analysisB)
 
-        class SetsActionParalysis[A](action: monoid.Action[A])
-/*          
-        class SetsActionAnalysis[A](
-          val action: monoid.Action[A]
-        ):
+        override def enumerateMorphisms[A, B](
+          src: SetsActionAnalysis[A],
+          target: SetsActionAnalysis[B]
+        ): Iterable[Map[A, B]] =
+          src.enumerateMorphisms(target)
+
+        class SetsActionAnalysis[A](val action: monoid.Action[A]):
           val actionSplitting: ActionSplitting[M, A, monoid.Action] =
             actionSplitter.splitAction(action)
 
@@ -140,10 +137,9 @@ trait SetsMonoidAssistant extends BaseSets:
                 partialMap ++ ext
             }            
 
-          override def enumerateMorphisms[B](
+          def enumerateMorphisms[B](
             target: SetsActionAnalysis[B]
           ): Iterable[Map[A, B]] =
-            ???
             val srcComponents: Seq[ActionComponent[M, A, monoid.Action]] =
               actionSplitting.components
             val tgtComponents: Seq[ActionComponent[M, B, monoid.Action]] =
@@ -203,64 +199,30 @@ trait SetsMonoidAssistant extends BaseSets:
           ): (M, A) => B =
             (m, a) => arrow(m -> a)
 
-          override def makeExponential[B](
+          def makeExponential[B](
             analysisB: SetsActionAnalysis[B]
           ): monoid.Action[monoid.InternalMap[A, B]] = 
-            {
-              implicit val mXa: Set[(M, A)] =
-                summon
-              // TODO: should be able to optimize away
-              def arrowToMap(
-                arrow: ((M, A)) => B
-              ): Map[(M, A), B] =
-                mXa.map(m_a => m_a -> arrow(m_a)) toMap
+            val mXa: Set[(M, A)] =
+              summon[Dot[(M, A)]].dot
+            // TODO: should be able to optimize away
+            def arrowToMap(
+              arrow: ((M, A)) => B
+            ): Map[(M, A), B] =
+              mXa.map(m_a => m_a -> arrow(m_a)) toMap
 
-              val morphisms: Set[Map[(M, A), B]] =
-                  recursiveImago
-                    .enumerateMorphisms(
-                      analysisB
-                    ).map(arrowToMap).toSet
+            val morphisms: Set[Map[(M, A), B]] =
+                recursiveImago
+                  .enumerateMorphisms(
+                    analysisB
+                  ).map(arrowToMap).toSet
 
-              val twigg: monoid.Action[monoid.InternalMap[A, B]] = 
-                monoid.hackTag[monoid.Action, A, B](
-                  withDot(morphisms) {
-                    monoid.Action[Map[(M, A), B]] { (f, m) =>
-                      arrowToMap(
-                        (n, a) => f(monoid.multiply(m, n) -> a)
-                      )
-                    }
-                  }
-                )
-              // twigg
-              ???
-            }
+            monoid.hackTag[monoid.Action, A, B](
+              withDot(morphisms) {
+                monoid.Action[Map[(M, A), B]] { (f, m) =>
+                  arrowToMap(
+                    (n, a) => f(monoid.multiply(m, n) -> a)
+                  )
+                }
+              }
+            )
 
-                // override val evaluation =
-                //   morphisms
-                //     .x(action.actionCarrier)
-                //     .biArrow(
-                //       targetCarrier
-                //     ) { (f, s) =>
-                //       f(
-                //         monoid.unit(
-                //           action.actionCarrier.toI(s)
-                //         ) ⊕⊕ s
-                //       )
-                //     }
-
-                // override def transpose[X <: ~](
-                //   otherAction: monoid.Action[X],
-                //   biArrow: BiArrow[X, A, B]
-                // ) =
-                //   otherAction.actionCarrier(morphisms) { x =>
-                //     arrowToMap(
-                //       mXa
-                //         .biArrow(targetCarrier) { (m, a) =>
-                //           biArrow(
-                //             otherAction.actionMultiply(x, m),
-                //           a
-                //         )
-                //       } arrow
-                //     )
-                //   }
-*/
