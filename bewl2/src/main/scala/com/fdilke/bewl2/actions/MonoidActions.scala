@@ -254,71 +254,36 @@ trait MonoidActions[
       analysisB: ACTION_ANALYSIS[B]
     ): Iterable[A ~> B]
 
-  // class JokeActionAnalysis[ACTION[_], INTERNAL_MAP[_, _], A](action: ACTION[A]) extends 
-  //   ActionAnalysis[A, ACTION, INTERNAL_MAP, [A] =>> JokeActionAnalysis[ACTION, INTERNAL_MAP, A]]:
-  //   override def makeExponential[B](
-  //     analysisB: JokeActionAnalysis[ACTION, INTERNAL_MAP, B]
-  //   ): ACTION[INTERNAL_MAP[A, B]] =
-  //     ???
-  //   override def enumerateMorphisms[B](
-  //     analysisB: JokeActionAnalysis[ACTION, INTERNAL_MAP, B]
-  //   ): Iterable[A ~> B] =
-  //     ???
-
   object DefaultMonoidAssistant extends MonoidAssistant:
     override def actionAnalyzer[M : Dot](
       monoid: Monoid[M]
     ) : ActionAnalyzer[monoid.Action, monoid.InternalMap] =
-      ???
-
-/*
       new ActionAnalyzer[monoid.Action, monoid.InternalMap]:
-        override type ACTION_ANALYSIS[A] = FarceActionAnalysis[monoid.Action, monoid.InternalMap, A]
+        override type ACTION_ANALYSIS[A] = DefaultActionAnalysis[A]
         override def analyze[A](
           action: monoid.Action[A]
         ) : DefaultActionAnalysis[A] =
           new DefaultActionAnalysis[A](action)
 
-        trait FarceActionAnalysis[ACTION[_], INTERNAL_MAP[_, _], A] extends 
-          ActionAnalysis[A, ACTION, INTERNAL_MAP, [A] =>> FarceActionAnalysis[ACTION, INTERNAL_MAP, A]]:
-          override def makeExponential[B](
-            analysisB: FarceActionAnalysis[ACTION, INTERNAL_MAP, B]
-          ): ACTION[INTERNAL_MAP[A, B]] =
-            ???
-          override def enumerateMorphisms[B](
-            analysisB: FarceActionAnalysis[ACTION, INTERNAL_MAP, B]
-          ): Iterable[A ~> B] =
-            ???
+        override def makeExponential[A, B](
+          analysisA: DefaultActionAnalysis[A],
+          analysisB: DefaultActionAnalysis[B]
+        ): monoid.Action[monoid.InternalMap[A, B]] = 
+          analysisA.makeExponential(analysisB)
 
-        class DefaultActionAnalysis[A](action: monoid.Action[A]) extends 
-              FarceActionAnalysis[monoid.Action, monoid.InternalMap, A]:
-          override def makeExponential[B](
-            analysisB: FarceActionAnalysis[monoid.Action, monoid.InternalMap, B]
-          ): monoid.Action[monoid.InternalMap[A, B]] =
-            ???
-          override def enumerateMorphisms[B](
-            analysisB: FarceActionAnalysis[monoid.Action, monoid.InternalMap, B]
-          ): Iterable[A ~> B] =
-            ???
-
-        // class BaseDefaultActionAnalysis[A](action: monoid.Action[A]) extends 
-        //   ActionAnalysis[A, monoid.Action, monoid.InternalMap, BaseDefaultActionAnalysis]:
-        //   override def makeExponential[B](
-        //     analysisB: BaseDefaultActionAnalysis[B]
-        //   ): monoid.Action[monoid.InternalMap[A, B]] =
-        //     ???
-        //   override def enumerateMorphisms[B](
-        //     analysisB: BaseDefaultActionAnalysis[B]
-        //   ): Iterable[A ~> B] =
-        //     ???
+        override def enumerateMorphisms[A, B](
+          src: DefaultActionAnalysis[A],
+          target: DefaultActionAnalysis[B]
+        ): Iterable[A ~> B] =
+          src.enumerateMorphisms(target)
 
         class DefaultActionAnalysis[A](
           val action: monoid.Action[A]
-        ) extends BaseDefaultActionAnalysis[A]:
+        ):
           given Dot[A] = action.dot
           given Dot[M] = monoid.dot
-          override def makeExponential[B](
-            analysisB: BaseDefaultActionAnalysis[B]
+          def makeExponential[B](
+            analysisB: DefaultActionAnalysis[B]
           ): monoid.Action[monoid.InternalMap[A, B]] =
             given Dot[B] = analysisB.action.dot
             val eval: ((M, A) > B, (M, A)) ~> B =
@@ -345,16 +310,13 @@ trait MonoidActions[
                 action.asInstanceOf[monoid.Action[monoid.InternalMap[A, B]]]
               }
               
-          override def enumerateMorphisms[B](
-            analysisB: BaseDefaultActionAnalysis[B]
-          ): Iterable[A > B] =
-            throw new IllegalArgumentException()
-            // given Dot[B] = analysisB.action.dot
-            // morphisms[A, B] filter { (f: A ~> B) =>
-            //   ∀[(A, M)] { case a ⊕ m =>
-            //     f(action.actionMultiply(a, m)) =?=
-            //       analysisB.action.actionMultiply(f(a), m)
-            //   }
-            // }
-*/
+          def enumerateMorphisms[B](
+            analysisB: DefaultActionAnalysis[B]
+          ): Iterable[A ~> B] =
+            given Dot[B] = analysisB.action.dot
+            morphisms[A, B] filter:
+              (f: A ~> B) => ∀[(A, M)]: 
+                case a ⊕ m =>
+                  f(action.actionMultiply(a, m)) =?=
+                    analysisB.action.actionMultiply(f(a), m)
 
