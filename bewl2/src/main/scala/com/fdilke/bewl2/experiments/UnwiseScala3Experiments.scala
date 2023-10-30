@@ -273,3 +273,34 @@ object FurtherFTypes:
     ACTION_ANALYSIS[AA] <: ActionAnalysis[AA, ACTION, INTERNAL_MAP, ACTION_ANALYSIS]
   ]
   class SetsActionAnalysis[A] extends ActionAnalysis[A, List, Map, SetsActionAnalysis]
+
+object TrackPifflyError:
+  trait Monoid[M]:
+    type InternalMap[A, B] = (M, A) => B
+    trait Action[A]:
+      def x  = 0
+  trait ActionAnalysis[
+    A,
+    ACTION[_],
+    INTERNAL_MAP[_, _],
+    ACTION_ANALYSIS[AA] <: ActionAnalysis[AA, ACTION, INTERNAL_MAP, ACTION_ANALYSIS]
+  ]:
+    def makeExponential[B](
+      analysisB: ACTION_ANALYSIS[B]
+    ): ACTION[INTERNAL_MAP[A, B]]
+    def enumerateMorphisms[B](
+      analysisB: ACTION_ANALYSIS[B]
+    ): Iterable[A => B]
+
+  def twiggle[M](monoid: Monoid[M]): Unit =
+    class BaseDefaultActionAnalysis[A](action: monoid.Action[A]) extends 
+      ActionAnalysis[A, monoid.Action, monoid.InternalMap, BaseDefaultActionAnalysis]:
+      override def makeExponential[B](
+        analysisB: BaseDefaultActionAnalysis[B]
+      ): monoid.Action[monoid.InternalMap[A, B]] =
+        ???
+      override def enumerateMorphisms[B](
+        analysisB: BaseDefaultActionAnalysis[B]
+      ): Iterable[A => B] =
+        ???
+    ()

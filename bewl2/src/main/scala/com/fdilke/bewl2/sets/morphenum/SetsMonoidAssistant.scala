@@ -14,39 +14,54 @@ trait SetsMonoidAssistant extends BaseSets:
   object LocalMonoidAssistant extends MonoidAssistant:
     override def actionAnalyzer[M : Dot](monoid: Monoid[M]) : ActionAnalyzer[monoid.Action, monoid.InternalMap] =
       new ActionAnalyzer[monoid.Action, monoid.InternalMap]:
+        // trait FarceActionAnalysis[ACTION[_], INTERNAL_MAP[_, _], A] extends 
+        //   ActionAnalysis[A, ACTION, INTERNAL_MAP, [A] =>> FarceActionAnalysis[ACTION, INTERNAL_MAP, A]]:
+        //   override def makeExponential[B](
+        //     analysisB: FarceActionAnalysis[ACTION, INTERNAL_MAP, B]
+        //   ): ACTION[INTERNAL_MAP[A, B]] =
+        //     ???
+        //   override def enumerateMorphisms[B](
+        //     analysisB: FarceActionAnalysis[ACTION, INTERNAL_MAP, B]
+        //   ): Iterable[A ~> B] =
+        //     ???
+
+        // override type ACTION_ANALYSIS[A] = FarceActionAnalysis[monoid.Action, monoid.InternalMap, A]
+        // override def analyze[A](action: monoid.Action[A]): FarceActionAnalysis[monoid.Action, monoid.InternalMap, A] =
+        //   ???
+
         override type ACTION_ANALYSIS[A] = SetsActionParalysis[A]
 
-        private val generatorFinder: GeneratorFinder[M, monoid.Action] =
-          GeneratorFinder.forMonoid(monoid)
+        // private val generatorFinder: GeneratorFinder[M, monoid.Action] =
+        //   GeneratorFinder.forMonoid(monoid)
 
-        private val presentationFinder: PresentationFinder[M, monoid.Action] =
-          PresentationFinder.forMonoid(monoid, generatorFinder)
+        // private val presentationFinder: PresentationFinder[M, monoid.Action] =
+        //   PresentationFinder.forMonoid(monoid, generatorFinder)
 
-        private val actionSplitter: ActionSplitter[M, monoid.Action] =
-          ActionSplitter.forMonoid(monoid, generatorFinder, presentationFinder)
+        // private val actionSplitter: ActionSplitter[M, monoid.Action] =
+        //   ActionSplitter.forMonoid(monoid, generatorFinder, presentationFinder)
 
-        private val monoidElements: Set[M] =
-          monoid.dot.dot
+        // private val monoidElements: Set[M] =
+        //   monoid.dot.dot
 
         override def analyze[A](action: monoid.Action[A]): SetsActionParalysis[A] =
           new SetsActionParalysis[A](action)
 
-        class SetsActionParalysis[A](
-          override val action: monoid.Action[A]
-        ) extends ActionAnalysis[A, monoid.Action, monoid.InternalMap, SetsActionParalysis]:
-          override def makeExponential[B](
-            analysisB: SetsActionParalysis[B]
-          ): monoid.Action[monoid.InternalMap[A, B]] = 
-            ??? // null.asInstanceOf[monoid.Action[monoid.InternalMap[A, B]]]
-          override def enumerateMorphisms[B](
-            target: SetsActionParalysis[B]
-          ): Iterable[Map[A, B]] =
-            ???
+        override def makeExponential[A, B](
+          analysisA: SetsActionParalysis[A],
+          analysisB: SetsActionParalysis[B]
+        ): monoid.Action[monoid.InternalMap[A, B]] = 
+          ??? // null.asInstanceOf[monoid.Action[monoid.InternalMap[A, B]]]
+        override def enumerateMorphisms[A, B](
+          src: SetsActionParalysis[A],
+          target: SetsActionParalysis[B]
+        ): Iterable[Map[A, B]] =
+          ???
 
-/*         
+        class SetsActionParalysis[A](action: monoid.Action[A])
+/*          
         class SetsActionAnalysis[A](
-          override val action: monoid.Action[A]
-        ) extends ActionAnalysis[A, monoid.Action, monoid.InternalMap, SetsActionAnalysis]:
+          val action: monoid.Action[A]
+        ):
           val actionSplitting: ActionSplitting[M, A, monoid.Action] =
             actionSplitter.splitAction(action)
 
