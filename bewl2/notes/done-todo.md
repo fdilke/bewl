@@ -63,6 +63,8 @@ do a systematic search for permutations p, q that are "adjacent" (= they differ 
 # LEGITIMATELY POSTPONED
 - simplify ∃ def by adding an extension so we can have f(x) instead of eval(f, x) for f: X ~> Y.
   Also simplify use of eval(fnBarBaz, cBar) in generic. Do this when there's more code, see if it affects performance
+- asInstanceOf in monoid action code: fix via refactoring Equalizer via Tagged to provide an implicit =:= 
+  rather than inclusion
 
 # DONE
 - done_todo.md as motivator inside project, or should these notes live there?

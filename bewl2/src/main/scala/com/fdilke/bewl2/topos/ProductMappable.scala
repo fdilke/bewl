@@ -28,7 +28,7 @@ object ProductMappable {
       (x, y)
   
   inline def apply[C[_]: ProductMappable]: ProductMappable[C] =
-    implicitly
+    summon
 
   extension[C[_]: ProductMappable, X](
     cx: C[X]

@@ -12,9 +12,9 @@ trait SetsMonoidAssistant extends BaseSets:
   override protected val monoidAssistant: MonoidAssistant = LocalMonoidAssistant
 
   object LocalMonoidAssistant extends MonoidAssistant:
-    override def actionAnalyzer[M : Dot](monoid: Monoid[M]) : monoid.ActionAnalyzer =
-      new monoid.ActionAnalyzer:
-        override type ACTION_ANALYSIS[A] = SetsActionAnalysis[A]
+    override def actionAnalyzer[M : Dot](monoid: Monoid[M]) : ActionAnalyzer[monoid.Action, monoid.InternalMap] =
+      new ActionAnalyzer[monoid.Action, monoid.InternalMap]:
+        override type ACTION_ANALYSIS[A] = SetsActionParalysis[A]
 
         private val generatorFinder: GeneratorFinder[M, monoid.Action] =
           GeneratorFinder.forMonoid(monoid)
@@ -28,13 +28,22 @@ trait SetsMonoidAssistant extends BaseSets:
         private val monoidElements: Set[M] =
           monoid.dot.dot
 
-        override def analyze[A](action: monoid.Action[A]): SetsActionAnalysis[A] =
-          new SetsActionAnalysis[A](action)
+        override def analyze[A](action: monoid.Action[A]): SetsActionParalysis[A] =
+          new SetsActionParalysis[A](action)
 
-        // abstract class SetsActionParalysis[A](
-        //   override val action: monoid.Action[A]
-        // ) extends ActionAnalysis[A, monoid.Action, monoid.InternalMap, SetsActionParalysis]
+        class SetsActionParalysis[A](
+          override val action: monoid.Action[A]
+        ) extends ActionAnalysis[A, monoid.Action, monoid.InternalMap, SetsActionParalysis]:
+          override def makeExponential[B](
+            analysisB: SetsActionParalysis[B]
+          ): monoid.Action[monoid.InternalMap[A, B]] = 
+            ??? // null.asInstanceOf[monoid.Action[monoid.InternalMap[A, B]]]
+          override def enumerateMorphisms[B](
+            target: SetsActionParalysis[B]
+          ): Iterable[Map[A, B]] =
+            ???
 
+/*         
         class SetsActionAnalysis[A](
           override val action: monoid.Action[A]
         ) extends ActionAnalysis[A, monoid.Action, monoid.InternalMap, SetsActionAnalysis]:
@@ -118,7 +127,8 @@ trait SetsMonoidAssistant extends BaseSets:
 
           override def enumerateMorphisms[B](
             target: SetsActionAnalysis[B]
-          ) =
+          ): Iterable[Map[A, B]] =
+            ???
             val srcComponents: Seq[ActionComponent[M, A, monoid.Action]] =
               actionSplitting.components
             val tgtComponents: Seq[ActionComponent[M, B, monoid.Action]] =
@@ -181,8 +191,6 @@ trait SetsMonoidAssistant extends BaseSets:
           override def makeExponential[B](
             analysisB: SetsActionAnalysis[B]
           ): monoid.Action[monoid.InternalMap[A, B]] = 
-            null.asInstanceOf[monoid.Action[monoid.InternalMap[A, B]]]
-/*              
             {
               implicit val mXa: Set[(M, A)] =
                 summon
@@ -211,7 +219,6 @@ trait SetsMonoidAssistant extends BaseSets:
               // twigg
               ???
             }
-*/
 
                 // override val evaluation =
                 //   morphisms
@@ -241,3 +248,4 @@ trait SetsMonoidAssistant extends BaseSets:
                 //       } arrow
                 //     )
                 //   }
+*/

@@ -220,7 +220,7 @@ trait MonoidActions[
           given Ɛ.Dot[A] = dotA.dot
           Ɛ.backDivideMonic[X, Y, A](arrow, monic)
 
-        val analyzer: monoid.ActionAnalyzer =
+        val analyzer: ActionAnalyzer[monoid.Action, monoid.InternalMap] =
           Ɛ.monoidAssistant.actionAnalyzer[M](monoid)
 
         override type TOOLKIT[A] = analyzer.ACTION_ANALYSIS[A]
@@ -248,18 +248,67 @@ trait MonoidActions[
     ): Iterable[A ~> B]
 
   trait MonoidAssistant:
-    def actionAnalyzer[M : Dot](monoid: Monoid[M]) : monoid.ActionAnalyzer
+    def actionAnalyzer[M : Dot](monoid: Monoid[M]) : ActionAnalyzer[monoid.Action, monoid.InternalMap]
+
+  trait ActionAnalyzer[ACTION[_], INTERNAL_MAP[_, _]]:
+    type ACTION_ANALYSIS[A] <: ActionAnalysis[A, ACTION, INTERNAL_MAP, ACTION_ANALYSIS]        
+    def analyze[A](
+      action: ACTION[A]
+    ) : ACTION_ANALYSIS[A]
 
   object DefaultMonoidAssistant extends MonoidAssistant:
     override def actionAnalyzer[M : Dot](
       monoid: Monoid[M]
-    ) : monoid.ActionAnalyzer =
-      new monoid.ActionAnalyzer:
-        override type ACTION_ANALYSIS[A] = monoid.DefaultActionAnalysis[A]
+    ) : ActionAnalyzer[monoid.Action, monoid.InternalMap] =
+      new ActionAnalyzer[monoid.Action, monoid.InternalMap]:
+        override type ACTION_ANALYSIS[A] = DefaultActionAnalysis[A]
         override def analyze[A](
           action: monoid.Action[A]
-        ) : monoid.DefaultActionAnalysis[A] =
-          new monoid.DefaultActionAnalysis[A](action)
+        ) : DefaultActionAnalysis[A] =
+          new DefaultActionAnalysis[A](action)
+
+        class DefaultActionAnalysis[A](
+          val action: monoid.Action[A]
+        ) extends ActionAnalysis[A, monoid.Action, monoid.InternalMap, DefaultActionAnalysis]:
+          given Dot[A] = action.dot
+          given Dot[M] = monoid.dot
+          override def makeExponential[B](
+            analysisB: DefaultActionAnalysis[B]
+          ): monoid.Action[monoid.InternalMap[A, B]] =
+            given Dot[B] = analysisB.action.dot
+            val eval: ((M, A) > B, (M, A)) ~> B =
+              evaluation[(M, A), B]
+            val isMorphism: ((M, A) > B) ~> BEWL =
+              ∀[(M, A) > B, M, A, M] {
+                (phi, m, a, n) =>
+                  analysisB.action.actionMultiply(eval(phi, m ⊕ a), n) =?= 
+                    eval(phi, monoid.multiply(m, n) ⊕ action.actionMultiply(a, n))
+              }
+            isMorphism.whereTrue {
+              [F] => (_ : Dot[F]) ?=> (equalizer: Equalizer[F, ((M, A) > B)]) =>
+                val action: monoid.Action[F] =
+                  monoid.Action {
+                    equalizer.restrict(
+                      transpose[(F, M), (M, A), B]{ case (f ⊕ m) ⊕ (n ⊕ a) =>
+                        val phi: CTXT[(M, A) > B] =
+                          equalizer.inclusion(f)
+                        eval(phi, monoid.multiply(m, n) ⊕ a)
+                      }
+                    )
+                  }
+                // awful, fix via refactoring Equalizer via Tagged to provide an implicit =:= rather than inclusion
+                action.asInstanceOf[monoid.Action[monoid.InternalMap[A, B]]]
+              }
+          override def enumerateMorphisms[B](
+            analysisB: DefaultActionAnalysis[B]
+          ): Iterable[A ~> B] =
+            given Dot[B] = analysisB.action.dot
+            morphisms[A, B] filter { (f: A ~> B) =>
+              ∀[(A, M)] { case a ⊕ m =>
+                f(action.actionMultiply(a, m)) =?=
+                  analysisB.action.actionMultiply(f(a), m)
+              }
+            }
 
   protected val monoidAssistant: MonoidAssistant =
     DefaultMonoidAssistant

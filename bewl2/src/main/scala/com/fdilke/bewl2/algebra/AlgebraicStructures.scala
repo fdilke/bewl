@@ -141,54 +141,6 @@ trait AlgebraicStructures[
         block
       }
 
-    trait ActionAnalyzer:
-      type ACTION_ANALYSIS[A] <: ActionAnalysis[A, Action, InternalMap, ACTION_ANALYSIS]        
-      def analyze[A](
-        action: Action[A]
-      ) : ACTION_ANALYSIS[A]
-
-    class DefaultActionAnalysis[A](
-      val action: Action[A]
-    ) extends ActionAnalysis[A, Action, InternalMap, DefaultActionAnalysis]:
-      override def makeExponential[B](
-        analysisB: DefaultActionAnalysis[B]
-      ): Action[InternalMap[A, B]] =
-        given Dot[A] = action.dot
-        given Dot[B] = analysisB.action.dot
-        val eval: ((M, A) > B, (M, A)) ~> B =
-          evaluation[(M, A), B]
-        val isMorphism: ((M, A) > B) ~> BEWL =
-          ∀[(M, A) > B, M, A, M] {
-            (phi, m, a, n) =>
-              analysisB.action.actionMultiply(eval(phi, m ⊕ a), n) =?= 
-                eval(phi, multiply(m, n) ⊕ action.actionMultiply(a, n))
-          }
-        isMorphism.whereTrue {
-          [F] => (_ : Dot[F]) ?=> (equalizer: Equalizer[F, ((M, A) > B)]) =>
-            val action: Action[F] =
-              Action {
-                equalizer.restrict(
-                  transpose[(F, M), (M, A), B]{ case (f ⊕ m) ⊕ (n ⊕ a) =>
-                    val phi: CTXT[(M, A) > B] =
-                      equalizer.inclusion(f)
-                    eval(phi, multiply(m, n) ⊕ a)
-                  }
-                )
-              }
-            action.asInstanceOf[Action[InternalMap[A, B]]]
-          }
-      override def enumerateMorphisms[B](
-        analysisB: DefaultActionAnalysis[B]
-      ): Iterable[A ~> B] =
-        given Dot[A] = action.dot
-        given Dot[B] = analysisB.action.dot
-        morphisms[A, B] filter { (f: A ~> B) =>
-          ∀[(A, M)] { case a ⊕ m =>
-            f(action.actionMultiply(a, m)) =?=
-              analysisB.action.actionMultiply(f(a), m)
-          }
-        }
-
     class Action[A: Dot](
       val actionMultiply: BiArrow[A, M, A]
     ) extends actions.Algebra[A](
