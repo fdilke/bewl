@@ -10,7 +10,7 @@ trait AbstractCyclic[A] {
 
 trait AbstractCyclics[A] {
   val cyclics: Seq[AbstractCyclic[A]]
-  val transversal: Seq[A]
+  lazy val transversal: Seq[A]
 
   def contains(a: A): Boolean
   def +(a: A): AbstractCyclics[A]
@@ -20,8 +20,8 @@ trait AbstractCyclics[A] {
 trait FindGenerators extends BaseSets {
 
   trait FindGeneratorAnalysis[M, A] {
-    val initialCyclics: AbstractCyclics[A]
-    val generators: Seq[A]
+    lazy val initialCyclics: AbstractCyclics[A]
+    lazy val generators: Seq[A]
   }
 
   trait GeneratorFinder[M, ACTION[_]]:
