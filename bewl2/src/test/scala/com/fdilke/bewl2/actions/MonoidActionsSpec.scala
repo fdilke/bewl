@@ -18,7 +18,7 @@ object SlowMonoidActionsSetup extends MonoidActionsSetup(Sets)
 object FastMonoidActionsSetup extends MonoidActionsSetup(FastSets)
 
 class SlowMonoidActionsSpec extends BaseMonoidActionsSpec(SlowMonoidActionsSetup.Fixtures)
-// class FastMonoidActionsSpec extends BaseMonoidActionsSpec(FastMonoidActionsSetup.Fixtures)
+class FastMonoidActionsSpec extends BaseMonoidActionsSpec(FastMonoidActionsSetup.Fixtures)
 
 trait MonoidActionsSetupFixtures[ACTION[_], RIGHT_IDEAL, INTERNAL_MAP[_, _]]:
   val actionTopos: Topos[ACTION, [A] =>> A, Void, Unit, RIGHT_IDEAL, INTERNAL_MAP]
@@ -103,9 +103,6 @@ abstract class BaseMonoidActionsSpec[ACTION[_], RIGHT_IDEAL, INTERNAL_MAP[_, _]]
         }
       )
 
-  // val fixtures: MonoidActionsFixtures,
-  // val actionTopos: Topos[ACTION, [A] =>> A, Void, Unit, RIGHT_IDEAL, INTERNAL_MAP]
-
 abstract class MonoidActionsSetup(val baseSets: BaseSets):
   import baseSets._
 
@@ -158,25 +155,7 @@ abstract class MonoidActionsSetup(val baseSets: BaseSets):
           f
       )
 
-// abstract class BaseMonoidActionsSpec(
-//   val fixtures: MonoidActionsFixtures
-// ) extends GenericToposSpec[
-//   fixtures.monoidOf3.Action, [A] =>> A, Void, Unit, fixtures.monoidOf3.RightIdeal, fixtures.monoidOf3.InternalMap
-//   ](
-//   fixtures.actionTopos
-// ):
-
-// fixtures.monoidOf3.InternalMap
-// fixtures.monoidOf3.RightIdeal
-// fixtures.monoidOf3.Action
-
-// abstract class BaseMonoidActionsSpec[ACTION[_], RIGHT_IDEAL, INTERNAL_MAP[_, _]](
-//   val fixtures: MonoidActionsFixtures
-// ) extends GenericToposSpec[ACTION, [A] =>> A, Void, Unit, RIGHT_IDEAL, INTERNAL_MAP](
-//   fixtures.actionTopos
-// )
-
-object CommonSymbolDefs: // TODO fix this!
+object CommonSymbolDefs:
   object Rope extends Opacity[String]
   type ROPE = Rope.theType
   val Seq(e, a, b): Seq[Symbol] = 

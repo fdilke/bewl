@@ -1,78 +1,65 @@
 package com.fdilke.bewl2.sets.morphenum
 
 import com.fdilke.bewl2.sets.FastSets
-import com.fdilke.bewl2.sets.FiniteSets.ActionComponent
-import com.fdilke.bewl2.sets.FiniteSetsUtilities.{dot, elementsOf}
-import com.fdilke.bewl2.topos.algebra.KnownMonoids.monoidOf3
-import com.fdilke.bewl2.topos.algebra.KnownMonoids.monoidOf3.Action
-import org.scalatest.matchers.should.Matchers._
+import FastSets.{ ActionComponent, ActionSplitter, GeneratorFinder, PresentationFinder }
 
-import org.scalatest.freespec.AnyFreeSpec
-import com.fdilke.bewl.helper.StandardSymbols.{i, x, y}
+import com.fdilke.bewl2.utility.StockStructures._
 import scala.language.{postfixOps, reflectiveCalls}
 
-class ActionSplitterTest extends AnyFreeSpec {
-  import monoidOf3.regularAction
+import com.fdilke.bewl2.utility.RichFunSuite
+import com.fdilke.bewl2.helper.BuildEquivalence
+import scala.language.{existentials, reflectiveCalls}
 
-  private val splitter: FiniteSets.ActionSplitter[
-    Symbol,
-    ({ type λ[T] = monoidOf3.Action[T] })#λ
-  ] =
-    FiniteSets.ActionSplitter.forMonoid(
-      monoidOf3
-    )
+class ActionSplitterTest extends RichFunSuite:
 
-  def components[A](
-    action: Action[A]
-  ): Seq[
-    ActionComponent[
-      Symbol,
-      A,
-      ({ type λ[T] = monoidOf3.Action[T] })#λ
-    ]
-  ] =
-    splitter
-      .splitAction(
-        action
-      ) components
+  withMonoidOf3(FastSets):
+    (_: FastSets.Dot[Symbol]) ?=> (monoidOf3: FastSets.Monoid[Symbol]) ?=>
 
-  private val scalarMultiply: (String, Symbol) => String =
-    (s, m) => monoidOf3.multiply(Symbol(s), m).name
+      monoidOf3.withRegularAction:
+        (regularAction: monoidOf3.Action[Symbol]) ?=>
 
-  private val barDot: FiniteSets.DOT[String] = dot("x", "y")
+        val generatorFinder: GeneratorFinder[Symbol, monoidOf3.Action] =
+          GeneratorFinder.forMonoid(monoidOf3)
+        val presentationFinder: PresentationFinder[Symbol, monoidOf3.Action] =
+          PresentationFinder.forMonoid(monoidOf3, generatorFinder)
 
-  private val bar = monoidOf3.action(barDot)(scalarMultiply)
+        val splitter: ActionSplitter[
+          Symbol,
+          ({ type λ[T] = monoidOf3.Action[T] })#λ
+        ] = ActionSplitter.forMonoid(monoidOf3, generatorFinder, presentationFinder)
 
-  "The action splitter can extract a coproduct decomposition" - {
-    "for the empty monoid action" in {
-      components(
-        monoidOf3.voidAction
-      ) shouldBe empty
-    }
+        def components[A](action: monoidOf3.Action[A]): Seq[
+          ActionComponent[Symbol, A, monoidOf3.Action]
+        ] =
+          splitter.splitAction(action).components
 
-    "for the regular monoid action" in {
-      val regularSplitting =
-        components(
-          regularAction
-        )
+        // val scalarMultiply: ((String, Symbol)) => String =
+        //   (s, m) => monoidOf3.multiply(Symbol(s), m).name
 
-      regularSplitting should have size 1
-      elementsOf(
-        regularSplitting.head.componentAction.actionCarrier
-      ) should have size 3
-    }
+        FastSets.withDot(Set[String]("x", "y")):
 
-    "for regularAction x bar" in {
-      val regbarSplitting =
-        components(
-          regularAction.x(bar)
-        )
+          val bar: monoidOf3.Action[String] =
+            monoidOf3.Action:
+              (s, m) => monoidOf3.multiply(Symbol(s), m).name
+            //  monoidOf3.Action(scalarMultiply)
 
-      regbarSplitting should have size 1
 
-      elementsOf(
-        regbarSplitting.head.componentAction.actionCarrier
-      ).size shouldBe 12
-    }
-  }
-}
+          test("Action splitter extracts coproduct decomposition for the empty monoid action"):
+            monoidOf3.withVoidAction:
+              (voidAction: monoidOf3.Action[Void]) ?=> 
+                components(voidAction).isEmpty is true
+
+          test("and for the regular monoid action"):
+            val regularSplitting: Seq[ActionComponent[Symbol, Symbol, monoidOf3.Action]] =
+              components(regularAction)
+
+            regularSplitting.size is 1
+            regularSplitting.head.componentAction.dot.dot.size is 3
+
+          test("and for regularAction x bar"):
+            val regbarSplitting: Seq[ActionComponent[Symbol, (Symbol, String), monoidOf3.Action]]=
+              components(regularAction.x(bar))
+
+            regbarSplitting.size is 1
+            regbarSplitting.head.componentAction.dot.dot.size is 12
+
