@@ -1,70 +1,56 @@
 package com.fdilke.bewl2.sets.morphenum
 
-import com.fdilke.bewl3.sets.FiniteSets
-import com.fdilke.bewl2.sets.FiniteSets.{
-  >,
-  FindGeneratorAnalysis,
-  FindGenerators,
-  FindPresentation,
-  Monoid,
-  ToposOfMonoidActions
-}
-import com.fdilke.bewl.fsets.FiniteSetsUtilities.dot
-import com.fdilke.bewl.helper.StandardSymbols
-import com.fdilke.bewl.helper.StandardSymbols.{i, iso}
-import org.scalatest.matchers.should.Matchers._
+import com.fdilke.bewl2.sets.FastSets
+import FastSets.{ Dot, Monoid, ActionComponent, ActionSplitter, GeneratorFinder, PresentationFinder, RichArrow }
+
+import com.fdilke.bewl2.utility.StockStructures._
+import scala.language.{postfixOps, reflectiveCalls}
+
+import com.fdilke.bewl2.utility.RichFunSuite._
 
 import scala.language.{postfixOps, reflectiveCalls}
 
-object CheckExtractPresentation {
+object CheckExtractPresentation:
   def apply[M, A](
     monoid: Monoid[M]
   )(
     action: monoid.Action[A]
-  ): Unit = {
+  ): Unit =
+    val generatorFinder: GeneratorFinder[M, monoid.Action] =
+      GeneratorFinder.forMonoid(monoid)
     val generatorsWithRelators: Seq[GeneratorWithRelators[M, A]] =
-      FindPresentation.forMonoid(
-        monoid
-      )(
+      PresentationFinder.forMonoid(
+        monoid,
+        generatorFinder
+      ).findPresentation(
         action,
-        FindGenerators
-          .forMonoid(
-            monoid
-          )(
-            action
-          )
-          .generators
+        generatorFinder.findGenerators(action).generators
       )
 
+    val i: M = monoid.unit(())
     for {
       (g, index) <- generatorsWithRelators.zipWithIndex
     } {
-      g.relators should not contain Relator(i, index, i)
+      g.relators.contains(Relator(i, index, i)) is false
     }
 
-    val presentedAction =
-      FiniteSetsPresentedAction(
-        monoid
-      )(
-        generatorsWithRelators
-      )
+    val presentedAction: PresentedAction[Int, monoid.Action] =
+      FiniteSetsPresentedAction(monoid)(generatorsWithRelators)
     presentedAction.sanityTest
 
     // Check this presents the original action
-    val theProjection: Int > A =
+    val theProjection: Int => A =
       presentedAction.project(
         action,
-        generatorsWithRelators.map {
-          _.generator
-        }
+        generatorsWithRelators.map { _.generator }
       )
 
+    given monoid.Action[Int] = presentedAction.action
+    given Dot[Int] = presentedAction.action.dot
+    given monoid.Action[A] = action
+    given Dot[A] = action.dot
     monoid.actions.isMorphism(
-      presentedAction.action,
-      action,
       theProjection
-    ) shouldBe true
+    ) is true
 
-    theProjection shouldBe iso
-  }
-}
+    theProjection.isIso is true

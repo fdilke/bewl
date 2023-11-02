@@ -6,11 +6,12 @@ import FastSets.{ ActionComponent, ActionSplitter, GeneratorFinder, Presentation
 import com.fdilke.bewl2.utility.StockStructures._
 import scala.language.{postfixOps, reflectiveCalls}
 
-import com.fdilke.bewl2.utility.RichFunSuite
+import munit.FunSuite
+import com.fdilke.bewl2.utility.RichFunSuite._
 import com.fdilke.bewl2.helper.BuildEquivalence
 import scala.language.{existentials, reflectiveCalls}
 
-class ActionSplitterTest extends RichFunSuite:
+class ActionSplitterTest extends FunSuite:
 
   withMonoidOf3(FastSets):
     (_: FastSets.Dot[Symbol]) ?=> (monoidOf3: FastSets.Monoid[Symbol]) ?=>
@@ -33,17 +34,7 @@ class ActionSplitterTest extends RichFunSuite:
         ] =
           splitter.splitAction(action).components
 
-        // val scalarMultiply: ((String, Symbol)) => String =
-        //   (s, m) => monoidOf3.multiply(Symbol(s), m).name
-
         FastSets.withDot(Set[String]("x", "y")):
-
-          val bar: monoidOf3.Action[String] =
-            monoidOf3.Action:
-              (s, m) => monoidOf3.multiply(Symbol(s), m).name
-            //  monoidOf3.Action(scalarMultiply)
-
-
           test("Action splitter extracts coproduct decomposition for the empty monoid action"):
             monoidOf3.withVoidAction:
               (voidAction: monoidOf3.Action[Void]) ?=> 
@@ -57,8 +48,11 @@ class ActionSplitterTest extends RichFunSuite:
             regularSplitting.head.componentAction.dot.dot.size is 3
 
           test("and for regularAction x bar"):
+            val bar: monoidOf3.Action[String] =
+              monoidOf3.Action:
+                (s, m) => monoidOf3.multiply(Symbol(s), m).name
             val regbarSplitting: Seq[ActionComponent[Symbol, (Symbol, String), monoidOf3.Action]]=
-              components(regularAction.x(bar))
+              components(regularAction x bar)
 
             regbarSplitting.size is 1
             regbarSplitting.head.componentAction.dot.dot.size is 12

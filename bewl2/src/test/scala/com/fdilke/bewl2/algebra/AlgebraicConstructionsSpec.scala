@@ -5,9 +5,10 @@ import com.fdilke.bewl2.algebra.Principal
 import com.fdilke.bewl2.sets.Sets
 import com.fdilke.bewl2.sets.SetsUtilities.*
 import com.fdilke.bewl2.utility.StockStructures.*
-import com.fdilke.bewl2.utility.{RichFunSuite, StockSymbols}
+import com.fdilke.bewl2.utility.StockSymbols
 import munit.Clue.generate
 import munit.FunSuite
+import com.fdilke.bewl2.utility.RichFunSuite._
 
 import scala.Function.tupled
 import scala.collection.immutable.Set
@@ -15,7 +16,7 @@ import scala.language.postfixOps
 import Sets.*
 import Sets.StandardTermsAndOperators.*
 
-class AlgebraicConstructionsSpec extends RichFunSuite:
+class AlgebraicConstructionsSpec extends FunSuite:
   
   test("Construct cyclic groups"):
     withCyclicGroup(order = 17) {

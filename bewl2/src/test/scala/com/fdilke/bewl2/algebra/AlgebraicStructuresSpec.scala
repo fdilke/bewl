@@ -6,9 +6,9 @@ import com.fdilke.bewl2.sets.Sets
 import com.fdilke.bewl2.sets.SetsUtilities.*
 import com.fdilke.bewl2.utility.StockStructures.*
 import com.fdilke.bewl2.utility.StockSymbols.*
-import com.fdilke.bewl2.utility.RichFunSuite
 import munit.Clue.generate
 import munit.FunSuite
+import com.fdilke.bewl2.utility.RichFunSuite._
 
 import scala.Function.{tupled, untupled}
 import scala.language.postfixOps
@@ -17,7 +17,7 @@ import Sets.*
 import Sets.StandardTermsAndOperators.*
 import com.fdilke.utility.Shortcuts.*
 
-class AlgebraicStructuresSpec extends RichFunSuite:
+class AlgebraicStructuresSpec extends FunSuite:
 
   test("Algebraic theories support binary multiplication of their algebras"):
     withCyclicGroup(order = 2) {

@@ -1,12 +1,13 @@
 package com.fdilke.bewl2.algebra
 
 import com.fdilke.bewl2.sets.SetsUtilities.*
-import com.fdilke.bewl2.utility.RichFunSuite
+import munit.FunSuite
+import com.fdilke.bewl2.utility.RichFunSuite._
 
 import scala.Function.tupled
 import scala.language.postfixOps
 
-class AlgebraicTheoriesSpec extends RichFunSuite:
+class AlgebraicTheoriesSpec extends FunSuite:
 
   private val topos = com.fdilke.bewl2.sets.Sets
   import topos.*

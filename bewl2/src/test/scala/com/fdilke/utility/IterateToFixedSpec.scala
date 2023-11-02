@@ -1,9 +1,10 @@
 package com.fdilke.utility
 
-import com.fdilke.bewl2.utility.RichFunSuite
+import munit.FunSuite
+import com.fdilke.bewl2.utility.RichFunSuite._
 import scala.collection.mutable.ListBuffer
 
-class IterateToFixedSpec extends RichFunSuite:
+class IterateToFixedSpec extends FunSuite:
   test("Iterating to a fixed point works"):
     val argumentsSeen = new ListBuffer[Int]
     def collatz(n: Int) =

@@ -2,12 +2,13 @@ package com.fdilke.bewl2.helper
 
 import munit.FunSuite
 import munit.Clue.generate
-import com.fdilke.bewl2.utility.RichFunSuite
+import munit.FunSuite
+import com.fdilke.bewl2.utility.RichFunSuite._
 import Tagged.*
 import java.nio.file.{Files, Path}
 import java.util.concurrent.atomic.AtomicInteger
 
-class TaggedSpec extends RichFunSuite:
+class TaggedSpec extends FunSuite:
 
   test("Can tag and untag primitive types"):
     val obj: Int = 2

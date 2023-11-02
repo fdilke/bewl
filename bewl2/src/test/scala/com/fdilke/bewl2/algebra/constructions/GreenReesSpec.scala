@@ -1,13 +1,13 @@
 package com.fdilke.bewl2.algebra.constructions
 
-
-import com.fdilke.bewl2.utility.RichFunSuite
+import munit.FunSuite
+import com.fdilke.bewl2.utility.RichFunSuite._
 import com.fdilke.bewl2.sets.SetsUtilities.*
 import java.util.concurrent.atomic.AtomicBoolean
 import com.fdilke.utility.Shortcuts._
 import GreenRees.*
 
-class GreenReesSpec extends RichFunSuite:
+class GreenReesSpec extends FunSuite:
 
   test("Can create standard alphabets"):
     alphabetOfSize(0) is ""
