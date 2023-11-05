@@ -1,70 +1,65 @@
 package com.fdilke.bewl2.sets.morphenum
 
-import com.fdilke.bewl2.sets.FiniteSets
-import FiniteSets.{
-  >,
-  bifunctionAsBiArrow,
-  functionAsArrow,
-  DefaultMonoidAssistant,
-  LocalMonoidAssistant,
-  Monoid,
-  ToposOfMonoidActions
-}
-import org.scalatest.matchers.should.Matchers._
-import com.fdilke.bewl.testutil.CustomMatchers._
+import com.fdilke.bewl2.sets.FastSets
+import FastSets.{ Dot, DefaultMonoidAssistant, LocalMonoidAssistant, Monoid, ActionAnalyzer, RichArrow }
+import com.fdilke.bewl2.utility.RichFunSuite._
 
-object CheckLocalMorphismEnumerator {
-  def apply[M, X, Y](
-    monoid: Monoid[M]
-  )(
+object CheckLocalMorphismEnumerator:
+  def apply[M, X, Y](monoid: Monoid[M])(
     sourceAction: monoid.Action[X],
     targetAction: monoid.Action[Y],
     thorough: Boolean
-  ): Unit = {
-    val localAnalyzer: monoid.ActionAnalyzer =
-      LocalMonoidAssistant.actionAnalyzer(
-        monoid
-      )
+  ): Unit =
+    given Dot[M] = monoid.dot
+    given Dot[X] = sourceAction.dot
+    given monoid.Action[X] = sourceAction
+    given Dot[Y] = targetAction.dot
+    given monoid.Action[Y] = targetAction
+    val localAnalyzer: ActionAnalyzer[monoid.Action, monoid.InternalMap] =
+      LocalMonoidAssistant.actionAnalyzer(monoid)
 
     def enumerateMorphisms(
-      analyzer: monoid.ActionAnalyzer
-    ): Iterable[X > Y] =
-      analyzer
-        .analyze(
-          sourceAction
-        )
-        .morphismsTo(
-          analyzer.analyze(
-            targetAction
-          )
+      analyzer: ActionAnalyzer[monoid.Action, monoid.InternalMap]
+    ): Iterable[X => Y] =
+      analyzer.enumerateMorphisms(
+          analyzer.analyze(sourceAction),
+          analyzer.analyze(targetAction)
         )
 
-    val localMorphisms =
-      enumerateMorphisms(
-        localAnalyzer
-      )
+    val localMorphisms: Iterable[X => Y] =
+      enumerateMorphisms(localAnalyzer)
 
     localMorphisms.forall {
-      monoid.actions.isMorphism(
-        sourceAction,
-        targetAction,
-        _
-      )
-    } shouldBe true
+      monoid.actions.isMorphism(_)
+    } is true
 
     if (thorough) {
-      val defaultAnalyzer: monoid.ActionAnalyzer =
-        DefaultMonoidAssistant.actionAnalyzer(
-          monoid
-        )
+      val defaultAnalyzer: ActionAnalyzer[monoid.Action, monoid.InternalMap] =
+        DefaultMonoidAssistant.actionAnalyzer(monoid)
 
-      val defaultMorphisms =
-        enumerateMorphisms(
-          defaultAnalyzer
-        )
+      val defaultMorphisms: Iterable[X => Y] =
+        enumerateMorphisms(defaultAnalyzer)
 
-      localMorphisms should not(containDuplicates)
-      localMorphisms should contain theSameElementsAs defaultMorphisms
+      checkNoDuplicates(localMorphisms)
+      checkSameMorphisms(localMorphisms, defaultMorphisms)
     }
-  }
-}
+
+  def checkNoDuplicates[X: Dot, Y: Dot](
+    morphisms: Iterable[X => Y]
+  ): Unit =
+    for
+      (f, i) <- morphisms.zipWithIndex
+      (g, j) <- morphisms.zipWithIndex if (i < j)
+    do
+      (f =!= g) is false
+
+  def checkSameMorphisms[X: Dot, Y: Dot](
+    morphisms1: Iterable[X => Y],
+    morphisms2: Iterable[X => Y]
+  ): Unit =
+    def asMap(morphism: X => Y): Map[X, Y] =
+      summon[Dot[X]].dot.map { x => 
+        x -> morphism(x)
+      }.toMap
+    morphisms1.map(asMap) is morphisms2.map(asMap)
+

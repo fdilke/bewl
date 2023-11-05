@@ -1,52 +1,57 @@
 package com.fdilke.bewl2.sets.morphenum
 
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.should.Matchers._
-import com.fdilke.bewl.helper.StandardSymbols.{x, y, z}
+import munit.FunSuite
+import com.fdilke.bewl2.utility.RichFunSuite._
 
-class CullRelatorsTest extends AnyFreeSpec {
-  "Culling relators" - {
-    "preserves irredundant sets" in {
+class CullRelatorsTest extends FunSuite:
+  val Seq(x, y, z) =
+    Seq[String]("x", "y", "z").map { Symbol(_) }
+
+  test("Culling relators preserves irredundant sets"):
+    checkSameElementsAs(
       CullRelators(
         1,
         Seq(
           Relator(x, 0, y)
         )
-      ) should contain theSameElementsAs Seq(
+      ),
+      Seq(
         Relator(x, 0, y)
       )
-    }
+    )
 
-    "removes diagonal entries" in {
-      CullRelators(
-        1,
+    test("Culling relators removes diagonal entries"):
+      checkSameElementsAs(
+        CullRelators(
+          1,
+          Seq(
+            Relator(x, 0, y),
+            Relator(z, 1, z),
+            Relator(y, 0, y)
+          )
+        ),
         Seq(
           Relator(x, 0, y),
-          Relator(z, 1, z),
           Relator(y, 0, y)
         )
-      ) should contain theSameElementsAs Seq(
-        Relator(x, 0, y),
-        Relator(y, 0, y)
       )
-    }
-
-    "removes symmetric entries" in {
-      CullRelators(
-        1,
+    
+    test("Culling relators removes symmetric entries"):
+      checkSameElementsAs(
+        CullRelators(
+          1,
+          Seq(
+            Relator(x, 0, y),
+            Relator(x, 1, z),
+            Relator(y, 0, x),
+            Relator(z, 1, x),
+            Relator(z, 1, y)
+          )
+        ),
         Seq(
           Relator(x, 0, y),
           Relator(x, 1, z),
           Relator(y, 0, x),
-          Relator(z, 1, x),
           Relator(z, 1, y)
         )
-      ) should contain theSameElementsAs Seq(
-        Relator(x, 0, y),
-        Relator(x, 1, z),
-        Relator(y, 0, x),
-        Relator(z, 1, y)
       )
-    }
-  }
-}

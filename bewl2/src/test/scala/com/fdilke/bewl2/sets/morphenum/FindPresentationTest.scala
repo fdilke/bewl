@@ -1,99 +1,77 @@
 package com.fdilke.bewl2.sets.morphenum
 
-import com.fdilke.bewl2.sets.FiniteSets
-import com.fdilke.bewl2.sets.FiniteSets.{
-  >,
+import munit.FunSuite
+import com.fdilke.bewl2.utility.RichFunSuite._
+import com.fdilke.bewl2.topos.Topos
+
+import com.fdilke.bewl2.sets.{ FastSets }
+import FastSets.{
+  withDot,
+  Monoid,
+  Dot,
   FindGeneratorAnalysis,
-  FindGenerators,
-  ToposOfMonoidActions
+  GeneratorFinder,
+  PresentationFinder,
 }
-import com.fdilke.bewl.fsets.FiniteSetsUtilities.dot
-import com.fdilke.bewl.topos.algebra.KnownMonoids.monoidOf3
-import com.fdilke.bewl.helper.StandardSymbols.{i, x, y}
-import org.scalatest.freespec.AnyFreeSpec
-import org.scalatest.matchers.should.Matchers._
+import com.fdilke.bewl2.utility.StockStructures._
 
 import scala.language.{postfixOps, reflectiveCalls}
 
-class FindPresentationTest extends AnyFreeSpec {
+class FindPresentationTest extends FunSuite:
 
-  import monoidOf3.{regularAction, Action}
+  private val Seq(i, x, y) =
+    Seq[String]("i", "x", "y").map { Symbol(_) }
 
-  private val findGenerators: {
-    def apply[A](
-      action: Action[A]
-    ): FindGeneratorAnalysis[Symbol, A]
-  } =
-    FindGenerators.forMonoid(
-      monoidOf3
-    )
+  withMonoidOf3(FastSets):
+    (_: Dot[Symbol]) ?=> (monoidOf3: FastSets.Monoid[Symbol]) ?=>
 
-  private val findPresentation =
-    FiniteSets.FindPresentation.forMonoid(
-      monoidOf3
-    )
+    monoidOf3.withRegularAction:
+      (regularAction: monoidOf3.Action[Symbol]) ?=>
 
-  def findPresentation[A](
-    action: Action[A]
-  ): Seq[GeneratorWithRelators[Symbol, A]] =
-    findPresentation(
-      action,
-      findGenerators(
-        action
-      ) generators
-    )
+      val generatorFinder: GeneratorFinder[Symbol, monoidOf3.Action] =
+        GeneratorFinder.forMonoid(monoidOf3)
+      val presentationFinder: PresentationFinder[Symbol, monoidOf3.Action] =
+        PresentationFinder.forMonoid(monoidOf3, generatorFinder)
 
-  private val actionTopos =
-    ToposOfMonoidActions.of(monoidOf3, FiniteSets.DefaultMonoidAssistant)
+      val actionTopos: Topos[
+        monoidOf3.Action, [A] =>> A, Void, Unit, monoidOf3.RightIdeal, monoidOf3.InternalMap
+      ] =
+        monoidOf3.actionTopos
 
-  private val scalarMultiply: (String, Symbol) => String =
-    (s, m) => monoidOf3.multiply(Symbol(s), m).name
+      val scalarMultiply: ((String, Symbol)) => String =
+        (s, m) => monoidOf3.multiply(Symbol(s), m).name
 
-  private val barDot: FiniteSets.DOT[String] = dot("x", "y")
+      val omega: monoidOf3.Action[monoidOf3.RightIdeal] =
+        actionTopos.pretopos.omegaDot
 
-  private val bar = monoidOf3.action(barDot)(scalarMultiply)
+      def canExtractPresentation[A](action: monoidOf3.Action[A]) =
+        CheckExtractPresentation(monoidOf3)(action)
 
-  "The presentation finder can extract a presentation" - {
-    "for the regular monoid action" in {
-      canExtractPresentation(monoidOf3.regularAction)
-    }
-    "for an empty monoid action" in {
-      canExtractPresentation(
-        monoidOf3.voidAction
-      )
-    }
-    "for a right ideal action" in {
-      canExtractPresentation(
-        bar
-      )
-    }
-    "for a right ideal squared action" in {
-      canExtractPresentation(
-        bar.x(bar)
-      )
-    }
-    "for the truth object monoid action" in {
-      canExtractPresentation(
-        actionTopos.unwrap(
-          actionTopos.omega
-        )
-      )
-    }
-    "for a more fancy monoid action" in {
-      canExtractPresentation(
-        actionTopos.unwrap(
-          actionTopos.omega.x(
-            actionTopos.makeDot(
-              monoidOf3.regularAction
-            )
-          )
-        )
-      )
-    }
-  }
+      withDot(Set[String]("x", "y")):
+        (barDot: Dot[String]) ?=>
 
-  private def canExtractPresentation[A](
-    action: monoidOf3.Action[A]
-  ) =
-    CheckExtractPresentation(monoidOf3)(action)
-}
+        monoidOf3.withAction(scalarMultiply):
+          (bar: monoidOf3.Action[String]) ?=>
+
+          test("Can extract a presentation for the regular monoid action"):
+            canExtractPresentation(regularAction)
+
+          test("Can extract a presentation for an empty monoid action"):
+            monoidOf3.withVoidAction:
+              (voidAction: monoidOf3.Action[Void]) ?=>
+                canExtractPresentation(voidAction)
+      
+          test("Can extract a presentation for a sample action"):
+            canExtractPresentation(bar)
+
+          test("Can extract a presentation for a sample action squared"):
+            canExtractPresentation(bar.x(bar))
+
+          test("Can extract a presentation for the truth object monoid action"):
+            canExtractPresentation(omega)
+
+          test("Can extract a presentation for a more fancy monoid action"):
+            canExtractPresentation(
+              omega x regularAction
+
+

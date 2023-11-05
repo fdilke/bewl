@@ -10,7 +10,6 @@ import StockEnums.Direction
 import Direction._
 import com.fdilke.bewl2.utility.Opacity
 import com.fdilke.utility.TimeIt
-import com.fdilke.bewl2.utility.RichFunSuite
 import cats.syntax.monoid
 import CommonSymbolDefs._
 

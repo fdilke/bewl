@@ -1,13 +1,14 @@
 package com.fdilke.utility
 
-import com.fdilke.bewl2.utility.RichFunSuite
+import munit.FunSuite
+import com.fdilke.bewl2.utility.RichFunSuite._
 import com.fdilke.utility.Mask.*
 import junit.framework.TestCase
 
 import scala.runtime.Arrays
 import scala.quoted.*
 
-class EnumValuesSpec extends RichFunSuite:
+class EnumValuesSpec extends FunSuite:
   enum Suit:
     case Hearts, Diamonds, Clubs, Spades
   import Suit.*

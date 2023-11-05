@@ -21,6 +21,8 @@ object RichFunSuite:
     inline def isNotArrow(arrow2: A => B): Unit =
       assert(!(arrow =!= arrow2))
 
+  def checkSameElementsAs[X](thing: Seq[S], other: Seq[S]): Unit =
+    thing.toSet is other.toSet
   // extension(text: String)
   //   inline def is(letters: Seq[Char]): Unit =
   //     assertEquals(letters, text.toSeq)

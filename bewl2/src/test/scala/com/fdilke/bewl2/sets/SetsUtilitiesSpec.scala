@@ -2,16 +2,16 @@ package com.fdilke.bewl2.sets;
 
 import junit.framework.TestCase
 import munit.FunSuite
+import com.fdilke.bewl2.utility.RichFunSuite._
 import SetsUtilities.*
 import com.fdilke.bewl2.sets.Sets
 import Sets.*
 
 import scala.language.postfixOps
-import com.fdilke.bewl2.utility.RichFunSuite
 
 import java.util.concurrent.atomic.AtomicBoolean
 
-class SetsUtilitiesSpec extends RichFunSuite:
+class SetsUtilitiesSpec extends FunSuite:
   test("enumerates all maps between two sets"):
       allMaps(Set(1, 2), Set("a", "b", "c")).map { f =>
           Seq(f(1), f(2))
