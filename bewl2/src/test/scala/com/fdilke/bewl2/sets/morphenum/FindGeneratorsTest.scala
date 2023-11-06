@@ -1,114 +1,98 @@
 package com.fdilke.bewl2.sets.morphenum
 
-import com.fdilke.bewl2.sets.FastSets
-import FastSets.ToposOfMonoidActions
-import com.fdilke.bewl2.topos.algebra.KnownMonoids.monoidOf3
-import org.scalatest.matchers.should.Matchers._
-import com.fdilke.bewl.helper.StandardSymbols.{i, x, y}
-import org.scalatest.freespec.AnyFreeSpec
+import munit.FunSuite
+import com.fdilke.bewl2.utility.RichFunSuite._
+import com.fdilke.bewl2.topos.Topos
 
-import scala.language.reflectiveCalls
+import com.fdilke.bewl2.sets.{ FastSets }
+import FastSets.{
+  withDot,
+  Monoid,
+  Dot,
+  FindGeneratorAnalysis,
+  GeneratorFinder,
+  PresentationFinder,
+}
+import com.fdilke.bewl2.utility.StockStructures._
 
-class FindGeneratorsTest extends AnyFreeSpec {
+import scala.language.{postfixOps, reflectiveCalls}
 
-  import monoidOf3.regularAction
+class FindGeneratorsTest extends FunSuite:
 
-  private val finder =
-    FiniteSets.FindGenerators.forMonoid(
-      monoidOf3
-    )
+  private val Seq(i, x, y) =
+    Seq[String]("i", "x", "y").map { Symbol(_) }
 
-  import finder.apply
+  withMonoidOf3(FastSets):
+    (_: Dot[Symbol]) ?=> (monoidOf3: FastSets.Monoid[Symbol]) ?=>
 
-  private val regularAnalysis =
-    apply(
-      regularAction
-    )
+    monoidOf3.withRegularAction:
+      (regularAction: monoidOf3.Action[Symbol]) ?=>
 
-  private val actionTopos =
-    ToposOfMonoidActions.of(monoidOf3, FiniteSets.DefaultMonoidAssistant)
+      val generatorFinder: GeneratorFinder[Symbol, monoidOf3.Action] =
+        GeneratorFinder.forMonoid(monoidOf3)
+      val presentationFinder: PresentationFinder[Symbol, monoidOf3.Action] =
+        PresentationFinder.forMonoid(monoidOf3, generatorFinder)
 
-  "The generator finder" - {
-    "can build up a set of maximal cyclic subalgebras for a monoid action" - {
+      val regularAnalysis: FindGeneratorAnalysis[Symbol, Symbol] =
+        generatorFinder.findGenerators(regularAction)
+
+      val actionTopos: Topos[
+        monoidOf3.Action, [A] =>> A, Void, Unit, monoidOf3.RightIdeal, monoidOf3.InternalMap
+      ] =
+        monoidOf3.actionTopos
+
       import regularAnalysis.initialCyclics
+      test("Action analysis gives maximal cyclic subalgebras which are initially empty"):
+        initialCyclics.cyclics.isEmpty is true
+        initialCyclics.contains(i) is false
+        initialCyclics.transversal.isEmpty is true
 
-      "which are initially empty" in {
-
-        initialCyclics.cyclics shouldBe empty
-
-        initialCyclics.contains(i) shouldBe false
-
-        initialCyclics.transversal shouldBe empty
-      }
-
-      "which can be added to, filtering out any eclipsed cyclics" in {
-        val cyclics_I =
+      test("MCSs can be added to, filtering out any eclipsed cyclics"):
+        val cyclics_I: AbstractCyclics[Symbol] =
           initialCyclics + i
 
-        cyclics_I.cyclics should have size 1
+        cyclics_I.cyclics.size is 1
 
-        val cyclics_X_Y =
+        val cyclics_X_Y: AbstractCyclics[Symbol] =
           initialCyclics + x + y
 
-        cyclics_X_Y.cyclics should have size 1
+        cyclics_X_Y.cyclics.size is 1
 
-        val theCyclics =
+        val theCyclics: Seq[AbstractCyclic[Symbol]] =
           (cyclics_X_Y + i).cyclics
 
-        theCyclics should have size 1
-        theCyclics.head.generator shouldEqual i
-      }
+        theCyclics.size is 1
+        theCyclics.head.generator is i
 
-      "which can be used to build up the complete set" in {
-        val allMaxCyclics =
+      test("MCSs can be used to build up the complete set"):
+        val allMaxCyclics: AbstractCyclics[Symbol] =
           Seq(i, x, y).foldLeft(
             initialCyclics
-          ) {
-            _ << _
-          }
+          ) { _ << _ }
 
-        val theCyclics =
+        val theCyclics: Seq[AbstractCyclic[Symbol]] =
           allMaxCyclics.cyclics
 
-        theCyclics should have size 1
-        theCyclics.head.generator shouldEqual i
-      }
+        theCyclics.size is 1
+        theCyclics.head.generator is i
 
-      "as expected for the empty action" in {
-        apply(
-          monoidOf3.voidAction
-        ).generators shouldBe empty
-      }
+      test("MCSs are as expected for the void action"):
+        monoidOf3.withVoidAction:
+          (voidAction: monoidOf3.Action[Void]) ?=>
+          generatorFinder.findGenerators(voidAction).generators.isEmpty is true
 
-      "as expected for a non-cyclic action" in {
-        val regularSquared =
-          actionTopos.unwrap(
-            actionTopos
-              .makeDot(
-                regularAction
-              )
-              .squared
-          )
-        apply(
+      test("MCSs are as expected for a non-cyclic action"):
+        val regularSquared: monoidOf3.Action[(Symbol, Symbol)] = 
+          regularAction x regularAction
+        generatorFinder.findGenerators(
           regularSquared
-        ).generators should have size 7
-      }
+        ).generators.size is 7
 
-      "as expected for another non-cyclic action" in {
-        val theOmega =
-          actionTopos.unwrap(
-            actionTopos.omega
-          )
-        apply(
-          theOmega
-        ).generators should have size 2
-      }
-    }
+      test("MCSs are as expected for another non-cyclic action"):
+        val omega: monoidOf3.Action[monoidOf3.RightIdeal] =
+          actionTopos.pretopos.omegaDot
+        generatorFinder.findGenerators(omega).generators.size is 2
+      
+      test("MCSs can extract a set of generators for a monoid action"):
+        generatorFinder.findGenerators(regularAction).generators is Seq(i)
 
-    "can extract a set of generators for a monoid action" in {
-      apply(
-        monoidOf3.regularAction
-      ).generators shouldBe Seq(i)
-    }
-  }
-}

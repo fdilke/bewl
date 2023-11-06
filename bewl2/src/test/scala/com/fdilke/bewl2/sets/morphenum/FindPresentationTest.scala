@@ -9,9 +9,8 @@ import FastSets.{
   withDot,
   Monoid,
   Dot,
-  FindGeneratorAnalysis,
   GeneratorFinder,
-  PresentationFinder,
+  PresentationFinder
 }
 import com.fdilke.bewl2.utility.StockStructures._
 
@@ -71,7 +70,6 @@ class FindPresentationTest extends FunSuite:
             canExtractPresentation(omega)
 
           test("Can extract a presentation for a more fancy monoid action"):
-            canExtractPresentation(
-              omega x regularAction
+            canExtractPresentation(omega x regularAction)
 
 
