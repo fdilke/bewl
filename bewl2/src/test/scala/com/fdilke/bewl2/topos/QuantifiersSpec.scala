@@ -7,13 +7,14 @@ import com.fdilke.bewl2.sets.SetsUtilities.*
 
 import scala.Function.tupled
 import scala.language.postfixOps
-import com.fdilke.bewl2.utility.RichFunSuite
+import munit.FunSuite
+import com.fdilke.bewl2.utility.RichFunSuite._
 
 import scala.collection.immutable.Set
 import com.fdilke.bewl2.sets.Sets
 import Sets._
 
-class QuantifiersSpec extends RichFunSuite:
+class QuantifiersSpec extends FunSuite:
 
   test("Universal quantifiers work as expected for sets"):
     withDot(Set[Int](1, 2, 3)) {

@@ -1,52 +1,68 @@
 package com.fdilke.bewl2.sets.morphenum
 
-import com.fdilke.bewl2.sets.FiniteSets
-import com.fdilke.bewl2.sets.FiniteSets.{>, ToposOfMonoidActions, VOID}
-import com.fdilke.bewl2.sets.FiniteSetsUtilities._
-import com.fdilke.bewl2.topos.algebra.KnownMonoids.monoidOf3
-import org.scalatest.freespec.AnyFreeSpec
-import com.fdilke.bewl2.helper.StandardSymbols.{a, b, c, i, iso, r, s, source, target, x, y}
-import org.scalatest.matchers.should.Matchers._
+import munit.FunSuite
+import com.fdilke.bewl2.utility.RichFunSuite._
+import com.fdilke.bewl2.sets.FastSets
+import FastSets.{
+  Monoid,
+  Dot,
+  GeneratorFinder,
+  PresentationFinder,
+  withDot,
+  withMonoidFromTable,
+  RichArrow
+}
+import com.fdilke.bewl2.topos.Topos
+import com.fdilke.bewl2.utility.StockStructures._
 
 import scala.language.{existentials, reflectiveCalls}
 
-class PresentationTest extends AnyFreeSpec {
+class PresentationTest extends FunSuite:
 
-  private val actionTopos =
-    ToposOfMonoidActions.of(monoidOf3)
+  val Seq(i, a, b, c, r, s, x, y) =
+    Seq[String]("i", "a", "b", "c", "r", "s", "x", "y").map { Symbol(_) }
 
-  "Building actions from presentations" - {
-    "works for an empty generating set" in {
+  withMonoidOf3(FastSets):
+    (_: Dot[Symbol]) ?=> (monoidOf3: FastSets.Monoid[Symbol]) ?=>
+
+    // val generatorFinder: GeneratorFinder[Symbol, monoidOf3.Action] =
+    //   GeneratorFinder.forMonoid(monoidOf3)
+    // val presentationFinder: PresentationFinder[Symbol, monoidOf3.Action] =
+    //   PresentationFinder.forMonoid(monoidOf3, generatorFinder)
+
+    val actionTopos: Topos[
+      monoidOf3.Action, [A] =>> A, Void, Unit, monoidOf3.RightIdeal, monoidOf3.InternalMap
+    ] =
+      monoidOf3.actionTopos
+
+    test("Building actions from presentations works for an empty generating set"):
       val presentation =
         FiniteSetsPresentedAction(
           monoidOf3
         )(
-          List[GeneratorWithRelators[Symbol, VOID]]()
+          List[GeneratorWithRelators[Symbol, Void]]()
         )
-      val emptyAction =
-        monoidOf3.voidAction
-      val emptyProjection: Int > VOID =
-        presentation.project(
-          emptyAction,
-          Seq[VOID]()
-        )
-      emptyProjection should have(
-        source(presentation.action.actionCarrier),
-        target(emptyAction.actionCarrier)
-      )
-      monoidOf3.actions.isMorphism(
-        presentation.action,
-        emptyAction,
-        emptyProjection
-      ) shouldBe true
-      emptyProjection shouldBe iso
-    }
-    "works for a single generator with no relators" in {
+      monoidOf3.withVoidAction:
+        (voidAction: monoidOf3.Action[Void]) ?=>
+
+        val voidProjection: Int => Void =
+          presentation.project(
+            voidAction,
+            Seq.empty[Void]
+          )
+        given Dot[Int] = presentation.action.dot
+        given monoidOf3.Action[Int] = presentation.action
+        monoidOf3.actions.isMorphism(
+          voidProjection
+        ) is true
+        voidProjection.isIso is true
+
+    test("Building actions works for a single generator with no relators"):
       val presentation =
         FiniteSetsPresentedAction(
           monoidOf3
         )(
-          List[GeneratorWithRelators[Symbol, FiniteSets.UNIT]](
+          List[GeneratorWithRelators[Symbol, Unit]](
             GeneratorWithRelators(
               (),
               Seq.empty
@@ -54,32 +70,28 @@ class PresentationTest extends AnyFreeSpec {
           )
         )
 
-      val regularAction =
-        monoidOf3.regularAction
-      val regularProjection: Int > Symbol =
-        presentation.project(
-          regularAction,
-          List(
-            i
+      monoidOf3.withRegularAction:
+        (regularAction: monoidOf3.Action[Symbol]) ?=>
+
+        val regularProjection: Int => Symbol =
+          presentation.project(
+            regularAction,
+            List(i)
           )
-        )
-      regularProjection should have(
-        source(presentation.action.actionCarrier),
-        target(regularAction.actionCarrier)
-      )
-      monoidOf3.actions.isMorphism(
-        presentation.action,
-        regularAction,
-        regularProjection
-      ) shouldBe true
-      regularProjection shouldBe iso
-    }
-    "works for presenting a cyclic right ideal { x, y }" in {
+        
+        given Dot[Int] = presentation.action.dot
+        given monoidOf3.Action[Int] = presentation.action
+        monoidOf3.actions.isMorphism(
+          regularProjection
+        ) is true
+        regularProjection.isIso is true
+
+    test("Building actions works for presenting a cyclic right ideal { x, y }"):
       val presentation =
         FiniteSetsPresentedAction(
           monoidOf3
         )(
-          List[GeneratorWithRelators[Symbol, FiniteSets.UNIT]](
+          List[GeneratorWithRelators[Symbol, Unit]](
             GeneratorWithRelators(
               (),
               Seq(
@@ -89,155 +101,111 @@ class PresentationTest extends AnyFreeSpec {
           )
         )
 
-      val idealCarrier = dot(x, y)
-      val idealAction =
-        monoidOf3.action(idealCarrier) {
-          monoidOf3.multiply(_, _)
-        }
+      withDot(Set[Symbol](x, y)):
+        (idealDot: Dot[Symbol]) ?=>
 
-      val idealProjection: Int > Symbol =
-        presentation.project(
-          idealAction,
-          List(
-            x
-          )
-        )
-      idealProjection should have(
-        source(presentation.action.actionCarrier),
-        target(idealCarrier)
-      )
-      monoidOf3.actions.isMorphism(
-        presentation.action,
-        idealAction,
-        idealProjection
-      ) shouldBe true
-      idealProjection shouldBe iso
-    }
-    "works for presenting 2 over its endomorphism monoid" in {
+        val idealMultiply: ((Symbol, Symbol)) => Symbol =
+            case (s, m) => monoidOf3.multiply(s, m)
+
+        monoidOf3.withAction(idealMultiply):
+          (idealAction: monoidOf3.Action[Symbol]) ?=>
+          val idealProjection: Int => Symbol =
+            presentation.project(
+              idealAction,
+              List(x)
+            )
+          // idealProjection should have(
+          //   source(presentation.action.actionCarrier),
+          //   target(idealCarrier)
+          // )
+          given Dot[Int] = presentation.action.dot
+          given monoidOf3.Action[Int] = presentation.action
+          monoidOf3.actions.isMorphism(
+            // presentation.action,
+            // idealAction,
+            idealProjection
+          ) is true
+          idealProjection.isIso is true
+
+    test("Building an action works for presenting 2 over its endomorphism monoid"):
       val ¬ = Symbol("¬")
       val O = Symbol("O")
       val I = Symbol("I")
-      val end2 =
-        monoidFromTable(
-          i,
-          ¬,
-          O,
-          I,
-          ¬,
-          i,
-          O,
-          I,
-          O,
-          I,
-          O,
-          I,
-          I,
-          O,
-          O,
-          I
-        )
+      withMonoidFromTable(
+          i, ¬, O, I,
+          ¬, i, O, I,
+          O, I, O, I,
+          I, O, O, I
+      ):
+        (_: Dot[Symbol]) ?=> (end2: Monoid[Symbol]) ?=>
 
-      val presentation =
-        FiniteSetsPresentedAction(
-          end2
-        )(
-          List[GeneratorWithRelators[Symbol, Int]](
-            GeneratorWithRelators(
-              0,
-              Seq(
-                Relator(O, 0, i),
-                Relator(¬, 0, I)
+        val presentation: PresentedAction[Int, end2.Action] =
+          FiniteSetsPresentedAction(end2)(
+            List[GeneratorWithRelators[Symbol, Int]](
+              GeneratorWithRelators(
+                0,
+                Seq(
+                  Relator(O, 0, i),
+                  Relator(¬, 0, I)
+                )
               )
             )
           )
-        )
+        withDot(Set[String]("0", "1")):
+          (twoDot: Dot[String]) ?=>
 
-      val twoCarrier = dot(0, 1)
-      val twoActionMap: Map[Symbol, Int => Int] =
-        Map(
-          i -> identity,
-          ¬ -> { 1 - _ },
-          O -> { _ => 0 },
-          I -> { _ => 1 }
-        )
-      val twoAction =
-        end2.action(twoCarrier)((s, m) => twoActionMap(m)(s))
+          val twoActionMap: Map[Symbol, String => String] =
+            Map(
+              i -> identity,
+              ¬ -> Map("0" -> "1", "1" -> "0"),
+              O -> { _ => "0" },
+              I -> { _ => "1" }
+            )
+          val twoMultiply: ((String, Symbol)) => String =
+            case (s, m) => twoActionMap(m)(s)
 
-      val twoProjection: Int > Int =
-        presentation.project(
-          twoAction,
-          List(
-            0
-          )
-        )
-      twoProjection should have(
-        source(presentation.action.actionCarrier),
-        target(twoCarrier)
-      )
-      end2.actions.isMorphism(
-        presentation.action,
-        twoAction,
-        twoProjection
-      ) shouldBe true
-      twoProjection shouldBe iso
-    }
-    "works for a cyclic action over a group" in {
-      val group = monoidFromTable(
-        i,
-        a,
-        b,
-        c,
-        r,
-        s,
-        a,
-        i,
-        s,
-        r,
-        c,
-        b,
-        b,
-        r,
-        i,
-        s,
-        a,
-        c,
-        c,
-        s,
-        r,
-        i,
-        b,
-        a,
-        r,
-        b,
-        c,
-        a,
-        s,
-        i,
-        s,
-        c,
-        a,
-        b,
-        i,
-        r
-      )
+          end2.withAction(twoMultiply):
+            (twoAction: end2.Action[String]) ?=>
+            val twoProjection: Int => String =
+              presentation.project(
+                twoAction,
+                List("0")
+              )
+            given Dot[Int] = presentation.action.dot
+            given end2.Action[Int] = presentation.action
+            end2.actions.isMorphism(
+              // presentation.action,
+              // twoAction,
+              twoProjection
+            ) is true
+            twoProjection.isIso is true
 
-      val presentation =
-        FiniteSetsPresentedAction(
-          group
-        )(
-          List[GeneratorWithRelators[Symbol, String]](
-            GeneratorWithRelators(
-              "x",
-              Seq(
-                Relator(r, 0, a)
+    test("Building an action works for a cyclic action over a group"):
+      withMonoidFromTable(
+        i, a, b, c, r, s,
+        a, i, s, r, c, b,
+        b, r, i, s, a, c,
+        c, s, r, i, b, a,
+        r, b, c, a, s, i,
+        s, c, a, b, i, r
+      ):
+        (_: Dot[Symbol]) ?=> (group: Monoid[Symbol]) ?=>
+
+        val presentation =
+          FiniteSetsPresentedAction(group)(
+            List[GeneratorWithRelators[Symbol, String]](
+              GeneratorWithRelators(
+                "x",
+                Seq(
+                  Relator(r, 0, a)
+                )
               )
             )
           )
-        )
 
-      presentation.action.actionCarrier should have size 3
-    }
-    // note: should probably add a more sophisticated
-    // example, with multiple interacting generators
-  }
-}
+        presentation.action.dot.dot.size is 3
+
+// note: should probably add a more sophisticated
+// example, with multiple interacting generators
+
+// TODO: Refactor for convenience with withPresentation():

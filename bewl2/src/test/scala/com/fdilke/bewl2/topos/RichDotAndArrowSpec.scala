@@ -7,14 +7,15 @@ import com.fdilke.bewl2.sets.SetsUtilities.*
 
 import scala.Function.tupled
 import scala.language.postfixOps
-import com.fdilke.bewl2.utility.RichFunSuite
+import munit.FunSuite
+import com.fdilke.bewl2.utility.RichFunSuite._
 
 import scala.collection.immutable.Set
 import com.fdilke.bewl2.sets.Sets
 import Sets._
 import com.fdilke.bewl2.utility.StockSymbols.*
 
-class RichDotAndArrowSpec extends RichFunSuite:
+class RichDotAndArrowSpec extends FunSuite:
   test("Can tell if an arrow is monic"):
     withDot(Set[Int](1, 2, 3)) {
       withDot(Set[Char]('A', 'B', 'C', 'D')) {

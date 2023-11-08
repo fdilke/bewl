@@ -1,13 +1,14 @@
 package com.fdilke.bewl2.utility
 
 import munit.{ FunSuite, Assertions }
+import Assertions.assertEquals
 import com.fdilke.bewl2.sets.Sets
 import com.fdilke.utility.Shortcuts._
 
 object RichFunSuite:
   extension[A] (a: A)
     inline def is(b: A): Unit =
-      Assertions.assertEquals(a, b)
+      assertEquals(a, b)
 
   extension(letters: Seq[Char])
     inline def be(text: String): Unit =
@@ -21,7 +22,7 @@ object RichFunSuite:
     inline def isNotArrow(arrow2: A => B): Unit =
       assert(!(arrow =!= arrow2))
 
-  def checkSameElementsAs[X](thing: Seq[S], other: Seq[S]): Unit =
+  def checkSameElementsAs[X](thing: Seq[X], other: Seq[X]): Unit =
     thing.toSet is other.toSet
   // extension(text: String)
   //   inline def is(letters: Seq[Char]): Unit =

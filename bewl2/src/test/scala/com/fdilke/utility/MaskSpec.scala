@@ -2,9 +2,10 @@ package com.fdilke.utility;
 
 import junit.framework.TestCase
 import Mask.*
-import com.fdilke.bewl2.utility.RichFunSuite
+import munit.FunSuite
+import com.fdilke.bewl2.utility.RichFunSuite._
 
-class MaskSpec extends RichFunSuite:
+class MaskSpec extends FunSuite:
   test("Can mask a type"):
     mask[Int, Set, Boolean](
       Set[Int](1, 2, 3)
