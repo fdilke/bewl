@@ -1,7 +1,7 @@
 package com.fdilke.bewl2.sets.morphenum
 
-import com.fdilke.bewl2.sets.FastSets
-import FastSets.{ Dot, Monoid, ActionComponent, ActionSplitter, GeneratorFinder, PresentationFinder, RichArrow }
+import com.fdilke.bewl2.sets.Sets
+import Sets.{ Dot, Monoid, ActionComponent, ActionSplitter, GeneratorFinder, PresentationFinder, RichArrow }
 
 import com.fdilke.bewl2.utility.StockStructures._
 import scala.language.{postfixOps, reflectiveCalls}

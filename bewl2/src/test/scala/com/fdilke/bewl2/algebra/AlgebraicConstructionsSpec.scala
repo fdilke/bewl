@@ -2,7 +2,7 @@ package com.fdilke.bewl2.algebra
 
 import com.fdilke.bewl2.algebra.AlgebraicConstructions.*
 import com.fdilke.bewl2.algebra.Principal
-import com.fdilke.bewl2.sets.FastSets
+import com.fdilke.bewl2.sets.Sets
 import com.fdilke.bewl2.sets.SetsUtilities.*
 import com.fdilke.bewl2.utility.StockStructures.*
 import com.fdilke.bewl2.utility.StockSymbols
@@ -13,9 +13,9 @@ import com.fdilke.bewl2.utility.RichFunSuite._
 import scala.Function.tupled
 import scala.collection.immutable.Set
 import scala.language.postfixOps
-import com.fdilke.bewl2.sets.FastSets
-import FastSets.*
-import FastSets.StandardTermsAndOperators.*
+import com.fdilke.bewl2.sets.Sets
+import Sets.*
+import Sets.StandardTermsAndOperators.*
 
 class AlgebraicConstructionsSpec extends FunSuite:
   
@@ -54,7 +54,7 @@ class AlgebraicConstructionsSpec extends FunSuite:
   test("Construct symmetric groups"):
     import StockSymbols.*
 
-    withSymmetricGroup(1) { (ints : FastSets.Dot[Int], seqs: FastSets.Dot[Seq[Int]], group: FastSets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => 
+    withSymmetricGroup(1) { (ints : Sets.Dot[Int], seqs: Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => 
       dot[Seq[Int]] is Set(Seq(0))
       group.sanityTest
       group.unit(()) is Seq(0)
@@ -62,7 +62,7 @@ class AlgebraicConstructionsSpec extends FunSuite:
       action.sanityTest
       action.actionMultiply(0, Seq(0)) is 0
     }
-    withSymmetricGroup(2) { (ints : FastSets.Dot[Int], seqs: FastSets.Dot[Seq[Int]], group: FastSets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => 
+    withSymmetricGroup(2) { (ints : Sets.Dot[Int], seqs: Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => 
       dot[Seq[Int]] is Set(Seq(0, 1), Seq(1, 0))
       group.sanityTest
       group.unit(()) is Seq(0, 1)
@@ -72,7 +72,7 @@ class AlgebraicConstructionsSpec extends FunSuite:
       action.actionMultiply(1, Seq(1, 0)) is 0
       group.isCommutative is true
     }
-    withSymmetricGroup(3) { (ints : FastSets.Dot[Int], seqs: FastSets.Dot[Seq[Int]], group: FastSets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => 
+    withSymmetricGroup(3) { (ints : Sets.Dot[Int], seqs: Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => 
       dot[Seq[Int]] is Set(
         Seq(0, 1, 2),
         Seq(1, 0, 2), Seq(0, 2, 1), Seq(2, 1, 0),
@@ -86,7 +86,7 @@ class AlgebraicConstructionsSpec extends FunSuite:
       action.actionMultiply(0, Seq(1, 0, 2)) is 1
       group.isCommutative is false
     }
-    withSymmetricGroup(4) { (ints : FastSets.Dot[Int], seqs: FastSets.Dot[Seq[Int]], group: FastSets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => 
+    withSymmetricGroup(4) { (ints : Sets.Dot[Int], seqs: Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => 
       dot[Seq[Int]].size is 24
       group.sanityTest
       dot[Int] is Set(0, 1, 2, 3)
@@ -97,7 +97,7 @@ class AlgebraicConstructionsSpec extends FunSuite:
 
   if (false)
     test("(Benchmark, sanity test S_5)"):
-      withSymmetricGroup(5) { (ints : FastSets.Dot[Int], seqs: FastSets.Dot[Seq[Int]], group: FastSets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => 
+      withSymmetricGroup(5) { (ints : Sets.Dot[Int], seqs: Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => 
         dot[Seq[Int]].size is 120
         group.sanityTest
         action.sanityTest

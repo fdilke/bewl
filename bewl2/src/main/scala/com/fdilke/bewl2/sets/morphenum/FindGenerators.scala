@@ -1,6 +1,6 @@
 package com.fdilke.bewl2.sets.morphenum
 
-import com.fdilke.bewl2.sets.{BaseSets, FastSets}
+import com.fdilke.bewl2.sets.{BaseSets, Sets}
 
 import scala.language.postfixOps
 

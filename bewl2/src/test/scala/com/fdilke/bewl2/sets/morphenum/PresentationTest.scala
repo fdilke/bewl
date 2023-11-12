@@ -2,8 +2,8 @@ package com.fdilke.bewl2.sets.morphenum
 
 import munit.FunSuite
 import com.fdilke.bewl2.utility.RichFunSuite._
-import com.fdilke.bewl2.sets.FastSets
-import FastSets.{
+import com.fdilke.bewl2.sets.Sets
+import Sets.{
   Monoid,
   Dot,
   GeneratorFinder,
@@ -22,8 +22,8 @@ class PresentationTest extends FunSuite:
   val Seq(i, a, b, c, r, s, x, y) =
     Seq[String]("i", "a", "b", "c", "r", "s", "x", "y").map { Symbol(_) }
 
-  withMonoidOf3(FastSets):
-    (_: Dot[Symbol]) ?=> (monoidOf3: FastSets.Monoid[Symbol]) ?=>
+  withMonoidOf3(Sets):
+    (_: Dot[Symbol]) ?=> (monoidOf3: Sets.Monoid[Symbol]) ?=>
 
     val actionTopos: Topos[
       monoidOf3.Action, [A] =>> A, Void, Unit, monoidOf3.RightIdeal, monoidOf3.InternalMap

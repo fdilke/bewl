@@ -1,7 +1,7 @@
 package com.fdilke.bewl2.sets.morphenum
 
-import com.fdilke.bewl2.sets.FastSets
-import FastSets.{ ActionComponent, ActionSplitter, GeneratorFinder, PresentationFinder }
+import com.fdilke.bewl2.sets.Sets
+import Sets.{ ActionComponent, ActionSplitter, GeneratorFinder, PresentationFinder }
 
 import com.fdilke.bewl2.utility.StockStructures._
 import scala.language.{postfixOps, reflectiveCalls}
@@ -13,8 +13,8 @@ import scala.language.{existentials, reflectiveCalls}
 
 class ActionSplitterTest extends FunSuite:
 
-  withMonoidOf3(FastSets):
-    (_: FastSets.Dot[Symbol]) ?=> (monoidOf3: FastSets.Monoid[Symbol]) ?=>
+  withMonoidOf3(Sets):
+    (_: Sets.Dot[Symbol]) ?=> (monoidOf3: Sets.Monoid[Symbol]) ?=>
 
       monoidOf3.withRegularAction:
         (regularAction: monoidOf3.Action[Symbol]) ?=>
@@ -34,7 +34,7 @@ class ActionSplitterTest extends FunSuite:
         ] =
           splitter.splitAction(action).components
 
-        FastSets.withDot(Set[String]("x", "y")):
+        Sets.withDot(Set[String]("x", "y")):
           test("Action splitter extracts coproduct decomposition for the empty monoid action"):
             monoidOf3.withVoidAction:
               (voidAction: monoidOf3.Action[Void]) ?=> 

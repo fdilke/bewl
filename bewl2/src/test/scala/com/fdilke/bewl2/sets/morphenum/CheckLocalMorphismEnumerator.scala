@@ -1,7 +1,7 @@
 package com.fdilke.bewl2.sets.morphenum
 
-import com.fdilke.bewl2.sets.FastSets
-import FastSets.{ Dot, DefaultMonoidAssistant, LocalMonoidAssistant, Monoid, ActionAnalyzer, RichArrow }
+import com.fdilke.bewl2.sets.Sets
+import Sets.{ Dot, DefaultMonoidAssistant, LocalMonoidAssistant, Monoid, ActionAnalyzer, RichArrow }
 import com.fdilke.bewl2.utility.RichFunSuite._
 
 object CheckLocalMorphismEnumerator:

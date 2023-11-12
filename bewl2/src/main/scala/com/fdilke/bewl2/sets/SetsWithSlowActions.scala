@@ -268,7 +268,7 @@ class BaseSets extends Topos[
 
 object SetsWithSlowActions extends BaseSets
 
-object FastSets extends BaseSets 
+object Sets extends BaseSets 
   with SetsMonoidAssistant
   with FindGenerators
   with FindPresentation

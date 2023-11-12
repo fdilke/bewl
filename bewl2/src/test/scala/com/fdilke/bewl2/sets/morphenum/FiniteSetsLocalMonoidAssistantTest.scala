@@ -1,7 +1,7 @@
 package com.fdilke.bewl2.sets.morphenum
 
-import com.fdilke.bewl2.sets.FastSets
-import FastSets.{
+import com.fdilke.bewl2.sets.Sets
+import Sets.{
   withDot,
   withDotMask,
   Monoid,
@@ -25,8 +25,8 @@ class FiniteSetsLocalMonoidAssistantTest extends FunSuite:
   private val Seq(i, x, y) =
     Seq[String]("i", "x", "y").map { Symbol(_) }
 
-  withMonoidOf3(FastSets):
-    (_: Dot[Symbol]) ?=> (monoidOf3: FastSets.Monoid[Symbol]) ?=>
+  withMonoidOf3(Sets):
+    (_: Dot[Symbol]) ?=> (monoidOf3: Sets.Monoid[Symbol]) ?=>
 
     monoidOf3.withRegularAction:
       (regularAction: monoidOf3.Action[Symbol]) ?=>

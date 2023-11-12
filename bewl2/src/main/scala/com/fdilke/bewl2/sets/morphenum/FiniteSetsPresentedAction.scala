@@ -3,7 +3,7 @@ package com.fdilke.bewl2.sets.morphenum
 import com.fdilke.bewl2.sets.SetsUtilities._
 import com.fdilke.bewl2.helper.BuildEquivalence
 import scala.language.postfixOps
-import com.fdilke.bewl2.sets.FastSets
+import com.fdilke.bewl2.sets.Sets
 
 trait PresentedAction[A, ACTION[_]]:
   val action: ACTION[A]
@@ -15,7 +15,7 @@ trait PresentedAction[A, ACTION[_]]:
 
 object FiniteSetsPresentedAction:
   def apply[M, A](
-    monoid: FastSets.Monoid[M]
+    monoid: Sets.Monoid[M]
   )(
     generatorsWithRelators: Seq[GeneratorWithRelators[M, A]]
   ): PresentedAction[Int, monoid.Action] =
@@ -52,7 +52,7 @@ object FiniteSetsPresentedAction:
       )
 
     val wordIndices: Set[Int] = equivalenceTable.toSet
-    FastSets.withDot(wordIndices):
+    Sets.withDot(wordIndices):
       new PresentedAction[Int, monoid.Action]:
         override val action: monoid.Action[Int] =
           monoid.Action{ (index, n) =>

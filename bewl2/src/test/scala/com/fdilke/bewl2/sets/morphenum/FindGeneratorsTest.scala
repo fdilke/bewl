@@ -4,8 +4,8 @@ import munit.FunSuite
 import com.fdilke.bewl2.utility.RichFunSuite._
 import com.fdilke.bewl2.topos.Topos
 
-import com.fdilke.bewl2.sets.FastSets
-import FastSets.{
+import com.fdilke.bewl2.sets.Sets
+import Sets.{
   withDot,
   Monoid,
   Dot,
@@ -22,8 +22,8 @@ class FindGeneratorsTest extends FunSuite:
   private val Seq(i, x, y) =
     Seq[String]("i", "x", "y").map { Symbol(_) }
 
-  withMonoidOf3(FastSets):
-    (_: Dot[Symbol]) ?=> (monoidOf3: FastSets.Monoid[Symbol]) ?=>
+  withMonoidOf3(Sets):
+    (_: Dot[Symbol]) ?=> (monoidOf3: Sets.Monoid[Symbol]) ?=>
 
     monoidOf3.withRegularAction:
       (regularAction: monoidOf3.Action[Symbol]) ?=>

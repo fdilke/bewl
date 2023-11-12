@@ -1,6 +1,6 @@
 package com.fdilke.bewl2.experiments
 
-import com.fdilke.bewl2.sets.FastSets
+import com.fdilke.bewl2.sets.Sets
 object UnwiseScala3Experiments {
 
   trait Crappable[A, CTXT[_] /* <: Mappable[A, CTXT]] */ ] { self: CTXT[A] =>
@@ -157,39 +157,39 @@ object CurriedDependentImplicits:
   //   ()
   // }
   def noddy4(
-    block: [E] => FastSets.Dot[E] ?=> (monoid: FastSets.Monoid[E]) ?=> monoid.Action[Int] ?=> Unit
+    block: [E] => Sets.Dot[E] ?=> (monoid: Sets.Monoid[E]) ?=> monoid.Action[Int] ?=> Unit
   ): Unit = ()
   noddy4 {
-    [E] => (_ : FastSets.Dot[E]) ?=> (monoid: FastSets.Monoid[E]) ?=> (action: monoid.Action[Int]) ?=>
+    [E] => (_ : Sets.Dot[E]) ?=> (monoid: Sets.Monoid[E]) ?=> (action: monoid.Action[Int]) ?=>
       ()
   }
   def noddy5(
-    block: [E] => FastSets.Dot[E] ?=> (monoid: FastSets.Monoid[E]) ?=> monoid.Action[Int] ?=> Unit
+    block: [E] => Sets.Dot[E] ?=> (monoid: Sets.Monoid[E]) ?=> monoid.Action[Int] ?=> Unit
   ): Unit = ()
   noddy5 {
-    [E] => (dot : FastSets.Dot[E]) ?=> (monoid: FastSets.Monoid[E]) ?=> (action: monoid.Action[Int]) ?=>
+    [E] => (dot : Sets.Dot[E]) ?=> (monoid: Sets.Monoid[E]) ?=> (action: monoid.Action[Int]) ?=>
     // [E] => (_ : Sets.Dot[E]) ?=> (monoid: Monoid[E]) ?=> monoid.Action[X] ?=>
       ()
   }
   def noddy6(
-    block: (group: FastSets.Group[Seq[Int]]) ?=> group.Action[Int] => Unit
+    block: (group: Sets.Group[Seq[Int]]) ?=> group.Action[Int] => Unit
   ): Unit = ()
   noddy6 {
-    (group: FastSets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) =>
+    (group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) =>
       ()
   }
   def noddy7(
-    block: FastSets.Dot[Seq[Int]] ?=> (group: FastSets.Group[Seq[Int]]) ?=> group.Action[Int] => Unit
+    block: Sets.Dot[Seq[Int]] ?=> (group: Sets.Group[Seq[Int]]) ?=> group.Action[Int] => Unit
   ): Unit = ()
   noddy7 {
-    (dot : FastSets.Dot[Seq[Int]]) ?=> (group: FastSets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) =>
+    (dot : Sets.Dot[Seq[Int]]) ?=> (group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) =>
       ()
   }
   def noddy8(
-    block: FastSets.Dot[Seq[Int]] ?=> FastSets.Dot[Int] ?=> (group: FastSets.Group[Seq[Int]]) ?=> group.Action[Int] => Unit
+    block: Sets.Dot[Seq[Int]] ?=> Sets.Dot[Int] ?=> (group: Sets.Group[Seq[Int]]) ?=> group.Action[Int] => Unit
   ): Unit = ()
   noddy8 {
-    (dot : FastSets.Dot[Seq[Int]]) ?=> (ints: FastSets.Dot[Int]) ?=> (group: FastSets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) =>
+    (dot : Sets.Dot[Seq[Int]]) ?=> (ints: Sets.Dot[Int]) ?=> (group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) =>
       ()
   }
   // def noddy4(

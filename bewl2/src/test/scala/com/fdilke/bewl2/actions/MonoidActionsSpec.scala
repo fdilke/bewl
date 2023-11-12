@@ -2,7 +2,7 @@ package com.fdilke.bewl2.actions
 
 import com.fdilke.bewl2.topos.Topos
 import com.fdilke.bewl2.sets.{ SetsWithSlowActions, BaseSets }
-import com.fdilke.bewl2.sets.{FastSets, BaseSets}
+import com.fdilke.bewl2.sets.{Sets, BaseSets}
 import com.fdilke.bewl2.topos.GenericToposSpec
 import munit.FunSuite
 import com.fdilke.bewl2.utility.StockEnums
@@ -15,7 +15,7 @@ import cats.syntax.monoid
 import CommonSymbolDefs._
 
 object SlowMonoidActionsSetup extends MonoidActionsSetup(SetsWithSlowActions)
-object FastMonoidActionsSetup extends MonoidActionsSetup(FastSets)
+object FastMonoidActionsSetup extends MonoidActionsSetup(Sets)
 
 class SlowMonoidActionsSpec extends BaseMonoidActionsSpec(SlowMonoidActionsSetup.Fixtures)
 class FastMonoidActionsSpec extends BaseMonoidActionsSpec(FastMonoidActionsSetup.Fixtures)
