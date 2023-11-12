@@ -55,5 +55,5 @@ class ActionSplitterTest extends FunSuite:
               components(regularAction x bar)
 
             regbarSplitting.size is 1
-            regbarSplitting.head.componentAction.dot.dot.size is 12
+            regbarSplitting.head.componentAction.dot.dot.size is 6
 

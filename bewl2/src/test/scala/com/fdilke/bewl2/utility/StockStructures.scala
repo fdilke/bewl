@@ -13,9 +13,9 @@ object StockStructures:
     block: baseSets.Dot[Symbol] ?=> baseSets.Monoid[Symbol] ?=> RESULT
   ): RESULT =
     baseSets.withMonoidFromTable(
-      e, a, b,
-      a, a, b,
-      b, a, b
+      i, x, y,
+      x, x, y,
+      y, x, y
     )(block)
 
   def withMonoidOf3[RESULT](

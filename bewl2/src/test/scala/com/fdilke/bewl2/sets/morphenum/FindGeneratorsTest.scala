@@ -42,6 +42,7 @@ class FindGeneratorsTest extends FunSuite:
         monoidOf3.actionTopos
 
       import regularAnalysis.initialCyclics
+      
       test("Action analysis gives maximal cyclic subalgebras which are initially empty"):
         initialCyclics.cyclics.isEmpty is true
         initialCyclics.contains(i) is false

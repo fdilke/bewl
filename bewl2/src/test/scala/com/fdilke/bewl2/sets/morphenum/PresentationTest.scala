@@ -25,11 +25,6 @@ class PresentationTest extends FunSuite:
   withMonoidOf3(FastSets):
     (_: Dot[Symbol]) ?=> (monoidOf3: FastSets.Monoid[Symbol]) ?=>
 
-    // val generatorFinder: GeneratorFinder[Symbol, monoidOf3.Action] =
-    //   GeneratorFinder.forMonoid(monoidOf3)
-    // val presentationFinder: PresentationFinder[Symbol, monoidOf3.Action] =
-    //   PresentationFinder.forMonoid(monoidOf3, generatorFinder)
-
     val actionTopos: Topos[
       monoidOf3.Action, [A] =>> A, Void, Unit, monoidOf3.RightIdeal, monoidOf3.InternalMap
     ] =

@@ -71,7 +71,7 @@ class AlgebraicStructuresSpec extends FunSuite:
   test("Algebraic theories support binary multiplication of their algebras, even with scalar extensions"):
     withMonoidOf3 {
       (_: Dot[Symbol]) ?=> (monoidOf3: Monoid[Symbol]) ?=>
-        withDot(Set[String]("a", "b")):
+        withDot(Set[String]("x", "y")):
           val scalarMultiply: ((String, Symbol)) => String =
             case (s, m) => monoidOf3.multiply(Symbol(s), m).name
 
@@ -82,7 +82,7 @@ class AlgebraicStructuresSpec extends FunSuite:
                 summon[monoidOf3.Action[String]] x summon[monoidOf3.Action[Symbol]]
 
               product.sanityTest
-              product.operatorAssignments.lookup(II).get(()) is e
+              product.operatorAssignments.lookup(II).get(()) is i
               monoidOf3.actions.isMorphism[(String, Symbol), String](
                 π0[String, Symbol]
               ) is true
@@ -482,8 +482,8 @@ class AlgebraicStructuresSpec extends FunSuite:
 
   test("Can use infix * for multiplication in the context of a group"):
     withMonoidOf3 { (_: Dot[Symbol]) ?=> (monoidOf3: Monoid[Symbol]) ?=>
-      (a * e) is a
-      (a * b) is b
+      (x * i) is x
+      (x * y) is y
     }
 
   test("Can use infix * for multiplication and unary ~ for inversion in the context of a group"):

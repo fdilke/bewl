@@ -73,6 +73,6 @@ class ActionSplitterTest extends AnyFreeSpec {
       elementsOf(
         regbarSplitting.head.componentAction.actionCarrier
       ).size shouldBe 12
-    }
+    } // TODO: these are not being enumerated correctly, there is duplication - should be 6 obvs
   }
 }
