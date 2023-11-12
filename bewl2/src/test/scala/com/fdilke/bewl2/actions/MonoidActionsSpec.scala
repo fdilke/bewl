@@ -53,7 +53,7 @@ abstract class BaseMonoidActionsSpec[ACTION[_], RIGHT_IDEAL, INTERNAL_MAP[_, _]]
         new ToposFixtures {
           override val foo2bar: Symbol ~> String =
             Map(
-              e -> "a", a -> "a", b -> "b"
+              i -> "x", x -> "x", y -> "y"
             )
 
           override val foo2baz: Symbol ~> ROPE =
@@ -64,27 +64,27 @@ abstract class BaseMonoidActionsSpec[ACTION[_], RIGHT_IDEAL, INTERNAL_MAP[_, _]]
 
           override val foobar2baz: (Symbol, String) ~> ROPE = 
             Map(
-              (e, "a") -> aR,
-              (a, "a") -> aR,
-              (b, "a") -> bR,
-              (e, "b") -> bR,
-              (a, "b") -> aR,
-              (b, "b") -> bR
+              (i, "x") -> xR,
+              (x, "x") -> xR,
+              (y, "x") -> yR,
+              (i, "y") -> yR,
+              (x, "y") -> xR,
+              (y, "y") -> yR
             )
 
           override val foo2ImageOfBar: Symbol ~> ROPE =
             Map(
-              e -> bR, 
-              a -> aR,
-              b -> bR
+              i -> yR, 
+              x -> xR,
+              y -> yR
             )
 
           override val equalizerSituation: EqualizerSituation[_, _, _] =
             EqualizerSituation[FOO, Int, Boolean](
               Map(
-                e -> 1,
-                a -> 1,
-                b -> 2
+                i -> 1,
+                x -> 1,
+                y -> 2
               ),
               Map(
                 0 -> true,
@@ -127,10 +127,10 @@ abstract class MonoidActionsSetup(val baseSets: BaseSets):
         }
 
     override val barAction: monoidOf3.Action[String] =
-      actionOnStrings("a", "b")
+      actionOnStrings("x", "y")
 
     override val bazAction: monoidOf3.Action[ROPE] =
-      Rope.blur(actionOnStrings("e", "a", "b"))
+      Rope.blur(actionOnStrings("i", "x", "y"))
 
     override val intAction: monoidOf3.Action[Int] =
       withDot(
@@ -142,9 +142,9 @@ abstract class MonoidActionsSetup(val baseSets: BaseSets):
               0
             else
               r match {
-                case `e` => n
-                case `a` => 1
-                case `b` => 2
+                case `i` => n
+                case `x` => 1
+                case `y` => 2
               }
         )
 
@@ -157,7 +157,7 @@ abstract class MonoidActionsSetup(val baseSets: BaseSets):
 object CommonSymbolDefs:
   object Rope extends Opacity[String]
   type ROPE = Rope.theType
-  val Seq(e, a, b): Seq[Symbol] = 
-    Seq[String]("e", "a", "b").map { Symbol(_) }
-  val Seq(aR, bR): Seq[ROPE] =
-    Seq[String]("a", "b").map { Rope.blur[[A] =>> A](_) }
+  val Seq(i, x, y): Seq[Symbol] = 
+    Seq[String]("i", "x", "y").map { Symbol(_) }
+  val Seq(xR, yR): Seq[ROPE] =
+    Seq[String]("x", "y").map { Rope.blur[[A] =>> A](_) }
