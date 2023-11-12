@@ -1,6 +1,6 @@
 package com.fdilke.bewl2.apps
 
-import com.fdilke.bewl2.sets.Sets.*
+import com.fdilke.bewl2.sets.SetsWithSlowActions.*
 import com.fdilke.utility.Mask.*
 
 object DebugPartialArrowClassifier extends App:

@@ -1,6 +1,6 @@
 package com.fdilke.bewl2.topos
 
-import com.fdilke.bewl2.sets.Sets
+import com.fdilke.bewl2.sets.SetsWithSlowActions
 import munit.FunSuite
 import munit.Clue.generate
 import com.fdilke.bewl2.sets.SetsUtilities.*
@@ -11,8 +11,8 @@ import munit.FunSuite
 import com.fdilke.bewl2.utility.RichFunSuite._
 
 import scala.collection.immutable.Set
-import com.fdilke.bewl2.sets.Sets
-import Sets._
+import com.fdilke.bewl2.sets.SetsWithSlowActions
+import SetsWithSlowActions._
 import com.fdilke.bewl2.utility.StockSymbols.*
 
 class RichDotAndArrowSpec extends FunSuite:

@@ -3,11 +3,11 @@ package com.fdilke.bewl2.algebra
 import com.fdilke.bewl2.topos.ProductMappable
 import com.fdilke.bewl2.topos.Topos
 import com.fdilke.utility.Shortcuts.*
+import com.fdilke.bewl2.sets.{FastSets, BaseSets}
 
 import scala.language.{dynamics, postfixOps}
 import ProductMappable.*
-import com.fdilke.bewl2.sets.Sets
-import Sets.{ makeNullaryOperator, makeBinaryOperator }
+import FastSets.{ makeNullaryOperator, makeBinaryOperator }
 import com.fdilke.bewl2.sets.SetsUtilities._
 import Function.tupled
 
@@ -136,14 +136,14 @@ object AlgebraicConstructions:
   def withCyclicGroup[R](
     order: Int
   )(
-    block: [I] => Sets.Dot[I] ?=> I =:= Int ?=> Int =:= I ?=> Sets.Group[I] ?=> R
+    block: [I] => FastSets.Dot[I] ?=> I =:= Int ?=> Int =:= I ?=> FastSets.Group[I] ?=> R
   ): R =
-    Sets.withDotMask[Int, R](
+    FastSets.withDotMask[Int, R](
       dot = 0 until order toSet
     ) {
-      [I] => (_: Sets.Dot[I]) ?=> (_: I =:= Int) ?=> (_: Int =:= I) ?=>
-        given Sets.Group[I] =
-          new Sets.Group[I](
+      [I] => (_: FastSets.Dot[I]) ?=> (_: I =:= Int) ?=> (_: Int =:= I) ?=>
+        given FastSets.Group[I] =
+          new FastSets.Group[I](
             makeNullaryOperator[I](0),
             tupled { (x, y) => (x + y) % order },
             { (i: I) => (order - i) % order }
@@ -154,7 +154,7 @@ object AlgebraicConstructions:
   def withGroupFromTable[G, RESULT](
     table: G*
   )(
-    block: Sets.Dot[G] ?=> Sets.Group[G] ?=> RESULT
+    block: FastSets.Dot[G] ?=> FastSets.Group[G] ?=> RESULT
   ): RESULT =
     val carrierSize = intSqrt(table.size)
     val carrierAsList = table.take(carrierSize)
@@ -170,11 +170,11 @@ object AlgebraicConstructions:
         i * carrierSize + j
       )
 
-    Sets.withDot(carrierAsList.toSet) {
+    FastSets.withDot(carrierAsList.toSet) {
       val binOp = makeBinaryOperator[G](mappings: _*)
       val theUnit: G = table.head
-      given Sets.Group[G] =
-        Sets.Group[G](
+      given FastSets.Group[G] =
+        FastSets.Group[G](
           unit = makeNullaryOperator[G](theUnit),
           multiply = binOp,
           inverse = { (g: G) =>
@@ -190,14 +190,14 @@ object AlgebraicConstructions:
   def withSymmetricGroupNoAction[RESULT](
     degree: Int
   )(
-    block: (seqs: Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=> RESULT
+    block: (seqs: FastSets.Dot[Seq[Int]], group: FastSets.Group[Seq[Int]]) ?=> RESULT
   ): RESULT =
     val symbols: Seq[Int] = (0 until degree)
-    Sets.withDot(
+    FastSets.withDot(
       symbols.permutations.toSet[Seq[Int]]
     ) {
-      given Sets.Group[Seq[Int]] =
-        Sets.Group[Seq[Int]](
+      given FastSets.Group[Seq[Int]] =
+        FastSets.Group[Seq[Int]](
           unit = makeNullaryOperator[Seq[Int]](symbols),
           multiply = { (p1: Seq[Int], p2: Seq[Int]) =>
             symbols map { s => p2(p1(s)) }
@@ -216,10 +216,10 @@ object AlgebraicConstructions:
   def withSymmetricGroup[RESULT](
     degree: Int
   )(
-    block: (ints : Sets.Dot[Int], seqs: Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => RESULT
+    block: (ints : FastSets.Dot[Int], seqs: FastSets.Dot[Seq[Int]], group: FastSets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => RESULT
   ): RESULT =
-    withSymmetricGroupNoAction[RESULT](degree) { (_ : Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=>
-      Sets.withDot(
+    withSymmetricGroupNoAction[RESULT](degree) { (_ : FastSets.Dot[Seq[Int]], group: FastSets.Group[Seq[Int]]) ?=>
+      FastSets.withDot(
         (0 until degree).toSet[Int]
       ) {
         block(

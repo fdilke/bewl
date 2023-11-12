@@ -9,7 +9,7 @@ import scala.language.postfixOps
 
 class AlgebraicTheoriesSpec extends FunSuite:
 
-  private val topos = com.fdilke.bewl2.sets.Sets
+  private val topos = com.fdilke.bewl2.sets.SetsWithSlowActions
   import topos.*
   import topos.StandardTermsAndOperators.*
 

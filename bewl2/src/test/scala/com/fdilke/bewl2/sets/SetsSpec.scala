@@ -7,7 +7,7 @@ import com.fdilke.bewl2.utility.StockEnums
 import StockEnums.Direction
 import Direction._
 
-class SetsSpec extends GenericToposSpec(Sets):
+class SetsSpec extends GenericToposSpec(SetsWithSlowActions):
   import topos.*
 
   override type FOO = Direction

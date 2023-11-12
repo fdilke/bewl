@@ -2,7 +2,7 @@ package com.fdilke.bewl2.algebra
 
 import com.fdilke.bewl2.algebra.AlgebraicConstructions.*
 import com.fdilke.bewl2.algebra.Principal
-import com.fdilke.bewl2.sets.Sets
+import com.fdilke.bewl2.sets.FastSets
 import com.fdilke.bewl2.sets.SetsUtilities.*
 import com.fdilke.bewl2.utility.StockStructures.*
 import com.fdilke.bewl2.utility.StockSymbols.*
@@ -12,10 +12,10 @@ import com.fdilke.bewl2.utility.RichFunSuite._
 
 import scala.Function.{tupled, untupled}
 import scala.language.postfixOps
-import com.fdilke.bewl2.sets.Sets
-import Sets.*
-import Sets.StandardTermsAndOperators.*
-import com.fdilke.utility.Shortcuts.*
+import com.fdilke.bewl2.sets.FastSets
+import FastSets._
+import FastSets.StandardTermsAndOperators._
+import com.fdilke.utility.Shortcuts._
 
 class AlgebraicStructuresSpec extends FunSuite:
 
@@ -369,10 +369,10 @@ class AlgebraicStructuresSpec extends FunSuite:
       .getMessage is "left inverse law failed"
 
   test("Groups can tell if a group is commutative or not"):
-    withSymmetricGroup(2) { (ints : Sets.Dot[Int], seqs: Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => 
+    withSymmetricGroup(2) { (ints : FastSets.Dot[Int], seqs: FastSets.Dot[Seq[Int]], group: FastSets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => 
       group.isCommutative is true
     }
-    withSymmetricGroup(3) { (ints : Sets.Dot[Int], seqs: Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => 
+    withSymmetricGroup(3) { (ints : FastSets.Dot[Int], seqs: FastSets.Dot[Seq[Int]], group: FastSets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => 
       group.isCommutative is false
     }
 
@@ -487,7 +487,7 @@ class AlgebraicStructuresSpec extends FunSuite:
     }
 
   test("Can use infix * for multiplication and unary ~ for inversion in the context of a group"):
-    withSymmetricGroup(3) { (ints : Sets.Dot[Int], seqs: Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => 
+    withSymmetricGroup(3) { (ints : FastSets.Dot[Int], seqs: FastSets.Dot[Seq[Int]], group: FastSets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => 
       val a: Seq[Int] = Seq(1, 0, 2)
       val b: Seq[Int] = Seq(0, 2, 1)
       (a * b) is Seq(2, 0, 1)

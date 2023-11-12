@@ -4,8 +4,8 @@ import junit.framework.TestCase
 import munit.FunSuite
 import com.fdilke.bewl2.utility.RichFunSuite._
 import SetsUtilities.*
-import com.fdilke.bewl2.sets.Sets
-import Sets.*
+import com.fdilke.bewl2.sets.SetsWithSlowActions
+import SetsWithSlowActions.*
 
 import scala.language.postfixOps
 

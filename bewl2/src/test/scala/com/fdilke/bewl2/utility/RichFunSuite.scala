@@ -2,7 +2,7 @@ package com.fdilke.bewl2.utility
 
 import munit.{ FunSuite, Assertions }
 import Assertions.assertEquals
-import com.fdilke.bewl2.sets.Sets
+import com.fdilke.bewl2.sets.SetsWithSlowActions
 import com.fdilke.utility.Shortcuts._
 
 object RichFunSuite:
@@ -14,7 +14,7 @@ object RichFunSuite:
     inline def be(text: String): Unit =
       assertEquals(letters.string, text)
 
-  import Sets._
+  import SetsWithSlowActions._
 
   implicit class arrowComparisons[A: Dot, B: Dot](arrow: A => B):
     inline def isArrow(arrow2: A => B): Unit =

@@ -2,7 +2,7 @@ package com.fdilke.bewl2.sets
 
 import scala.language.postfixOps
 import com.fdilke.utility.Shortcuts.*
-import Sets.*
+import SetsWithSlowActions.*
 import com.fdilke.utility.EnumValues
 
 import scala.deriving.Mirror

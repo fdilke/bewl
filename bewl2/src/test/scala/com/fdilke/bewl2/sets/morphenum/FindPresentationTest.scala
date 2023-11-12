@@ -4,7 +4,7 @@ import munit.FunSuite
 import com.fdilke.bewl2.utility.RichFunSuite._
 import com.fdilke.bewl2.topos.Topos
 
-import com.fdilke.bewl2.sets.{ FastSets }
+import com.fdilke.bewl2.sets.FastSets
 import FastSets.{
   withDot,
   Monoid,

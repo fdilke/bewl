@@ -266,7 +266,7 @@ class BaseSets extends Topos[
                 }.map(arrow)
         }
 
-object Sets extends BaseSets
+object SetsWithSlowActions extends BaseSets
 
 object FastSets extends BaseSets 
   with SetsMonoidAssistant
