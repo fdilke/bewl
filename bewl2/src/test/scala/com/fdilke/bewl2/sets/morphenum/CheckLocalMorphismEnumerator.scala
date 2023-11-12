@@ -53,13 +53,21 @@ object CheckLocalMorphismEnumerator:
     do
       (f =!= g) is false
 
+  private def asMap[X: Dot, Y: Dot](
+    morphism: X => Y
+  ): Map[X, Y] =
+    summon[Dot[X]].dot.map { x => 
+      x -> morphism(x)
+    }.toMap
+
+  private def asMaps[X: Dot, Y: Dot](
+    morphisms: Iterable[X => Y]
+  ): Set[Map[X, Y]] =
+    morphisms.map(asMap).toSet
+
   def checkSameMorphisms[X: Dot, Y: Dot](
     morphisms1: Iterable[X => Y],
     morphisms2: Iterable[X => Y]
   ): Unit =
-    def asMap(morphism: X => Y): Map[X, Y] =
-      summon[Dot[X]].dot.map { x => 
-        x -> morphism(x)
-      }.toMap
-    morphisms1.map(asMap) is morphisms2.map(asMap)
+    asMaps(morphisms1) is asMaps(morphisms2)
 
