@@ -7,7 +7,7 @@ import com.fdilke.bewl2.topos.ProductMappable
 import com.fdilke.bewl2.sets.SetsUtilities.*
 import com.fdilke.utility.Shortcuts.*
 import com.fdilke.bewl2.sets.morphenum.SetsMonoidAssistant
-import com.fdilke.bewl2.sets.morphenum.{ FindPresentation, FindGenerators, ActionSplitter }
+import com.fdilke.bewl2.sets.morphenum.{ FindPresentation, FindGenerators, ObtainGenerators, ActionSplitter }
 import scala.language.postfixOps
 
 object PreSets extends PreToposWithDefaultToolkit[Set, [A] =>> A, Void, Unit, Boolean, Map]:
@@ -271,6 +271,7 @@ object SetsWithSlowActions extends BaseSets
 object Sets extends BaseSets 
   with SetsMonoidAssistant
   with FindGenerators
+  with ObtainGenerators
   with FindPresentation
   with ActionSplitter
 

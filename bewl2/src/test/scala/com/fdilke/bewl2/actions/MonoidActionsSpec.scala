@@ -1,7 +1,7 @@
 package com.fdilke.bewl2.actions
 
 import com.fdilke.bewl2.topos.Topos
-import com.fdilke.bewl2.sets.{ SetsWithSlowActions, BaseSets }
+import com.fdilke.bewl2.sets.{SetsWithSlowActions, BaseSets}
 import com.fdilke.bewl2.sets.{Sets, BaseSets}
 import com.fdilke.bewl2.topos.GenericToposSpec
 import munit.FunSuite

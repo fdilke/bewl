@@ -30,8 +30,6 @@ class FindGeneratorsTest extends FunSuite:
 
       val generatorFinder: GeneratorFinder[Symbol, monoidOf3.Action] =
         GeneratorFinder.forMonoid(monoidOf3)
-      val presentationFinder: PresentationFinder[Symbol, monoidOf3.Action] =
-        PresentationFinder.forMonoid(monoidOf3, generatorFinder)
 
       val regularAnalysis: FindGeneratorAnalysis[Symbol, Symbol] =
         generatorFinder.findGenerators(regularAction)

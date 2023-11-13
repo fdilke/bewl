@@ -1,6 +1,7 @@
 package com.fdilke.bewl2.apps
 
-import com.fdilke.bewl2.sets.{SetsWithSlowActions, SetsUtilities}
+import com.fdilke.bewl2.sets.{SetsUtilities}
+import com.fdilke.bewl2.sets.SetsWithSlowActions
 import SetsWithSlowActions.*
 import SetsUtilities.*
 import scala.language.postfixOps

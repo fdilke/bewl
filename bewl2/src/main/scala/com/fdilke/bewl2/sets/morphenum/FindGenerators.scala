@@ -4,30 +4,27 @@ import com.fdilke.bewl2.sets.{BaseSets, Sets}
 
 import scala.language.postfixOps
 
-trait AbstractCyclic[A] {
+trait AbstractCyclic[A]:
   val generator: A
-}
 
-trait AbstractCyclics[A] {
+
+trait AbstractCyclics[A]:
   val cyclics: Seq[AbstractCyclic[A]]
   lazy val transversal: Seq[A]
 
   def contains(a: A): Boolean
   def +(a: A): AbstractCyclics[A]
   def <<(a: A): AbstractCyclics[A]
-}
 
-trait FindGenerators extends BaseSets {
-
-  trait FindGeneratorAnalysis[M, A] {
+trait FindGenerators extends BaseSets:
+  trait FindGeneratorAnalysis[M, A]:
     lazy val initialCyclics: AbstractCyclics[A]
     lazy val generators: Seq[A]
-  }
 
   trait GeneratorFinder[M, ACTION[_]]:
     def findGenerators[A](action: ACTION[A]): FindGeneratorAnalysis[M, A]
 
-  object GeneratorFinder {
+  object GeneratorFinder:
     def forMonoid[M](
       monoid: Monoid[M]
     ): GeneratorFinder[M, monoid.Action] =
@@ -106,6 +103,4 @@ trait FindGenerators extends BaseSets {
 
             override lazy val initialCyclics =
               new MaximalCyclics
-          }
-      }
 
