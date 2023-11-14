@@ -16,4 +16,30 @@ trait ObtainGenerators extends BaseSets:
         def findGenerators[A](
           action: monoid.Action[A]
         ): Seq[A] =
-          action.dot.dot.toSeq
+          class Accumulator(
+            val generators: Seq[A] = Seq.empty,
+            val generated: Set[A] = Set.empty
+          ):
+            def foldIn(x: A): Accumulator =
+              if generated contains x then
+                this
+              else
+                Accumulator(
+                  generators = x +: generators,
+                  generated = monoidElements map { m =>
+                    action.actionMultiply(x, m)
+                  } union generated
+                )
+          val firstPass: Accumulator =
+            action.dot.dot.toSeq.foldLeft(
+              new Accumulator()
+            ) { 
+                _.foldIn(_)
+              }
+          val secondPass: Accumulator =
+            firstPass.generators.foldLeft(
+              new Accumulator()
+            ) { 
+                _.foldIn(_)
+              }
+          secondPass.generators

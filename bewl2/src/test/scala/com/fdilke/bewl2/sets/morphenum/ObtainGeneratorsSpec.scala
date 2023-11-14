@@ -11,13 +11,13 @@ import Sets.{
   Dot,
   FindGeneratorAnalysis,
   GeneratorObtainer,
-  PresentationFinder,
+  PresentationFinder
 }
 import com.fdilke.bewl2.utility.StockStructures._
 
 import scala.language.{postfixOps, reflectiveCalls}
 
-abstract class ObtainGeneratorsSpec extends FunSuite:
+class ObtainGeneratorsSpec extends FunSuite:
   private val Seq(i, x, y) =
     Seq[String]("i", "x", "y").map { Symbol(_) }
 
