@@ -1,7 +1,7 @@
 package com.fdilke.bewl2.utility
 
 import munit.{ FunSuite, Assertions }
-import Assertions.assertEquals
+import Assertions.{ assertEquals, assertNotEquals }
 import com.fdilke.bewl2.sets.SetsWithSlowActions
 import com.fdilke.utility.Shortcuts._
 
@@ -9,6 +9,8 @@ object RichFunSuite:
   extension[A] (a: A)
     inline def is(b: A): Unit =
       assertEquals(a, b)
+    inline def isnt(b: A): Unit =
+      assertNotEquals(a, b)
 
   extension(letters: Seq[Char])
     inline def be(text: String): Unit =
