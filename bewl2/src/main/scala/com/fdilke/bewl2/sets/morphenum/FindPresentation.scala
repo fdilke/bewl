@@ -39,7 +39,7 @@ trait FindPresentation extends BaseSets:
                 }
               }
             }            
-          generatorFinder.findGenerators(specialAction).generators
+          generatorFinder.findGenerators(specialAction)
 
         override def findPresentation[A](action: monoid.Action[A], generators: Seq[A]): Seq[GeneratorWithRelators[M, A]] =
           generators.zipWithIndex.map(tupled { (g, j) =>

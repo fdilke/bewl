@@ -6,7 +6,6 @@ import Sets.{
   withDotMask,
   Monoid,
   Dot,
-  FindGeneratorAnalysis,
   GeneratorFinder,
   PresentationFinder,
   ActionAnalyzer,

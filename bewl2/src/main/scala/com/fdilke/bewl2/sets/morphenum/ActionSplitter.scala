@@ -51,7 +51,7 @@ trait ActionSplitter extends BaseSets {
           action: monoid.Action[A]
         ) = {
           val allGenerators: Seq[A] =
-            generatorFinder.findGenerators(action) generators
+            generatorFinder.findGenerators(action)
           val indexedGenerators: Seq[(A, Int)] =
             allGenerators.zipWithIndex
           val actionMultiply: BiArrow[A, M, A] =

@@ -9,23 +9,22 @@ import Sets.{
   withDot,
   Monoid,
   Dot,
-  FindGeneratorAnalysis,
-  GeneratorObtainer,
+  GeneratorFinder,
   PresentationFinder
 }
 import com.fdilke.bewl2.utility.StockStructures._
 
 import scala.language.{postfixOps, reflectiveCalls}
 
-class ObtainGeneratorsSpec extends FunSuite:
+class FindGeneratorsSpec extends FunSuite:
   private val Seq(i, x, y) =
     Seq[String]("i", "x", "y").map { Symbol(_) }
 
   withMonoidOf3(Sets):
     (monoidDot: Dot[Symbol]) ?=> (monoidOf3: Sets.Monoid[Symbol]) ?=>
     val monoidElements: Set[Symbol] = monoidDot.dot
-    val generatorFinder: GeneratorObtainer[Symbol, monoidOf3.Action] =
-      GeneratorObtainer.forMonoid(monoidOf3)
+    val generatorFinder: GeneratorFinder[Symbol, monoidOf3.Action] =
+      GeneratorFinder.forMonoid(monoidOf3)
 
     val actionTopos: Topos[
       monoidOf3.Action, [A] =>> A, Void, Unit, monoidOf3.RightIdeal, monoidOf3.InternalMap
