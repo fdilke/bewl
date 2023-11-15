@@ -5,7 +5,7 @@ import com.fdilke.bewl2.helper.{ Memoize}
 
 trait FindGenerators extends BaseSets:
   trait GeneratorFinder[M, ACTION[_]]:
-    def findGenerators[A](action: ACTION[A]): Seq[A]
+    def apply[A](action: ACTION[A]): Seq[A]
 
   object GeneratorFinder:
     def forMonoid[M](
@@ -14,7 +14,7 @@ trait FindGenerators extends BaseSets:
       val monoidElements: Set[M] =
         monoid.dot.dot
       new GeneratorFinder[M, monoid.Action]:
-        def findGenerators[A](
+        override def apply[A](
           action: monoid.Action[A]
         ): Seq[A] =
           def predecessors(a: A): Set[A] =

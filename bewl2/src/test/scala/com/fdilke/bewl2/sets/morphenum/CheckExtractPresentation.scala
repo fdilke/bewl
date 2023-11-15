@@ -24,7 +24,7 @@ object CheckExtractPresentation:
         generatorFinder
       ).findPresentation(
         action,
-        generatorFinder.findGenerators(action)
+        generatorFinder(action)
       )
 
     val i: M = monoid.unit(())

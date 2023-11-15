@@ -35,14 +35,14 @@ class FindGeneratorsSpec extends FunSuite:
       monoidOf3.withRegularAction:
         (regularAction: monoidOf3.Action[Symbol]) ?=>
         val generators: Seq[Symbol] =
-          generatorFinder.findGenerators(regularAction)
+          generatorFinder(regularAction)
         generators is Seq(i)
         checkMinimalGeneratingSet(regularAction)(generators)
 
     test("Generators are as expected for the void action"):
       monoidOf3.withVoidAction:
         (voidAction: monoidOf3.Action[Void]) ?=>
-        generatorFinder.findGenerators(voidAction) is Seq()
+        generatorFinder(voidAction) is Seq()
         checkMinimalGeneratingSet(voidAction)()
 
     test("Generators are as expected for a non-cyclic action"):
@@ -51,7 +51,7 @@ class FindGeneratorsSpec extends FunSuite:
         val regularSquared: monoidOf3.Action[(Symbol, Symbol)] = 
           regularAction x regularAction
         val generators: Seq[(Symbol, Symbol)] = 
-          generatorFinder.findGenerators(regularSquared)
+          generatorFinder(regularSquared)
         generators.size is 7
         checkMinimalGeneratingSet(regularSquared)(generators)        
 
@@ -59,7 +59,7 @@ class FindGeneratorsSpec extends FunSuite:
       val omega: monoidOf3.Action[monoidOf3.RightIdeal] =
         actionTopos.pretopos.omegaDot
       val generators: Seq[monoidOf3.RightIdeal] = 
-        generatorFinder.findGenerators(omega)
+        generatorFinder(omega)
       generators.size is 2
       checkMinimalGeneratingSet(omega)(generators)
 
@@ -76,7 +76,7 @@ class FindGeneratorsSpec extends FunSuite:
     def checkMinimalGeneratingSet[A](
       action: monoidOf3.Action[A]
     )(
-      generators: Seq[A] = generatorFinder.findGenerators(action)
+      generators: Seq[A] = generatorFinder(action)
     ): Unit =
       val actionElements: Set[A] = action.dot.dot
       def generatedBy(elements: Seq[A]): Set[A] =
