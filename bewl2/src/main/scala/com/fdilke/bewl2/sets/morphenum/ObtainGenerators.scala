@@ -1,7 +1,7 @@
 package com.fdilke.bewl2.sets.morphenum
 
 import com.fdilke.bewl2.sets.{BaseSets, Sets}
-import com.fdilke.bewl2.helper.Memoize
+import com.fdilke.bewl2.helper.{ Memoize}
 
 trait ObtainGenerators extends BaseSets:
   trait GeneratorObtainer[M, ACTION[_]]:
@@ -17,27 +17,28 @@ trait ObtainGenerators extends BaseSets:
         def findGenerators[A](
           action: monoid.Action[A]
         ): Seq[A] =
-          val monogenic: A => Set[A] =
-            Memoize[A, Set[A]]:
-              a => monoidElements map { m =>
-                action.actionMultiply(a, m)
-              }
-          class Accumulator(
-            val generators: Seq[A] = Seq.empty,
-            val generated: Set[A] = Set.empty
-          ):
-            def foldIn(x: A): Accumulator =
-              if generated contains x then
-                this
-              else
-                Accumulator(
-                  generators = x +: generators,
-                  generated = generated union monogenic(x)
-                )
-          def pass(generators: Seq[A]): Accumulator =
-            generators.foldLeft(new Accumulator()) { _.foldIn(_) }
-          val firstPass: Accumulator =
-            pass(action.dot.dot.toSeq)
-          val secondPass: Accumulator =
-            pass(firstPass.generators)
-          secondPass.generators
+          def predecessors(a: A): Set[A] =
+            monoidElements map { action.actionMultiply(a, _) }
+          qoFindGenerators[A](action.dot.dot.toSeq, predecessors)
+
+  private def qoFindGenerators[A](
+    elements: Seq[A],
+    uncachedPredecessors: A => Set[A]
+  ): Seq[A] =
+    val predecessors: A => Set[A] =
+      Memoize[A, Set[A]](uncachedPredecessors)
+    class Accumulator(
+      val generators: Seq[A] = Seq.empty,
+      val generated: Set[A] = Set.empty
+    ):
+      def foldIn(x: A): Accumulator =
+        if generated contains x then
+          this
+        else
+          Accumulator(
+            generators = x +: generators,
+            generated = generated union predecessors(x)
+          )
+    def pass(generators: Seq[A]): Seq[A] =
+      generators.foldLeft(new Accumulator) { _.foldIn(_) }.generators
+    pass(pass(elements))
