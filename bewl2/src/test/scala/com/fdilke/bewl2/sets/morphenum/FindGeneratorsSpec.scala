@@ -9,8 +9,7 @@ import Sets.{
   withDot,
   Monoid,
   Dot,
-  GeneratorFinder,
-  PresentationFinder
+  GeneratorFinder
 }
 import com.fdilke.bewl2.utility.StockStructures._
 

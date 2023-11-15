@@ -63,7 +63,7 @@ trait SetsMonoidAssistant extends BaseSets:
             actionSplitter.splitAction(action)
 
           private val generatorsWithRelators: Seq[GeneratorWithRelators[M, A]] =
-            presentationFinder.findPresentation(
+            presentationFinder(
               action,
               actionSplitting.allGenerators
             )

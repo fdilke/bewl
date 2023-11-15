@@ -96,7 +96,7 @@ trait ActionSplitter extends BaseSets {
                 monoid.Action { actionMultiply }
               }
             val componentPresentation: Seq[GeneratorWithRelators[M, A]] =
-              presentationFinder.findPresentation(
+              presentationFinder(
                 componentAction,
                 componentGenerators
               )

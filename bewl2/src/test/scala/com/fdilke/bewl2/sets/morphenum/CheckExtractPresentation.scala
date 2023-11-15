@@ -22,7 +22,7 @@ object CheckExtractPresentation:
       PresentationFinder.forMonoid(
         monoid,
         generatorFinder
-      ).findPresentation(
+      )(
         action,
         generatorFinder(action)
       )

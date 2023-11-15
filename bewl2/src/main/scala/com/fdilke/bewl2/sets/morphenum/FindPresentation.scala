@@ -8,7 +8,7 @@ trait FindPresentation extends BaseSets:
   Ɛ: FindGenerators =>
 
   trait PresentationFinder[M, ACTION[_]]:
-      def findPresentation[A](action: ACTION[A], generators: Seq[A]): Seq[GeneratorWithRelators[M, A]]
+      def apply[A](action: ACTION[A], generators: Seq[A]): Seq[GeneratorWithRelators[M, A]]
 
   object PresentationFinder:
     def forMonoid[M](
@@ -41,7 +41,7 @@ trait FindPresentation extends BaseSets:
             }            
           generatorFinder(specialAction)
 
-        override def findPresentation[A](action: monoid.Action[A], generators: Seq[A]): Seq[GeneratorWithRelators[M, A]] =
+        override def apply[A](action: monoid.Action[A], generators: Seq[A]): Seq[GeneratorWithRelators[M, A]] =
           generators.zipWithIndex.map(tupled { (g, j) =>
             GeneratorWithRelators[M, A](
               g,
