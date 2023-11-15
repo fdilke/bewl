@@ -1,6 +1,7 @@
 package com.fdilke.bewl2.sets.morphenum
 
 import com.fdilke.bewl2.sets.{BaseSets, Sets}
+import com.fdilke.bewl2.helper.Memoize
 
 trait ObtainGenerators extends BaseSets:
   trait GeneratorObtainer[M, ACTION[_]]:
@@ -16,6 +17,11 @@ trait ObtainGenerators extends BaseSets:
         def findGenerators[A](
           action: monoid.Action[A]
         ): Seq[A] =
+          val monogenic: A => Set[A] =
+            Memoize[A, Set[A]]:
+              a => monoidElements map { m =>
+                action.actionMultiply(a, m)
+              }
           class Accumulator(
             val generators: Seq[A] = Seq.empty,
             val generated: Set[A] = Set.empty
@@ -26,20 +32,12 @@ trait ObtainGenerators extends BaseSets:
               else
                 Accumulator(
                   generators = x +: generators,
-                  generated = monoidElements map { m =>
-                    action.actionMultiply(x, m)
-                  } union generated
+                  generated = generated union monogenic(x)
                 )
+          def pass(generators: Seq[A]): Accumulator =
+            generators.foldLeft(new Accumulator()) { _.foldIn(_) }
           val firstPass: Accumulator =
-            action.dot.dot.toSeq.foldLeft(
-              new Accumulator()
-            ) { 
-                _.foldIn(_)
-              }
+            pass(action.dot.dot.toSeq)
           val secondPass: Accumulator =
-            firstPass.generators.foldLeft(
-              new Accumulator()
-            ) { 
-                _.foldIn(_)
-              }
+            pass(firstPass.generators)
           secondPass.generators
