@@ -39,7 +39,7 @@ class Topos[
 
   class Dot[X] private[Topos](
     val dot: DOT[X]
-  ) {
+  ):
     given Dot[X] = this
     lazy val toolkit: pretopos.TOOLKIT[X] =
       pretopos.toolkitBuilder.buildToolkit[X](dot)
@@ -63,7 +63,7 @@ class Topos[
     = Memoize.type1[
       [Y] =>> Dot[Y],
       [Y] =>> Dot[X > Y]
-    ](
+    ]:
       [Y] => (dotY: Dot[Y]) => Dot(
         pretopos.uncachedExponentialObject[X, Y](
           dot,
@@ -72,7 +72,6 @@ class Topos[
           dotY.toolkit
         )
       )
-    )
 
     lazy val diagonal: (X, X) ~> BEWL =
       { (x: CTXT[X]) => x ⊕ x }.chi
@@ -90,14 +89,10 @@ class Topos[
       (truth o toUnit[X]).name.chi
 
     lazy val singleton: X ~> (X > BEWL) =
-      transpose[X, X, BEWL]{
-        // case x ⊕ y => x =?= y
-        =?=[X]
-      }
+      transpose[X, X, BEWL]{ =?=[X]} 
 
     lazy val pac: PartialArrowClassifier[X, OPTION[X]] =
       optionator.partialArrowClassifier[X]
-  }
 
   final def withDot[X, RESULT](
     dot: DOT[X]
@@ -113,11 +108,9 @@ class Topos[
   )(
     block: Dot[X] ?=> Dot[Y] ?=> RESULT
   ): RESULT =
-    withDot(dotX) {
-      withDot(dotY) {
+    withDot(dotX):
+      withDot(dotY):
         block
-      }
-    }
 
   final inline def withDots[X, Y, Z, RESULT](
     dotX: DOT[X],
@@ -126,13 +119,10 @@ class Topos[
   )(
     block: Dot[X] ?=> Dot[Y] ?=> Dot[Z] ?=> RESULT
   ): RESULT =
-    withDot(dotX) {
-      withDot(dotY) {
-        withDot(dotZ) {
+    withDot(dotX):
+      withDot(dotY):
+        withDot(dotZ):
           block
-        }
-      }
-    }
 
   final inline def withDots[X, Y, Z, W, RESULT](
     dotX: DOT[X],
@@ -142,15 +132,11 @@ class Topos[
   )(
     block: Dot[X] ?=> Dot[Y] ?=> Dot[Z] ?=> Dot[W] ?=> RESULT
   ): RESULT =
-    withDot(dotX) {
-      withDot(dotY) {
-        withDot(dotZ) {
-          withDot(dotW) {
+    withDot(dotX):
+      withDot(dotY):
+        withDot(dotZ):
+          withDot(dotW):
             block
-          }
-        }
-      }
-    }
 
   final inline def withDots[X, Y, Z, W, V, RESULT](
     dotX: DOT[X],
@@ -161,26 +147,20 @@ class Topos[
   )(
     block: Dot[X] ?=> Dot[Y] ?=> Dot[Z] ?=> Dot[W] ?=> Dot[V] ?=> RESULT
   ): RESULT =
-    withDot(dotX) {
-      withDot(dotY) {
-        withDot(dotZ) {
-          withDot(dotW) {
-            withDot(dotV) {
+    withDot(dotX):
+      withDot(dotY):
+        withDot(dotZ):
+          withDot(dotW):
+            withDot(dotV):
               block
-            }
-          }
-        }
-      }
-    }
 
   final def withDotMask[X, RESULT](
     dot: DOT[X]
   )(
     block: [X_] => Dot[X_] ?=> (X_ =:= X) ?=> (X =:= X_) ?=> RESULT
   ): RESULT =
-      withDot(dot) {
+      withDot(dot):
         block[X]
-      }
 
   final def maskDot[X: Dot, RESULT](
     block: [X_] => Dot[X_] ?=> (X_ =:= X) ?=> (X =:= X_) ?=> RESULT
@@ -231,12 +211,11 @@ class Topos[
     capture: [A] => Dot[A] ?=> Equalizer[A, X] => RESULT
   ): RESULT =
     pretopos.doEqualizer(dot[X], dot[Y], f, f2)(
-      [A] => (rawEqualizer: pretopos.RawEqualizer[A, X]) => (dotA: DOT[A]) => {
+      [A] => (rawEqualizer: pretopos.RawEqualizer[A, X]) => (dotA: DOT[A]) =>
         given Dot[A] = Dot(dotA)
-        capture[A](new Equalizer[A, X] {
+        capture[A](new Equalizer[A, X]:
           override val inclusion: A ~> X =
             rawEqualizer.inclusion
-
           override def restrict[R: Dot](
             arrow: R ~> X
           ): R ~> A =
@@ -244,8 +223,7 @@ class Topos[
               dot[R],
               arrow
             )
-        })
-      }
+        )
     )
 
   final inline def chiForMonic[X: Dot, Y: Dot](
@@ -343,18 +321,17 @@ class Topos[
   final inline def ∀[X: Dot, Y: Dot](
     untupledFn: UntupledBiArrow[X, Y, BEWL]
   ): X ~> BEWL =
-    ∀[X, Y]{
+    ∀[X, Y]:
       case x ⊕ y => untupledFn(x, y)
-    }
 
   final def ∀[X: Dot, Y: Dot, Z: Dot](
     f: (CTXT[X], CTXT[Y], CTXT[Z]) => CTXT[BEWL]
   ): X ~> BEWL =
     ∀[X, Y] { (x, y) =>
       val piff: Y ~> BEWL =
-        (∀[Y, Z] { (y, z) =>
-          f(x, y, z)
-        })
+        ∀[Y, Z]:
+          (y, z) =>
+            f(x, y, z)
       piff(y)
     }
 
@@ -386,9 +363,8 @@ class Topos[
   final inline def ∃[X: Dot, Y: Dot](
     untupledFn: UntupledBiArrow[X, Y, BEWL]
   ): X ~> BEWL =
-    ∃[X, Y]{
+    ∃[X, Y]:
       case x ⊕ y => untupledFn(x, y)
-    }
 
   object `⊕` :
     def unapply[X: Dot, Y: Dot](
@@ -486,11 +462,9 @@ class Topos[
     override def isEpic[X: Dot, Y: Dot](
       arrow: X ~> Y
     ): Boolean =
-      ∀[Y](
-        ∃[Y, X] { (y, x) =>
-          y =?= arrow(x)
-        }
-      )
+      ∀[Y]:
+        ∃[Y, X]:
+          _ =?= arrow(_)
 
   lazy val epicVerifier: EpicVerifier =
     new DefaultEpicVerifier
@@ -502,9 +476,8 @@ class Topos[
     def whereTrue[RESULT](
       capture: [A] => Dot[A] ?=> Equalizer[A, X] => RESULT
     ): RESULT =
-      f.?=(toTrue[X]) {
+      f.?=(toTrue[X]):
         capture
-      }
 
   trait PartialArrowClassifier[X: Dot, OPTION_X: Dot]:
     final val classifier: Dot[OPTION_X] = summon[Dot[OPTION_X]]
@@ -527,11 +500,10 @@ class Topos[
       val evalPredicate: BiArrow[X > BEWL, X, BEWL] =
         evaluation[X, BEWL]
       val isSubSingleton: (X > BEWL) ~> BEWL =
-        ∀[X > BEWL, (X, X)] {
+        ∀[X > BEWL, (X, X)]:
           case p ⊕ (x ⊕ y) =>
             (evalPredicate(p ⊕ x) ∧ evalPredicate(p ⊕ y)) → (x =?= y)
-        }
-      isSubSingleton.whereTrue { 
+      isSubSingleton.whereTrue: 
         [OX] => (dotOptionX : Dot[OX]) ?=> (equalizer : Equalizer[OX, X > BEWL]) =>
           (new PartialArrowClassifier[X, OX]:
             override val some: X ~> OX = 
@@ -552,7 +524,6 @@ class Topos[
                 }
               )
           ).asInstanceOf[PartialArrowClassifier[X, OPTION[X]]]
-      }
 
 object Topos:
   inline def apply[

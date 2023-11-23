@@ -28,11 +28,10 @@ object CheckExtractPresentation:
       )
 
     val i: M = monoid.unit(())
-    for {
+    for
       (g, index) <- generatorsWithRelators.zipWithIndex
-    } {
+    do
       g.relators.contains(Relator(i, index, i)) is false
-    }
 
     val presentedAction: PresentedAction[Int, monoid.Action] =
       FiniteSetsPresentedAction(monoid)(generatorsWithRelators)
