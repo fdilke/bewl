@@ -41,7 +41,7 @@ class AlgebraicConstructionsSpec extends FunSuite:
 
   test("Construct a group from a table"):
     import StockSymbols.*
-    withGroupFromTable(
+    Sets.withGroupFromTable(
       e, a,
       a, e
     ):

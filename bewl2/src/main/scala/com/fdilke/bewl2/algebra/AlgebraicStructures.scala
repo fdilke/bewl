@@ -46,6 +46,9 @@ trait AlgebraicStructures[
     * := multiply,
     (!) := inverse
   ) with Actions[G] :
+    lazy val actionTopos: Topos[Action, CTXT, VOID, UNIT, BEWL, >] =
+      toposOfGroupActions(this)
+
     def x[H: Dot]( // product sugar
       that: Group[H]
     ): Group[(G, H)] = {

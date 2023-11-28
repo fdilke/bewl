@@ -44,11 +44,21 @@ object StockStructures:
   def with_S_3[RESULT](
     block: Sets.Dot[Symbol] ?=> Sets.Group[Symbol] ?=> RESULT
   ): RESULT =
-    withGroupFromTable(
+    Sets.withGroupFromTable(
       e, a, b, c, r, s,
       a, e, s, r, c, b,
       b, r, e, s, a, c,
       c, s, r, e, b, a,
       r, b, c, a, s, e,
       s, c, a, b, e, r
+    )(block)
+
+  def withGroupOf2[RESULT](
+    baseSets: BaseSets
+  )(
+    block: baseSets.Dot[Symbol] ?=> baseSets.Group[Symbol] ?=> RESULT
+  ): RESULT =
+    baseSets.withGroupFromTable(
+      e, a,
+      a, e
     )(block)
