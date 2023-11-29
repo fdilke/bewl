@@ -8,7 +8,7 @@ import Sets.{
   Dot,
   GeneratorFinder,
   PresentationFinder,
-  ActionAnalyzer,
+  MonoidActionAnalyzer,
   LocalMonoidAssistant
 }
 import munit.FunSuite
@@ -43,7 +43,7 @@ class FiniteSetsLocalMonoidAssistantTest extends FunSuite:
       val omega: monoidOf3.Action[monoidOf3.RightIdeal] =
         actionTopos.pretopos.omegaDot
 
-      val analyzer: ActionAnalyzer[monoidOf3.Action, monoidOf3.InternalMap] =
+      val analyzer: MonoidActionAnalyzer[monoidOf3.Action, monoidOf3.InternalMap] =
         LocalMonoidAssistant.actionAnalyzer(monoidOf3)
 
       withDot(Set[String]("x", "y")):

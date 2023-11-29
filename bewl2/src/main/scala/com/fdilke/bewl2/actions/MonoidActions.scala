@@ -220,7 +220,7 @@ trait MonoidActions[
           given Ɛ.Dot[A] = dotA.dot
           Ɛ.backDivideMonic[X, Y, A](arrow, monic)
 
-        val analyzer: ActionAnalyzer[monoid.Action, monoid.InternalMap] =
+        val analyzer: MonoidActionAnalyzer[monoid.Action, monoid.InternalMap] =
           Ɛ.monoidAssistant.actionAnalyzer[M](monoid)
 
         override type TOOLKIT[A] = analyzer.ACTION_ANALYSIS[A]
@@ -238,9 +238,9 @@ trait MonoidActions[
     DefaultMonoidAssistant
 
   trait MonoidAssistant:
-    def actionAnalyzer[M : Dot](monoid: Monoid[M]) : ActionAnalyzer[monoid.Action, monoid.InternalMap]
+    def actionAnalyzer[M : Dot](monoid: Monoid[M]) : MonoidActionAnalyzer[monoid.Action, monoid.InternalMap]
 
-  trait ActionAnalyzer[ACTION[_], INTERNAL_MAP[_, _]]:
+  trait MonoidActionAnalyzer[ACTION[_], INTERNAL_MAP[_, _]]:
     type ACTION_ANALYSIS[A]
     def analyze[A](
       action: ACTION[A]
@@ -257,8 +257,8 @@ trait MonoidActions[
   object DefaultMonoidAssistant extends MonoidAssistant:
     override def actionAnalyzer[M : Dot](
       monoid: Monoid[M]
-    ) : ActionAnalyzer[monoid.Action, monoid.InternalMap] =
-      new ActionAnalyzer[monoid.Action, monoid.InternalMap]:
+    ) : MonoidActionAnalyzer[monoid.Action, monoid.InternalMap] =
+      new MonoidActionAnalyzer[monoid.Action, monoid.InternalMap]:
         override type ACTION_ANALYSIS[A] = DefaultActionAnalysis[A]
         override def analyze[A](
           action: monoid.Action[A]

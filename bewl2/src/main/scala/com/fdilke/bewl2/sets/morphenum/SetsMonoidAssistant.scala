@@ -12,8 +12,8 @@ trait SetsMonoidAssistant extends BaseSets:
   override protected val monoidAssistant: MonoidAssistant = LocalMonoidAssistant
 
   object LocalMonoidAssistant extends MonoidAssistant:
-    override def actionAnalyzer[M : Dot](monoid: Monoid[M]) : ActionAnalyzer[monoid.Action, monoid.InternalMap] =
-      new ActionAnalyzer[monoid.Action, monoid.InternalMap]:
+    override def actionAnalyzer[M : Dot](monoid: Monoid[M]) : MonoidActionAnalyzer[monoid.Action, monoid.InternalMap] =
+      new MonoidActionAnalyzer[monoid.Action, monoid.InternalMap]:
         // trait FarceActionAnalysis[ACTION[_], INTERNAL_MAP[_, _], A] extends 
         //   ActionAnalysis[A, ACTION, INTERNAL_MAP, [A] =>> FarceActionAnalysis[ACTION, INTERNAL_MAP, A]]:
         //   override def makeExponential[B](

@@ -1,7 +1,7 @@
 package com.fdilke.bewl2.sets.morphenum
 
 import com.fdilke.bewl2.sets.Sets
-import Sets.{ Dot, DefaultMonoidAssistant, LocalMonoidAssistant, Monoid, ActionAnalyzer, RichArrow }
+import Sets.{ Dot, DefaultMonoidAssistant, LocalMonoidAssistant, Monoid, MonoidActionAnalyzer, RichArrow }
 import com.fdilke.bewl2.utility.RichFunSuite._
 
 object CheckLocalMorphismEnumerator:
@@ -15,11 +15,11 @@ object CheckLocalMorphismEnumerator:
     given monoid.Action[X] = sourceAction
     given Dot[Y] = targetAction.dot
     given monoid.Action[Y] = targetAction
-    val localAnalyzer: ActionAnalyzer[monoid.Action, monoid.InternalMap] =
+    val localAnalyzer: MonoidActionAnalyzer[monoid.Action, monoid.InternalMap] =
       LocalMonoidAssistant.actionAnalyzer(monoid)
 
     def enumerateMorphisms(
-      analyzer: ActionAnalyzer[monoid.Action, monoid.InternalMap]
+      analyzer: MonoidActionAnalyzer[monoid.Action, monoid.InternalMap]
     ): Iterable[X => Y] =
       analyzer.enumerateMorphisms(
           analyzer.analyze(sourceAction),
@@ -34,7 +34,7 @@ object CheckLocalMorphismEnumerator:
     } is true
 
     if (thorough) {
-      val defaultAnalyzer: ActionAnalyzer[monoid.Action, monoid.InternalMap] =
+      val defaultAnalyzer: MonoidActionAnalyzer[monoid.Action, monoid.InternalMap] =
         DefaultMonoidAssistant.actionAnalyzer(monoid)
 
       val defaultMorphisms: Iterable[X => Y] =
