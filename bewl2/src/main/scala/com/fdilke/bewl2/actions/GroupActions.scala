@@ -56,11 +56,11 @@ trait GroupActions[
 
         override def uncachedExponentialObject[X, Y](
           dotX: group.Action[X],
-          analysisX: Unit,
+          analysisX: analyzer.ACTION_ANALYSIS[X],
           dotY: group.Action[Y],
-          analysisY: Unit
+          analysisY: analyzer.ACTION_ANALYSIS[Y]
         ): group.Action[X > Y] =
-          ???
+          analyzer.makeExponential(analysisX, analysisY)
 
         override def evaluation[X, Y](
           dotX: group.Action[X],
@@ -100,11 +100,11 @@ trait GroupActions[
 
         override def enumerateMorphisms[X, Y](
           dotX: group.Action[X],
-          analysisX: Unit,
+          analysisX: analyzer.ACTION_ANALYSIS[X],
           dotY: group.Action[Y],
-          analysisY: Unit
+          analysisY: analyzer.ACTION_ANALYSIS[Y]
         ): Iterable[X ~> Y] =
-          ??? // TODO: use modified/simplified version of action algorithm?
+          analyzer.enumerateMorphisms(analysisX, analysisY)
 
         override def fromZero[X](
           dotX: group.Action[X]
@@ -173,109 +173,100 @@ trait GroupActions[
           given Ɛ.Dot[A] = dotA.dot
           Ɛ.backDivideMonic[X, Y, A](arrow, monic)
 
-        // TODO: will need an analyzer of some kind, but for groups
-        // val analyzer: ActionAnalyzer[monoid.Action, monoid.InternalMap] =
-        //   Ɛ.monoidAssistant.actionAnalyzer[M](monoid)
+        val analyzer: GroupActionAnalyzer[group.Action] =
+          Ɛ.groupAssistant.actionAnalyzer[M](group)
 
-        override type TOOLKIT[A] = Unit
+        override type TOOLKIT[A] = analyzer.ACTION_ANALYSIS[A]
         override val toolkitBuilder: ToolkitBuilder = new ToolkitBuilder:
             override def buildToolkit[A](
               theAction: group.Action[A]
-            ): Unit = ()
-        // override type TOOLKIT[A] = analyzer.ACTION_ANALYSIS[A]
-        // override val toolkitBuilder: MyToolkitBuilder.type =
-        //   MyToolkitBuilder
-
-        // object MyToolkitBuilder extends ToolkitBuilder:
-        //     override def buildToolkit[A](
-        //       theAction: monoid.Action[A]
-        //     ): analyzer.ACTION_ANALYSIS[A] =
-        //       analyzer.analyze(theAction)
+            ): analyzer.ACTION_ANALYSIS[A] =
+              analyzer.analyze(theAction)
     )
 
-  // protected val monoidAssistant: MonoidAssistant =
-  //   DefaultMonoidAssistant
+  protected val groupAssistant: GroupAssistant =
+    DefaultGroupAssistant
 
-  // trait MonoidAssistant:
-  //   def actionAnalyzer[M : Dot](monoid: Monoid[M]) : ActionAnalyzer[monoid.Action, monoid.InternalMap]
+  trait GroupAssistant:
+    def actionAnalyzer[G : Dot](group: Group[G]) : GroupActionAnalyzer[group.Action]
 
-  // trait ActionAnalyzer[ACTION[_], INTERNAL_MAP[_, _]]:
-  //   type ACTION_ANALYSIS[A]
-  //   def analyze[A](
-  //     action: ACTION[A]
-  //   ) : ACTION_ANALYSIS[A]
-  //   def makeExponential[A, B](
-  //     analysisA: ACTION_ANALYSIS[A],
-  //     analysisB: ACTION_ANALYSIS[B]
-  //   ): ACTION[INTERNAL_MAP[A, B]]
-  //   def enumerateMorphisms[A, B](
-  //     analysisA: ACTION_ANALYSIS[A],
-  //     analysisB: ACTION_ANALYSIS[B]
-  //   ): Iterable[A ~> B]
+  trait GroupActionAnalyzer[ACTION[_]]:
+    type ACTION_ANALYSIS[A]
+    def analyze[A](
+      action: ACTION[A]
+    ) : ACTION_ANALYSIS[A]
+    def makeExponential[A, B](
+      analysisA: ACTION_ANALYSIS[A],
+      analysisB: ACTION_ANALYSIS[B]
+    ): ACTION[A > B]
+    def enumerateMorphisms[A, B](
+      analysisA: ACTION_ANALYSIS[A],
+      analysisB: ACTION_ANALYSIS[B]
+    ): Iterable[A ~> B]
 
-  // object DefaultMonoidAssistant extends MonoidAssistant:
-  //   override def actionAnalyzer[M : Dot](
-  //     monoid: Monoid[M]
-  //   ) : ActionAnalyzer[monoid.Action, monoid.InternalMap] =
-  //     new ActionAnalyzer[monoid.Action, monoid.InternalMap]:
-  //       override type ACTION_ANALYSIS[A] = DefaultActionAnalysis[A]
-  //       override def analyze[A](
-  //         action: monoid.Action[A]
-  //       ) : DefaultActionAnalysis[A] =
-  //         new DefaultActionAnalysis[A](action)
+  object DefaultGroupAssistant extends GroupAssistant:
+    override def actionAnalyzer[G : Dot](
+      group: Group[G]
+    ) : GroupActionAnalyzer[group.Action] =
+      new GroupActionAnalyzer[group.Action]:
+        override type ACTION_ANALYSIS[A] = DefaultGroupActionAnalysis[A]
+        override def analyze[A](
+          action: group.Action[A]
+        ) : DefaultGroupActionAnalysis[A] =
+          new DefaultGroupActionAnalysis[A](action)
 
-  //       override def makeExponential[A, B](
-  //         analysisA: DefaultActionAnalysis[A],
-  //         analysisB: DefaultActionAnalysis[B]
-  //       ): monoid.Action[monoid.InternalMap[A, B]] = 
-  //         analysisA.makeExponential(analysisB)
+        override def makeExponential[A, B](
+          analysisA: DefaultGroupActionAnalysis[A],
+          analysisB: DefaultGroupActionAnalysis[B]
+        ): group.Action[A > B] = 
+          analysisA.makeExponential(analysisB)
 
-  //       override def enumerateMorphisms[A, B](
-  //         src: DefaultActionAnalysis[A],
-  //         target: DefaultActionAnalysis[B]
-  //       ): Iterable[A ~> B] =
-  //         src.enumerateMorphisms(target)
+        override def enumerateMorphisms[A, B](
+          src: DefaultGroupActionAnalysis[A],
+          target: DefaultGroupActionAnalysis[B]
+        ): Iterable[A ~> B] =
+          src.enumerateMorphisms(target)
 
-  //       class DefaultActionAnalysis[A](
-  //         val action: monoid.Action[A]
-  //       ):
-  //         given Dot[A] = action.dot
-  //         given Dot[M] = monoid.dot
-  //         def makeExponential[B](
-  //           analysisB: DefaultActionAnalysis[B]
-  //         ): monoid.Action[monoid.InternalMap[A, B]] =
-  //           given Dot[B] = analysisB.action.dot
-  //           val eval: ((M, A) > B, (M, A)) ~> B =
-  //             evaluation[(M, A), B]
-  //           val isMorphism: ((M, A) > B) ~> BEWL =
-  //             ∀[(M, A) > B, M, A, M] {
-  //               (phi, m, a, n) =>
-  //                 analysisB.action.actionMultiply(eval(phi, m ⊕ a), n) =?= 
-  //                   eval(phi, monoid.multiply(m, n) ⊕ action.actionMultiply(a, n))
-  //             }
-  //           isMorphism.whereTrue {
-  //             [F] => (_ : Dot[F]) ?=> (equalizer: Equalizer[F, ((M, A) > B)]) =>
-  //               val action: monoid.Action[F] =
-  //                 monoid.Action {
-  //                   equalizer.restrict(
-  //                     transpose[(F, M), (M, A), B]{ case (f ⊕ m) ⊕ (n ⊕ a) =>
-  //                       val phi: CTXT[(M, A) > B] =
-  //                         equalizer.inclusion(f)
-  //                       eval(phi, monoid.multiply(m, n) ⊕ a)
-  //                     }
-  //                   )
-  //                 }
-  //               // awful, fix via refactoring Equalizer via Tagged to provide an implicit =:= rather than inclusion
-  //               action.asInstanceOf[monoid.Action[monoid.InternalMap[A, B]]]
-  //             }
+        class DefaultGroupActionAnalysis[A](
+          val action: group.Action[A]
+        ):
+          given Dot[A] = action.dot
+          given Dot[G] = group.dot
+          def makeExponential[B](
+            analysisB: DefaultGroupActionAnalysis[B]
+          ): group.Action[A > B] =
+            given Dot[B] = analysisB.action.dot
+            val eval: (A > B, A) ~> B =
+              evaluation[A, B]
+            val isMorphism: (A > B) ~> BEWL =
+              ∀[A > B, A, G] {
+                (phi, a, g) =>
+                  analysisB.action.actionMultiply(eval(phi, a), g) =?= 
+                    eval(phi, action.actionMultiply(a, g))
+              }
+            isMorphism.whereTrue {
+              [F] => (_ : Dot[F]) ?=> (equalizer: Equalizer[F, A > B]) =>
+                val action: group.Action[F] =
+                  group.Action {
+                    equalizer.restrict(
+                      transpose[(F, G), A, B]{ case (f ⊕ m) ⊕ a =>
+                        val phi: CTXT[A > B] =
+                          equalizer.inclusion(f)
+                        eval(phi, a)
+                      }
+                    )
+                  }
+                // awful, fix via refactoring Equalizer via Tagged to provide an implicit =:= rather than inclusion
+                action.asInstanceOf[group.Action[A > B]]
+              }
               
-  //         def enumerateMorphisms[B](
-  //           analysisB: DefaultActionAnalysis[B]
-  //         ): Iterable[A ~> B] =
-  //           given Dot[B] = analysisB.action.dot
-  //           morphisms[A, B] filter:
-  //             (f: A ~> B) => ∀[(A, M)]: 
-  //               case a ⊕ m =>
-  //                 f(action.actionMultiply(a, m)) =?=
-  //                   analysisB.action.actionMultiply(f(a), m)
+          def enumerateMorphisms[B](
+            analysisB: DefaultGroupActionAnalysis[B]
+          ): Iterable[A ~> B] =
+            given Dot[B] = analysisB.action.dot
+            morphisms[A, B] filter:
+              (f: A ~> B) => ∀[(A, G)]: 
+                case a ⊕ g =>
+                  f(action.actionMultiply(a, g)) =?=
+                    analysisB.action.actionMultiply(f(a), g)
 

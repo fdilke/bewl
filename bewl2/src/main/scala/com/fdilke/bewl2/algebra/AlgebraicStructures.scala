@@ -46,6 +46,8 @@ trait AlgebraicStructures[
     * := multiply,
     (!) := inverse
   ) with Actions[G] :
+    val dot: Dot[G] = summon
+
     lazy val actionTopos: Topos[Action, CTXT, VOID, UNIT, BEWL, >] =
       toposOfGroupActions(this)
 
