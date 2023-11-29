@@ -24,9 +24,10 @@ trait GroupActionsSetupFixtures[ACTION[_]]:
   val actionTopos: Topos[ACTION, [A] =>> A, Void, Unit, Boolean, Map]
   val fooAction: ACTION[Symbol]
   val barAction: ACTION[String]
-  val bazAction: ACTION[ROPE]
-  val intAction: ACTION[Int]
-  val boolAction: ACTION[Boolean]
+  val bazAction: ACTION[Int]
+  // val bazAction: ACTION[ROPE]
+  // val intAction: ACTION[Int]
+  // val boolAction: ACTION[Boolean]
 
 abstract class BaseGroupActionsSpec[ACTION[_]](
   val fixtures: GroupActionsSetupFixtures[ACTION]
@@ -38,7 +39,7 @@ abstract class BaseGroupActionsSpec[ACTION[_]](
 
   override type FOO = Symbol
   override type BAR = String
-  override type BAZ = ROPE
+  override type BAZ = Int
 
   override def withTestDots(
     block: Dot[FOO] ?=> Dot[BAR] ?=> Dot[BAZ] ?=> ToposFixtures => Unit
@@ -46,59 +47,42 @@ abstract class BaseGroupActionsSpec[ACTION[_]](
     withDots(
       fooAction,
       barAction,
-      bazAction,
-      intAction,
-      boolAction
+      bazAction
+      // intAction,
+      // boolAction
     ):
       block(
         new ToposFixtures {
           override val foo2bar: Symbol ~> String =
+            Map(e -> "x", a -> "x'")
+
+          override val foo2baz: Symbol ~> Int =
+            Map(e -> 4, a -> 3)
+
+          override val monicBar2baz: String ~> Int =
+            Map("x" -> 3, "x'" -> 4, "y" -> 5)
+
+          val altMonicBar2baz: String ~> Int =
+            Map("x" -> 2, "x'" -> 1, "y" -> 5)
+
+          override val foobar2baz: (Symbol, String) ~> Int = 
             Map(
-              i -> "x", x -> "x", y -> "y"
+              (e, "x") -> 1,
+              (e, "x'") -> 3,
+              (e, "y") -> 2,
+              (a, "x") -> 4,
+              (a, "x'") -> 2,
+              (a, "y") -> 1
             )
 
-          override val foo2baz: Symbol ~> ROPE =
-            s => Rope.blur[[A] =>> A](s.name)
-
-          override val monicBar2baz: String ~> ROPE =
-            Rope.blur[[A] =>> A](_)
-
-          override val foobar2baz: (Symbol, String) ~> ROPE = 
-            Map(
-              (i, "x") -> xR,
-              (x, "x") -> xR,
-              (y, "x") -> yR,
-              (i, "y") -> yR,
-              (x, "y") -> xR,
-              (y, "y") -> yR
-            )
-
-          override val foo2ImageOfBar: Symbol ~> ROPE =
-            Map(
-              i -> yR, 
-              x -> xR,
-              y -> yR
-            )
+          override val foo2ImageOfBar: Symbol ~> Int =
+            Map(e -> 4, a -> 3)
 
           override val equalizerSituation: EqualizerSituation[_, _, _] =
-            EqualizerSituation[FOO, Int, Boolean](
-              Map(
-                i -> 1,
-                x -> 1,
-                y -> 2
-              ),
-              Map(
-                0 -> true,
-                1 -> true,
-                2 -> true,
-                3 -> true
-              ),
-              Map(
-                0 -> false,
-                1 -> true,
-                2 -> true,
-                3 -> true
-              )
+            EqualizerSituation[Unit, String, Int](
+              _ => "y",
+              monicBar2baz,
+              altMonicBar2baz
             )
         }
       )
@@ -124,42 +108,59 @@ abstract class GroupActionsSetup(val baseSets: BaseSets):
         Set[String](strings :_*)
       ):
         groupOf2.Action {
-          (s, m) => groupOf2.multiply(Symbol(s), m).name
+          (s, g) =>
+            if (g == e) || (s == "y") then
+              s
+            else if (s == "x")
+              "x'"
+            else
+              "x"
         }
 
     override val barAction: groupOf2.Action[String] =
-      actionOnStrings("x", "y")
+      actionOnStrings("x", "x'", "y")
 
-    override val bazAction: groupOf2.Action[ROPE] =
-      Rope.blur(actionOnStrings("i", "x", "y"))
-
-    override val intAction: groupOf2.Action[Int] =
+    def actionOnInts(intMap: Map[Int, Int]): groupOf2.Action[Int] =
       withDot(
-        Set[Int](0, 1, 2, 3)
+        intMap.keySet
       ):
-        groupOf2.Action[Int](
-          (n: Int, r: Symbol) =>
-            if (n == 0)
-              0
+        groupOf2.Action:
+          (i, g) =>
+            if (g == e) then
+              i
             else
-              r match {
-                case `i` => n
-                case `x` => 1
-                case `y` => 2
-              }
-        )
+              intMap(i)
 
-    override val boolAction: groupOf2.Action[Boolean] =
-      groupOf2.Action[Boolean](
-        (f: Boolean, _: Symbol) =>
-          f
-      )
+    override val bazAction: groupOf2.Action[Int] =
+      actionOnInts(Map(1 -> 2, 2 -> 1, 3 -> 4, 4 -> 3, 5 -> 5))
+
+    // override val intAction: groupOf2.Action[Int] =
+    //   withDot(
+    //     Set[Int](0, 1, 2, 3)
+    //   ):
+    //     groupOf2.Action[Int](
+    //       (n: Int, r: Symbol) =>
+    //         if (n == 0)
+    //           0
+    //         else
+    //           r match {
+    //             case `i` => n
+    //             case `x` => 1
+    //             case `y` => 2
+    //           }
+    //     )
+
+    // override val boolAction: groupOf2.Action[Boolean] =
+    //   groupOf2.Action[Boolean](
+    //     (f: Boolean, _: Symbol) =>
+    //       f
+    //   )
 
 object VulgarSymbolDefs:
   object Rope extends Opacity[String]
-  type ROPE = Rope.theType
-  val Seq(i, x, y): Seq[Symbol] = 
-    Seq[String]("i", "x", "y").map { Symbol(_) }
-  val Seq(xR, yR): Seq[ROPE] =
-    Seq[String]("x", "y").map { Rope.blur[[A] =>> A](_) }
+  // type ROPE = Rope.theType
+  val Seq(e, a, b): Seq[Symbol] = 
+    Seq[String]("e", "a", "b").map { Symbol(_) }
+  // val Seq(xR, yR): Seq[ROPE] =
+  //   Seq[String]("x", "y").map { Rope.blur[[A] =>> A](_) }
 
