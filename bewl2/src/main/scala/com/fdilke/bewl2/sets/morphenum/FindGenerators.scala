@@ -1,6 +1,6 @@
 package com.fdilke.bewl2.sets.morphenum
 
-import com.fdilke.bewl2.sets.{BaseSets, Sets}
+import com.fdilke.bewl2.sets.BaseSets
 import com.fdilke.bewl2.helper.{ Memoize}
 
 trait FindGenerators extends BaseSets:

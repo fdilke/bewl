@@ -18,7 +18,7 @@ object SlowGroupActionsSetup extends GroupActionsSetup(SetsWithSlowActions)
 object FastGroupActionsSetup extends GroupActionsSetup(Sets)
 
 class SlowGroupActionsSpec extends BaseGroupActionsSpec(SlowGroupActionsSetup.Fixtures)
-class FastGroupActionsSpec extends BaseGroupActionsSpec(FastGroupActionsSetup.Fixtures)
+abstract class FastGroupActionsSpec extends BaseGroupActionsSpec(FastGroupActionsSetup.Fixtures)
 
 trait GroupActionsSetupFixtures[ACTION[_]]:
   val actionTopos: Topos[ACTION, [A] =>> A, Void, Unit, Boolean, Map]

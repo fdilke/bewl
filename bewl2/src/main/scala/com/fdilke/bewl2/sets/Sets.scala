@@ -7,8 +7,10 @@ import com.fdilke.bewl2.topos.ProductMappable
 import com.fdilke.bewl2.sets.SetsUtilities.*
 import com.fdilke.utility.Shortcuts.*
 import com.fdilke.bewl2.sets.morphenum.SetsMonoidAssistant
-import com.fdilke.bewl2.sets.morphenum.{ FindPresentation, FindGenerators, ActionSplitter }
 import scala.language.postfixOps
+import com.fdilke.bewl2.sets.morphenum.{ 
+  FindPresentation, FindGenerators, ActionSplitter, FindGroupGenerators, SetsGroupAssistant
+}
 
 object PreSets extends PreToposWithDefaultToolkit[Set, [A] =>> A, Void, Unit, Boolean, Map]:
   override def equalArrows[X, Y](
@@ -309,6 +311,8 @@ object Sets extends BaseSets
   with FindGenerators
   with FindPresentation
   with ActionSplitter
+  with SetsGroupAssistant
+  with FindGroupGenerators
 
 
 
