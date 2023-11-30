@@ -238,27 +238,43 @@ trait GroupActions[
             given Dot[B] = analysisB.action.dot
             val eval: (A > B, A) ~> B =
               evaluation[A, B]
-            val isMorphism: (A > B) ~> BEWL =
-              ∀[A > B, A, G] {
-                (phi, a, g) =>
-                  analysisB.action.actionMultiply(eval(phi, a), g) =?= 
-                    eval(phi, action.actionMultiply(a, g))
-              }
-            isMorphism.whereTrue {
-              [F] => (_ : Dot[F]) ?=> (equalizer: Equalizer[F, A > B]) =>
-                val action: group.Action[F] =
-                  group.Action {
-                    equalizer.restrict(
-                      transpose[(F, G), A, B]{ case (f ⊕ m) ⊕ a =>
-                        val phi: CTXT[A > B] =
-                          equalizer.inclusion(f)
-                        eval(phi, a)
-                      }
-                    )
-                  }
-                // awful, fix via refactoring Equalizer via Tagged to provide an implicit =:= rather than inclusion
-                action.asInstanceOf[group.Action[A > B]]
-              }
+            val premul: ((A > B, G), A) ~> B = {
+              case (f ⊕ g) ⊕ a =>
+                analysisB.action.actionMultiply(
+                  eval(
+                    f ⊕ action.actionMultiply(a, group.inverse(g))
+                  ),
+                  g
+                )
+            }
+            // val mul: (A > B, G) ~> (A > B) = ???
+            val mul: (A > B, G) ~> (A > B) =
+              Ɛ.transpose[(A > B, G), A, B](premul)
+            group.Action[A > B](mul)
+
+            // val eval: (A > B, A) ~> B =
+            //   evaluation[A, B]
+            // val isMorphism: (A > B) ~> BEWL =
+            //   ∀[A > B, A, G] {
+            //     (phi, a, g) =>
+            //       analysisB.action.actionMultiply(eval(phi, a), g) =?= 
+            //         eval(phi, action.actionMultiply(a, g))
+            //   }
+            // isMorphism.whereTrue {
+            //   [F] => (_ : Dot[F]) ?=> (equalizer: Equalizer[F, A > B]) =>
+            //     val action: group.Action[F] =
+            //       group.Action {
+            //         equalizer.restrict(
+            //           transpose[(F, G), A, B]{ case (f ⊕ m) ⊕ a =>
+            //             val phi: CTXT[A > B] =
+            //               equalizer.inclusion(f)
+            //             eval(phi, a)
+            //           }
+            //         )
+            //       }
+            //     // awful, fix via refactoring Equalizer via Tagged to provide an implicit =:= rather than inclusion
+            //     action.asInstanceOf[group.Action[A > B]]
+            //   }
               
           def enumerateMorphisms[B](
             analysisB: DefaultGroupActionAnalysis[B]
