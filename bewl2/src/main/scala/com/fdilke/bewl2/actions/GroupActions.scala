@@ -15,8 +15,8 @@ trait GroupActions[
 ] extends AlgebraicMachinery[DOT, CTXT, VOID, UNIT, BEWL, >]:
   Ɛ: Topos[DOT, CTXT, VOID, UNIT, BEWL, >] =>
 
-  def toposOfGroupActions[M: Dot](
-    group: Group[M]
+  def toposOfGroupActions[G: Dot](
+    group: Group[G]
   ): Topos[group.Action, CTXT, VOID, UNIT, BEWL, >] =
     new Topos[group.Action, CTXT, VOID, UNIT, BEWL, >](      
       new PreTopos[
@@ -60,7 +60,21 @@ trait GroupActions[
           dotY: group.Action[Y],
           analysisY: analyzer.ACTION_ANALYSIS[Y]
         ): group.Action[X > Y] =
-          analyzer.makeExponential(analysisX, analysisY)
+          // analyzer.makeExponential(analysisX, analysisY)
+          given Dot[G] = group.dot
+          given Dot[X] = dotX.dot
+          given Dot[Y] = dotY.dot
+          val eval: (X > Y, X) ~> Y =
+            Ɛ.evaluation[X, Y]
+          group.Action[X > Y]:
+            Ɛ.transpose[(X > Y, G), X, Y]:
+              case (f ⊕ g) ⊕ a =>
+                dotY.actionMultiply(
+                  eval(
+                    f ⊕ dotX.actionMultiply(a, group.inverse(g))
+                  ),
+                  g
+                )
 
         override def evaluation[X, Y](
           dotX: group.Action[X],
@@ -174,7 +188,7 @@ trait GroupActions[
           Ɛ.backDivideMonic[X, Y, A](arrow, monic)
 
         val analyzer: GroupActionAnalyzer[group.Action] =
-          Ɛ.groupAssistant.actionAnalyzer[M](group)
+          Ɛ.groupAssistant.actionAnalyzer[G](group)
 
         override type TOOLKIT[A] = analyzer.ACTION_ANALYSIS[A]
         override val toolkitBuilder: ToolkitBuilder = new ToolkitBuilder:
@@ -195,10 +209,6 @@ trait GroupActions[
     def analyze[A](
       action: ACTION[A]
     ) : ACTION_ANALYSIS[A]
-    def makeExponential[A, B](
-      analysisA: ACTION_ANALYSIS[A],
-      analysisB: ACTION_ANALYSIS[B]
-    ): ACTION[A > B]
     def enumerateMorphisms[A, B](
       analysisA: ACTION_ANALYSIS[A],
       analysisB: ACTION_ANALYSIS[B]
@@ -215,12 +225,6 @@ trait GroupActions[
         ) : DefaultGroupActionAnalysis[A] =
           new DefaultGroupActionAnalysis[A](action)
 
-        override def makeExponential[A, B](
-          analysisA: DefaultGroupActionAnalysis[A],
-          analysisB: DefaultGroupActionAnalysis[B]
-        ): group.Action[A > B] = 
-          analysisA.makeExponential(analysisB)
-
         override def enumerateMorphisms[A, B](
           src: DefaultGroupActionAnalysis[A],
           target: DefaultGroupActionAnalysis[B]
@@ -230,55 +234,10 @@ trait GroupActions[
         class DefaultGroupActionAnalysis[A](
           val action: group.Action[A]
         ):
-          given Dot[A] = action.dot
-          given Dot[G] = group.dot
-          def makeExponential[B](
-            analysisB: DefaultGroupActionAnalysis[B]
-          ): group.Action[A > B] =
-            given Dot[B] = analysisB.action.dot
-            val eval: (A > B, A) ~> B =
-              evaluation[A, B]
-            val premul: ((A > B, G), A) ~> B = {
-              case (f ⊕ g) ⊕ a =>
-                analysisB.action.actionMultiply(
-                  eval(
-                    f ⊕ action.actionMultiply(a, group.inverse(g))
-                  ),
-                  g
-                )
-            }
-            // val mul: (A > B, G) ~> (A > B) = ???
-            val mul: (A > B, G) ~> (A > B) =
-              Ɛ.transpose[(A > B, G), A, B](premul)
-            group.Action[A > B](mul)
-
-            // val eval: (A > B, A) ~> B =
-            //   evaluation[A, B]
-            // val isMorphism: (A > B) ~> BEWL =
-            //   ∀[A > B, A, G] {
-            //     (phi, a, g) =>
-            //       analysisB.action.actionMultiply(eval(phi, a), g) =?= 
-            //         eval(phi, action.actionMultiply(a, g))
-            //   }
-            // isMorphism.whereTrue {
-            //   [F] => (_ : Dot[F]) ?=> (equalizer: Equalizer[F, A > B]) =>
-            //     val action: group.Action[F] =
-            //       group.Action {
-            //         equalizer.restrict(
-            //           transpose[(F, G), A, B]{ case (f ⊕ m) ⊕ a =>
-            //             val phi: CTXT[A > B] =
-            //               equalizer.inclusion(f)
-            //             eval(phi, a)
-            //           }
-            //         )
-            //       }
-            //     // awful, fix via refactoring Equalizer via Tagged to provide an implicit =:= rather than inclusion
-            //     action.asInstanceOf[group.Action[A > B]]
-            //   }
-              
           def enumerateMorphisms[B](
             analysisB: DefaultGroupActionAnalysis[B]
           ): Iterable[A ~> B] =
+            given Dot[A] = action.dot
             given Dot[B] = analysisB.action.dot
             morphisms[A, B] filter:
               (f: A ~> B) => ∀[(A, G)]: 
