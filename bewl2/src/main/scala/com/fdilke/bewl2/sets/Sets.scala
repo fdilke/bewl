@@ -9,7 +9,7 @@ import com.fdilke.utility.Shortcuts.*
 import com.fdilke.bewl2.sets.morphenum.SetsMonoidAssistant
 import scala.language.postfixOps
 import com.fdilke.bewl2.sets.morphenum.{ 
-  FindPresentation, FindGenerators, ActionSplitter, FindGroupGenerators, SetsGroupAssistant
+  FindMonoidActionPresentation, FindMonoidActionGenerators, ActionSplitter, FindGroupActionGenerators, SetsGroupAssistant
 }
 
 object PreSets extends PreToposWithDefaultToolkit[Set, [A] =>> A, Void, Unit, Boolean, Map]:
@@ -308,11 +308,11 @@ object SetsWithSlowActions extends BaseSets
 
 object Sets extends BaseSets 
   with SetsMonoidAssistant
-  with FindGenerators
-  with FindPresentation
+  with FindMonoidActionGenerators
+  with FindMonoidActionPresentation
   with ActionSplitter
   with SetsGroupAssistant
-  with FindGroupGenerators
+  with FindGroupActionGenerators
 
 
 

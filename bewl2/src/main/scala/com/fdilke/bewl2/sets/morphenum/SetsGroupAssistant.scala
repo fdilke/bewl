@@ -3,7 +3,7 @@ package com.fdilke.bewl2.sets.morphenum
 import com.fdilke.bewl2.sets.BaseSets
 
 trait SetsGroupAssistant extends BaseSets:
-  Ɛ: FindGroupGenerators =>
+  Ɛ: FindGroupActionGenerators =>
 
   override protected val groupAssistant: GroupAssistant = LocalGroupAssistant
 

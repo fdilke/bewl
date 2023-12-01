@@ -6,7 +6,7 @@ import com.fdilke.bewl2.helper.BuildEquivalence
 import scala.language.{postfixOps, reflectiveCalls}
 
 trait ActionSplitter extends BaseSets {
-  Ɛ: FindGenerators with FindPresentation =>
+  Ɛ: FindMonoidActionGenerators with FindMonoidActionPresentation =>
 
   case class ActionComponent[
     M,
@@ -40,7 +40,7 @@ trait ActionSplitter extends BaseSets {
   object ActionSplitter {
     def forMonoid[M](
       monoid: Monoid[M],
-      generatorFinder: GeneratorFinder[M, monoid.Action],
+      generatorFinder: MonoidActionGeneratorFinder[M, monoid.Action],
       presentationFinder: PresentationFinder[M, monoid.Action]
     ): ActionSplitter[M, monoid.Action] =
       new ActionSplitter[M, monoid.Action] {

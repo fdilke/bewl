@@ -3,17 +3,17 @@ package com.fdilke.bewl2.sets.morphenum
 import com.fdilke.bewl2.sets.BaseSets
 import com.fdilke.bewl2.helper.{ Memoize}
 
-trait FindGenerators extends BaseSets:
-  trait GeneratorFinder[M, ACTION[_]]:
+trait FindMonoidActionGenerators extends BaseSets:
+  trait MonoidActionGeneratorFinder[M, ACTION[_]]:
     def apply[A](action: ACTION[A]): Seq[A]
 
-  object GeneratorFinder:
+  object MonoidActionGeneratorFinder:
     def forMonoid[M](
       monoid: Monoid[M]
-    ): GeneratorFinder[M, monoid.Action] =
+    ): MonoidActionGeneratorFinder[M, monoid.Action] =
       val monoidElements: Set[M] =
         monoid.dot.dot
-      new GeneratorFinder[M, monoid.Action]:
+      new MonoidActionGeneratorFinder[M, monoid.Action]:
         override def apply[A](
           action: monoid.Action[A]
         ): Seq[A] =

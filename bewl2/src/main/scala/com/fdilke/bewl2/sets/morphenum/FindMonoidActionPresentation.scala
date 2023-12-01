@@ -4,8 +4,8 @@ import com.fdilke.bewl2.sets.BaseSets
 import scala.Function.tupled
 import scala.language.{postfixOps, reflectiveCalls}
 
-trait FindPresentation extends BaseSets:
-  Ɛ: FindGenerators =>
+trait FindMonoidActionPresentation extends BaseSets:
+  Ɛ: FindMonoidActionGenerators =>
 
   trait PresentationFinder[M, ACTION[_]]:
       def apply[A](action: ACTION[A], generators: Seq[A]): Seq[GeneratorWithRelators[M, A]]
@@ -13,7 +13,7 @@ trait FindPresentation extends BaseSets:
   object PresentationFinder:
     def forMonoid[M](
       monoid: Monoid[M],
-      generatorFinder: GeneratorFinder[M, monoid.Action]
+      generatorFinder: MonoidActionGeneratorFinder[M, monoid.Action]
     ): PresentationFinder[M, monoid.Action] =
       new PresentationFinder[M, monoid.Action]:
         private def specialGenerators[A](

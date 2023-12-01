@@ -1,7 +1,7 @@
 package com.fdilke.bewl2.sets.morphenum
 
 import com.fdilke.bewl2.sets.Sets
-import Sets.{ ActionComponent, ActionSplitter, GeneratorFinder, PresentationFinder }
+import Sets.{ ActionComponent, ActionSplitter, MonoidActionGeneratorFinder, PresentationFinder }
 
 import com.fdilke.bewl2.utility.StockStructures._
 import scala.language.{postfixOps, reflectiveCalls}
@@ -19,8 +19,8 @@ class ActionSplitterTest extends FunSuite:
       monoidOf3.withRegularAction:
         (regularAction: monoidOf3.Action[Symbol]) ?=>
 
-        val generatorFinder: GeneratorFinder[Symbol, monoidOf3.Action] =
-          GeneratorFinder.forMonoid(monoidOf3)
+        val generatorFinder: MonoidActionGeneratorFinder[Symbol, monoidOf3.Action] =
+          MonoidActionGeneratorFinder.forMonoid(monoidOf3)
         val presentationFinder: PresentationFinder[Symbol, monoidOf3.Action] =
           PresentationFinder.forMonoid(monoidOf3, generatorFinder)
 

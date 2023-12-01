@@ -5,7 +5,7 @@ import com.fdilke.bewl2.helper.BuildEquivalence
 import scala.language.postfixOps
 import com.fdilke.bewl2.sets.Sets
 
-trait PresentedAction[A, ACTION[_]]:
+trait PresentedMonoidAction[A, ACTION[_]]:
   val action: ACTION[A]
   def project[B](
     otherAction: ACTION[B],
@@ -13,12 +13,12 @@ trait PresentedAction[A, ACTION[_]]:
   ): A => B
   def sanityTest: Unit
 
-object FiniteSetsPresentedAction:
+object FiniteSetsPresentedMonoidAction:
   def apply[M, A](
     monoid: Sets.Monoid[M]
   )(
     generatorsWithRelators: Seq[GeneratorWithRelators[M, A]]
-  ): PresentedAction[Int, monoid.Action] =
+  ): PresentedMonoidAction[Int, monoid.Action] =
     val monoidElements: List[M] =
       monoid.dot.dot.toList
     val lookupMonoid: Map[M, Int] =
@@ -27,8 +27,6 @@ object FiniteSetsPresentedAction:
       generatorsWithRelators.map(_.generator) toList
     val lookupGenerator: Map[A, Int] =
       generators.zipWithIndex.toMap
-
-    // val words = makeDot(generators).x(monoid.carrier)
 
     def indexOfWord(g: A, m: M): Int =
       lookupGenerator(g) * monoidElements.size + lookupMonoid(m)
@@ -53,7 +51,7 @@ object FiniteSetsPresentedAction:
 
     val wordIndices: Set[Int] = equivalenceTable.toSet
     Sets.withDot(wordIndices):
-      new PresentedAction[Int, monoid.Action]:
+      new PresentedMonoidAction[Int, monoid.Action]:
         override val action: monoid.Action[Int] =
           monoid.Action{ (index, n) =>
             val (g, m) = wordOfIndex(index)

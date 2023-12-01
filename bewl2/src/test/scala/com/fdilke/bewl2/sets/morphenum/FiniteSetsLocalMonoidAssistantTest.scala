@@ -6,7 +6,7 @@ import Sets.{
   withDotMask,
   Monoid,
   Dot,
-  GeneratorFinder,
+  MonoidActionGeneratorFinder,
   PresentationFinder,
   MonoidActionAnalyzer,
   LocalMonoidAssistant
@@ -30,8 +30,8 @@ class FiniteSetsLocalMonoidAssistantTest extends FunSuite:
     monoidOf3.withRegularAction:
       (regularAction: monoidOf3.Action[Symbol]) ?=>
 
-      val generatorFinder: GeneratorFinder[Symbol, monoidOf3.Action] =
-        GeneratorFinder.forMonoid(monoidOf3)
+      val generatorFinder: MonoidActionGeneratorFinder[Symbol, monoidOf3.Action] =
+        MonoidActionGeneratorFinder.forMonoid(monoidOf3)
       val presentationFinder: PresentationFinder[Symbol, monoidOf3.Action] =
         PresentationFinder.forMonoid(monoidOf3, generatorFinder)
 

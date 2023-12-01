@@ -1,7 +1,7 @@
 package com.fdilke.bewl2.sets.morphenum
 
 import com.fdilke.bewl2.sets.Sets
-import Sets.{ Dot, Monoid, ActionComponent, ActionSplitter, GeneratorFinder, PresentationFinder, RichArrow }
+import Sets.{ Dot, Monoid, ActionComponent, ActionSplitter, MonoidActionGeneratorFinder, PresentationFinder, RichArrow }
 
 import com.fdilke.bewl2.utility.StockStructures._
 import scala.language.{postfixOps, reflectiveCalls}
@@ -16,8 +16,8 @@ object CheckExtractPresentation:
   )(
     action: monoid.Action[A]
   ): Unit =
-    val generatorFinder: GeneratorFinder[M, monoid.Action] =
-      GeneratorFinder.forMonoid(monoid)
+    val generatorFinder: MonoidActionGeneratorFinder[M, monoid.Action] =
+      MonoidActionGeneratorFinder.forMonoid(monoid)
     val generatorsWithRelators: Seq[GeneratorWithRelators[M, A]] =
       PresentationFinder.forMonoid(
         monoid,
@@ -33,8 +33,8 @@ object CheckExtractPresentation:
     do
       g.relators.contains(Relator(i, index, i)) is false
 
-    val presentedAction: PresentedAction[Int, monoid.Action] =
-      FiniteSetsPresentedAction(monoid)(generatorsWithRelators)
+    val presentedAction: PresentedMonoidAction[Int, monoid.Action] =
+      FiniteSetsPresentedMonoidAction(monoid)(generatorsWithRelators)
     presentedAction.sanityTest
 
     // Check this presents the original action

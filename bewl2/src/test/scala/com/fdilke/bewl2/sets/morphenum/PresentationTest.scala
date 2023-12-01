@@ -6,7 +6,7 @@ import com.fdilke.bewl2.sets.Sets
 import Sets.{
   Monoid,
   Dot,
-  GeneratorFinder,
+  MonoidActionGeneratorFinder,
   PresentationFinder,
   withDot,
   withMonoidFromTable,
@@ -32,7 +32,7 @@ class PresentationTest extends FunSuite:
 
     test("Building actions from presentations works for an empty generating set"):
       val presentation =
-        FiniteSetsPresentedAction(
+        FiniteSetsPresentedMonoidAction(
           monoidOf3
         )(
           List[GeneratorWithRelators[Symbol, Void]]()
@@ -54,7 +54,7 @@ class PresentationTest extends FunSuite:
 
     test("Building actions works for a single generator with no relators"):
       val presentation =
-        FiniteSetsPresentedAction(
+        FiniteSetsPresentedMonoidAction(
           monoidOf3
         )(
           List[GeneratorWithRelators[Symbol, Unit]](
@@ -83,7 +83,7 @@ class PresentationTest extends FunSuite:
 
     test("Building actions works for presenting a cyclic right ideal { x, y }"):
       val presentation =
-        FiniteSetsPresentedAction(
+        FiniteSetsPresentedMonoidAction(
           monoidOf3
         )(
           List[GeneratorWithRelators[Symbol, Unit]](
@@ -127,15 +127,15 @@ class PresentationTest extends FunSuite:
       val O = Symbol("O")
       val I = Symbol("I")
       withMonoidFromTable(
-          i, ¬, O, I,
-          ¬, i, O, I,
-          O, I, O, I,
-          I, O, O, I
+        i, ¬, O, I,
+        ¬, i, O, I,
+        O, I, O, I,
+        I, O, O, I
       ):
         (_: Dot[Symbol]) ?=> (end2: Monoid[Symbol]) ?=>
 
-        val presentation: PresentedAction[Int, end2.Action] =
-          FiniteSetsPresentedAction(end2)(
+        val presentation: PresentedMonoidAction[Int, end2.Action] =
+          FiniteSetsPresentedMonoidAction(end2)(
             List[GeneratorWithRelators[Symbol, Int]](
               GeneratorWithRelators(
                 0,
@@ -169,8 +169,6 @@ class PresentationTest extends FunSuite:
             given Dot[Int] = presentation.action.dot
             given end2.Action[Int] = presentation.action
             end2.actions.isMorphism(
-              // presentation.action,
-              // twoAction,
               twoProjection
             ) is true
             twoProjection.isIso is true
@@ -187,7 +185,7 @@ class PresentationTest extends FunSuite:
         (_: Dot[Symbol]) ?=> (group: Monoid[Symbol]) ?=>
 
         val presentation =
-          FiniteSetsPresentedAction(group)(
+          FiniteSetsPresentedMonoidAction(group)(
             List[GeneratorWithRelators[Symbol, String]](
               GeneratorWithRelators(
                 "x",

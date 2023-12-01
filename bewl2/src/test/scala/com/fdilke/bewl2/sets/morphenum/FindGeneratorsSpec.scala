@@ -9,7 +9,7 @@ import Sets.{
   withDot,
   Monoid,
   Dot,
-  GeneratorFinder
+  MonoidActionGeneratorFinder
 }
 import com.fdilke.bewl2.utility.StockStructures._
 
@@ -22,8 +22,8 @@ class FindGeneratorsSpec extends FunSuite:
   withMonoidOf3(Sets):
     (monoidDot: Dot[Symbol]) ?=> (monoidOf3: Sets.Monoid[Symbol]) ?=>
     val monoidElements: Set[Symbol] = monoidDot.dot
-    val generatorFinder: GeneratorFinder[Symbol, monoidOf3.Action] =
-      GeneratorFinder.forMonoid(monoidOf3)
+    val generatorFinder: MonoidActionGeneratorFinder[Symbol, monoidOf3.Action] =
+      MonoidActionGeneratorFinder.forMonoid(monoidOf3)
 
     val actionTopos: Topos[
       monoidOf3.Action, [A] =>> A, Void, Unit, monoidOf3.RightIdeal, monoidOf3.InternalMap

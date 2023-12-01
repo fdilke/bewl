@@ -7,7 +7,7 @@ import scala.Function.tupled
 import scala.language.{postfixOps, reflectiveCalls}
 
 trait SetsMonoidAssistant extends BaseSets:
-  Ɛ: FindGenerators with FindPresentation with ActionSplitter =>
+  Ɛ: FindMonoidActionGenerators with FindMonoidActionPresentation with ActionSplitter =>
 
   override protected val monoidAssistant: MonoidAssistant = LocalMonoidAssistant
 
@@ -31,8 +31,8 @@ trait SetsMonoidAssistant extends BaseSets:
 
         override type ACTION_ANALYSIS[A] = SetsActionAnalysis[A]
 
-        private val generatorFinder: GeneratorFinder[M, monoid.Action] =
-          GeneratorFinder.forMonoid(monoid)
+        private val generatorFinder: MonoidActionGeneratorFinder[M, monoid.Action] =
+          MonoidActionGeneratorFinder.forMonoid(monoid)
 
         private val presentationFinder: PresentationFinder[M, monoid.Action] =
           PresentationFinder.forMonoid(monoid, generatorFinder)
