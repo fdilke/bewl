@@ -17,7 +17,7 @@ resolvers += "Maven central" at "https://repo1.maven.org/maven2/"
 resolvers +=
   "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 
-parallelExecution in Test := false
+Test / parallelExecution := false
 
 libraryDependencies ++= Seq(
   "junit" % "junit" % "4.12" % "test" exclude(
