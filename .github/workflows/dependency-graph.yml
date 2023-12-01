@@ -1,9 +1,15 @@
 name: Update Dependency Graph
 
+#on:
+#  push:
+#    branches:
+#      - main # default branch of the project
+
 on:
   push:
-    branches:
-      - main # default branch of the project
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
 
 jobs:
   dependency-graph:
