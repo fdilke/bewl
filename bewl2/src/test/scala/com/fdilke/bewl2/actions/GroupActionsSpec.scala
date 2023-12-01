@@ -25,9 +25,6 @@ trait GroupActionsSetupFixtures[ACTION[_]]:
   val fooAction: ACTION[Symbol]
   val barAction: ACTION[String]
   val bazAction: ACTION[Int]
-  // val bazAction: ACTION[ROPE]
-  // val intAction: ACTION[Int]
-  // val boolAction: ACTION[Boolean]
 
 abstract class BaseGroupActionsSpec[ACTION[_]](
   val fixtures: GroupActionsSetupFixtures[ACTION]
@@ -48,8 +45,6 @@ abstract class BaseGroupActionsSpec[ACTION[_]](
       fooAction,
       barAction,
       bazAction
-      // intAction,
-      // boolAction
     ):
       block(
         new ToposFixtures {
@@ -134,33 +129,9 @@ abstract class GroupActionsSetup(val baseSets: BaseSets):
     override val bazAction: groupOf2.Action[Int] =
       actionOnInts(Map(1 -> 2, 2 -> 1, 3 -> 4, 4 -> 3, 5 -> 5))
 
-    // override val intAction: groupOf2.Action[Int] =
-    //   withDot(
-    //     Set[Int](0, 1, 2, 3)
-    //   ):
-    //     groupOf2.Action[Int](
-    //       (n: Int, r: Symbol) =>
-    //         if (n == 0)
-    //           0
-    //         else
-    //           r match {
-    //             case `i` => n
-    //             case `x` => 1
-    //             case `y` => 2
-    //           }
-    //     )
-
-    // override val boolAction: groupOf2.Action[Boolean] =
-    //   groupOf2.Action[Boolean](
-    //     (f: Boolean, _: Symbol) =>
-    //       f
-    //   )
 
 object VulgarSymbolDefs:
   object Rope extends Opacity[String]
-  // type ROPE = Rope.theType
   val Seq(e, a, b): Seq[Symbol] = 
     Seq[String]("e", "a", "b").map { Symbol(_) }
-  // val Seq(xR, yR): Seq[ROPE] =
-  //   Seq[String]("x", "y").map { Rope.blur[[A] =>> A](_) }
 
