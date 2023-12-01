@@ -30,10 +30,10 @@ jobs:
     - name: Run tests
       run: sbt test
       # Optional: This step uploads information to the GitHub dependency graph and unblocking Dependabot alerts for the repository
-    - name: Update dependency graph
-      runs-on: ubuntu-latest
-      uses: actions/checkout@v3
-      uses: scalacenter/sbt-dependency-submission@v2
+#    - name: Update dependency graph
+#      runs-on: ubuntu-latest
+#      uses: actions/checkout@v3
+#      uses: scalacenter/sbt-dependency-submission@v2
 
 #  dependency-graph:
 #    name: Update Dependency Graph
