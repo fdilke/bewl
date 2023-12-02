@@ -5,7 +5,7 @@ import com.fdilke.bewl2.utility.RichFunSuite._
 import com.fdilke.bewl2.helper.BuildEquivalence
 import scala.language.{existentials, reflectiveCalls}
 
-class BuildEquivalenceTest extends FunSuite:
+class BuildEquivalenceSpec extends FunSuite:
 
   test("Equivalence relations can be calculated over an empty set"):
     BuildEquivalence(

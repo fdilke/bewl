@@ -11,7 +11,7 @@ import com.fdilke.bewl2.utility.RichFunSuite._
 import com.fdilke.bewl2.helper.BuildEquivalence
 import scala.language.{existentials, reflectiveCalls}
 
-class ActionSplitterTest extends FunSuite:
+class ActionSplitterSpec extends FunSuite:
 
   withMonoidOf3(Sets):
     (_: Sets.Dot[Symbol]) ?=> (monoidOf3: Sets.Monoid[Symbol]) ?=>

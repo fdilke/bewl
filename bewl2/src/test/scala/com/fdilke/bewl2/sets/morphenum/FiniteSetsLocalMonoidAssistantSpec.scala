@@ -19,7 +19,7 @@ import scala.Function.untupled
 import scala.language.{existentials, postfixOps, reflectiveCalls}
 import com.fdilke.bewl2.utility.StockStructures._
 
-class FiniteSetsLocalMonoidAssistantTest extends FunSuite:
+class FiniteSetsLocalMonoidAssistantSpec extends FunSuite:
 
   private val Seq(i, x, y) =
     Seq[String]("i", "x", "y").map { Symbol(_) }

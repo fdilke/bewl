@@ -3,7 +3,7 @@ package com.fdilke.bewl2.sets.morphenum
 import munit.FunSuite
 import com.fdilke.bewl2.utility.RichFunSuite._
 
-class CullRelatorsTest extends FunSuite:
+class CullRelatorsSpec extends FunSuite:
   val Seq(x, y, z) =
     Seq[String]("x", "y", "z").map { Symbol(_) }
 

@@ -16,7 +16,7 @@ import com.fdilke.bewl2.utility.StockStructures._
 
 import scala.language.{postfixOps, reflectiveCalls}
 
-class FindMonoidActionPresentationTest extends FunSuite:
+class FindMonoidActionPresentationSpec extends FunSuite:
 
   private val Seq(i, x, y) =
     Seq[String]("i", "x", "y").map { Symbol(_) }

@@ -17,7 +17,7 @@ import com.fdilke.bewl2.utility.StockStructures._
 
 import scala.language.{existentials, reflectiveCalls}
 
-class PresentationTest extends FunSuite:
+class PresentationSpec extends FunSuite:
 
   val Seq(i, a, b, c, r, s, x, y) =
     Seq[String]("i", "a", "b", "c", "r", "s", "x", "y").map { Symbol(_) }
