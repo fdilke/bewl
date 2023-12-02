@@ -13,7 +13,7 @@ import Sets.{
   GroupActionGeneratorFinder
 }
 
-abstract class FindGroupActionGeneratorsSpec extends FunSuite:
+class FindGroupActionGeneratorsSpec extends FunSuite:
   private val Seq(e, a, b, c, r, s) =
     Seq[String]("e", "a", "b", "c", "r", "s").map { Symbol(_) }
 
@@ -49,7 +49,7 @@ abstract class FindGroupActionGeneratorsSpec extends FunSuite:
           regularAction x regularAction
         val generators: Seq[(Symbol, Symbol)] = 
           generatorFinder(regularSquared)
-        generators.size is 7 // actually 6?
+        generators.size is 6
         checkMinimalGeneratingSet(regularSquared)(generators)        
 
     test("Generators are as expected for another non-cyclic action"):
