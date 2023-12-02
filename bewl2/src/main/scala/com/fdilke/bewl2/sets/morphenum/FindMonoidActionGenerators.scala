@@ -4,16 +4,16 @@ import com.fdilke.bewl2.sets.BaseSets
 import com.fdilke.bewl2.helper.{ Memoize}
 
 trait FindMonoidActionGenerators extends BaseSets:
-  trait MonoidActionGeneratorFinder[M, ACTION[_]]:
+  trait MonoidActionGeneratorFinder[ACTION[_]]:
     def apply[A](action: ACTION[A]): Seq[A]
 
   object MonoidActionGeneratorFinder:
     def forMonoid[M](
       monoid: Monoid[M]
-    ): MonoidActionGeneratorFinder[M, monoid.Action] =
+    ): MonoidActionGeneratorFinder[monoid.Action] =
       val monoidElements: Set[M] =
         monoid.dot.dot
-      new MonoidActionGeneratorFinder[M, monoid.Action]:
+      new MonoidActionGeneratorFinder[monoid.Action]:
         override def apply[A](
           action: monoid.Action[A]
         ): Seq[A] =

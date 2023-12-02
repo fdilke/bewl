@@ -40,7 +40,7 @@ trait ActionSplitter extends BaseSets {
   object ActionSplitter {
     def forMonoid[M](
       monoid: Monoid[M],
-      generatorFinder: MonoidActionGeneratorFinder[M, monoid.Action],
+      generatorFinder: MonoidActionGeneratorFinder[monoid.Action],
       presentationFinder: PresentationFinder[M, monoid.Action]
     ): ActionSplitter[M, monoid.Action] =
       new ActionSplitter[M, monoid.Action] {

@@ -31,7 +31,7 @@ trait SetsMonoidAssistant extends BaseSets:
 
         override type ACTION_ANALYSIS[A] = SetsActionAnalysis[A]
 
-        private val generatorFinder: MonoidActionGeneratorFinder[M, monoid.Action] =
+        private val generatorFinder: MonoidActionGeneratorFinder[monoid.Action] =
           MonoidActionGeneratorFinder.forMonoid(monoid)
 
         private val presentationFinder: PresentationFinder[M, monoid.Action] =

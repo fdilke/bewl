@@ -15,14 +15,14 @@ import com.fdilke.bewl2.utility.StockStructures._
 
 import scala.language.{postfixOps, reflectiveCalls}
 
-class FindGeneratorsSpec extends FunSuite:
+class FindMonoidActionGeneratorsSpec extends FunSuite:
   private val Seq(i, x, y) =
     Seq[String]("i", "x", "y").map { Symbol(_) }
 
   withMonoidOf3(Sets):
     (monoidDot: Dot[Symbol]) ?=> (monoidOf3: Sets.Monoid[Symbol]) ?=>
     val monoidElements: Set[Symbol] = monoidDot.dot
-    val generatorFinder: MonoidActionGeneratorFinder[Symbol, monoidOf3.Action] =
+    val generatorFinder: MonoidActionGeneratorFinder[monoidOf3.Action] =
       MonoidActionGeneratorFinder.forMonoid(monoidOf3)
 
     val actionTopos: Topos[
@@ -89,7 +89,3 @@ class FindGeneratorsSpec extends FunSuite:
       for { g <- generators }
         generatedBy(generators.filter { _ != g}) isnt actionElements
     
-
-
-
-

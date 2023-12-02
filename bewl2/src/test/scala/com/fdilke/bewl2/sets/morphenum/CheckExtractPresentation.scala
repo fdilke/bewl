@@ -16,7 +16,7 @@ object CheckExtractPresentation:
   )(
     action: monoid.Action[A]
   ): Unit =
-    val generatorFinder: MonoidActionGeneratorFinder[M, monoid.Action] =
+    val generatorFinder: MonoidActionGeneratorFinder[monoid.Action] =
       MonoidActionGeneratorFinder.forMonoid(monoid)
     val generatorsWithRelators: Seq[GeneratorWithRelators[M, A]] =
       PresentationFinder.forMonoid(

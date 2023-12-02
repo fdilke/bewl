@@ -13,7 +13,7 @@ trait FindMonoidActionPresentation extends BaseSets:
   object PresentationFinder:
     def forMonoid[M](
       monoid: Monoid[M],
-      generatorFinder: MonoidActionGeneratorFinder[M, monoid.Action]
+      generatorFinder: MonoidActionGeneratorFinder[monoid.Action]
     ): PresentationFinder[M, monoid.Action] =
       new PresentationFinder[M, monoid.Action]:
         private def specialGenerators[A](

@@ -169,7 +169,7 @@ class PresentationTest extends FunSuite:
             given Dot[Int] = presentation.action.dot
             given end2.Action[Int] = presentation.action
             end2.actions.isMorphism(
-              twoProjection
+                twoProjection
             ) is true
             twoProjection.isIso is true
 
