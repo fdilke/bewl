@@ -31,6 +31,7 @@ do a systematic search for permutations p, q that are "adjacent" (= they differ 
 - how much of the theory of (finite) groups carries over to LFTs?
 - Motivating question: for what monoids M is the truth object a cogenerator? For groups, only when G = 1.
 - define the category of tables, then 'closure' of a table. Is this an idempotent monad? What are the algebras?
+- check equivalent of Baer's criterion, but for injectivity of monoid actions: would make this computable
 
 # BEWL AS TOOL
 - for card shuffle calc: verify surjectivity, investigate uniformity. Good stretch goal

@@ -8,6 +8,18 @@ trait SetsGroupAssistant extends BaseSets:
   override protected val groupAssistant: GroupAssistant = LocalGroupAssistant
 
   object LocalGroupAssistant extends GroupAssistant:
+    def findCandidates[G, X, Y](group: Group[G])(
+      x: X, 
+      sourceAction: group.Action[X],
+      targetAction: group.Action[Y]
+    ): Set[Y] =
+      val groupElements: Set[G] = group.dot.dot
+      val stabilizer: Set[G] = groupElements.filter:
+        g => x == sourceAction.actionMultiply(x, g)
+      println("Stabilizer is: " + stabilizer)
+      targetAction.dot.dot.filter:
+        y => stabilizer.map { targetAction.actionMultiply(y, _) }.size == 1
+
     override def actionAnalyzer[G : Dot](group: Group[G]) : GroupActionAnalyzer[group.Action] =
       new GroupActionAnalyzer[group.Action]:
         override type ACTION_ANALYSIS[A] = LocalGroupActionAnalysis[A]

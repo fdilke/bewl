@@ -10,6 +10,7 @@ import Sets.{
   GroupActionAnalyzer,
   LocalGroupAssistant
 }
+import LocalGroupAssistant.findCandidates
 import munit.FunSuite
 import com.fdilke.bewl2.utility.RichFunSuite._
 import com.fdilke.bewl2.topos.Topos
@@ -19,7 +20,7 @@ import scala.language.{existentials, postfixOps, reflectiveCalls}
 import com.fdilke.bewl2.utility.StockStructures._
 import com.fdilke.bewl2.apps.CommutingOpsSubtle.theNext
 
-abstract class FiniteSetsLocalGroupAssistantSpec extends FunSuite:
+class FiniteSetsLocalGroupAssistantSpec extends FunSuite:
 
   private val Seq(e, a, b, c, r, s) =
     Seq[String]("e", "a", "b", "c", "r", "s").map { Symbol(_) }
@@ -45,7 +46,7 @@ abstract class FiniteSetsLocalGroupAssistantSpec extends FunSuite:
         LocalGroupAssistant.actionAnalyzer(s3)
 
       withDot(Set[String]("x", "y")):
-        (barDot: Dot[String]) ?=>
+        (actionOf2Dot: Dot[String]) ?=>
 
         val scalarMultiply: ((String, Symbol)) => String =
           (x, g) => 
@@ -57,8 +58,21 @@ abstract class FiniteSetsLocalGroupAssistantSpec extends FunSuite:
               "x"
 
         s3.withAction(scalarMultiply):
-          (bar: s3.Action[String]) ?=>
+          (actionOf2: s3.Action[String]) ?=>
 
+          test("Assistant finds candidates for action morphisms"):
+            s3.withTrivialAction[Unit, Unit]:
+              (trivialAction: s3.Action[Unit]) ?=>
+              findCandidates(s3)((), trivialAction, actionOf2) is Set.empty
+              findCandidates(s3)("x", actionOf2, trivialAction) is Set(())
+              findCandidates(s3)((), trivialAction, trivialAction) is Set(())
+              findCandidates(s3)("x", actionOf2, actionOf2) is Set("x", "y")
+              findCandidates(s3)("x", actionOf2, actionOf2 x actionOf2) is Set(
+                "x" -> "x", "y" -> "x", "x" -> "y", "y" -> "y"
+              )
+              findCandidates(s3)((), trivialAction, regularAction) is Set.empty
+              findCandidates(s3)(a, regularAction, regularAction) is s3.dot.dot
+/*
           test("Analyzer enumerates the morphisms for the trivial action on Unit to itself"):
             s3.withTrivialAction[Unit, Unit]:
               (trivialAction: s3.Action[Unit]) ?=>
@@ -77,21 +91,21 @@ abstract class FiniteSetsLocalGroupAssistantSpec extends FunSuite:
 
           test("Analyzer enumerates the morphisms for regularAction x bar to bar"):
             enumeratesMorphisms(
-              regularAction x bar,
-              bar,
+              regularAction x actionOf2,
+              actionOf2,
               thorough = true
             )
 
           test("Analyzer enumerates the morphisms for bar x bar to bar"):
             enumeratesMorphisms(
-              bar x bar,
-              bar,
+              actionOf2 x actionOf2,
+              actionOf2,
               thorough = true
             )
 
           test("Analyzer enumerates the morphisms for bar x bar to regularAction"):
             enumeratesMorphisms(
-              bar x bar,
+              actionOf2 x actionOf2,
               regularAction,
               thorough = true
             )
@@ -130,17 +144,17 @@ abstract class FiniteSetsLocalGroupAssistantSpec extends FunSuite:
                 Set(e, r, s) map rightCoset
               println("right cosets = " + rightCosets)
               withDot(rightCosets):
-                (bazDot: Dot[Set[Symbol]]) ?=>
+                (actionOf3Dot: Dot[Set[Symbol]]) ?=>
 
                   val cosetScalarMultiply: ((Set[Symbol], Symbol)) => Set[Symbol] =
                     (coset, g) => coset.map { s3.multiply(_, g) }
 
                   s3.withAction(cosetScalarMultiply):
-                    (baz: s3.Action[Set[Symbol]]) ?=>
+                    (actionOf3: s3.Action[Set[Symbol]]) ?=>
 
                     enumeratesMorphisms(
-                      baz x baz,
-                      baz,
+                      actionOf3 x actionOf3,
+                      actionOf3,
                       thorough = true
                     )
 
@@ -155,3 +169,4 @@ abstract class FiniteSetsLocalGroupAssistantSpec extends FunSuite:
         thorough
       )
 
+*/
