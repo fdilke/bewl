@@ -1,7 +1,8 @@
 package com.fdilke.bewl2.sets.morphenum
 
 import com.fdilke.bewl2.sets.Sets
-import Sets.{ Dot, DefaultMonoidAssistant, LocalMonoidAssistant, Monoid, MonoidActionAnalyzer, RichArrow }
+import Sets.{ Dot, DefaultMonoidAssistant, LocalMonoidAssistant, Monoid, MonoidActionAnalyzer, 
+  Group, LocalGroupAssistant, DefaultGroupAssistant, GroupActionAnalyzer, RichArrow }
 import com.fdilke.bewl2.utility.RichFunSuite._
 
 object CheckLocalMorphismEnumerator:
@@ -36,6 +37,45 @@ object CheckLocalMorphismEnumerator:
     if (thorough) {
       val defaultAnalyzer: MonoidActionAnalyzer[monoid.Action, monoid.InternalMap] =
         DefaultMonoidAssistant.actionAnalyzer(monoid)
+
+      val defaultMorphisms: Iterable[X => Y] =
+        enumerateMorphisms(defaultAnalyzer)
+
+      checkNoDuplicates(localMorphisms)
+      checkSameMorphisms(localMorphisms, defaultMorphisms)
+    }
+
+  def apply[G, X, Y](group: Group[G])(
+    sourceAction: group.Action[X],
+    targetAction: group.Action[Y],
+    thorough: Boolean
+  ): Unit =
+    given Dot[G] = group.dot
+    given Dot[X] = sourceAction.dot
+    given group.Action[X] = sourceAction
+    given Dot[Y] = targetAction.dot
+    given group.Action[Y] = targetAction
+    val localAnalyzer: GroupActionAnalyzer[group.Action] =
+      LocalGroupAssistant.actionAnalyzer(group)
+
+    def enumerateMorphisms(
+      analyzer: GroupActionAnalyzer[group.Action]
+    ): Iterable[X => Y] =
+      analyzer.enumerateMorphisms(
+          analyzer.analyze(sourceAction),
+          analyzer.analyze(targetAction)
+        )
+
+    val localMorphisms: Iterable[X => Y] =
+      enumerateMorphisms(localAnalyzer)
+
+    localMorphisms.forall {
+      group.actions.isMorphism(_)
+    } is true
+
+    if (thorough) {
+      val defaultAnalyzer: GroupActionAnalyzer[group.Action] =
+        DefaultGroupAssistant.actionAnalyzer(group)
 
       val defaultMorphisms: Iterable[X => Y] =
         enumerateMorphisms(defaultAnalyzer)
