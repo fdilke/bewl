@@ -72,7 +72,7 @@ class FiniteSetsLocalGroupAssistantSpec extends FunSuite:
               )
               findCandidates(s3)((), trivialAction, regularAction) is Set.empty
               findCandidates(s3)(a, regularAction, regularAction) is s3.dot.dot
-/*
+
           test("Analyzer enumerates the morphisms for the trivial action on Unit to itself"):
             s3.withTrivialAction[Unit, Unit]:
               (trivialAction: s3.Action[Unit]) ?=>
@@ -169,4 +169,3 @@ class FiniteSetsLocalGroupAssistantSpec extends FunSuite:
         thorough
       )
 
-*/

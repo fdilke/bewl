@@ -14,21 +14,6 @@ trait SetsMonoidAssistant extends BaseSets:
   object LocalMonoidAssistant extends MonoidAssistant:
     override def actionAnalyzer[M : Dot](monoid: Monoid[M]) : MonoidActionAnalyzer[monoid.Action, monoid.InternalMap] =
       new MonoidActionAnalyzer[monoid.Action, monoid.InternalMap]:
-        // trait FarceActionAnalysis[ACTION[_], INTERNAL_MAP[_, _], A] extends 
-        //   ActionAnalysis[A, ACTION, INTERNAL_MAP, [A] =>> FarceActionAnalysis[ACTION, INTERNAL_MAP, A]]:
-        //   override def makeExponential[B](
-        //     analysisB: FarceActionAnalysis[ACTION, INTERNAL_MAP, B]
-        //   ): ACTION[INTERNAL_MAP[A, B]] =
-        //     ???
-        //   override def enumerateMorphisms[B](
-        //     analysisB: FarceActionAnalysis[ACTION, INTERNAL_MAP, B]
-        //   ): Iterable[A ~> B] =
-        //     ???
-
-        // override type ACTION_ANALYSIS[A] = FarceActionAnalysis[monoid.Action, monoid.InternalMap, A]
-        // override def analyze[A](action: monoid.Action[A]): FarceActionAnalysis[monoid.Action, monoid.InternalMap, A] =
-        //   ???
-
         override type ACTION_ANALYSIS[A] = SetsActionAnalysis[A]
 
         private val generatorFinder: MonoidActionGeneratorFinder[monoid.Action] =
