@@ -93,6 +93,21 @@ object SetsUtilities:
     } yield both
 
   def subsetsOfString(letters: String): Iterable[String] =
-    subsetsOf(letters.toSet) map {
+    subsetsOf(letters.toSet) map:
       _.toSeq.string
-    }
+
+  def bulkJoin[X, Y, Z](
+    inputs: Seq[X],
+    candidates: X => Iterable[Y],
+    assignment: (X, Y) => Z,
+    assignmentZero: Z,
+    join: (Z, Z) => Z
+  ): Iterable[Z] =
+    def foldIn(it: Iterable[Z], x: X): Iterable[Z] =
+      for
+        y <- candidates(x)
+        assign = assignment(x, y)
+        z <- it
+      yield
+        join(z, assign)
+    inputs.foldLeft(Iterable[Z](assignmentZero))(foldIn)
