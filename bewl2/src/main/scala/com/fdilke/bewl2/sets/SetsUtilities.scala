@@ -103,11 +103,11 @@ object SetsUtilities:
     assignmentZero: Z,
     join: (Z, Z) => Z
   ): Iterable[Z] =
-    def foldIn(it: Iterable[Z], x: X): Iterable[Z] =
+    inputs.foldLeft(Iterable[Z](assignmentZero)):
+      (it: Iterable[Z], x: X) =>
       for
         y <- candidates(x)
         assign = assignment(x, y)
         z <- it
       yield
         join(z, assign)
-    inputs.foldLeft(Iterable[Z](assignmentZero))(foldIn)
