@@ -41,12 +41,12 @@ object SetsUtilities:
   ): Iterable[Seq[H]] =
     if (letters.isEmpty || length == 0) then
       Iterable(Seq.empty)
-    else for {
-      seq <- sequencesOfLength(letters, length - 1)
-      letter <- letters
-    } yield {
-      letter +: seq
-    }
+    else
+      for
+        seq <- sequencesOfLength(letters, length - 1)
+        letter <- letters
+      yield
+        letter +: seq
 
   def wordsOfLength(
     letters: String,
@@ -86,11 +86,11 @@ object SetsUtilities:
   def subsetsOf[H](set: Set[H]): Iterable[Set[H]] =
     if (set.isEmpty)
       Iterable(Set.empty[H])
-    else for {
+    else for
       element <- (set : Iterable[H])
       theRest <- subsetsOf(set - element)
       both <- Iterable[Set[H]](theRest, theRest + element)
-    } yield both
+    yield both
 
   def subsetsOfString(letters: String): Iterable[String] =
     subsetsOf(letters.toSet) map:

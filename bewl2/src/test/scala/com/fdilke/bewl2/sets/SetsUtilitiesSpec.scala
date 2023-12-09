@@ -12,20 +12,20 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class SetsUtilitiesSpec extends FunSuite:
   test("enumerates all maps between two sets"):
-      allMaps(Set(1, 2), Set("a", "b", "c")).map { f =>
-          Seq(f(1), f(2))
-      }.toSeq is
-      Seq(
-         Seq("a", "a"),
-         Seq("b", "a"),
-         Seq("c", "a"),
-         Seq("a", "b"),
-         Seq("b", "b"),
-         Seq("c", "b"),
-         Seq("a", "c"),
-         Seq("b", "c"),
-         Seq("c", "c")
-      )
+    allMaps(Set(1, 2), Set("a", "b", "c")).map { f =>
+        Seq(f(1), f(2))
+    }.toSeq is
+    Seq(
+        Seq("a", "a"),
+        Seq("b", "a"),
+        Seq("c", "a"),
+        Seq("a", "b"),
+        Seq("b", "b"),
+        Seq("c", "b"),
+        Seq("a", "c"),
+        Seq("b", "c"),
+        Seq("c", "c")
+    )
 
   test("gives sensible results even when the source is empty"):
     allMaps(Set[String](), Set(0)).size is 1
@@ -52,11 +52,10 @@ class SetsUtilitiesSpec extends FunSuite:
         1 -> 1
       )
 
-  test("enumerates n-ary operations: even more degenerate case of nullaries on 0") {
+  test("enumerates n-ary operations: even more degenerate case of nullaries on 0"):
     allNaryOps(arity = 0, order = 0).toSeq is Seq.empty
-  }
 
-  test("enumerates n-ary operations: case of binaries on 2") {
+  test("enumerates n-ary operations: case of binaries on 2"):
     (allNaryOps(arity = 2, order = 2) map { f =>
       s"${f(0,0)}${f(0,1)}${f(1,0)}${f(1,1)}"
     }).toSet is
@@ -64,8 +63,7 @@ class SetsUtilitiesSpec extends FunSuite:
         "0000", "0001", "0010", "0011", "0100", "0101", "0110", "0111",
         "1000", "1001", "1010", "1011", "1100", "1101", "1110", "1111"
       )
-  }
-
+  
   test("compact notation for importing enumerations into FinSet"):
     enum Suit:
       case Hearts, Clubs, Spades, Diamonds
@@ -113,3 +111,35 @@ class SetsUtilitiesSpec extends FunSuite:
       Set(0, 1), Set(0, 2), Set(1, 2),
       Set(0, 1, 2)
     )
+
+  test("bulk join operation, trivial version"):
+    bulkJoin[Boolean, Int, String](
+      inputs = Seq.empty[Boolean],
+      candidates = _ => Iterable(0),
+      assignment = (_, _) => "x",
+      assignmentZero = "",
+      join = { _ + _ }
+    ).toSeq is Seq("")
+
+  test("bulk join operation, less trivial version"):
+    bulkJoin[Boolean, Int, String](
+      inputs = Seq[Boolean](true),
+      candidates = _ => Iterable(0),
+      assignment = (x, y) => s"<$x:$y>",
+      assignmentZero = "",
+      join = { _ + _ }
+    ).toSeq is Seq("<true:0>")
+
+  test("bulk join operation, more typical version"):
+    bulkJoin[Boolean, Int, String](
+      inputs = Seq[Boolean](true, false),
+      candidates = Map[Boolean, Iterable[Int]](true -> Iterable(1, 2), false -> Iterable(3, 4, 5)),
+      assignment = (x, y) => s"<$x:$y>",
+      assignmentZero = "",
+      join = { _ + _ }
+    ).toSeq is Seq(
+      "<true:1><false:3>",  "<true:2><false:3>",
+      "<true:1><false:4>",  "<true:2><false:4>",
+      "<true:1><false:5>",  "<true:2><false:5>"
+    )
+
