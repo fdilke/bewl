@@ -6,7 +6,8 @@ import com.fdilke.bewl2.sets.SetsUtilities.bulkJoin
 trait SetsGroupAssistant extends BaseSets:
   Ɛ: FindGroupActionGenerators =>
 
-  override protected val groupAssistant: GroupAssistant = LocalGroupAssistant
+  override protected val groupAssistant: GroupAssistant =
+    LocalGroupAssistant
 
   object LocalGroupAssistant extends GroupAssistant:
     def findCandidates[G, X, Y](group: Group[G])(

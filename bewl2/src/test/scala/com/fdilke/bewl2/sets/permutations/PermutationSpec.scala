@@ -2,6 +2,7 @@ package com.fdilke.bewl2.sets.permutations
 
 import munit.FunSuite
 import com.fdilke.bewl2.utility.RichFunSuite._
+import Permutation._
 
 class PermutationSpec extends FunSuite:
   test("Permutation can permute distinct objects in a cycle, and knows its domain"):
