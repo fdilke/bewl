@@ -12,16 +12,14 @@ class Permutation[A](
 
 class Cycle[A](
   cycle: Seq[A]
-) {
+):
   if (cycle.toSet.size < cycle.length)
     throw new IllegalArgumentException("cycle repeats")
 
   def toMap: Map[A, A] =
-    val x: Seq[(A, A)] = cycle.indices.map { i =>
+    cycle.indices.map { i =>
       cycle(i) -> cycle( (i + 1) % cycle.length ) 
-    }
-    x.toMap[A, A]
-}
+    }.toMap[A, A]
 
 class OngoingPermutation[A](
   cycles: Seq[Cycle[A]]

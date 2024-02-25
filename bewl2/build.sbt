@@ -6,10 +6,7 @@ lazy val root = project
     version := "0.1.0",
     scalaVersion := "3.3.1", // 3.3.0-RC4. 3.2.2,
     scalacOptions ++= Seq(
-        // "-Yrangepos",
-        // "-Yindent-colons",
-        "-explain",
-//        "-language:experimental.fewerBraces"
+        "-explain"
     ),
     ThisBuild/scalacOptions ++= Seq("-unchecked", "-deprecation" /*, "-rangepos" */),
     // Test / javaOptions += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000",
