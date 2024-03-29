@@ -18,7 +18,6 @@ import com.fdilke.bewl2.topos.Topos
 import scala.Function.untupled
 import scala.language.{existentials, postfixOps, reflectiveCalls}
 import com.fdilke.bewl2.utility.StockStructures._
-import com.fdilke.bewl2.apps.CommutingOpsSubtle.theNext
 
 class FiniteSetsLocalGroupAssistantSpec extends FunSuite:
 
