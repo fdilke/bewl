@@ -18,7 +18,6 @@ trait SetsGroupAssistant extends BaseSets:
       val groupElements: Set[G] = group.dot.dot
       val stabilizer: Set[G] = groupElements.filter:
         g => x == sourceAction.actionMultiply(x, g)
-      println("Stabilizer is: " + stabilizer)
       targetAction.dot.dot.filter:
         y => stabilizer.map { targetAction.actionMultiply(y, _) }.size == 1
 
