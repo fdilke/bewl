@@ -4,8 +4,9 @@ import com.fdilke.bewl2.algebra.AlgebraicMachinery
 import com.fdilke.bewl2.helper.Memoize
 import ProductMappable.*
 import com.fdilke.bewl2.logic.LogicalOperations
-import com.fdilke.bewl2.actions.{ MonoidActions, GroupActions }
-import com.fdilke.utility.Mask._
+import com.fdilke.bewl2.actions.{GroupActions, MonoidActions}
+import com.fdilke.bewl2.topos.constructions.ToposOfPermutations
+import com.fdilke.utility.Mask.*
 
 class Topos[
   DOT[_],
@@ -546,6 +547,7 @@ trait ToposConstructions[
   BEWL,
   >[_, _]
 ] extends MonoidActions[DOT, CTXT, VOID, UNIT, BEWL, >]
-  with GroupActions[DOT, CTXT, VOID, UNIT, BEWL, >]:
+  with GroupActions[DOT, CTXT, VOID, UNIT, BEWL, >]
+  with ToposOfPermutations[DOT, CTXT, VOID, UNIT, BEWL, >]:
   topos: Topos[DOT, CTXT, VOID, UNIT, BEWL, >] =>
 
