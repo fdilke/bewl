@@ -9,6 +9,7 @@ project/build.properties
 
 # IDEA specific
 .idea/
+.bsp/
 
 # Eclipse specific
 .cache-main
