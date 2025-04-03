@@ -257,7 +257,7 @@ abstract class GenericToposSpec[
         (monicBar2baz o restriction) =!= foo2ImageOfBar
     
     test("overrides the logops driver correctly, if at all"):
-      if (!(logicalOperations.isInstanceOf[DefaultLogicalOperations])) {
+      if !(logicalOperations.isInstanceOf[DefaultLogicalOperations]) then
         val defaultLogOps: LogicalOperations = new DefaultLogicalOperations
         val heyting: HeytingAlgebra[BEWL] =
           new HeytingAlgebra[BEWL](
@@ -266,69 +266,80 @@ abstract class GenericToposSpec[
             defaultLogOps.and,
             defaultLogOps.or,
             defaultLogOps.implies
-            )
-        mask[BEWL, HeytingAlgebra, Unit](heyting) { 
-        [ALTBEWL] => (altHeyting: HeytingAlgebra[ALTBEWL]) => (_ : ALTBEWL =:= BEWL) ?=> (_ : BEWL =:= ALTBEWL) ?=>
+          )
+        mask[BEWL, HeytingAlgebra, Unit](heyting): 
+          [ALTBEWL] => (altHeyting: HeytingAlgebra[ALTBEWL]) =>
+            (_ : ALTBEWL =:= BEWL) ?=> (_ : BEWL =:= ALTBEWL) ?=>
           val reallyBewl: ALTBEWL ~> BEWL =
             summon[ALTBEWL =:= BEWL].substituteCo[CTXT]
-          given Dot[ALTBEWL] = summon[BEWL =:= ALTBEWL].substituteCo[Dot](summon[Dot[BEWL]])
+          given Dot[ALTBEWL] = 
+            summon[BEWL =:= ALTBEWL].substituteCo[Dot]:
+              summon[Dot[BEWL]]
           given HeytingAlgebra[ALTBEWL] = altHeyting
-          assert { heytingAlgebras.isMorphism(reallyBewl) }
-        }
-      }
+          assert:
+            heytingAlgebras.isMorphism(reallyBewl)
 
     test("overrides the epic verifier correctly, if at all"):
-      if (!(epicVerifier.isInstanceOf[DefaultEpicVerifier])) {
-        val defaultEpicVerifier: EpicVerifier = new DefaultEpicVerifier
-        morphisms[FOO, BAR].foreach { arrow =>
-          assert { arrow.isEpic == defaultEpicVerifier.isEpic(arrow) }
-        }
-        morphisms[BAR, FOO].foreach { arrow =>
-          assert { arrow.isEpic == defaultEpicVerifier.isEpic(arrow) }
-        }
-        morphisms[FOO, FOO].foreach { arrow =>
-          assert { arrow.isEpic == defaultEpicVerifier.isEpic(arrow) }
-        }
-      }
+      if !(epicVerifier.isInstanceOf[DefaultEpicVerifier]) then
+        val defaultEpicVerifier: EpicVerifier = 
+          new DefaultEpicVerifier
+        def checkEpics[A: Dot, B: Dot]: Unit =
+          morphisms[A, B].foreach: arrow =>
+            assert:
+              arrow.isEpic == defaultEpicVerifier.isEpic(arrow)
+        checkEpics[FOO, BAR]
+        checkEpics[BAR, FOO]
+        checkEpics[FOO, FOO]
             
     test("overrides the automorphism finder correctly, if at all"):
-      if (! autoFinder.isInstanceOf[DefaultAutomorphismFinder]) {
-        val defaultAutoFinder: AutomorphismFinder = new DefaultAutomorphismFinder
-        autoFinder.withAutomorphismGroup[FOO, Unit] {
+      if ! autoFinder.isInstanceOf[DefaultAutomorphismFinder] then
+        val defaultAutoFinder: AutomorphismFinder = 
+          new DefaultAutomorphismFinder
+        autoFinder.withAutomorphismGroup[FOO, Unit]:
           [A] => (_ : Dot[A]) ?=> (group: Group[A]) ?=> (actionA: group.Action[FOO]) ?=>
-          defaultAutoFinder.withAutomorphismGroup[FOO, Unit] {
-          [D] => (_ : Dot[D]) ?=> (groupD: Group[D]) ?=> (actionD: groupD.Action[FOO]) ?=>
-            val groupIso: D ~> A = actionD.toExponent \ actionA.toExponent
-            assert { groups.isMorphism(groupIso) }
-            assert { groupIso.isIso }
-            mask[FOO, groupD.Action, Unit](
-              actionA.induced(groupIso)
-            ) { [F] => (actionF: groupD.Action[F]) => (f2foo : F =:= FOO) ?=> (foo2f : FOO =:= F) ?=>
-              given Dot[F] = foo2f.substituteCo[Dot](summon[Dot[FOO]])
-              val realFoo: F ~> FOO = f2foo.substituteCo[CTXT]
-              given groupD.Action[F] = actionF
-              assert { realFoo.isIso }
-              assert { groupD.actions.isMorphism(realFoo) }
-            }
-          }
-        }
-      }
-  
+          defaultAutoFinder.withAutomorphismGroup[FOO, Unit]:
+            [D] => (_ : Dot[D]) ?=> (groupD: Group[D]) ?=> (actionD: groupD.Action[FOO]) ?=>
+              val groupIso: D ~> A = 
+                actionD.toExponent \ actionA.toExponent
+              assert { groups.isMorphism(groupIso) }
+              assert { groupIso.isIso }
+              mask[FOO, groupD.Action, Unit](
+                actionA.induced(groupIso)
+              ):
+                [F] => (actionF: groupD.Action[F]) => (f2foo : F =:= FOO) ?=> (foo2f : FOO =:= F) ?=>
+                  given Dot[F] = 
+                    foo2f.substituteCo[Dot]:
+                      summon[Dot[FOO]]
+                  val realFoo: F ~> FOO = 
+                    f2foo.substituteCo[CTXT]
+                  given groupD.Action[F] = actionF
+                  assert { realFoo.isIso }
+                  assert { groupD.actions.isMorphism(realFoo) }
+
     test("overrides the optionator correctly, if at all"):
-      if (! optionator.isInstanceOf[DefaultOptionator.type]) {
+      if ! optionator.isInstanceOf[DefaultOptionator.type] then
         type D_OPTION[X] = DefaultOptionator.OPTION[X]
-        maskDot[FOO, Unit] { [F] => (_ : Dot[F]) ?=> (_ : F =:= FOO) ?=> (_ : FOO =:= F) ?=>
-          val altPac: PartialArrowClassifier[F, D_OPTION[F]] = DefaultOptionator.partialArrowClassifier[F]
-          given Dot[D_OPTION[F]] = altPac.classifier
-          val f2foo: F ~> FOO = summon[F =:= FOO].substituteCo[CTXT]
-          val foo2f: FOO ~> F = summon[FOO =:= F].substituteCo[CTXT]
-          val extend: D_OPTION[F] ~> OPTION[FOO] =
-            extendAlong[F, D_OPTION[F], FOO](altPac.some, f2foo)
-          val extendInv: OPTION[FOO] ~> D_OPTION[F] =
-            altPac.extendAlong[FOO, OPTION[FOO]](some[FOO], foo2f)
-          assert { extend.isIso }
-          assert { extendInv.isIso }
-          assert { (extend o extendInv) =!= id[OPTION[FOO]] }
-          assert { (extendInv o extend) =!= id[D_OPTION[F]] }
-        }
-      }
+        maskDot[FOO, Unit]:
+          [F] => (_ : Dot[F]) ?=> (_ : F =:= FOO) ?=> (_ : FOO =:= F) ?=>
+            val altPac: PartialArrowClassifier[F, D_OPTION[F]] =
+              DefaultOptionator.partialArrowClassifier[F]
+            given Dot[D_OPTION[F]] =
+              altPac.classifier
+            val f2foo: F ~> FOO =
+              summon[F =:= FOO].substituteCo[CTXT]
+            val foo2f: FOO ~> F =
+              summon[FOO =:= F].substituteCo[CTXT]
+            val extend: D_OPTION[F] ~> OPTION[FOO] =
+              extendAlong[F, D_OPTION[F], FOO](
+                altPac.some, 
+                f2foo
+              )
+            val extendInv: OPTION[FOO] ~> D_OPTION[F] =
+              altPac.extendAlong[FOO, OPTION[FOO]](
+                some[FOO],
+                foo2f
+              )
+            assert { extend.isIso }
+            assert { extendInv.isIso }
+            assert { (extend o extendInv) =!= id[OPTION[FOO]] }
+            assert { (extendInv o extend) =!= id[D_OPTION[F]] }
