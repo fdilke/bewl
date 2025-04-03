@@ -126,16 +126,14 @@ abstract class GenericToposSpec[
         recombine =!= id[(BAR, BAZ)]
 
     test("distinguishes projection arrows"):
-      assert(!(
-        π0[FOO, FOO] =!= π1[FOO, FOO]
-      ))
+      assert:
+        π0[FOO, FOO] =!!= π1[FOO, FOO]
 
     test("caches products"):
       val fooXbar1: Dot[(FOO, BAR)] = summon[Dot[(FOO, BAR)]]
       val fooXbar2: Dot[(FOO, BAR)] = summon[Dot[(FOO, BAR)]]
-      assert(
+      assert:
         (fooXbar1.asInstanceOf[Object]) eq (fooXbar2.asInstanceOf[Object])
-      )
 
     test("the unit object behaves"):
       sanityTest[UNIT]
@@ -143,12 +141,12 @@ abstract class GenericToposSpec[
       fooTo1.sanityTest
 
       val arrows: Iterable[FOO ~> UNIT] = morphisms[FOO, UNIT]
-      assert { arrows.size == 1 }
-      assert { arrows.head =!= fooTo1 }
-
-      assert {
+      assert: 
+        arrows.size == 1
+      assert: 
+        arrows.head =!= fooTo1 
+      assert:
         (toUnit[BAR] o foo2bar) =!= fooTo1
-      }
 
     test("the zero object behaves"):
       sanityTest[VOID]
@@ -156,19 +154,18 @@ abstract class GenericToposSpec[
       barFrom0.sanityTest
 
       val arrows: Iterable[VOID ~> BAR] = morphisms[VOID, BAR]
-      assert { arrows.size == 1 }
-      assert { arrows.head =!= barFrom0 }
-
-      assert(
+      assert: 
+        arrows.size == 1
+      assert: 
+        arrows.head =!= barFrom0
+      assert:
         (foo2bar o fromZero[FOO]) =!= barFrom0
-      )
 
     test("has enumeration of arrows"):
       extension [X: Dot, Y: Dot](arrow: X ~> Y)
         def appears: Unit =
-          assert {
+          assert:
             morphisms[X, Y] exists { _ =!= arrow }
-          }
       (foo2bar         appears)
       (foo2baz         appears)
       (foobar2baz      appears)
@@ -212,22 +209,23 @@ abstract class GenericToposSpec[
 
       // reconstruct the arrow from its transpose:
       // f(foo, bar) === eval(f*(foo), bar)
-      assert( foobar2baz =!= { (cFooBar: CTXT[(FOO, BAR)]) =>
-        val cFoo: CTXT[FOO] = π0[FOO, BAR](cFooBar)
-        val cBar: CTXT[BAR] = π1[FOO, BAR](cFooBar)
-        val fnBarBaz: CTXT[BAR > BAZ] = foo2bar2baz(cFoo)
-        eval(fnBarBaz, cBar)
-      })
+      assert: 
+        foobar2baz.=!=(
+          (cFooBar: CTXT[(FOO, BAR)]) =>
+            val cFoo: CTXT[FOO] = π0[FOO, BAR](cFooBar)
+            val cBar: CTXT[BAR] = π1[FOO, BAR](cFooBar)
+            val fnBarBaz: CTXT[BAR > BAZ] = foo2bar2baz(cFoo)
+            eval(fnBarBaz, cBar)
+        )
 
     test("caches exponentials"):
       val fooToBar1: Dot[FOO > BAR] = summon[Dot[FOO > BAR]]
       val fooToBar2: Dot[FOO > BAR] = summon[Dot[FOO > BAR]]
-      assert(
+      assert:
         (fooToBar1.asInstanceOf[Object]) eq (fooToBar2.asInstanceOf[Object])
-      )
 
     test("calculates equalizers"):
-      equalizerSituation[Unit](
+      equalizerSituation[Unit]:
         [S, M, T] => (
           r: S ~> M,
           s: M ~> T,
@@ -235,32 +233,28 @@ abstract class GenericToposSpec[
         ) => (
           ss: Dot[S], mm: Dot[M], tt: Dot[T]
         ) ?=>
-          s.?=(t) {
+          s.?=(t):
             [A] => (aa: Dot[A]) ?=> (equalizer: Equalizer[A, M]) =>
               val e = equalizer.inclusion
-              assert {
+              assert:
                 (s o e) =!= (t o e)
-              }
-              assert {
+              assert:
                 (e o equalizer.restrict(r)) =!= r
-              }
-          }
-      )
 
     test("has a subobject classifier"):
       sanityTest[BEWL]
       sanityTest(truth)
-      // sanityTest(falsity)
-      val char: BAZ ~> BEWL = monicBar2baz.chi
+      sanityTest(falsity)
+      val char: BAZ ~> BEWL = 
+        monicBar2baz.chi
       sanityTest(char)
-      assert {
+      assert:
         (char o monicBar2baz) =!= toTrue[BAR]
-      }
-      val restriction = foo2ImageOfBar \ monicBar2baz
+      val restriction: FOO ~> BAR = 
+        foo2ImageOfBar \ monicBar2baz
       restriction.sanityTest
-      assert {
+      assert:
         (monicBar2baz o restriction) =!= foo2ImageOfBar
-      }
     
     test("overrides the logops driver correctly, if at all"):
       if (!(logicalOperations.isInstanceOf[DefaultLogicalOperations])) {

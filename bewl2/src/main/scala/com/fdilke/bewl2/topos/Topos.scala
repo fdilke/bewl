@@ -399,6 +399,11 @@ class Topos[
       f2: X ~> Y
     ): Boolean =
       pretopos.equalArrows(dot[X], dot[Y], f, f2)
+      
+    inline def =!!=(
+      f2: X ~> Y
+    ): Boolean =
+      !(this =!= f2)
 
     inline def o[V: Dot](
       f2: V ~> X
@@ -500,7 +505,8 @@ class Topos[
     type OPTION[X]
     def partialArrowClassifier[X: Dot]: PartialArrowClassifier[X, OPTION[X]]
 
-  val optionator: Optionator = DefaultOptionator
+  val optionator: Optionator =
+    DefaultOptionator
 
   object DefaultOptionator extends Optionator:
     override type OPTION[X] = X > BEWL
@@ -527,10 +533,10 @@ class Topos[
               equalizer.restrict:
                 transpose[W, X, BEWL]:
                   case w ⊕ x =>
-                    (∃[W, V]:
+                    ∃[W, V]:
                       case w ⊕ v  =>
                         ( arrow(v) =?= x ) ∧ ( monic(v) =?= w )
-                    : W ~> BEWL)(w)
+                    .apply(w)
           .asInstanceOf[PartialArrowClassifier[X, OPTION[X]]]
 
 object Topos:
