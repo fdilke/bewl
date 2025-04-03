@@ -22,8 +22,8 @@ class SetsSpec extends GenericToposSpec(SetsWithSlowActions):
       Set[String]("one", "two", "three"),
       Set[Int](1, 2, 3, 4)
     ):
-      block(
-        new ToposFixtures {
+      block:
+        new ToposFixtures:
           override val foo2bar: Direction ~> String =
             Map[Direction, String](elems =
               Up -> "one",
@@ -65,8 +65,14 @@ class SetsSpec extends GenericToposSpec(SetsWithSlowActions):
               Map[String, Int]("one" -> 1, "two" -> 2, "three" -> 3),
               Map[String, Int]("one" -> 1, "two" -> 2, "three" -> 1)
             )
-        }
-      )
+            
+          override val isomorphismSituation: IsomorphismSituation[_, _] =
+            IsomorphismSituation[BAR, BAR]:
+              Map(
+                "one" -> "two",
+                "two" -> "three",
+                "three" -> "one"
+              )
 
 
 

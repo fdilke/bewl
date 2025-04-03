@@ -5,7 +5,7 @@ import com.fdilke.bewl2.helper.Memoize
 import ProductMappable.*
 import com.fdilke.bewl2.logic.LogicalOperations
 import com.fdilke.bewl2.actions.{GroupActions, MonoidActions}
-import com.fdilke.bewl2.topos.constructions.ToposOfPermutations
+import com.fdilke.bewl2.topos.constructions.ToposOfAutomorphisms
 import com.fdilke.utility.Mask.*
 
 class Topos[
@@ -405,44 +405,51 @@ class Topos[
     ): V ~> Y =
       f compose f2
 
-    inline final def x[Z: Dot](
+    inline def x[Z: Dot](
      f2: X ~> Z
     ): X ~> (Y, Z) =
       cx => f(cx) ⊕ f2(cx)
 
-    inline final def ?=[RESULT](
+    inline def ?=[RESULT](
      f2: X ~> Y
     )(
       capture: [A] => Dot[A] ?=> Equalizer[A, X] => RESULT
     ): RESULT =
       doEqualizer(f, f2)(capture)
 
-    inline final def chi: Y ~> BEWL =
+    inline def chi: Y ~> BEWL =
       chiForMonic(f)
 
-    inline final def \[A: Dot](
+    inline def \[A: Dot](
       monic: A ~> Y
     ): X ~> A =
       backDivideMonic(f, monic)
+
+    def inverse: Y ~> X =
+      val tran: Y ~> (X > BEWL) = 
+        transpose[Y, X, BEWL]:
+          case y ⊕ x =>
+            y =?= f(x)
+      tran \ singleton[X]
       
-    final def isMonic: Boolean =
+    def isMonic: Boolean =
       ∀[(X, X)] { case x1 ⊕ x2 =>
         (f(x1) =?= f(x2)) → (x1 =?= x2)
       }
 
-    final def isEpic: Boolean =
+    def isEpic: Boolean =
       epicVerifier.isEpic(f)
 
-    final def isIso: Boolean =
+    def isIso: Boolean =
       isMonic && isEpic
 
-    inline final def sanityTest: Unit =
+    inline def sanityTest: Unit =
       Topos.this.sanityTest[X, Y](f)
 
-    final def name: NullaryOp[X > Y] =
+    def name: NullaryOp[X > Y] =
       transpose(f o π1[UNIT, X])
 
-    final def factorize[RESULT](
+    def factorize[RESULT](
       block: [I] => Dot[I] ?=> (epic: X ~> I, monic: I ~> Y) => RESULT
     ): RESULT =
       ∃[Y, X] { (y, x) =>
@@ -548,6 +555,6 @@ trait ToposConstructions[
   >[_, _]
 ] extends MonoidActions[DOT, CTXT, VOID, UNIT, BEWL, >]
   with GroupActions[DOT, CTXT, VOID, UNIT, BEWL, >]
-  with ToposOfPermutations[DOT, CTXT, VOID, UNIT, BEWL, >]:
+  with ToposOfAutomorphisms[DOT, CTXT, VOID, UNIT, BEWL, >]:
   topos: Topos[DOT, CTXT, VOID, UNIT, BEWL, >] =>
 

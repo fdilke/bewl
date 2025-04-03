@@ -79,6 +79,10 @@ abstract class BaseGroupActionsSpec[ACTION[_]](
               monicBar2baz,
               altMonicBar2baz
             )
+
+          override val isomorphismSituation: IsomorphismSituation[_, _] =
+            IsomorphismSituation[Int, Int]:
+              Map(1 -> 3, 3 -> 1, 2 -> 4, 4 -> 2, 5 -> 5)
         }
       )
 

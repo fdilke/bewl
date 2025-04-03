@@ -23,6 +23,18 @@ abstract class GenericToposSpec[
   type BAR
   type BAZ
 
+  case class IsomorphismSituation[S: Dot, T: Dot](
+    isomorphism: S ~> T
+  ):
+    def sanityTest: Unit =
+      isomorphism.sanityTest
+      if (!isomorphism.isIso)
+        throw new IllegalArgumentException("not an isomorphism!")
+    def withIsomorphism[Z](
+      block: [_S, _T] => Dot[_S] ?=> Dot[_T] ?=> (_S ~> _T) => Z
+    ): Z =
+      block[S, T](isomorphism)
+
   case class EqualizerSituation[S: Dot, M: Dot, T: Dot](
     r: S ~> M,
     s: M ~> T,
@@ -58,6 +70,7 @@ abstract class GenericToposSpec[
     val monicBar2baz: BAR ~> BAZ
     val foo2ImageOfBar: FOO ~> BAZ
     val equalizerSituation: EqualizerSituation[_, _, _]
+    val isomorphismSituation: IsomorphismSituation[_, _]
 
   def withTestDots(
      block: Dot[FOO] ?=> Dot[BAR] ?=> Dot[BAZ] ?=> ToposFixtures => Unit
@@ -72,7 +85,7 @@ abstract class GenericToposSpec[
     Dot[BAR],
     Dot[BAZ]
   ): Unit =
-    import fixtures.*
+    import fixtures._
 
     test("identity arrows have sane equality semantics"):
       assert(
@@ -168,14 +181,29 @@ abstract class GenericToposSpec[
 
     test("can factorize arrows into 'monic o epic'"):
       for { arrow <- morphisms[FOO, BAR] }
-        arrow.factorize { [I] => (_: Dot[I]) ?=> (epic: FOO ~> I, monic: I ~> BAR) =>
-          assert { epic.isEpic }
-          assert { monic.isMonic }
-          assert { arrow =!= ( monic o epic ) }
-        }
+        arrow.factorize:
+          [I] => (_: Dot[I]) ?=> (epic: FOO ~> I, monic: I ~> BAR) =>
+          assert:
+            epic.isEpic
+          assert:
+            monic.isMonic
+          assert:
+            arrow =!= ( monic o epic )
 
     test("consistently calculates arrows from the initial to the terminal"):
-      assert( toUnit[VOID] =!= fromZero[UNIT] )
+      assert:
+        toUnit[VOID] =!= fromZero[UNIT]
+
+    test("can compute inverses"):
+      isomorphismSituation.sanityTest
+      isomorphismSituation.withIsomorphism:
+        [S, T] => (_: Dot[S]) ?=> (_: Dot[T]) ?=> (isomorphism: S ~> T) =>
+          val theInverse: T ~> S =
+          isomorphism.inverse
+          assert:
+            (theInverse o isomorphism) =!= id[S]
+          assert:
+            (isomorphism o theInverse) =!= id[T]
 
     test("can construct exponential diagrams"):
       sanityTest[BAR > BAZ]

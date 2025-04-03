@@ -50,8 +50,8 @@ abstract class BaseMonoidActionsSpec[ACTION[_], RIGHT_IDEAL, INTERNAL_MAP[_, _]]
       intAction,
       boolAction
     ):
-      block(
-        new ToposFixtures {
+      block:
+        new ToposFixtures:
           override val foo2bar: Symbol ~> String =
             Map(
               i -> "x", x -> "x", y -> "y"
@@ -100,8 +100,14 @@ abstract class BaseMonoidActionsSpec[ACTION[_], RIGHT_IDEAL, INTERNAL_MAP[_, _]]
                 3 -> true
               )
             )
-        }
-      )
+            
+          override val isomorphismSituation: IsomorphismSituation[_, _] =
+            IsomorphismSituation[Symbol, ROPE]:
+              foo2baz
+//              Seq(i, x, y).map:
+//                q => q -> q
+//              .toMap.view.mapValues: symbol =>
+//                monicBar2baz(symbol.toString)
 
 abstract class MonoidActionsSetup(val baseSets: BaseSets):
   import baseSets._
@@ -115,6 +121,7 @@ abstract class MonoidActionsSetup(val baseSets: BaseSets):
       monoidOf3.Action, [A] =>> A, Void, Unit, monoidOf3.RightIdeal, monoidOf3.InternalMap
     ] =
       monoidOf3.actionTopos
+      
     override val fooAction: monoidOf3.Action[Symbol] =
       monoidOf3.withRegularAction:
         summon
@@ -123,9 +130,8 @@ abstract class MonoidActionsSetup(val baseSets: BaseSets):
       withDot(
         Set[String](strings :_*)
       ):
-        monoidOf3.Action {
+        monoidOf3.Action:
           (s, m) => monoidOf3.multiply(Symbol(s), m).name
-        }
 
     override val barAction: monoidOf3.Action[String] =
       actionOnStrings("x", "y")
@@ -150,10 +156,9 @@ abstract class MonoidActionsSetup(val baseSets: BaseSets):
         )
 
     override val boolAction: monoidOf3.Action[Boolean] =
-      monoidOf3.Action[Boolean](
+      monoidOf3.Action[Boolean]:
         (f: Boolean, _: Symbol) =>
           f
-      )
 
 object CommonSymbolDefs:
   object Rope extends Opacity[String]
@@ -161,4 +166,5 @@ object CommonSymbolDefs:
   val Seq(i, x, y): Seq[Symbol] = 
     Seq[String]("i", "x", "y").map { Symbol(_) }
   val Seq(xR, yR): Seq[ROPE] =
-    Seq[String]("x", "y").map { Rope.blur[[A] =>> A](_) }
+    Rope.blur[Seq]:
+      Seq[String]("x", "y")

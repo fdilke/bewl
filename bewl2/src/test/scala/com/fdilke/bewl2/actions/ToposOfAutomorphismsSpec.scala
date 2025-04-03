@@ -3,16 +3,18 @@ package com.fdilke.bewl2.actions
 import com.fdilke.bewl2.sets.Sets
 import com.fdilke.bewl2.topos.GenericToposSpec
 
-abstract class ToposOfPermutationsSpec
+import Sets.{ Automorphism => Permutation }
+
+abstract class ToposOfAutomorphismsSpec
   extends GenericToposSpec[
-    [A] =>> (A => A, A => A),
+    Permutation,
     [A] =>> A,
     Void,
     Unit,
     Boolean,
     Map
   ](
-    Sets.toposOfPermutations
+    Sets.toposOfAutomorphisms
   ):
   import topos._
 
@@ -20,13 +22,19 @@ abstract class ToposOfPermutationsSpec
   override type BAR = Int
   override type BAZ = String
 
-  private val fooPermutation: (FOO => FOO, FOO => FOO) =
+  val Seq(a, b, c, d) =
+    Seq("a", "b", "c", "d").map:
+      Symbol(_)
+
+  private val fooPermutation: Permutation[FOO] =
+    Sets.withDot(Set(a, b, c, d)):
+      Permutation[Symbol]:
+        Map(a -> c, b -> d, c -> a, d -> b) : Sets.~>[Symbol, Symbol]
+
+  private val barPermutation: Permutation[BAR] =
     ???
 
-  private val barPermutation: (BAR => BAR, BAR => BAR) =
-    ???
-
-  private val bazPermutation: (BAZ => BAZ, BAZ => BAZ) =
+  private val bazPermutation: Permutation[BAZ] =
     ???
 
   override def withTestDots(
@@ -37,8 +45,8 @@ abstract class ToposOfPermutationsSpec
       barPermutation,
       bazPermutation
     ):
-      block(
-        new ToposFixtures {
+      block:
+        new ToposFixtures:
           override val foo2bar: Symbol ~> Int =
             ??? // Map(e -> "x", a -> "x'")
 
@@ -74,6 +82,8 @@ abstract class ToposOfPermutationsSpec
 //              monicBar2baz,
 //              altMonicBar2baz
             )
-        }
-      )
+            
+          override val isomorphismSituation: IsomorphismSituation[_, _] =
+            IsomorphismSituation[Symbol, String]:
+              _.toString
 
