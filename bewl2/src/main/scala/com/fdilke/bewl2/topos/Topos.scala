@@ -432,9 +432,9 @@ class Topos[
       \ singleton[X]
       
     def isMonic: Boolean =
-      ∀[(X, X)] { case x1 ⊕ x2 =>
-        (f(x1) =?= f(x2)) → (x1 =?= x2)
-      }
+      ∀[(X, X)]:
+        case x1 ⊕ x2 =>
+          (f(x1) =?= f(x2)) → (x1 =?= x2)
 
     def isEpic: Boolean =
       epicVerifier.isEpic(f)
@@ -446,19 +446,20 @@ class Topos[
       Topos.this.sanityTest[X, Y](f)
 
     def name: NullaryOp[X > Y] =
-      transpose(f o π1[UNIT, X])
+      transpose:
+        f o π1[UNIT, X]
 
     def factorize[RESULT](
       block: [I] => Dot[I] ?=> (epic: X ~> I, monic: I ~> Y) => RESULT
     ): RESULT =
-      ∃[Y, X] { (y, x) =>
+      ∃[Y, X]: (y, x) =>
         y =?= f(x)
-      } whereTrue { [I] => (_: Dot[I]) ?=> (equalizer: Equalizer[I, Y]) =>
-        block[I](
-          epic = equalizer.restrict(f),
-          monic = equalizer.inclusion
-        )
-      }
+      .whereTrue:
+        [I] => (_: Dot[I]) ?=> (equalizer: Equalizer[I, Y]) =>
+          block[I](
+            epic = equalizer.restrict(f),
+            monic = equalizer.inclusion
+          )
 
   trait EpicVerifier:
     def isEpic[X: Dot, Y: Dot](
@@ -512,25 +513,25 @@ class Topos[
             (evalPredicate(p ⊕ x) ∧ evalPredicate(p ⊕ y)) → (x =?= y)
       isSubSingleton.whereTrue: 
         [OX] => (dotOptionX : Dot[OX]) ?=> (equalizer : Equalizer[OX, X > BEWL]) =>
-          (new PartialArrowClassifier[X, OX]:
+          new PartialArrowClassifier[X, OX]:
             override val some: X ~> OX = 
               equalizer.restrict(singleton[X])
             override val none: UNIT ~> OX = 
-              equalizer.restrict(
-                transpose[UNIT, X, BEWL] { case u ⊕ _ => falsity(u) }
-              )
+              equalizer.restrict:
+                transpose[UNIT, X, BEWL]:
+                  case u ⊕ _ => falsity(u)
             override def extendAlong[V: Dot, W: Dot](
               monic: V ~> W,
               arrow: V ~> X
             ): W ~> OX =
-              equalizer.restrict(
-                transpose[W, X, BEWL] { case w ⊕ x =>
-                  (∃[W, V] { case w ⊕ v  =>
-                      ( arrow(v) =?= x ) ∧ ( monic(v) =?= w )
-                  } : W ~> BEWL)(w)
-                }
-              )
-          ).asInstanceOf[PartialArrowClassifier[X, OPTION[X]]]
+              equalizer.restrict:
+                transpose[W, X, BEWL]:
+                  case w ⊕ x =>
+                    (∃[W, V]:
+                      case w ⊕ v  =>
+                        ( arrow(v) =?= x ) ∧ ( monic(v) =?= w )
+                    : W ~> BEWL)(w)
+          .asInstanceOf[PartialArrowClassifier[X, OPTION[X]]]
 
 object Topos:
   inline def apply[
