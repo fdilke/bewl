@@ -44,12 +44,10 @@ abstract class GenericToposSpec[
       topos.sanityTest(r)
       topos.sanityTest(s)
       topos.sanityTest(t)
-      if (s =!= t) {
+      if (s =!= t)
         throw new IllegalArgumentException("equalizing two arrows that are already equal!")
-      }
-      assert(
+      assert:
         (s o r) =!= (t o r)
-      )
 
     def apply[RESULT](
       capture: [S, M, T] => (
@@ -88,16 +86,16 @@ abstract class GenericToposSpec[
     import fixtures._
 
     test("identity arrows have sane equality semantics"):
-      assert(
+      assert:
         identity[CTXT[FOO]] =!= id[FOO]
-      )
-      assert(
+      assert:
         id[FOO] =!= id[FOO]
-      )
 
     test("identity arrows obey composition laws"):
-      assert( (foo2bar o id[FOO]) =!= foo2bar)
-      assert( (id[BAR] o foo2bar) =!= foo2bar)
+      assert:
+        (foo2bar o id[FOO]) =!= foo2bar
+      assert:
+        (id[BAR] o foo2bar) =!= foo2bar
 
     test("sane fixtures"):
       sanityTest[FOO]
@@ -111,23 +109,21 @@ abstract class GenericToposSpec[
 
     test("biproduct diagrams work"):
       sanityTest[(BAR, BAZ)]
-      val productArrow: FOO ~> (BAR, BAZ) = foo2bar x foo2baz
+      val productArrow: FOO ~> (BAR, BAZ) = 
+        foo2bar x foo2baz
       productArrow.sanityTest
 
       π0[BAR, BAZ].sanityTest
       π1[BAR, BAZ].sanityTest
 
-      assert(
+      assert:
         (π0[BAR, BAZ] o productArrow)  =!= foo2bar
-      )
-      assert(
+      assert:
         (π1[BAR, BAZ] o productArrow) =!= foo2baz
-      )
       val recombine: (BAR, BAZ) ~> (BAR, BAZ) =
         π0[BAR, BAZ] x π1[BAR, BAZ]
-      assert(
+      assert:
         recombine =!= id[(BAR, BAZ)]
-      )
 
     test("distinguishes projection arrows"):
       assert(!(

@@ -395,12 +395,12 @@ class Topos[
   implicit final class RichArrow[X: Dot, Y: Dot](
     f: X ~> Y
   ):
-    inline final def =!=(
+    inline def =!=(
       f2: X ~> Y
     ): Boolean =
       pretopos.equalArrows(dot[X], dot[Y], f, f2)
 
-    inline final def o[V: Dot](
+    inline def o[V: Dot](
       f2: V ~> X
     ): V ~> Y =
       f compose f2
@@ -426,11 +426,10 @@ class Topos[
       backDivideMonic(f, monic)
 
     def inverse: Y ~> X =
-      val tran: Y ~> (X > BEWL) = 
-        transpose[Y, X, BEWL]:
-          case y ⊕ x =>
-            y =?= f(x)
-      tran \ singleton[X]
+      transpose[Y, X, BEWL]:
+        case y ⊕ x =>
+          y =?= f(x)
+      \ singleton[X]
       
     def isMonic: Boolean =
       ∀[(X, X)] { case x1 ⊕ x2 =>
