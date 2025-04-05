@@ -29,13 +29,17 @@ abstract class ToposOfAutomorphismsSpec
   private val fooPermutation: Permutation[FOO] =
     Sets.withDot(Set(a, b, c, d)):
       Permutation[Symbol]:
-        Map(a -> c, b -> d, c -> a, d -> b) : Sets.~>[Symbol, Symbol]
+        Map(a -> c, b -> d, c -> a, d -> b)
 
   private val barPermutation: Permutation[BAR] =
-    ???
+    Sets.withDot(Set(1,2)):
+      Permutation[Int]:
+        Map(1 -> 2, 2 -> 1)
 
   private val bazPermutation: Permutation[BAZ] =
-    ???
+    Sets.withDot(Set("x", "y", "z", "w")):
+      Permutation[String]:
+        Map("x" -> "y", "y" -> "x", "z" -> "z", "w" -> "w")
 
   override def withTestDots(
     block: Dot[FOO] ?=> Dot[BAR] ?=> Dot[BAZ] ?=> ToposFixtures => Unit
@@ -48,42 +52,53 @@ abstract class ToposOfAutomorphismsSpec
       block:
         new ToposFixtures:
           override val foo2bar: Symbol ~> Int =
-            ??? // Map(e -> "x", a -> "x'")
+            Map(
+              a -> 1,
+              b -> 2,
+              c -> 2,
+              d -> 1
+            )
 
           override val foo2baz: Symbol ~> String =
-            ??? // Map(e -> 4, a -> 3)
+            Map(a -> "x", b -> "z", c -> "y",  d -> "z")
 
           override val monicBar2baz: Int ~> String =
-            ??? // Map("x" -> 3, "x'" -> 4, "y" -> 5)
+            Map(
+              1 -> "x",
+              2 -> "y"
+            )
 
           val altMonicBar2baz: Int ~> String =
-            ??? // Map("x" -> 2, "x'" -> 1, "y" -> 5)
+            Map(1 -> "x", 2 -> "y")
 
           override val foobar2baz: (Symbol, Int) ~> String =
-            ???
-//            Map(
-//              (e, "x") -> 1,
-//              (e, "x'") -> 3,
-//              (e, "y") -> 2,
-//              (a, "x") -> 4,
-//              (a, "x'") -> 2,
-//              (a, "y") -> 1
-//            )
+            Map(
+              (a, 1) -> "x",
+              (b, 1) -> "y",
+              (c, 1) -> "y",
+              (d, 1) -> "y",
+              (a, 2) -> "x",
+              (b, 2) -> "x",
+              (c, 2) -> "y",
+              (d, 2) -> "x"
+            )
 
           override val foo2ImageOfBar: Symbol ~> String =
-            ??? // Map(e -> 4, a -> 3)
+            Map(
+              a -> "x",
+              b -> "x",
+              c -> "y",
+              d -> "y"
+            )
 
           override val equalizerSituation: EqualizerSituation[_, _, _] =
             EqualizerSituation[Unit, Symbol, String](
               _ => Symbol("sensibleChoiceNotThis"),
               foo2ImageOfBar,
               monicBar2baz o foo2bar
-//              _ => "y",
-//              monicBar2baz,
-//              altMonicBar2baz
             )
             
           override val isomorphismSituation: IsomorphismSituation[_, _] =
             IsomorphismSituation[Symbol, String]:
-              _.toString
+              Map(a -> "x", b -> "z", c -> "y",  d -> "w")
 
