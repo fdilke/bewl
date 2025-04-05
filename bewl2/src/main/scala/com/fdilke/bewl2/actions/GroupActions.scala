@@ -18,185 +18,185 @@ trait GroupActions[
   def toposOfGroupActions[G: Dot](
     group: Group[G]
   ): Topos[group.Action, CTXT, VOID, UNIT, BEWL, >] =
-    new Topos[group.Action, CTXT, VOID, UNIT, BEWL, >](      
-      new PreTopos[
-        group.Action, CTXT, VOID, UNIT, BEWL, >
-      ]:
-        override val unitDot: group.Action[UNIT] =
-          group.withTrivialAction[UNIT, group.Action[UNIT]]:
-            summon[group.Action[UNIT]]
+    new PreTopos[
+      group.Action, CTXT, VOID, UNIT, BEWL, >
+    ]:
+      override val unitDot: group.Action[UNIT] =
+        group.withTrivialAction[UNIT, group.Action[UNIT]]:
+          summon[group.Action[UNIT]]
 
-        override val zeroDot: group.Action[VOID] =
-          group.withVoidAction:
-            summon[group.Action[VOID]]
+      override val zeroDot: group.Action[VOID] =
+        group.withVoidAction:
+          summon[group.Action[VOID]]
 
-        override val omegaDot: group.Action[BEWL] =
-          group.withTrivialAction[BEWL, group.Action[BEWL]]:
-            summon[group.Action[BEWL]]
+      override val omegaDot: group.Action[BEWL] =
+        group.withTrivialAction[BEWL, group.Action[BEWL]]:
+          summon[group.Action[BEWL]]
 
-        override val truth: UNIT ~> BEWL =
-          Ɛ.truth
+      override val truth: UNIT ~> BEWL =
+        Ɛ.truth
 
-        override def equalArrows[X, Y](
-          dotX: group.Action[X],
-          dotY: group.Action[Y],
-          f1: X ~> Y,
-          f2: X ~> Y
-        ): Boolean =
-          given Ɛ.Dot[X] = dotX.dot
-          given Ɛ.Dot[Y] = dotY.dot
-          Ɛ.RichArrow(f1) =!= f2
+      override def equalArrows[X, Y](
+        dotX: group.Action[X],
+        dotY: group.Action[Y],
+        f1: X ~> Y,
+        f2: X ~> Y
+      ): Boolean =
+        given Ɛ.Dot[X] = dotX.dot
+        given Ɛ.Dot[Y] = dotY.dot
+        Ɛ.RichArrow(f1) =!= f2
 
-        override def uncachedProductObject[X, Y](
-          dotX: group.Action[X],
-          dotY: group.Action[Y]
-        ): group.Action[(X, Y)] =
-          given Ɛ.Dot[Y] = dotY.dot
-          dotX.x(dotY)
+      override def uncachedProductObject[X, Y](
+        dotX: group.Action[X],
+        dotY: group.Action[Y]
+      ): group.Action[(X, Y)] =
+        given Ɛ.Dot[Y] = dotY.dot
+        dotX.x(dotY)
 
-        override def uncachedExponentialObject[X, Y](
-          dotX: group.Action[X],
-          analysisX: analyzer.ACTION_ANALYSIS[X],
-          dotY: group.Action[Y],
-          analysisY: analyzer.ACTION_ANALYSIS[Y]
-        ): group.Action[X > Y] =
-          // analyzer.makeExponential(analysisX, analysisY)
-          given Dot[G] = group.dot
-          given Dot[X] = dotX.dot
-          given Dot[Y] = dotY.dot
-          val eval: (X > Y, X) ~> Y =
-            Ɛ.evaluation[X, Y]
-          group.Action[X > Y]:
-            Ɛ.transpose[(X > Y, G), X, Y]:
-              case (f ⊕ g) ⊕ a =>
-                dotY.actionMultiply(
-                  eval(
-                    f ⊕ dotX.actionMultiply(a, group.inverse(g))
-                  ),
-                  g
-                )
-
-        override def evaluation[X, Y](
-          dotX: group.Action[X],
-          dotY: group.Action[Y]
-        ): (X > Y, X) ~> Y =
-          given Ɛ.Dot[X] = dotX.dot
-          given Ɛ.Dot[Y] = dotY.dot
+      override def uncachedExponentialObject[X, Y](
+        dotX: group.Action[X],
+        analysisX: analyzer.ACTION_ANALYSIS[X],
+        dotY: group.Action[Y],
+        analysisY: analyzer.ACTION_ANALYSIS[Y]
+      ): group.Action[X > Y] =
+        // analyzer.makeExponential(analysisX, analysisY)
+        given Dot[G] = group.dot
+        given Dot[X] = dotX.dot
+        given Dot[Y] = dotY.dot
+        val eval: (X > Y, X) ~> Y =
           Ɛ.evaluation[X, Y]
-
-        override def transpose[X, Y, Z](
-          dotX: group.Action[X],
-          dotY: group.Action[Y],
-          dotZ: group.Action[Z],
-          xy2z: ((X, Y)) ~> Z
-        ): X ~> (Y > Z) =
-          given Ɛ.Dot[X] = dotX.dot
-          given Ɛ.Dot[Y] = dotY.dot
-          given Ɛ.Dot[Z] = dotZ.dot
-          Ɛ.transpose[X, Y, Z](xy2z)
-
-        override def sanityTest[X](
-          dotX: group.Action[X]
-        ): Unit =
-          dotX.sanityTest
-
-        override def sanityTest[X, Y](
-          dotX: group.Action[X],
-          dotY: group.Action[Y],
-          f: X ~> Y
-        ): Unit =
-          given Ɛ.Dot[X] = dotX.dot
-          given Ɛ.Dot[Y] = dotY.dot
-          given group.Action[X] = dotX
-          given group.Action[Y] = dotY
-          Ɛ.sanityTest[X, Y](f)
-          assert { group.actions.isMorphism(f) }
-
-        override def enumerateMorphisms[X, Y](
-          dotX: group.Action[X],
-          analysisX: analyzer.ACTION_ANALYSIS[X],
-          dotY: group.Action[Y],
-          analysisY: analyzer.ACTION_ANALYSIS[Y]
-        ): Iterable[X ~> Y] =
-          analyzer.enumerateMorphisms(analysisX, analysisY)
-
-        override def fromZero[X](
-          dotX: group.Action[X]
-        ): VOID ~> X =
-          given Ɛ.Dot[X] = dotX.dot
-          Ɛ.fromZero[X]
-
-        override def toUnit[X](
-          dotX: group.Action[X]
-        ): X ~> UNIT =
-          given Ɛ.Dot[X] = dotX.dot
-          Ɛ.toUnit[X]
-
-        override def doEqualizer[X, Y, RESULT](
-          dotX: group.Action[X],
-          dotY: group.Action[Y],
-          f: X ~> Y,
-          f2: X ~> Y
-        )(
-          block: [A] => RawEqualizer[A, X] => group.Action[A] => RESULT
-        ): RESULT =
-          given Ɛ.Dot[X] = dotX.dot
-          given Ɛ.Dot[Y] = dotY.dot
-          Ɛ.doEqualizer(f, f2):
-            [A] => (_: Dot[A]) ?=> (equalizer: Ɛ.Equalizer[A, X]) =>
-              block[A](
-                new RawEqualizer[A, X]:
-                  override val inclusion: A ~> X =
-                    equalizer.inclusion
-                  override def restrict[R](
-                    dotR: group.Action[R],
-                    arrow: R ~> X
-                  ): R ~> A =
-                    given Ɛ.Dot[R] = dotR.dot
-                    equalizer.restrict[R](arrow)
-              )(
-                group.Action[A](
-                  equalizer.restrict {
-                    case a ⊕ m =>
-                      dotX.actionMultiply(
-                        equalizer.inclusion(a),
-                        m
-                      )
-                  }
-                )
+        group.Action[X > Y]:
+          Ɛ.transpose[(X > Y, G), X, Y]:
+            case (f ⊕ g) ⊕ a =>
+              dotY.actionMultiply(
+                eval(
+                  f ⊕ dotX.actionMultiply(a, group.inverse(g))
+                ),
+                g
               )
 
-        override def chiForMonic[X, Y](
-          dotX: group.Action[X],
-          dotY: group.Action[Y],
-          monic: X ~> Y
-        ): Y ~> BEWL =
-          given Ɛ.Dot[X] = dotX.dot
-          given Ɛ.Dot[Y] = dotY.dot
-          Ɛ.chiForMonic[X, Y](monic)
+      override def evaluation[X, Y](
+        dotX: group.Action[X],
+        dotY: group.Action[Y]
+      ): (X > Y, X) ~> Y =
+        given Ɛ.Dot[X] = dotX.dot
+        given Ɛ.Dot[Y] = dotY.dot
+        Ɛ.evaluation[X, Y]
 
-        override def backDivideMonic[X, Y, A](
-          dotX: group.Action[X],
-          dotY: group.Action[Y],
-          dotA: group.Action[A],
-          arrow: X ~> Y,
-          monic: A ~> Y
-        ): X ~> A =
-          given Ɛ.Dot[X] = dotX.dot
-          given Ɛ.Dot[Y] = dotY.dot
-          given Ɛ.Dot[A] = dotA.dot
-          Ɛ.backDivideMonic[X, Y, A](arrow, monic)
+      override def transpose[X, Y, Z](
+        dotX: group.Action[X],
+        dotY: group.Action[Y],
+        dotZ: group.Action[Z],
+        xy2z: ((X, Y)) ~> Z
+      ): X ~> (Y > Z) =
+        given Ɛ.Dot[X] = dotX.dot
+        given Ɛ.Dot[Y] = dotY.dot
+        given Ɛ.Dot[Z] = dotZ.dot
+        Ɛ.transpose[X, Y, Z](xy2z)
 
-        val analyzer: GroupActionAnalyzer[group.Action] =
-          Ɛ.groupAssistant.actionAnalyzer[G](group)
+      override def sanityTest[X](
+        dotX: group.Action[X]
+      ): Unit =
+        dotX.sanityTest
 
-        override type TOOLKIT[A] = analyzer.ACTION_ANALYSIS[A]
-        override val toolkitBuilder: ToolkitBuilder = new ToolkitBuilder:
-            override def buildToolkit[A](
-              theAction: group.Action[A]
-            ): analyzer.ACTION_ANALYSIS[A] =
-              analyzer.analyze(theAction)
-    )
+      override def sanityTest[X, Y](
+        dotX: group.Action[X],
+        dotY: group.Action[Y],
+        f: X ~> Y
+      ): Unit =
+        given Ɛ.Dot[X] = dotX.dot
+        given Ɛ.Dot[Y] = dotY.dot
+        given group.Action[X] = dotX
+        given group.Action[Y] = dotY
+        Ɛ.sanityTest[X, Y](f)
+        assert { group.actions.isMorphism(f) }
+
+      override def enumerateMorphisms[X, Y](
+        dotX: group.Action[X],
+        analysisX: analyzer.ACTION_ANALYSIS[X],
+        dotY: group.Action[Y],
+        analysisY: analyzer.ACTION_ANALYSIS[Y]
+      ): Iterable[X ~> Y] =
+        analyzer.enumerateMorphisms(analysisX, analysisY)
+
+      override def fromZero[X](
+        dotX: group.Action[X]
+      ): VOID ~> X =
+        given Ɛ.Dot[X] = dotX.dot
+        Ɛ.fromZero[X]
+
+      override def toUnit[X](
+        dotX: group.Action[X]
+      ): X ~> UNIT =
+        given Ɛ.Dot[X] = dotX.dot
+        Ɛ.toUnit[X]
+
+      override def doEqualizer[X, Y, RESULT](
+        dotX: group.Action[X],
+        dotY: group.Action[Y],
+        f: X ~> Y,
+        f2: X ~> Y
+      )(
+        block: [A] => RawEqualizer[A, X] => group.Action[A] => RESULT
+      ): RESULT =
+        given Ɛ.Dot[X] = dotX.dot
+        given Ɛ.Dot[Y] = dotY.dot
+        Ɛ.doEqualizer(f, f2):
+          [A] => (_: Dot[A]) ?=> (equalizer: Ɛ.Equalizer[A, X]) =>
+            block[A](
+              new RawEqualizer[A, X]:
+                override val inclusion: A ~> X =
+                  equalizer.inclusion
+                override def restrict[R](
+                  dotR: group.Action[R],
+                  arrow: R ~> X
+                ): R ~> A =
+                  given Ɛ.Dot[R] = dotR.dot
+                  equalizer.restrict[R](arrow)
+            )(
+              group.Action[A](
+                equalizer.restrict {
+                  case a ⊕ m =>
+                    dotX.actionMultiply(
+                      equalizer.inclusion(a),
+                      m
+                    )
+                }
+              )
+            )
+
+      override def chiForMonic[X, Y](
+        dotX: group.Action[X],
+        dotY: group.Action[Y],
+        monic: X ~> Y
+      ): Y ~> BEWL =
+        given Ɛ.Dot[X] = dotX.dot
+        given Ɛ.Dot[Y] = dotY.dot
+        Ɛ.chiForMonic[X, Y](monic)
+
+      override def backDivideMonic[X, Y, A](
+        dotX: group.Action[X],
+        dotY: group.Action[Y],
+        dotA: group.Action[A],
+        arrow: X ~> Y,
+        monic: A ~> Y
+      ): X ~> A =
+        given Ɛ.Dot[X] = dotX.dot
+        given Ɛ.Dot[Y] = dotY.dot
+        given Ɛ.Dot[A] = dotA.dot
+        Ɛ.backDivideMonic[X, Y, A](arrow, monic)
+
+      val analyzer: GroupActionAnalyzer[group.Action] =
+        Ɛ.groupAssistant.actionAnalyzer[G](group)
+
+      override type TOOLKIT[A] = analyzer.ACTION_ANALYSIS[A]
+      override val toolkitBuilder: ToolkitBuilder = new ToolkitBuilder:
+          override def buildToolkit[A](
+            theAction: group.Action[A]
+          ): analyzer.ACTION_ANALYSIS[A] =
+            analyzer.analyze(theAction)
+            
+    .toTopos
 
   protected val groupAssistant: GroupAssistant =
     DefaultGroupAssistant

@@ -8,7 +8,7 @@ import StockEnums.Direction
 import Direction._
 
 class SetsSpec extends GenericToposSpec(SetsWithSlowActions):
-  import topos.*
+  import topos._
 
   override type FOO = Direction
   override type BAR = String

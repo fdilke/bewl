@@ -8,6 +8,7 @@ trait PreTopos[
   BEWL,
   >[_, _]
 ]:
+  pretopos =>
   type ~>[X, Y] = CTXT[X] => CTXT[Y]
 
   trait RawEqualizer[A, X]:
@@ -87,6 +88,22 @@ trait PreTopos[
   trait ToolkitBuilder:
     def buildToolkit[X](dot: DOT[X]): TOOLKIT[X]
   val toolkitBuilder: ToolkitBuilder
+  
+  final def toTopos: Topos[
+    DOT,
+    CTXT,
+    VOID,
+    UNIT,
+    BEWL,
+    >
+  ] = new Topos[
+    DOT,
+    CTXT,
+    VOID,
+    UNIT,
+    BEWL,
+    >
+  ](pretopos)
 
 trait PreToposWithDefaultToolkit[
   DOT[_],
