@@ -17,15 +17,16 @@ trait ToposOfAutomorphisms[
   case class Automorphism[A : Dot](
     arrow: A ~> A,
     inverse: A ~> A
-  ) //:
-//    ()
-// weak if we can't do this!    
-//    def this(arrow: A ~> A) =
-//      this(arrow, arrow.inverse)
+  )
 
-  object Automorphism:    
-    def apply[A : Dot](arrow: A ~> A) =
-      new Automorphism[A](arrow, arrow.inverse)
+  object Automorphism:
+    def apply[A : Dot](
+      arrow: A ~> A
+    ): Automorphism[A] =
+      Automorphism[A](
+        arrow,
+        arrow.inverse
+      )
 
   lazy val toposOfAutomorphisms: Topos[
     Automorphism,

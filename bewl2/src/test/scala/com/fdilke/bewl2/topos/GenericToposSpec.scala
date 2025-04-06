@@ -270,14 +270,14 @@ abstract class GenericToposSpec[
         mask[BEWL, HeytingAlgebra, Unit](heyting): 
           [ALTBEWL] => (altHeyting: HeytingAlgebra[ALTBEWL]) =>
             (_ : ALTBEWL =:= BEWL) ?=> (_ : BEWL =:= ALTBEWL) ?=>
-          val reallyBewl: ALTBEWL ~> BEWL =
-            summon[ALTBEWL =:= BEWL].substituteCo[CTXT]
-          given Dot[ALTBEWL] = 
-            summon[BEWL =:= ALTBEWL].substituteCo[Dot]:
-              summon[Dot[BEWL]]
-          given HeytingAlgebra[ALTBEWL] = altHeyting
-          assert:
-            heytingAlgebras.isMorphism(reallyBewl)
+            val reallyBewl: ALTBEWL ~> BEWL =
+              summon[ALTBEWL =:= BEWL].substituteCo[CTXT]
+            given Dot[ALTBEWL] =
+              summon[BEWL =:= ALTBEWL].substituteCo[Dot]:
+                summon[Dot[BEWL]]
+            given HeytingAlgebra[ALTBEWL] = altHeyting
+            assert:
+              heytingAlgebras.isMorphism(reallyBewl)
 
     test("overrides the epic verifier correctly, if at all"):
       if !(epicVerifier.isInstanceOf[DefaultEpicVerifier]) then
@@ -300,7 +300,8 @@ abstract class GenericToposSpec[
           defaultAutoFinder.withAutomorphismGroup[FOO, Unit]:
             [D] => (_ : Dot[D]) ?=> (groupD: Group[D]) ?=> (actionD: groupD.Action[FOO]) ?=>
               val groupIso: D ~> A = 
-                actionD.toExponent \ actionA.toExponent
+                actionD.toExponent \
+                  actionA.toExponent
               assert { groups.isMorphism(groupIso) }
               assert { groupIso.isIso }
               mask[FOO, groupD.Action, Unit](
