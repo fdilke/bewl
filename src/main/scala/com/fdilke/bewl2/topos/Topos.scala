@@ -280,3 +280,4 @@ trait Topos[DOT[_]] { topos =>
       collapse((a: Ω, b: Ω) => ∀((ω: Ω) => (a → ω) ∧ (b → ω) → ω))
   }
 }
+

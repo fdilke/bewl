@@ -17,7 +17,9 @@ trait ToposOfAutomorphisms[
   case class Automorphism[A : Dot](
     arrow: A ~> A,
     inverse: A ~> A
-  )
+  ):
+    val theDot: Dot[A] =
+      summon
 
   object Automorphism:
     def apply[A : Dot](
@@ -44,13 +46,20 @@ trait ToposOfAutomorphisms[
         f1: X ~> Y,
         f2: X ~> Y
       ): Boolean =
-        ???
+        given Ɛ.Dot[X] = dotX.theDot
+        given Ɛ.Dot[Y] = dotY.theDot
+        f1 =!= f2
 
       override def uncachedProductObject[X, Y](
         dotX: Automorphism[X],
         dotY: Automorphism[Y]
       ): Automorphism[(X, Y)] =
-        ???
+        given Ɛ.Dot[X] = dotX.theDot
+        given Ɛ.Dot[Y] = dotY.theDot
+        Automorphism[(X, Y)](
+          (dotX.arrow o Ɛ.π0[X, Y]) x (dotY.arrow o Ɛ.π1[X, Y]),
+          (dotX.inverse o Ɛ.π0[X, Y]) x (dotY.inverse o Ɛ.π1[X, Y])
+        )
 
       override def uncachedExponentialObject[X, Y](
         dotX: Automorphism[X],
@@ -58,7 +67,100 @@ trait ToposOfAutomorphisms[
         dotY: Automorphism[Y],
         toolkitY: Unit
       ): Automorphism[X > Y] =
+        given Ɛ.Dot[X] = dotX.theDot
+        given Ɛ.Dot[Y] = dotY.theDot
+//        val exponentialCarrier = carrier > that.carrier
+//          exponentialCarrier.transpose(exponentialCarrier) { (e, x) =>
+//            that.arrow(
+//              exponentialCarrier.evaluate(e, inverse(x))
+//            )
+//          },
+//          exponentialCarrier.transpose(exponentialCarrier) { (e, x) =>
+//            that.inverse(
+//              exponentialCarrier.evaluate(e, arrow(x))
+//            )
+//          }
         ???
+
+        def piggywig(
+          f: CTXT[X > Y],
+          x: CTXT[X]
+        ): CTXT[Y] =
+          val zig: CTXT[(X > Y, X)] =
+            f ⊕ dotX.inverse(x)
+//            Ɛ.⊕(f, dotX.inverse(x))
+          val twig: (X > Y, X) ~> Y =
+            Ɛ.evaluation[X, Y]
+          val wig: CTXT[Y] =
+            twig(zig)
+//            Ɛ.evaluation[X, Y](
+//              zig
+//            )
+          dotY.arrow(wig)
+
+        val snuggle: (X > Y, X) ~> Y =
+          case Ɛ.⊕(f, x)  =>
+            val zig: CTXT[(X > Y, X)] =
+              f ⊕ dotX.inverse(x)
+            val twig: (X > Y, X) ~> Y =
+              Ɛ.evaluation[X, Y]
+            val wig: CTXT[Y] =
+              twig(zig)
+            dotY.arrow(wig)
+
+//              Ɛ.applicate(
+
+//        val spod: (X > Y, X) ~> Y =
+//            case Ɛ.⊕(f, x) =>
+//              Ɛ.evaluation(
+//                f ⊕ dotX.inverse(x)
+//              )
+            // Ɛ.evaluation[X, Y]
+        val arrow0: (X > Y) ~> (X > Y) =
+          Ɛ.transpose[X > Y, X, Y]:
+            snuggle
+
+        val snuggleI: (X > Y, X) ~> Y =
+          case Ɛ.⊕(f, x)  =>
+            val zig: CTXT[(X > Y, X)] =
+              f ⊕ dotX.arrow(x)
+            val twig: (X > Y, X) ~> Y =
+              Ɛ.evaluation[X, Y]
+            val wig: CTXT[Y] =
+              twig(zig)
+            dotY.inverse(wig)
+
+//        val arrow: (X > Y) ~> (X > Y) =
+//          transpose[X > Y, X, Y]:
+//            case Ɛ.⊕[X > Y, X]( f: >[X, Y], x : X ) =>
+//              spod(f, x)
+//              dotY.arrow(
+//                Ɛ.evaluation(f, dotX.inverse(x))
+//              )
+
+        val arrowI: (X > Y) ~> (X > Y) =
+          Ɛ.transpose[X > Y, X, Y]:
+            snuggleI
+
+        new Automorphism[X > Y](
+          arrow0,
+          arrowI
+        )
+        // with ExponentialDot[X, Y] { exponentialAutomorphism =>
+//        new Automorphism[X > Y](
+//          transpose[X > Y, X, Y]:
+//            case f ⊕ x =>
+//              dotY.arrow(
+//                Ɛ.evaluation(f, dotX.inverse(x))
+//              )
+//          ,
+//          exponentialCarrier.transpose(exponentialCarrier) { (e, x) =>
+//            that.inverse(
+//              exponentialCarrier.evaluate(e, arrow(x))
+//            )
+//          }
+//        ) with ExponentialDot[X, Y] { exponentialAutomorphism =>
+//        ???
 
       override def sanityTest[X](
         dotX: Automorphism[X]
@@ -141,5 +243,3 @@ trait ToposOfAutomorphisms[
         ???
 
     .toTopos
-
-
