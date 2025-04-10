@@ -109,7 +109,8 @@ trait GroupActions[
         given group.Action[X] = dotX
         given group.Action[Y] = dotY
         Ɛ.sanityTest[X, Y](f)
-        assert { group.actions.isMorphism(f) }
+        assert:
+          group.actions.isMorphism(f)
 
       override def enumerateMorphisms[X, Y](
         dotX: group.Action[X],

@@ -5,6 +5,7 @@ import com.fdilke.bewl2.helper.Memoize
 import ProductMappable.*
 import com.fdilke.bewl2.logic.LogicalOperations
 import com.fdilke.bewl2.actions.{GroupActions, MonoidActions}
+import com.fdilke.bewl2.sets.PreSets.RawEqualizer
 import com.fdilke.bewl2.topos.constructions.ToposOfAutomorphisms
 import com.fdilke.utility.Mask.*
 
@@ -26,7 +27,8 @@ class Topos[
   type UntupledBiArrow[P, Q, X] = (CTXT[P], CTXT[Q]) => CTXT[X]
   /* opaque */ type OPTION[X] = optionator.OPTION[X]
 
-  trait Equalizer[A, X]:
+  trait Equalizer[A, X]: 
+    equalizer =>
     val inclusion: A ~> X
     def restrict[R: Dot](
       arrow: R ~> X
@@ -37,6 +39,8 @@ class Topos[
       restrict[(P, Q)] {
         case p ⊕ q => untupledArrow(p, q)
       }
+    // TODO: can factor this for use in GroupActions, MonoidActions, ToposOfAutomorphisms?
+    //  final def toRaw: RawEqualizer[A, X] =
 
   class Dot[X] private[Topos](
     val dot: DOT[X]

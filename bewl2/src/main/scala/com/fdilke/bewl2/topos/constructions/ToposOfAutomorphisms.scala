@@ -180,13 +180,40 @@ trait ToposOfAutomorphisms[
       )(
         capture: [A] => RawEqualizer[A, X] => Automorphism[A] => RESULT
       ): RESULT =
-        ???
+        given Ɛ.Dot[X] = dotX.theDot
+        given Ɛ.Dot[Y] = dotY.theDot
+        Ɛ.doEqualizer[X, Y, RESULT](f, f2):
+          [A] => (dotA: Dot[A]) ?=> (equalizer: Ɛ.Equalizer[A, X]) =>
+            capture[A](
+              new RawEqualizer[A, X]:
+                override val inclusion: A ~> X =
+                  equalizer.inclusion
+                override def restrict[R](
+                  dotR: Automorphism[R],
+                  arrow: R ~> X
+                ): R ~> A =
+                  given Ɛ.Dot[R] = dotR.theDot
+                  equalizer.restrict[R]:
+                    arrow
+            )(
+              Automorphism[A](
+                equalizer.restrict:
+                  dotX.arrow o equalizer.inclusion
+                ,
+                equalizer.restrict:
+                  dotX.inverse o equalizer.inclusion
+              )
+            )
 
       override def chiForMonic[X, Y](
         dotX: Automorphism[X],
         dotY: Automorphism[Y],
         monic: X ~> Y
-      ): Y ~> BEWL = ???
+      ): Y ~> BEWL =
+        given Ɛ.Dot[X] = dotX.theDot
+        given Ɛ.Dot[Y] = dotY.theDot
+        Ɛ.chiForMonic[X, Y]:
+          monic
 
       override def backDivideMonic[X, Y, A](
         dotX: Automorphism[X],
@@ -195,6 +222,12 @@ trait ToposOfAutomorphisms[
         arrow: X ~> Y,
         monic: A ~> Y
       ): X ~> A =
-        ???
+        given Ɛ.Dot[X] = dotX.theDot
+        given Ɛ.Dot[Y] = dotY.theDot
+        given Ɛ.Dot[A] = dotA.theDot
+        Ɛ.backDivideMonic[X, Y, A](
+          arrow,
+          monic
+        )
 
     .toTopos
