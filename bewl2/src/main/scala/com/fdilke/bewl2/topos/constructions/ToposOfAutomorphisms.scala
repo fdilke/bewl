@@ -92,15 +92,22 @@ trait ToposOfAutomorphisms[
         assert:
           (dotX.inverse o dotX.arrow) =!= Ɛ.id[X]
 
+      private inline def isMorphism[X, Y](
+        dotX: Automorphism[X],
+        dotY: Automorphism[Y],
+        f: X ~> Y
+      ): Boolean =
+        given Ɛ.Dot[X] = dotX.theDot
+        given Ɛ.Dot[Y] = dotY.theDot
+        (dotY.arrow o f) =!= (f o dotX.arrow)
+
       override def sanityTest[X, Y](
         dotX: Automorphism[X],
         dotY: Automorphism[Y],
         f: X ~> Y
       ): Unit =
-        given Ɛ.Dot[X] = dotX.theDot
-        given Ɛ.Dot[Y] = dotY.theDot
         assert:
-          (dotY.arrow o f) =!= (f o dotX.arrow)
+          isMorphism[X, Y](dotX, dotY, f)
 
       private def liftIdentity[X: Ɛ.Dot]: Automorphism[X] =
         val identityX: X ~> X =
@@ -142,13 +149,16 @@ trait ToposOfAutomorphisms[
       ): Iterable[X ~> Y] =
         given Ɛ.Dot[X] = dotX.theDot
         given Ɛ.Dot[Y] = dotY.theDot
-        ???
+        Ɛ.morphisms[X, Y].filter: f =>
+          isMorphism[X, Y](dotX, dotY, f)
 
       override def evaluation[X, Y](
         dotX: Automorphism[X],
         dotY: Automorphism[Y]
       ): (X > Y, X) ~> Y =
-        ???
+        given Ɛ.Dot[X] = dotX.theDot
+        given Ɛ.Dot[Y] = dotY.theDot
+        Ɛ.evaluation[X, Y]
 
       override def transpose[X, Y, Z](
         dotX: Automorphism[X],
@@ -156,7 +166,11 @@ trait ToposOfAutomorphisms[
         dotZ: Automorphism[Z],
         xy2z: (X, Y) ~> Z
       ): X ~> (Y > Z) =
-        ???
+        given Ɛ.Dot[X] = dotX.theDot
+        given Ɛ.Dot[Y] = dotY.theDot
+        given Ɛ.Dot[Z] = dotZ.theDot
+        Ɛ.transpose[X, Y, Z]:
+          xy2z
 
       override def doEqualizer[X, Y, RESULT](
         dotX: Automorphism[X],

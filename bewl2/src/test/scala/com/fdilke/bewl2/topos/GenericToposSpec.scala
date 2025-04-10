@@ -171,6 +171,10 @@ abstract class GenericToposSpec[
       (foobar2baz      appears)
       (monicBar2baz    appears)
       (foo2ImageOfBar  appears)
+      morphisms[FOO, BAR].foreach:
+        _.sanityTest
+      morphisms[FOO, BEWL].foreach:
+        _.sanityTest
 
     test("can factorize arrows into 'monic o epic'"):
       for { arrow <- morphisms[FOO, BAR] }
