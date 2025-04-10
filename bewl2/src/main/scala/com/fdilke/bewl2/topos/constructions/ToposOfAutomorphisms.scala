@@ -86,35 +86,53 @@ trait ToposOfAutomorphisms[
       override def sanityTest[X](
         dotX: Automorphism[X]
       ): Unit =
-        ???
+        given Ɛ.Dot[X] = dotX.theDot
+        assert:
+          (dotX.arrow o dotX.inverse) =!= Ɛ.id[X]
+        assert:
+          (dotX.inverse o dotX.arrow) =!= Ɛ.id[X]
 
       override def sanityTest[X, Y](
         dotX: Automorphism[X],
         dotY: Automorphism[Y],
         f: X ~> Y
       ): Unit =
-        ???
+        given Ɛ.Dot[X] = dotX.theDot
+        given Ɛ.Dot[Y] = dotY.theDot
+        assert:
+          (dotY.arrow o f) =!= (f o dotX.arrow)
+
+      private def liftIdentity[X: Ɛ.Dot]: Automorphism[X] =
+        val identityX: X ~> X =
+          Ɛ.id[X]
+        new Automorphism[X](
+          identityX,
+          identityX
+        )
 
       override val unitDot: Automorphism[UNIT] =
-        ???
+        liftIdentity[UNIT]
 
       override val zeroDot: Automorphism[VOID] =
-        ???
+        liftIdentity[VOID]
 
       override val omegaDot: Automorphism[BEWL] =
-        ???
+        liftIdentity[BEWL]
 
       override def toUnit[X](
         dotX: Automorphism[X]
       ): X ~> UNIT =
-        ???
+        given Ɛ.Dot[X] = dotX.theDot
+        Ɛ.toUnit[X]
 
       override def fromZero[X](
         dotX: Automorphism[X]
-      ): VOID ~> X = ???
+      ): VOID ~> X =
+        given Ɛ.Dot[X] = dotX.theDot
+        Ɛ.fromZero[X]
 
       override val truth: UNIT ~> BEWL =
-        ???
+        Ɛ.truth
 
       override def enumerateMorphisms[X, Y](
         dotX: Automorphism[X],
@@ -122,6 +140,8 @@ trait ToposOfAutomorphisms[
         dotY: Automorphism[Y],
         toolkitY: Unit
       ): Iterable[X ~> Y] =
+        given Ɛ.Dot[X] = dotX.theDot
+        given Ɛ.Dot[Y] = dotY.theDot
         ???
 
       override def evaluation[X, Y](
