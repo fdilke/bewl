@@ -5,7 +5,7 @@ import com.fdilke.bewl2.topos.GenericToposSpec
 
 import Sets.{ Automorphism => Permutation }
 
-abstract class ToposOfAutomorphismsSpec
+class ToposOfAutomorphismsSpec
   extends GenericToposSpec[
     Permutation,
     [A] =>> A,
@@ -22,28 +22,27 @@ abstract class ToposOfAutomorphismsSpec
   override type BAR = Int
   override type BAZ = String
 
-  val Seq(a, b, c, d) =
-    Seq("a", "b", "c", "d").map:
-      Symbol(_)
-
-  private val fooPermutation: Permutation[FOO] =
-    Sets.withDot(Set(a, b, c, d)):
-      Permutation[Symbol]:
-        Map(a -> c, b -> d, c -> a, d -> b)
-
-  private val barPermutation: Permutation[BAR] =
-    Sets.withDot(Set(1,2)):
-      Permutation[Int]:
-        Map(1 -> 2, 2 -> 1)
-
-  private val bazPermutation: Permutation[BAZ] =
-    Sets.withDot(Set("x", "y", "z", "w")):
-      Permutation[String]:
-        Map("x" -> "y", "y" -> "x", "z" -> "z", "w" -> "w")
-
   override def withTestDots(
     block: Dot[FOO] ?=> Dot[BAR] ?=> Dot[BAZ] ?=> ToposFixtures => Unit
   ): Unit =
+    val Seq(a, b, c, d) =
+      Seq("a", "b", "c", "d").map:
+        Symbol(_)
+
+    val fooPermutation: Permutation[FOO] =
+      Sets.withDot(Set(a, b, c, d)):
+        Permutation[Symbol]:
+          Map(a -> c, b -> d, c -> a, d -> b)
+
+    val barPermutation: Permutation[BAR] =
+      Sets.withDot(Set(1, 2)):
+        Permutation[Int]:
+          Map(1 -> 2, 2 -> 1)
+
+    val bazPermutation: Permutation[BAZ] =
+      Sets.withDot(Set("x", "y", "z", "w")):
+        Permutation[String]:
+          Map("x" -> "y", "y" -> "x", "z" -> "z", "w" -> "w")
     withDots(
       fooPermutation,
       barPermutation,
@@ -99,6 +98,6 @@ abstract class ToposOfAutomorphismsSpec
             )
             
           override val isomorphismSituation: IsomorphismSituation[_, _] =
-            IsomorphismSituation[Symbol, String]:
-              Map(a -> "x", b -> "z", c -> "y",  d -> "w")
+            IsomorphismSituation[Symbol, (Int, Int)]:
+              Map(a -> (1, 2), b -> (1, 1), c -> (2, 1),  d -> (2, 2))
 

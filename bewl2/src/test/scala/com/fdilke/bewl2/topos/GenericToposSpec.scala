@@ -198,6 +198,8 @@ abstract class GenericToposSpec[
           val theInverse: T ~> S =
           isomorphism.inverse
           assert:
+            theInverse.isIso
+          assert:
             (theInverse o isomorphism) =!= id[S]
           assert:
             (isomorphism o theInverse) =!= id[T]
