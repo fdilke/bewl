@@ -275,6 +275,13 @@ class BaseSets extends Topos[
           block[Seq[Int]]
         }
         
+  override lazy val monicVerifier: MonicVerifier =
+    new MonicVerifier:
+      override def isMonic[X: Dot, Y: Dot](
+        arrow: X ~> Y
+      ): Boolean =
+        dot[X].map(arrow).size == dot[X].size
+
   override lazy val epicVerifier: EpicVerifier =
     new EpicVerifier:
       override def isEpic[X: Dot, Y: Dot](

@@ -441,9 +441,7 @@ class Topos[
       \ singleton[X]
       
     def isMonic: Boolean =
-      ∀[(X, X)]:
-        case x1 ⊕ x2 =>
-          (f(x1) =?= f(x2)) → (x1 =?= x2)
+      monicVerifier.isMonic(f)
 
     def isEpic: Boolean =
       epicVerifier.isEpic(f)
@@ -470,6 +468,23 @@ class Topos[
             monic = equalizer.inclusion
           )
 
+  trait MonicVerifier:
+    def isMonic[X: Dot, Y: Dot](
+      arrow: X ~> Y
+    ): Boolean
+
+  object DefaultMonicVerifier extends MonicVerifier:
+    override def isMonic[X: Dot, Y: Dot](
+      f: X ~> Y
+    ): Boolean =
+      ∀[(X, X)]:
+        case x1 ⊕ x2 =>
+          (f(x1) =?= f(x2)) →
+            (x1 =?= x2)
+
+  lazy val monicVerifier: MonicVerifier =
+    DefaultMonicVerifier
+
   trait EpicVerifier:
     def isEpic[X: Dot, Y: Dot](
       arrow: X ~> Y
@@ -477,11 +492,11 @@ class Topos[
 
   object DefaultEpicVerifier extends EpicVerifier:
     override def isEpic[X: Dot, Y: Dot](
-      arrow: X ~> Y
+      f: X ~> Y
     ): Boolean =
       ∀[Y]:
         ∃[Y, X]:
-          _ =?= arrow(_)
+          _ =?= f(_)
 
   lazy val epicVerifier: EpicVerifier =
     DefaultEpicVerifier

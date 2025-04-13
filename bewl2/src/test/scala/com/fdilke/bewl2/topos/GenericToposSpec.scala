@@ -285,6 +285,17 @@ abstract class GenericToposSpec[
             assert:
               heytingAlgebras.isMorphism(reallyBewl)
 
+    test("overrides the monic verifier correctly, if at all"):
+      if !(monicVerifier eq DefaultMonicVerifier) then
+        def checkMonics[A: Dot, B: Dot]: Unit =
+          morphisms[A, B].foreach: arrow =>
+            assert:
+              arrow.isMonic == DefaultMonicVerifier.isMonic(arrow)
+        checkMonics[FOO, BAR]
+        checkMonics[BAR, FOO]
+        checkMonics[FOO, FOO]
+        checkMonics[BEWL, BEWL]
+
     test("overrides the epic verifier correctly, if at all"):
       if !(epicVerifier eq DefaultEpicVerifier) then
         def checkEpics[A: Dot, B: Dot]: Unit =
