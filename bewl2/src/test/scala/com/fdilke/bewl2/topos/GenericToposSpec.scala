@@ -286,17 +286,16 @@ abstract class GenericToposSpec[
               heytingAlgebras.isMorphism(reallyBewl)
 
     test("overrides the epic verifier correctly, if at all"):
-      if !(epicVerifier.isInstanceOf[DefaultEpicVerifier]) then
-        val defaultEpicVerifier: EpicVerifier = 
-          new DefaultEpicVerifier
+      if !(epicVerifier eq DefaultEpicVerifier) then
         def checkEpics[A: Dot, B: Dot]: Unit =
           morphisms[A, B].foreach: arrow =>
             assert:
-              arrow.isEpic == defaultEpicVerifier.isEpic(arrow)
+              arrow.isEpic == DefaultEpicVerifier.isEpic(arrow)
         checkEpics[FOO, BAR]
         checkEpics[BAR, FOO]
         checkEpics[FOO, FOO]
-            
+        checkEpics[BEWL, BEWL]
+
     test("overrides the automorphism finder correctly, if at all"):
       if ! autoFinder.isInstanceOf[DefaultAutomorphismFinder] then
         val defaultAutoFinder: AutomorphismFinder = 

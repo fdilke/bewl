@@ -475,7 +475,7 @@ class Topos[
       arrow: X ~> Y
     ): Boolean
 
-  class DefaultEpicVerifier extends EpicVerifier:
+  object DefaultEpicVerifier extends EpicVerifier:
     override def isEpic[X: Dot, Y: Dot](
       arrow: X ~> Y
     ): Boolean =
@@ -484,7 +484,7 @@ class Topos[
           _ =?= arrow(_)
 
   lazy val epicVerifier: EpicVerifier =
-    new DefaultEpicVerifier
+    DefaultEpicVerifier
 
   inline final def singleton[X: Dot]: X ~> (X > BEWL) =
     summon[Dot[X]].singleton
