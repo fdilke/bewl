@@ -218,22 +218,20 @@ class BaseSets extends Topos[
         i * carrierSize + j
       )
 
-    withDot(carrierAsList.toSet) {
+    withDot(carrierAsList.toSet):
       val binOp = makeBinaryOperator[G](mappings: _*)
       val theUnit: G = table.head
       given Group[G] =
         Group[G](
           unit = makeNullaryOperator[G](theUnit),
           multiply = binOp,
-          inverse = { (g: G) =>
-            carrierAsList.find { h =>
-              binOp((g, h)) == theUnit
-            }.get
-          }
+          inverse =
+            (g: G) =>
+              carrierAsList.find: h =>
+                binOp((g, h)) == theUnit
+              .get
         )
-
       block
-    }
 
   override lazy val logicalOperations: LogicalOperations =
     new LogicalOperations:
@@ -295,7 +293,7 @@ class BaseSets extends Topos[
       override def partialArrowClassifier[X: Dot]: PartialArrowClassifier[X, Option[X]] =
         withDot(
           dot[X].map(Some[X]) + None
-        ) {
+        ):
           new PartialArrowClassifier[X, Option[X]]:
             override val some: X ~> Option[X] =
               x => Some(x)
@@ -306,10 +304,9 @@ class BaseSets extends Topos[
               arrow: V ~> X
             ): W ~> Option[X] =
               w =>
-                dot[V].find {
-                  v => monic(v) == w
-                }.map(arrow)
-        }
+                dot[V].find: v =>
+                  monic(v) == w
+                .map(arrow)
 
 object SetsWithSlowActions extends BaseSets
 
