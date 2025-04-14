@@ -114,17 +114,15 @@ trait AlgebraicConstructions[
     override def withAutomorphismGroup[X : Dot, RESULT](
       block: [A] => Dot[A] ?=> (group: Group[A]) ?=> group.Action[X] ?=> RESULT
     ): RESULT =
-      withEndomorphismMonoid[X, RESULT] {
+      withEndomorphismMonoid[X, RESULT]:
         [E] => (_: Dot[E]) ?=> (monoid: Monoid[E]) ?=> (action: monoid.Action[X]) ?=>
-        withGroupOfUnits[E, RESULT] {
+        withGroupOfUnits[E, RESULT]:
           [A] => (_: Dot[A]) ?=> (group: Group[A]) ?=> (embed: A ~> E) =>
             // ??? : RESULT
             given group.Action[X] = group.Action[X] { case x ⊕ a =>
               action.actionMultiply(x, embed(a))
             }
             block[A]
-          }
-        }
 
 // Constructions specific to Sets (and maybe other topoi) live here
 object AlgebraicConstructions:
@@ -136,7 +134,7 @@ object AlgebraicConstructions:
   ): R =
     Sets.withDotMask[Int, R](
       dot = 0 until order toSet
-    ) {
+    ):
       [I] => (_: Sets.Dot[I]) ?=> (_: I =:= Int) ?=> (_: Int =:= I) ?=>
         given Sets.Group[I] =
           new Sets.Group[I](
@@ -145,47 +143,53 @@ object AlgebraicConstructions:
             { (i: I) => (order - i) % order }
           )
         block[I]
-    }
 
   def withSymmetricGroupNoAction[RESULT](
     degree: Int
   )(
     block: (seqs: Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=> RESULT
   ): RESULT =
-    val symbols: Seq[Int] = (0 until degree)
+    val symbols: Seq[Int] = 
+      (0 until degree)
     Sets.withDot(
       symbols.permutations.toSet[Seq[Int]]
-    ) {
+    ):
       given Sets.Group[Seq[Int]] =
         Sets.Group[Seq[Int]](
-          unit = makeNullaryOperator[Seq[Int]](symbols),
-          multiply = { (p1: Seq[Int], p2: Seq[Int]) =>
-            symbols map { s => p2(p1(s)) }
-          },
-          inverse = { (p: Seq[Int]) =>
-            val array: Array[Int] = new Array[Int](degree)
-            symbols.foreach { s =>
-              array(p(s)) = s
-            }
-            array.toSeq
-          }
+          unit = 
+            makeNullaryOperator[Seq[Int]]:
+              symbols
+          ,
+          multiply =
+            (p1: Seq[Int], p2: Seq[Int]) =>
+              symbols map:
+                s => p2(p1(s))
+          ,
+          inverse =
+            (p: Seq[Int]) =>
+              val array: Array[Int] =
+                new Array[Int](degree)
+              symbols.foreach: s =>
+                array(p(s)) = s
+              array.toSeq
         )
       block
-    }
 
   def withSymmetricGroup[RESULT](
     degree: Int
   )(
-    block: (ints : Sets.Dot[Int], seqs: Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => RESULT
+    block: (
+      ints : Sets.Dot[Int], 
+      seqs: Sets.Dot[Seq[Int]], 
+      group: Sets.Group[Seq[Int]]
+    ) ?=> (action: group.Action[Int]) => RESULT
   ): RESULT =
-    withSymmetricGroupNoAction[RESULT](degree) { (_ : Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=>
+    withSymmetricGroupNoAction[RESULT](degree):
+      (_ : Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=>
       Sets.withDot(
         (0 until degree).toSet[Int]
-      ) {
-        block(
-          group.Action[Int] { (i, seq) =>
-            seq(i)
-          }          
-        )
-      }
-    }
+      ):
+        block:
+          group.Action[Int]: 
+            (i, seq) =>
+              seq(i)
