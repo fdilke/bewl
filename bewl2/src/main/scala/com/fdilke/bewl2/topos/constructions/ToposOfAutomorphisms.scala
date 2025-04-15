@@ -251,25 +251,17 @@ trait ToposOfAutomorphisms[
             given Ɛ.Dot[X] = dot[X].theDot
             given Ɛ.Dot[Y] = dot[Y].theDot
             Ɛ.monicVerifier.isMonic(f)
-        
-//        [X, Y] => (dotX: Automorphism[X]) ?=> (dotY: Automorphism[Y]) ?=>
-//          given Ɛ.Dot[X] = dotX.theDot
-//          given Ɛ.Dot[Y] = dotY.theDot
-//          (f: X ~> Y) => Ɛ.monicVerifier.isMonic(f)
-//        [X, Y] => (dotX: Automorphism[X]) ?=> (dotY: Automorphism[Y]) ?=>
-//          given Ɛ.Dot[X] = dotX.theDot
-//          given Ɛ.Dot[Y] = dotY.theDot
-//          (f: X ~> Y) => Ɛ.monicVerifier.isMonic(f)
 
-//      override lazy val epicVerifier: EpicVerifier =
-//        new EpicVerifier:
-//          override def isEpic[X: Dot, Y: Dot](
-//            arrow: X ~> Y
-//          ): Boolean =
-//            dot[X].map(arrow).size == dot[Y].size
+      override lazy val epicVerifier: EpicVerifier =
+        new EpicVerifier:
+          override def isEpic[X: Dot, Y: Dot](
+            f: X ~> Y
+          ): Boolean =
+            given Ɛ.Dot[X] = dot[X].theDot
+            given Ɛ.Dot[Y] = dot[Y].theDot
+            Ɛ.epicVerifier.isEpic(f)
 
   /*
-
     override lazy val autoFinder: AutomorphismFinder =
       new AutomorphismFinder:
         override def withAutomorphismGroup[X : Dot, RESULT](
