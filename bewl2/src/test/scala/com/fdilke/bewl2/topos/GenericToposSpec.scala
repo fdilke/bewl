@@ -132,7 +132,7 @@ abstract class GenericToposSpec[
     test("caches products"):
       val fooXbar1: Dot[(FOO, BAR)] =
         summon
-      val fooXbar2: Dot[(FOO, BAR)] = 
+      val fooXbar2: Dot[(FOO, BAR)] =
         summon
       assert:
         (fooXbar1.asInstanceOf[Object]) eq (fooXbar2.asInstanceOf[Object])
@@ -287,7 +287,8 @@ abstract class GenericToposSpec[
                 summon[Dot[BEWL]]
             given HeytingAlgebra[ALTBEWL] = altHeyting
             assert:
-              heytingAlgebras.isMorphism(reallyBewl)
+              heytingAlgebras.isMorphism:
+                reallyBewl
 
     test("overrides the monic verifier correctly, if at all"):
       if !(monicVerifier eq DefaultMonicVerifier) then
@@ -312,24 +313,23 @@ abstract class GenericToposSpec[
         checkEpics[BEWL, BEWL]
 
     test("overrides the automorphism finder correctly, if at all"):
-      if ! autoFinder.isInstanceOf[DefaultAutomorphismFinder] then
-        val defaultAutoFinder: AutomorphismFinder = 
-          new DefaultAutomorphismFinder
+      if ! (autoFinder eq DefaultAutomorphismFinder) then
         autoFinder.withAutomorphismGroup[FOO, Unit]:
           [A] => (_ : Dot[A]) ?=> (group: Group[A]) ?=> (actionA: group.Action[FOO]) ?=>
-          defaultAutoFinder.withAutomorphismGroup[FOO, Unit]:
+          DefaultAutomorphismFinder.withAutomorphismGroup[FOO, Unit]:
             [D] => (_ : Dot[D]) ?=> (groupD: Group[D]) ?=> (actionD: groupD.Action[FOO]) ?=>
               val groupIso: D ~> A = 
                 actionD.toExponent \
                   actionA.toExponent
               assert:
-                groups.isMorphism(groupIso)
+                groups.isMorphism:
+                  groupIso
               assert:
                 groupIso.isIso
               mask[FOO, groupD.Action, Unit](
                 actionA.induced(groupIso)
               ):
-                [F] => (actionF: groupD.Action[F]) => 
+                [F] => (actionF: groupD.Action[F]) =>
                   (f2foo : F =:= FOO) ?=> (foo2f : FOO =:= F) ?=>
                   given Dot[F] = 
                     foo2f.substituteCo[Dot]:
@@ -340,7 +340,8 @@ abstract class GenericToposSpec[
                   assert:
                     realFoo.isIso
                   assert:
-                    groupD.actions.isMorphism(realFoo)
+                    groupD.actions.isMorphism:
+                      realFoo
 
     test("overrides the optionator correctly, if at all"):
       if ! optionator.isInstanceOf[DefaultOptionator.type] then

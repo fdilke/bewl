@@ -103,14 +103,14 @@ trait AlgebraicConstructions[
     autoFinder.withAutomorphismGroup[X, RESULT](block)
 
   lazy val autoFinder: AutomorphismFinder =
-    new DefaultAutomorphismFinder
+    DefaultAutomorphismFinder
 
   trait AutomorphismFinder:
     def withAutomorphismGroup[X : Dot, RESULT](
       block: [A] => Dot[A] ?=> (group: Group[A]) ?=> group.Action[X] ?=> RESULT
     ): RESULT
 
-  class DefaultAutomorphismFinder extends AutomorphismFinder:
+  object DefaultAutomorphismFinder extends AutomorphismFinder:
     override def withAutomorphismGroup[X : Dot, RESULT](
       block: [A] => Dot[A] ?=> (group: Group[A]) ?=> group.Action[X] ?=> RESULT
     ): RESULT =
@@ -118,10 +118,9 @@ trait AlgebraicConstructions[
         [E] => (_: Dot[E]) ?=> (monoid: Monoid[E]) ?=> (action: monoid.Action[X]) ?=>
         withGroupOfUnits[E, RESULT]:
           [A] => (_: Dot[A]) ?=> (group: Group[A]) ?=> (embed: A ~> E) =>
-            // ??? : RESULT
-            given group.Action[X] = group.Action[X] { case x ⊕ a =>
-              action.actionMultiply(x, embed(a))
-            }
+            given group.Action[X] = group.Action[X]:
+              case x ⊕ a =>
+                action.actionMultiply(x, embed(a))
             block[A]
 
 // Constructions specific to Sets (and maybe other topoi) live here
