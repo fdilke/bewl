@@ -18,7 +18,7 @@ trait ToposOfAutomorphisms[
     arrow: A ~> A,
     inverse: A ~> A
   ):
-    val theDot: Dot[A] =
+    val theDot: Ɛ.Dot[A] =
       summon
 
   object Automorphism:
@@ -229,7 +229,7 @@ trait ToposOfAutomorphisms[
     BEWL,
     >
   ] =
-    new Topos[Automorphism, CTXT, VOID, UNIT, BEWL, >](
+    new Topos[Ɛ.Automorphism, CTXT, VOID, UNIT, BEWL, >](
       preAutoTopos
     ):
       override lazy val logicalOperations: LogicalOperations =
@@ -243,9 +243,31 @@ trait ToposOfAutomorphisms[
           override val falsity: NullaryOp[BEWL] =
             Ɛ.logicalOperations.falsity
 
-/*
-    :
-*/
+      override lazy val monicVerifier: MonicVerifier =
+        new MonicVerifier:
+          override def isMonic[X: Dot, Y: Dot](
+            f: X ~> Y
+          ): Boolean =
+            given Ɛ.Dot[X] = dot[X].theDot
+            given Ɛ.Dot[Y] = dot[Y].theDot
+            Ɛ.monicVerifier.isMonic(f)
+        
+//        [X, Y] => (dotX: Automorphism[X]) ?=> (dotY: Automorphism[Y]) ?=>
+//          given Ɛ.Dot[X] = dotX.theDot
+//          given Ɛ.Dot[Y] = dotY.theDot
+//          (f: X ~> Y) => Ɛ.monicVerifier.isMonic(f)
+//        [X, Y] => (dotX: Automorphism[X]) ?=> (dotY: Automorphism[Y]) ?=>
+//          given Ɛ.Dot[X] = dotX.theDot
+//          given Ɛ.Dot[Y] = dotY.theDot
+//          (f: X ~> Y) => Ɛ.monicVerifier.isMonic(f)
+
+//      override lazy val epicVerifier: EpicVerifier =
+//        new EpicVerifier:
+//          override def isEpic[X: Dot, Y: Dot](
+//            arrow: X ~> Y
+//          ): Boolean =
+//            dot[X].map(arrow).size == dot[Y].size
+
   /*
 
     override lazy val autoFinder: AutomorphismFinder =
@@ -280,20 +302,6 @@ trait ToposOfAutomorphisms[
             }
             block[Seq[Int]]
           }
-
-    override lazy val monicVerifier: MonicVerifier =
-      new MonicVerifier:
-        override def isMonic[X: Dot, Y: Dot](
-          arrow: X ~> Y
-        ): Boolean =
-          dot[X].map(arrow).size == dot[X].size
-
-    override lazy val epicVerifier: EpicVerifier =
-      new EpicVerifier:
-        override def isEpic[X: Dot, Y: Dot](
-          arrow: X ~> Y
-        ): Boolean =
-          dot[X].map(arrow).size == dot[Y].size
 
     override val optionator: Optionator =
       new Optionator:
