@@ -67,40 +67,39 @@ trait AlgebraicConstructions[
       val mm_to_1: (M, M) ~> M =
         monoid.unit o toUnit[(M, M)]
       (mm_to_1 x mm_to_1)
-    doubleProduct.?=(oneOne) {
+    doubleProduct.?=(oneOne):
       [G] => (_: Dot[G]) ?=> (equalizer: Equalizer[G, (M, M)]) =>
         given Group[G] =
           new Group(
             unit = equalizer.restrict[UNIT](
               monoid.unit x monoid.unit
             ),
-            multiply = equalizer.restrict[G, G] { (g, h) =>
+            multiply = equalizer.restrict[G, G]: (g, h) =>
               val c_m_m__n_n_ : CTXT[((M, M), (M, M))] =
                 equalizer.inclusion(g) ⊕
                 equalizer.inclusion(h)
-                
-              monoid.multiply(c_m_m__n_n_.map {
-                case ((m, m_), (n, n_)) => (m, n)
-              }) ⊕
-              monoid.multiply(c_m_m__n_n_.map {
-                case ((m, m_), (n, n_)) => (n_, m_)
-              })
-            },
-            inverse = equalizer.restrict[G] { (g: CTXT[G]) =>
-              equalizer.inclusion(g).map {
+              monoid.multiply:
+                c_m_m__n_n_.map:
+                  case ((m, m_), (n, n_)) => (m, n)
+              ⊕
+              monoid.multiply:
+                c_m_m__n_n_.map:
+                  case ((m, m_), (n, n_)) => (n_, m_)
+            ,
+            inverse = equalizer.restrict[G]: (g: CTXT[G]) =>
+              equalizer.inclusion(g).map:
                 case (m, n) => (n, m)
-              }
-            }
           )
         val embed: G ~> M =
           π0[M, M] o equalizer.inclusion
-        block[G](embed)
-    }
+        block[G]:
+          embed
 
   final inline def withAutomorphismGroup[X : Dot, RESULT](
     block: [A] => Dot[A] ?=> (group: Group[A]) ?=> group.Action[X] ?=> RESULT
   ): RESULT =
-    autoFinder.withAutomorphismGroup[X, RESULT](block)
+    autoFinder.withAutomorphismGroup[X, RESULT]:
+      block
 
   lazy val autoFinder: AutomorphismFinder =
     DefaultAutomorphismFinder
