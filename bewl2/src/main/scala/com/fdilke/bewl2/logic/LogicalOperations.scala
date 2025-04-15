@@ -22,10 +22,9 @@ trait LogicalOperations[
     val falsity: NullaryOp[BEWL]
   }
 
-  class DefaultLogicalOperations extends LogicalOperations {
-
+  object DefaultLogicalOperations extends LogicalOperations:
     override val and: BiArrow[BEWL, BEWL, BEWL] =
-      truth.x(truth).chi
+      (truth x truth).chi
 
     override val implies: BiArrow[BEWL, BEWL, BEWL] =
       =?=[BEWL].apply[(BEWL, BEWL)](
@@ -34,19 +33,16 @@ trait LogicalOperations[
       )
 
     override val or: BiArrow[BEWL, BEWL, BEWL] =
-      ∀[(BEWL, BEWL), BEWL] {
+      ∀[(BEWL, BEWL), BEWL]:
         case (a ⊕ b) ⊕ ω =>
           (a → ω ∧ (b → ω)) → ω
-      }
 
     override val falsity: NullaryOp[BEWL] =
-      ∀[UNIT, BEWL] {
+      ∀[UNIT, BEWL]:
         (_, ω) => ω
-      }
-  }
 
   lazy val logicalOperations: LogicalOperations =
-    new DefaultLogicalOperations
+    DefaultLogicalOperations
 
   lazy implicit val omega: HeytingAlgebra[BEWL] =
     new HeytingAlgebra[BEWL](

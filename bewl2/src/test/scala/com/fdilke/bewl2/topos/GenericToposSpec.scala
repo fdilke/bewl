@@ -267,15 +267,14 @@ abstract class GenericToposSpec[
         (monicBar2baz o restriction) =!= foo2ImageOfBar
     
     test("overrides the logops driver correctly, if at all"):
-      if !(logicalOperations.isInstanceOf[DefaultLogicalOperations]) then
-        val defaultLogOps: LogicalOperations = new DefaultLogicalOperations
+      if !(logicalOperations eq DefaultLogicalOperations) then
         val heyting: HeytingAlgebra[BEWL] =
           new HeytingAlgebra[BEWL](
-            defaultLogOps.falsity,
+            DefaultLogicalOperations.falsity,
             truth,
-            defaultLogOps.and,
-            defaultLogOps.or,
-            defaultLogOps.implies
+            DefaultLogicalOperations.and,
+            DefaultLogicalOperations.or,
+            DefaultLogicalOperations.implies
           )
         mask[BEWL, HeytingAlgebra, Unit](heyting): 
           [ALTBEWL] => (altHeyting: HeytingAlgebra[ALTBEWL]) =>
@@ -285,7 +284,8 @@ abstract class GenericToposSpec[
             given Dot[ALTBEWL] =
               summon[BEWL =:= ALTBEWL].substituteCo[Dot]:
                 summon[Dot[BEWL]]
-            given HeytingAlgebra[ALTBEWL] = altHeyting
+            given HeytingAlgebra[ALTBEWL] =
+              altHeyting
             assert:
               heytingAlgebras.isMorphism:
                 reallyBewl
@@ -344,7 +344,7 @@ abstract class GenericToposSpec[
                       realFoo
 
     test("overrides the optionator correctly, if at all"):
-      if ! optionator.isInstanceOf[DefaultOptionator.type] then
+      if ! (optionator eq DefaultOptionator) then
         type D_OPTION[X] = DefaultOptionator.OPTION[X]
         maskDot[FOO, Unit]:
           [F] => (_ : Dot[F]) ?=> (_ : F =:= FOO) ?=> (_ : FOO =:= F) ?=>
