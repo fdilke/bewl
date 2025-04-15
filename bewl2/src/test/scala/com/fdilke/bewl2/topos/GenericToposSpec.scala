@@ -127,17 +127,20 @@ abstract class GenericToposSpec[
 
     test("distinguishes projection arrows"):
       assert:
-        π0[FOO, FOO] =!!= π1[FOO, FOO]
+        π0[FOO, FOO] !=!= π1[FOO, FOO]
 
     test("caches products"):
-      val fooXbar1: Dot[(FOO, BAR)] = summon[Dot[(FOO, BAR)]]
-      val fooXbar2: Dot[(FOO, BAR)] = summon[Dot[(FOO, BAR)]]
+      val fooXbar1: Dot[(FOO, BAR)] =
+        summon
+      val fooXbar2: Dot[(FOO, BAR)] = 
+        summon
       assert:
         (fooXbar1.asInstanceOf[Object]) eq (fooXbar2.asInstanceOf[Object])
 
     test("the unit object behaves"):
       sanityTest[UNIT]
-      val fooTo1: FOO ~> UNIT = toUnit[FOO]
+      val fooTo1: FOO ~> UNIT =
+        toUnit[FOO]
       fooTo1.sanityTest
 
       val arrows: Iterable[FOO ~> UNIT] = morphisms[FOO, UNIT]
@@ -150,7 +153,8 @@ abstract class GenericToposSpec[
 
     test("the zero object behaves"):
       sanityTest[VOID]
-      val barFrom0: VOID ~> BAR = fromZero[BAR]
+      val barFrom0: VOID ~> BAR =
+        fromZero[BAR]
       barFrom0.sanityTest
 
       val arrows: Iterable[VOID ~> BAR] = morphisms[VOID, BAR]
@@ -318,20 +322,25 @@ abstract class GenericToposSpec[
               val groupIso: D ~> A = 
                 actionD.toExponent \
                   actionA.toExponent
-              assert { groups.isMorphism(groupIso) }
-              assert { groupIso.isIso }
+              assert:
+                groups.isMorphism(groupIso)
+              assert:
+                groupIso.isIso
               mask[FOO, groupD.Action, Unit](
                 actionA.induced(groupIso)
               ):
-                [F] => (actionF: groupD.Action[F]) => (f2foo : F =:= FOO) ?=> (foo2f : FOO =:= F) ?=>
+                [F] => (actionF: groupD.Action[F]) => 
+                  (f2foo : F =:= FOO) ?=> (foo2f : FOO =:= F) ?=>
                   given Dot[F] = 
                     foo2f.substituteCo[Dot]:
                       summon[Dot[FOO]]
                   val realFoo: F ~> FOO = 
                     f2foo.substituteCo[CTXT]
                   given groupD.Action[F] = actionF
-                  assert { realFoo.isIso }
-                  assert { groupD.actions.isMorphism(realFoo) }
+                  assert:
+                    realFoo.isIso
+                  assert:
+                    groupD.actions.isMorphism(realFoo)
 
     test("overrides the optionator correctly, if at all"):
       if ! optionator.isInstanceOf[DefaultOptionator.type] then
@@ -356,7 +365,11 @@ abstract class GenericToposSpec[
                 some[FOO],
                 foo2f
               )
-            assert { extend.isIso }
-            assert { extendInv.isIso }
-            assert { (extend o extendInv) =!= id[OPTION[FOO]] }
-            assert { (extendInv o extend) =!= id[D_OPTION[F]] }
+            assert:
+              extend.isIso
+            assert:
+              extendInv.isIso
+            assert:
+              (extend o extendInv) =!= id[OPTION[FOO]]
+            assert:
+              (extendInv o extend) =!= id[D_OPTION[F]]

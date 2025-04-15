@@ -404,7 +404,7 @@ class Topos[
     ): Boolean =
       pretopos.equalArrows(dot[X], dot[Y], f, f2)
       
-    inline def =!!=(
+    inline def !=!=(
       f2: X ~> Y
     ): Boolean =
       !(this =!= f2)

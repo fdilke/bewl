@@ -4,6 +4,8 @@ import com.fdilke.bewl2.algebra.AlgebraicMachinery
 import com.fdilke.bewl2.topos.{PreToposWithDefaultToolkit, ProductMappable, Topos}
 import ProductMappable.*
 
+import scala.language.postfixOps
+
 trait ToposOfAutomorphisms[
   DOT[_],
   CTXT[_]: ProductMappable,
@@ -28,6 +30,11 @@ trait ToposOfAutomorphisms[
       Automorphism[A](
         arrow,
         arrow.inverse
+      )
+    def id[A: Dot]: Automorphism[A] =
+      Automorphism[A](
+        Ɛ.id[A],
+        Ɛ.id[A]
       )
 
   private object preAutoTopos extends PreToposWithDefaultToolkit[Automorphism, CTXT, VOID, UNIT, BEWL, >]:
@@ -261,7 +268,29 @@ trait ToposOfAutomorphisms[
             given Ɛ.Dot[Y] = dot[Y].theDot
             Ɛ.epicVerifier.isEpic(f)
 
-  /*
+      override lazy val autoFinder: AutomorphismFinder =
+        new AutomorphismFinder:
+          override def withAutomorphismGroup[X: Dot, RESULT](
+            block: [A] => Dot[A] ?=>
+              (group: Group[A]) ?=> group.Action[X] ?=> RESULT
+          ): RESULT =
+            given Ɛ.Dot[X] = dot[X].theDot
+            Ɛ.autoFinder.withAutomorphismGroup[X, RESULT]:
+              [A] => (_: Ɛ.Dot[A]) ?=> (group: Ɛ.Group[A]) ?=> (action: group.Action[X]) ?=>
+              withDot(
+                Ɛ.Automorphism.id[A]
+              ):
+                implicit val autoGroup: Group[A] =
+                  Group[A](
+                    unit = group.unit,
+                    multiply = group.multiply,
+                    inverse = group.inverse
+                  )
+                given autoGroup.Action[X] =
+                  new autoGroup.Action[X](action.actionMultiply)
+                block[A]
+
+/*
     override lazy val autoFinder: AutomorphismFinder =
       new AutomorphismFinder:
         override def withAutomorphismGroup[X : Dot, RESULT](
