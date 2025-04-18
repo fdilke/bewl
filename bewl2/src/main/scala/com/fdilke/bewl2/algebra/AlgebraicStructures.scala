@@ -124,7 +124,8 @@ trait AlgebraicStructures[
     )(
       block: Action[A] ?=> RESULT
     ): RESULT =
-      given Action[A] = Action[A](actionMultiply)
+      given Action[A] =
+        Action[A](actionMultiply)
       block
 
     def withRegularAction[RESULT](
@@ -136,15 +137,15 @@ trait AlgebraicStructures[
     def withTrivialAction[A: Dot, RESULT](
        block: Action[A] ?=> RESULT
     ): RESULT =
-      given Action[A] = Action[A]{ case a ⊕ _ => a }
+      given Action[A] = Action[A]:
+        case a ⊕ _ => a
       block
 
     def withVoidAction[RESULT](
       block: Action[VOID] ?=> RESULT
     ): RESULT =
-      withTrivialAction[VOID, RESULT] {
+      withTrivialAction[VOID, RESULT]:
         block
-      }
 
     class Action[A: Dot](
       val actionMultiply: BiArrow[A, M, A]
@@ -158,43 +159,44 @@ trait AlgebraicStructures[
         that: Action[B]
       ): Action[(A, B)] =
         val product = (this: actions.Algebra[A]) x that
-        new Action[(A, B)](
+        Action[(A, B)]:
           product.operatorAssignments.lookup(**).get
-        )
 
       def induced[G: Dot](
         morphism: G ~> M
       )(
         implicit group: Group[G]
       ): group.Action[A] =
-        group.Action[A]{ case a ⊕ g =>
-          actionMultiply(a, morphism(g))
-        }
+        group.Action[A]:
+          case a ⊕ g =>
+            actionMultiply(a, morphism(g))
 
       def preserving[Q: Dot, RESULT](
         arrow: A ~> Q
       ) (
         block: [P] => (dotP : Dot[P]) ?=> (groupP: Group[P]) ?=> (embed: P ~> M) => RESULT
       ) (
-        implicit groupM: Group[M] // note, this is a kludge
+        implicit groupM: Group[M] // note, this is a kludge. Better way to express that it's a group?
       ): RESULT =
-        ∀[M, A] { (m, a) =>
+        ∀[M, A]:(m, a) =>
           arrow(a) =?= arrow(actionMultiply(a, m))
-        } whereTrue { [P] => (dotP: Dot[P]) ?=> (equalizer: Equalizer[P, M]) =>
+        .whereTrue:
+          [P] => (dotP: Dot[P]) ?=> (equalizer: Equalizer[P, M]) =>
           implicit val groupP: Group[P] = new Group[P](
-            unit = equalizer.restrict(groupM.unit),
-            multiply = equalizer.restrict { (p, q) => 
-              groupM.multiply(
-                equalizer.inclusion(p),
-                equalizer.inclusion(q)
-              )
-            },
-            inverse = equalizer.restrict { p =>
-              groupM.inverse(equalizer.inclusion(p))
-            }
+            unit =
+              equalizer.restrict(groupM.unit),
+            multiply =
+              equalizer.restrict: (p, q) =>
+                groupM.multiply(
+                  equalizer.inclusion(p),
+                  equalizer.inclusion(q)
+                )
+            ,
+            inverse = equalizer.restrict: p =>
+              groupM.inverse:
+                equalizer.inclusion(p)
           )
           block[P](equalizer.inclusion)
-        }
 
       def toExponent: M ~> (A > A) =
         transpose[M, A, A] { case m ⊕ a => 
