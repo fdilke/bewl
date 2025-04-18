@@ -399,53 +399,50 @@ class AlgebraicStructuresSpec extends FunSuite:
     }
 
   test("A group action can be induced from a monoid one via a morphism"):
-    withCyclicGroup(4) { [I] => (_: Dot[I]) ?=> (i2int : I =:= Int) ?=> (_ : Int =:= I) ?=> (groupI : Group[I]) ?=>
-      withCyclicGroup(4) { [J] => (_: Dot[J]) ?=>(_: J =:= Int) ?=> (int2j: Int =:= J) ?=> (groupJ: Group[J]) ?=>
-        val iToJ: I => J = { x =>
-          transmute[I, Int, J](groupI.multiply(x, x))
-        }
+    withCyclicGroup(4):
+      [I] => (_: Dot[I]) ?=> (i2int : I =:= Int) ?=> (_ : Int =:= I) ?=> (groupI : Group[I]) ?=>
+      withCyclicGroup(4):
+        [J] => (_: Dot[J]) ?=>(_: J =:= Int) ?=> (int2j: Int =:= J) ?=> (groupJ: Group[J]) ?=>
+        val iToJ: I => J =
+          x =>
+            transmute[I, Int, J](groupI.multiply(x, x))
         groups.isMorphism(iToJ) is true
-        groupJ.withMonoid{ (monoidJ: Monoid[J]) ?=>
-          monoidJ.withRegularAction { (actionJ: monoidJ.Action[J]) ?=>
+        groupJ.withMonoid:
+          (monoidJ: Monoid[J]) ?=>
+          monoidJ.withRegularAction:
+            (actionJ: monoidJ.Action[J]) ?=>
             val actionI: groupI.Action[J] = actionJ.induced(iToJ)
             actionI.sanityTest
             actionI.actionMultiply(1, 3) is 3
-          }
-        }
-      }
-    }
 
   test("Pick out the subgroup preserving an arrow from an action"):
     withDots(
       Set[String]("a", "b"),
       Set[Int](0, 1)
     ):
-      withAutomorphismGroup[(String, Int), Unit] {
+      withAutomorphismGroup[(String, Int), Unit]:
         [A] => (_ : Dot[A]) ?=> (group: Group[A]) ?=> (action: group.Action[(String, Int)]) ?=>
         action.preserving(
           π0[String, Int]
-        ) { [P] => (_ : Dot[P]) ?=> (groupP: Group[P]) ?=> (embed: P => A) =>
+        ):
+          [P] => (_ : Dot[P]) ?=> (groupP: Group[P]) ?=> (embed: P => A) =>
           groupP.sanityTest
           dot[P].size is 4
           // dot[P].map(embed) is Set[Seq[Int]]( Seq(0, 1, 2), Seq(1, 2, 0), Seq(2, 0, 1) )
           action.induced[P](embed).sanityTest
-        }
-      }
 
   test("The action machinery for monoids also works with groups"):
-    withCyclicGroup(order = 6) { [Int6] => (_: Dot[Int6]) ?=> (_: Int6 =:= Int) ?=> (_: Int =:= Int6) ?=> (group6: Group[Int6]) ?=>
+    withCyclicGroup(order = 6):
+      [Int6] => (_: Dot[Int6]) ?=> (_: Int6 =:= Int) ?=> (_: Int =:= Int6) ?=> (group6: Group[Int6]) ?=>
       withDot(Set[Int](0, 1)):
-        group6.withAction[Int, Unit] {
-          case (a: Int, m: Int6) => (a + m) % 2
-        } {
+        group6.withAction[Int, Unit](
+          (a: Int, m: Int6) => (a + m) % 2
+        ):
           summon[group6.Action[Int]].sanityTest
-          group6.withRegularAction {
-            group6.actions.isMorphism[Int6, Int] {
+          group6.withRegularAction:
+            group6.actions.isMorphism[Int6, Int](
               _ % 2
-            } is true
-          }
-        }
-    }
+            ) is true
 
   test("Lattices can be defined and verified"):
     withDot(0 to 7 toSet : Set[Int]):
@@ -481,16 +478,15 @@ class AlgebraicStructuresSpec extends FunSuite:
         ).sanityTest
 
   test("Can use infix * for multiplication in the context of a group"):
-    withMonoidOf3 { (_: Dot[Symbol]) ?=> (monoidOf3: Monoid[Symbol]) ?=>
+    withMonoidOf3:
+      (_: Dot[Symbol]) ?=> (monoidOf3: Monoid[Symbol]) ?=>
       (x * i) is x
       (x * y) is y
-    }
 
   test("Can use infix * for multiplication and unary ~ for inversion in the context of a group"):
-    withSymmetricGroup(3) { (ints : Sets.Dot[Int], seqs: Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) => 
+    withSymmetricGroup(3):
+      (ints : Sets.Dot[Int], seqs: Sets.Dot[Seq[Int]], group: Sets.Group[Seq[Int]]) ?=> (action: group.Action[Int]) =>
       val a: Seq[Int] = Seq(1, 0, 2)
       val b: Seq[Int] = Seq(0, 2, 1)
       (a * b) is Seq(2, 0, 1)
       ~(a * b) is Seq(1, 2, 0)
-    }
-  
