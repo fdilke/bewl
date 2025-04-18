@@ -61,10 +61,10 @@ trait LogicalOperations[
 
   implicit class BewlOps(ω: CTXT[BEWL]):
     inline def →(that: CTXT[BEWL]) =
-      omega.implies(ω, that)
+      logicalOperations.implies(ω, that)
 
     inline def ∧(that: CTXT[BEWL]) =
-      omega.meet(ω, that)
+      logicalOperations.and(ω, that)
 
     inline def ∨(that: CTXT[BEWL]) =
-      omega.join(ω, that)
+      logicalOperations.or(ω, that)
