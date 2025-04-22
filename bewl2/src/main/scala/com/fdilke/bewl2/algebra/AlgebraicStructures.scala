@@ -14,7 +14,7 @@ trait AlgebraicStructures[
   UNIT,
   BEWL,
   >[_, _]
-] extends AlgebraicTheories[DOT, CTXT, VOID, UNIT, BEWL, >] {
+] extends AlgebraicTheories[DOT, CTXT, VOID, UNIT, BEWL, >]:
   topos: Topos[DOT, CTXT, VOID, UNIT, BEWL, >] =>
 
   import StandardTermsAndOperators._
@@ -23,18 +23,17 @@ trait AlgebraicStructures[
 
   val groups: Variety =
     AlgebraicTheory(ι, !, *)(
-      "left unit" law {
+      "left unit" law:
         ι * α := α
-      },
-      "right unit" law {
+      ,
+      "right unit" law:
         α * ι := α
-      },
-      "left inverse" law {
+      ,
+      "left inverse" law:
         (!α) * α := ι
-      },
-      "associative" law {
+      ,
+      "associative" law:
         (α * β) * γ := α * (β * γ)
-      }
     )
 
   class Group[G: Dot](
@@ -53,16 +52,18 @@ trait AlgebraicStructures[
 
     def x[H: Dot]( // product sugar
       that: Group[H]
-    ): Group[(G, H)] = {
-      val product = (this: groups.Algebra[G]) x that
+    ): Group[(G, H)] =
+      val product: groups.Algebra[(G, H)] =
+        (this: groups.Algebra[G]) x that
       new Group[(G, H)](
-        product.operatorAssignments.lookup(ι).get,
-        product.operatorAssignments.lookup(*).get,
-        product.operatorAssignments.lookup(!).get
+        unit = product.operatorAssignments.lookup(ι).get,
+        multiply = product.operatorAssignments.lookup(*).get,
+        inverse = product.operatorAssignments.lookup(!).get
       )
-    }
+
     private lazy val asMonoid: Monoid[G] =
       new Monoid[G](unit, multiply)
+
     def withMonoid[RESULT](
       block: Monoid[G] ?=> RESULT
     ): RESULT =
@@ -73,7 +74,11 @@ trait AlgebraicStructures[
     inline def *(b: CTXT[M]): CTXT[M] =
       summon[Monoid[M]].multiply(a, b)
 
-  implicit class RichGroupElement[G: Dot: Group](a: CTXT[G]):
+  implicit class RichGroupElement[
+    G: Dot: Group
+  ](
+    a: CTXT[G]
+  ):
     inline def *(b: CTXT[G]): CTXT[G] =
       summon[Group[G]].multiply(a, b)
     inline def unary_~ =
@@ -196,17 +201,17 @@ trait AlgebraicStructures[
               groupM.inverse:
                 equalizer.inclusion(p)
           )
-          block[P](equalizer.inclusion)
+          block[P]:
+            equalizer.inclusion
 
       def toExponent: M ~> (A > A) =
-        transpose[M, A, A] { case m ⊕ a => 
-          actionMultiply(a, m)
-        }
+        transpose[M, A, A]:
+          case m ⊕ a =>
+            actionMultiply(a, m)
 
   extension(a: AlgebraicTheory[_]#Algebra[_])
-    def isCommutative = a.satisfies(
+    def isCommutative = a.satisfies:
       α * β := β * α
-    )
 
   val lattices: Variety =
     AlgebraicTheory(⊥, ⊤, ∨, ∧)(
@@ -255,4 +260,3 @@ trait AlgebraicStructures[
     ∨ := join,
     → := implies
   )
-}

@@ -82,7 +82,7 @@ object PreSets extends PreToposWithDefaultToolkit[Set, [A] =>> A, Void, Unit, Bo
     dotX: Set[X],
     dotY: Set[Y]
   ): ((X Map Y, X)) => Y =
-    (xMapY, x) => xMapY(x)
+    _(_)
 
   override def transpose[X, Y, Z](
     dotX: Set[X],
@@ -90,11 +90,9 @@ object PreSets extends PreToposWithDefaultToolkit[Set, [A] =>> A, Void, Unit, Bo
     dotZ: Set[Z],
     xy2z: ((X, Y)) => Z
   ): X => (Y Map Z) =
-    x => Map.from(
-      dotY map { y =>
+    x => Map.from:
+      dotY map: y =>
         y -> xy2z( (x, y) )
-      }
-    )
 
   override def doEqualizer[X, Y, RESULT](
     dotX: Set[X],
@@ -105,7 +103,7 @@ object PreSets extends PreToposWithDefaultToolkit[Set, [A] =>> A, Void, Unit, Bo
     block: [A] => RawEqualizer[A, X] => Set[A] => RESULT
   ): RESULT =
     block[X](
-      new RawEqualizer[X, X] {
+      new RawEqualizer[X, X]:
         override val inclusion: X ~> X =
           identity[X]
 
@@ -114,11 +112,9 @@ object PreSets extends PreToposWithDefaultToolkit[Set, [A] =>> A, Void, Unit, Bo
           arrow: R ~> X
         ): R ~> X =
           arrow
-      }
     )(
-      dotX.filter { x =>
+      dotX.filter: x =>
         f(x) == f2(x)
-      }
     )
 
   override def chiForMonic[X, Y](
@@ -126,9 +122,9 @@ object PreSets extends PreToposWithDefaultToolkit[Set, [A] =>> A, Void, Unit, Bo
     dotY: Set[Y],
     monic: X => Y
   ): Y => Boolean =
-    y => dotX.exists { x =>
-      monic(x) == y
-    }
+    y =>
+      dotX.exists:
+        monic(_) == y
 
   override def backDivideMonic[X, Y, A](
     dotX: Set[X],
@@ -137,12 +133,11 @@ object PreSets extends PreToposWithDefaultToolkit[Set, [A] =>> A, Void, Unit, Bo
     arrow: X => Y,
     monic: A => Y
   ): X => A =
-    x => {
+    x =>
       val target: Y = arrow(x)
-      dotA.find { a =>
-        monic(a) == target
-      } get
-    }
+      dotA.find:
+        monic(_) == target
+      .get
 
 class BaseSets extends Topos[
   Set, [A] =>> A, Void, Unit, Boolean, Map

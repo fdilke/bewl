@@ -318,9 +318,14 @@ abstract class GenericToposSpec[
           [A] => (_ : Dot[A]) ?=> (group: Group[A]) ?=> (actionA: group.Action[FOO]) ?=>
           DefaultAutomorphismFinder.withAutomorphismGroup[FOO, Unit]:
             [D] => (_ : Dot[D]) ?=> (groupD: Group[D]) ?=> (actionD: groupD.Action[FOO]) ?=>
-              val groupIso: D ~> A = 
+              assert:
+                actionD.toExponent.isMonic
+              assert:
+                actionA.toExponent.isMonic
+              val groupIso: D ~> A =
                 actionD.toExponent \
                   actionA.toExponent
+              groupIso.sanityTest
               assert:
                 groups.isMorphism:
                   groupIso
@@ -336,6 +341,7 @@ abstract class GenericToposSpec[
                       summon[Dot[FOO]]
                   val realFoo: F ~> FOO = 
                     f2foo.substituteCo[CTXT]
+                  realFoo.sanityTest
                   given groupD.Action[F] = actionF
                   assert:
                     realFoo.isIso

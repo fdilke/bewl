@@ -377,26 +377,21 @@ class AlgebraicStructuresSpec extends FunSuite:
     }
 
   test("Groups verify explicitly that S_3 is not commutative"):
-    with_S_3 {
+    with_S_3:
       (_: Dot[Symbol]) ?=> (group: Group[Symbol]) ?=>
         dot[Symbol].size is 6
         group.sanityTest
         group.isCommutative is false
-    }
 
   test("Groups can be regarded as monoids"):
-    withDot(Set[Int](1, 2, 3)) {
-      withEndomorphismMonoid[Int, Unit] {
+    withDot(Set[Int](1, 2, 3)):
+      withEndomorphismMonoid[Int, Unit]:
         [E] => (_: Dot[E]) ?=> (largerMonoid: Monoid[E]) ?=> (standardAction: largerMonoid.Action[Int]) ?=>
-          withGroupOfUnits[E, Unit] {
+          withGroupOfUnits[E, Unit]:
             [U] => (_: Dot[U]) ?=> (groupU: Group[U]) ?=> (embed: U => E) =>
-              groupU.withMonoid {
+              groupU.withMonoid:
                 summon[Monoid[U]].sanityTest
                 monoids.isMorphism[U, E](embed) is true
-              }
-            }
-      }
-    }
 
   test("A group action can be induced from a monoid one via a morphism"):
     withCyclicGroup(4):

@@ -311,7 +311,7 @@ trait AlgebraicTheories[
     S : Dot
   ](
      assignments: Seq[OperatorAssignment[T, S]]
-   ) {
+   ):
     private def doLookup[OP](
       op: Operator
     )(
@@ -325,59 +325,53 @@ trait AlgebraicTheories[
     def lookup(
       principalConstant: PrincipalConstant
     ): Option[NullaryOp[T]] =
-      doLookup(principalConstant) {
+      doLookup(principalConstant):
         _.lookupPrincipalConstant
-      }
 
     def lookup(
       scalarConstant: ScalarConstant
     ): Option[NullaryOp[S]] =
-      doLookup(scalarConstant) {
+      doLookup(scalarConstant):
         _.lookupScalarConstant
-      }
 
     def lookup(
       unaryOp: AbstractUnaryOp
     ): Option[UnaryOp[T]] =
-      doLookup(unaryOp) {
+      doLookup(unaryOp):
         _.lookupUnaryOp
-      }
 
     def lookup(
       binaryOp: AbstractBinaryOp
     ): Option[BinaryOp[T]] =
-      doLookup(binaryOp) {
+      doLookup(binaryOp):
         _.lookupBinaryOp
-      }
 
     def lookup(
       op: AbstractRightScalarBinaryOp
     ): Option[RightScalarBinaryOp[T, S]] =
-      doLookup(op) {
+      doLookup(op):
         _.lookupRightScalarBinaryOp
-      }
 
     def lookup(
       op: AbstractScalarBinaryOp
     ): Option[BinaryOp[S]] =
-      doLookup(op) {
+      doLookup(op):
         _.lookupScalarBinaryOp
-      }
 
     def hasPrecisely(
       operators: Seq[Operator]
     ): Boolean =
-      assignments.map {
+      assignments.map:
         _.operator
-      }.toSet ==
+      .toSet ==
         operators.toSet
 
     def crossedWith[U : Dot](
       that: OperatorAssignments[U, S]
     ): Seq[OperatorAssignment[(T, U), S]] =
-      assignments map { assignment =>
+      assignments map: assignment =>
         import assignment.operator
-        that.doLookup(operator) { thatAssignment =>
+        that.doLookup(operator): thatAssignment =>
           Some(
             new OperatorAssignment[(T, U), S](operator) {
               override def lookupUnaryOp: Option[UnaryOp[(T, U)]] =
@@ -431,57 +425,47 @@ trait AlgebraicTheories[
                     )
             }
           )
-        } getOrElse {
-          throw new IllegalArgumentException(
-            "algebra multiplication failed: can't match operator " + operator
-          )
-        }
-      }
-  }
+        .getOrElse:
+          throw IllegalArgumentException:
+            s"algebra multiplication failed: can't match operator $operator"
 
   class AbstractBinaryOp(
     name: String
-  ) extends Operator(name, arity =2) {
+  ) extends Operator(name, arity = 2):
     def :=[S : Dot, T : Dot](
       binaryOp: BinaryOp[T]
     ): OperatorAssignment[T, S] =
-      new OperatorAssignment[T, S](operator = this) {
+      new OperatorAssignment[T, S](operator = this):
         override def lookupBinaryOp =
           Some(binaryOp)
-      }
-  }
 
   class AbstractRightScalarBinaryOp(
     name: String
-  ) extends Operator(name, arity = 2) {
+  ) extends Operator(name, arity = 2):
     def :=[T : Dot, S : Dot](
       binaryOp: RightScalarBinaryOp[T, S]
     ): OperatorAssignment[T, S] =
-      new OperatorAssignment[T, S](this) {
+      new OperatorAssignment[T, S](this):
         override def lookupRightScalarBinaryOp =
           Some(binaryOp)
-      }
-  }
 
   class AbstractScalarBinaryOp(
     name: String
-  ) extends Operator(name, 2) {
+  ) extends Operator(name, 2):
     def :=[S : Dot](binaryOp: BinaryOp[S]) =
-      new OperatorPreassignment[S](this) {
+      new OperatorPreassignment[S](this):
         override def lookupScalarBinaryOp =
           Some(binaryOp)
-      }
-  }
 
   class AbstractUnaryOp(
     name: String
-  ) extends Operator(name, arity = 1) {
-    def :=[S : Dot, T : Dot](unaryOp: UnaryOp[T]): OperatorAssignment[T, S] =
-      new OperatorAssignment[T, S](this) {
+  ) extends Operator(name, arity = 1):
+    def :=[S : Dot, T : Dot](
+      unaryOp: UnaryOp[T]
+    ): OperatorAssignment[T, S] =
+      new OperatorAssignment[T, S](this):
         override def lookupUnaryOp =
           Some(unaryOp)
-      }
-  }
 
   class AlgebraicTheory[
     S : Dot

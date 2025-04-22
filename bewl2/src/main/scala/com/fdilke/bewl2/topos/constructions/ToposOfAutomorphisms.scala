@@ -277,8 +277,32 @@ trait ToposOfAutomorphisms[
             given Ɛ.Dot[X] = dot[X].theDot
             Ɛ.autoFinder.withAutomorphismGroup[X, RESULT]:
               [A] => (_: Ɛ.Dot[A]) ?=> (group: Ɛ.Group[A]) ?=> (action: group.Action[X]) ?=>
+              val nameOfArrow: UNIT ~> A =
+                Ɛ.RichArrow:
+                  dot[X].arrow.name
+                \ action.toExponent
+              val nameOfInverse: UNIT ~> A =
+                group.inverse compose nameOfArrow
+              val constantArrow: A ~> A =
+                nameOfArrow compose Ɛ.toUnit[A]
+              val constantInverse: A ~> A =
+                nameOfInverse compose Ɛ.toUnit[A]
+              val idA: A~> A =
+                Ɛ.id[A]
+              def biMultiply(
+                prefix: A ~> A,
+                suffix: A ~> A
+              ): A ~> A =
+                group.multiply compose :
+                  Ɛ.RichArrow(
+                    group.multiply compose :
+                      Ɛ.RichArrow(prefix) x idA
+                  ) x suffix
               withDot(
-                Ɛ.Automorphism.id[A]
+                Ɛ.Automorphism(
+                  biMultiply(constantInverse, constantArrow),
+                  biMultiply(constantArrow, constantInverse)
+                )
               ):
                 implicit val autoGroup: Group[A] =
                   Group[A](
@@ -286,44 +310,16 @@ trait ToposOfAutomorphisms[
                     multiply = group.multiply,
                     inverse = group.inverse
                   )
-                given autoGroup.Action[X] =
-                  new autoGroup.Action[X](action.actionMultiply)
-                block[A]
+                autoGroup.Action[X](action.actionMultiply).preserving(
+                  dot[X].arrow
+                ):
+                  [P] => (_ : Dot[P]) ?=> (_: Group[P]) ?=> (_: P ~> A) =>
+                  given autoGroup.Action[X] =
+                    autoGroup.Action[X]:
+                      action.actionMultiply
+                  block[A]
 
 /*
-    override lazy val autoFinder: AutomorphismFinder =
-      new AutomorphismFinder:
-        override def withAutomorphismGroup[X : Dot, RESULT](
-          block: [A] => Dot[A] ?=> (group: Group[A]) ?=> group.Action[X] ?=> RESULT
-          ): RESULT =
-          val seqX: Seq[X] = dot[X].toSeq
-          val numbers: Seq[Int] = seqX.indices
-          withDot[Seq[Int], RESULT](
-            numbers.permutations.toSet[Seq[Int]]
-          ) {
-            implicit val group: Group[Seq[Int]] =
-              Group[Seq[Int]](
-                unit = makeNullaryOperator[Seq[Int]](numbers),
-                multiply = { (p1: Seq[Int], p2: Seq[Int]) =>
-                  numbers map { s => p2(p1(s)) }
-                },
-                inverse = { (p: Seq[Int]) =>
-                  val array: Array[Int] = new Array[Int](seqX.size)
-                  numbers.foreach { s =>
-                    array(p(s)) = s
-                  }
-                  array.toSeq
-                }
-              )
-            val index: Map[X, Int] = Map(
-              seqX.zip(numbers) :_*
-            )
-            given group.Action[X] = group.Action[X] { (x, seq) =>
-              seqX(seq(index(x)))
-            }
-            block[Seq[Int]]
-          }
-
     override val optionator: Optionator =
       new Optionator:
         override type OPTION[X] = Option[X]
