@@ -319,6 +319,47 @@ trait ToposOfAutomorphisms[
                       action.actionMultiply
                   block[A]
 
+      override val optionator: Optionator =
+        new Optionator:
+          override type OPTION[X] = Ɛ.OPTION[X]
+          override def partialArrowClassifier[
+            X: Dot
+          ]: PartialArrowClassifier[X, OPTION[X]] =
+            given Ɛ.Dot[X] = dot[X].theDot
+            val delegate: Ɛ.PartialArrowClassifier[X, OPTION[X]] =
+              Ɛ.optionator.partialArrowClassifier[X]
+            def liftAuto(
+              auto: X ~> X
+            ): OPTION[X] ~> OPTION[X] =
+              delegate.extendAlong[X, OPTION[X]](
+                delegate.some,
+                auto
+              )
+            withDot(
+                new Ɛ.Automorphism[OPTION[X]](
+                  liftAuto:
+                    dot[X].arrow,
+                  liftAuto:
+                    dot[X].inverse
+                )
+            ):
+              new PartialArrowClassifier[X, OPTION[X]]:
+                override val some: X ~> OPTION[X] =
+                  x => delegate.some(x)
+                override val none: UNIT ~> OPTION[X] =
+                  delegate.none
+                override def extendAlong[V: Dot, W: Dot](
+                  monic: V ~> W,
+                  arrow: V ~> X
+                ): W ~> OPTION[X] =
+                  given Ɛ.Dot[V] = dot[V].theDot
+                  given Ɛ.Dot[W] = dot[W].theDot
+                  delegate.extendAlong[V, W](
+                    monic,
+                    arrow
+                  )
+
+
 /*
     override val optionator: Optionator =
       new Optionator:

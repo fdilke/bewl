@@ -283,9 +283,8 @@ class Topos[
     X: Dot,
     Y: Dot
   ]: Dot[X > Y] =
-    summon[Dot[X]].memoizedExponential[Y](
+    summon[Dot[X]].memoizedExponential[Y]:
       summon[Dot[Y]]
-    )
 
   implicit def optionDot[X: Dot]: Dot[OPTION[X]] =
     summon[Dot[X]].pac.classifier
@@ -306,9 +305,8 @@ class Topos[
   )(
     f: T => (X > Y, X)
   ): CTXT[Y] =
-    evaluation[X, Y].apply(
+    evaluation[X, Y].apply:
       ctxt.map(f)
-    )
 
   final def ∀[X: Dot](
     fn: X ~> BEWL
@@ -327,29 +325,28 @@ class Topos[
     untupledFn: UntupledBiArrow[X, Y, BEWL]
   ): X ~> BEWL =
     ∀[X, Y]:
-      case x ⊕ y => untupledFn(x, y)
+      case x ⊕ y =>
+        untupledFn(x, y)
 
   final def ∀[X: Dot, Y: Dot, Z: Dot](
     f: (CTXT[X], CTXT[Y], CTXT[Z]) => CTXT[BEWL]
   ): X ~> BEWL =
-    ∀[X, Y] { (x, y) =>
+    ∀[X, Y]: (x, y) =>
       val piff: Y ~> BEWL =
         ∀[Y, Z]:
           (y, z) =>
             f(x, y, z)
       piff(y)
-    }
 
   final def ∀[X: Dot, Y: Dot, Z: Dot, W: Dot](
     f: (CTXT[X], CTXT[Y], CTXT[Z], CTXT[W]) => CTXT[BEWL]
   ): X ~> BEWL =
-    ∀[X, Y] { (x, y) =>
+    ∀[X, Y]: (x, y) =>
       val piff: Y ~> BEWL =
         (∀[Y, Z, W] { (y, z, w) =>
           f(x, y, z, w)
         })
       piff(y)
-    }
 
   final def ∃[X: Dot](
     fn: X ~> BEWL
@@ -369,13 +366,15 @@ class Topos[
     untupledFn: UntupledBiArrow[X, Y, BEWL]
   ): X ~> BEWL =
     ∃[X, Y]:
-      case x ⊕ y => untupledFn(x, y)
+      case x ⊕ y => 
+        untupledFn(x, y)
 
   object `⊕` :
     def unapply[X: Dot, Y: Dot](
       xy: CTXT[(X, Y)]
     ): Option[(CTXT[X], CTXT[Y])] =
-      Some(xy.map{ _._1 }, xy.map { _._2 })
+      Some:
+        xy.map{ _._1 } -> xy.map { _._2 }
 
   extension[X: Dot](x: CTXT[X])
     inline def =?=(x2: CTXT[X]): CTXT[BEWL] =
@@ -394,7 +393,8 @@ class Topos[
       x: CTXT[X],
       y: CTXT[Y]
     ): CTXT[Z] =
-      biArrow(x ⊕ y)
+      biArrow:
+        x ⊕ y
 
   implicit final class RichArrow[X: Dot, Y: Dot](
     f: X ~> Y
@@ -417,7 +417,8 @@ class Topos[
     inline def x[Z: Dot](
      f2: X ~> Z
     ): X ~> (Y, Z) =
-      cx => f(cx) ⊕ f2(cx)
+      cx => 
+        f(cx) ⊕ f2(cx)
 
     inline def ?=[RESULT](
      f2: X ~> Y
