@@ -239,6 +239,9 @@ trait ToposOfAutomorphisms[
     new Topos[Ɛ.Automorphism, CTXT, VOID, UNIT, BEWL, >](
       preAutoTopos
     ):
+      implicit inline def dotFromAuto[X: Dot]: Ɛ.Dot[X] =
+        summon[Dot[X]].dot.theDot
+
       override lazy val logicalOperations: LogicalOperations =
         new LogicalOperations:
           override val and: BiArrow[BEWL, BEWL, BEWL] =
@@ -255,8 +258,6 @@ trait ToposOfAutomorphisms[
           override def isMonic[X: Dot, Y: Dot](
             f: X ~> Y
           ): Boolean =
-            given Ɛ.Dot[X] = dot[X].theDot
-            given Ɛ.Dot[Y] = dot[Y].theDot
             Ɛ.monicVerifier.isMonic(f)
 
       override lazy val epicVerifier: EpicVerifier =
@@ -264,8 +265,6 @@ trait ToposOfAutomorphisms[
           override def isEpic[X: Dot, Y: Dot](
             f: X ~> Y
           ): Boolean =
-            given Ɛ.Dot[X] = dot[X].theDot
-            given Ɛ.Dot[Y] = dot[Y].theDot
             Ɛ.epicVerifier.isEpic(f)
 
       override lazy val autoFinder: AutomorphismFinder =
@@ -274,7 +273,6 @@ trait ToposOfAutomorphisms[
             block: [A] => Dot[A] ?=>
               (group: Group[A]) ?=> group.Action[X] ?=> RESULT
           ): RESULT =
-            given Ɛ.Dot[X] = dot[X].theDot
             Ɛ.autoFinder.withAutomorphismGroup[X, RESULT]:
               [A] => (_: Ɛ.Dot[A]) ?=> (group: Ɛ.Group[A]) ?=> (action: group.Action[X]) ?=>
               val nameOfArrow: UNIT ~> A =
@@ -325,7 +323,6 @@ trait ToposOfAutomorphisms[
           override def partialArrowClassifier[
             X: Dot
           ]: PartialArrowClassifier[X, OPTION[X]] =
-            given Ɛ.Dot[X] = dot[X].theDot
             val delegate: Ɛ.PartialArrowClassifier[X, OPTION[X]] =
               Ɛ.optionator.partialArrowClassifier[X]
             def liftAuto(
@@ -352,8 +349,6 @@ trait ToposOfAutomorphisms[
                   monic: V ~> W,
                   arrow: V ~> X
                 ): W ~> OPTION[X] =
-                  given Ɛ.Dot[V] = dot[V].theDot
-                  given Ɛ.Dot[W] = dot[W].theDot
                   delegate.extendAlong[V, W](
                     monic,
                     arrow
