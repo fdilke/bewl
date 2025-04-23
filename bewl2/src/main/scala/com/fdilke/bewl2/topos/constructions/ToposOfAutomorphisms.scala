@@ -358,29 +358,3 @@ trait ToposOfAutomorphisms[
                     monic,
                     arrow
                   )
-
-
-/*
-    override val optionator: Optionator =
-      new Optionator:
-        override type OPTION[X] = Option[X]
-        override def partialArrowClassifier[X: Dot]: PartialArrowClassifier[X, Option[X]] =
-          withDot(
-            dot[X].map(Some[X]) + None
-          ) {
-            new PartialArrowClassifier[X, Option[X]]:
-              override val some: X ~> Option[X] =
-                x => Some(x)
-              override val none: Unit ~> Option[X] =
-                _ => None
-              override def extendAlong[V: Dot, W: Dot](
-                monic: V ~> W,
-                arrow: V ~> X
-              ): W ~> Option[X] =
-                w =>
-                  dot[V].find {
-                    v => monic(v) == w
-                  }.map(arrow)
-          }
-
-  */

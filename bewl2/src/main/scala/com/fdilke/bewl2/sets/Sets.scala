@@ -287,7 +287,9 @@ class BaseSets extends Topos[
       override type OPTION[X] = Option[X]
       override def partialArrowClassifier[X: Dot]: PartialArrowClassifier[X, Option[X]] =
         withDot(
-          dot[X].map(Some[X]) + None
+          dot[X].map:
+            Some[X]
+          + None
         ):
           new PartialArrowClassifier[X, Option[X]]:
             override val some: X ~> Option[X] =
@@ -301,7 +303,8 @@ class BaseSets extends Topos[
               w =>
                 dot[V].find: v =>
                   monic(v) == w
-                .map(arrow)
+                .map:
+                  arrow
 
 object SetsWithSlowActions extends BaseSets
 
