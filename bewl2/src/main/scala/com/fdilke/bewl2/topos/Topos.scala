@@ -409,12 +409,12 @@ class Topos[
     ): Boolean =
       !(this =!= f2)
 
-    inline def o[V: Dot](
+    inline infix def o[V: Dot](
       f2: V ~> X
     ): V ~> Y =
       f compose f2
 
-    inline def x[Z: Dot](
+    infix inline def x[Z: Dot](
      f2: X ~> Z
     ): X ~> (Y, Z) =
       cx => 

@@ -32,7 +32,7 @@ object SetsUtilities:
     Map(
       a.indices map { i =>
         i -> a(i)
-      } :_*
+      }*
     )
 
   def sequencesOfLength[H](

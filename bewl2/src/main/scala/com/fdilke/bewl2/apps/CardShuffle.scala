@@ -21,7 +21,7 @@ object CardShuffle extends App:
   withDot(numbers):
     withEnum[Suit]:
       withAutomorphismGroup[(Suit, Int), Unit]:
-        [A] => (_ : Dot[A]) ?=> (group: Group[A]) ?=> (action: group.Action[(Suit, Int)]) ?=>
+        [A] => (_ : Dot[A]) ?=> (group: Group[A]) ?=> (action: group.Action[(Suit, Int)]) =>
           println("Main group constructed.")  
           action.preserving(π0[Suit, Int]):
             [H] => (dotH : Dot[H]) ?=> (groupH: Group[H]) ?=> (embedH: H ~> A) =>

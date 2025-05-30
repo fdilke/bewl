@@ -24,7 +24,7 @@ class Scala3Playground extends FunSuite:
   }
 
   test("swapping ? for > ... ?") {
-    val x: List[_] = List[Int](1,2,3)
+    val x: List[?] = List[Int](1,2,3)
   }
 
 case class Captured[S](s: S):

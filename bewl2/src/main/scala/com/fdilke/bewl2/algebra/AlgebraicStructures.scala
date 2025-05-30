@@ -50,7 +50,7 @@ trait AlgebraicStructures[
     lazy val actionTopos: Topos[Action, CTXT, VOID, UNIT, BEWL, >] =
       toposOfGroupActions(this)
 
-    def x[H: Dot]( // product sugar
+    infix def x[H: Dot]( // product sugar
       that: Group[H]
     ): Group[(G, H)] =
       val product: groups.Algebra[(G, H)] =
@@ -160,7 +160,7 @@ trait AlgebraicStructures[
       def dot: Dot[A] =
         summon
         
-      def x[B: Dot]( // Formalism to make the product of two Actions an Action to facilitate sugar
+      infix def x[B: Dot]( // Formalism to make the product of two Actions an Action to facilitate sugar
         that: Action[B]
       ): Action[(A, B)] =
         val product = (this: actions.Algebra[A]) x that
@@ -209,7 +209,7 @@ trait AlgebraicStructures[
           case m ⊕ a =>
             actionMultiply(a, m)
 
-  extension(a: AlgebraicTheory[_]#Algebra[_])
+  extension(a: AlgebraicTheory[?]#Algebra[?])
     def isCommutative = a.satisfies:
       α * β := β * α
 

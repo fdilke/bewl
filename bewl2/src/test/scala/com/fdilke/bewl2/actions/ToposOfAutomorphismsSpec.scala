@@ -90,14 +90,14 @@ class ToposOfAutomorphismsSpec
               d -> "y"
             )
 
-          override val equalizerSituation: EqualizerSituation[_, _, _] =
+          override val equalizerSituation: EqualizerSituation[?, ?, ?] =
             EqualizerSituation[Unit, Symbol, String](
               _ => Symbol("sensibleChoiceNotThis"),
               foo2ImageOfBar,
               monicBar2baz o foo2bar
             )
             
-          override val isomorphismSituation: IsomorphismSituation[_, _] =
+          override val isomorphismSituation: IsomorphismSituation[?, ?] =
             IsomorphismSituation[Symbol, (Int, Int)]:
               Map(a -> (1, 2), b -> (1, 1), c -> (2, 1),  d -> (2, 2))
 

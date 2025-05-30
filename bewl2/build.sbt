@@ -4,12 +4,12 @@ lazy val root = project
     name := "bewl2",
     description := "Experimental version of topos DSL us Scala 3",
     version := "0.1.0",
-    scalaVersion := "3.3.1", // 3.3.0-RC4. 3.2.2,
+    scalaVersion := "3.7.0",
     scalacOptions ++= Seq(
-        "-explain"
+        "-explain",
+        "-feature"
     ),
-    ThisBuild/scalacOptions ++= Seq("-unchecked", "-deprecation" /*, "-rangepos" */),
-    // Test / javaOptions += "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000",
+    ThisBuild/scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature" /*, "-rangepos" */),
     libraryDependencies ++= Seq(
         "org.scalameta" %% "munit" % "1.0.0-M3" % Test,
         "org.typelevel" % "cats-core_3" % "2.7.0"

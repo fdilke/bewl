@@ -150,7 +150,7 @@ class BaseSets extends Topos[
   def makeUnaryOperator[X: Dot](
     values: (X, X)*
   ): X => X =
-    val map: Map[X, X] = Map[X, X](values: _*)
+    val map: Map[X, X] = Map[X, X](values*)
     if dot[X] != map.keySet then
       bail("incomplete or excessive unary operator definition")
     map
@@ -158,7 +158,7 @@ class BaseSets extends Topos[
   def makeBinaryOperator[X: Dot](
     values: ((X, X), X)*
   ): ((X, X)) => X =
-    val map: Map[(X, X), X] = Map[(X, X), X](values: _*)
+    val map: Map[(X, X), X] = Map[(X, X), X](values*)
     map
 
   def withMonoidFromTable[M, RESULT](
@@ -187,7 +187,7 @@ class BaseSets extends Topos[
             table.head
           ),
           makeBinaryOperator[M](
-            mappings: _*
+            mappings*
           )
         )
 
@@ -214,7 +214,7 @@ class BaseSets extends Topos[
       )
 
     withDot(carrierAsList.toSet):
-      val binOp = makeBinaryOperator[G](mappings: _*)
+      val binOp = makeBinaryOperator[G](mappings*)
       val theUnit: G = table.head
       given Group[G] =
         Group[G](
@@ -238,35 +238,31 @@ class BaseSets extends Topos[
   override lazy val autoFinder: AutomorphismFinder =
     new AutomorphismFinder:
       override def withAutomorphismGroup[X : Dot, RESULT](
-        block: [A] => Dot[A] ?=> (group: Group[A]) ?=> group.Action[X] ?=> RESULT
-        ): RESULT =
+        block: [A] => Dot[A] ?=> (group: Group[A]) ?=> group.Action[X] => RESULT
+      ): RESULT =
         val seqX: Seq[X] = dot[X].toSeq
         val numbers: Seq[Int] = seqX.indices
         withDot[Seq[Int], RESULT](
           numbers.permutations.toSet[Seq[Int]]
-        ) {
+        ):
           implicit val group: Group[Seq[Int]] =
             Group[Seq[Int]](
               unit = makeNullaryOperator[Seq[Int]](numbers),
               multiply = { (p1: Seq[Int], p2: Seq[Int]) =>
                 numbers map { s => p2(p1(s)) }
               },
-              inverse = { (p: Seq[Int]) =>
-                val array: Array[Int] = new Array[Int](seqX.size)
-                numbers.foreach { s =>
-                  array(p(s)) = s
-                }
-                array.toSeq
-              }
+              inverse =
+                (p: Seq[Int]) =>
+                  val array: Array[Int] = new Array[Int](seqX.size)
+                  numbers.foreach: s =>
+                    array(p(s)) = s
+                  array.toSeq
             )
-          val index: Map[X, Int] = Map(
-            seqX.zip(numbers) :_*
-          )
-          given group.Action[X] = group.Action[X] { (x, seq) =>
-            seqX(seq(index(x)))
-          }
-          block[Seq[Int]]
-        }
+          val index: Map[X, Int] = 
+            seqX.zip(numbers).toMap
+          block[Seq[Int]]:
+            group.Action[X]: (x, seq) =>
+              seqX(seq(index(x)))
         
   override lazy val monicVerifier: MonicVerifier =
     new MonicVerifier:

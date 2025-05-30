@@ -1,6 +1,6 @@
 package com.fdilke.bewl2.helper
 
-class Tagged[PAYLOAD, TAG](
+infix class Tagged[PAYLOAD, TAG](
   payload: PAYLOAD
 ) extends AnyVal:
   inline def untag: PAYLOAD =

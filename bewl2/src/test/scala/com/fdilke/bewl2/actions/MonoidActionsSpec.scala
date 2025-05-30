@@ -80,7 +80,7 @@ abstract class BaseMonoidActionsSpec[ACTION[_], RIGHT_IDEAL, INTERNAL_MAP[_, _]]
               y -> yR
             )
 
-          override val equalizerSituation: EqualizerSituation[_, _, _] =
+          override val equalizerSituation: EqualizerSituation[?, ?, ?] =
             EqualizerSituation[FOO, Int, Boolean](
               Map(
                 i -> 1,
@@ -101,7 +101,7 @@ abstract class BaseMonoidActionsSpec[ACTION[_], RIGHT_IDEAL, INTERNAL_MAP[_, _]]
               )
             )
             
-          override val isomorphismSituation: IsomorphismSituation[_, _] =
+          override val isomorphismSituation: IsomorphismSituation[?, ?] =
             IsomorphismSituation[Symbol, ROPE]:
               foo2baz
 //              Seq(i, x, y).map:
@@ -128,7 +128,7 @@ abstract class MonoidActionsSetup(val baseSets: BaseSets):
 
     def actionOnStrings(strings: String*): monoidOf3.Action[String] =
       withDot(
-        Set[String](strings :_*)
+        Set[String](strings*)
       ):
         monoidOf3.Action:
           (s, m) => monoidOf3.multiply(Symbol(s), m).name

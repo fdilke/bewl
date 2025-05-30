@@ -88,15 +88,15 @@ trait AlgebraicTheories[
   }
 
   extension(name: String)
-    def law(unnamedLaw: Law) =
+    infix def law(unnamedLaw: Law) =
       unnamedLaw.named(name)
 
   sealed trait Term[
     X <: AlgebraicSort
   ](
-     val initFreeVariables: Seq[VariableTerm[_ <: AlgebraicSort]]
+     val initFreeVariables: Seq[VariableTerm[? <: AlgebraicSort]]
    ) extends Dynamic {
-    def freeVariables: Seq[VariableTerm[_ <: AlgebraicSort]] =
+    def freeVariables: Seq[VariableTerm[? <: AlgebraicSort]] =
       initFreeVariables
       
     def applyDynamic(
@@ -163,14 +163,14 @@ trait AlgebraicTheories[
      symbol: String,
      isScalar: Boolean
    ) extends Term[S](Nil) {
-    override def freeVariables: Seq[VariableTerm[_ <: AlgebraicSort]] =
+    override def freeVariables: Seq[VariableTerm[? <: AlgebraicSort]] =
       Seq(this)
 
     def addToContext[S : Dot, T : Dot](
       algebra: AlgebraicTheory[S]#Algebra[T]
     )(
-      context: algebra.EvaluationContext[_]
-    ): algebra.EvaluationContext[_] =
+      context: algebra.EvaluationContext[?]
+    ): algebra.EvaluationContext[?] =
       if (isScalar) then
         context.spawnCompound[S](symbol)
       else
@@ -478,11 +478,11 @@ trait AlgebraicTheories[
    ) {
     def extend(moreOperators: Operator*)(moreLaws: Law*) =
       new AlgebraicTheory[S]( // (scalars)
-        preassignments: _*
+        preassignments*
       )(
-        operators ++ moreOperators: _*
+        operators ++ moreOperators*
       )(
-        laws ++ moreLaws: _*
+        laws ++ moreLaws*
       )
 
     def isMorphism[A : Dot, B : Dot](
@@ -564,7 +564,7 @@ trait AlgebraicTheories[
           }) ++ assignments
         )
 
-      def x[U : Dot](
+      infix def x[U : Dot](
         that: Algebra[U]
       ): Algebra[(T, U)] = {
         new Algebra[(T, U)](
@@ -572,15 +572,15 @@ trait AlgebraicTheories[
             assignments
           ).crossedWith(
             OperatorAssignments(that.assignments)
-          ): _*
+          )*
         )
       }
 
       object EvaluationContext {
         def apply(
-          variables: Seq[VariableTerm[_ <: AlgebraicSort]]
-        ): EvaluationContext[_] =
-          variables.foldRight[EvaluationContext[_]](
+          variables: Seq[VariableTerm[? <: AlgebraicSort]]
+        ): EvaluationContext[?] =
+          variables.foldRight[EvaluationContext[?]](
             SimpleEvaluationContext
           ) {
             _.addToContext(algebra = Algebra.this)(_)
@@ -660,7 +660,7 @@ trait AlgebraicTheories[
             "Unknown operator in expression: " + term.op
           )
 
-        def doesSatisfy(
+        infix def doesSatisfy(
           law: Law
         ): Boolean =
           evaluatePrincipal(law.left) =!=
@@ -668,7 +668,7 @@ trait AlgebraicTheories[
 
         def spawnCompound[U: Dot](
           symbol: String
-        ): EvaluationContext[_] =
+        ): EvaluationContext[?] =
           new CompoundEvaluationContext[U, ROOT](
             symbol,
             this
@@ -707,7 +707,7 @@ trait AlgebraicTheories[
 
         override def spawnCompound[U: Dot](
           symbol: String
-        ): EvaluationContext[_] =
+        ): EvaluationContext[?] =
           new UnaryEvaluationContext[U](
             symbol
           )
@@ -816,7 +816,7 @@ trait AlgebraicTheories[
   object AlgebraicTheory:
     import topos.given
     def apply(operators: Operator*)(laws: Law*) =
-      new AlgebraicTheory[UNIT]()(operators: _*)(laws: _*)
+      new AlgebraicTheory[UNIT]()(operators*)(laws*)
 
   object AlgebraicTheoryWithScalars:
     def apply[S : Dot](
@@ -826,7 +826,7 @@ trait AlgebraicTheories[
     )(
       laws: Law*
     ) =
-      new AlgebraicTheory[S](preassignments: _*)(operators: _*)(laws: _*)
+      new AlgebraicTheory[S](preassignments*)(operators*)(laws*)
 
   type Variety = AlgebraicTheory[UNIT]
 }

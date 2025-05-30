@@ -271,10 +271,10 @@ trait ToposOfAutomorphisms[
         new AutomorphismFinder:
           override def withAutomorphismGroup[X: Dot, RESULT](
             block: [A] => Dot[A] ?=>
-              (group: Group[A]) ?=> group.Action[X] ?=> RESULT
+              (group: Group[A]) ?=> group.Action[X] => RESULT
           ): RESULT =
             Ɛ.autoFinder.withAutomorphismGroup[X, RESULT]:
-              [A] => (_: Ɛ.Dot[A]) ?=> (group: Ɛ.Group[A]) ?=> (action: group.Action[X]) ?=>
+              [A] => (_: Ɛ.Dot[A]) ?=> (group: Ɛ.Group[A]) ?=> (action: group.Action[X]) =>
               val nameOfArrow: UNIT ~> A =
                 Ɛ.RichArrow:
                   dot[X].arrow.name
@@ -312,10 +312,9 @@ trait ToposOfAutomorphisms[
                   dot[X].arrow
                 ):
                   [P] => (_ : Dot[P]) ?=> (_: Group[P]) ?=> (_: P ~> A) =>
-                  given autoGroup.Action[X] =
+                  block[A]:
                     autoGroup.Action[X]:
                       action.actionMultiply
-                  block[A]
 
       override val optionator: Optionator =
         new Optionator:

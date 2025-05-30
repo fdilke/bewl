@@ -386,7 +386,7 @@ class AlgebraicStructuresSpec extends FunSuite:
   test("Groups can be regarded as monoids"):
     withDot(Set[Int](1, 2, 3)):
       withEndomorphismMonoid[Int, Unit]:
-        [E] => (_: Dot[E]) ?=> (largerMonoid: Monoid[E]) ?=> (standardAction: largerMonoid.Action[Int]) ?=>
+        [E] => (_: Dot[E]) ?=> (largerMonoid: Monoid[E]) ?=> (standardAction: largerMonoid.Action[Int]) =>
           withGroupOfUnits[E, Unit]:
             [U] => (_: Dot[U]) ?=> (groupU: Group[U]) ?=> (embed: U => E) =>
               groupU.withMonoid:
@@ -416,7 +416,7 @@ class AlgebraicStructuresSpec extends FunSuite:
       Set[Int](0, 1)
     ):
       withAutomorphismGroup[(String, Int), Unit]:
-        [A] => (_ : Dot[A]) ?=> (group: Group[A]) ?=> (action: group.Action[(String, Int)]) ?=>
+        [A] => (_ : Dot[A]) ?=> (group: Group[A]) ?=> (action: group.Action[(String, Int)]) =>
         action.preserving(
           π0[String, Int]
         ):

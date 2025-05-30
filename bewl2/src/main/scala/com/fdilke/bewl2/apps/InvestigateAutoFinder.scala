@@ -22,9 +22,9 @@ object InvestigateAutoFinder extends App:
     fooPermutation
   ):  
     Ʒ.DefaultAutomorphismFinder.withAutomorphismGroup[FOO, Unit]:
-      [D] => (_ : Ʒ.Dot[D]) ?=> (groupD: Ʒ.Group[D]) ?=> (actionD: groupD.Action[FOO]) ?=>
+      [D] => (_ : Ʒ.Dot[D]) ?=> (groupD: Ʒ.Group[D]) ?=> (actionD: groupD.Action[FOO]) =>
       Ʒ.autoFinder.withAutomorphismGroup[FOO, Unit]:
-        [A] => (_ : Ʒ.Dot[A]) ?=> (groupA: Ʒ.Group[A]) ?=> (actionA: groupA.Action[FOO]) ?=>
+        [A] => (_ : Ʒ.Dot[A]) ?=> (groupA: Ʒ.Group[A]) ?=> (actionA: groupA.Action[FOO]) =>
         import Ʒ.RichArrow
         println(s"default group size = ${groupD.dot.dot.theDot.dot.size}")
         println(s"autoFinder group size = ${groupA.dot.dot.theDot.dot.size}")
@@ -53,6 +53,8 @@ object InvestigateAutoFinder extends App:
                 f2foo
               realFoo.sanityTest
               given groupD.Action[F] = actionF
+              given groupD.Action[FOO] =
+                f2foo.substituteCo[groupD.Action](actionF)
               assert:
                 realFoo.isIso
               assert:

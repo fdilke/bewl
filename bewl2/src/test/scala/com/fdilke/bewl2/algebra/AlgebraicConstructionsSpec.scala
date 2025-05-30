@@ -105,17 +105,14 @@ class AlgebraicConstructionsSpec extends FunSuite:
         group.isCommutative is false
       }
 
-  test("Construct the monoid of endomorphisms") {
+  test("Construct the monoid of endomorphisms"):
     import StockSymbols.*
-    withDot(Set[Symbol](e, a, b)) {
-      withEndomorphismMonoid[Symbol, Unit] {
-        [E] => (_: Dot[E]) ?=> (monoid: Monoid[E]) ?=> (standardAction: monoid.Action[Symbol]) ?=>
+    withDot(Set[Symbol](e, a, b)):
+      withEndomorphismMonoid[Symbol, Unit]:
+        [E] => (_: Dot[E]) ?=> (monoid: Monoid[E]) ?=> (standardAction: monoid.Action[Symbol]) =>
         monoid.sanityTest
         dot[E].size is 27
         standardAction.sanityTest
-      }
-    }
-  }
 
   test("Construct the group of units"):
     withMonoid_1_0 { (_: Dot[Int]) ?=> (_: Monoid[Int]) ?=>
@@ -130,7 +127,7 @@ class AlgebraicConstructionsSpec extends FunSuite:
     }
     withDot(Set[Int](1, 2, 3)):
       withEndomorphismMonoid[Int, Unit] {
-        [E] => (_: Dot[E]) ?=> (monoid: Monoid[E]) ?=> (standardAction: monoid.Action[Int]) ?=>
+        [E] => (_: Dot[E]) ?=> (monoid: Monoid[E]) ?=> (standardAction: monoid.Action[Int]) =>
           withGroupOfUnits[E, Unit] {
             [U] => (_: Dot[U]) ?=> (groupU: Group[U]) ?=> (embed: U => E) =>
               dot[U].size is 6
@@ -143,7 +140,7 @@ class AlgebraicConstructionsSpec extends FunSuite:
     import StockSymbols.*
     withDot(Set[Symbol](e, a, b, c)):
       withAutomorphismGroup[Symbol, Unit] {
-        [G] => (_: Dot[G]) ?=> (group: Group[G]) ?=> (action: group.Action[Symbol]) ?=>
+        [G] => (_: Dot[G]) ?=> (group: Group[G]) ?=> (action: group.Action[Symbol]) =>
         group.sanityTest
         action.sanityTest
         dot[G].size is 24

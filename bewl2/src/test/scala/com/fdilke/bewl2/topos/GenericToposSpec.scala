@@ -67,8 +67,8 @@ abstract class GenericToposSpec[
     val foobar2baz: (FOO, BAR) ~> BAZ
     val monicBar2baz: BAR ~> BAZ
     val foo2ImageOfBar: FOO ~> BAZ
-    val equalizerSituation: EqualizerSituation[_, _, _]
-    val isomorphismSituation: IsomorphismSituation[_, _]
+    val equalizerSituation: EqualizerSituation[?, ?, ?]
+    val isomorphismSituation: IsomorphismSituation[?, ?]
 
   def withTestDots(
      block: Dot[FOO] ?=> Dot[BAR] ?=> Dot[BAZ] ?=> ToposFixtures => Unit
@@ -315,9 +315,9 @@ abstract class GenericToposSpec[
     test("overrides the automorphism finder correctly, if at all"):
       if ! (autoFinder eq DefaultAutomorphismFinder) then
         autoFinder.withAutomorphismGroup[FOO, Unit]:
-          [A] => (_ : Dot[A]) ?=> (group: Group[A]) ?=> (actionA: group.Action[FOO]) ?=>
+          [A] => (_ : Dot[A]) ?=> (group: Group[A]) ?=> (actionA: group.Action[FOO]) =>
           DefaultAutomorphismFinder.withAutomorphismGroup[FOO, Unit]:
-            [D] => (_ : Dot[D]) ?=> (groupD: Group[D]) ?=> (actionD: groupD.Action[FOO]) ?=>
+            [D] => (_ : Dot[D]) ?=> (groupD: Group[D]) ?=> (actionD: groupD.Action[FOO]) =>
               assert:
                 actionD.toExponent.isMonic
               assert:
@@ -343,6 +343,7 @@ abstract class GenericToposSpec[
                     f2foo.substituteCo[CTXT]
                   realFoo.sanityTest
                   given groupD.Action[F] = actionF
+                  given groupD.Action[FOO] = actionD
                   assert:
                     realFoo.isIso
                   assert:

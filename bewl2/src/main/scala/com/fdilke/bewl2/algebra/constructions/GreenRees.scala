@@ -16,19 +16,19 @@ object GreenRees:
     def =!=(word2: String): Boolean =
       Factorization(word) == Factorization(word2)
 
-    def R(word2: String): Boolean =
+    infix def R(word2: String): Boolean =
       Factorization(word).optionalPrefix == Factorization(word2).optionalPrefix
 
-    def L(word2: String): Boolean =
+    infix def L(word2: String): Boolean =
       Factorization(word).optionalSuffix == Factorization(word2).optionalSuffix
 
     def canonical: String =
       Factorization(word).toWord
 
-    def isCanonical: Boolean =
+    infix def isCanonical: Boolean =
       word.canonical == word
 
-    def *(word2: String) =
+    infix def *(word2: String) =
       (word + word2).canonical
 
   @tailrec private def extractLeftSegmentHelper(  

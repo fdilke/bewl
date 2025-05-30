@@ -73,14 +73,14 @@ abstract class BaseGroupActionsSpec[ACTION[_]](
           override val foo2ImageOfBar: Symbol ~> Int =
             Map(e -> 4, a -> 3)
 
-          override val equalizerSituation: EqualizerSituation[_, _, _] =
+          override val equalizerSituation: EqualizerSituation[?, ?, ?] =
             EqualizerSituation[Unit, String, Int](
               _ => "y",
               monicBar2baz,
               altMonicBar2baz
             )
 
-          override val isomorphismSituation: IsomorphismSituation[_, _] =
+          override val isomorphismSituation: IsomorphismSituation[?, ?] =
             IsomorphismSituation[Int, Int]:
               Map(1 -> 3, 3 -> 1, 2 -> 4, 4 -> 2, 5 -> 5)
         }
@@ -104,9 +104,9 @@ abstract class GroupActionsSetup(val baseSets: BaseSets):
 
     def actionOnStrings(strings: String*): groupOf2.Action[String] =
       withDot(
-        Set[String](strings :_*)
+        Set[String](strings*)
       ):
-        groupOf2.Action {
+        groupOf2.Action:
           (s, g) =>
             if (g == e) || (s == "y") then
               s
@@ -114,7 +114,6 @@ abstract class GroupActionsSetup(val baseSets: BaseSets):
               "x'"
             else
               "x"
-        }
 
     override val barAction: groupOf2.Action[String] =
       actionOnStrings("x", "x'", "y")

@@ -59,14 +59,14 @@ class SetsSpec extends GenericToposSpec(SetsWithSlowActions):
               Down -> 2
             )
 
-          override val equalizerSituation: EqualizerSituation[_, _, _] =
+          override val equalizerSituation: EqualizerSituation[?, ?, ?] =
             new EqualizerSituation[FOO, BAR, BAZ](
               foo2bar,
               Map[String, Int]("one" -> 1, "two" -> 2, "three" -> 3),
               Map[String, Int]("one" -> 1, "two" -> 2, "three" -> 1)
             )
             
-          override val isomorphismSituation: IsomorphismSituation[_, _] =
+          override val isomorphismSituation: IsomorphismSituation[?, ?] =
             IsomorphismSituation[BAR, BAR]:
               Map(
                 "one" -> "two",

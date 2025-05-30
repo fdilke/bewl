@@ -157,18 +157,17 @@ object CurriedDependentImplicits:
   //   ()
   // }
   def noddy4(
-    block: [E] => Sets.Dot[E] ?=> (monoid: Sets.Monoid[E]) ?=> monoid.Action[Int] ?=> Unit
+    block: [E] => Sets.Dot[E] ?=> (monoid: Sets.Monoid[E]) ?=> monoid.Action[Int] => Unit
   ): Unit = ()
   noddy4 {
-    [E] => (_ : Sets.Dot[E]) ?=> (monoid: Sets.Monoid[E]) ?=> (action: monoid.Action[Int]) ?=>
+    [E] => (_ : Sets.Dot[E]) ?=> (monoid: Sets.Monoid[E]) ?=> (action: monoid.Action[Int]) =>
       ()
   }
   def noddy5(
-    block: [E] => Sets.Dot[E] ?=> (monoid: Sets.Monoid[E]) ?=> monoid.Action[Int] ?=> Unit
+    block: [E] => Sets.Dot[E] ?=> (monoid: Sets.Monoid[E]) ?=> monoid.Action[Int] => Unit
   ): Unit = ()
   noddy5 {
-    [E] => (dot : Sets.Dot[E]) ?=> (monoid: Sets.Monoid[E]) ?=> (action: monoid.Action[Int]) ?=>
-    // [E] => (_ : Sets.Dot[E]) ?=> (monoid: Monoid[E]) ?=> monoid.Action[X] ?=>
+    [E] => (dot : Sets.Dot[E]) ?=> (monoid: Sets.Monoid[E]) ?=> (action: monoid.Action[Int]) =>
       ()
   }
   def noddy6(

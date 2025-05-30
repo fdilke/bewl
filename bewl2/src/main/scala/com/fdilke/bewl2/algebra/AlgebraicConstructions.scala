@@ -22,7 +22,7 @@ trait AlgebraicConstructions[
   topos: Topos[DOT, CTXT, VOID, UNIT, BEWL, >] =>
 
   def withEndomorphismMonoid[X : Dot, RESULT](
-    block: [E] => Dot[E] ?=> (monoid: Monoid[E]) ?=> monoid.Action[X] ?=> RESULT
+    block: [E] => Dot[E] ?=> (monoid: Monoid[E]) ?=> monoid.Action[X] => RESULT
   ): RESULT =
     type E = X > X
 
@@ -46,13 +46,10 @@ trait AlgebraicConstructions[
         unit = id[X].name,
         multiply = transpose(applyPair)
       )
-    implicit val action: monoid.Action[X] =
-      monoid.Action[X] { (x_e: CTXT[(X, E)]) =>
-        applicate(x_e) {
+    block[E]:
+      monoid.Action[X]: (x_e: CTXT[(X, E)]) =>
+        applicate(x_e):
           case (x, e) => (e, x)
-        }
-      }
-    block[E]
 
   def withGroupOfUnits[M : Dot, RESULT](
     block: [G] => Dot[G] ?=> Group[G] ?=> (embed: G ~> M) => RESULT
@@ -96,7 +93,7 @@ trait AlgebraicConstructions[
           embed
 
   final inline def withAutomorphismGroup[X : Dot, RESULT](
-    block: [A] => Dot[A] ?=> (group: Group[A]) ?=> group.Action[X] ?=> RESULT
+    block: [A] => Dot[A] ?=> (group: Group[A]) ?=> group.Action[X] => RESULT
   ): RESULT =
     autoFinder.withAutomorphismGroup[X, RESULT]:
       block
@@ -106,21 +103,21 @@ trait AlgebraicConstructions[
 
   trait AutomorphismFinder:
     def withAutomorphismGroup[X : Dot, RESULT](
-      block: [A] => Dot[A] ?=> (group: Group[A]) ?=> group.Action[X] ?=> RESULT
+      block: [A] => Dot[A] ?=> (group: Group[A]) ?=> group.Action[X] => RESULT
     ): RESULT
 
   object DefaultAutomorphismFinder extends AutomorphismFinder:
     override def withAutomorphismGroup[X : Dot, RESULT](
-      block: [A] => Dot[A] ?=> (group: Group[A]) ?=> group.Action[X] ?=> RESULT
+      block: [A] => Dot[A] ?=> (group: Group[A]) ?=> group.Action[X] => RESULT
     ): RESULT =
       withEndomorphismMonoid[X, RESULT]:
-        [E] => (_: Dot[E]) ?=> (monoid: Monoid[E]) ?=> (action: monoid.Action[X]) ?=>
-        withGroupOfUnits[E, RESULT]:
-          [A] => (_: Dot[A]) ?=> (group: Group[A]) ?=> (embed: A ~> E) =>
-            given group.Action[X] = group.Action[X]:
-              case x ⊕ a =>
-                action.actionMultiply(x, embed(a))
-            block[A]
+        [E] => (_: Dot[E]) ?=> (monoid: Monoid[E]) ?=> (action: monoid.Action[X]) =>
+          withGroupOfUnits[E, RESULT]:
+            [A] => (_: Dot[A]) ?=> (group: Group[A]) ?=> (embed: A ~> E) =>
+              block[A]:
+                group.Action[X]:
+                  case x ⊕ a =>
+                    action.actionMultiply(x, embed(a))
 
 // Constructions specific to Sets (and maybe other topoi) live here
 object AlgebraicConstructions:
