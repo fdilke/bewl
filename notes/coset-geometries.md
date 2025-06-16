@@ -78,10 +78,10 @@ using the incidences of the geometry. What is the Euler characteristic of this s
 Clearly just (G:V) - (G:E) + (G:F).
 
 I'd expect that under reasonable conditions, if such a 'polyhedron geometry' has an 
-automorphism group G which acts transitively on its vertices/edges/faces, then we can
-reconstruct it as a rank 3 Buekenhout geometry via the above construction with V,E,F the
-subgroups stabilizing a vertex. Will add a ref here to a suitable book if I find one!
-
-
+automorphism group G which acts transitively( and "orientation-preservingly"?) 
+on its vertices/edges/faces, then we can reconstruct it as a rank 3 Buekenhout geometry
+via the above construction with V,E,F the subgroups stabilizing a vertex. 
+Will add a ref here to a suitable book if I find one!
+Peter Cameron's online book about projective geometry is a starting point.
 
 
