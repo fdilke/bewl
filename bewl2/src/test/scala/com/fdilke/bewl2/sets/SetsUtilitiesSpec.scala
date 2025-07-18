@@ -4,7 +4,7 @@ import junit.framework.TestCase
 import munit.FunSuite
 import com.fdilke.bewl2.utility.RichFunSuite._
 import SetsUtilities.*
-import SetsWithSlowActions.*
+import Sets.*
 import scala.language.postfixOps
 import java.util.concurrent.atomic.AtomicBoolean
 

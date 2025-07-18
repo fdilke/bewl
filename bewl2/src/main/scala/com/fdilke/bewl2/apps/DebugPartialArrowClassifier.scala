@@ -1,6 +1,6 @@
 package com.fdilke.bewl2.apps
 
-import com.fdilke.bewl2.sets.SetsWithSlowActions.*
+import com.fdilke.bewl2.sets.Sets.*
 import com.fdilke.utility.Mask.*
 
 object DebugPartialArrowClassifier extends App:
@@ -8,12 +8,12 @@ object DebugPartialArrowClassifier extends App:
   val numbers: Set[Int] = (1 to 4).toSet
 
   println("The great task begins.")
-  withDot(numbers) {
+  withDot(numbers):
     println("And I can assure you it's well under way.")
     type D_OPTION[X] = DefaultOptionator.OPTION[X]
     type FOO = Int
     // val dotOptionFoo: Dot[D_OPTION[FOO]] = DefaultOptionator.partialArrowClassifier[FOO].classifier
-    maskDot[FOO, Unit] {
+    maskDot[FOO, Unit]:
       [F] => (_: Dot[F]) ?=> (_ : F =:= FOO) ?=> (_: FOO =:= F) ?=>
         // (actionF: groupD.Action[F]) => (_ : F =:= FOO) ?=> (foo2f : FOO =:= F) ?=>
         // FOO -- some ---> FOO*
@@ -38,7 +38,5 @@ object DebugPartialArrowClassifier extends App:
         assert {
           (extendInv o extend) =!= id[D_OPTION[F]]
         }
-    }
 
-  }
 
