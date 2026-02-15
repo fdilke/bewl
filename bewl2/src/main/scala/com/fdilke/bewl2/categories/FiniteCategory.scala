@@ -1,13 +1,26 @@
 package com.fdilke.bewl2.categories
 
+import scala.language.implicitConversions
+
 trait PreArrow[+DOT]:
   val name: String
   val source: DOT
   val target: DOT
 
+type Chain[DOT] = Seq[PreArrow[DOT]]
+
+implicit def toChain[DOT](preArrow: PreArrow[DOT]): Chain[DOT] =
+  Seq(preArrow)
+  
+extension[DOT](chain: Chain[DOT])
+  infix def o(preArrow: PreArrow[DOT]): Chain[DOT] =
+    chain :+ preArrow
+  def :=(rhs: Chain[DOT]): CompositionLaw[DOT] =
+    CompositionLaw(lhs = chain, rhs = rhs)
+
 case class CompositionLaw[DOT](
-  lhs: Seq[PreArrow[DOT]],
-  rhs: Seq[PreArrow[DOT]]
+  lhs: Chain[DOT],
+  rhs: Chain[DOT]
 )
 
 object CompositionLaw:

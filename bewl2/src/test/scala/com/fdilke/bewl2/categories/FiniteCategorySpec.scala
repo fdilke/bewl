@@ -28,4 +28,15 @@ class FiniteCategorySpec extends FunSuite:
   FiniteCategory[Int](1, 2)(
     FiniteCategory.SimplePreArrow[Int]("arrow", 1, 2)
   )()
+  
+  test("can model the retraction category"):
+    val retraction: PreArrow[Boolean] =
+      FiniteCategory.SimplePreArrow[Boolean]("retraction", true, false)
+    val section: PreArrow[Boolean] =
+      FiniteCategory.SimplePreArrow[Boolean]("section", false, true)
+    FiniteCategory[Boolean](true, false)(
+      retraction, section
+    )(
+      retraction o section := CompositionLaw.ONE
+    )
 
