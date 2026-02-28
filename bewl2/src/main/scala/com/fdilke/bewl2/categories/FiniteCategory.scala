@@ -11,7 +11,7 @@ type Chain[DOT] = Seq[PreArrow[DOT]]
 
 implicit def toChain[DOT](preArrow: PreArrow[DOT]): Chain[DOT] =
   Seq(preArrow)
-  
+
 extension[DOT](chain: Chain[DOT])
   infix def o(preArrow: PreArrow[DOT]): Chain[DOT] =
     chain :+ preArrow
@@ -33,10 +33,18 @@ class FiniteCategory[DOT](
 )(
   laws: CompositionLaw[DOT]*
 ):
+  def checkChain(chain: Chain[DOT]): Unit =
+    for { i <- chain.indices}
+      if (!arrows.contains(chain(i)))
+        throw new IllegalArgumentException("unknown arrow in chain")
+//      if (i > 0 && chain(i - 1).source != chain(i).target)
+//        throw new IllegalArgumentException("bad chain")
   for { arrow <- arrows }
     if (!((dots.contains(arrow.source)) && (dots.contains(arrow.target)))) {
       throw new IllegalArgumentException("source/target not listed")
     }
+  for { law <- laws }
+    { checkChain(law.lhs) ; checkChain(law.rhs) }
 
 object FiniteCategory:
   case class SimplePreArrow[DOT](

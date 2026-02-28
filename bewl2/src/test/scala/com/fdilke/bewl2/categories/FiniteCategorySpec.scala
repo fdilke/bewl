@@ -28,7 +28,7 @@ class FiniteCategorySpec extends FunSuite:
   FiniteCategory[Int](1, 2)(
     FiniteCategory.SimplePreArrow[Int]("arrow", 1, 2)
   )()
-  
+
   test("can model the retraction category"):
     val retraction: PreArrow[Boolean] =
       FiniteCategory.SimplePreArrow[Boolean]("retraction", true, false)
@@ -40,3 +40,12 @@ class FiniteCategorySpec extends FunSuite:
       retraction o section := CompositionLaw.ONE
     )
 
+  test("every arrow in a chain must have been listed"):
+    val notListed: PreArrow[Int] =
+      FiniteCategory.SimplePreArrow[Int]("notListed", 1, 2)
+    intercept[IllegalArgumentException]:
+      FiniteCategory[Int](1, 2)(
+        FiniteCategory.SimplePreArrow[Int]("arrow", 1, 2)
+      )(
+        notListed := notListed
+      )
