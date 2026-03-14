@@ -12,6 +12,15 @@ scalaVersion := "2.13.2"
 
 scalacOptions ++= Seq("-feature", "-deprecation")
 
+javacOptions ++= Seq("--release", "17")
+
+initialize := {
+  val _ = initialize.value
+  val javaVersion = sys.props("java.specification.version")
+  if (javaVersion != "17")
+    sys.error(s"Java 17 required. Found: $javaVersion")
+}
+
 resolvers += "Maven central" at "https://repo1.maven.org/maven2/"
 //resolvers += Resolver.sonatypeRepo("releases")
 resolvers +=

@@ -1,0 +1,46 @@
+*.class
+*.log
+nohup.out
+
+.vscode/
+.metals/
+.bloop/
+project/metals.sbt
+project/project/
+project/.bloop/
+
+scratch/
+.DS_Store
+config/
+project/build.properties
+
+# IDEA specific
+.idea/
+.bsp/
+
+# Eclipse specific
+.cache-main
+.cache-tests
+.classpath
+.project
+.settings/
+bin/
+
+# security specific
+keys/
+
+# sbt specific
+sbt
+.cache/
+.history/
+.lib/
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+
+# Scala-IDE specific
+.scala_dependencies
+.worksheet
